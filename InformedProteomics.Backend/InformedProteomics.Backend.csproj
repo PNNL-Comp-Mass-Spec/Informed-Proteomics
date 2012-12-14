@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{70A129AC-217A-4086-9ECB-63FF22289D90}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InformedProteomics.Backend</RootNamespace>
+    <AssemblyName>InformedProteomics.Backend</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DeconTools.Backend">
+      <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
+    </Reference>
+    <Reference Include="NETPrediction">
+      <HintPath>..\lib\NETPrediction.dll</HintPath>
+    </Reference>
+    <Reference Include="ProteinFileReader">
+      <HintPath>..\lib\ProteinFileReader.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data\DatabaseSubTarget.cs" />
+    <Compile Include="Data\DatabaseTarget.cs" />
+    <Compile Include="Utils\Feature.cs" />
+    <Compile Include="Utils\AminoAcid.cs" />
+    <Compile Include="Utils\AminoAcidSet.cs" />
+    <Compile Include="Utils\Atom.cs" />
+    <Compile Include="Utils\Composition.cs" />
+    <Compile Include="Utils\CompositionFactory.cs" />
+    <Compile Include="IMS\DriftRange.cs" />
+    <Compile Include="Utils\Enzyme.cs" />
+    <Compile Include="IMS\Frame.cs" />
+    <Compile Include="IMS\FrameSet.cs" />
+    <Compile Include="Utils\IMolecule.cs" />
+    <Compile Include="IMS\IMSData.cs" />
+    <Compile Include="IMS\IMSPrecursor.cs" />
+    <Compile Include="Database\IndexedDatabase.cs" />
+    <Compile Include="Utils\Ion.cs" />
+    <Compile Include="Scoring\IScorer.cs" />
+    <Compile Include="Scoring\IsopomerEnvScorer.cs" />
+    <Compile Include="Scoring\IsotopomerEnvScorer.cs" />
+    <Compile Include="Database\IStringEnumerator.cs" />
+    <Compile Include="Utils\IMatter.cs" />
+    <Compile Include="Utils\Modification.cs" />
+    <Compile Include="Utils\ModificationInstanceList.cs" />
+    <Compile Include="Utils\ModificationParam.cs" />
+    <Compile Include="Utils\ModifiedAminoAcid.cs" />
+    <Compile Include="Utils\ModParamSet.cs" />
+    <Compile Include="Utils\Peak.cs" />
+    <Compile Include="Utils\PeptideEnumerator.cs" />
+    <Compile Include="Utils\PeptideUtil.cs" />
+    <Compile Include="Utils\Precursor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Protein.cs" />
+    <Compile Include="Database\ProteinDatabase.cs" />
+    <Compile Include="Database\FastaDatabase.cs" />
+    <Compile Include="Scoring\ScoredSpectra.cs" />
+    <Compile Include="Scoring\Scorer.cs" />
+    <Compile Include="Utils\Sequence.cs" />
+    <Compile Include="Utils\SequenceEnumerator.cs" />
+    <Compile Include="Utils\SequenceLocation.cs" />
+    <Compile Include="Utils\SequenceType.cs" />
+    <Compile Include="Utils\SequenceVariant.cs" />
+    <Compile Include="Utils\Spectra.cs" />
+    <Compile Include="Utils\Spectrum.cs" />
+    <Compile Include="IMS\XIC.cs" />
+    <Compile Include="IMS\XICPeak.cs" />
+    <Compile Include="IMS\XICProfile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

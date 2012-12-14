@@ -1,0 +1,8 @@
+/.svn
+/packages
+*/bin/
+*/obj/
+*.user
+*.suo
+*.psess
+/.vs
