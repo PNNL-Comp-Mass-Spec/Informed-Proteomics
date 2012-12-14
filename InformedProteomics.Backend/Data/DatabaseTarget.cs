@@ -11,7 +11,6 @@ namespace InformedProteomics.Backend.Data
 	public class DatabaseTarget
 	{
 		private Sequence _sequence;
-		private List<TargetBase> _targetList;
 		private double _minMz;
 		private double _maxMz;
 		private short _minChargeState;
@@ -29,16 +28,14 @@ namespace InformedProteomics.Backend.Data
 			this._maxMz = maxMz;
 			this._minChargeState = minChargeState;
 			this._maxChargeState = maxChargeState;
-
-			_targetList = CreateTargets();
 		}
 
-		private List<TargetBase> CreateTargets()
+		public List<TargetBase> CreatePrecursorTargets()
 		{
 			List<TargetBase> targetList = new List<TargetBase>();
 
-			string sequenceString = this._sequence.SequenceStr;
-			string empiricalFormula = this._sequence.GetComposition().ToString();
+			string sequenceString = this._sequence.SequenceString;
+			string empiricalFormula = this._sequence.Composition.ToString();
 			double monoIsotopicMass = this._sequence.GetMass();
 			float normalizedElutionTime = PeptideUtil.CalculatePredictedElutionTime(sequenceString);
 
@@ -47,11 +44,11 @@ namespace InformedProteomics.Backend.Data
 			{
 				double mz = (monoIsotopicMass / chargeState) + Globals.PROTON_MASS;
 
-				// Move on to the next charge state if the m/z value is too small
-				if (mz < _minMz) continue;
+				// Move on to the next charge state if the m/z value is too large
+				if (mz > _maxMz) continue;
 
-				// Stop creating targets if the m/z is too large (already created all possible targets)
-				if (mz > _maxMz) break;
+				// Stop creating targets if the m/z is too small (already created all possible targets)
+				if (mz < _minMz) break;
 
 				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, empiricalFormula, monoIsotopicMass, mz, chargeState, normalizedElutionTime);
 				targetList.Add(target);
@@ -61,6 +58,5 @@ namespace InformedProteomics.Backend.Data
 
 			return targetList;
 		}
-
 	}
 }

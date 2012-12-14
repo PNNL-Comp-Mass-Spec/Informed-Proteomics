@@ -53,6 +53,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="alglibnet2">
+      <HintPath>..\lib\alglibnet2.dll</HintPath>
+    </Reference>
     <Reference Include="DeconEngineV2, Version=1.0.4408.30259, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconEngineV2.dll</HintPath>
@@ -70,6 +73,9 @@
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PNNLOmics">
+      <HintPath>..\lib\x86\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -100,6 +106,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="PNNLOmicsElementData.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="xerces-c_2_7.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -16,16 +16,17 @@ namespace InformedProteomics.Backend.Utils
                 composition += aa.Composition;
             }
 
-            Composition = composition;
+            this.Composition = composition;
         }
+
+		public Sequence (Composition composition, string sequence)
+		{
+			this.Composition = composition;
+			this.SequenceString = sequence;
+		}
 
         public Composition Composition { get; private set; }
-
-        public string SequenceStr
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+    	public string SequenceString { get; set; }
 
         public double GetMass()
         {
@@ -74,11 +75,6 @@ namespace InformedProteomics.Backend.Utils
             {
                 throw new NotImplementedException();
             }
-        }
-
-        public Composition GetComposition()
-        {
-            throw new NotImplementedException();
         }
     }
 }

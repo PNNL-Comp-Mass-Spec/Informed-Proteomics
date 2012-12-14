@@ -6,9 +6,7 @@ namespace InformedProteomics.Backend.Utils
     {
         #region Constructors
 
-        /// <summary>
-        /// Generate an amino acid map with 20 standard amino acids 
-        /// </summary>
+        // Generate an amino acid map with 20 standard amino acids
         public AminoAcidSet()
         {
             foreach (var aa in AminoAcid.StandardAminoAcidArr)
@@ -16,10 +14,7 @@ namespace InformedProteomics.Backend.Utils
             _numDynMods = 0;
         }
 
-        /// <summary>
-        /// Generate an amino acid map with Cys static modification
-        /// </summary>
-        /// <param name="cysMod"></param>
+        // Generate an amino acid map with Cys static modification
         public AminoAcidSet(Modification cysMod)
         {
             foreach (var aa in AminoAcid.StandardAminoAcidArr)

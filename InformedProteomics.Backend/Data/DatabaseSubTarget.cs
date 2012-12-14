@@ -20,6 +20,10 @@ namespace InformedProteomics.Backend.Data
 			this.NormalizedElutionTime = elutionTime;
 		}
 
+		/// <summary>
+		/// Returns the empirical formula. It was necessary to override this from DeconTools. Our version just returns the stored formula instead of calculating a new one.
+		/// </summary>
+		/// <returns></returns>
 		public override string GetEmpiricalFormulaFromTargetCode()
 		{
 			return this.EmpiricalFormula;

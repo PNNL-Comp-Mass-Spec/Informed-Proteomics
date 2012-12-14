@@ -95,7 +95,7 @@ namespace InformedProteomics
         /// <param name="modIndex">Modification index applied to the sequence</param>
         private void ComputeBestScore(int modIndex)
         {
-            Composition seqComp = _sequence.GetComposition() + _modParams.GetModificationComposition(modIndex);
+            Composition seqComp = _sequence.Composition + _modParams.GetModificationComposition(modIndex);
             float?[,] _score = new float?[_sequence.Count - 1, modIndex + 1];
 
             float?[] maxSeqScore = new float?[modIndex + 1];
