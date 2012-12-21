@@ -56,15 +56,11 @@
     <Reference Include="alglibnet2">
       <HintPath>..\lib\alglibnet2.dll</HintPath>
     </Reference>
-    <Reference Include="DeconEngineV2, Version=1.0.4408.30259, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\DeconTools\x86\DeconEngineV2.dll</HintPath>
-    </Reference>
-    <Reference Include="DeconTools.Backend, Version=1.0.4728.28346, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="DeconTools.Backend, Version=1.0.4735.28030, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
     </Reference>
-    <Reference Include="DeconTools.Workflows, Version=1.0.4728.28348, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="DeconTools.Workflows, Version=1.0.4735.28041, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Workflows.dll</HintPath>
     </Reference>
