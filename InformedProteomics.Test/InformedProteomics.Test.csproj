@@ -53,9 +53,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="alglibnet2">
-      <HintPath>..\lib\alglibnet2.dll</HintPath>
-    </Reference>
     <Reference Include="DeconTools.Backend, Version=1.0.4735.28030, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
