@@ -50,7 +50,7 @@ namespace InformedProteomics.Test
 			AminoAcidSet aminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
 			// TODO: Read in a peptide list?
-			List<string> peptideSequenceList = new List<string> { "GECQAEGVLFFQGDREWFWDLATGTMK" };
+			List<string> peptideSequenceList = new List<string> { "IFFHLNAVALGDGGHYTCR" };
 			foreach (string peptideSequence in peptideSequenceList)
 			{
 				IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
@@ -132,7 +132,7 @@ namespace InformedProteomics.Test
 			var workflowParameters = new UIMFTargetedMSMSWorkflowCollapseIMSParameters();
 
 			workflowParameters.AreaOfPeakToSumInDynamicSumming = 2;
-			workflowParameters.ChromatogramCorrelationIsPerformed = true;
+			workflowParameters.ChromatogramCorrelationIsPerformed = false;
 			workflowParameters.ChromGeneratorMode = Globals.ChromatogramGeneratorMode.MOST_ABUNDANT_PEAK;
 			workflowParameters.ChromGenSourceDataPeakBR = 2;
 			workflowParameters.ChromGenSourceDataSigNoise = 3;
