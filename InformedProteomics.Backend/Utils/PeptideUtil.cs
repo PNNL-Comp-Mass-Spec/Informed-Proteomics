@@ -8,11 +8,11 @@ namespace InformedProteomics.Backend.Utils
 {
 	public class PeptideUtil
 	{
-		private static readonly ElutionTimePredictionKrokhin _netPrediction;
+		private static readonly ElutionTimePredictionKangas _netPrediction;
 
 		static PeptideUtil()
 		{
-			_netPrediction = new ElutionTimePredictionKrokhin();
+			_netPrediction = new ElutionTimePredictionKangas();
 		}
 
 		/// <summary>
@@ -22,7 +22,12 @@ namespace InformedProteomics.Backend.Utils
 		/// <returns>The predicted normalized elution time value.</returns>
 		public static float CalculatePredictedElutionTime(String peptideString)
 		{
-			return _netPrediction.GetElutionTime(peptideString);
+			return _netPrediction.GetElutionTime(PrepareSequenceForNetPrediction(peptideString));
+		}
+
+		private static string PrepareSequenceForNetPrediction(string peptideSequence)
+		{
+			return peptideSequence.Replace('C', 'c');
 		}
 	}
 }
