@@ -2,8 +2,10 @@
 {
     public class Composition : IMolecule
     {
-        public static readonly Composition Zero = new Composition(0,0,0,0,0);
+        public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
 		public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
+		public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
+		public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
         public Composition(int c, int h, int n, int o, int s)
         {
