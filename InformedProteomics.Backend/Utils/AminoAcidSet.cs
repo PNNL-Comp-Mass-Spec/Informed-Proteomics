@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -9,9 +10,12 @@ namespace InformedProteomics.Backend.Utils
         // Generate an amino acid map with 20 standard amino acids
         public AminoAcidSet()
         {
-            foreach (var aa in AminoAcid.StandardAminoAcidArr)
-                _residueMap.Add(aa.Residue, new[] {aa});
-            _numDynMods = 0;
+			foreach (var aa in AminoAcid.StandardAminoAcidArr)
+			{
+				_residueMap.Add(aa.Residue, new[] {aa});
+			}
+
+        	_numDynMods = 0;
         }
 
         // Generate an amino acid map with Cys static modification
@@ -20,13 +24,15 @@ namespace InformedProteomics.Backend.Utils
             foreach (var aa in AminoAcid.StandardAminoAcidArr)
             {
                 AminoAcid cys = AminoAcid.GetStandardAminoAcid('C');
-                if (aa != cys)
-                    _residueMap.Add(aa.Residue, new[] {aa});
-                else
-                {
-                    var modCys = new AminoAcid('C', cysMod.Name + " C", cys.Composition + cysMod.Composition);
-                    _residueMap.Add('C', new[] {modCys});
-                }
+				if (aa != cys)
+				{
+					_residueMap.Add(aa.Residue, new[] {aa});
+				}
+				else
+				{
+					var modCys = new AminoAcid('C', cysMod.Name + " C", cys.Composition + cysMod.Composition);
+					_residueMap.Add('C', new[] { modCys });
+				}
             }
             _numDynMods = 0;
         }
@@ -55,9 +61,7 @@ namespace InformedProteomics.Backend.Utils
         public AminoAcid GetUnmodifiedAminoAcid(char residue)
         {
             AminoAcid[] aaArr = GetAminoAcids(residue);
-            if (aaArr == null)
-                return null;
-            return aaArr[0];
+			return aaArr == null ? null : aaArr[0];
         }
             
         public AminoAcid[] GetAminoAcids(char residue)
@@ -74,15 +78,18 @@ namespace InformedProteomics.Backend.Utils
                 foreach (char residue in sequence)
                 {
                     var aaArr = GetAminoAcids(residue);
-                    if (aaArr == null)
-                        return null;
-                    composition += aaArr[0].Composition;
+					if (aaArr == null)
+					{
+						return null;
+					}
+                	composition += aaArr[0].Composition;
                 }
 
                 return new[] {composition};
             }
+
             // TODO: not yet implemented
-            return null;
+            throw new NotImplementedException("Dynamic mods have not been implemented.");
         }
 
         //public AminoAcid[] GetAminoAcids(AminoAcid aa, SequenceLocation location)
