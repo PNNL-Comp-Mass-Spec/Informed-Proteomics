@@ -61,6 +61,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Workflows.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="MultiAlignEngine">
       <HintPath>..\lib\DeconTools\x86\MultiAlignEngine.dll</HintPath>
     </Reference>
@@ -100,9 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="PNNLOmicsElementData.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="xerces-c_2_7.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
