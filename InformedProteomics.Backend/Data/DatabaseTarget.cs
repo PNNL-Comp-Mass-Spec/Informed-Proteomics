@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.Data
 				// Stop creating targets if the m/z is too small (already created all possible targets)
 				if (mz < _minMz) break;
 
-				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, empiricalFormula, monoIsotopicMass, mz, chargeState, normalizedElutionTime);
+				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, empiricalFormula, monoIsotopicMass, mz, chargeState, normalizedElutionTime, 1);
 				targetList.Add(target);
 			}
 

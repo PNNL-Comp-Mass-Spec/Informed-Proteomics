@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data
 {
 	public class DatabaseSubTarget : TargetBase
 	{
-		public DatabaseSubTarget(String sequence, String empiricalFormula, double mass, double mz, short chargeState, float elutionTime) : base()
+		public DatabaseSubTarget(String sequence, String empiricalFormula, double mass, double mz, short chargeState, float elutionTime, int msLevel) : base()
 		{
 			this.Code = sequence;
 			this.EmpiricalFormula = empiricalFormula;
@@ -18,6 +18,7 @@ namespace InformedProteomics.Backend.Data
 			this.ChargeState = chargeState;
 			ElutionTimeUnit = Globals.ElutionTimeUnit.NormalizedElutionTime;
 			this.NormalizedElutionTime = elutionTime;
+			this.MsLevel = msLevel;
 		}
 
 		/// <summary>
