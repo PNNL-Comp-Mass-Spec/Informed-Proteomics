@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DeconTools.Backend;
 using DeconTools.Backend.Core;
+using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data
@@ -58,5 +59,25 @@ namespace InformedProteomics.Backend.Data
 
 			return targetList;
 		}
+
+		public List<TargetBase> CreateFragmentTargets(int maxChargeState)
+		{
+			List<TargetBase> targetList = new List<TargetBase>();
+
+			string sequenceString = this._sequence.SequenceString;
+			float normalizedElutionTime = PeptideUtil.CalculatePredictedElutionTime(sequenceString);
+
+			IEnumerable<Fragment> fragmentList = FragmentationUtil.FindFragmentsForPeptide(sequenceString, maxChargeState);
+
+			foreach (Fragment fragment in fragmentList)
+			{
+				string fragmentEmpFormula = IsotopicDistributionCalculator.Instance.GetAveragineFormulaAsString(fragment.Mass);
+
+				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, fragmentEmpFormula, fragment.Mass, fragment.Mz, (short)fragment.ChargeState, normalizedElutionTime, 2);
+				targetList.Add(target);
+			}
+
+			return targetList;
+		} 
 	}
 }

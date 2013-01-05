@@ -29,5 +29,10 @@ namespace InformedProteomics.Backend.Data
 		{
 			return this.EmpiricalFormula;
 		}
+
+		public override string ToString()
+		{
+			return string.Format("ID: {0}, MonoIsotopicMass: {1}, ChargeState: {2}, MZ: {3}, Code: {4}, MsLevel: {5}, NormalizedElutionTime: {6}", ID, MonoIsotopicMass, ChargeState, MZ, Code, MsLevel, NormalizedElutionTime);
+		}
 	}
 }

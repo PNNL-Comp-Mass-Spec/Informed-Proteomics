@@ -77,6 +77,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
     </Reference>
+    <Reference Include="MwtWinDll">
+      <HintPath>..\lib\MwtWinDll.dll</HintPath>
+    </Reference>
     <Reference Include="NETPrediction">
       <HintPath>..\lib\NETPrediction.dll</HintPath>
     </Reference>
@@ -94,6 +97,7 @@
   <ItemGroup>
     <Compile Include="Data\DatabaseSubTarget.cs" />
     <Compile Include="Data\DatabaseTarget.cs" />
+    <Compile Include="Data\Fragment.cs" />
     <Compile Include="Utils\Feature.cs" />
     <Compile Include="Utils\AminoAcid.cs" />
     <Compile Include="Utils\AminoAcidSet.cs" />
@@ -104,6 +108,7 @@
     <Compile Include="Utils\Enzyme.cs" />
     <Compile Include="IMS\Frame.cs" />
     <Compile Include="IMS\FrameSet.cs" />
+    <Compile Include="Utils\FragmentationUtil.cs" />
     <Compile Include="Utils\IMolecule.cs" />
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="IMS\IMSPrecursor.cs" />
