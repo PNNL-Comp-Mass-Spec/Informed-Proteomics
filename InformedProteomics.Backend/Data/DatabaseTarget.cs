@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.Data
 				// Stop creating targets if the m/z is too small (already created all possible targets)
 				if (mz < _minMz) break;
 
-				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, empiricalFormula, monoIsotopicMass, mz, chargeState, normalizedElutionTime, 1);
+				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, empiricalFormula, monoIsotopicMass, mz, chargeState, normalizedElutionTime);
 				targetList.Add(target);
 			}
 
@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.Data
 			{
 				string fragmentEmpFormula = IsotopicDistributionCalculator.Instance.GetAveragineFormulaAsString(fragment.Mass);
 
-				DatabaseSubTarget target = new DatabaseSubTarget(sequenceString, fragmentEmpFormula, fragment.Mass, fragment.Mz, (short)fragment.ChargeState, normalizedElutionTime, 2);
+				DatabaseSubTarget target = new DatabaseFragmentTarget(fragment, sequenceString, fragmentEmpFormula, normalizedElutionTime);
 				targetList.Add(target);
 			}
 

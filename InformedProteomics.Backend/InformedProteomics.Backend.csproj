@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\DatabaseFragmentTarget.cs" />
     <Compile Include="Data\DatabaseSubTarget.cs" />
     <Compile Include="Data\DatabaseTarget.cs" />
     <Compile Include="Data\Fragment.cs" />
