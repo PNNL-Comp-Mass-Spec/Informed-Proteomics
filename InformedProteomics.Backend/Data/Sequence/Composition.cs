@@ -1,4 +1,7 @@
-﻿namespace InformedProteomics.Backend.Utils
+using InformedProteomics.Backend.Data.Science;
+using InformedProteomics.Backend.Utils;
+
+namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Composition : IMolecule
     {

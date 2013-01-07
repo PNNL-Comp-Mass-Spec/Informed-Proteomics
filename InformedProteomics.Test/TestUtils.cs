@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DeconTools.Backend;
 using InformedProteomics.Backend.Data;
+using InformedProteomics.Backend.Data.Spectrometry;
 using MwtWinDll;
 
 namespace InformedProteomics.Backend.Utils

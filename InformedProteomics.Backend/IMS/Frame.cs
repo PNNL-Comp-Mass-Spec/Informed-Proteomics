@@ -1,4 +1,5 @@
-﻿using InformedProteomics.Backend.Utils;
+﻿using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.IMS
 {

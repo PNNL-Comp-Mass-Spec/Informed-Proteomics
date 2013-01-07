@@ -1,4 +1,5 @@
 using System;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Targets
 {

@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Science;
+using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Sequence : List<AminoAcid>, IMatter, IEnumerable<Composition>
     {

@@ -2,24 +2,25 @@ using System.Collections.Generic;
 using DeconTools.Backend;
 using DeconTools.Backend.Core;
 using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Targets
 {
 	public class DatabaseTarget
 	{
-		private Sequence _sequence;
+		private Sequence.Sequence _sequence;
 		private double _minMz;
 		private double _maxMz;
 		private short _minChargeState;
 		private short _maxChargeState;
 
-		public DatabaseTarget(Sequence sequence, short minChargeState, short maxChargeState)
+		public DatabaseTarget(Sequence.Sequence sequence, short minChargeState, short maxChargeState)
 			: this(sequence, double.MinValue, double.MaxValue, minChargeState, maxChargeState)
 		{
 		}
 
-		public DatabaseTarget(Sequence sequence, double minMz, double maxMz, short minChargeState, short maxChargeState)
+		public DatabaseTarget(Sequence.Sequence sequence, double minMz, double maxMz, short minChargeState, short maxChargeState)
 		{
 			this._sequence = sequence;
 			this._minMz = minMz;

@@ -1,4 +1,4 @@
-﻿namespace InformedProteomics.Backend.Data
+namespace InformedProteomics.Backend.Data.Spectrometry
 {
 	public class Fragment
 	{

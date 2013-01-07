@@ -1,8 +1,19 @@
-﻿namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class Precursor
+    public class Peak
     {
         public double Mass
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
+
+        public double Intensity
         {
             get
             {
@@ -23,5 +34,6 @@
             {
             }
         }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.Utils
+﻿using InformedProteomics.Backend.Data.Sequence;
+
+namespace InformedProteomics.Backend.Utils
 {
     public class CompositionFactory
     {

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.Data.Sequence
 {
     public class AminoAcidSet
     {

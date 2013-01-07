@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Science;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Scoring
