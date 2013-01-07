@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.Utils
+﻿using InformedProteomics.Backend.Data.Enum;
+
+namespace InformedProteomics.Backend.Utils
 {
     public class ModificationInstance
     {

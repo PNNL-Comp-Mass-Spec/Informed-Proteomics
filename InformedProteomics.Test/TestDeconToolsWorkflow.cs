@@ -8,6 +8,7 @@ using DeconTools.Backend.Core;
 using DeconTools.Backend.ProcessingTasks.ChromatogramProcessing;
 using DeconTools.Workflows.Backend.Core;
 using InformedProteomics.Backend.Data;
+using InformedProteomics.Backend.Data.Targets;
 using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;

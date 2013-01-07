@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Enum;
 
 namespace InformedProteomics.Backend.Utils
 {

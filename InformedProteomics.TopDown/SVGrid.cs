@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Scoring;
 using InformedProteomics.Backend.Utils;
 

@@ -95,10 +95,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\DatabaseFragmentTarget.cs" />
-    <Compile Include="Data\DatabaseSubTarget.cs" />
-    <Compile Include="Data\DatabaseTarget.cs" />
+    <Compile Include="Data\Enum\SequenceLocation.cs" />
+    <Compile Include="Data\Enum\SequenceType.cs" />
     <Compile Include="Data\Fragment.cs" />
+    <Compile Include="Data\Targets\DatabaseFragmentTarget.cs" />
+    <Compile Include="Data\Targets\DatabaseSubTarget.cs" />
+    <Compile Include="Data\Targets\DatabaseTarget.cs" />
     <Compile Include="Utils\Feature.cs" />
     <Compile Include="Utils\AminoAcid.cs" />
     <Compile Include="Utils\AminoAcidSet.cs" />
@@ -137,8 +139,6 @@
     <Compile Include="Scoring\Scorer.cs" />
     <Compile Include="Utils\Sequence.cs" />
     <Compile Include="Utils\SequenceEnumerator.cs" />
-    <Compile Include="Utils\SequenceLocation.cs" />
-    <Compile Include="Utils\SequenceType.cs" />
     <Compile Include="Utils\SequenceVariant.cs" />
     <Compile Include="Utils\Spectra.cs" />
     <Compile Include="Utils\Spectrum.cs" />

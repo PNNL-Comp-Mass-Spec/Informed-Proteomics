@@ -1,4 +1,4 @@
-﻿namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.Data.Enum
 {
     public enum SequenceLocation
     {
