@@ -103,6 +103,8 @@
     <Compile Include="Data\Biology\IMolecule.cs" />
     <Compile Include="Data\Biology\Ion.cs" />
     <Compile Include="Data\Biology\Protein.cs" />
+    <Compile Include="Data\Results\DatabaseFragmentTargetResult.cs" />
+    <Compile Include="Data\Results\DatabaseSubTargetResult.cs" />
     <Compile Include="Data\Sequence\AminoAcid.cs" />
     <Compile Include="Data\Sequence\AminoAcidSet.cs" />
     <Compile Include="Data\Sequence\Composition.cs" />

@@ -58,21 +58,34 @@ namespace InformedProteomics.Backend.Data.Targets
 			return targetList;
 		}
 
-		public List<TargetBase> CreateFragmentTargets(int maxChargeState)
+		public List<TargetBase> CreateFragmentTargets(float elutionTime, int maxChargeState)
 		{
 			List<TargetBase> targetList = new List<TargetBase>();
 
 			string sequenceString = this._sequence.SequenceString;
-			float normalizedElutionTime = PeptideUtil.CalculatePredictedElutionTime(sequenceString);
+			float normalizedElutionTime = elutionTime;
 
-			IEnumerable<Fragment> fragmentList = FragmentationUtil.FindFragmentsForPeptide(sequenceString, maxChargeState);
+			IEnumerable<Fragment> fragmentList = FragmentationUtil.FindFragmentsForPeptide(sequenceString, 1);
 
 			foreach (Fragment fragment in fragmentList)
 			{
-				string fragmentEmpFormula = IsotopicDistributionCalculator.Instance.GetAveragineFormulaAsString(fragment.Mass);
+				double fragmentMass = fragment.Mass;
+				string fragmentEmpFormula = IsotopicDistributionCalculator.Instance.GetAveragineFormulaAsString(fragmentMass);
 
-				DatabaseSubTarget target = new DatabaseFragmentTarget(fragment, sequenceString, fragmentEmpFormula, normalizedElutionTime);
-				targetList.Add(target);
+				for (short chargeState = 1; chargeState <= maxChargeState; chargeState++)
+				{
+					double mz = (fragmentMass / chargeState) + Globals.PROTON_MASS;
+
+					// Move on to the next charge state if the m/z value is too large
+					if (mz > _maxMz) continue;
+
+					// Stop creating targets if the m/z is too small (already created all possible targets)
+					if (mz < _minMz) break;
+
+					Fragment newFragment = new Fragment { ChargeState = chargeState, IonSymbol = fragment.IonSymbol, IonType = fragment.IonType, Mass = fragment.Mass, Mz = mz, ResidueNumber = fragment.ResidueNumber };
+					DatabaseSubTarget target = new DatabaseFragmentTarget(newFragment, sequenceString, fragmentEmpFormula, normalizedElutionTime);
+					targetList.Add(target);
+				}
 			}
 
 			return targetList;

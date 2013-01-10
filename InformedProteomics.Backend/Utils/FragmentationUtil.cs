@@ -23,8 +23,8 @@ namespace InformedProteomics.Backend.Utils
 
 			MWPeptideClass.udtIonTypeOptionsType[] ionTypeOptions = new MWPeptideClass.udtIonTypeOptionsType[5];
 			ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itAIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true, NeutralLossWater = false, NeutralLossAmmonia = false };
-			ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itBIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true, NeutralLossWater = false, NeutralLossAmmonia = false };
-			ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itYIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true, NeutralLossWater = false, NeutralLossAmmonia = false };
+			ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itBIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true, NeutralLossWater = true, NeutralLossAmmonia = true };
+			ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itYIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true, NeutralLossWater = true, NeutralLossAmmonia = true };
 			//ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itCIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true };
 			//ionTypeOptions[(int)MWPeptideClass.itIonTypeConstants.itZIon] = new MWPeptideClass.udtIonTypeOptionsType { ShowIon = true };
 
@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Utils
 			m_fragmentationOptions.DoubleChargeIonsShow = true;
 			m_fragmentationOptions.TripleChargeIonsShow = true;
 			m_fragmentationOptions.IntensityOptions.BYIonShoulder = 0;
-			//m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itAIon] = 100;
+			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itAIon] = 100;
 			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itBIon] = 100;
 			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itYIon] = 100;
 			//fragmentationOptions.IntensityOptions.IonType[(int)MWPeptideClass.itIonTypeConstants.itCIon] = 100;
