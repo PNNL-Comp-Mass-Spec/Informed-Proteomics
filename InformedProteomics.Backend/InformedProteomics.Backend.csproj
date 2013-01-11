@@ -73,6 +73,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="alglibnet2, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\alglibnet2.dll</HintPath>
+    </Reference>
     <Reference Include="DeconTools.Backend, Version=1.0.4735.28030, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
@@ -104,6 +108,7 @@
     <Compile Include="Data\Biology\Ion.cs" />
     <Compile Include="Data\Biology\Protein.cs" />
     <Compile Include="Data\Results\DatabaseFragmentTargetResult.cs" />
+    <Compile Include="Data\Results\DatabaseMultipleSubTargetResult.cs" />
     <Compile Include="Data\Results\DatabaseSubTargetResult.cs" />
     <Compile Include="Data\Sequence\AminoAcid.cs" />
     <Compile Include="Data\Sequence\AminoAcidSet.cs" />
@@ -128,6 +133,7 @@
     <Compile Include="IMS\DriftRange.cs" />
     <Compile Include="IMS\Frame.cs" />
     <Compile Include="IMS\FrameSet.cs" />
+    <Compile Include="Utils\DataUtil.cs" />
     <Compile Include="Utils\FragmentationUtil.cs" />
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="IMS\IMSPrecursor.cs" />
