@@ -94,6 +94,7 @@ namespace InformedProteomics.Test
 					List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
 					UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
 					Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
+					int maxChargeStateOfPrecursor = 0;
 
 					foreach (var precursorTargetedResultBase in precursorResultList)
 					{
@@ -116,11 +117,14 @@ namespace InformedProteomics.Test
 							XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
 							precursorProfileData.NormalizeYData();
 							XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
+							int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
 
 							// TODO: Remove this hard-coded filter
 							//if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
 
 							DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile);
+
+							if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
 
 							// Find out if this result relates to a previous result
 							bool foundMatch = false;

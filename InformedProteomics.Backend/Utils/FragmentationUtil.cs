@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using DeconTools.Backend;
+using DeconTools.Backend.Core;
 using InformedProteomics.Backend.Data;
+using InformedProteomics.Backend.Data.Results;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MwtWinDll;
 
@@ -70,6 +72,35 @@ namespace InformedProteomics.Backend.Utils
 			}
 
 			return theoreticalFragments;
+		}
+
+		public static List<TargetedResultBase> FilterFragmentResultList(List<TargetedResultBase> fragmentResultList)
+		{
+			List<TargetedResultBase> filteredList = new List<TargetedResultBase>();
+
+			foreach (var fragmentTargetedResultBase in fragmentResultList)
+			{
+				if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
+				{
+					continue;
+				}
+				if (fragmentTargetedResultBase.FailedResult)
+				{
+					continue;
+				}
+
+				List<ChromPeakQualityData> newPeakQualityDataList = fragmentTargetedResultBase.ChromPeakQualityList.Where(fragmentPeakQualityData => fragmentPeakQualityData.FitScore <= 0.3).ToList();
+
+				if(!newPeakQualityDataList.Any())
+				{
+					continue;
+				}
+
+				fragmentTargetedResultBase.ChromPeakQualityList = newPeakQualityDataList;
+				filteredList.Add(fragmentTargetedResultBase);
+			}
+
+			return filteredList;
 		}
 	}
 }
