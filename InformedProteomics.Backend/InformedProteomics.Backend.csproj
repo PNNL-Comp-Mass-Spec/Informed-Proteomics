@@ -134,6 +134,7 @@
     <Compile Include="IMS\Frame.cs" />
     <Compile Include="IMS\FrameSet.cs" />
     <Compile Include="Utils\DataUtil.cs" />
+    <Compile Include="Utils\DtaUtil.cs" />
     <Compile Include="Utils\FragmentationUtil.cs" />
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="IMS\IMSPrecursor.cs" />

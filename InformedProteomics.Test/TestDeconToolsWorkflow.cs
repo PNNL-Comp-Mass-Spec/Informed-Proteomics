@@ -61,6 +61,8 @@ namespace InformedProteomics.Test
 			double intercept;
 			double rSquared;
 
+			TextWriter dtaWriter = new StreamWriter("test_dta.txt");
+
 			AminoAcidSet aminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
 			// TODO: Read in a peptide list?
@@ -163,7 +165,7 @@ namespace InformedProteomics.Test
 						UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
 						Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
 
-						foreach (var fragmentTargetedResultBase in fragmentResultList)
+						foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
 						{
 							if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
 							{
@@ -176,7 +178,7 @@ namespace InformedProteomics.Test
 
 							DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
 
-							foreach (var fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
+							foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
 							{
 								if (fragmentPeakQualityData.FitScore > 0.3) continue;
 
@@ -200,17 +202,12 @@ namespace InformedProteomics.Test
 							}
 						}
 
-						foreach (DatabaseFragmentTargetResult fragmentResult in result.FragmentResultList)
-						{
-							List<MSPeak> isotopicPeakList = fragmentResult.PeakQualityData.IsotopicProfile.Peaklist;
-							foreach (MSPeak msPeak in isotopicPeakList)
-							{
-								Console.WriteLine(msPeak.XValue + "\t\t" + msPeak.Height);
-							}
-						}
+						DtaUtil.AppendToDtaFile(result, dtaWriter);
 					}
 				}
 			}
+
+			dtaWriter.Close();
 		}
 
 		[Test]
