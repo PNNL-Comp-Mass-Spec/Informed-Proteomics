@@ -8,13 +8,30 @@ using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.Data.Results
 {
+	/// <summary>
+	/// Contains information related to the resulting search for a single target.
+	/// </summary>
 	public class DatabaseSubTargetResult
 	{
+		/// <summary>
+		/// The original target, not including the specific charge state.
+		/// </summary>
 		public DatabaseTarget DatabaseTarget { get; private set; }
+
+		/// <summary>
+		/// The actual target that was used.
+		/// </summary>
 		public DatabaseSubTarget DatabaseSubTarget { get; private set; }
+
+		/// <summary>
+		/// XY data points that repesent the elution profile for this target.
+		/// </summary>
 		public XYData XYData { get; private set; }
+
+		/// <summary>
+		/// Information related to the elution profile for this target.
+		/// </summary>
 		public XICProfile XICProfile { get; private set; }
-		public IList<DatabaseFragmentTargetResult> FragmentResultList { get; set; } 
 
 		public DatabaseSubTargetResult(DatabaseSubTarget subTarget, DatabaseTarget databaseTarget, XYData xyData, XICProfile xicProfile)
 		{
@@ -22,7 +39,6 @@ namespace InformedProteomics.Backend.Data.Results
 			this.DatabaseTarget = databaseTarget;
 			this.XYData = xyData;
 			this.XICProfile = xicProfile;
-			this.FragmentResultList = new List<DatabaseFragmentTargetResult>();
 		}
 	}
 }

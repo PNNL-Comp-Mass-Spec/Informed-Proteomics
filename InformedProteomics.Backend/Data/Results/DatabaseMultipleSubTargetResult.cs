@@ -5,12 +5,35 @@ using System.Text;
 
 namespace InformedProteomics.Backend.Data.Results
 {
+	/// <summary>
+	/// Contains all the results for a peptide target at a specific elution time. 
+	/// If the peptide target was found in multiple elution times, then there will be more than 1 of these objects created.
+	/// </summary>
 	public class DatabaseMultipleSubTargetResult
 	{
+		/// <summary>
+		/// The specific elution time of this result
+		/// </summary>
 		public double ElutionTime { get; private set; }
+
+		/// <summary>
+		/// Each Precursor target result that is attached to this result. Should be 1 per charge state found.
+		/// </summary>
 		public List<DatabaseSubTargetResult> SubTargetResultList { get; private set; }
+
+		/// <summary>
+		/// List of charge states that were discovered when looking for the precursor targets.
+		/// </summary>
 		public List<int> ChargeStateList { get; private set; }
+
+		/// <summary>
+		/// The respresentative precursor target result. This is the most intense precursor discovered.
+		/// </summary>
 		public DatabaseSubTargetResult PrecursorResultRep { get; private set; }
+
+		/// <summary>
+		/// List of Fragment results.
+		/// </summary>
 		public IList<DatabaseFragmentTargetResult> FragmentResultList { get; set; } 
 
 		public DatabaseMultipleSubTargetResult(DatabaseSubTargetResult result)
@@ -22,6 +45,11 @@ namespace InformedProteomics.Backend.Data.Results
 			this.FragmentResultList = new List<DatabaseFragmentTargetResult>();
 		}
 
+		/// <summary>
+		/// Checks to see if a new precursor target result fits in with this result object.
+		/// </summary>
+		/// <param name="result">The precursor target result to test.</param>
+		/// <returns>True if the new result belongs, false otherwise.</returns>
 		public bool DoesNewResultBelong(DatabaseSubTargetResult result)
 		{
 			double elutionTime = result.XICProfile.ApexPeak.NormalizedElutionTime;
@@ -42,6 +70,10 @@ namespace InformedProteomics.Backend.Data.Results
 			return false;
 		}
 
+		/// <summary>
+		/// Adds a new precursor result to this result. This method will update the list of charge states, average elution time, and the representative precursor.
+		/// </summary>
+		/// <param name="result"></param>
 		public void AddNewResult(DatabaseSubTargetResult result)
 		{
 			this.SubTargetResultList.Add(result);
