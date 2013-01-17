@@ -2,11 +2,34 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
 	public class Fragment
 	{
+		/// <summary>
+		/// The charge state of the fragment.
+		/// </summary>
 		public int ChargeState { get; set; }
+
+		/// <summary>
+		/// The m/z of the fragment.
+		/// </summary>
 		public double Mz { get; set; }
+
+		/// <summary>
+		/// The mass of the fragment.
+		/// </summary>
 		public double Mass { get; set; }
+
+		/// <summary>
+		/// If this fragment is y6, the IonType is y
+		/// </summary>
 		public string IonType { get; set; }
+
+		/// <summary>
+		/// The index of the residue this fragment breaks the peptide at.
+		/// </summary>
 		public int ResidueNumber { get; set; }
+
+		/// <summary>
+		/// The full ion symbol of the fragment. e.g. y6 or y6++ or y6-H2O++
+		/// </summary>
 		public string IonSymbol { get; set; }
 
 		public bool Equals(Fragment other)
