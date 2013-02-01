@@ -16,7 +16,14 @@ namespace InformedProteomics.Backend.Utils
 		public static void AppendToDtaFile(DatabaseMultipleSubTargetResult result, TextWriter dtaWriter)
 		{
 			string dtaString = CreateSingleDtaEntry(result);
-			dtaWriter.WriteLine(dtaString);
+
+			// Only write out valid strings
+			if(dtaString != null && !dtaString.Equals(""))
+			{
+				dtaWriter.WriteLine(dtaString);
+			}
+
+			// Flush the DTA so it can be read immediately
 			dtaWriter.Flush();
 		}
 
@@ -44,11 +51,22 @@ namespace InformedProteomics.Backend.Utils
 
 			foreach (DatabaseFragmentTargetResult fragmentResult in result.FragmentResultList)
 			{
+				if (fragmentResult == null || fragmentResult.PeakQualityData == null || fragmentResult.PeakQualityData.IsotopicProfile == null || fragmentResult.PeakQualityData.IsotopicProfile.Peaklist == null) continue;
 				msPeakList.AddRange(fragmentResult.PeakQualityData.IsotopicProfile.Peaklist);
 			}
 
+			// If no peaks, don't return the dta string
+			if(!msPeakList.Any())
+			{
+				return "";
+			}
+
+			double previousXValue = 0;
 			foreach (var msPeak in msPeakList.OrderBy(x => x.XValue))
 			{
+				if (Math.Abs(msPeak.XValue - previousXValue) < 0.001) continue;
+				previousXValue = msPeak.XValue;
+
 				dtaString.AppendLine(msPeak.XValue + " " + msPeak.Height);
 			}
 

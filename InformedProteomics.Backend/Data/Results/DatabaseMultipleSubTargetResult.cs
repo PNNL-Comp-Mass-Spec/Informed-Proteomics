@@ -17,6 +17,11 @@ namespace InformedProteomics.Backend.Data.Results
 		public double ElutionTime { get; private set; }
 
 		/// <summary>
+		/// The best isotopic fit score for this result, as calculated by DeconTools
+		/// </summary>
+		public double IsotopicFitScore { get; private set; }
+
+		/// <summary>
 		/// Each Precursor target result that is attached to this result. Should be 1 per charge state found.
 		/// </summary>
 		public List<DatabaseSubTargetResult> SubTargetResultList { get; private set; }
@@ -43,6 +48,7 @@ namespace InformedProteomics.Backend.Data.Results
 			this.ChargeStateList = new List<int> { result.DatabaseSubTarget.ChargeState };
 			this.PrecursorResultRep = result;
 			this.FragmentResultList = new List<DatabaseFragmentTargetResult>();
+			this.IsotopicFitScore = result.IsotopicFitScore;
 		}
 
 		/// <summary>
@@ -83,6 +89,11 @@ namespace InformedProteomics.Backend.Data.Results
 			if(result.XICProfile.ApexPeak.Intensity > this.PrecursorResultRep.XICProfile.ApexPeak.Intensity)
 			{
 				this.PrecursorResultRep = result;
+			}
+
+			if(result.IsotopicFitScore < this.IsotopicFitScore)
+			{
+				this.IsotopicFitScore = result.IsotopicFitScore;
 			}
 		}
 

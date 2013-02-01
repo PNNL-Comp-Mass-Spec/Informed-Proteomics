@@ -37,12 +37,24 @@ namespace InformedProteomics.Test
 		[Test]
 		public void TestTargetPeptideAndFragments()
 		{
+			TextWriter textWriter = new StreamWriter("fragmentData.csv");
+			textWriter.WriteLine("Sequence,EmpFormula,NET,Charge,Fit,Fragment,FragmentCharge,RSquared,FragmentFit");
+
+			//string line = "ion";
+			//for(int i = 509; i <= 527; i+=2)
+			//{
+			//    line += "," + i;
+			//}
+			//textWriter.WriteLine(line);
+
 			short minChargeState = 1;
 			short maxChargeState = 5;
 			double minMz = 200;
 			double maxMz = 2500;
 
-			string datasetPath = @"\\protoapps\UserData\Slysz\Standard_Testing\Targeted_FeatureFinding\UIMF_Targeted_MSMS_Testing\RawData\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo.UIMF";
+			//string datasetPath = @"\\protoapps\UserData\Slysz\Standard_Testing\Targeted_FeatureFinding\UIMF_Targeted_MSMS_Testing\RawData\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo.UIMF";
+			//string datasetPath = @"\\protoapps\UserData\Slysz\Standard_Testing\Targeted_FeatureFinding\UIMF_Targeted_MSMS_Testing\RawData\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Collision_Energy_Collapsed.UIMF";
+			string datasetPath = @"D:\Development\Source\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
 
 			var executorParameters = CreateWorkflowExecutorParameters();
 			var workflowParameters = CreateWorkflowParameters();
@@ -66,7 +78,10 @@ namespace InformedProteomics.Test
 			AminoAcidSet aminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
 			// TODO: Read in a peptide list?
-			List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
+			//List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
+			List<string> peptideSequenceList = new List<string> { "YICDNQDTISSK" };
+			//IEnumerable<string> peptideSequenceList = ReadPeptideList(@"../../../TestFiles/BSA.txt");
+			
 			foreach (string peptideSequence in peptideSequenceList)
 			{
 				IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
@@ -100,12 +115,15 @@ namespace InformedProteomics.Test
 
 					foreach (var precursorTargetedResultBase in precursorResultList)
 					{
+						//Console.WriteLine("Checking Target...");
 						if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
 						{
+							//Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
 							continue;
 						}
 						if (precursorTargetedResultBase.FailedResult)
 						{
+							//Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
 							continue;
 						}
 
@@ -113,18 +131,22 @@ namespace InformedProteomics.Test
 
 						foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
 						{
-							if (precursorPeakQualityData.FitScore > 0.3) continue;
+							if (precursorPeakQualityData.FitScore > 0.4) continue;
 
 							ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
 							XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
 							precursorProfileData.NormalizeYData();
 							XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
 							int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
+							//Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+
+							// I don't believe any peaks that are not wide enough to be valid peptides
+							if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 20) continue;
 
 							// TODO: Remove this hard-coded filter
 							//if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
 
-							DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile);
+							DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
 
 							if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
 
@@ -155,7 +177,8 @@ namespace InformedProteomics.Test
 						int chargeStateToSearch = result.ChargeStateList.Max();
 						double elutionTime = result.ElutionTime;
 
-						Console.WriteLine("Targeting NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+						//Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+						//precursorProfileData.Display();
 
 						// Create fragment targets
 						fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
@@ -167,35 +190,49 @@ namespace InformedProteomics.Test
 
 						foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
 						{
+							DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
+							//Console.WriteLine(fragmentTarget.Fragment.ToString());
+
 							if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
 							{
+								//Console.WriteLine(fragmentTargetedResultBase.ErrorDescription);
 								continue;
 							}
 							if (fragmentTargetedResultBase.FailedResult)
 							{
+								//Console.WriteLine("Failed Result.");
 								continue;
 							}
 
-							DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
-
 							foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
 							{
-								if (fragmentPeakQualityData.FitScore > 0.3) continue;
+								//Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
+								if (fragmentPeakQualityData.FitScore > 0.5) continue;
+								//if (fragmentPeakQualityData.FitScore >= 1) continue;
 
 								ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
 								XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
 								fragmentProfileData.NormalizeYData();
 								XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
 
-								DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
 								//Console.WriteLine(fragmentTarget.Fragment.ToString());
 								//Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+								DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
 								//Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
 								//fragmentProfileData.Display();
 
-								if (rSquared >= 0.5)
+								//String label = fragmentTarget.Fragment.IonSymbol;
+								//for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
+								//{
+								//    label += "+";
+								//}
+
+								//WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
+
+								if (rSquared >= 0.4)
 								{
-									Console.WriteLine(fragmentTarget.Fragment.ToString());
+									textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
+									//Console.WriteLine(fragmentTarget.Fragment.ToString());
 									DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
 									result.FragmentResultList.Add(fragmentResult);
 								}
@@ -208,6 +245,7 @@ namespace InformedProteomics.Test
 			}
 
 			dtaWriter.Close();
+			textWriter.Close();
 		}
 
 		[Test]
@@ -408,6 +446,67 @@ namespace InformedProteomics.Test
 					}
 				}
 			}
+		}
+
+		private IEnumerable<string> ReadPeptideList(string fileLocation)
+		{
+			List<string> peptideList = new List<string>();
+
+			TextReader textReader = new StreamReader(fileLocation);
+
+			string line = "";
+			while ((line = textReader.ReadLine()) != null)
+			{
+				// If peptide in form of X.PEPTIDE.X, then grab the PEPTIDE string
+				if(line.Contains("."))
+				{
+					line = line.Split('.')[1];
+				}
+
+				// Cannot yet handle this mod
+				if (line.Contains("@")) continue;
+
+				// Remove the "!" since C is a static mod that is already expected
+				line = line.Replace("!", "");
+
+				peptideList.Add(line);
+			}
+
+			textReader.Close();
+
+			return peptideList;
+		}
+
+		private void WriteFragmentProfileToFile(XYData xyData, String label, TextWriter textWriter, int minXValue, int maxXValue)
+		{
+			String line = label;
+
+			double[] xValues = xyData.Xvalues;
+			double[] yValues = xyData.Yvalues;
+
+			Dictionary<double, double> dictionary = new Dictionary<double, double>();
+			for (double i = minXValue; i <= maxXValue; i+=2)
+			{
+				dictionary.Add(i, 0);
+			}
+
+			for (int i = 0; i < xValues.Length; i++)
+			{
+				// Since these are fragments, the x value should be 1 less (to be same as precursor)
+				double xValue = xValues[i] + 1;
+
+				// Only consider values that are within range
+				if (xValue < minXValue || xValue > maxXValue) continue;
+
+				dictionary[xValue] = yValues[i];
+			}
+
+			foreach (var value in dictionary.Values)
+			{
+				line += "," + value;
+			}
+
+			textWriter.WriteLine(line);
 		}
 	}
 }

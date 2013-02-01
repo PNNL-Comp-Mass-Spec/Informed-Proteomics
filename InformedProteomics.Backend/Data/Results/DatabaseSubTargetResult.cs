@@ -24,6 +24,11 @@ namespace InformedProteomics.Backend.Data.Results
 		public DatabaseSubTarget DatabaseSubTarget { get; private set; }
 
 		/// <summary>
+		/// The isotopic fit score, as calculated by DeconTools
+		/// </summary>
+		public double IsotopicFitScore { get; private set; }
+
+		/// <summary>
 		/// XY data points that repesent the elution profile for this target.
 		/// </summary>
 		public XYData XYData { get; private set; }
@@ -33,12 +38,13 @@ namespace InformedProteomics.Backend.Data.Results
 		/// </summary>
 		public XICProfile XICProfile { get; private set; }
 
-		public DatabaseSubTargetResult(DatabaseSubTarget subTarget, DatabaseTarget databaseTarget, XYData xyData, XICProfile xicProfile)
+		public DatabaseSubTargetResult(DatabaseSubTarget subTarget, DatabaseTarget databaseTarget, XYData xyData, XICProfile xicProfile, double isotopicFitScore)
 		{
 			this.DatabaseSubTarget = subTarget;
 			this.DatabaseTarget = databaseTarget;
 			this.XYData = xyData;
 			this.XICProfile = xicProfile;
+			this.IsotopicFitScore = isotopicFitScore;
 		}
 	}
 }
