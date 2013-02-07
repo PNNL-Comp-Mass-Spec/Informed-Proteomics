@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Utils
 			chromatogramCorrelator.GetElutionCorrelationData(profile1, alignedProfile, out slope, out intercept, out rSquared);
 		}
 
-		private static XYData AlignXYData(XYData referenceProfile, XYData profileToAlign, int diffBetweenXValues)
+		public static XYData AlignXYData(XYData referenceProfile, XYData profileToAlign, int diffBetweenXValues)
 		{
 			double[] referenceXValues = referenceProfile.Xvalues;
 			double[] oldYValues = profileToAlign.Yvalues;
