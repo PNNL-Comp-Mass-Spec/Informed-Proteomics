@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Science;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.IMS

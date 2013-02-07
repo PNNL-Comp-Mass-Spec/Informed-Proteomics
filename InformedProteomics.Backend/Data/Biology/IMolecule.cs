@@ -1,6 +1,6 @@
 using InformedProteomics.Backend.Data.Sequence;
 
-namespace InformedProteomics.Backend.Data.Science
+namespace InformedProteomics.Backend.Data.Biology
 {
     public interface IMolecule : IMatter
     {

@@ -18,7 +18,7 @@ namespace InformedProteomics
         private readonly Sequence _sequence;
         private readonly Composition[] _prefixCompArr;
 
-        private readonly ScoredSpectra _scorer;
+        //private readonly ScoredSpectra _scorer;
         private readonly ModificationParams _modParams;
         private readonly int _maxModIndex;
 
@@ -45,7 +45,7 @@ namespace InformedProteomics
         #endregion
 
 
-        public SequenceVariantSet(Sequence sequence, ModificationParams modParams, ScoredSpectra scorer)
+        public SequenceVariantSet(Sequence sequence, ModificationParams modParams) //, ScoredSpectra scorer)
         {
             _sequence = sequence;
             _prefixCompArr = new Composition[_sequence.Count - 1];
@@ -54,7 +54,7 @@ namespace InformedProteomics
                 _prefixCompArr[i] = _prefixCompArr[i - 1] + _sequence[i].Composition;
 
             _modParams = modParams;
-            _scorer = scorer;
+            //_scorer = scorer;
 
             _maxModIndex = _modParams.GetNumMassShifts();
 
@@ -139,7 +139,8 @@ namespace InformedProteomics
                             float? cutScore = _score[i,curModIndex];
                             if (cutScore == null)
                             {
-                                cutScore = _scorer.GetProductIonScore(_prefixCompArr[i] + _modParams.GetModificationComposition(curModIndex), seqComp);
+                                //cutScore = _scorer.GetProductIonScore(_prefixCompArr[i] + _modParams.GetModificationComposition(curModIndex), seqComp);
+                                cutScore = 0;
                                 _score[i, curModIndex] = cutScore;
                                 newMaxSeqScore[curModIndex] = maxSeqScore[prevModIndex] + cutScore;
                             }

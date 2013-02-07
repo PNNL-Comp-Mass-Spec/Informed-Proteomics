@@ -13,8 +13,8 @@ namespace InformedProteomics
         public IEnumerable<Sequence> Sequences { get; set; }
         public int MinCharge { get; set; }
         public int MaxCharge { get; set; }
-        public ScoredSpectra Spectra { get; set; }
-        public ScoredSpectra Scorer { get; set; }
+        //public ScoredSpectra Spectra { get; set; }
+        //public ScoredSpectra Scorer { get; set; }
 
         public void ICTopdown()
         {
