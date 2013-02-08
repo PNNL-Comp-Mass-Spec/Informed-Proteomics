@@ -1,6 +1,6 @@
 ﻿namespace InformedProteomics.Backend.Scoring
 {
-    class SpectrumParameter
+    class CorrelationCoefficientProbabilityTrainer
     {
     }
 }

@@ -2,7 +2,7 @@
 
 namespace InformedProteomics.Backend.Scoring
 {
-    public static class ScoreParameter
+    public static class SubScoreFactory
     {
         public static void Read(string fileName)
         {

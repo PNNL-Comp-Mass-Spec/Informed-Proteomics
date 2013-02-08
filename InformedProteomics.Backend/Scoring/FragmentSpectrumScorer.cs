@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace InformedProteomics.Backend.Scoring
 {
-    class SpectrumScorer
+    class FragmentSpectrumScorer
     {
         public Dictionary<IonType, double>[] SpectraPerFragment { get; private set; }
         public char PrecedingAa { get; private set; }
         public char SucceedingAa { get; private set; }
         public float Score { get; private set; }
         public List<IonType> UsedIons { get; private set; }
- 
-        public SpectrumScorer(Dictionary<IonType, double>[] spectraPerFragment, char precedingAA, char succeedingAA)
+        public int BestSpectrumIndex { get; private set; }
+
+        public FragmentSpectrumScorer(Dictionary<IonType, double>[] spectraPerFragment)
         {
             SpectraPerFragment = spectraPerFragment;
-            PrecedingAa = precedingAA;
-            SucceedingAa = succeedingAA;
             Score = GetScore();
         }
 
@@ -23,8 +21,9 @@ namespace InformedProteomics.Backend.Scoring
         {
             var score = -50f;
             UsedIons = new List<IonType>();
-            foreach (var t in SpectraPerFragment)
+            for(var i=0;i<SpectraPerFragment.Length;i++)
             {
+                var t = SpectraPerFragment[i];
                 var ions = new List<IonType>();
                 var subScore = 0f;
                 for (var c = 1; c <= 5; c++)
@@ -35,6 +34,7 @@ namespace InformedProteomics.Backend.Scoring
                 {
                     score = subScore;
                     UsedIons = ions;
+                    BestSpectrumIndex = i;
                 }
             }
             //Console.WriteLine("***" + UsedIons.Count);
@@ -58,7 +58,7 @@ namespace InformedProteomics.Backend.Scoring
                 if (ion.Charge != charge) continue;
                 if (ion.NeutralLoss.Length != 0) continue;
                
-                var s = ScoreParameter.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
+                var s = SubScoreFactory.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
                 //Console.Write(s+"\t");
                 if (ion.IsPrefix)
                 {
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.Scoring
                 
                 if (bestPrefixIonType == null && ion.IsPrefix)
                 {
-                    var s = ScoreParameter.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
+                    var s = SubScoreFactory.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
                     if (s > prefixNeutralLossScore)
                     {
                         prefixNeutralLossScore = s;
@@ -96,7 +96,7 @@ namespace InformedProteomics.Backend.Scoring
 
                 if (bestPrefixIonType!=null && ion.Type.Equals(bestPrefixIonType.Type))
                 {
-                    var s = ScoreParameter.GetProductIonSpectrumScore(bestPrefixIonType, ion, spectrum[bestPrefixIonType], spectrum[ion]);
+                    var s = SubScoreFactory.GetProductIonSpectrumScore(bestPrefixIonType, ion, spectrum[bestPrefixIonType], spectrum[ion]);
                     if (s > prefixNeutralLossScore)
                     {
                         prefixNeutralLossScore = s;
@@ -106,7 +106,7 @@ namespace InformedProteomics.Backend.Scoring
 
                 if (bestSuffixIonType == null && !ion.IsPrefix)
                 {
-                    var s = ScoreParameter.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
+                    var s = SubScoreFactory.GetProductIonSpectrumScore(null, ion, 0, spectrum[ion]);
                     if (s > suffixNeutralLossScore)
                     {
                         suffixNeutralLossScore = s;
@@ -116,7 +116,7 @@ namespace InformedProteomics.Backend.Scoring
 
                 if (bestSuffixIonType != null && ion.Type.Equals(bestSuffixIonType.Type))
                 {
-                    var s = ScoreParameter.GetProductIonSpectrumScore(bestSuffixIonType, ion, spectrum[bestSuffixIonType], spectrum[ion]);
+                    var s = SubScoreFactory.GetProductIonSpectrumScore(bestSuffixIonType, ion, spectrum[bestSuffixIonType], spectrum[ion]);
                     if (s > suffixNeutralLossScore)
                     {
                         suffixNeutralLossScore = s;
@@ -127,7 +127,7 @@ namespace InformedProteomics.Backend.Scoring
 
             if (bestPrefixIonType != null && bestSuffixIonType != null)
             {
-                prefixSuffixScore = ScoreParameter.GetProductIonSpectrumScore(bestSuffixIonType, bestPrefixIonType, spectrum[bestSuffixIonType], spectrum[bestPrefixIonType]);
+                prefixSuffixScore = SubScoreFactory.GetProductIonSpectrumScore(bestSuffixIonType, bestPrefixIonType, spectrum[bestSuffixIonType], spectrum[bestPrefixIonType]);
             }
 
             if (bestPrefixIonType!=null) usedIons.Add(bestPrefixIonType);

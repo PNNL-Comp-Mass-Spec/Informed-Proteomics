@@ -1,5 +1,4 @@
-﻿using System;
-using MathNet.Numerics.LinearAlgebra.Single;
+﻿using MathNet.Numerics.LinearAlgebra.Single;
 using System.Collections.Generic;
 
 namespace InformedProteomics.Backend.Scoring
@@ -24,7 +23,7 @@ namespace InformedProteomics.Backend.Scoring
         {
             var r = GetCorrelationMatrices();
             RawScore = new MultipleCorrelationCoefficient(GetX(), GetY(), r[0], r[1]).Get();
-            return ScoreParameter.GetProductIonXICLikelihoodRatioScore(RawScore, UsedIonTypes.Count);
+            return SubScoreFactory.GetProductIonXICLikelihoodRatioScore(RawScore, UsedIonTypes.Count);
         }
 
         private DenseMatrix GetX()
@@ -61,9 +60,9 @@ namespace InformedProteomics.Backend.Scoring
             {
                 for (var k = 0; k < j; k++)
                 {
-                    rxx.At(i, k, ScoreParameter.GetProductIonCorrelationCoefficient(UsedIonTypes[i], UsedIonTypes[k]));
+                    rxx.At(i, k, SubScoreFactory.GetProductIonCorrelationCoefficient(UsedIonTypes[i], UsedIonTypes[k]));
                 }
-                rxy.At(i, 0, ScoreParameter.GetProductIonCorrelationCoefficient(UsedIonTypes[i]));
+                rxy.At(i, 0, SubScoreFactory.GetProductIonCorrelationCoefficient(UsedIonTypes[i]));
             }
 
             return new[] { rxx, rxy };

@@ -107,9 +107,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
+    <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
+    <Compile Include="Scoring\FragmentSpectrum.cs" />
     <Compile Include="Scoring\IonType.cs" />
     <Compile Include="Scoring\Misc.cs" />
-    <Compile Include="Scoring\SpectrumScorer.cs" />
+    <Compile Include="Scoring\FragmentSpectrumParameter.cs" />
+    <Compile Include="Scoring\FragmentSpectrumScorer.cs" />
     <Compile Include="Data\Enum\SequenceLocation.cs" />
     <Compile Include="Data\Enum\SequenceType.cs" />
     <Compile Include="Data\Biology\Atom.cs" />
@@ -143,12 +147,11 @@
     <Compile Include="Scoring\FragmentXICScorer.cs" />
     <Compile Include="Scoring\IScorer.cs" />
     <Compile Include="Scoring\MultipleCorrelationCoefficient.cs" />
-    <Compile Include="Scoring\PeakParameter.cs" />
+    <Compile Include="Scoring\FragmentParameter.cs" />
     <Compile Include="Scoring\PrecursorIonScorer.cs" />
     <Compile Include="Scoring\ProductIonScorer.cs" />
-    <Compile Include="Scoring\ScoreParameter.cs" />
+    <Compile Include="Scoring\SubScoreFactory.cs" />
     <Compile Include="Scoring\Scorer.cs" />
-    <Compile Include="Scoring\SpectrumParameter.cs" />
     <Compile Include="Utils\CompositionFactory.cs" />
     <Compile Include="IMS\DriftRange.cs" />
     <Compile Include="IMS\Frame.cs" />

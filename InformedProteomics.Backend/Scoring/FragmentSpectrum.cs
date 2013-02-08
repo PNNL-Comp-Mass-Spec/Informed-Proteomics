@@ -1,6 +1,6 @@
 ﻿namespace InformedProteomics.Backend.Scoring
 {
-    class PeakParameter
+    internal class FragmentSpectrum
     {
     }
 }

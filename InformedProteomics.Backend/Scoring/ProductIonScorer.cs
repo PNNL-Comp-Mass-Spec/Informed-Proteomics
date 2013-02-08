@@ -1,7 +1,7 @@
 ﻿using System;
 using InformedProteomics.Backend.Data.Results;
 using System.Collections.Generic;
-using System.Linq;
+using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Scoring
 {
@@ -10,14 +10,14 @@ namespace InformedProteomics.Backend.Scoring
         public Dictionary<int, Dictionary<IonType, double[]>> IonXICs { get; private set; }
         public Dictionary<int, Dictionary<IonType, double>[]> Spectra { get; private set; }
         public float Score { get; private set; }
-        public string Sequence { get; private set; }
+        public Sequence Peptide { get; private set; }
         public DatabaseSubTargetResult PrecursorResultRep { get; private set; }
         
-        public ProductIonScorer(DatabaseMultipleSubTargetResult matchedResult)
+        public ProductIonScorer(DatabaseMultipleSubTargetResult matchedResult, Sequence peptide)
         {
             PrecursorResultRep = matchedResult.PrecursorResultRep;
             GetFragmentResults(matchedResult);
-            Sequence = matchedResult.PrecursorResultRep.DatabaseSubTarget.Code;
+            Peptide = peptide;
             Score = GetScore();
         }
 
@@ -73,13 +73,12 @@ namespace InformedProteomics.Backend.Scoring
         private float GetScore()
         {
             var score = 0f;//
-            for(var residueNumber = 1; residueNumber<Sequence.Length;residueNumber++)
+            for (var residueNumber = 1; residueNumber < Peptide.Count; residueNumber++)
             {
                 float subScore;
                 if (IonXICs.ContainsKey(residueNumber))
                 {
-                    var specScorer = new SpectrumScorer(Spectra[residueNumber], Sequence[residueNumber - 1],
-                                                        Sequence[residueNumber]); // check if +1 or -1..
+                    var specScorer = new FragmentSpectrumScorer(Spectra[residueNumber]); // check if +1 or -1..
 
 
                     
