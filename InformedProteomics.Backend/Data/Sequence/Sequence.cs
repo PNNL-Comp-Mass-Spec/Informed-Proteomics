@@ -11,21 +11,34 @@ namespace InformedProteomics.Backend.Data.Sequence
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
             Composition composition = Composition.Zero;
+            SequenceString = "";
 
             foreach (AminoAcid aa in aaArr)
             {
                 Add(aa);
                 composition += aa.Composition;
+                SequenceString += aa.Residue; // added by Kyowon jeong
             }
 
             this.Composition = composition;
         }
 
-		public Sequence (Composition composition, string sequence)
+		/*public Sequence (Composition composition, string sequence)
 		{
 			this.Composition = composition;
 			this.SequenceString = sequence;
-		}
+		}*/
+
+        // fixed by Kyowon so that both constructors have amino acid list.
+        public Sequence(Composition composition, string sequence, AminoAcidSet aminoAcidSet)
+        {
+            this.Composition = composition;
+            this.SequenceString = sequence;
+            foreach(var residue in SequenceString)
+            {
+                Add(aminoAcidSet.GetAminoAcids(residue)[0]);
+            }
+        }
 
         public Composition Composition { get; private set; }
     	public string SequenceString { get; set; }

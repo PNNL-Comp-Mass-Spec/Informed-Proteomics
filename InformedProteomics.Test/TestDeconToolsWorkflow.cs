@@ -13,6 +13,7 @@ using InformedProteomics.Backend.Data.Results;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Targets;
 using InformedProteomics.Backend.IMS;
+using InformedProteomics.Backend.Scoring;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
@@ -92,7 +93,7 @@ namespace InformedProteomics.Test
 					Composition peptideComposition = composition + Composition.H2O;
 
 					// Create the database target
-					Sequence sequence = new Sequence(peptideComposition, peptideSequence);
+                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
 					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
@@ -278,7 +279,7 @@ namespace InformedProteomics.Test
 					Composition peptideComposition = composition + Composition.H2O;
 
 					// Create the database target
-					Sequence sequence = new Sequence(peptideComposition, peptideSequence);
+                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
 					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
@@ -331,7 +332,7 @@ namespace InformedProteomics.Test
 					Composition peptideComposition = composition + Composition.H2O;
 
 					// Create the database target
-					Sequence sequence = new Sequence(peptideComposition, peptideSequence);
+                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
 					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
@@ -508,5 +509,302 @@ namespace InformedProteomics.Test
 
 			textWriter.WriteLine(line);
 		}
+
+        [Test]
+        public void TestScoring()
+        {
+            TextWriter textWriter = new StreamWriter("fragmentData.csv");
+            textWriter.WriteLine("Sequence,EmpFormula,NET,Charge,Fit,Fragment,FragmentCharge,RSquared,FragmentFit");
+
+            //string line = "ion";
+            //for(int i = 509; i <= 527; i+=2)
+            //{
+            //    line += "," + i;
+            //}
+            //textWriter.WriteLine(line);
+
+            short minChargeState = 1;
+            short maxChargeState = 5;
+            double minMz = 200;
+            double maxMz = 2500;
+
+
+            //string datasetPath = @"\\protoapps\UserData\Slysz\Standard_Testing\Targeted_FeatureFinding\UIMF_Targeted_MSMS_Testing\RawData\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo.UIMF";
+            //string datasetPath = @"\\protoapps\UserData\Slysz\Standard_Testing\Targeted_FeatureFinding\UIMF_Targeted_MSMS_Testing\RawData\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Collision_Energy_Collapsed.UIMF";
+            string datasetPath = @"D:\Development\Source\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            datasetPath = @"C:\workspace\IMS\data\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            //datasetPath = @"C:\workspace\IMS\data\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Collision_Energy_Collapsed.UIMF";
+
+
+            var executorParameters = CreateWorkflowExecutorParameters();
+            var workflowParameters = CreateWorkflowParameters();
+
+            // Create workflow for precursors
+            var precursorExecutor = new UIMFTargetedWorkflowExecutor(executorParameters, workflowParameters, datasetPath);
+            precursorExecutor.Targets = new TargetCollection();
+
+            // Create workflow for fragments
+            var fragmentWorkflowParameters = CreateWorkflowParameters();
+            fragmentWorkflowParameters.ChromNETTolerance = 0.005;
+            var fragmentExecutor = new UIMFTargetedWorkflowExecutor(executorParameters, fragmentWorkflowParameters, datasetPath);
+            fragmentExecutor.Targets = new TargetCollection();
+
+            double slope;
+            double intercept;
+            double rSquared;
+
+            TextWriter dtaWriter = new StreamWriter(@"C:\workspace\IMS\data\test_dta.txt");
+
+            AminoAcidSet aminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
+
+            // TODO: Read in a peptide list?
+            //List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
+            List<string> peptideSequenceList = new List<string> { "YICDNQDTISSK" };
+            //IEnumerable<string> peptideSequenceList = ReadPeptideList(@"../../../TestFiles/BSA.txt");
+            //C81H124N22O29S1
+
+            TextWriter scoreWriter = new StreamWriter(@"C:\workspace\IMS\data\GoodDist.m");
+            float[,] scores = new float[100, 500];
+
+
+
+            var sr = new StreamReader(@"C:\workspace\IMS\data\goodPeptides.tsv");
+            string ss;
+
+            while ((ss = sr.ReadLine()) != null)
+            {
+                if (ss.StartsWith("#")) continue;
+                string[] token = ss.Split('\t');
+                string pep = token[2];
+                if (pep.Contains("@")) continue;
+                //Console.WriteLine(pep);
+                pep = pep.Replace("C!", "C");
+                pep = pep.Substring(2, pep.Length - 4);
+                peptideSequenceList.Add(pep);
+                //Console.WriteLine(pep);
+            }
+
+
+            sr.Close();
+            peptideSequenceList.Clear();
+            peptideSequenceList.Add("ERNECFLSHK");
+
+            // peptideSequenceList.Clear();
+            // peptideSequenceList.Add("DQHRERPQTTR");
+            peptideSequenceList.Clear();
+            // peptideSequenceList.Add("DQHRERPQTTR");
+            //var bsa = "MKWVTFISLLLLFSSAYSRGVFRRDTHKSEIAHRFKDLGEEHFKGLVLIAFSQYLQQCPFDEHVKLVNELTEFAKTCVADESHAGCEKSLHTLFGDELCKVASLRETYGDMADCCEKQEPERNECFLSHKDDSPDLPKLKPDPNTLCDEFKADEKKFWGKYLYEIARRHPYFYAPELLYYANKYNGVFQECCQAEDKGACLLPKIETMREKVLASSARQRLRCASIQKFGERALKAWSVARLSQKFPKAEFVEVTKLVTDLTKVHKECCHGDLLECADDRADLAKYICDNQDTISSKLKECCDKPLLEKSHCIAEVEKDAIPENLPPLTADFAEDKDVCKNYQEAKDAFLGSFLYEYSRRHPEYAVSVLLRLAKEYEATLEECCAKDDPHACYSTVFDKLKHLVDEPQNLIKQNCDQFEKLGEYGFQNALIVRYTRKVPQVSTPTLVEVSRSLGKVGTRCCTKPESERMPCTEDYLSLILNRLCVLHEKTPVSEKVTKCCTESLVNRRPCFSALTPDETYVPKAFDEKLFTFHADICTLPDTEKQIKKQTALVELLKHKPKATEEQLKTVMENFVAFVDKCCAADDKEACFAVEGPKLVVSTQTALA";
+
+            var fasta = @"C:\workspace\IMS\data\ID_003649_C4CE0EAB.fasta";
+            foreach (var pep in Misc.GetPeptidesFromFasta(fasta, false, 2, true))
+            {
+                peptideSequenceList.Add(pep);
+                // Console.WriteLine(pep);
+            }
+            peptideSequenceList.Clear();
+            peptideSequenceList.Add("ERNECFLSHK");
+            Console.WriteLine("# of peptides : " + peptideSequenceList.Count);
+
+
+            foreach (string peptideSequence in peptideSequenceList)
+            {
+                IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
+
+
+
+                foreach (Composition composition in compositions)
+                {
+                    List<DatabaseMultipleSubTargetResult> resultList = new List<DatabaseMultipleSubTargetResult>();
+                    Composition peptideComposition = composition + Composition.H2O;
+
+                    Console.WriteLine("******" + composition);
+
+                    // Create the database target
+                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+
+                    DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+
+                    // Get the list of precursor targets from the DatabaseTarget object and pass them in
+                    precursorExecutor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
+
+                    foreach (var target in precursorExecutor.Targets.TargetList)
+                    {
+                        Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" +
+                                          target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+                    }
+
+                    // Execute the workflow with the new targets
+                    precursorExecutor.Execute();
+
+                    List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+                    UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
+                    Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
+                    int maxChargeStateOfPrecursor = 0;
+
+                    foreach (var precursorTargetedResultBase in precursorResultList)
+                    {
+                        //Console.WriteLine("Checking Target...");
+                        if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
+                        {
+                            //Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
+                            continue;
+                        }
+                        if (precursorTargetedResultBase.FailedResult)
+                        {
+                            //Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
+                            continue;
+                        }
+
+                        DatabaseSubTarget precursorTarget = precursorTargetedResultBase.Target as DatabaseSubTarget;
+
+                        foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
+                        {
+                            if (precursorPeakQualityData.FitScore > 0.4) continue;
+
+                            ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
+                            XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
+                            precursorProfileData.NormalizeYData();
+                            XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
+                            int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
+                            //Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+
+                            // I don't believe any peaks that are not wide enough to be valid peptides
+                            if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 20) continue;
+                            // Console.WriteLine("#####");
+                            // TODO: Remove this hard-coded filter
+                            //if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
+
+                            DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
+
+                            if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
+
+                            // Find out if this result relates to a previous result
+                            bool foundMatch = false;
+                            foreach (DatabaseMultipleSubTargetResult result in resultList)
+                            {
+                                if (result.DoesNewResultBelong(precursorResult))
+                                {
+                                    result.AddNewResult(precursorResult);
+                                    foundMatch = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundMatch)
+                            {
+                                DatabaseMultipleSubTargetResult newResult = new DatabaseMultipleSubTargetResult(precursorResult);
+                                resultList.Add(newResult);
+                            }
+                        }
+                    }
+
+                    foreach (DatabaseMultipleSubTargetResult result in resultList)
+                    {
+                        XYData precursorProfileData = result.PrecursorResultRep.XYData;
+
+                        int chargeStateToSearch = result.ChargeStateList.Max();
+                        double elutionTime = result.ElutionTime;
+
+                        //Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+                        //precursorProfileData.Display();
+
+                        // Create fragment targets
+                        fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
+                        fragmentExecutor.Execute();
+
+                        List<TargetedResultBase> fragmentResultList = fragmentExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+                        UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
+                        Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
+
+                        foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
+                        {
+                            DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
+                            //Console.WriteLine(fragmentTarget.Fragment.ToString());
+
+                            if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
+                            {
+                                //Console.WriteLine(fragmentTargetedResultBase.ErrorDescription);
+                                continue;
+                            }
+                            if (fragmentTargetedResultBase.FailedResult)
+                            {
+                                //Console.WriteLine("Failed Result.");
+                                continue;
+                            }
+
+                            foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
+                            {
+                                //Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
+                                //if (fragmentPeakQualityData.FitScore > 0.5) continue;
+                                //if (fragmentPeakQualityData.FitScore >= 1) continue;
+
+                                ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
+                                XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
+                                fragmentProfileData.NormalizeYData();
+                                XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
+
+                                //Console.WriteLine(fragmentTarget.Fragment.ToString());
+                                //Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+                                DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
+                                //Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
+                                //fragmentProfileData.Display();
+
+                                //String label = fragmentTarget.Fragment.IonSymbol;
+                                //for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
+                                //{
+                                //    label += "+";
+                                //}
+                                //WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
+
+                                if (rSquared >= 0.01)
+                                {
+                                    textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
+                                    //Console.WriteLine(fragmentTarget.Fragment.ToString());
+                                    DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
+                                    result.FragmentResultList.Add(fragmentResult);
+                                }
+                            }
+                        }
+
+                        DtaUtil.AppendToDtaFile(result, dtaWriter);
+                    }
+
+                    var score = -250f;
+                    //Console.WriteLine("Here" + resultList.Count);
+                    if (resultList.Count > 0)
+                    {
+                        foreach (DatabaseMultipleSubTargetResult result in resultList)
+                        {
+
+                            var s = new Scorer(sequence, result).Score;
+                            if (score < s) score = s;
+                        }
+                        Console.WriteLine("***\t" + peptideSequence + "\t" + score);
+                        scores[
+                            Math.Min(peptideSequence.Length, scores.GetLength(0) - 1),
+                            Math.Min((int)(score + 250.5), scores.GetLength(1) - 1)]++;
+                    }
+
+                }
+            }
+            scoreWriter.WriteLine("d=[");
+            for (int j = 0; j < scores.GetLength(0); j++)
+            {
+                for (int i = 0; i < scores.GetLength(1); i++)
+                {
+                    scoreWriter.Write(scores[j, i] + " ");
+                }
+                scoreWriter.WriteLine();
+            }
+
+            scoreWriter.WriteLine("];");
+            scoreWriter.Close();
+
+
+            //scoreWriter
+            dtaWriter.Close();
+            textWriter.Close();
+        }
+
 	}
 }

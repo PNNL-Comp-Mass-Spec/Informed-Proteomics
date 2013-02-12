@@ -7,109 +7,100 @@ namespace InformedProteomics.Backend.Scoring
 {
     class ProductIonScorer
     {
-        public Dictionary<int, Dictionary<IonType, double[]>> IonXICs { get; private set; }
-        public Dictionary<int, Dictionary<IonType, double>[]> Spectra { get; private set; }
+        public FragmentXICSet[] FragmentXICSets { get; private set; } // residue
+        public FragmentSpectrum[][] FragmentSpectra { get; private set; } // residue, x 
         public float Score { get; private set; }
         public Sequence Peptide { get; private set; }
         public DatabaseSubTargetResult PrecursorResultRep { get; private set; }
-        
+        private HashSet<int> _matchedResidues;
+        private static readonly Dictionary<FragmentSpectrumParameter, float> NoXICScore = new Dictionary<FragmentSpectrumParameter, float>();
+ 
         public ProductIonScorer(DatabaseMultipleSubTargetResult matchedResult, Sequence peptide)
         {
             PrecursorResultRep = matchedResult.PrecursorResultRep;
-            GetFragmentResults(matchedResult);
             Peptide = peptide;
+            GetFragmentResults(matchedResult);
             Score = GetScore();
         }
-
+        /*Console.WriteLine(residueNumber + "\t" + PrecursorResultRep.XYData.Xvalues.Length + "\t" + fragmentTargetResult.XYData.Yvalues.Length + "\t" + fragmentTargetResult.XYData.Xvalues.Length + "\t" + spectraPerFragment.Length);
+               foreach (var t in PrecursorResultRep.XYData.Xvalues)
+                   Console.Write(t + " ");
+               Console.WriteLine();
+               foreach (var t in fragmentTargetResult.XYData.Xvalues)
+                   Console.Write(t+" ");
+               Console.WriteLine();
+               foreach (var t in fragmentTargetResult.XYData.Yvalues)
+                   Console.Write(t + " ");
+               Console.WriteLine();
+               Console.WriteLine();
+               */
         private void GetFragmentResults(DatabaseMultipleSubTargetResult matchedResult)
         {
-            IonXICs = new Dictionary<int, Dictionary<IonType, double[]>>();
-            Spectra = new Dictionary<int, Dictionary<IonType, double>[]>();
+            FragmentXICSets = new FragmentXICSet[Peptide.Count];
+            FragmentSpectra = new FragmentSpectrum[Peptide.Count][];
+            _matchedResidues = new HashSet<int>();
+            for (var i = 0; i < FragmentXICSets.Length; i++)
+            {
+                FragmentXICSets[i] = new FragmentXICSet();
+            }
+
+            for (var i = 0; i < FragmentSpectra.Length; i++)
+            {
+                FragmentSpectra[i] = new FragmentSpectrum[matchedResult.PrecursorResultRep.XYData.Yvalues.Length];
+                for (var j = 0; j < FragmentSpectra[i].Length; j++)
+                {
+                    FragmentSpectra[i][j] = new FragmentSpectrum();
+                }
+            }
+
+           
 
             foreach (var fragmentTargetResult in matchedResult.FragmentResultList)
             {
+               
                 var fragment = fragmentTargetResult.DatabaseFragmentTarget.Fragment;
                 var residueNumber = fragment.ResidueNumber;
-                //Console.WriteLine(residueNumber + "\t");
-                var ion = new IonType(fragment.IonSymbol, fragment.ChargeState);
-                //Console.WriteLine(ion);
-                if (!IonXICs.ContainsKey(residueNumber))
-                {
-                    IonXICs.Add(residueNumber, new Dictionary<IonType, double[]>());
-                    Spectra.Add(residueNumber, new Dictionary<IonType, double>[fragmentTargetResult.XYData.Yvalues.Length]);
-                    for (var i = 0; i < Spectra[residueNumber].Length;i++ )
-                        Spectra[residueNumber][i] = new Dictionary<IonType, double>();
-                }
+                var ion = new IonType(fragment.IonSymbol, fragment.ChargeState);//TODO isotope
 
-                if (!IonXICs[residueNumber].ContainsKey(ion)){
-                    IonXICs[residueNumber].Add(ion, fragmentTargetResult.XYData.Yvalues);
-                }
-                var spectraPerFragment = Spectra[residueNumber];
-                
-                /*Console.WriteLine(residueNumber + "\t" + PrecursorResultRep.XYData.Xvalues.Length + "\t" + fragmentTargetResult.XYData.Yvalues.Length + "\t" + fragmentTargetResult.XYData.Xvalues.Length + "\t" + spectraPerFragment.Length);
-                foreach (var t in PrecursorResultRep.XYData.Xvalues)
-                    Console.Write(t + " ");
-                Console.WriteLine();
-                foreach (var t in fragmentTargetResult.XYData.Xvalues)
-                    Console.Write(t+" ");
-                Console.WriteLine();
-                foreach (var t in fragmentTargetResult.XYData.Yvalues)
-                    Console.Write(t + " ");
-                Console.WriteLine();
-                Console.WriteLine();
-                */
-                for (var i = 0; i < fragmentTargetResult.XYData.Yvalues.Length;i++)
+                //  fragmentTargetResult.PeakQualityData.IsotopicProfile.
+                if (residueNumber < 0 || FragmentXICSets.Length - 1 < residueNumber) continue;
+                FragmentXICSets[residueNumber].AddIonXIC(ion, fragmentTargetResult.XYData.Yvalues);
+                for (var i = 0; i < fragmentTargetResult.XYData.Yvalues.Length; i++)
                 {
-                    //Console.WriteLine(spectraPerFragment.Length + "\t" + i);
-                    if (!spectraPerFragment[i].ContainsKey(ion))
-                    {
-                        spectraPerFragment[i].Add(ion, fragmentTargetResult.XYData.Yvalues[i]);
-                    }
+                    FragmentSpectra[residueNumber][i].AddIntensity(ion, fragmentTargetResult.XYData.Yvalues[i]);  
                 }
+                _matchedResidues.Add(residueNumber);
             }
         }
 
 
         private float GetScore()
         {
-            var score = 0f;//
+            var score = 0f;
             for (var residueNumber = 1; residueNumber < Peptide.Count; residueNumber++)
             {
                 float subScore;
-                if (IonXICs.ContainsKey(residueNumber))
+                var fragmentXICSet = FragmentXICSets[residueNumber];
+                var fragmentSpectra = FragmentSpectra[residueNumber];
+                var par = new FragmentSpectrumParameter(Peptide, residueNumber);
+
+                if (fragmentXICSet.Count == 0 && NoXICScore.ContainsKey(par))
                 {
-                    var specScorer = new FragmentSpectrumScorer(Spectra[residueNumber]); // check if +1 or -1..
-
-
-                    
-                    //foreach(var q in specScorer.UsedIons) Console.Write(q.ToString() + " ");
-                   // Console.WriteLine();
-                   // foreach(var q in IonXICs[residueNumber].Keys) Console.Write(q.ToString()+" ");
-                   // Console.WriteLine();
-                    if (specScorer.UsedIons.Count == 0)
-                    {
-                        subScore = -3;
-                    }
-                    else
-                    {
-                        var fragXICScorer = new FragmentXICScorer(IonXICs[residueNumber], specScorer.UsedIons,
-                                                                  PrecursorResultRep.XYData.Yvalues);
-                        subScore = fragXICScorer.Score + specScorer.Score;
-
-                        Console.WriteLine("Frag Score : " + residueNumber + "\t" + specScorer.Score + "\t" + fragXICScorer.RawScore + "\t" + fragXICScorer.Score + "\t" + specScorer.UsedIons.Count + "\t" + IonXICs[residueNumber].Keys.Count);
-
-                    }
-                    //Console.WriteLine("Frag Score : " + residueNumber + "\t" + fragXICScorer.Score + "\t" + specScorer.Score + "\t" + specScorer.UsedIons.Count);
+                    subScore = NoXICScore[par];
                 }
                 else
                 {
-                    subScore = -3;
+                    var specScorer = new FragmentSpectrumScorer(fragmentSpectra, par);
+                    var fragXICScorer = new FragmentXICSetScorer(fragmentXICSet, specScorer.UsedIons, PrecursorResultRep.XYData.Yvalues, par);
+                    subScore = fragXICScorer.Score + specScorer.Score;
+                    if (fragmentXICSet.Count == 0) NoXICScore[par] = subScore;
+                    Console.WriteLine("Frag Score : " + residueNumber + "\t" + specScorer.Score + "\t" +
+                                      fragXICScorer.Score + "\t" +
+                                      specScorer.UsedIons.Count + "\t" + fragmentXICSet.Count);
                 }
-
-                score += subScore;
-                
+                score += subScore; 
             }
-            Console.WriteLine();
+            Console.WriteLine("Score : " + score);
             return score;                        
         }
 

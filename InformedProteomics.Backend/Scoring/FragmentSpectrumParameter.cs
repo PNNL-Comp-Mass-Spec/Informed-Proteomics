@@ -3,7 +3,7 @@ using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Scoring
 {
-    internal class FragmentSpectrumParameter : FragmentParameter
+    public class FragmentSpectrumParameter : FragmentParameter
     {
         private readonly int _flankingResidueIndex;
 

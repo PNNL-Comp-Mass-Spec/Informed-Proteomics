@@ -110,6 +110,7 @@
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
+    <Compile Include="Scoring\FragmentXICSet.cs" />
     <Compile Include="Scoring\IonType.cs" />
     <Compile Include="Scoring\Misc.cs" />
     <Compile Include="Scoring\FragmentSpectrumParameter.cs" />
@@ -144,7 +145,7 @@
     <Compile Include="Data\Targets\DatabaseFragmentTarget.cs" />
     <Compile Include="Data\Targets\DatabaseSubTarget.cs" />
     <Compile Include="Data\Targets\DatabaseTarget.cs" />
-    <Compile Include="Scoring\FragmentXICScorer.cs" />
+    <Compile Include="Scoring\FragmentXICSetScorer.cs" />
     <Compile Include="Scoring\IScorer.cs" />
     <Compile Include="Scoring\MultipleCorrelationCoefficient.cs" />
     <Compile Include="Scoring\FragmentParameter.cs" />

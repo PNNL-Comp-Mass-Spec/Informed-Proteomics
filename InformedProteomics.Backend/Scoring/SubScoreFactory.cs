@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Scoring
             return GetNormalLogRatio(rawScore, numVar);
         }
 
-        internal static float GetProductIonXICLikelihoodRatioScore(float rawScore, float numVar) // spectrum para
+        internal static float GetProductIonXICLikelihoodRatioScore(float rawScore, float numVar, FragmentParameter par) // spectrum para
         {
             return GetNormalLogRatio(rawScore, numVar);
         }
@@ -33,7 +33,7 @@ namespace InformedProteomics.Backend.Scoring
             return 0.8f;
         }
 
-        internal static float GetProductIonCorrelationCoefficient(IonType ion1, IonType ion2) // spectrum para, peak para (of ion1)
+        internal static float GetProductIonCorrelationCoefficient(IonType ion1, IonType ion2, FragmentParameter par) // spectrum para, peak para (of ion1)
         {
             if (ion1.Equals(ion2)) return 1;
             if (ion1.Charge != ion2.Charge) return 0.4f;
@@ -43,25 +43,25 @@ namespace InformedProteomics.Backend.Scoring
             
         }
 
-        internal static float GetProductIonCorrelationCoefficient(IonType ion) // spectrum para, peak para
+        internal static float GetProductIonCorrelationCoefficient(IonType ion, FragmentParameter par) // spectrum para, peak para
         {
             return 0.5f;
         }
 
-        public static float GetProductIonSpectrumScore(IonType ion1, IonType ion2, double intensity1, double intensity2)
+        public static float GetProductIonSpectrumScore(FragmentSpectrum spectrum, IonType ion1, IonType ion2, FragmentSpectrumParameter par)
+        {
+            var rawScore = GetRatioScore(spectrum.GetIntensity(ion1), spectrum.GetIntensity(ion2));
+            return (float) Math.Log(rawScore);
+        }
+
+        public static float GetProductIonSpectrumScore(FragmentSpectrum spectrum, IonType ion, FragmentSpectrumParameter par)
         {
             float rawScore;
-            if (ion1 == null)
-            {
-                if (ion2.Type.Equals("y")) rawScore = 0.7f / 0.1f;
-                else if (ion2.Type.Equals("b")) rawScore = 0.6f / 0.1f;
-                else if (ion2.Type.Equals("a")) rawScore = 0.3f/0.1f;
-                else rawScore = 0.2f/0.1f;
-            }else
-            {
-                rawScore = GetRatioScore(intensity1, intensity2);
-            }
-            return (float) Math.Log(rawScore);
+            if (ion.Type.Equals("y")) rawScore = 0.7f / 0.1f;
+            else if (ion.Type.Equals("b")) rawScore = 0.6f / 0.1f;
+            else if (ion.Type.Equals("a")) rawScore = 0.3f / 0.1f;
+            else rawScore = 0.2f / 0.1f;
+            return (float)Math.Log(rawScore);
         }
 
         private static float GetRatioScore(double i1, double i2)

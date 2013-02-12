@@ -72,7 +72,7 @@ namespace InformedProteomics.IMS
 					Composition peptideComposition = composition + Composition.H2O;
 
 					// Create the database target
-					Sequence sequence = new Sequence(peptideComposition, peptideSequence);
+                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
 					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
