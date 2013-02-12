@@ -82,7 +82,7 @@ namespace InformedProteomics.Test
                     Composition peptideComposition = composition + Composition.H2O;
 
                     // Create the database target
-                    var sequence = new Sequence(peptideComposition, peptideSequence);
+                    var sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
                     var databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
@@ -107,7 +107,7 @@ namespace InformedProteomics.Test
                     Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
                     int maxChargeStateOfPrecursor = 0;
 
-                    foreach (var precursorTargetedResultBase in precursorResultList)
+                    foreach (TargetedResultBase precursorTargetedResultBase in precursorResultList)
                     {
                         //Console.WriteLine("Checking Target...");
                         if (precursorTargetedResultBase.ErrorDescription != null &&
