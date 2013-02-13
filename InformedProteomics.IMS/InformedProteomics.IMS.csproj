@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -54,24 +54,24 @@
       <HintPath>..\lib\alglibnet2.dll</HintPath>
     </Reference>
     <Reference Include="DeconTools.Backend">
-      <HintPath>..\lib\DeconTools\x86\DeconTools.Backend.dll</HintPath>
+      <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Backend.dll</HintPath>
     </Reference>
     <Reference Include="DeconTools.Workflows">
-      <HintPath>..\lib\DeconTools\x86\DeconTools.Workflows.dll</HintPath>
+      <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Workflows.dll</HintPath>
     </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="MultiAlignEngine">
-      <HintPath>..\lib\DeconTools\x86\MultiAlignEngine.dll</HintPath>
+      <HintPath>..\lib\DeconTools\$(Platform)\MultiAlignEngine.dll</HintPath>
     </Reference>
     <Reference Include="PNNLOmics">
-      <HintPath>..\lib\x86\PNNLOmics.dll</HintPath>
+      <HintPath>..\lib\$(Platform)\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
-      <HintPath>..\lib\x86\System.Data.SQLite.dll</HintPath>
+      <HintPath>..\lib\$(Platform)\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -79,7 +79,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UIMFLibrary">
-      <HintPath>..\lib\x86\UIMFLibrary.dll</HintPath>
+      <HintPath>..\lib\$(Platform)\UIMFLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

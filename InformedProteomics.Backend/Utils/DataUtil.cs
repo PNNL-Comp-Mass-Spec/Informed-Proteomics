@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DeconTools.Backend;
 using DeconTools.Backend.Algorithms;
+using DeconTools.Backend.ProcessingTasks.ChromatogramProcessing;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -13,7 +14,8 @@ namespace InformedProteomics.Backend.Utils
 
 		static DataUtil()
 		{
-			chromatogramCorrelator = new ChromatogramCorrelator();
+			// TODO: Update the hard-coded value of 5 for num points to smooth
+			chromatogramCorrelator = new ChromatogramCorrelator(5);
 		}
 
 		public static void CorrelateXYData(XYData profile1, XYData profile2, int diffBetweenXValues, out double slope, out double intercept, out double rSquared)

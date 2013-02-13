@@ -67,6 +67,7 @@ namespace InformedProteomics.Test
 			// Create workflow for fragments
 			var fragmentWorkflowParameters = CreateWorkflowParameters();
 			fragmentWorkflowParameters.ChromNETTolerance = 0.005;
+			fragmentWorkflowParameters.ChromGenTolerance = 25;
 			var fragmentExecutor = new UIMFTargetedWorkflowExecutor(executorParameters, fragmentWorkflowParameters, datasetPath);
 			fragmentExecutor.Targets = new TargetCollection();
 
@@ -80,8 +81,8 @@ namespace InformedProteomics.Test
 
 			// TODO: Read in a peptide list?
 			//List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
-			List<string> peptideSequenceList = new List<string> { "YICDNQDTISSK" };
-			//IEnumerable<string> peptideSequenceList = ReadPeptideList(@"../../../TestFiles/BSA.txt");
+			List<string> peptideSequenceList = new List<string> { "CCAADDKEACFAVEGPK" };
+			//IEnumerable<string> peptideSequenceList = ReadPeptideList(@"../../../TestFiles/BSA_ST_Rev.txt");
 			
 			foreach (string peptideSequence in peptideSequenceList)
 			{
@@ -116,15 +117,15 @@ namespace InformedProteomics.Test
 
 					foreach (var precursorTargetedResultBase in precursorResultList)
 					{
-						//Console.WriteLine("Checking Target...");
+						Console.WriteLine("Checking Target...");
 						if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
 						{
-							//Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
+							Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
 							continue;
 						}
 						if (precursorTargetedResultBase.FailedResult)
 						{
-							//Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
+							Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
 							continue;
 						}
 
@@ -139,10 +140,11 @@ namespace InformedProteomics.Test
 							precursorProfileData.NormalizeYData();
 							XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
 							int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
-							//Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+							Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
 
 							// I don't believe any peaks that are not wide enough to be valid peptides
-							if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 20) continue;
+							//if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 40) continue;
+							if (precursorChromPeak.Width < 5) continue;
 
 							// TODO: Remove this hard-coded filter
 							//if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
@@ -178,8 +180,8 @@ namespace InformedProteomics.Test
 						int chargeStateToSearch = result.ChargeStateList.Max();
 						double elutionTime = result.ElutionTime;
 
-						//Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
-						//precursorProfileData.Display();
+						Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+						precursorProfileData.Display();
 
 						// Create fragment targets
 						fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
@@ -192,22 +194,22 @@ namespace InformedProteomics.Test
 						foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
 						{
 							DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
-							//Console.WriteLine(fragmentTarget.Fragment.ToString());
+							Console.WriteLine(fragmentTarget.Fragment.ToString());
 
 							if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
 							{
-								//Console.WriteLine(fragmentTargetedResultBase.ErrorDescription);
+								Console.WriteLine("Fragment Error: " + fragmentTargetedResultBase.ErrorDescription);
 								continue;
 							}
 							if (fragmentTargetedResultBase.FailedResult)
 							{
-								//Console.WriteLine("Failed Result.");
+								Console.WriteLine("Fragment Failed Result: " + fragmentTargetedResultBase.FailureType);
 								continue;
 							}
 
 							foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
 							{
-								//Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
+								Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
 								if (fragmentPeakQualityData.FitScore > 0.5) continue;
 								//if (fragmentPeakQualityData.FitScore >= 1) continue;
 
@@ -217,10 +219,10 @@ namespace InformedProteomics.Test
 								XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
 
 								//Console.WriteLine(fragmentTarget.Fragment.ToString());
-								//Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+								Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
 								DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
-								//Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
-								//fragmentProfileData.Display();
+								Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
+								fragmentProfileData.Display();
 
 								//String label = fragmentTarget.Fragment.IonSymbol;
 								//for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
@@ -384,7 +386,7 @@ namespace InformedProteomics.Test
 			workflowParameters.ChromPeakDetectorSigNoise = 1;
 			workflowParameters.ChromPeakSelectorMode = Globals.PeakSelectorMode.SmartUIMF;
 			workflowParameters.ChromSmootherNumPointsInSmooth = 9;
-			workflowParameters.ChromToleranceInPPM = 25;
+			workflowParameters.ChromGenTolerance = 15;
 			workflowParameters.MaxScansSummedInDynamicSumming = 100;
 			workflowParameters.MSPeakDetectorPeakBR = 1.3;
 			workflowParameters.MSPeakDetectorSigNoise = 3;
