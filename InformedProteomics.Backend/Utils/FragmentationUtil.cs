@@ -43,6 +43,13 @@ namespace InformedProteomics.Backend.Utils
 
 		public static List<Fragment> FindFragmentsForPeptide(String peptideSequence, int maxChargeState)
 		{
+			// Handle static C mod
+			if((peptideSequence.Contains("C") || peptideSequence.Contains("c")) && !peptideSequence.Contains("!"))
+			{
+				peptideSequence = peptideSequence.Replace("C", "C!");
+				peptideSequence = peptideSequence.Replace("c", "C!");
+			}
+
 			List<Fragment> theoreticalFragments = new List<Fragment>();
 
 			m_molecularWeightCalculator.Peptide.SetSequence(peptideSequence, MWPeptideClass.ntgNTerminusGroupConstants.ntgHydrogen, MWPeptideClass.ctgCTerminusGroupConstants.ctgHydroxyl, false);
