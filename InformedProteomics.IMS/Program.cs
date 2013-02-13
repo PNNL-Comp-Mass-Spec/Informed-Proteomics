@@ -248,8 +248,10 @@ namespace InformedProteomics.IMS
 			workflowParameters.ChromPeakDetectorSigNoise = 1;
 			workflowParameters.ChromPeakSelectorMode = Globals.PeakSelectorMode.SmartUIMF;
 			workflowParameters.ChromSmootherNumPointsInSmooth = 9;
-			workflowParameters.ChromToleranceInPPM = 25;
-			workflowParameters.MaxScansSummedInDynamicSumming = 100;
+            //workflowParameters.ChromToleranceInPPM = 25;
+            workflowParameters.ChromGenTolerance = 25;
+            workflowParameters.ChromGenToleranceUnit = Globals.ToleranceUnit.PPM;
+            workflowParameters.MaxScansSummedInDynamicSumming = 100;
 			workflowParameters.MSPeakDetectorPeakBR = 1.3;
 			workflowParameters.MSPeakDetectorSigNoise = 3;
 			workflowParameters.MSToleranceInPPM = 25;

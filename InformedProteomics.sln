@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.TopDown", "InformedProteomics.TopDown\InformedProteomics.TopDown.csproj", "{29038CA2-A6C9-468E-A174-615E5F69BBB2}"

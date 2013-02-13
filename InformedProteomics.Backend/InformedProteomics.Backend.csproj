@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -81,6 +81,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Backend.dll</HintPath>
     </Reference>
+    <Reference Include="DeconTools.Workflows">
+      <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Workflows.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=2.3.0.25, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
@@ -102,11 +105,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="zlib.net">
-      <HintPath>..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Biology\Constants.cs" />
+    <Compile Include="Data\Targets\NominalMassTarget.cs" />
+    <Compile Include="IQMillion\IQMillionWorkflow.cs" />
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
