@@ -34,23 +34,23 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestNominalMassCaching()
+        public void TestIQMillion()
         {
-            //const short minChargeState = 1;
-            //const short maxChargeState = 4;
-            //const int minPrecursorNominalMass = 400;
-            //const int maxPrecursorNominalMass = 2500;
+            const short minChargeState = 1;
+            const short maxChargeState = 4;
+            const int minPrecursorNominalMass = 400;
+            const int maxPrecursorNominalMass = 2500;
 
-            //const string datasetPath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            const string datasetPath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
 
-            //var executorParameters = CreateWorkflowExecutorParameters();
-            //var precursorWorkflowParameters = CreateWorkflowParameters();
+            var executorParameters = CreateWorkflowExecutorParameters();
+            var precursorWorkflowParameters = CreateWorkflowParameters();
 
-            //// Create workflow for precursors
-            //var precursorExecutor = new UIMFTargetedWorkflowExecutor(executorParameters, precursorWorkflowParameters, datasetPath)
-            //                            {
-            //                                Targets = new TargetCollection()
-            //                            };
+            // Create workflow for precursors
+            var precursorExecutor = new UIMFTargetedWorkflowExecutor(executorParameters, precursorWorkflowParameters, datasetPath)
+                                        {
+                                            Targets = new TargetCollection()
+                                        };
 
             //// Create workflow for fragments
             //var fragmentWorkflowParameters = CreateWorkflowParameters();

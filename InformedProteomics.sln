@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.TopDown", "InformedProteomics.TopDown\InformedProteomics.TopDown.csproj", "{29038CA2-A6C9-468E-A174-615E5F69BBB2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.IMS", "InformedProteomics.IMS\InformedProteomics.IMS.csproj", "{90A7866D-11FD-478C-BE23-FA1A489EF1F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Test", "InformedProteomics.Test\InformedProteomics.Test.csproj", "{800535C0-E5A3-4A05-8ED6-FDF02658D999}"
@@ -25,14 +23,6 @@ Global
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x64.Build.0 = Release|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x86.ActiveCfg = Release|x86
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x86.Build.0 = Release|x86
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Debug|x64.ActiveCfg = Debug|x64
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Debug|x64.Build.0 = Debug|x64
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Debug|x86.ActiveCfg = Debug|x86
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Debug|x86.Build.0 = Debug|x86
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Release|x64.ActiveCfg = Release|x64
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Release|x64.Build.0 = Release|x64
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Release|x86.ActiveCfg = Release|x86
-		{29038CA2-A6C9-468E-A174-615E5F69BBB2}.Release|x86.Build.0 = Release|x86
 		{90A7866D-11FD-478C-BE23-FA1A489EF1F4}.Debug|x64.ActiveCfg = Debug|x64
 		{90A7866D-11FD-478C-BE23-FA1A489EF1F4}.Debug|x64.Build.0 = Debug|x64
 		{90A7866D-11FD-478C-BE23-FA1A489EF1F4}.Debug|x86.ActiveCfg = Debug|x86

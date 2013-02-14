@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Targets\NominalMassTarget.cs" />
+    <Compile Include="IQMillion\NominalMassFeatureGenerator.cs" />
     <Compile Include="IQMillion\IQMillionWorkflow.cs" />
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
