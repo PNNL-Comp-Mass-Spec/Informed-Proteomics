@@ -33,24 +33,24 @@ namespace InformedProteomics.Backend.IQMillion
 
         protected override void DoMainInitialization()
         {
-            ValidateParameters();
+            //ValidateParameters();
 
-            _theorFeatureGen = new NominalMassFeatureGenerator();
-            _chromGen = new PeakChromatogramGenerator(_workflowParameters.ChromGenTolerance, _workflowParameters.ChromGeneratorMode,
-                                                      DeconTools.Backend.Globals.IsotopicProfileType.UNLABELLED,
-                                                      _workflowParameters.ChromGenToleranceUnit)
-            {
-                TopNPeaksLowerCutOff = 0.333,
-                NETWindowWidthForAlignedData = (float)_workflowParameters.ChromNETTolerance * 2,
-                NETWindowWidthForNonAlignedData = (float)_workflowParameters.ChromNETTolerance * 2
-            };
+            //_theorFeatureGen = new NominalMassFeatureGenerator();
+            //_chromGen = new PeakChromatogramGenerator(_workflowParameters.ChromGenTolerance, _workflowParameters.ChromGeneratorMode,
+            //                                          DeconTools.Backend.Globals.IsotopicProfileType.UNLABELLED,
+            //                                          _workflowParameters.ChromGenToleranceUnit)
+            //{
+            //    TopNPeaksLowerCutOff = 0.333,
+            //    NETWindowWidthForAlignedData = (float)_workflowParameters.ChromNETTolerance * 2,
+            //    NETWindowWidthForNonAlignedData = (float)_workflowParameters.ChromNETTolerance * 2
+            //};
 
-            const bool allowNegativeValues = false;
-            _chromSmoother = new SavitzkyGolaySmoother(_workflowParameters.ChromSmootherNumPointsInSmooth, 2, allowNegativeValues);
-            _chromPeakDetector = new ChromPeakDetector(_workflowParameters.ChromPeakDetectorPeakBR, _workflowParameters.ChromPeakDetectorSigNoise);
+            //const bool allowNegativeValues = false;
+            //_chromSmoother = new SavitzkyGolaySmoother(_workflowParameters.ChromSmootherNumPointsInSmooth, 2, allowNegativeValues);
+            //_chromPeakDetector = new ChromPeakDetector(_workflowParameters.ChromPeakDetectorPeakBR, _workflowParameters.ChromPeakDetectorSigNoise);
 
-            ChromatogramXYData = new XYData();
-            ChromPeaksDetected = new List<ChromPeak>();
+            //ChromatogramXYData = new XYData();
+            //ChromPeaksDetected = new List<ChromPeak>();
         }
 
         public override void DoWorkflow()
