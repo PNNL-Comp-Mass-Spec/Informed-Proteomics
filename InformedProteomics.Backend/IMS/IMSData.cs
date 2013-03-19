@@ -1,52 +1,57 @@
 ﻿using System.Collections.Generic;
+using DeconTools.Backend;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
+using MultiDimensionalPeakFinding;
+using UIMFLibrary;
 
 namespace InformedProteomics.Backend.IMS
 {
-    public class IMSData
+    public class ImsData
     {
-        public int NumFrameSets
+        private readonly UimfUtil _uimfUtil;
+        private readonly string _filePath;
+
+        public ImsData(string filePath)
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
+            _filePath = filePath;
+            _uimfUtil = new UimfUtil(filePath);
         }
 
-        public int NumFramesPerFrameSet
+        public FeatureSet GetFeatures(double mz, Tolerance tolerance, DataReader.FrameType frameType)
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-    
-        // MS1 only
-        public XIC GetXIC(Ion ion)
-        {
-            throw new System.NotImplementedException();
+            List<IntensityPoint> intensityBlock = _uimfUtil.GetXic(mz, tolerance.GetValue(), frameType, tolerance.GetUnit());
+            var xic = new FeatureSet(intensityBlock);
+
+            return xic;
         }
 
-        public void GetFrameSet(int frameSetID)
+        public FeatureSet GetFeatures(int targetBin, DataReader.FrameType frameType)
         {
-            throw new System.NotImplementedException();
+            List<IntensityPoint> intensityPointList = _uimfUtil.GetXic(targetBin, frameType);
+            var xic = new FeatureSet(intensityPointList);
+
+            return xic;
         }
 
-        public List<Frame> GetMS1Frames()
+        public int GetNumberOfBins()
         {
-            throw new System.NotImplementedException();
+            return _uimfUtil.GetNumberOfBins();
         }
 
-        public List<FrameSet> GetFrameSetList()
+        public double GetMzFromBin(int bin)
         {
-            throw new System.NotImplementedException();
+            return _uimfUtil.GetMzFromBin(bin);
+        }
+
+        public int GetBinFromMz(double mz)
+        {
+            return _uimfUtil.GetBinFromMz(mz);
+        }
+
+        public string GetFilePath()
+        {
+            return _filePath;
         }
     }
 }

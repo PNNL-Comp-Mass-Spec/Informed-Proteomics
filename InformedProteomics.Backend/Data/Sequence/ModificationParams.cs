@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 {
     public class ModificationParams
     {
-        private List<ModificationInstance> _modList;
+        //private List<ModificationInstance> _modList;
 
         public ModificationParams(int maxNumMods)
         {

@@ -7,13 +7,17 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Targets
 {
-    class NominalMassTarget : TargetBase
+    public class NominalMassTarget : TargetBase
     {
-        public NominalMassTarget(int nominalMass, short chargeState) : base()
+        public NominalMassTarget(int nominalMass, short chargeState, int msLevel) : base()
         {
+            NominalMass = nominalMass;
             this.MZ = nominalMass/Constants.RescalingConstant;
             this.ChargeState = chargeState;
+            this.MsLevel = msLevel;
         }
+
+        public int NominalMass { get; private set; }
 
         public override string GetEmpiricalFormulaFromTargetCode()
         {
@@ -22,7 +26,7 @@ namespace InformedProteomics.Backend.Data.Targets
 
         public override string ToString()
         {
-            return string.Format("ID: {0}, MZ: {2}, ChargeState: {3}", ID, MZ, ChargeState);
+            return string.Format("ID: {0}, MZ: {1}, ChargeState: {2}", ID, MZ, ChargeState);
         }
     }
 }
