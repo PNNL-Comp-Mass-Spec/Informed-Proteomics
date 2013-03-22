@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public double GetMz()
         {
-            return (Composition.GetMass() + Constants.H2O + Charge * Constants.H) / Charge;
+            return (Composition.GetMass() + Charge * Constants.H) / Charge;
         }
     }
 }

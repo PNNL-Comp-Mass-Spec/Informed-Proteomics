@@ -13,9 +13,8 @@ using UIMFLibrary;
 namespace InformedProteomics.Test
 {
     [TestFixture]
-    internal class TestIqMillion
+    internal class TestIcIms
     {
-
         [Test]
         public void TestImsFeatureFinding()
         {
@@ -29,15 +28,42 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             foreach (Composition composition in aaSet.GetCompositions(targetPeptide))
             {
-                for (int charge = 2; charge <= 4; charge++)
+                for (int charge = 3; charge <= 3; charge++)
                 {
-                    Ion precursorIon = new Ion(composition, charge);
+                    var precursorIon = new Ion(composition+Composition.H2O, charge);
                     double precursorMz = precursorIon.GetMz();
                     FeatureSet precursorFeatures = imsData.GetPrecursorFeatures(precursorMz);
-                    Console.WriteLine("Precursor: {0}, Charge: {1}", precursorMz, charge);
+                    Console.WriteLine("Precursor: {0}, Charge: {1}\n", precursorMz, charge);
                     foreach (Feature precursorFeature in precursorFeatures)
                     {
                         Console.WriteLine(precursorFeature);
+                        Console.WriteLine("LC Apex profile");
+                        Console.WriteLine(string.Join("\t", precursorFeature.LcApexPeakProfile));
+                        Console.WriteLine("IMS Apex profile");
+                        Console.WriteLine(string.Join("\t", precursorFeature.ImsApexPeakProfile));
+                        Console.WriteLine();
+                    }
+                }
+            }
+
+            imsData.CreateFragmentFeatures();
+            const string targetFragment = "AADDKEACFAVEGPK";
+            foreach (Composition composition in aaSet.GetCompositions(targetFragment))
+            {
+                for (int charge = 2; charge <= 2; charge++)
+                {
+                    var y15C2 = new Ion(composition + Composition.H2O, 2);
+                    double fragmentMz = y15C2.GetMz();
+                    FeatureSet fragmentFeatures = imsData.GetFragmentFeatures(fragmentMz);
+                    Console.WriteLine("Fragment: {0}, Charge: {1}", fragmentMz, charge);
+                    foreach (Feature fragmentFeature in fragmentFeatures)
+                    {
+                        Console.WriteLine(fragmentFeature);
+                        Console.WriteLine("LC Apex profile");
+                        Console.WriteLine(string.Join("\t", fragmentFeature.LcApexPeakProfile));
+                        Console.WriteLine("IMS Apex profile");
+                        Console.WriteLine(string.Join("\t", fragmentFeature.ImsApexPeakProfile));
+                        Console.WriteLine();
                     }
                 }
             }

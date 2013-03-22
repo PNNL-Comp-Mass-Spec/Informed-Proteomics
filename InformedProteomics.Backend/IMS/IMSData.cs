@@ -21,17 +21,17 @@ namespace InformedProteomics.Backend.IMS
         public FeatureSet GetFeatures(double mz, Tolerance tolerance, DataReader.FrameType frameType)
         {
             List<IntensityPoint> intensityBlock = _uimfUtil.GetXic(mz, tolerance.GetValue(), frameType, tolerance.GetUnit());
-            var xic = new FeatureSet(intensityBlock);
+            var features = new FeatureSet(intensityBlock);
 
-            return xic;
+            return features;
         }
 
         public FeatureSet GetFeatures(int targetBin, DataReader.FrameType frameType)
         {
             List<IntensityPoint> intensityPointList = _uimfUtil.GetXic(targetBin, frameType);
-            var xic = new FeatureSet(intensityPointList);
+            var features = new FeatureSet(intensityPointList);
 
-            return xic;
+            return features;
         }
 
         public int GetNumberOfBins()
