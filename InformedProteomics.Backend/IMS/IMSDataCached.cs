@@ -99,6 +99,41 @@ namespace InformedProteomics.Backend.IMS
             return bestFeature;
         }
 
+        /// <summary>
+        /// Extracts the fragment feature within the boundary of the precursorFeature 
+        /// </summary>
+        /// <param name="fragmentMz"></param>
+        /// <param name="precursorFeature"></param>
+        /// <returns>the fragment feature within the boundary of the precursorFeature</returns>
+        public Feature GetPrecursorFeature(double fragmentMz, Feature precursorFeature)
+        {
+            Feature bestFeature = null;
+            int bestIntersectionArea = 0;
+            Rectangle precursorBoundary = precursorFeature.GetBoundary();
+
+            // TODO: this is not optimal
+            FeatureSet fragmentFeatures = GetFragmentFeatures(fragmentMz);
+            foreach (Feature feature in fragmentFeatures)
+            {
+                if (precursorBoundary.Contains(feature.GetHighestPoint()))
+                {
+                    Rectangle boundary = feature.GetBoundary();
+                    Rectangle intersection = Rectangle.Intersect(precursorBoundary, boundary);
+                    int intersectionArea = intersection.Width * intersection.Height;
+                    double portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
+                    if (portionIntersection < 0.9f)
+                        continue;
+                    if (intersectionArea > bestIntersectionArea)
+                    {
+                        bestFeature = feature;
+                        bestIntersectionArea = intersectionArea;
+                    }
+                }
+            }
+
+            return bestFeature;
+        }
+
         public void CreatePrecursorFeatures()
         {
             // Precursor

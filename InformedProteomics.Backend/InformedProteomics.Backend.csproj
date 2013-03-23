@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
+    <Compile Include="Data\Sequence\SequenceGenerator.cs" />
     <Compile Include="Data\Spectrometry\IonType.cs" />
     <Compile Include="Data\Spectrometry\XIC.cs" />
     <Compile Include="Data\Targets\NominalMassTarget.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="IMS\Feature.cs" />
     <Compile Include="IMS\IMSDataCached.cs" />
     <Compile Include="IMS\Featureset.cs" />
+    <Compile Include="IMS\XICPeak.cs" />
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
@@ -173,16 +175,13 @@
     <Compile Include="Utils\DtaUtil.cs" />
     <Compile Include="Utils\FragmentationUtil.cs" />
     <Compile Include="IMS\IMSData.cs" />
-    <Compile Include="IMS\IMSPrecursor.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Database\IStringEnumerator.cs" />
     <Compile Include="Utils\PeptideEnumerator.cs" />
     <Compile Include="Utils\PeptideUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Database\ProteinDatabase.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
     <Compile Include="Utils\SequenceEnumerator.cs" />
-    <Compile Include="IMS\XICPeak.cs" />
     <Compile Include="IMS\XICProfile.cs" />
   </ItemGroup>
   <ItemGroup>

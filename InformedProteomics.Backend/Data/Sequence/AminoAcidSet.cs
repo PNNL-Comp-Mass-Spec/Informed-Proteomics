@@ -48,12 +48,12 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Properties
 
-        private int _numDynModsPerPeptide = 2;
+        private int _maxNumDynModsPerPeptide = 2;
 
-        public int NumDynModsPerPeptide
+        public int MaxNumDynModsPerPeptide
         {
-            get { return _numDynModsPerPeptide; }
-            set { _numDynModsPerPeptide = value; }
+            get { return _maxNumDynModsPerPeptide; }
+            set { _maxNumDynModsPerPeptide = value; }
         }
 
         #endregion
