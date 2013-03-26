@@ -10,17 +10,17 @@ namespace InformedProteomics.Backend.IMS
 {
     public class Feature
     {
-        public ushort ScanLcStart { get; private set; }
-        public byte ScanLcLength { get; private set; }
-        public byte ScanLcRepOffset { get; private set; }
+        public ushort ScanLcStart { get; private set; }// 100
+        public byte ScanLcLength { get; private set; }// 5 -> 100-104
+        public byte ScanLcRepOffset { get; private set; }// to highest point 
         public ushort ScanImsStart { get; private set; }
         public byte ScanImsLength { get; private set; }
         public byte ScanImsRepOffset { get; private set; }
         public float IntensityMax { get; private set; }
         public float SumIntensities { get; private set; }
         public ushort NumPoints { get; private set; }
-        public float[] LcApexPeakProfile { get; private set; }
-        public float[] ImsApexPeakProfile { get; private set; }
+        public float[] LcApexPeakProfile { get; private set; }//ScanLcLength
+        public float[] ImsApexPeakProfile { get; private set; }//ScanImsLength
 
         public Feature()
         {

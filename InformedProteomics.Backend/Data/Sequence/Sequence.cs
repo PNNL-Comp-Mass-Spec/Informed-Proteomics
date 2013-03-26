@@ -51,12 +51,18 @@ namespace InformedProteomics.Backend.Data.Sequence
         //added by kyowon jeong
         public double GetMass(int from, int to)
         {
+            return GetComposition(from, to).GetMass();
+        }
+
+        //added by kyowon jeong
+        public Composition GetComposition(int from, int to)
+        {
             from = Math.Max(from, 0);
             to = Math.Min(to, Count);
-            double sum = 0;
+            var composition = Composition.Zero;
             for (var i = from; i < to; i++)
-                sum += this[i].GetMass();
-            return sum;
+                composition += this[i].Composition;
+            return composition;
         }
 
         IEnumerator<Composition> IEnumerable<Composition>.GetEnumerator()

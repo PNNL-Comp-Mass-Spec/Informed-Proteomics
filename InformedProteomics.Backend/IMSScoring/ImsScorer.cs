@@ -19,6 +19,7 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             _imsData = imsData;
         }
+        //TODO
 
         //public double GetCutScore(Feature4D precursorFeature, Composition cutComposition, List<IonType> ionTypes)
         //{

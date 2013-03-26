@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Scoring
         {
             var prevIonXIC = ContainsKey(ion) ? this[ion] : new double[ionXIC.Length];
             var updatedIonXIC = new double[ionXIC.Length];
-            for (int i = 0; i < ionXIC.Length; i++)
+            for (var i = 0; i < ionXIC.Length; i++)
             {
                 updatedIonXIC[i] = ionXIC[i] + prevIonXIC[i];
             }

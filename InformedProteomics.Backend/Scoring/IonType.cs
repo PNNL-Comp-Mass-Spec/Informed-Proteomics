@@ -6,13 +6,23 @@ namespace InformedProteomics.Backend.Scoring
     {
         public string Type { get; private set; }
         public string NeutralLoss { get; private set; }
+        public bool IsPrecursor { get; private set; }
         public bool IsPrefix { get; private set; }
         public int Charge { get; private set; }
 
         public IonType(string symbol, int charge)
         {
             Type = symbol.Substring(0, 1);
-            IsPrefix = Type.ToCharArray()[0] < 'g';
+            if (Type.Equals("p"))
+            {
+                IsPrecursor = true;
+                IsPrefix = true;
+            }
+            else
+            {
+                IsPrecursor = false;
+                IsPrefix = Type.ToCharArray()[0] < 'g';
+            }
             var i = Math.Max(symbol.LastIndexOf('+'), symbol.LastIndexOf('-'));
             NeutralLoss = "";
             if (i > 0)
@@ -21,6 +31,11 @@ namespace InformedProteomics.Backend.Scoring
             }
             
             Charge = charge;
+        }
+
+        public static IonType GetPrecursorIon(int charge)
+        {
+            return new IonType("p", charge);
         }
 
         public override int GetHashCode()

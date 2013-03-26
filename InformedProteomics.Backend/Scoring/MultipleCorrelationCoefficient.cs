@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Generic;
-using MathNet.Numerics.LinearAlgebra.Single;
+﻿using MathNet.Numerics.LinearAlgebra.Single;
 using System;
 
 namespace InformedProteomics.Backend.Scoring
@@ -14,8 +12,8 @@ namespace InformedProteomics.Backend.Scoring
 
         public MultipleCorrelationCoefficient(DenseMatrix x, DenseMatrix y, DenseMatrix rxx, DenseMatrix rxy)// x should be appended to 1s
         {
-            X = Standardize(x);
-            Y = Standardize(y);
+            X = x;
+            Y = y;
             Rxx = rxx;
             Rxy = rxy;
         }
@@ -46,29 +44,12 @@ namespace InformedProteomics.Backend.Scoring
            
             
             var r2 = Math.Max(0,ssr) / sst;
-            
+            if (float.IsNaN(r2)) r2 = 0f;
             return r2;
         }
 
-        private static DenseMatrix Standardize(Matrix<float> x) // return standardized x (i.e., mean = 0, var = 1) 
-        {
-            var sx = new DenseMatrix(x.RowCount, x.ColumnCount);
-            for (var i = 0; i < x.ColumnCount; i++)
-            { 
-                var c = x.Column(i);
-                var m = GetSampleMean(c);
-                var v = GetSampleVariance(c, m);
-               
-                for (var k = 0; k < x.RowCount; k++)
-                {
-                    sx.At(k,i, (x.At(k,i) - m) / (float)Math.Sqrt(v));
-                }
-            }
-            return sx;
-        }
-
-
-        private static float GetSampleMean(Vector<float> x)
+        
+        /*private static float GetSampleMean(Vector<float> x)
         {
             var m = Enumerable.Sum(x);
             return m / x.Count;
@@ -78,7 +59,7 @@ namespace InformedProteomics.Backend.Scoring
         {
             var var = x.Sum(v => (v - m)*(v - m));
             return var / (x.Count - 1);
-        }
+        }*/
 
         /*
         static public void Main(String[] args)

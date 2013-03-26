@@ -8,6 +8,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class IonType
     {
+        public class CtermIonType // temporarily defined by kyowon
+        {
+            
+        }
+
+        public class NtermIonType
+        {
+            
+        }
+
+        public class PrecursorIonType
+        {
+            
+        }
+
+        public int charge { get; private set; }
+        
         public double GetMz(Composition cutComposition)
         {
             throw new System.NotImplementedException();
