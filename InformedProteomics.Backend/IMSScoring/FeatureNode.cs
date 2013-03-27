@@ -6,13 +6,13 @@ namespace InformedProteomics.Backend.IMSScoring
     public class FeatureNode
     {
         public FragmentParameter Parameter { get; private set; }
-        public IonType IonType { get; private set; }
+        public IonType FragmentIonClassBase { get; private set; }
         public Feature Feature { get; private set; }
 
-        public FeatureNode(Feature feature, IonType ionType, FragmentParameter parameter)
+        public FeatureNode(Feature feature, IonType fragmentIonClassBase, FragmentParameter parameter)
         {
             Feature = feature;
-            IonType = ionType;
+            FragmentIonClassBase = fragmentIonClassBase;
             Parameter = parameter;
         }
     }

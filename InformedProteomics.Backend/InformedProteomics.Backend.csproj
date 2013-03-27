@@ -116,7 +116,11 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
+    <Compile Include="Data\Sequence\SequenceGenerator.cs" />
+    <Compile Include="Data\Spectrometry\BaseIonType.cs" />
     <Compile Include="Data\Spectrometry\IonType.cs" />
+    <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
+    <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
     <Compile Include="Data\Spectrometry\XIC.cs" />
     <Compile Include="Data\Targets\NominalMassTarget.cs" />
     <Compile Include="IMSScoring\FeatureGraph.cs" />

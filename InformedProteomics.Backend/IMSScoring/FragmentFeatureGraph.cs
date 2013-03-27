@@ -34,26 +34,27 @@ namespace InformedProteomics.Backend.IMSScoring
         static private List<FeatureNode> GetTargetNodes(FeatureNode primeNode, IEnumerable<FeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
         {
             var targetNodes = new List<FeatureNode>();
-            var primeNterm = primeNode.IonType is IonType.NtermIonType;
+            //var primeNterm = primeNode.FragmentIonClassBase is IonType.NtermIonType;
+            var primeNterm = primeNode.FragmentIonClassBase.IsPrefixIon;    // Modified by Sangtae
 
             foreach (var node in nodes)
             {
                 if (node.Equals(primeNode)) continue;
                 if (diffCharge)
                 {
-                    if(node.IonType.charge != primeNode.IonType.charge)
+                    if(node.FragmentIonClassBase.Charge != primeNode.FragmentIonClassBase.Charge)
                         targetNodes.Add(node);
                 }else
                 {
-                    if (node.IonType.charge != primeNode.IonType.charge) continue;
+                    if (node.FragmentIonClassBase.Charge != primeNode.FragmentIonClassBase.Charge) continue;
                     if (diffTerminal && primeNterm || !diffTerminal && !primeNterm)
                     {
-                        if(node.IonType is IonType.CtermIonType)
+                        if(node.FragmentIonClassBase.IsPrefixIon)
                             targetNodes.Add(node);
                     }
                     else
                     {
-                        if(node.IonType is IonType.NtermIonType)
+                        if(node.FragmentIonClassBase.IsPrefixIon)
                             targetNodes.Add(node);
                     }
                 }
@@ -83,7 +84,7 @@ namespace InformedProteomics.Backend.IMSScoring
         static private List<FeatureNode> GetFragmentNodes(ImsDataCached imsData, FeatureNode precursorNode, Sequence peptide, int cutNumber)
         {
             var parameter = new FragmentParameter(peptide, cutNumber);
-            var ionTypes = SubScoreFactory.GetIonTypes(parameter, precursorNode.IonType.charge);
+            var ionTypes = SubScoreFactory.GetIonTypes(parameter, precursorNode.FragmentIonClassBase.Charge);
 
             var nodes = new List<FeatureNode>();
             var prefixComposition = peptide.GetComposition(0, cutNumber);
@@ -92,7 +93,7 @@ namespace InformedProteomics.Backend.IMSScoring
             foreach (var ionType in ionTypes)
             {
                 double mz;
-                if (ionType is IonType.NtermIonType)
+                if (ionType.IsPrefixIon)
                     mz = ionType.GetMz(prefixComposition);
                 else
                     mz = ionType.GetMz(suffixComposition);

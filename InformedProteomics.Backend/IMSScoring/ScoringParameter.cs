@@ -15,22 +15,22 @@ namespace InformedProteomics.Backend.IMSScoring
             return null;
         }
 
-        internal static float GetRatioScore(IonType ionType1, IonType ionType2, int ratio, FragmentParameter fragmentParameter)
+        internal static float GetRatioScore(IonType fragmentIonClassBaseType1, IonType fragmentIonClassBaseType2, int ratio, FragmentParameter fragmentParameter)
         {
             throw new System.NotImplementedException();
         }
 
-        internal static float GetLCCorrelationScore(IonType ionType1, IonType ionType2, float lcCorr, FragmentParameter fragmentParameter)
+        internal static float GetLCCorrelationScore(IonType fragmentIonClassBaseType1, IonType fragmentIonClassBaseType2, float lcCorr, FragmentParameter fragmentParameter)
         {
             throw new System.NotImplementedException();
         }
 
-        internal static float GetIMSCorrelationScore(IonType ionType1, IonType ionType2, float imsCorr, FragmentParameter fragmentParameter)
+        internal static float GetIMSCorrelationScore(IonType fragmentIonClassBaseType1, IonType fragmentIonClassBaseType2, float imsCorr, FragmentParameter fragmentParameter)
         {
             throw new System.NotImplementedException();
         }
 
-        public static float GetKLDivergence(IonType ionType, IonType ionType1, int ratio, float lcCorrelation, float imsCorrelation, FragmentParameter parameter)
+        public static float GetKLDivergence(IonType fragmentIonClassBase, IonType fragmentIonClassBaseType1, int ratio, float lcCorrelation, float imsCorrelation, FragmentParameter parameter)
         {
             throw new System.NotImplementedException();
         }

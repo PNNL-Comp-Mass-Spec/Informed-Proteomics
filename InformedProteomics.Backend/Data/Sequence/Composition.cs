@@ -7,8 +7,11 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
 		public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
-		public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
-		public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
+        public static readonly Composition NH3 = new Composition(0, 3, 1, 0, 0);
+        public static readonly Composition NH2 = new Composition(0, 2, 1, 0, 0);
+        public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
+        public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
+        public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
         public Composition(int c, int h, int n, int o, int s)
         {
@@ -18,17 +21,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             O = (short)o;
             S = (short)s;
         }
+        
+        public Composition(Composition composition): this(composition.C, composition.H, 
+            composition.N, composition.O, composition.S)
+        {
+            
+        }
 
         #region Properties
 
         public short C { get; private set; }
-
         public short H { get; private set; }
-
         public short N { get; private set; }
-
         public short O { get; private set; }
-
         public short S { get; private set; }
 
         #endregion

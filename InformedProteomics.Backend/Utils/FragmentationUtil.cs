@@ -37,8 +37,8 @@ namespace InformedProteomics.Backend.Utils
 			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itAIon] = 100;
 			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itBIon] = 100;
 			m_fragmentationOptions.IntensityOptions.IonType[(int) MWPeptideClass.itIonTypeConstants.itYIon] = 100;
-			//fragmentationOptions.IntensityOptions.IonType[(int)MWPeptideClass.itIonTypeConstants.itCIon] = 100;
-			//fragmentationOptions.IntensityOptions.IonType[(int)MWPeptideClass.itIonTypeConstants.itZIon] = 100;
+			//fragmentationOptions.IntensityOptions.FragmentIonClassBase[(int)MWPeptideClass.itIonTypeConstants.itCIon] = 100;
+			//fragmentationOptions.IntensityOptions.FragmentIonClassBase[(int)MWPeptideClass.itIonTypeConstants.itZIon] = 100;
 		}
 
 		public static List<Fragment> FindFragmentsForPeptide(String peptideSequence, int maxChargeState)

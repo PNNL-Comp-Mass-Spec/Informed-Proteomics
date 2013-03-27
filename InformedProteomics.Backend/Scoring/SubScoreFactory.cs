@@ -257,12 +257,12 @@ namespace InformedProteomics.Backend.Scoring
             return _ratioProbabilityScore[par][ion1][ion2][r];
         }
 
-       /* public static float GetIonXICMean(IonType ionType, FragmentParameter par)
+       /* public static float GetIonXICMean(FragmentIonClassBase FragmentIonClassBase, FragmentParameter par)
         {
             return 0.6f;
         }
 
-        public static float GetIonXICVariance(IonType ionType, FragmentParameter par)
+        public static float GetIonXICVariance(FragmentIonClassBase FragmentIonClassBase, FragmentParameter par)
         {
             return 1;
         }*/

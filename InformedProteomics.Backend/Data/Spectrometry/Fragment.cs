@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 		public double Mass { get; set; }
 
 		/// <summary>
-		/// If this fragment is y6, the IonType is y
+		/// If this fragment is y6, the FragmentIonClassBase is y
 		/// </summary>
 		public string IonType { get; set; }
 
@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
 		public override string ToString()
 		{
-			return string.Format("ChargeState: {0}, Mz: {1}, Mass: {2}, ResidueNumber: {3}, IonType: {4}, IonSymbol: {5}", ChargeState, Mz, Mass, ResidueNumber, IonType, IonSymbol);
+			return string.Format("ChargeState: {0}, Mz: {1}, Mass: {2}, ResidueNumber: {3}, FragmentIonClassBase: {4}, IonSymbol: {5}", ChargeState, Mz, Mass, ResidueNumber, IonType, IonSymbol);
 		}
 	}
 }

@@ -21,11 +21,11 @@ namespace InformedProteomics.Backend.IMSScoring
         }
         //TODO
 
-        //public double GetCutScore(Feature4D precursorFeature, Composition cutComposition, List<IonType> ionTypes)
+        //public double GetCutScore(Feature4D precursorFeature, Composition cutComposition, List<FragmentIonClassBase> ionTypes)
         //{
-        //    foreach (var ionType in ionTypes)
+        //    foreach (var FragmentIonClassBase in ionTypes)
         //    {
-        //        double fragmentMz = ionType.GetMz(cutComposition);
+        //        double fragmentMz = FragmentIonClassBase.GetMz(cutComposition);
         //        var fragmentFeature = _imsData.GetFragmentXIC4D(precursorFeature, fragmentMz, _fragmentTolerance);
         //    }
 
