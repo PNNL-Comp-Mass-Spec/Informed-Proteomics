@@ -32,6 +32,7 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("N", 14.003074, 14, "Nitrogen"),
                 new Atom("O", 15.99491463, 16, "Oxigen"),
                 new Atom("S", 31.9720707, 32, "Sulfur"),
+                new Atom("C13", 13.00335483, 13, "Carbon-13")
             };
 
         public static Atom Get(string code)

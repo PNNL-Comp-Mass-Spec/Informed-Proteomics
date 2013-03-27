@@ -17,5 +17,15 @@ namespace InformedProteomics.Backend.Data.Biology
         {
             return (Composition.GetMass() + Charge * Constants.H) / Charge;
         }
+
+        /// <summary>
+        /// Gets the m/z of ith isotope
+        /// </summary>
+        /// <param name="isotopeIndex">isotope index. 0 means mono-isotope, 1 means 2nd isotope, etc.</param>
+        /// <returns></returns>
+        public double GetIsotopeMz(int isotopeIndex)
+        {
+            return (Composition.GetIsotopeMass(isotopeIndex) + Charge * Constants.H) / Charge;
+        }
     }
 }

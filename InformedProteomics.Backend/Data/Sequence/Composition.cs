@@ -47,6 +47,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
+        /// Gets the m/z of ith isotope
+        /// </summary>
+        /// <param name="isotopeIndex">isotope index. 0 means mono-isotope, 1 means 2nd isotope, etc.</param>
+        /// <returns></returns>
+        public double GetIsotopeMass(int isotopeIndex)
+        {
+            return GetMass() + isotopeIndex * MassIsotope;
+        }
+
+        /// <summary>
         /// Gets the mono-isotopic nominal mass
         /// </summary>
         public int GetNominalMass()
@@ -95,6 +105,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly double MassN = Atom.Get("N").Mass;
         private static readonly double MassO = Atom.Get("O").Mass;
         private static readonly double MassS = Atom.Get("S").Mass;
+        private static readonly double MassIsotope = Atom.Get("C13").Mass - MassC;
+
 
         private static readonly int NominalMassC = Atom.Get("C").NominalMass;
         private static readonly int NominalMassH = Atom.Get("H").NominalMass;
