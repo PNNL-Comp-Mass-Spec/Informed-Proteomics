@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
@@ -10,6 +11,22 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestUtils
     {
+        [Test]
+        public void TestGeneratingCombinations()
+        {
+            const int n = 10;
+            const int k = 3;
+            var combinations = ModificationParams.GetCombinationsWithRepetition(n, k);
+            int count = 0;
+            foreach (var combination in combinations)
+            {
+                ++count;
+                Console.WriteLine(string.Join(",", combination));
+            }
+            Console.WriteLine("Count: " + count);
+            Console.WriteLine("Count2: " + ModificationParams.NChooseK(n+k-1,k));
+        }
+
         [Test]
         public void TestCSharpSyntax()
         {

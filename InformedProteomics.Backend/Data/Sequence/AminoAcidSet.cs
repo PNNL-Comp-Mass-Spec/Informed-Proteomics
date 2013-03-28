@@ -37,6 +37,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             _numDynMods = 0;
         }
 
+        public AminoAcidSet(IEnumerable<SearchModification> modInstances)
+        {
+            
+        }
+
         // TODO: Read modification information from modFileName
         public AminoAcidSet(string modFileName)
         {
@@ -57,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         #endregion
-
+        
         public AminoAcid GetUnmodifiedAminoAcid(char residue)
         {
             AminoAcid[] aaArr = GetAminoAcids(residue);

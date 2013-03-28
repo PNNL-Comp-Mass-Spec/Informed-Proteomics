@@ -78,6 +78,18 @@ namespace InformedProteomics.Backend.Data.Sequence
             S += composition.S;
         }
 
+        public override int GetHashCode()
+        {
+            return C*0x01000000 + H*0x00010000 + N*0x00000400 + O*0x00000010 + S;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Composition;
+            return other != null &&
+                C == other.C && H == other.H && N == other.N && O == other.O && S == other.S;
+        }
+
         public float[] GetIsotopomerEnvelop()
         {
             throw new System.NotImplementedException();

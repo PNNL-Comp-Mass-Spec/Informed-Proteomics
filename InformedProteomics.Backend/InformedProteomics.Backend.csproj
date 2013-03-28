@@ -116,7 +116,9 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
-    <Compile Include="Data\Sequence\SequenceGenerator.cs" />
+    <Compile Include="Data\Sequence\ModificationInstance.cs" />
+    <Compile Include="Data\Sequence\ModificationParams.cs" />
+    <Compile Include="Data\Sequence\SequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\BaseIonType.cs" />
     <Compile Include="Data\Spectrometry\IonType.cs" />
     <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
@@ -157,12 +159,9 @@
     <Compile Include="Data\Sequence\AminoAcidSet.cs" />
     <Compile Include="Data\Sequence\Composition.cs" />
     <Compile Include="Data\Sequence\Modification.cs" />
-    <Compile Include="Data\Sequence\ModificationParams.cs" />
-    <Compile Include="Data\Sequence\ModificationInstance.cs" />
+    <Compile Include="Data\Sequence\SearchModification.cs" />
     <Compile Include="Data\Sequence\ModifiedAminoAcid.cs" />
-    <Compile Include="Data\Sequence\ModParamSet.cs" />
     <Compile Include="Data\Sequence\Sequence.cs" />
-    <Compile Include="Data\Sequence\SequenceVariant.cs" />
     <Compile Include="Data\Spectrometry\Feature.cs" />
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />

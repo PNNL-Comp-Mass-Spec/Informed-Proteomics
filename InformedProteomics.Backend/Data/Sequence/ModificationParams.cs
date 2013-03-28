@@ -1,41 +1,143 @@
+﻿using System;
 using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Enum;
+using System.Linq;
+using System.Text;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// This class cataluges all possible modification instances
+    /// </summary>
     public class ModificationParams
     {
-        //private List<ModificationInstance> _modList;
+        private ModificationInstance[] _modificationInstances;
+        private int _numMaxDynMods;
+        private Dictionary<int, Modification>[] _map;
 
-        public ModificationParams(int maxNumMods)
+        /// <summary>
+        /// Storing all possible combinations of modifications up to numMaxDynMods
+        /// </summary>
+        /// <param name="modifications"></param>
+        /// <param name="numMaxDynMods"></param>
+        public ModificationParams(Modification[] modifications, int numMaxDynMods)
         {
-            MaxNumMods = maxNumMods;
+            int numModifications = modifications.Count();
+            int numModificationInstances = NChooseK(numModifications + numMaxDynMods, numMaxDynMods);
+            _modificationInstances = new ModificationInstance[numModificationInstances];
+            GenerateModificationInstances(modifications.ToArray(), numMaxDynMods);
         }
 
-        public int MaxNumMods
+        /// <summary>
+        /// Gets the modification instance of the specified index
+        /// </summary>
+        /// <param name="index">modification instance index</param>
+        /// <returns>the modification instance</returns>
+        public ModificationInstance GetModificationInstance(int index)
         {
-            get;
-            private set;
+            return _modificationInstances[index];
         }
 
-        public int GetNumMassShifts()
+        /// <summary>
+        /// Apply modification to prevModIns and returns the modification instance.
+        /// Modification instances are referred by their indices.
+        /// </summary>
+        /// <param name="prevModIndex">the index of the modification instance to apply modification</param>
+        /// <param name="modification">modification to apply</param>
+        /// <returns>the index of the modification instance of prevModIns + modification</returns>
+        public int GetModificationInstanceIndex(int prevModIndex, Modification modification)
         {
             throw new System.NotImplementedException();
         }
 
-        public int[] GetModificationIndices(int prevIndex, AminoAcid aa, SequenceLocation? location)
+        /// <summary>
+        /// Apply modification to prevModIns and returns the modification instance
+        /// </summary>
+        /// <param name="prevModIns">modification instance to apply modification</param>
+        /// <param name="modification">modification to apply</param>
+        /// <returns>the modification instance of prevModIns + modification</returns>
+        public ModificationInstance GetModificationInstance(ModificationInstance prevModIns, Modification modification)
         {
             throw new System.NotImplementedException();
         }
 
-        public Composition GetModificationComposition(int modConfIndex)
+        /// <summary>
+        /// Gets the number of all possible modification instances
+        /// </summary>
+        /// <returns>the number of modification instances</returns>
+        public int GetNumModificationInstances()
         {
-            throw new System.NotImplementedException();
+            return _modificationInstances.Length;
         }
 
-        public Composition[] GetModificationCompositions()
+        private void GenerateModificationInstances(Modification[] modifications, int numMaxDynMods)
         {
-            throw new System.NotImplementedException();
+            var modInsList = new List<ModificationInstance>[numMaxDynMods+1];
+            modInsList[0] = new List<ModificationInstance>
+                {
+                    new ModificationInstance(new[] {Modification.NoModification})
+                };
+
+            _map = new Dictionary<int, Modification>[_modificationInstances.Length];
+
+            // No modification
+
+            for (int numMods = 1; numMods <= numMaxDynMods; numMods++)
+            {
+                //modInsList.AddRange(GetModificationInstances(modInsList));
+            }
+        }
+
+        private IEnumerable<ModificationInstance> GetModificationInstances(IEnumerable<ModificationInstance> modificationInstances)
+        {
+            return null;
+        }
+
+        public static int NChooseK(int n, int k)
+        {
+            int num = 1;
+            for (int i = 0; i < k; i++)
+                num *= n - i;
+            int denom = 1;
+            for (int i = 0; i < k; i++)
+                denom *= k - i;
+            return num/denom;
+        }
+
+        public static int[][] GetCombinationsWithRepetition(int n, int length)
+        {
+            if (n <= 0)
+                return null;
+
+            if (length == 0)
+            {
+                return new[] {new int[0] };
+            }
+            if (length == 1)
+            {
+                var combinations = new int[n][];
+                for (int i = 0; i < n; i++)
+                {
+                    combinations[i] = new[] {i};
+                }
+                return combinations;
+            }
+            else
+            {
+                int[][] prevCombinations = GetCombinationsWithRepetition(n, length - 1);
+                var combinations = new List<int[]>();
+                foreach (var combination in prevCombinations)
+                {
+                    int lastValue = combination.Last();
+                    for (int j = lastValue; j < n; j++)
+                    {
+                        var newCombination = new int[combination.Length+1];
+                        Array.Copy(combination, newCombination, combination.Length);
+                        newCombination[newCombination.Length - 1] = j;
+                        combinations.Add(newCombination);
+                    }
+                }
+                return combinations.ToArray();
+            }
         }
     }
 }

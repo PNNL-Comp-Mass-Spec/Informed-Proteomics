@@ -1,18 +1,44 @@
-using InformedProteomics.Backend.Data.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
     public class ModificationInstance
     {
-        public ModificationInstance(Modification mod, AminoAcid targetAA, SequenceLocation loc)
+        public ModificationInstance(IEnumerable<Modification> modifications)
         {
-            Modification = mod;
-            TargetAA = targetAA;
-            Location = loc;
+            Modifications = modifications;
+            Composition = Composition.Zero;
+            foreach(var modification in Modifications)
+            {
+                Composition += modification.Composition;
+            }
         }
 
-        public Modification Modification { get; private set; }
-        public AminoAcid TargetAA { get; private set; }
-        public SequenceLocation Location { get; private set; }
+        private Composition _composition;
+        private double _mass;
+
+        public IEnumerable<Modification> Modifications { get; private set; }
+        public Composition Composition 
+        { 
+            get { return _composition; }
+            private set 
+            { 
+                _composition = value;
+                _mass = value.GetMass();
+            }
+        }
+
+        public int GetNumModifications()
+        {
+            return Modifications.Count();
+        }
+
+        public double GetMass()
+        {
+            return _mass;
+        }
     }
 }

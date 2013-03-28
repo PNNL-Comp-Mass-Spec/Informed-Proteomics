@@ -5,22 +5,23 @@ using System.Text;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
-    class SequenceGenerator
+    public class SequenceGraph
     {
         private const int MaxPeptideLength = 50;
 
         public AminoAcidSet AminoAcidSet { get; private set; }
+
         private readonly int _maxIndex;
         private readonly int _maxNumDynModsPerPeptide;
 
         private int _index;
-        private Node[][] seqGraph;
+        private Node[][] graph;
 
         /// <summary>
         /// Initialize. Set the maximum sequence length as MaxPeptideLength
         /// </summary>
         /// <param name="aminoAcidSet"></param>
-        public SequenceGenerator(AminoAcidSet aminoAcidSet)
+        public SequenceGraph(AminoAcidSet aminoAcidSet)
             : this(aminoAcidSet, MaxPeptideLength)
         {
         }
@@ -30,7 +31,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="aminoAcidSet">amino acid set</param>
         /// <param name="pepSequence">peptide sequence</param>
-        public SequenceGenerator(AminoAcidSet aminoAcidSet, string pepSequence)
+        public SequenceGraph(AminoAcidSet aminoAcidSet, string pepSequence)
             : this(aminoAcidSet, pepSequence.Length)
         {
             int index = 0;
@@ -48,7 +49,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="aminoAcidSet"></param>
         /// <param name="maxSequenceLength"></param>
-        public SequenceGenerator(AminoAcidSet aminoAcidSet, int maxSequenceLength)
+        public SequenceGraph(AminoAcidSet aminoAcidSet, int maxSequenceLength)
         {
             AminoAcidSet = aminoAcidSet;
             _maxNumDynModsPerPeptide = aminoAcidSet.MaxNumDynModsPerPeptide;
@@ -56,8 +57,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             _index = 0;
 
-            seqGraph = new Node[_maxIndex][];
-            seqGraph[0] = new[] { new Node(Composition.Zero) };
+            graph = new Node[_maxIndex][];
+            graph[0] = new[] { new Node(Composition.Zero) };
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>true if residue is a valid amino acid; false otherwise.</returns>
         public bool PutAminoAcid(int index, char residue)
         {
-            _index = index+1;
+            _index = index + 1;
 
             AminoAcid[] aminoAcids = AminoAcidSet.GetAminoAcids(residue);
             if (aminoAcids == null) // residue is not valid
@@ -77,10 +78,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (aminoAcids.Length == 1) // unmodified
             {
                 AminoAcid aa = aminoAcids[0];
-                seqGraph[_index] = new Node[seqGraph[_index - 1].Length];
-                for (int i = 0; i < seqGraph.Length; i++)
+                graph[_index] = new Node[graph[_index - 1].Length];
+                for (int i = 0; i < graph.Length; i++)
                 {
-                    seqGraph[_index][i] = new Node(seqGraph[_index - 1][i], aa.Composition);
+                    graph[_index][i] = new Node(graph[_index - 1][i], aa.Composition);
                 }
             }
             else
@@ -137,7 +138,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             _prevNodes = new List<Node>();
         }
 
-        internal Node(Node prevNode, Composition composition): this(prevNode.Composition+composition)
+        internal Node(Node prevNode, Composition composition)
+            : this(prevNode.Composition + composition)
         {
             _prevNodes.Add(prevNode);
         }
