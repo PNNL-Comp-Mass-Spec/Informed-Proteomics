@@ -9,19 +9,19 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class StatisticsTools
     {
-        static public float GetLCCorrelation(FeatureNode l, FeatureNode r)
+        static public float GetLCCorrelation(Feature l, Feature r)
         {
-            var intersection = Rectangle.Intersect(l.Feature.GetBoundary(), r.Feature.GetBoundary());
-            var llc = GetTruncatedLc(l.Feature, intersection);
-            var rlc = GetTruncatedLc(r.Feature, intersection);
+            var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
+            var llc = GetTruncatedLc(l, intersection);
+            var rlc = GetTruncatedLc(r, intersection);
             return GetCorrelation(llc, rlc);
         }
 
-        static public float GetIMSCorrelation(FeatureNode l, FeatureNode r)
+        static public float GetIMSCorrelation(Feature l, Feature r)
         {
-            var intersection = Rectangle.Intersect(l.Feature.GetBoundary(), r.Feature.GetBoundary());
-            var lims = GetTruncatedIms(l.Feature, intersection);
-            var rims = GetTruncatedIms(r.Feature, intersection);
+            var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
+            var lims = GetTruncatedIms(l, intersection);
+            var rims = GetTruncatedIms(r, intersection);
             return GetCorrelation(lims, rims);
         }
 

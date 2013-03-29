@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Linq;
-using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
@@ -21,8 +18,8 @@ namespace InformedProteomics.Backend.IMSScoring
             RNode = r;
 
             _ratio = GetRatio(l.Feature.IntensityMax, r.Feature.IntensityMax);
-            _lcCorrelation = StatisticsTools.GetLCCorrelation(l, r);
-            _imsCorrelation = StatisticsTools.GetIMSCorrelation(l, r);
+            _lcCorrelation = StatisticsTools.GetLCCorrelation(l.Feature, r.Feature);
+            _imsCorrelation = StatisticsTools.GetIMSCorrelation(l.Feature, r.Feature);
            
             Weight = GetWeight();
             Score = GetScore();

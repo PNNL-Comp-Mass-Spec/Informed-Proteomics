@@ -1,3 +1,4 @@
+using System;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 
@@ -95,6 +96,25 @@ namespace InformedProteomics.Backend.Data.Sequence
             throw new System.NotImplementedException();
         }
 
+        public float[] GetApproximatedIsotopomerEnvelop()
+        {
+            var mean = C*(1 - ProbC12) + H*(1 - ProbH1) + N*(1 - ProbN14) + O*(1 - ProbO16) + S*(1 - ProbS32);
+            var var = C * (1 - ProbC12) * ProbC12 + H * (1 - ProbH1) * ProbH1 + N * (1 - ProbN14) * ProbN14 + O * (1 - ProbO16) * ProbO16 + S * (1 - ProbS32) * ProbS32;
+            var std = Math.Sqrt(var);
+            var dist = new float[5]; 
+            for (var i = 0; i < dist.Length; i++)
+            {
+                var l = ((-.5 + i) - mean)/std;
+                var r = ((.5 + i) - mean) / std;
+                dist[i] = (float)(MathNet.Numerics.SpecialFunctions.Erf(r) - MathNet.Numerics.SpecialFunctions.Erf(l));
+            }
+            for (var i = 0; i < dist.Length; i++)
+            {
+                dist[i] /= dist[0];
+            }
+            return dist;
+        }
+
         public static Composition operator +(Composition c1, Composition c2)
         {
             return new Composition(c1.C + c2.C, c1.H + c2.H, c1.N + c2.N, c1.O + c2.O, c1.S + c2.S);
@@ -109,6 +129,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 		{
 		    return "C" + C + "H" + H + "N" + N + "O" + O + "S" + S;
 		}
+
+        
+
 
         #region Masses of Atoms
 
@@ -128,5 +151,14 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #endregion
 
+        #region Isotope probabilities of Atoms // added by kyowon
+
+        private static readonly double ProbC12 = .9889;
+        private static readonly double ProbH1 = .99985;
+        private static readonly double ProbN14 = .99636;
+        private static readonly double ProbO16 = .99762;
+        private static readonly double ProbS32 = .95029;
+
+        #endregion
     }
 }

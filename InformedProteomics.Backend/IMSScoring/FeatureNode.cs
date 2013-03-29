@@ -7,13 +7,27 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public GroupParameter Parameter { get; private set; }
         public Feature Feature { get; private set; }
+        private readonly float _isotopeCorrelation, _lcCorrelation, _imsCorrelation;
         internal float Score { get; set; }
         public FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter)
         {
-            Feature = isotopomerFeatures.GetNthFeatureFromTheMostInstenseFeature(0);
+            Feature = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(0);
             Parameter = parameter;
+
+            var c = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(0);
+            var l = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(-1);
+            var r = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(1);
+            var r2 = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(2);
+
+            _lcCorrelation = StatisticsTools.GetLCCorrelation(c, r) - StatisticsTools.GetLCCorrelation(l, c);
+            _imsCorrelation = StatisticsTools.GetIMSCorrelation(c, r) - StatisticsTools.GetIMSCorrelation(l, c);
+            
+            //_isotopeCorrelation = StatisticsTools.GetCorrelation()
+
             Score = GetScore();
         }
+
+        
 
         private float GetScore()
         {
@@ -25,6 +39,6 @@ namespace InformedProteomics.Backend.IMSScoring
             throw new NotImplementedException();
         }
 
-        
+      
     }
 }

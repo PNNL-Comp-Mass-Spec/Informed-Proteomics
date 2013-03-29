@@ -9,12 +9,18 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public IsotopomerFeatures(ImsDataCached imsData, Composition composition)
         {
+                       
             //TODO
         }
 
-        public Feature GetNthFeatureFromTheMostInstenseFeature(int n)
+        public Feature GetNthFeatureFromTheMostIntenseFeature(int n)
         {
             throw new NotImplementedException();
+        }
+
+        public float GetIntensityRatioOfNthFeatureFromTheMostIntenseFeature(int n)
+        {
+            throw new NotImplementedException();            
         }
     }
 }

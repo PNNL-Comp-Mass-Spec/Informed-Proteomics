@@ -13,23 +13,17 @@ namespace InformedProteomics.Backend.IMSScoring
     public class ImsScorer
     {
         private ImsDataCached _imsData;
-        private Tolerance _fragmentTolerance = new Tolerance(20, DataReader.ToleranceType.PPM);
+        private Composition _precursorComposition;
 
-        public ImsScorer(ImsDataCached imsData)
+        public ImsScorer(ImsDataCached imsData, Composition precursorComposition)
         {
             _imsData = imsData;
+            _precursorComposition = precursorComposition;
         }
-        //TODO
 
-        //public double GetCutScore(Feature4D precursorFeature, Composition cutComposition, List<FragmentIonClassBase> ionTypes)
-        //{
-        //    foreach (var FragmentIonClassBase in ionTypes)
-        //    {
-        //        double fragmentMz = FragmentIonClassBase.GetMz(cutComposition);
-        //        var fragmentFeature = _imsData.GetFragmentXIC4D(precursorFeature, fragmentMz, _fragmentTolerance);
-        //    }
-
-        //    return 0;
-        //}
+        public double GetCutScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
