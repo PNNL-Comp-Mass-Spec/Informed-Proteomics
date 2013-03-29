@@ -6,20 +6,20 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class FeatureGraph
     {
-        public List<FeatureNode> PrecursorFeatureNodes; // precursor feature nodes of different charge states
+        public List<PrecursorFeatureNode> PrecursorFeatureNodes; // precursor feature nodes of different charge states
         public Sequence Peptide { get; private set; }
-        private readonly Dictionary<FeatureNode, FragmentFeatureGraph>[] _fragmentFeatureGraphs; 
+        private readonly Dictionary<PrecursorFeatureNode, FragmentFeatureGraph>[] _fragmentFeatureGraphs;
 
-        public FeatureGraph(ImsDataCached imsData, List<FeatureNode> precursorFeatureNodes, Sequence peptide)
+        public FeatureGraph(ImsDataCached imsData, List<PrecursorFeatureNode> precursorFeatureNodes, Sequence peptide)
         {
             PrecursorFeatureNodes = precursorFeatureNodes;
             Peptide = peptide;
 
-            _fragmentFeatureGraphs = new Dictionary<FeatureNode, FragmentFeatureGraph>[Peptide.Count];
+            _fragmentFeatureGraphs = new Dictionary<PrecursorFeatureNode, FragmentFeatureGraph>[Peptide.Count];
 
             for (var cutNumber = 0; cutNumber < Peptide.Count; cutNumber++)
             {
-                _fragmentFeatureGraphs[cutNumber] = new Dictionary<FeatureNode, FragmentFeatureGraph>();
+                _fragmentFeatureGraphs[cutNumber] = new Dictionary<PrecursorFeatureNode, FragmentFeatureGraph>();
                 foreach (var precursorFeatureNode in precursorFeatureNodes)
                 {
                     _fragmentFeatureGraphs[cutNumber][precursorFeatureNode] = new FragmentFeatureGraph(imsData, precursorFeatureNode, peptide, cutNumber);
@@ -27,10 +27,11 @@ namespace InformedProteomics.Backend.IMSScoring
             }
         }
 
-        public FragmentFeatureGraph GetFragmentFeatureGraph(FeatureNode precursorFeatureNode, int cutNumber)
+        public FragmentFeatureGraph GetFragmentFeatureGraph(PrecursorFeatureNode precursorFeatureNode, int cutNumber)
         {
             return _fragmentFeatureGraphs[cutNumber][precursorFeatureNode];
         } 
 
+        
     }
 }

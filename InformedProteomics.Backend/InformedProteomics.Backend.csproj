@@ -128,10 +128,14 @@
     <Compile Include="IMSScoring\FeatureGraph.cs" />
     <Compile Include="IMSScoring\FeatureGraphScorer.cs" />
     <Compile Include="IMSScoring\FeatureNode.cs" />
+    <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
     <Compile Include="IMSScoring\FragmentFeatureGraph.cs" />
-    <Compile Include="IMSScoring\FragmentParameter.cs" />
+    <Compile Include="IMSScoring\GroupParameter.cs" />
     <Compile Include="IMSScoring\ImsScorer.cs" />
     <Compile Include="IMSScoring\FeatureEdge.cs" />
+    <Compile Include="IMSScoring\IsotopomerFeatures.cs" />
+    <Compile Include="IMSScoring\PrecursorFeatureNode.cs" />
+    <Compile Include="IMSScoring\StatisticsTools.cs" />
     <Compile Include="IMSScoring\SubScoreFactory.cs" />
     <Compile Include="IMS\Feature.cs" />
     <Compile Include="IMS\IMSDataCached.cs" />

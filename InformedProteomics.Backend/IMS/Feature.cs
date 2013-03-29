@@ -79,5 +79,10 @@ namespace InformedProteomics.Backend.IMS
                 NumPoints
                 );
         }
+
+        public bool IsEmpty() // added by kyowon
+        {
+            return NumPoints == 0;
+        }
     }
 }

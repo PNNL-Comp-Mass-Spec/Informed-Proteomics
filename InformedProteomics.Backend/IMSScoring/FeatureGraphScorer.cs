@@ -24,7 +24,7 @@ namespace InformedProteomics.Backend.IMSScoring
             } 
         }
 
-        static private float GetPrecursorFeatureNodesScore(List<FeatureNode> nodes)
+        static private float GetPrecursorFeatureNodesScore(List<PrecursorFeatureNode> nodes)
         {
             return 0;//TODO
         }

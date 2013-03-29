@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
@@ -9,13 +8,13 @@ namespace InformedProteomics.Backend.IMSScoring
     public class FragmentFeatureGraph : Dictionary<FeatureNode, List<FeatureEdge>>
     {
         public float Score { get; private set; }
-        public FragmentFeatureGraph(ImsDataCached imsData, FeatureNode precursorNode, Sequence peptide, int cutNumber)
+        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Sequence peptide, int cutNumber)
         {
             Add(precursorNode, new List<FeatureEdge>());
             var fragmentNodes = GetFragmentNodes(imsData, precursorNode, peptide, cutNumber);
             if (fragmentNodes.Count == 0) return;
             UpdateEdges(this, fragmentNodes); // from precursor to any of fragment nodes
-            var primeNode = this[precursorNode].ElementAt(0).RNode;
+            var primeNode = (FragmentFeatureNode)this[precursorNode].ElementAt(0).RNode;
             var targetNodes = GetTargetNodes(primeNode, fragmentNodes, true, false);
             UpdateEdges(this, targetNodes); // to the nodes of different terminal ions
             targetNodes = GetTargetNodes(primeNode, fragmentNodes, false, false);
@@ -31,9 +30,9 @@ namespace InformedProteomics.Backend.IMSScoring
             return graph.Keys.SelectMany(node => graph[node]).Sum(edge => edge.Score);
         }
 
-        static private List<FeatureNode> GetTargetNodes(FeatureNode primeNode, IEnumerable<FeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
+        static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
         {
-            var targetNodes = new List<FeatureNode>();
+            var targetNodes = new List<FragmentFeatureNode>();
             //var primeNterm = primeNode.FragmentIonClassBase is IonType.NtermIonType;
             var primeNterm = primeNode.FragmentIonClassBase.IsPrefixIon;    // Modified by Sangtae
 
@@ -81,23 +80,19 @@ namespace InformedProteomics.Backend.IMSScoring
             if (edgeWithMaxWeight != null) graph[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight); 
         }
 
-        static private List<FeatureNode> GetFragmentNodes(ImsDataCached imsData, FeatureNode precursorNode, Sequence peptide, int cutNumber)
+        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Sequence peptide, int cutNumber)
         {
-            var parameter = new FragmentParameter(peptide, cutNumber);
-            var ionTypes = SubScoreFactory.GetIonTypes(parameter, precursorNode.FragmentIonClassBase.Charge);
+            var parameter = new GroupParameter(peptide, cutNumber);
+            var ionTypes = SubScoreFactory.GetIonTypes(parameter, precursorNode.Charge);
 
-            var nodes = new List<FeatureNode>();
+            var nodes = new List<FragmentFeatureNode>();
             var prefixComposition = peptide.GetComposition(0, cutNumber);
             var suffixComposition = peptide.Composition - prefixComposition;
 
             foreach (var ionType in ionTypes)
             {
-                double mz;
-                if (ionType.IsPrefixIon)
-                    mz = ionType.GetMz(prefixComposition);
-                else
-                    mz = ionType.GetMz(suffixComposition);
-                nodes.Add(new FeatureNode(imsData.GetFramentFeature(mz, precursorNode.Feature), ionType, parameter));
+                var composition = ionType.IsPrefixIon ? prefixComposition : suffixComposition;
+                nodes.Add(new FragmentFeatureNode(new IsotopomerFeatures(imsData, composition), ionType, parameter));
             }
             return nodes;
         } 
