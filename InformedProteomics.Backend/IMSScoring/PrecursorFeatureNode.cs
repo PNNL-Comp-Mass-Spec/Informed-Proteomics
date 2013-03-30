@@ -10,5 +10,10 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             Charge = parameter.Charge;
         }
+
+        internal override float GetScore()
+        {
+            return 0;
+        }
     }
 }

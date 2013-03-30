@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMS;
-using UIMFLibrary;
+using Feature = InformedProteomics.Backend.IMS.Feature;
 
 namespace InformedProteomics.Backend.IMSScoring
 {

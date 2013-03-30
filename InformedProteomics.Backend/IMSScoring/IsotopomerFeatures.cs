@@ -13,6 +13,11 @@ namespace InformedProteomics.Backend.IMSScoring
             //TODO
         }
 
+        public IsotopomerFeatures(Feature precursorFeature) // TODO remove in the future..
+        {
+            
+        }
+
         public Feature GetNthFeatureFromTheMostIntenseFeature(int n)
         {
             throw new NotImplementedException();
