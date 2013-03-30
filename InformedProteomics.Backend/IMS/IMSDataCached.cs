@@ -58,6 +58,11 @@ namespace InformedProteomics.Backend.IMS
             return _precursorFeatureSetMap[precursorMzBin];
         }
 
+        public FeatureSet GetPrecursorFeatures(double precursorMz, Feature precursorFeature)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public FeatureSet GetFragmentFeatures(double fragmentMz)
         {
             int fragmentMzBin = GetBinFromMz(fragmentMz);

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -14,9 +15,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingCombinations()
         {
-            const int n = 10;
-            const int k = 3;
-            var combinations = ModificationParams.GetCombinationsWithRepetition(n, k);
+            const int n = 50;
+            const int k = 2;
+            var combinations = SimpleMath.GetCombinationsWithRepetition(n, k);
             int count = 0;
             foreach (var combination in combinations)
             {
@@ -24,7 +25,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(string.Join(",", combination));
             }
             Console.WriteLine("Count: " + count);
-            Console.WriteLine("Count2: " + ModificationParams.NChooseK(n+k-1,k));
+            Console.WriteLine("Count2: " + SimpleMath.NChooseK(n + k - 1, k));
         }
 
         [Test]

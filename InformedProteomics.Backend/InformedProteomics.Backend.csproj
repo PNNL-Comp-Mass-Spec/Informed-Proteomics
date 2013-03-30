@@ -190,6 +190,7 @@
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Database\IStringEnumerator.cs" />
+    <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Utils\PeptideEnumerator.cs" />
     <Compile Include="Utils\PeptideUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
