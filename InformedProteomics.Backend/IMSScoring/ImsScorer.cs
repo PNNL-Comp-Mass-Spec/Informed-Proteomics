@@ -1,5 +1,4 @@
-﻿using System;
-using InformedProteomics.Backend.Data.Sequence;
+﻿using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.IMS;
 using Feature = InformedProteomics.Backend.IMS.Feature;
 
@@ -7,9 +6,9 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class ImsScorer
     {
-        private ImsDataCached _imsData;
-        private Composition _precursorComposition;
-        private int _charge;
+        private readonly ImsDataCached _imsData;
+        private readonly Composition _precursorComposition;
+        private readonly int _charge;
 
         public ImsScorer(ImsDataCached imsData, Composition precursorComposition, int charge) // will precursorComposition have protons?
         {

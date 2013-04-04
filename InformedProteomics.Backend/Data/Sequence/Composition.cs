@@ -99,18 +99,22 @@ namespace InformedProteomics.Backend.Data.Sequence
         public float[] GetApproximatedIsotopomerEnvelop()
         {
             var mean = C*(1 - ProbC12) + H*(1 - ProbH1) + N*(1 - ProbN14) + O*(1 - ProbO16) + S*(1 - ProbS32);
-            var var = C * (1 - ProbC12) * ProbC12 + H * (1 - ProbH1) * ProbH1 + N * (1 - ProbN14) * ProbN14 + O * (1 - ProbO16) * ProbO16 + S * (1 - ProbS32) * ProbS32;
-            var std = Math.Sqrt(var);
-            var dist = new float[5]; 
+          
+            var dist = new float[5];
+            var exp = Math.Exp(-mean);
             for (var i = 0; i < dist.Length; i++)
             {
-                var l = ((-.5 + i) - mean)/std;
-                var r = ((.5 + i) - mean) / std;
-                dist[i] = (float)(MathNet.Numerics.SpecialFunctions.Erf(r) - MathNet.Numerics.SpecialFunctions.Erf(l));
+                dist[i] = (float) (Math.Pow(mean, i)*exp/MathNet.Numerics.SpecialFunctions.Factorial(i));
+
+            }
+            float max = 0;
+            for (var i = 0; i < dist.Length; i++)
+            {
+                max = Math.Max(max, dist[i]);
             }
             for (var i = 0; i < dist.Length; i++)
             {
-                dist[i] /= dist[0];
+                dist[i] = dist[i] / max;
             }
             return dist;
         }
@@ -153,7 +157,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Isotope probabilities of Atoms // added by kyowon
 
-        private static readonly double ProbC12 = .9889;
+        private static readonly double ProbC12 = .9890;
         private static readonly double ProbH1 = .99985;
         private static readonly double ProbN14 = .99636;
         private static readonly double ProbO16 = .99762;

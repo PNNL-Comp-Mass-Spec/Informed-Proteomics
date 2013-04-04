@@ -55,6 +55,9 @@ namespace InformedProteomics.Test
             Console.WriteLine(compositionArr[0].GetIsotopeMass(1));
             Console.WriteLine(compositionArr[0].GetIsotopeMass(2));
             Assert.AreEqual(compositionArr[0].ToString(), "C34H51N7O14S0");
+
+            foreach (var e in compositionArr[0].GetApproximatedIsotopomerEnvelop())
+                Console.WriteLine(e);
         }
 
         [Test]
