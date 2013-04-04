@@ -8,20 +8,12 @@ namespace InformedProteomics.Backend.IMSScoring
         private readonly int _massIndex, _locationIndex, _flankingResidueIndex;
         public int Charge { get; private set; }
 
-        public GroupParameter(Sequence peptide, int cutNumber, int charge)
+        public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Composition precurosrComposition, int charge)
         {
-            _massIndex = GetMassIndex(peptide);
+            _massIndex = GetMassIndex(precurosrComposition);
             Charge = charge;
-            _locationIndex = GetLocationIndex(peptide, cutNumber);
-            _flankingResidueIndex = GetFlankingResidueIndex(peptide, cutNumber); 
-        }
-
-        public GroupParameter(Sequence peptide, int charge) // for precursor
-        {
-            _massIndex = GetMassIndex(peptide);
-            Charge = charge;
-            _locationIndex = -1;
-            _flankingResidueIndex = -1;
+            _locationIndex = GetLocationIndex(precurosrComposition, cutComposition);
+            _flankingResidueIndex = GetFlankingResidueIndex(nTermAA, cTermAA); 
         }
 
         internal GroupParameter(int massIndex, int locationIndex, int flankingResidueIndex, int charge)
@@ -78,15 +70,15 @@ namespace InformedProteomics.Backend.IMSScoring
             return _massIndex + " " + _locationIndex + " " + _flankingResidueIndex + " " + Charge;
         }
 
-        private static int GetMassIndex(Sequence peptide)
+        private static int GetMassIndex(Composition precursorComposition)
         {
-            var len = peptide.Count;
-            return len < 10 ? 1 : (len < 20 ? 2 : 3);
+            var m = precursorComposition.GetMass();
+            return m < 1200 ? 1 : (m < 2400 ? 2 : 3);
         }
 
-        private static int GetLocationIndex(Sequence peptide, int cutNumber)
+        private static int GetLocationIndex(Composition precursorComposition, Composition cutComposition)
         {
-            return (int)(peptide.GetMass(0, cutNumber) / peptide.GetMass() * 4 + 1);
+            return (int)(cutComposition.GetMass() / precursorComposition.GetMass() * 4 + 1);
         }
 
         private static int GetResidueIndex(char residue)
@@ -95,11 +87,9 @@ namespace InformedProteomics.Backend.IMSScoring
             return residues.IndexOf(residue);
         }
 
-        private static int GetFlankingResidueIndex(Sequence peptide, int cutNumber)
+        private static int GetFlankingResidueIndex(char nTermAA, char cTermAA)
         {
-            var nterm = peptide[cutNumber - 1].Residue;
-            var cterm = peptide[cutNumber].Residue;
-            return ResidueTable[GetResidueIndex(nterm), GetResidueIndex(cterm)];
+            return ResidueTable[GetResidueIndex(nTermAA), GetResidueIndex(cTermAA)];
         }
 
         static private readonly int[,] ResidueTable =

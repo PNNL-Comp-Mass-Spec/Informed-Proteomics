@@ -7,15 +7,10 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class IsotopomerFeatures : List<Feature>
     {
-        public IsotopomerFeatures(ImsDataCached imsData, Composition composition)
+        public IsotopomerFeatures(ImsDataCached imsData, Composition composition, Feature precursorFeature, int charge)
         {
                        
             //TODO
-        }
-
-        public IsotopomerFeatures(Feature precursorFeature) // TODO remove in the future..
-        {
-            
         }
 
         public Feature GetNthFeatureFromTheMostIntenseFeature(int n)

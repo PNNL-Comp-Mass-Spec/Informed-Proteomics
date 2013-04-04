@@ -7,11 +7,12 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class FragmentFeatureGraph : Dictionary<FeatureNode, List<FeatureEdge>>
     {
-        public float Score { get; private set; }
-        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Sequence peptide, int cutNumber)
+        public double Score { get; private set; }
+        public FragmentFeatureGraph(ImsDataCached imsData, Feature precursorFeature, Composition precursorComposition, Composition cutComposition, GroupParameter parameter)
         {
+            var precursorNode = new PrecursorFeatureNode(precursorFeature, parameter);
             Add(precursorNode, new List<FeatureEdge>());
-            var fragmentNodes = GetFragmentNodes(imsData, precursorNode, peptide, cutNumber);
+            var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorComposition, parameter);
             if (fragmentNodes.Count == 0) return;
             UpdateEdges(this, fragmentNodes); // from precursor to any of fragment nodes
             var primeNode = (FragmentFeatureNode)this[precursorNode].ElementAt(0).RNode;
@@ -25,7 +26,7 @@ namespace InformedProteomics.Backend.IMSScoring
             Score = GetScore(this);
         }
         
-        static private float GetScore(FragmentFeatureGraph graph)
+        static private double GetScore(FragmentFeatureGraph graph)
         {
             return graph.Keys.SelectMany(node => graph[node]).Sum(edge => edge.Score);
         }
@@ -63,7 +64,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
         static private void UpdateEdges(FragmentFeatureGraph graph, IEnumerable<FeatureNode> nodes)
         {
-            var maxWeight = float.NegativeInfinity;
+            var maxWeight = double.NegativeInfinity;
             FeatureEdge edgeWithMaxWeight = null;
             foreach (var rnode in nodes)
             {
@@ -80,19 +81,17 @@ namespace InformedProteomics.Backend.IMSScoring
             if (edgeWithMaxWeight != null) graph[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight); 
         }
 
-        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Sequence peptide, int cutNumber)
+        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Composition precursorComposition, GroupParameter parameter)
         {
-            var parameter = new GroupParameter(peptide, cutNumber);
-            var ionTypes = SubScoreFactory.GetIonTypes(parameter, precursorNode.Charge);
+            var ionTypes = SubScoreFactory.GetIonTypes(parameter);
 
             var nodes = new List<FragmentFeatureNode>();
-            var prefixComposition = peptide.GetComposition(0, cutNumber);
-            var suffixComposition = peptide.Composition - prefixComposition;
+            var suffixComposition = precursorComposition - cutComposition;
 
             foreach (var ionType in ionTypes)
             {
-                var composition = ionType.IsPrefixIon ? prefixComposition : suffixComposition;
-                nodes.Add(new FragmentFeatureNode(new IsotopomerFeatures(imsData, composition), ionType, parameter));
+                var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
+                nodes.Add(new FragmentFeatureNode(new IsotopomerFeatures(imsData, composition, precursorFeature, parameter.Charge), ionType, parameter));
             }
             return nodes;
         } 

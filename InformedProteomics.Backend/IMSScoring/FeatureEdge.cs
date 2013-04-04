@@ -6,11 +6,11 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public FeatureNode LNode { get; private set; }
         public FeatureNode RNode { get; private set; }
-        public float Weight { get; private set; } // used to calculate weight of a path
-        public float Score { get; private set; } // used to calculate score
+        public double Weight { get; private set; } // used to calculate weight of a path
+        public double Score { get; private set; } // used to calculate score
         private readonly int _ratio;
-        private readonly float _lcCorrelation;
-        private readonly float _imsCorrelation;
+        private readonly double _lcCorrelation;
+        private readonly double _imsCorrelation;
 
         public FeatureEdge(FeatureNode l, FeatureNode r)
         {
@@ -25,7 +25,7 @@ namespace InformedProteomics.Backend.IMSScoring
             Score = GetScore();
         }
 
-        private float GetWeight()
+        private double GetWeight()
         {
             var r = (FragmentFeatureNode)RNode;
             if (LNode is PrecursorFeatureNode)
@@ -34,7 +34,7 @@ namespace InformedProteomics.Backend.IMSScoring
             return SubScoreFactory.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, l.Parameter);
         }
 
-        private float GetScore()
+        private double GetScore()
         { // contains the node score
             var score = RNode.Score;
             var r = (FragmentFeatureNode)RNode;

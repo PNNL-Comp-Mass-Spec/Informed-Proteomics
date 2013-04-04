@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
     public class PrecursorFeatureNode : FeatureNode
     {
-        public int Charge { get;private set; }
-        public PrecursorFeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter) : base(isotopomerFeatures, parameter)
+        public PrecursorFeatureNode(Feature precursorFeature, GroupParameter parameter)
+            : base(precursorFeature, parameter)
         {
-            Charge = parameter.Charge;
+            Score = GetScore();
         }
 
-        internal override float GetScore()
+        internal override sealed double GetScore()
         {
             return 0;
         }

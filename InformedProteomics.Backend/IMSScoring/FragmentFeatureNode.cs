@@ -13,9 +13,10 @@ namespace InformedProteomics.Backend.IMSScoring
             : base(isotopomerFeatures, parameter)
         {
             FragmentIonClassBase = fragmentIonClassBase;
+            Score = GetScore();
         }
 
-        internal override float GetScore()
+        internal override sealed double GetScore()
         {
             throw new System.NotImplementedException();
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using InformedProteomics.Backend.IMS;
+﻿using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
@@ -7,7 +6,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public GroupParameter Parameter { get; private set; }
         public Feature Feature { get; private set; }
-        internal float Score { get; set; }
+        internal double Score { get; set; }
 
         protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter)
         {
@@ -24,9 +23,15 @@ namespace InformedProteomics.Backend.IMSScoring
             
             //_isotopeCorrelation = StatisticsTools.GetCorrelation()
 
-           // Score = GetScore();
+           
         }
 
-        internal abstract float GetScore();
+        protected FeatureNode(Feature precursorFeature, GroupParameter parameter)
+        {
+            Feature = precursorFeature;
+            Parameter = parameter;
+        }
+
+        internal abstract double GetScore();
     }
 }

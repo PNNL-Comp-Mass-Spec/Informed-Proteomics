@@ -125,8 +125,6 @@
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
     <Compile Include="Data\Spectrometry\XIC.cs" />
     <Compile Include="Data\Targets\NominalMassTarget.cs" />
-    <Compile Include="IMSScoring\FeatureGraph.cs" />
-    <Compile Include="IMSScoring\FeatureGraphScorer.cs" />
     <Compile Include="IMSScoring\FeatureNode.cs" />
     <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
     <Compile Include="IMSScoring\FragmentFeatureGraph.cs" />
