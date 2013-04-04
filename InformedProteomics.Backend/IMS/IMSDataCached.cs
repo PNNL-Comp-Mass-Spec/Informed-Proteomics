@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
 using UIMFLibrary;
 
 namespace InformedProteomics.Backend.IMS
@@ -13,10 +10,10 @@ namespace InformedProteomics.Backend.IMS
     public class ImsDataCached : ImsData
     {
         private Dictionary<int, FeatureSet> _precursorFeatureSetMap;
-        private int _numPrecursorFeatures = 0;
+        private int _numPrecursorFeatures;
 
         private Dictionary<int, FeatureSet> _fragmentFeatureSetMap;
-        private int _numFragmentFeatures = 0;
+        private int _numFragmentFeatures;
 
         public ImsDataCached(string filePath) : this(filePath, 400.0, 2000.0, 10.0, 2500.0, 
             new Tolerance(25, DataReader.ToleranceType.PPM), new Tolerance(25, DataReader.ToleranceType.PPM))
@@ -54,19 +51,23 @@ namespace InformedProteomics.Backend.IMS
 
         public FeatureSet GetPrecursorFeatures(double precursorMz)
         {
-            int precursorMzBin = GetBinFromMz(precursorMz);
-            return _precursorFeatureSetMap[precursorMzBin];
+            return GetFeatures(precursorMz, true);
         }
 
-        public FeatureSet GetPrecursorFeatures(double precursorMz, Feature precursorFeature)
+        /// <summary>
+        /// Gets the precursor feature within the boundary of the precursorFeature
+        /// </summary>
+        /// <param name="precursorMz">m/z of the precursor</param>
+        /// <param name="precursorFeature">precursorFeature defining the retention and drift time boundary</param>
+        /// <returns>the precursor feature within the boundary of the precursorFeature</returns>
+        public Feature GetPrecursorFeature(double precursorMz, Feature precursorFeature)
         {
-            throw new System.NotImplementedException();
+            return GetFeature(precursorMz, precursorFeature, true);
         }
 
         public FeatureSet GetFragmentFeatures(double fragmentMz)
         {
-            int fragmentMzBin = GetBinFromMz(fragmentMz);
-            return _fragmentFeatureSetMap[fragmentMzBin];
+            return GetFeatures(fragmentMz, false);
         }
 
         /// <summary>
@@ -77,66 +78,7 @@ namespace InformedProteomics.Backend.IMS
         /// <returns>the fragment feature within the boundary of the precursorFeature</returns>
         public Feature GetFramentFeature(double fragmentMz, Feature precursorFeature)
         {
-            Feature bestFeature = null;
-            int bestIntersectionArea = 0;
-            Rectangle precursorBoundary = precursorFeature.GetBoundary();
-
-            // TODO: this is not optimal
-            FeatureSet fragmentFeatures = GetFragmentFeatures(fragmentMz);
-            foreach (Feature feature in fragmentFeatures)
-            {
-                if (precursorBoundary.Contains(feature.GetHighestPoint()))
-                {
-                    Rectangle boundary = feature.GetBoundary();
-                    Rectangle intersection = Rectangle.Intersect(precursorBoundary, boundary);
-                    int intersectionArea = intersection.Width*intersection.Height;
-                    double portionIntersection = (double) intersectionArea/(boundary.Width*boundary.Height);
-                    if (portionIntersection < 0.9f)
-                        continue;
-                    if (intersectionArea > bestIntersectionArea)
-                    {
-                        bestFeature = feature;
-                        bestIntersectionArea = intersectionArea;
-                    }
-                }
-            }
-
-            return bestFeature;
-        }
-
-        /// <summary>
-        /// Extracts the fragment feature within the boundary of the precursorFeature 
-        /// </summary>
-        /// <param name="fragmentMz"></param>
-        /// <param name="precursorFeature"></param>
-        /// <returns>the fragment feature within the boundary of the precursorFeature</returns>
-        public Feature GetPrecursorFeature(double fragmentMz, Feature precursorFeature)
-        {
-            Feature bestFeature = null;
-            int bestIntersectionArea = 0;
-            Rectangle precursorBoundary = precursorFeature.GetBoundary();
-
-            // TODO: this is not optimal
-            FeatureSet fragmentFeatures = GetFragmentFeatures(fragmentMz);
-            foreach (Feature feature in fragmentFeatures)
-            {
-                if (precursorBoundary.Contains(feature.GetHighestPoint()))
-                {
-                    Rectangle boundary = feature.GetBoundary();
-                    Rectangle intersection = Rectangle.Intersect(precursorBoundary, boundary);
-                    int intersectionArea = intersection.Width * intersection.Height;
-                    double portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
-                    if (portionIntersection < 0.9f)
-                        continue;
-                    if (intersectionArea > bestIntersectionArea)
-                    {
-                        bestFeature = feature;
-                        bestIntersectionArea = intersectionArea;
-                    }
-                }
-            }
-
-            return bestFeature;
+            return GetFeature(fragmentMz, precursorFeature, false);
         }
 
         public void CreatePrecursorFeatures()
@@ -189,6 +131,45 @@ namespace InformedProteomics.Backend.IMS
             }
 
             _numFragmentFeatures = totalNumFragmentFeatures;
+        }
+
+        private FeatureSet GetFeatures(double mz, bool isPrecursor)
+        {
+            int mzBin = GetBinFromMz(mz);
+            if (isPrecursor)
+            {
+                return _precursorFeatureSetMap[mzBin];
+            }
+            return _fragmentFeatureSetMap[mzBin];
+        }
+
+        private Feature GetFeature(double mz, Feature precursorFeature, bool isPrecursor)
+        {
+            Feature bestFeature = null;
+            int bestIntersectionArea = 0;
+            Rectangle precursorBoundary = precursorFeature.GetBoundary();
+
+            // TODO: this is not optimal
+            FeatureSet features = GetFeatures(mz, isPrecursor);
+            foreach (Feature feature in features)
+            {
+                if (precursorBoundary.Contains(feature.GetHighestPoint()))
+                {
+                    Rectangle boundary = feature.GetBoundary();
+                    Rectangle intersection = Rectangle.Intersect(precursorBoundary, boundary);
+                    int intersectionArea = intersection.Width * intersection.Height;
+                    double portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
+                    if (portionIntersection < 0.9f)
+                        continue;
+                    if (intersectionArea > bestIntersectionArea)
+                    {
+                        bestFeature = feature;
+                        bestIntersectionArea = intersectionArea;
+                    }
+                }
+            }
+
+            return bestFeature;
         }
     }
 }
