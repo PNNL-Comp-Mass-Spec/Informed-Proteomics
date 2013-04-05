@@ -1,98 +1,118 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
     /// <summary>
-    /// This class cataluges all possible modification instances
+    /// This class catalogues all possible combinations of modifications
     /// </summary>
     public class ModificationParams
     {
-        private ModificationInstance[] _modificationInstances;
-        private int _numMaxDynMods;
-        private Dictionary<int, Modification>[] _map;
+        private readonly Modification[] _modifications;
+        private ModificationCombination[] _modificationCombinations;
+        private readonly int _numMaxDynMods;
+        private Dictionary<int, int> _modCombMap;
 
         /// <summary>
         /// Storing all possible combinations of modifications up to numMaxDynMods
         /// </summary>
-        /// <param name="modifications"></param>
-        /// <param name="numMaxDynMods"></param>
+        /// <param name="modifications">array of modifications</param>
+        /// <param name="numMaxDynMods">number of maximum modifications</param>
         public ModificationParams(Modification[] modifications, int numMaxDynMods)
         {
-            int numModifications = modifications.Count();
-            int numModificationInstances = SimpleMath.NChooseK(numModifications + numMaxDynMods, numMaxDynMods);
-            _modificationInstances = new ModificationInstance[numModificationInstances];
-            GenerateModificationInstances(modifications.ToArray(), numMaxDynMods);
+            _modifications = modifications;
+            _numMaxDynMods = numMaxDynMods;
+            CataloguePossibleModificationCombinations();
+            GenerateModCombMap();
         }
 
         /// <summary>
-        /// Gets the modification instance of the specified index
+        /// Gets the modificatino combination with the specified index
         /// </summary>
-        /// <param name="index">modification instance index</param>
-        /// <returns>the modification instance</returns>
-        public ModificationInstance GetModificationInstance(int index)
+        /// <param name="index">modification combination index</param>
+        /// <returns>modification combination</returns>
+        public ModificationCombination GetModificationCombination(int index)
         {
-            return _modificationInstances[index];
+            return _modificationCombinations[index];
         }
 
-        /// <summary>
-        /// Apply modification to prevModIns and returns the modification instance.
-        /// Modification instances are referred by their indices.
-        /// </summary>
-        /// <param name="prevModIndex">the index of the modification instance to apply modification</param>
-        /// <param name="modification">modification to apply</param>
-        /// <returns>the index of the modification instance of prevModIns + modification</returns>
-        public int GetModificationInstanceIndex(int prevModIndex, Modification modification)
+        public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
-            throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Apply modification to prevModIns and returns the modification instance
-        /// </summary>
-        /// <param name="prevModIns">modification instance to apply modification</param>
-        /// <param name="modification">modification to apply</param>
-        /// <returns>the modification instance of prevModIns + modification</returns>
-        public ModificationInstance GetModificationInstance(ModificationInstance prevModIns, Modification modification)
-        {
-            throw new System.NotImplementedException();
+            return _modCombMap[prevModCombIndex*_numMaxDynMods + modIndex];
         }
 
         /// <summary>
         /// Gets the number of all possible modification instances
         /// </summary>
         /// <returns>the number of modification instances</returns>
-        public int GetNumModificationInstances()
+        public int GetNumModificationCombinations()
         {
-            return _modificationInstances.Length;
+            return _modificationCombinations.Length;
         }
 
-        private void GenerateModificationInstances(Modification[] modifications, int numMaxDynMods)
+        private void CataloguePossibleModificationCombinations()
         {
-            var modInsList = new List<ModificationInstance>[numMaxDynMods+1];
-            modInsList[0] = new List<ModificationInstance>
-                {
-                    new ModificationInstance(new[] {Modification.NoModification})
-                };
+            _indexToHashValue = new Dictionary<int, long>();
+            _hashValueToIndex = new Dictionary<long, int>();
 
-            _map = new Dictionary<int, Modification>[_modificationInstances.Length];
-
-            // No modification
-
-            for (int numMods = 1; numMods <= numMaxDynMods; numMods++)
+            var combinations = SimpleMath.GetCombinationsWithRepetition(_numMaxDynMods + 1, _numMaxDynMods);
+            _modificationCombinations = new ModificationCombination[combinations.Length];
+            int index = -1;
+            foreach (var combination in combinations)
             {
-                //modInsList.AddRange(GetModificationInstances(modInsList));
+                var modList = (from i in combination where i > 1 select _modifications[i - 1]).ToList();
+                _modificationCombinations[++index] = new ModificationCombination(modList);
+                long hashValue = ToHash(combination);
+                _indexToHashValue[index] = hashValue;
+                _hashValueToIndex[hashValue] = index;
             }
         }
 
-        private IEnumerable<ModificationInstance> GetModificationInstances(IEnumerable<ModificationInstance> modificationInstances)
+        private void GenerateModCombMap()
         {
-            return null;
+            _modCombMap = new Dictionary<int, int>();
+            for (int modCombIndex = 0; modCombIndex < _modificationCombinations.Length; modCombIndex++)
+            {
+                long hashValue = _indexToHashValue[modCombIndex];
+                int[] modArray = ToModArray(hashValue);
+
+                if (modArray[_numMaxDynMods - 1] != 0)  // this ModificationCombination has _numMaxDynMods modifications
+                    continue;
+                for (int modIndex = 0; modIndex < _modifications.Length; modIndex++)
+                {
+                    modArray[_numMaxDynMods - 1] = modIndex + 1;
+                    Array.Sort(modArray);
+                    long newHashValue = ToHash(modArray);
+                    int newIndex = _hashValueToIndex[newHashValue];
+                    _modCombMap[modCombIndex*_numMaxDynMods + modIndex] = newIndex;
+                }
+            }
+            _hashValueToIndex = null;
+            _indexToHashValue = null;
         }
 
+        private Dictionary<long, int> _hashValueToIndex;
+        private Dictionary<int, long> _indexToHashValue;
 
+        private int[] ToModArray(long hashValue)
+        {
+            int digit = _numMaxDynMods + 1;
+            var arr = new int[_numMaxDynMods];
+            long val = hashValue;
+            for (int i = 0; i < _numMaxDynMods; i++)
+            {
+                arr[i] = (int) (val%digit);
+                val /= digit;
+            }
+            return arr;
+        }
+
+        private long ToHash(IEnumerable<int> combination)
+        {
+            int digit = _numMaxDynMods + 1;
+            return combination.Aggregate<int, long>(0, (current, i) => digit * current + i);
+        }
     }
 }

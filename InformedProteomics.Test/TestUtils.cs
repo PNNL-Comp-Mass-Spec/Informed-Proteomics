@@ -15,14 +15,14 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingCombinations()
         {
-            const int n = 50;
-            const int k = 2;
+            const int n = 5;
+            const int k = 3;
             var combinations = SimpleMath.GetCombinationsWithRepetition(n, k);
             int count = 0;
             foreach (var combination in combinations)
             {
                 ++count;
-                Console.WriteLine(string.Join(",", combination));
+                Console.WriteLine((count-1)+": "+string.Join(",", combination));
             }
             Console.WriteLine("Count: " + count);
             Console.WriteLine("Count2: " + SimpleMath.NChooseK(n + k - 1, k));

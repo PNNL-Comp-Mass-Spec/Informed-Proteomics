@@ -20,9 +20,10 @@ namespace InformedProteomics.Test
         {
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             var imsData = new ImsDataCached(uimfFilePath);
-            Console.WriteLine("Generating precursor features (MinMz: " + imsData.MinPrecursorMz + " MaxMz: " + imsData.MaxPrecursorMz + ")");
-            imsData.CreatePrecursorFeatures();
-            Console.WriteLine("TotalNumPrecursorFeatures: " + imsData.GetNumberOfPrecursorFeatures());            
+
+            //Console.WriteLine("Generating precursor features (MinMz: " + imsData.MinPrecursorMz + " MaxMz: " + imsData.MaxPrecursorMz + ")");
+            //int numPrecursorFeatures = imsData.CreatePrecursorFeatures();
+            //Console.WriteLine("TotalNumPrecursorFeatures: " + numPrecursorFeatures);            
 
             const string targetPeptide = "CCAADDKEACFAVEGPK";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -46,7 +47,10 @@ namespace InformedProteomics.Test
                 }
             }
 
-            imsData.CreateFragmentFeatures();
+            //Console.WriteLine("Generating fragment features (MinMz: " + imsData.MinFragmentMz + " MaxMz: " + imsData.MaxFragmentMz + ")");
+            //int numFragmentFeatures = imsData.CreateFragmentFeatures();
+            //Console.WriteLine("TotalNumFragmentFeatures: " + numFragmentFeatures);
+
             const string targetFragment = "AADDKEACFAVEGPK";
             foreach (Composition composition in aaSet.GetCompositions(targetFragment))
             {

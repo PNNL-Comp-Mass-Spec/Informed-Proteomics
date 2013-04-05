@@ -116,7 +116,7 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
-    <Compile Include="Data\Sequence\ModificationInstance.cs" />
+    <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />
     <Compile Include="Data\Sequence\SequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\BaseIonType.cs" />
@@ -137,7 +137,7 @@
     <Compile Include="IMSScoring\SubScoreFactory.cs" />
     <Compile Include="IMS\Feature.cs" />
     <Compile Include="IMS\IMSDataCached.cs" />
-    <Compile Include="IMS\Featureset.cs" />
+    <Compile Include="IMS\FeatureSet.cs" />
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
@@ -181,7 +181,6 @@
     <Compile Include="Scoring\SubScoreFactory.cs" />
     <Compile Include="Scoring\Scorer.cs" />
     <Compile Include="Utils\CompositionFactory.cs" />
-    <Compile Include="IMS\DriftRange.cs" />
     <Compile Include="Utils\DataUtil.cs" />
     <Compile Include="Utils\DtaUtil.cs" />
     <Compile Include="Utils\FragmentationUtil.cs" />
