@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Spectrometry;
-using Feature = InformedProteomics.Backend.IMS.Feature;
+﻿using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.IMSScoring
 {

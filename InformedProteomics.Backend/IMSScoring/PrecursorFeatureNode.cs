@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.IMS;
-
-namespace InformedProteomics.Backend.IMSScoring
+﻿namespace InformedProteomics.Backend.IMSScoring
 {
     public class PrecursorFeatureNode : FeatureNode
     {
-        public PrecursorFeatureNode(Feature precursorFeature, GroupParameter parameter)
-            : base(precursorFeature, parameter)
+        public PrecursorFeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter)
+            : base(isotopomerFeatures, parameter)
         {
             Score = GetScore();
         }

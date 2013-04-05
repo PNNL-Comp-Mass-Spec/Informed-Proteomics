@@ -10,13 +10,13 @@ namespace InformedProteomics.Backend.IMSScoring
 
         protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter)
         {
-            Feature = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(0);
+            Feature = isotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(0);
             Parameter = parameter;
 
-            //var c = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(0);
-            //var l = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(-1);
-            //var r = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(1);
-            //var r2 = isotopomerFeatures.GetNthFeatureFromTheMostIntenseFeature(2);
+            //var c = isotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(0);
+            //var l = isotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(-1);
+            //var r = isotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(1);
+            //var r2 = isotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(2);
 
             //_lcCorrelation = StatisticsTools.GetLCCorrelation(c, r) - StatisticsTools.GetLCCorrelation(l, c);
             //_imsCorrelation = StatisticsTools.GetIMSCorrelation(c, r) - StatisticsTools.GetIMSCorrelation(l, c);
@@ -25,13 +25,6 @@ namespace InformedProteomics.Backend.IMSScoring
 
            
         }
-
-        protected FeatureNode(Feature precursorFeature, GroupParameter parameter)
-        {
-            Feature = precursorFeature;
-            Parameter = parameter;
-        }
-
         internal abstract double GetScore();
     }
 }

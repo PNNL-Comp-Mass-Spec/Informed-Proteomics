@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.IMS;
 
@@ -8,11 +9,11 @@ namespace InformedProteomics.Backend.IMSScoring
     public class FragmentFeatureGraph : Dictionary<FeatureNode, List<FeatureEdge>>
     {
         public double Score { get; private set; }
-        public FragmentFeatureGraph(ImsDataCached imsData, Feature precursorFeature, Composition precursorComposition, Composition cutComposition, GroupParameter parameter)
+        public FragmentFeatureGraph(ImsDataCached imsData, Feature precursorFeature, Ion precursorIon, Composition cutComposition, GroupParameter parameter)
         {
-            var precursorNode = new PrecursorFeatureNode(precursorFeature, parameter);
+            var precursorNode = new PrecursorFeatureNode(IsotopomerFeatures.GetPrecursorIsotopomerFeatures(imsData, precursorIon, precursorFeature), parameter);
             Add(precursorNode, new List<FeatureEdge>());
-            var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorComposition, parameter);
+            var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorIon, parameter);
             if (fragmentNodes.Count == 0) return;
             UpdateEdges(this, fragmentNodes); // from precursor to any of fragment nodes
             var primeNode = (FragmentFeatureNode)this[precursorNode].ElementAt(0).RNode;
@@ -81,17 +82,17 @@ namespace InformedProteomics.Backend.IMSScoring
             if (edgeWithMaxWeight != null) graph[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight); 
         }
 
-        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Composition precursorComposition, GroupParameter parameter)
+        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Ion precursorIon, GroupParameter parameter)
         {
             var ionTypes = SubScoreFactory.GetIonTypes(parameter);
 
             var nodes = new List<FragmentFeatureNode>();
-            var suffixComposition = precursorComposition - cutComposition;
+            var suffixComposition = precursorIon.Composition - cutComposition;
 
             foreach (var ionType in ionTypes)
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
-                nodes.Add(new FragmentFeatureNode(new IsotopomerFeatures(imsData, composition, precursorFeature, parameter.Charge), ionType, parameter));
+                nodes.Add(new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter));
             }
             return nodes;
         } 

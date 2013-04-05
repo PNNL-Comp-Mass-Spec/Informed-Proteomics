@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.IMSScoring
@@ -8,11 +9,11 @@ namespace InformedProteomics.Backend.IMSScoring
         private readonly int _massIndex, _locationIndex, _flankingResidueIndex;
         public int Charge { get; private set; }
 
-        public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Composition precurosrComposition, int charge)
+        public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Ion precursorIon)
         {
-            _massIndex = GetMassIndex(precurosrComposition);
-            Charge = charge;
-            _locationIndex = GetLocationIndex(precurosrComposition, cutComposition);
+            _massIndex = GetMassIndex(precursorIon.Composition);
+            Charge = precursorIon.Charge;
+            _locationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
             _flankingResidueIndex = GetFlankingResidueIndex(nTermAA, cTermAA); 
         }
 
