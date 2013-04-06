@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -20,5 +21,11 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Composition Composition { get; private set; }
         public IList<Modification> Modifications { get; private set; }
+
+        public override string ToString()
+        {
+            Debug.Assert(Modifications != null, "Modifications != null");
+            return "[" + string.Join(",",Modifications) + "]";
+        }
     }
 }

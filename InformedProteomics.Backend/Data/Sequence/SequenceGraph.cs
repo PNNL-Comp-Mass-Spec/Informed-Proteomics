@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private const int MaxPeptideLength = 50;
 
         public AminoAcidSet AminoAcidSet { get; private set; }
-
+        public ModificationParams ModificationParams { get; private set; }
         private readonly int _maxIndex;
         private readonly int _maxNumDynModsPerPeptide;
 

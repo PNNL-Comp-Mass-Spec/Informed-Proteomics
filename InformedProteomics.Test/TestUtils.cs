@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
@@ -12,6 +13,37 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestUtils
     {
+        [Test]
+        public void TestCompositions()
+        {
+            var comp1 = Modification.Oxidation.Composition;
+            var comp2 = new Composition(1, 2, 3, 4, 5,
+                                        new[]
+                                            {
+                                                new Tuple<Atom, short>(Atom.Get("Au"), 2),
+                                                new Tuple<Atom, short>(Atom.Get("P"), 2)
+                                            });
+            var comp3 = comp1 + comp2;
+
+            Console.WriteLine(comp1);
+            Console.WriteLine(comp2);
+            Console.WriteLine(comp3);
+        }
+
+        [Test]
+        public void TestModificationParams()
+        {
+            var modifications = new[] { Modification.Acetylation, Modification.Phosphorylation, Modification.Oxidation}; //, Modification.PyroGluQ };
+            var modParams = new ModificationParams(modifications, 3);
+            int numCombinations = modParams.GetNumModificationCombinations();
+            for (int modCombIndex = 0; modCombIndex < numCombinations; modCombIndex++)
+            {
+                var modCombination = modParams.GetModificationCombination(modCombIndex);
+                Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination.ToString(), modCombination.Composition, modCombination.Composition.GetMass());
+                
+            }
+        }
+
         [Test]
         public void TestGeneratingCombinations()
         {
@@ -36,10 +68,14 @@ namespace InformedProteomics.Test
             Console.WriteLine(Path.GetFileNameWithoutExtension(path));
             Console.WriteLine(Path.GetExtension(path));
             Console.WriteLine(Path.GetDirectoryName(path));
+
+            var test = new Dictionary<int, int>();
+            test[1] = 2;
+            Console.WriteLine(test.Equals(null));
         }
 
         [Test]
-        public void TestCompositions()
+        public void TestPeptide()
         {
             const string sequence = "PEPTIDE";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
