@@ -12,20 +12,41 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         private readonly Modification[] _modifications;
         private ModificationCombination[] _modificationCombinations;
-        private readonly int _numMaxDynMods;
+        private readonly int _maxNumDynModsPerSequence;
         private Dictionary<int, int> _modCombMap;
 
         /// <summary>
-        /// Storing all possible combinations of modifications up to numMaxDynMods
+        /// No modification
+        /// </summary>
+        public ModificationParams(): this(new Modification[0], 0)
+        {
+        }
+
+        /// <summary>
+        /// Storing all possible combinations of modifications up to MaxNumDynModsPerSequence
         /// </summary>
         /// <param name="modifications">array of modifications</param>
-        /// <param name="numMaxDynMods">number of maximum modifications</param>
-        public ModificationParams(Modification[] modifications, int numMaxDynMods)
+        /// <param name="maxNumDynModsPerSequence">number of maximum modifications</param>
+        public ModificationParams(Modification[] modifications, int maxNumDynModsPerSequence)
         {
             _modifications = modifications;
-            _numMaxDynMods = numMaxDynMods;
+            _maxNumDynModsPerSequence = maxNumDynModsPerSequence;
             CataloguePossibleModificationCombinations();
             GenerateModCombMap();
+        }
+
+        public int MaxNumDynModsPerSequence 
+        {
+            get { return _maxNumDynModsPerSequence; }
+        }
+
+        /// <summary>
+        /// Gets the number of all possible modification instances
+        /// </summary>
+        /// <returns>the number of modification instances</returns>
+        public int NumModificationCombinations
+        {
+            get { return _modificationCombinations.Length; }
         }
 
         /// <summary>
@@ -40,16 +61,15 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
-            return _modCombMap[prevModCombIndex*_numMaxDynMods + modIndex];
-        }
-
-        /// <summary>
-        /// Gets the number of all possible modification instances
-        /// </summary>
-        /// <returns>the number of modification instances</returns>
-        public int GetNumModificationCombinations()
-        {
-            return _modificationCombinations.Length;
+            int newModCombIndex;
+            if(_modCombMap.TryGetValue(prevModCombIndex*_maxNumDynModsPerSequence + modIndex, out newModCombIndex))
+            {
+                return newModCombIndex;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         public IEnumerable<ModificationCombination> GetModificationCombinations()
@@ -71,7 +91,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _indexToHashValue = new Dictionary<int, long>();
             _hashValueToIndex = new Dictionary<long, int>();
 
-            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, _numMaxDynMods);
+            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, _maxNumDynModsPerSequence);
             _modificationCombinations = new ModificationCombination[combinations.Length];
             int index = -1;
             foreach (var combination in combinations)
@@ -91,8 +111,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 long hashValue = _indexToHashValue[modCombIndex];
                 int[] modArray = ToModArray(hashValue);
-
-                if (modArray[0] != 0) // this ModificationCombination has _numMaxDynMods modifications
+                if (modArray.Length == 0)
+                    continue;
+                if (modArray[0] != 0) // this ModificationCombination has _maxNumDynModsPerSequence modifications
                     continue;
                 for (int modIndex = 0; modIndex < _modifications.Length; modIndex++)
                 {
@@ -102,7 +123,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     Array.Sort(newArray);
                     long newHashValue = ToHash(newArray);
                     int newIndex = _hashValueToIndex[newHashValue];
-                    _modCombMap[modCombIndex*_numMaxDynMods + modIndex] = newIndex;
+                    _modCombMap[modCombIndex*_maxNumDynModsPerSequence + modIndex] = newIndex;
                     //Console.WriteLine("{0},{1} -> {2}", _modificationCombinations[modCombIndex], 
                     //    _modifications[modIndex], _modificationCombinations[newIndex]);
                 }
@@ -114,11 +135,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         private int[] ToModArray(long hashValue)
         {
             int digit = _modifications.Length + 1;
-            var arr = new int[_numMaxDynMods];
+            var arr = new int[_maxNumDynModsPerSequence];
             long val = hashValue;
-            for (int i = 0; i < _numMaxDynMods; i++)
+            for (int i = 0; i < _maxNumDynModsPerSequence; i++)
             {
-                arr[_numMaxDynMods-1-i] = (int)(val % digit);
+                arr[_maxNumDynModsPerSequence-1-i] = (int)(val % digit);
                 val /= digit;
             }
             return arr;

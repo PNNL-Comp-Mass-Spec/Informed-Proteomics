@@ -2,7 +2,7 @@ namespace InformedProteomics.Backend.Data.Enum
 {
     public enum SequenceLocation
     {
-        Inner,
+        Everywhere,
         PeptideNTerm,
         PeptideCTerm,
         ProteinNTerm,

@@ -22,6 +22,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         public Composition Composition { get; private set; }
         public IList<Modification> Modifications { get; private set; }
 
+        public int GetNumModifications()
+        {
+            return Modifications.Count;
+        }
+
         public override string ToString()
         {
             Debug.Assert(Modifications != null, "Modifications != null");

@@ -249,7 +249,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
 		public override string ToString()
 		{
-		    string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S (" + S + ")";
+		    string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + ")";
             if(_additionalElements == null)
                 return basicCompositionStr;
 

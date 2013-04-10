@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
@@ -13,6 +14,33 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestUtils
     {
+        [Test]
+        public void TestSequenceGraph()
+        {
+            var phosPhoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
+            var phosPhoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
+            var phosPhoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var fixCarbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
+
+            var searchModifications = new List<SearchModification> { phosPhoS, phosPhoT, phosPhoY, oxM, fixCarbamidomethylC };
+            //var searchModifications = new List<SearchModification> { phosPhoT, fixCarbamidomethylC };
+            const int numMaxModsPepPeptide = 2;
+
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
+            const string pepSeq = "PEPCTISDSMER";
+            Console.WriteLine(aaSet.GetComposition(pepSeq));
+            var graph = new SequenceGraph(aaSet, pepSeq);
+            Console.WriteLine(graph.GetUnmodifiedSequenceComposition());
+            Assert.AreEqual(graph.GetUnmodifiedSequenceComposition(), aaSet.GetComposition(pepSeq));
+
+            Console.WriteLine("Sequence Compositions:");
+            foreach (var composition in graph.GetSequenceCompositions())
+            {
+                Console.WriteLine(composition);
+            }
+        }
+
         [Test]
         public void TestCompositions()
         {
@@ -35,13 +63,15 @@ namespace InformedProteomics.Test
         {
             var modifications = new[] { Modification.Acetylation, Modification.Phosphorylation, Modification.Oxidation}; //, Modification.PyroGluQ };
             var modParams = new ModificationParams(modifications, 3);
-            int numCombinations = modParams.GetNumModificationCombinations();
+            int numCombinations = modParams.NumModificationCombinations;
             for (int modCombIndex = 0; modCombIndex < numCombinations; modCombIndex++)
             {
                 var modCombination = modParams.GetModificationCombination(modCombIndex);
                 Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination.ToString(), modCombination.Composition, modCombination.Composition.GetMass());
-                
             }
+
+            Console.WriteLine(modParams.GetModificationCombinationIndex(8, 0));
+            Console.WriteLine(modParams.GetModificationCombinationIndex(19, 1));
         }
 
         [Test]
@@ -79,20 +109,18 @@ namespace InformedProteomics.Test
         {
             const string sequence = "PEPTIDE";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
-            var compositions = aaSet.GetCompositions(sequence);
+            var composition = aaSet.GetComposition(sequence);
 
-            Composition[] compositionArr = compositions.ToArray();
-            Assert.AreEqual(compositionArr.Count(), 1);
-            Console.WriteLine(compositionArr[0]);
-            Console.WriteLine(compositionArr[0].GetMass());
-            Console.WriteLine(compositionArr[0].GetNominalMass());
+            Console.WriteLine(composition);
+            Console.WriteLine(composition.GetMass());
+            Console.WriteLine(composition.GetNominalMass());
             // 2nd isotope
-            Console.WriteLine(compositionArr[0].GetIsotopeMass(0));
-            Console.WriteLine(compositionArr[0].GetIsotopeMass(1));
-            Console.WriteLine(compositionArr[0].GetIsotopeMass(2));
-            Assert.AreEqual(compositionArr[0].ToString(), "C34H51N7O14S0");
+            Console.WriteLine(composition.GetIsotopeMass(0));
+            Console.WriteLine(composition.GetIsotopeMass(1));
+            Console.WriteLine(composition.GetIsotopeMass(2));
+            Assert.AreEqual(composition.ToString(), "C34H51N7O14S0");
 
-            foreach (var e in compositionArr[0].GetApproximatedIsotopomerEnvelop())
+            foreach (var e in composition.GetApproximatedIsotopomerEnvelop())
                 Console.WriteLine(e);
         }
 

@@ -35,7 +35,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             this.SequenceString = sequence;
             foreach(var residue in SequenceString)
             {
-                Add(aminoAcidSet.GetAminoAcids(residue)[0]);
+                Add(aminoAcidSet.GetAminoAcid(residue));
             }
         }
 

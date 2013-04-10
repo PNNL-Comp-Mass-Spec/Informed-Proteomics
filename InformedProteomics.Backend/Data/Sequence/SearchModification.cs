@@ -7,16 +7,16 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class SearchModification
     {
-        public SearchModification(Modification mod, AminoAcid targetAA, SequenceLocation loc, bool isFixedModification)
+        public SearchModification(Modification mod, char targetResidue, SequenceLocation loc, bool isFixedModification)
         {
             Modification = mod;
-            TargetAA = targetAA;
+            TargetResidue = targetResidue;
             Location = loc;
             IsFixedModification = isFixedModification;
         }
 
         public Modification Modification { get; private set; }
-        public AminoAcid TargetAA { get; private set; }
+        public char TargetResidue { get; private set; }
         public SequenceLocation Location { get; private set; }
         public bool IsFixedModification { get; private set; }
     }

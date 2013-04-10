@@ -116,8 +116,10 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
+    <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />
+    <Compile Include="Data\Sequence\ScoringGraph.cs" />
     <Compile Include="Data\Sequence\SequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\BaseIonType.cs" />
     <Compile Include="Data\Spectrometry\IonType.cs" />
@@ -162,7 +164,6 @@
     <Compile Include="Data\Sequence\Composition.cs" />
     <Compile Include="Data\Sequence\Modification.cs" />
     <Compile Include="Data\Sequence\SearchModification.cs" />
-    <Compile Include="Data\Sequence\ModifiedAminoAcid.cs" />
     <Compile Include="Data\Sequence\Sequence.cs" />
     <Compile Include="Data\Spectrometry\Feature.cs" />
     <Compile Include="Data\Spectrometry\Fragment.cs" />

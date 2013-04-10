@@ -1,5 +1,4 @@
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -53,7 +52,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static AminoAcid GetStandardAminoAcid(char residue)
         {
-            return StandardAaSet.GetUnmodifiedAminoAcid(residue);
+            return StandardAaSet.GetAminoAcid(residue);
         }
 
         # region Public Static Members
@@ -63,6 +62,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static readonly AminoAcid PeptideNTerm = new AminoAcid('(', "Peptide-C-terminus", Composition.Zero);
         public static readonly AminoAcid PeptideCTerm = new AminoAcid(')', "Peptide-C-terminus", Composition.Zero);
+
+        public static readonly AminoAcid Empty = new AminoAcid('\0', "Empty", Composition.Zero);
 
         public static readonly AminoAcid[] StandardAminoAcidArr =
         {

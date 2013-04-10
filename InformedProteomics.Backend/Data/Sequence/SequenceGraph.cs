@@ -9,13 +9,25 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         private const int MaxPeptideLength = 50;
 
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public ModificationParams ModificationParams { get; private set; }
+        public AminoAcidSet AminoAcidSet 
+        {
+            get { return _aminoAcidSet; } 
+        }
+        public ModificationParams ModificationParams 
+        { 
+            get { return _modificationParams; }
+        }
+
         private readonly int _maxIndex;
-        private readonly int _maxNumDynModsPerPeptide;
+        private readonly int _maxNumDynModsPerSequence;
+        private readonly int _maxNumModificationCombinations;
+        private readonly AminoAcidSet _aminoAcidSet;
+        private readonly ModificationParams _modificationParams;
 
         private int _index;
-        private Node[][] graph;
+        private readonly Node[][] _graph;
+        private readonly AminoAcid[] _aminoAcidSequence;
+        private readonly Composition[] _prefixComposition;
 
         /// <summary>
         /// Initialize. Set the maximum sequence length as MaxPeptideLength
@@ -51,14 +63,29 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="maxSequenceLength"></param>
         public SequenceGraph(AminoAcidSet aminoAcidSet, int maxSequenceLength)
         {
-            AminoAcidSet = aminoAcidSet;
-            _maxNumDynModsPerPeptide = aminoAcidSet.MaxNumDynModsPerPeptide;
+            _aminoAcidSet = aminoAcidSet;
+            _modificationParams = aminoAcidSet.GetModificationParams();
+
+            _maxNumDynModsPerSequence = _modificationParams.MaxNumDynModsPerSequence;
+            _maxNumModificationCombinations = _modificationParams.NumModificationCombinations;
+
             _maxIndex = maxSequenceLength + 3;  // init + N-term + sequence length + C-term
 
             _index = 0;
 
-            graph = new Node[_maxIndex][];
-            graph[0] = new[] { new Node(Composition.Zero) };
+            _aminoAcidSequence = new AminoAcid[_maxIndex];
+            _aminoAcidSequence[0] = AminoAcid.Empty;
+
+            _prefixComposition = new Composition[_maxIndex];
+            _prefixComposition[0] = Composition.Zero;
+
+            _graph = new Node[_maxIndex][];
+            _graph[0] = new[] { new Node(0) };
+        }
+
+        public bool AddAminoAcid(char residue)
+        {
+            return PutAminoAcid(_index, residue);
         }
 
         /// <summary>
@@ -71,28 +98,59 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             _index = index + 1;
 
-            AminoAcid[] aminoAcids = AminoAcidSet.GetAminoAcids(residue);
-            if (aminoAcids == null) // residue is not valid
+            AminoAcid aminoAcid = AminoAcidSet.GetAminoAcid(residue);
+            if (aminoAcid == null) // residue is not valid
                 return false;
 
-            if (aminoAcids.Length == 1) // unmodified
+            _aminoAcidSequence[_index] = aminoAcid;
+            _prefixComposition[_index] = _prefixComposition[_index - 1] + aminoAcid.Composition;
+
+            // TODO: Support location-specific modifications
+            var modIndices = AminoAcidSet.GetModificationIndices(residue); 
+
+            if (!modIndices.Any())  // No modification
             {
-                AminoAcid aa = aminoAcids[0];
-                graph[_index] = new Node[graph[_index - 1].Length];
-                for (int i = 0; i < graph.Length; i++)
+                _graph[_index] = new Node[_graph[_index - 1].Length];
+                for (int i = 0; i < _graph[_index - 1].Length; i++)
                 {
-                    graph[_index][i] = new Node(graph[_index - 1][i], aa.Composition);
+                    _graph[_index][i] = new Node(_graph[_index - 1][i].ModificationCombinationIndex, _graph[_index][i]);
                 }
             }
             else
             {
-                //var compositionSet = new HashSet<Composition>();
-                //var newCompositionList = new List<Composition>();
-                //foreach (var prevSeqComposition in seqComposition[_index - 1])
-                //{
-                //    newCompositionList.AddRange(aminoAcids.Select(aa => prevSeqComposition + aa.Composition).Where(compositionSet.Add));
-                //}
-                //seqComposition[_index] = newCompositionList.ToArray();
+                var modCombIndexToNodeMap = new Dictionary<int, Node>();
+                for (int i = 0; i < _graph[_index - 1].Length; i++)
+                {
+                    Node prevNode = _graph[_index - 1][i];
+                    int prevModCombIndex = prevNode.ModificationCombinationIndex;
+                    Node newNode;
+                    // unmodified
+                    if(modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out newNode))
+                    {
+                        newNode.AddPrevNode(prevNode);
+                    }
+                    else
+                    {
+                        modCombIndexToNodeMap.Add(prevModCombIndex, new Node(prevModCombIndex, prevNode));
+                    }
+                    // modified
+                    foreach(var modIndex in modIndices)
+                    {
+                        int modCombIndex = ModificationParams.GetModificationCombinationIndex(
+                                                    prevNode.ModificationCombinationIndex, modIndex);
+                        if (modCombIndex < 0)   // too many modifications
+                            continue;
+                        if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out newNode))
+                        {
+                            newNode.AddPrevNode(prevNode);
+                        }
+                        else
+                        {
+                            modCombIndexToNodeMap.Add(modCombIndex, new Node(modCombIndex, prevNode));
+                        }
+                    }
+                    _graph[_index] = modCombIndexToNodeMap.Values.ToArray();
+                }
             }
 
             return true;
@@ -104,7 +162,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public Composition[] GetSequenceCompositions()
         {
-            throw new System.NotImplementedException();
+            Composition unmodComp = GetUnmodifiedSequenceComposition();
+
+            var compositions = new List<Composition>();
+            compositions.AddRange(_graph[_index].Select(
+                node => unmodComp + _modificationParams.GetModificationCombination(node.ModificationCombinationIndex).Composition));
+            return compositions.ToArray();
         }
 
         /// <summary>
@@ -113,38 +176,48 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public Composition GetUnmodifiedSequenceComposition()
         {
-            throw new System.NotImplementedException();
+            return _prefixComposition[_index];
         }
 
         /// <summary>
         /// Gets possible compositions of a prefix fragment.
-        /// index=0 means N-terminus. index=i (0 < i 
+        /// index=0 means 1st cleavage (e.g. P/EPTIDE) 
         /// </summary>
         /// <param name="sequenceIndex">Index of the sequence. 0 for sequence with no variable modification.</param>
         /// <returns></returns>
         public Composition[][] GetFragmentCompositions(int sequenceIndex)
         {
+           // // backtracking
+           // var fragmentCompositions = new Composition[_index - 2][];
+
+           // var activeNodes = new List<Node> {_graph[_index][sequenceIndex]};
+           // for (int index = _index - 1; index >= 2; --index)
+           // {
+           //     var newActiveNodes = new List<Node>();
+           //     foreach (var node in activeNodes)
+           //     {
+                    
+           //     }
+           // }
+           //return fragmentCompositions;
             throw new System.NotImplementedException();
         }
-
-
     }
 
     internal class Node
     {
-        internal Node(Composition composition)
+        internal Node(int modificationCombinationIndex)
         {
-            Composition = composition;
+            ModificationCombinationIndex = modificationCombinationIndex;
             _prevNodes = new List<Node>();
         }
 
-        internal Node(Node prevNode, Composition composition)
-            : this(prevNode.Composition + composition)
+        internal Node(int modificationCombinationIndex, Node prevNode): this(modificationCombinationIndex)
         {
             _prevNodes.Add(prevNode);
         }
 
-        internal Composition Composition { get; private set; }
+        internal int ModificationCombinationIndex { get; private set; }
 
         private readonly IList<Node> _prevNodes;
 

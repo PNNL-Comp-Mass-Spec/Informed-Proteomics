@@ -86,164 +86,161 @@ namespace InformedProteomics.Test
 			
 			foreach (string peptideSequence in peptideSequenceList)
 			{
-				IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
+				var precursorComposition = aminoAcidSet.GetComposition(peptideSequence);
 
-				foreach (Composition composition in compositions)
+				List<DatabaseMultipleSubTargetResult> resultList = new List<DatabaseMultipleSubTargetResult>();
+                Composition peptideComposition = precursorComposition + Composition.H2O;
+
+				// Create the database target
+                Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+
+				DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+
+				// Get the list of precursor targets from the DatabaseTarget object and pass them in
+				precursorExecutor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
+
+				foreach (var target in precursorExecutor.Targets.TargetList)
 				{
-					List<DatabaseMultipleSubTargetResult> resultList = new List<DatabaseMultipleSubTargetResult>();
-					Composition peptideComposition = composition + Composition.H2O;
+					Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" +
+										target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+				}
 
-					// Create the database target
-                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+				// Execute the workflow with the new targets
+				precursorExecutor.Execute();
 
-					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+				List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+				UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
+				Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
+				int maxChargeStateOfPrecursor = 0;
 
-					// Get the list of precursor targets from the DatabaseTarget object and pass them in
-					precursorExecutor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
-
-					foreach (var target in precursorExecutor.Targets.TargetList)
+				foreach (var precursorTargetedResultBase in precursorResultList)
+				{
+					Console.WriteLine("Checking Target...");
+					if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
 					{
-						Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" +
-										  target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+						Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
+						continue;
+					}
+					if (precursorTargetedResultBase.FailedResult)
+					{
+						Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
+						continue;
 					}
 
-					// Execute the workflow with the new targets
-					precursorExecutor.Execute();
+					DatabaseSubTarget precursorTarget = precursorTargetedResultBase.Target as DatabaseSubTarget;
 
-					List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-					UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
-					Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
-					int maxChargeStateOfPrecursor = 0;
-
-					foreach (var precursorTargetedResultBase in precursorResultList)
+					foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
 					{
-						Console.WriteLine("Checking Target...");
-						if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
+						if (precursorPeakQualityData.FitScore > 0.4) continue;
+
+						ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
+						XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
+						precursorProfileData.NormalizeYData();
+						XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
+						int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
+						Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+
+						// I don't believe any peaks that are not wide enough to be valid peptides
+						//if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 40) continue;
+						if (precursorChromPeak.Width < 5) continue;
+
+						// TODO: Remove this hard-coded filter
+						//if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
+
+						DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
+
+						if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
+
+						// Find out if this result relates to a previous result
+						bool foundMatch = false;
+						foreach (DatabaseMultipleSubTargetResult result in resultList)
 						{
-							Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
-							continue;
-						}
-						if (precursorTargetedResultBase.FailedResult)
-						{
-							Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
-							continue;
-						}
-
-						DatabaseSubTarget precursorTarget = precursorTargetedResultBase.Target as DatabaseSubTarget;
-
-						foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
-						{
-							if (precursorPeakQualityData.FitScore > 0.4) continue;
-
-							ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
-							XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
-							precursorProfileData.NormalizeYData();
-							XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
-							int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
-							Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
-
-							// I don't believe any peaks that are not wide enough to be valid peptides
-							//if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 40) continue;
-							if (precursorChromPeak.Width < 5) continue;
-
-							// TODO: Remove this hard-coded filter
-							//if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
-
-							DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
-
-							if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
-
-							// Find out if this result relates to a previous result
-							bool foundMatch = false;
-							foreach (DatabaseMultipleSubTargetResult result in resultList)
+							if(result.DoesNewResultBelong(precursorResult))
 							{
-								if(result.DoesNewResultBelong(precursorResult))
-								{
-									result.AddNewResult(precursorResult);
-									foundMatch = true;
-									break;
-								}
+								result.AddNewResult(precursorResult);
+								foundMatch = true;
+								break;
 							}
+						}
 
-							if (!foundMatch)
-							{
-								DatabaseMultipleSubTargetResult newResult = new DatabaseMultipleSubTargetResult(precursorResult);
-								resultList.Add(newResult);
-							}
+						if (!foundMatch)
+						{
+							DatabaseMultipleSubTargetResult newResult = new DatabaseMultipleSubTargetResult(precursorResult);
+							resultList.Add(newResult);
 						}
 					}
+				}
 
-					foreach (DatabaseMultipleSubTargetResult result in resultList)
+				foreach (DatabaseMultipleSubTargetResult result in resultList)
+				{
+					XYData precursorProfileData = result.PrecursorResultRep.XYData;
+
+					int chargeStateToSearch = result.ChargeStateList.Max();
+					double elutionTime = result.ElutionTime;
+
+					Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+					precursorProfileData.Display();
+
+					// Create fragment targets
+					fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
+					fragmentExecutor.Execute();
+
+					List<TargetedResultBase> fragmentResultList = fragmentExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+					UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
+					Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
+
+					foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
 					{
-						XYData precursorProfileData = result.PrecursorResultRep.XYData;
+						DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
+						Console.WriteLine(fragmentTarget.Fragment.ToString());
 
-						int chargeStateToSearch = result.ChargeStateList.Max();
-						double elutionTime = result.ElutionTime;
-
-						Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
-						precursorProfileData.Display();
-
-						// Create fragment targets
-						fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
-						fragmentExecutor.Execute();
-
-						List<TargetedResultBase> fragmentResultList = fragmentExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-						UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
-						Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
-
-						foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
+						if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
 						{
-							DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
-							Console.WriteLine(fragmentTarget.Fragment.ToString());
+							Console.WriteLine("Fragment Error: " + fragmentTargetedResultBase.ErrorDescription);
+							continue;
+						}
+						if (fragmentTargetedResultBase.FailedResult)
+						{
+							Console.WriteLine("Fragment Failed Result: " + fragmentTargetedResultBase.FailureType);
+							continue;
+						}
 
-							if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
+						foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
+						{
+							Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
+							if (fragmentPeakQualityData.FitScore > 0.5) continue;
+							//if (fragmentPeakQualityData.FitScore >= 1) continue;
+
+							ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
+							XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
+							fragmentProfileData.NormalizeYData();
+							XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
+
+							//Console.WriteLine(fragmentTarget.Fragment.ToString());
+							Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+							DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
+							Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
+							fragmentProfileData.Display();
+
+							//String label = fragmentTarget.Fragment.IonSymbol;
+							//for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
+							//{
+							//    label += "+";
+							//}
+
+							//WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
+
+							if (rSquared >= 0.4)
 							{
-								Console.WriteLine("Fragment Error: " + fragmentTargetedResultBase.ErrorDescription);
-								continue;
-							}
-							if (fragmentTargetedResultBase.FailedResult)
-							{
-								Console.WriteLine("Fragment Failed Result: " + fragmentTargetedResultBase.FailureType);
-								continue;
-							}
-
-							foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
-							{
-								Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
-								if (fragmentPeakQualityData.FitScore > 0.5) continue;
-								//if (fragmentPeakQualityData.FitScore >= 1) continue;
-
-								ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
-								XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
-								fragmentProfileData.NormalizeYData();
-								XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
-
+								textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
 								//Console.WriteLine(fragmentTarget.Fragment.ToString());
-								Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
-								DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
-								Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
-								fragmentProfileData.Display();
-
-								//String label = fragmentTarget.Fragment.IonSymbol;
-								//for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
-								//{
-								//    label += "+";
-								//}
-
-								//WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
-
-								if (rSquared >= 0.4)
-								{
-									textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
-									//Console.WriteLine(fragmentTarget.Fragment.ToString());
-									DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
-									result.FragmentResultList.Add(fragmentResult);
-								}
+								DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
+								result.FragmentResultList.Add(fragmentResult);
 							}
 						}
-
-						DtaUtil.AppendToDtaFile(result, dtaWriter);
 					}
+
+					DtaUtil.AppendToDtaFile(result, dtaWriter);
 				}
 			}
 
@@ -274,33 +271,30 @@ namespace InformedProteomics.Test
 			List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
 			foreach (string peptideSequence in peptideSequenceList)
 			{
-				IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
+				var precursorComposition = aminoAcidSet.GetComposition(peptideSequence);
 
-				foreach (Composition composition in compositions)
+                Composition peptideComposition = precursorComposition + Composition.H2O;
+
+				// Create the database target
+                Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+
+				DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+
+				// Get the list of precursor targets from the DatabaseTarget object and pass them in
+				executor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
+
+				foreach (var target in executor.Targets.TargetList)
 				{
-					Composition peptideComposition = composition + Composition.H2O;
-
-					// Create the database target
-                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
-
-					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
-
-					// Get the list of precursor targets from the DatabaseTarget object and pass them in
-					executor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
-
-					foreach (var target in executor.Targets.TargetList)
-					{
-						Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" + target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
-					}
-
-					// Execute the workflow with the new targets
-					executor.Execute();
-
-					// TODO: Save results? Print results?
-					List<TargetedResultBase> resultList = executor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-					UIMFTargetedMSMSWorkflowCollapseIMS workflow = (UIMFTargetedMSMSWorkflowCollapseIMS)executor.TargetedWorkflow;
-					PrintResults(resultList, workflow.ChromPeakToXYDataMap);
+					Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" + target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
 				}
+
+				// Execute the workflow with the new targets
+				executor.Execute();
+
+				// TODO: Save results? Print results?
+				List<TargetedResultBase> resultList = executor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+				UIMFTargetedMSMSWorkflowCollapseIMS workflow = (UIMFTargetedMSMSWorkflowCollapseIMS)executor.TargetedWorkflow;
+				PrintResults(resultList, workflow.ChromPeakToXYDataMap);
 			}
 		}
 
@@ -327,33 +321,30 @@ namespace InformedProteomics.Test
 			List<string> peptideSequenceList = new List<string> { "EYANQFMWEYSTNYGQAPLSLLVSYTK" };
 			foreach (string peptideSequence in peptideSequenceList)
 			{
-				IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
+				var precursorCompositions = aminoAcidSet.GetComposition(peptideSequence);
 
-				foreach (Composition composition in compositions)
-				{
-					Composition peptideComposition = composition + Composition.H2O;
+                Composition peptideComposition = precursorCompositions + Composition.H2O;
 
-					// Create the database target
-                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+				// Create the database target
+                Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
 
-					DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+				DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
 
-					// Get the list of precursor targets from the DatabaseTarget object and pass them in
-					executor.Targets.TargetList = databaseTarget.CreateFragmentTargets(0.584f, maxChargeState);
+				// Get the list of precursor targets from the DatabaseTarget object and pass them in
+				executor.Targets.TargetList = databaseTarget.CreateFragmentTargets(0.584f, maxChargeState);
 
-					//foreach (var target in executor.Targets.TargetList)
-					//{
-					//    Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" + target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
-					//}
+				//foreach (var target in executor.Targets.TargetList)
+				//{
+				//    Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" + target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+				//}
 
-					// Execute the workflow with the new targets
-					executor.Execute();
+				// Execute the workflow with the new targets
+				executor.Execute();
 
-					// TODO: Save results? Print results?
-					List<TargetedResultBase> resultList = executor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-					UIMFTargetedMSMSWorkflowCollapseIMS workflow = (UIMFTargetedMSMSWorkflowCollapseIMS)executor.TargetedWorkflow;
-					PrintResults(resultList, workflow.ChromPeakToXYDataMap);
-				}
+				// TODO: Save results? Print results?
+				List<TargetedResultBase> resultList = executor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+				UIMFTargetedMSMSWorkflowCollapseIMS workflow = (UIMFTargetedMSMSWorkflowCollapseIMS)executor.TargetedWorkflow;
+				PrintResults(resultList, workflow.ChromPeakToXYDataMap);
 			}
 		}
 
@@ -612,184 +603,180 @@ namespace InformedProteomics.Test
 
             foreach (string peptideSequence in peptideSequenceList)
             {
-                IEnumerable<Composition> compositions = aminoAcidSet.GetCompositions(peptideSequence);
+                var precursorComposition = aminoAcidSet.GetComposition(peptideSequence);
 
 
+                List<DatabaseMultipleSubTargetResult> resultList = new List<DatabaseMultipleSubTargetResult>();
+                Composition peptideComposition = precursorComposition + Composition.H2O;
 
-                foreach (Composition composition in compositions)
+                Console.WriteLine("******" + precursorComposition);
+
+                // Create the database target
+                Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+
+                DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
+
+                // Get the list of precursor targets from the DatabaseTarget object and pass them in
+                precursorExecutor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
+
+                foreach (var target in precursorExecutor.Targets.TargetList)
                 {
-                    List<DatabaseMultipleSubTargetResult> resultList = new List<DatabaseMultipleSubTargetResult>();
-                    Composition peptideComposition = composition + Composition.H2O;
+                    Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" +
+                                        target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+                }
 
-                    Console.WriteLine("******" + composition);
+                // Execute the workflow with the new targets
+                precursorExecutor.Execute();
 
-                    // Create the database target
-                    Sequence sequence = new Sequence(peptideComposition, peptideSequence, aminoAcidSet);
+                List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+                UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
+                Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
+                int maxChargeStateOfPrecursor = 0;
 
-                    DatabaseTarget databaseTarget = new DatabaseTarget(sequence, minMz, maxMz, minChargeState, maxChargeState);
-
-                    // Get the list of precursor targets from the DatabaseTarget object and pass them in
-                    precursorExecutor.Targets.TargetList = databaseTarget.CreatePrecursorTargets();
-
-                    foreach (var target in precursorExecutor.Targets.TargetList)
+                foreach (var precursorTargetedResultBase in precursorResultList)
+                {
+                    //Console.WriteLine("Checking Target...");
+                    if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
                     {
-                        Console.WriteLine(target.ChargeState + "\t" + target.EmpiricalFormula + "\t" + target.Code + "\t" +
-                                          target.MonoIsotopicMass + "\t" + target.MZ + "\t" + target.NormalizedElutionTime);
+                        //Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
+                        continue;
+                    }
+                    if (precursorTargetedResultBase.FailedResult)
+                    {
+                        //Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
+                        continue;
                     }
 
-                    // Execute the workflow with the new targets
-                    precursorExecutor.Execute();
+                    DatabaseSubTarget precursorTarget = precursorTargetedResultBase.Target as DatabaseSubTarget;
 
-                    List<TargetedResultBase> precursorResultList = precursorExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-                    UIMFTargetedMSMSWorkflowCollapseIMS precursorWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)precursorExecutor.TargetedWorkflow;
-                    Dictionary<ChromPeak, XYData> precursorChromPeakToXYDataMap = precursorWorkflow.ChromPeakToXYDataMap;
-                    int maxChargeStateOfPrecursor = 0;
-
-                    foreach (var precursorTargetedResultBase in precursorResultList)
+                    foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
                     {
-                        //Console.WriteLine("Checking Target...");
-                        if (precursorTargetedResultBase.ErrorDescription != null && precursorTargetedResultBase.ErrorDescription.Any())
-                        {
-                            //Console.WriteLine("Precursor error: " + precursorTargetedResultBase.ErrorDescription);
-                            continue;
-                        }
-                        if (precursorTargetedResultBase.FailedResult)
-                        {
-                            //Console.WriteLine("Precursor failed result: " + precursorTargetedResultBase.FailureType);
-                            continue;
-                        }
+                        if (precursorPeakQualityData.FitScore > 0.4) continue;
 
-                        DatabaseSubTarget precursorTarget = precursorTargetedResultBase.Target as DatabaseSubTarget;
+                        ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
+                        XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
+                        precursorProfileData.NormalizeYData();
+                        XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
+                        int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
+                        //Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
 
-                        foreach (var precursorPeakQualityData in precursorTargetedResultBase.ChromPeakQualityList)
-                        {
-                            if (precursorPeakQualityData.FitScore > 0.4) continue;
+                        // I don't believe any peaks that are not wide enough to be valid peptides
+                        if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 20) continue;
+                        // Console.WriteLine("#####");
+                        // TODO: Remove this hard-coded filter
+                        //if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
 
-                            ChromPeak precursorChromPeak = precursorPeakQualityData.Peak;
-                            XYData precursorProfileData = precursorChromPeakToXYDataMap[precursorChromPeak];
-                            precursorProfileData.NormalizeYData();
-                            XICProfile precursorXicProfile = new XICProfile(precursorPeakQualityData, precursorPeakQualityData.Peak);
-                            int chargeState = precursorPeakQualityData.IsotopicProfile.ChargeState;
-                            //Console.WriteLine("NET = " + precursorChromPeak.NETValue + "\tScan = " + precursorChromPeak.XValue + "\tPeakWidth = " + precursorChromPeak.Width + "\tFit = " + precursorPeakQualityData.FitScore + "\tMass = " + precursorPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+                        DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
 
-                            // I don't believe any peaks that are not wide enough to be valid peptides
-                            if (precursorChromPeak.Width < 5 || precursorChromPeak.Width > 20) continue;
-                            // Console.WriteLine("#####");
-                            // TODO: Remove this hard-coded filter
-                            //if (precursorPeakQualityData.IsotopicProfile.ChargeState != 3 || precursorChromPeak.NETValue < 0.58 || precursorChromPeak.NETValue > 0.59) continue;
+                        if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
 
-                            DatabaseSubTargetResult precursorResult = new DatabaseSubTargetResult(precursorTarget, databaseTarget, precursorProfileData, precursorXicProfile, precursorPeakQualityData.FitScore);
-
-                            if (chargeState > maxChargeStateOfPrecursor) maxChargeStateOfPrecursor = chargeState;
-
-                            // Find out if this result relates to a previous result
-                            bool foundMatch = false;
-                            foreach (DatabaseMultipleSubTargetResult result in resultList)
-                            {
-                                if (result.DoesNewResultBelong(precursorResult))
-                                {
-                                    result.AddNewResult(precursorResult);
-                                    foundMatch = true;
-                                    break;
-                                }
-                            }
-
-                            if (!foundMatch)
-                            {
-                                DatabaseMultipleSubTargetResult newResult = new DatabaseMultipleSubTargetResult(precursorResult);
-                                resultList.Add(newResult);
-                            }
-                        }
-                    }
-
-                    foreach (DatabaseMultipleSubTargetResult result in resultList)
-                    {
-                        XYData precursorProfileData = result.PrecursorResultRep.XYData;
-
-                        int chargeStateToSearch = result.ChargeStateList.Max();
-                        double elutionTime = result.ElutionTime;
-
-                        //Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
-                        //precursorProfileData.Display();
-
-                        // Create fragment targets
-                        fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
-                        fragmentExecutor.Execute();
-
-                        List<TargetedResultBase> fragmentResultList = fragmentExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
-                        UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
-                        Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
-
-                        foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
-                        {
-                            DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
-                            //Console.WriteLine(fragmentTarget.Fragment.ToString());
-
-                            if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
-                            {
-                                //Console.WriteLine(fragmentTargetedResultBase.ErrorDescription);
-                                continue;
-                            }
-                            if (fragmentTargetedResultBase.FailedResult)
-                            {
-                                //Console.WriteLine("Failed Result.");
-                                continue;
-                            }
-
-                            foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
-                            {
-                                //Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
-                                //if (fragmentPeakQualityData.FitScore > 0.5) continue;
-                                //if (fragmentPeakQualityData.FitScore >= 1) continue;
-
-                                ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
-                                XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
-                                fragmentProfileData.NormalizeYData();
-                                XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
-
-                                //Console.WriteLine(fragmentTarget.Fragment.ToString());
-                                //Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
-                                DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
-                                //Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
-                                //fragmentProfileData.Display();
-
-                                //String label = fragmentTarget.Fragment.IonSymbol;
-                                //for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
-                                //{
-                                //    label += "+";
-                                //}
-                                //WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
-
-                                if (rSquared >= 0.01)
-                                {
-                                    textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
-                                    //Console.WriteLine(fragmentTarget.Fragment.ToString());
-                                    DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
-                                    result.FragmentResultList.Add(fragmentResult);
-                                }
-                            }
-                        }
-
-                        DtaUtil.AppendToDtaFile(result, dtaWriter);
-                    }
-
-                    var score = -250f;
-                    //Console.WriteLine("Here" + resultList.Count);
-                    if (resultList.Count > 0)
-                    {
+                        // Find out if this result relates to a previous result
+                        bool foundMatch = false;
                         foreach (DatabaseMultipleSubTargetResult result in resultList)
                         {
-
-                            var s = new Scorer(sequence, result).Score;
-                            if (score < s) score = s;
+                            if (result.DoesNewResultBelong(precursorResult))
+                            {
+                                result.AddNewResult(precursorResult);
+                                foundMatch = true;
+                                break;
+                            }
                         }
-                        Console.WriteLine("***\t" + peptideSequence + "\t" + score);
-                        scores[
-                            Math.Min(peptideSequence.Length, scores.GetLength(0) - 1),
-                            Math.Min((int)(score + 250.5), scores.GetLength(1) - 1)]++;
+
+                        if (!foundMatch)
+                        {
+                            DatabaseMultipleSubTargetResult newResult = new DatabaseMultipleSubTargetResult(precursorResult);
+                            resultList.Add(newResult);
+                        }
+                    }
+                }
+
+                foreach (DatabaseMultipleSubTargetResult result in resultList)
+                {
+                    XYData precursorProfileData = result.PrecursorResultRep.XYData;
+
+                    int chargeStateToSearch = result.ChargeStateList.Max();
+                    double elutionTime = result.ElutionTime;
+
+                    //Console.WriteLine("Targeting Sequence = " + result.PrecursorResultRep.DatabaseSubTarget.Code + " NET = " + (float)elutionTime + "\tCS = " + chargeStateToSearch + "\tFit = " + result.PrecursorResultRep.XICProfile.DeconToolsFitScore);
+                    //precursorProfileData.Display();
+
+                    // Create fragment targets
+                    fragmentExecutor.Targets.TargetList = databaseTarget.CreateFragmentTargets((float)elutionTime, chargeStateToSearch);
+                    fragmentExecutor.Execute();
+
+                    List<TargetedResultBase> fragmentResultList = fragmentExecutor.TargetedWorkflow.Run.ResultCollection.GetMassTagResults();
+                    UIMFTargetedMSMSWorkflowCollapseIMS fragmentWorkflow = (UIMFTargetedMSMSWorkflowCollapseIMS)fragmentExecutor.TargetedWorkflow;
+                    Dictionary<ChromPeak, XYData> fragmentChromPeakToXYDataMap = fragmentWorkflow.ChromPeakToXYDataMap;
+
+                    foreach (TargetedResultBase fragmentTargetedResultBase in fragmentResultList)
+                    {
+                        DatabaseFragmentTarget fragmentTarget = fragmentTargetedResultBase.Target as DatabaseFragmentTarget;
+                        //Console.WriteLine(fragmentTarget.Fragment.ToString());
+
+                        if (fragmentTargetedResultBase.ErrorDescription != null && fragmentTargetedResultBase.ErrorDescription.Any())
+                        {
+                            //Console.WriteLine(fragmentTargetedResultBase.ErrorDescription);
+                            continue;
+                        }
+                        if (fragmentTargetedResultBase.FailedResult)
+                        {
+                            //Console.WriteLine("Failed Result.");
+                            continue;
+                        }
+
+                        foreach (ChromPeakQualityData fragmentPeakQualityData in fragmentTargetedResultBase.ChromPeakQualityList)
+                        {
+                            //Console.WriteLine("Fit Score = " + fragmentPeakQualityData.FitScore);
+                            //if (fragmentPeakQualityData.FitScore > 0.5) continue;
+                            //if (fragmentPeakQualityData.FitScore >= 1) continue;
+
+                            ChromPeak fragmentChromPeak = fragmentPeakQualityData.Peak;
+                            XYData fragmentProfileData = fragmentChromPeakToXYDataMap[fragmentChromPeak];
+                            fragmentProfileData.NormalizeYData();
+                            XICProfile fragmentXicProfile = new XICProfile(fragmentPeakQualityData, fragmentPeakQualityData.Peak);
+
+                            //Console.WriteLine(fragmentTarget.Fragment.ToString());
+                            //Console.WriteLine("NET = " + fragmentChromPeak.NETValue + "\tScan = " + fragmentChromPeak.XValue + "\tPeakWidth = " + fragmentChromPeak.Width + "\tFit = " + fragmentPeakQualityData.FitScore + "\tMass = " + fragmentPeakQualityData.IsotopicProfile.MonoIsotopicMass);
+                            DataUtil.CorrelateXYData(precursorProfileData, fragmentProfileData, 1, out slope, out intercept, out rSquared);
+                            //Console.WriteLine("Slope = " + slope + "\tIntercept = " + intercept + "\tRSquared = " + rSquared);
+                            //fragmentProfileData.Display();
+
+                            //String label = fragmentTarget.Fragment.IonSymbol;
+                            //for (int i = 0; i < fragmentTarget.Fragment.ChargeState; i++)
+                            //{
+                            //    label += "+";
+                            //}
+                            //WriteFragmentProfileToFile(fragmentProfileData, label, textWriter, 509, 527);
+
+                            if (rSquared >= 0.01)
+                            {
+                                textWriter.WriteLine(result.PrecursorResultRep.DatabaseSubTarget.Code + "," + result.PrecursorResultRep.DatabaseSubTarget.EmpiricalFormula + "," + elutionTime + "," + chargeStateToSearch + "," + result.IsotopicFitScore + "," + fragmentTarget.Fragment.IonSymbol + "," + fragmentTarget.Fragment.ChargeState + "," + rSquared + "," + fragmentPeakQualityData.FitScore);
+                                //Console.WriteLine(fragmentTarget.Fragment.ToString());
+                                DatabaseFragmentTargetResult fragmentResult = new DatabaseFragmentTargetResult(fragmentTarget, fragmentProfileData, fragmentXicProfile, fragmentPeakQualityData);
+                                result.FragmentResultList.Add(fragmentResult);
+                            }
+                        }
                     }
 
+                    DtaUtil.AppendToDtaFile(result, dtaWriter);
                 }
+
+                var score = -250f;
+                //Console.WriteLine("Here" + resultList.Count);
+                if (resultList.Count > 0)
+                {
+                    foreach (DatabaseMultipleSubTargetResult result in resultList)
+                    {
+
+                        var s = new Scorer(sequence, result).Score;
+                        if (score < s) score = s;
+                    }
+                    Console.WriteLine("***\t" + peptideSequence + "\t" + score);
+                    scores[
+                        Math.Min(peptideSequence.Length, scores.GetLength(0) - 1),
+                        Math.Min((int)(score + 250.5), scores.GetLength(1) - 1)]++;
+                }
+
             }
             scoreWriter.WriteLine("d=[");
             for (int j = 0; j < scores.GetLength(0); j++)
