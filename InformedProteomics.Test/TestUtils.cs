@@ -35,7 +35,16 @@ namespace InformedProteomics.Test
             Assert.AreEqual(graph.GetUnmodifiedSequenceComposition(), aaSet.GetComposition(pepSeq));
 
             Console.WriteLine("Sequence Compositions:");
+            int index = -1;
             foreach (var composition in graph.GetSequenceCompositions())
+            {
+                Console.WriteLine(++index+": "+composition);
+            }
+
+            const int seqIndex = 0;
+            Console.WriteLine("Fragment Compositions (" + seqIndex +")");
+            var scoringGraph = graph.GetScoringGraph(seqIndex);
+            foreach (var composition in scoringGraph.GetCompositions())
             {
                 Console.WriteLine(composition);
             }

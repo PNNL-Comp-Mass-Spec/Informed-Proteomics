@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -19,8 +17,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         private readonly int _maxIndex;
-        private readonly int _maxNumDynModsPerSequence;
-        private readonly int _maxNumModificationCombinations;
         private readonly AminoAcidSet _aminoAcidSet;
         private readonly ModificationParams _modificationParams;
 
@@ -66,9 +62,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             _aminoAcidSet = aminoAcidSet;
             _modificationParams = aminoAcidSet.GetModificationParams();
 
-            _maxNumDynModsPerSequence = _modificationParams.MaxNumDynModsPerSequence;
-            _maxNumModificationCombinations = _modificationParams.NumModificationCombinations;
-
             _maxIndex = maxSequenceLength + 3;  // init + N-term + sequence length + C-term
 
             _index = 0;
@@ -113,7 +106,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 _graph[_index] = new Node[_graph[_index - 1].Length];
                 for (int i = 0; i < _graph[_index - 1].Length; i++)
                 {
-                    _graph[_index][i] = new Node(_graph[_index - 1][i].ModificationCombinationIndex, _graph[_index][i]);
+                    _graph[_index][i] = new Node(_graph[_index - 1][i].ModificationCombinationIndex, i);
                 }
             }
             else
@@ -121,17 +114,18 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var modCombIndexToNodeMap = new Dictionary<int, Node>();
                 for (int i = 0; i < _graph[_index - 1].Length; i++)
                 {
+                    int prevNodeIndex = i;
                     Node prevNode = _graph[_index - 1][i];
                     int prevModCombIndex = prevNode.ModificationCombinationIndex;
                     Node newNode;
                     // unmodified
                     if(modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out newNode))
                     {
-                        newNode.AddPrevNode(prevNode);
+                        newNode.AddPrevNodeIndex(prevNodeIndex);
                     }
                     else
                     {
-                        modCombIndexToNodeMap.Add(prevModCombIndex, new Node(prevModCombIndex, prevNode));
+                        modCombIndexToNodeMap.Add(prevModCombIndex, new Node(prevModCombIndex, prevNodeIndex));
                     }
                     // modified
                     foreach(var modIndex in modIndices)
@@ -142,11 +136,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                             continue;
                         if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out newNode))
                         {
-                            newNode.AddPrevNode(prevNode);
+                            newNode.AddPrevNodeIndex(prevNodeIndex);
                         }
                         else
                         {
-                            modCombIndexToNodeMap.Add(modCombIndex, new Node(modCombIndex, prevNode));
+                            modCombIndexToNodeMap.Add(modCombIndex, new Node(modCombIndex, prevNodeIndex));
                         }
                     }
                     _graph[_index] = modCombIndexToNodeMap.Values.ToArray();
@@ -162,12 +156,13 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public Composition[] GetSequenceCompositions()
         {
-            Composition unmodComp = GetUnmodifiedSequenceComposition();
-
-            var compositions = new List<Composition>();
-            compositions.AddRange(_graph[_index].Select(
-                node => unmodComp + _modificationParams.GetModificationCombination(node.ModificationCombinationIndex).Composition));
-            return compositions.ToArray();
+            int numCompositions = _graph[_index].Length;
+            var compositions = new Composition[numCompositions];
+            for (int nodeIndex = 0; nodeIndex < numCompositions; nodeIndex++)
+            {
+                compositions[nodeIndex] = GetComposition(_index, nodeIndex);
+            }
+            return compositions;
         }
 
         /// <summary>
@@ -179,28 +174,61 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _prefixComposition[_index];
         }
 
-        /// <summary>
-        /// Gets possible compositions of a prefix fragment.
-        /// index=0 means 1st cleavage (e.g. P/EPTIDE) 
-        /// </summary>
-        /// <param name="sequenceIndex">Index of the sequence. 0 for sequence with no variable modification.</param>
-        /// <returns></returns>
-        public Composition[][] GetFragmentCompositions(int sequenceIndex)
+        public ScoringGraph GetScoringGraph(int sequenceIndex)
         {
-           // // backtracking
-           // var fragmentCompositions = new Composition[_index - 2][];
+            // backtracking
+            ScoringGraphNode rootNode = null;
+            var nextNodeMap = new Dictionary<int, List<ScoringGraphNode>>
+                {
+                    {sequenceIndex, new List<ScoringGraphNode>()}
+                };
+            for (int seqIndex = _index; seqIndex >= 0; --seqIndex )
+            {
+                var newNextNodeMap = new Dictionary<int, List<ScoringGraphNode>>();
 
-           // var activeNodes = new List<Node> {_graph[_index][sequenceIndex]};
-           // for (int index = _index - 1; index >= 2; --index)
-           // {
-           //     var newActiveNodes = new List<Node>();
-           //     foreach (var node in activeNodes)
-           //     {
-                    
-           //     }
-           // }
-           //return fragmentCompositions;
-            throw new System.NotImplementedException();
+                foreach (var entry in nextNodeMap)
+                {
+                    int nodeIndex = entry.Key;
+                    var curNode = _graph[seqIndex][nodeIndex];
+                    var composition = GetComposition(seqIndex, nodeIndex);
+                    var scoringGraphNode = new ScoringGraphNode(composition);
+                    scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
+
+                    foreach (var prevNodeIndex in curNode.GetPrevIndices())
+                    {
+                        List<ScoringGraphNode> nextNodes;
+                        if (newNextNodeMap.TryGetValue(prevNodeIndex, out nextNodes))
+                        {
+                            nextNodes.Add(scoringGraphNode);
+                        }
+                        else
+                        {
+                            newNextNodeMap.Add(prevNodeIndex, new List<ScoringGraphNode> { scoringGraphNode });
+                        }
+                    }
+
+                    if (!curNode.GetPrevIndices().Any())
+                    {
+                        rootNode = scoringGraphNode;
+                    }
+                }
+                
+                nextNodeMap = newNextNodeMap;
+            }
+
+            
+            var scoringGraph = new ScoringGraph(_aminoAcidSequence, GetComposition(_index, sequenceIndex), rootNode);
+
+            return scoringGraph;
+        }
+
+        private Composition GetComposition(int seqIndex, int nodeIndex)
+        {
+            Node node = _graph[seqIndex][nodeIndex];
+            var composition = _prefixComposition[seqIndex] +
+                              _modificationParams.GetModificationCombination(node.ModificationCombinationIndex)
+                                                 .Composition;
+            return composition;
         }
     }
 
@@ -209,23 +237,25 @@ namespace InformedProteomics.Backend.Data.Sequence
         internal Node(int modificationCombinationIndex)
         {
             ModificationCombinationIndex = modificationCombinationIndex;
-            _prevNodes = new List<Node>();
+            _prevNodeIndices = new HashSet<int>();
         }
 
-        internal Node(int modificationCombinationIndex, Node prevNode): this(modificationCombinationIndex)
+        internal Node(int modificationCombinationIndex, int prevNodeIndex)
+            : this(modificationCombinationIndex)
         {
-            _prevNodes.Add(prevNode);
+            _prevNodeIndices.Add(prevNodeIndex);
         }
 
-        internal int ModificationCombinationIndex { get; private set; }
+        public int ModificationCombinationIndex { get; private set; }
 
-        private readonly IList<Node> _prevNodes;
+        private readonly HashSet<int> _prevNodeIndices;
 
-        internal void AddPrevNode(Node prevNode)
+        internal bool AddPrevNodeIndex(int prevNodeIndex)
         {
-            _prevNodes.Add(prevNode);
+            return _prevNodeIndices.Add(prevNodeIndex);
         }
 
-        internal IEnumerable<Node> GetPrevNodes() { return _prevNodes; }
+        public IEnumerable<int> GetPrevIndices() { return _prevNodeIndices; }
     }
+
 }

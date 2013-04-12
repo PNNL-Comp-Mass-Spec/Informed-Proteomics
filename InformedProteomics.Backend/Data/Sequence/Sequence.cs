@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
-    public class Sequence : List<AminoAcid>, IMatter, IEnumerable<Composition>
+    public class Sequence : List<AminoAcid>, IMolecule
     {
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
@@ -19,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 SequenceString += aa.Residue; // added by Kyowon jeong
             }
 
-            this.Composition = composition;
+            Composition = composition;
         }
 
 		/*public Sequence (Composition composition, string sequence)
@@ -31,8 +30,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         // fixed by Kyowon so that both constructors have amino acid list.
         public Sequence(Composition composition, string sequence, AminoAcidSet aminoAcidSet)
         {
-            this.Composition = composition;
-            this.SequenceString = sequence;
+            Composition = composition;
+            SequenceString = sequence;
             foreach(var residue in SequenceString)
             {
                 Add(aminoAcidSet.GetAminoAcid(residue));
@@ -45,6 +44,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         public double GetMass()
         {
             return Composition.GetMass();
+        }
+
+        public Composition GetComposition()
+        {
+            return Composition;
         }
 
         //added by kyowon jeong
@@ -62,50 +66,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             for (var i = from; i < to; i++)
                 composition += this[i].Composition;
             return composition;
-        }
-
-        IEnumerator<Composition> IEnumerable<Composition>.GetEnumerator()
-        {
-            return new CompositionEnum(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return (IEnumerator) new CompositionEnum(this);
-        }
-
-        private class CompositionEnum : IEnumerator<Composition>
-        {
-            private Sequence _sequence;
-            public CompositionEnum(Sequence sequence)
-            {
-                _sequence = sequence;
-            }
-
-            public Composition Current
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public void Dispose()
-            {
-                throw new NotImplementedException();
-            }
-
-            object IEnumerator.Current
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public bool MoveNext()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Reset()
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }
