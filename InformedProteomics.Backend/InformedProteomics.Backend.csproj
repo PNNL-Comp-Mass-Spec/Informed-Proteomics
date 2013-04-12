@@ -116,7 +116,6 @@
   <ItemGroup>
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Biology\Tolerance.cs" />
-    <Compile Include="Data\Scoring\IScorer.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />

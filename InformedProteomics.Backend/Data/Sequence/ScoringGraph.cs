@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.IMSScoring;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
     public class ScoringGraph
     {
+        private const int DefaultMinPrecursorCharge = 1;
+        private const int DefaultMaxPrecursorCharge = 4;
+
         private readonly AminoAcid[] _aminoAcidSequence;
         private readonly Composition _sequenceComposition;
         private readonly ScoringGraphNode _rootNode;
+        private readonly int _minPrecursorCharge;
+        private readonly int _maxPrecursorCharge;
+
+        private ImsDataCached _imsData;
         private ImsScorer _imsScorer;
 
         public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode)
@@ -18,32 +27,73 @@ namespace InformedProteomics.Backend.Data.Sequence
             _aminoAcidSequence = aminoAcidSequence;
             _sequenceComposition = sequenceComposition;
             _rootNode = rootNode;
+            _minPrecursorCharge = DefaultMinPrecursorCharge;
+            _maxPrecursorCharge = DefaultMaxPrecursorCharge;
         }
 
-        public void RegisterScorer(ImsScorer imsScorer)
+        public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode,
+                            int minPrecursorCharge, int maxPrecursorCharge)
+            : this(aminoAcidSequence, sequenceComposition, rootNode)
         {
-            _imsScorer = imsScorer;
+            _minPrecursorCharge = minPrecursorCharge;
+            _maxPrecursorCharge = maxPrecursorCharge;
+        }
+
+        public void RegisterImsData(ImsDataCached imsData)
+        {
+            _imsData = imsData;
         }
 
         public void ComputeScores()
         {
-            throw new System.NotImplementedException();
+            var compositions = new HashSet<Composition>();
+
+            var curNodes = new HashSet<ScoringGraphNode> { _rootNode };
+            int index = -1;
+            while (curNodes.Any())
+            {
+                ++index;
+                var newNodes = new HashSet<ScoringGraphNode>();
+                foreach (var node in curNodes)
+                {
+                    compositions.Add(node.Composition);
+                    foreach (var nextNode in node.GetNextNodes())
+                    {
+                        newNodes.Add(nextNode);
+                    }
+                }
+                curNodes = newNodes;
+            }
         }
 
         public IEnumerable<Composition> GetCompositions()
         {
-            return GetCompositions(_rootNode);
-        }
+            var compositions = new HashSet<Composition>();
 
-        public ISet<Composition> GetCompositions(ScoringGraphNode node)
-        {
-            var compositions = new HashSet<Composition> {node.Composition};
-            foreach (var nextNode in node.GetNextNodes())
+            var curNodes = new HashSet<ScoringGraphNode> {_rootNode};
+            while (curNodes.Any())
             {
-                compositions.Add(nextNode.Composition);
+                var newNodes = new HashSet<ScoringGraphNode>();
+                foreach (var node in curNodes)
+                {
+                    compositions.Add(node.Composition);
+                    foreach (var nextNode in node.GetNextNodes())
+                    {
+                        newNodes.Add(nextNode);
+                    }
+                }
+                curNodes = newNodes;
             }
 
             return compositions;
+        }
+
+        private double GetCutScore(int index, Composition cutComposition, int precursorCharge)
+        {
+            //char nTermAA = _aminoAcidSequence[index - 1].Residue;
+            //char cTermAA = _aminoAcidSequence[index].Residue;
+            //_imsScorer.GetCutScore(nTermAA, cTermAA, cutComposition, new Ion(_sequenceComposition, precursorCharge));
+            throw new System.NotImplementedException();
         }
     }
 

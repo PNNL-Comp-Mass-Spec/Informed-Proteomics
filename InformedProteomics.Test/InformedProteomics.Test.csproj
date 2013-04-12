@@ -79,6 +79,9 @@
     <Reference Include="PNNLOmics">
       <HintPath>..\lib\$(Platform)\PNNLOmics.dll</HintPath>
     </Reference>
+    <Reference Include="SAIS">
+      <HintPath>..\lib\x64\SAIS.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
@@ -96,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestIcIms.cs" />
+    <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDeconToolsWorkflow.cs" />

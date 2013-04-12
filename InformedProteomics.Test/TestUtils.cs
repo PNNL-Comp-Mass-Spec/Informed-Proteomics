@@ -28,7 +28,7 @@ namespace InformedProteomics.Test
             const int numMaxModsPepPeptide = 2;
 
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
-            const string pepSeq = "PEPCTISDSMER";
+            const string pepSeq = "T";
             Console.WriteLine(aaSet.GetComposition(pepSeq));
             var graph = new SequenceGraph(aaSet, pepSeq);
             Console.WriteLine(graph.GetUnmodifiedSequenceComposition());
@@ -41,7 +41,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(++index+": "+composition);
             }
 
-            const int seqIndex = 0;
+            const int seqIndex = 1;
             Console.WriteLine("Fragment Compositions (" + seqIndex +")");
             var scoringGraph = graph.GetScoringGraph(seqIndex);
             foreach (var composition in scoringGraph.GetCompositions())
@@ -65,6 +65,18 @@ namespace InformedProteomics.Test
             Console.WriteLine(comp1);
             Console.WriteLine(comp2);
             Console.WriteLine(comp3);
+            var comp4 = new Composition(1, 2, 3, 4, 5,
+                                        new[]
+                                            {
+                                                new Tuple<Atom, short>(Atom.Get("Au"), 2),
+                                                new Tuple<Atom, short>(Atom.Get("P"), 2)
+                                            });
+
+            Console.WriteLine("Testing GetHashCode() and Equals():");
+            Console.WriteLine(comp2.Equals(comp4));
+            Console.WriteLine(comp2.GetHashCode());
+            Console.WriteLine(comp4.GetHashCode());
+            Console.WriteLine(comp2.Equals(comp2 + Composition.Zero));
         }
 
         [Test]

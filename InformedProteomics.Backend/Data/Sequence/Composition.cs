@@ -142,10 +142,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public override int GetHashCode()
         {
-            var hashCode = _c*0x01000000 + _h*0x00010000 + _n*0x00000400 + _o*0x00000010 + _s;
-            if(_additionalElements == null)
+            var hashCode = _c * 0x01000000 + _h * 0x00010000 + _n * 0x00000400 + _o * 0x00000010 + _s;
+            if (_additionalElements == null)
                 return hashCode;
-            return hashCode + _additionalElements.GetHashCode();
+            return hashCode + _additionalElements.Sum(element => element.Key.GetHashCode() * element.Value);
         }
 
         public override bool Equals(object obj)
@@ -158,7 +158,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             if (_additionalElements != null)
             {
-                return _additionalElements.Equals(other._additionalElements);
+                if (other._additionalElements == null)
+                {
+                    return false;
+                }
+                foreach (var entry in _additionalElements)
+                {
+                    short num;
+                    if (_additionalElements.TryGetValue(entry.Key, out num))
+                    {
+                        if (entry.Value != num)
+                            return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
             return other._additionalElements == null;
         }
@@ -189,6 +206,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Composition operator +(Composition c1, Composition c2)
         {
+            if (c1 == Composition.Zero)
+                return c2;
+            if (c2 == Composition.Zero)
+                return c1;
             int numC = c1._c + c2._c;
             int numH = c1._h + c2._h;
             int numN = c1._n + c2._n;
