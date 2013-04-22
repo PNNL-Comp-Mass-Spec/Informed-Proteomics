@@ -114,8 +114,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
-    <Compile Include="Data\Biology\Tolerance.cs" />
+    <Compile Include="Data\Spectrometry\Tolerance.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />
@@ -125,7 +126,6 @@
     <Compile Include="Data\Spectrometry\IonType.cs" />
     <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
-    <Compile Include="Data\Spectrometry\XIC.cs" />
     <Compile Include="Data\Targets\NominalMassTarget.cs" />
     <Compile Include="IMSScoring\FeatureNode.cs" />
     <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
@@ -155,7 +155,6 @@
     <Compile Include="Data\Biology\IMatter.cs" />
     <Compile Include="Data\Biology\IMolecule.cs" />
     <Compile Include="Data\Biology\Ion.cs" />
-    <Compile Include="Data\Biology\Protein.cs" />
     <Compile Include="Data\Results\DatabaseFragmentTargetResult.cs" />
     <Compile Include="Data\Results\DatabaseMultipleSubTargetResult.cs" />
     <Compile Include="Data\Results\DatabaseSubTargetResult.cs" />
@@ -187,7 +186,6 @@
     <Compile Include="Utils\FragmentationUtil.cs" />
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="Database\IStringEnumerator.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Utils\PeptideEnumerator.cs" />
     <Compile Include="Utils\PeptideUtil.cs" />

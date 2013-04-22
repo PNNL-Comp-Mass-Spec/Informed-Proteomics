@@ -114,15 +114,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestCSharpSyntax()
         {
-            const string path = @"C:\cygwin\home\kims336\Developments\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            Console.WriteLine(Path.GetFileName(path));
-            Console.WriteLine(Path.GetFileNameWithoutExtension(path));
-            Console.WriteLine(Path.GetExtension(path));
-            Console.WriteLine(Path.GetDirectoryName(path));
+            //const string path = @"C:\cygwin\home\kims336\Developments\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            //Console.WriteLine(Path.GetFileName(path));
+            //Console.WriteLine(Path.GetFileNameWithoutExtension(path));
+            //Console.WriteLine(Path.GetExtension(path));
+            //Console.WriteLine(Path.GetDirectoryName(path));
 
-            var test = new Dictionary<int, int>();
-            test[1] = 2;
-            Console.WriteLine(test.Equals(null));
+            const int size = int.MaxValue/4-1;
+            var hugeList = new List<int>(size);
+            Console.WriteLine("Success: " + size + " " + hugeList.Capacity);
         }
 
         [Test]

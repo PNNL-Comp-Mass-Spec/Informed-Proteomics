@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public double GetMass()
         {
-            throw new System.NotImplementedException();
+            return Mass;
         }
 
         public static readonly Atom[] AtomArr =
@@ -53,7 +53,17 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("Ag", 106.905092, 107, "Silver"),
                 new Atom("I", 126.904473, 127, "Iodine"),
                 new Atom("Au", 196.966543, 197, "Gold"),
-                new Atom("Hg", 201.970617, 202, "Mercury")
+                new Atom("Hg", 201.970617, 202, "Mercury"),
+                new Atom("Hex", 162.052824, 162, "Hexose"),
+                new Atom("HexNAc", 203.079373, 203, "N-Acetylhexosamine"),
+                new Atom("dHex", 146.057909, 146, "Fucose"),
+                new Atom("NeuAc", 291.095417, 291, "N-acetyl neuraminic acid"),
+                new Atom("NeuGc", 307.090331, 307, "N-glycoyl neuraminic acid"),
+                new Atom("Hep", 192.063388, 192, "Heptose"),
+                new Atom("Pent", 132.042257, 85, "Pentose"),
+                new Atom("B", 11.00930554, 11, "Boron"),
+                new Atom("As", 74.92159, 75, "Arsenic"),
+                new Atom("Mg",  23.985043, 24, "Magnesium")
             };
 
         public static Atom Get(string code)

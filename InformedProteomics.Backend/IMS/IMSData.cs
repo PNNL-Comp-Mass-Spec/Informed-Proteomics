@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using DeconTools.Backend;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.Data.Spectrometry;
 using MultiDimensionalPeakFinding;
 using UIMFLibrary;
 

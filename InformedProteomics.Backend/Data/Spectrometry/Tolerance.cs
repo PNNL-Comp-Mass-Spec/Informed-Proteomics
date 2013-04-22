@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UIMFLibrary;
 
-namespace InformedProteomics.Backend.Data.Biology
+namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Tolerance
     {
@@ -37,10 +37,7 @@ namespace InformedProteomics.Backend.Data.Biology
             {
                 return _value;
             }
-            else
-            {
-                return mz*_value/1E6;
-            }
+            return mz*_value/1E6;
         }
     }
 }
