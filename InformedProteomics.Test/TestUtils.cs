@@ -28,7 +28,7 @@ namespace InformedProteomics.Test
             const int numMaxModsPepPeptide = 2;
 
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
-            const string pepSeq = "T";
+            const string pepSeq = "STR";
             Console.WriteLine(aaSet.GetComposition(pepSeq));
             var graph = new SequenceGraph(aaSet, pepSeq);
             Console.WriteLine(graph.GetUnmodifiedSequenceComposition());

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using UIMFLibrary;
 
@@ -35,7 +33,7 @@ namespace InformedProteomics.Backend.IMS
             _precursorFeatureSetMap = new Dictionary<int, FeatureSet>();
             _fragmentFeatureSetMap = new Dictionary<int, FeatureSet>();
 
-            int numBins = GetNumberOfBins();
+            var numBins = GetNumberOfBins();
             _isFragmentCached = new bool[numBins];
             _isPrecursorCached = new bool[numBins];
         }
@@ -126,16 +124,13 @@ namespace InformedProteomics.Backend.IMS
 
             if (isCached[mzBin])
                 return featureSetMap[mzBin];
-            else
-            {
-                double recoveredMz = GetMzFromBin(mzBin);
-                var featureSet = isPrecursor ?
-                    GetFeatures(recoveredMz, PrecursorTolerance, DataReader.FrameType.MS1)
-                    : GetFeatures(recoveredMz, FragmentTolerance, DataReader.FrameType.MS2);
-                featureSetMap.Add(mzBin, featureSet);
-                isCached[mzBin] = true;
-                return featureSet;
-            }
+            double recoveredMz = GetMzFromBin(mzBin);
+            var featureSet = isPrecursor ?
+                                 GetFeatures(recoveredMz, PrecursorTolerance, DataReader.FrameType.MS1)
+                                 : GetFeatures(recoveredMz, FragmentTolerance, DataReader.FrameType.MS2);
+            featureSetMap.Add(mzBin, featureSet);
+            isCached[mzBin] = true;
+            return featureSet;
         }
 
         private Feature GetFeature(double mz, Feature precursorFeature, bool isPrecursor)

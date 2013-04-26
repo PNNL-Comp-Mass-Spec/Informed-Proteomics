@@ -144,6 +144,7 @@
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
     <Compile Include="Scoring\FragmentXICSet.cs" />
+    <Compile Include="Scoring\IAdditiveScorer.cs" />
     <Compile Include="Scoring\IonType.cs" />
     <Compile Include="Scoring\Misc.cs" />
     <Compile Include="Scoring\FragmentSpectrumParameter.cs" />

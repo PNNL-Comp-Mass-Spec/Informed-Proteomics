@@ -8,6 +8,9 @@ using InformedProteomics.Backend.IMSScoring;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// ScoringGraph represents sequence variants with the same composition (e.g P*EPTIDE and PEP*TIDE)
+    /// </summary>
     public class ScoringGraph
     {
         private const int DefaultMinPrecursorCharge = 1;
@@ -15,6 +18,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private readonly AminoAcid[] _aminoAcidSequence;
         private readonly Composition _sequenceComposition;
+        private readonly Dictionary<int,Ion> _precursorIon;
+
         private readonly ScoringGraphNode _rootNode;
         private readonly int _minPrecursorCharge;
         private readonly int _maxPrecursorCharge;
@@ -23,20 +28,24 @@ namespace InformedProteomics.Backend.Data.Sequence
         private ImsScorer _imsScorer;
 
         public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode)
+            : this(aminoAcidSequence, sequenceComposition, rootNode, DefaultMinPrecursorCharge, DefaultMaxPrecursorCharge)
         {
-            _aminoAcidSequence = aminoAcidSequence;
-            _sequenceComposition = sequenceComposition;
-            _rootNode = rootNode;
-            _minPrecursorCharge = DefaultMinPrecursorCharge;
-            _maxPrecursorCharge = DefaultMaxPrecursorCharge;
         }
 
         public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode,
                             int minPrecursorCharge, int maxPrecursorCharge)
-            : this(aminoAcidSequence, sequenceComposition, rootNode)
         {
+            _aminoAcidSequence = aminoAcidSequence;
+            _sequenceComposition = sequenceComposition;
+            _rootNode = rootNode;
             _minPrecursorCharge = minPrecursorCharge;
             _maxPrecursorCharge = maxPrecursorCharge;
+
+            _precursorIon = new Dictionary<int, Ion>();
+            for (var precursorCharge = _minPrecursorCharge; precursorCharge <= _maxPrecursorCharge; precursorCharge++)
+            {
+                _precursorIon[precursorCharge] = new Ion(_sequenceComposition, precursorCharge);
+            } 
         }
 
         public void RegisterImsData(ImsDataCached imsData)
@@ -90,11 +99,17 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private double GetCutScore(int index, Composition cutComposition, int precursorCharge)
         {
-            //char nTermAA = _aminoAcidSequence[index - 1].Residue;
-            //char cTermAA = _aminoAcidSequence[index].Residue;
-            //_imsScorer.GetCutScore(nTermAA, cTermAA, cutComposition, new Ion(_sequenceComposition, precursorCharge));
+            Ion precursorIon = _precursorIon[precursorCharge];
+            _imsData.GetPrecursorFeatures(precursorIon.GetMz());
+
+            char nTermAA = _aminoAcidSequence[index - 1].Residue;
+            char cTermAA = _aminoAcidSequence[index].Residue;
+            //_imsScorer.GetCutScore(nTermAA, cTermAA, cutComposition, precursorIon);
+
             throw new System.NotImplementedException();
         }
+
+        
     }
 
     public class ScoringGraphNode
