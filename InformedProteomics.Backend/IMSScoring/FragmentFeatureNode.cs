@@ -1,11 +1,11 @@
-﻿using InformedProteomics.Backend.Data.Spectrometry;
+﻿
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
     public class FragmentFeatureNode : FeatureNode
     {
         public IonType FragmentIonClassBase { get; private set; }
-        private readonly float _isotopeCorrelation, _lcCorrelation, _imsCorrelation;
         
         public FragmentFeatureNode(IsotopomerFeatures isotopomerFeatures, IonType fragmentIonClassBase, GroupParameter parameter)
             : base(isotopomerFeatures, parameter)
@@ -16,7 +16,10 @@ namespace InformedProteomics.Backend.IMSScoring
 
         internal override sealed double GetScore()
         {
-            throw new System.NotImplementedException();
+            var lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(FragmentIonClassBase, LCCorrelation, Parameter);
+            var imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(FragmentIonClassBase, IMSCorrelation, Parameter);
+            var isotopeScore = SubScoreFactory.GetIsotopeIntensityCorrelationScore(FragmentIonClassBase, IsotopeCorrelation, Parameter);
+            return lcScore + imsScore + isotopeScore;
         }
     }
 }

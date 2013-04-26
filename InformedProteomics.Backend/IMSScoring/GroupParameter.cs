@@ -6,24 +6,31 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class GroupParameter
     {
-        private readonly int _massIndex, _locationIndex, _flankingResidueIndex;
+        public int MassIndex { get; private set; }
+        public int LocationIndex { get; private set; }
+        public int FlankingResidueIndex { get; private set; }
         public int Charge { get; private set; }
 
         public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Ion precursorIon)
         {
-            _massIndex = GetMassIndex(precursorIon.Composition);
+            MassIndex = GetMassIndex(precursorIon.Composition);
             Charge = precursorIon.Charge;
-            _locationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
-            _flankingResidueIndex = GetFlankingResidueIndex(nTermAA, cTermAA); 
+            LocationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
+            FlankingResidueIndex = GetFlankingResidueIndex(nTermAA, cTermAA); 
         }
 
         internal GroupParameter(int massIndex, int locationIndex, int flankingResidueIndex, int charge)
         {
-            _massIndex = massIndex;
-            _locationIndex = locationIndex;
-            _flankingResidueIndex = flankingResidueIndex;
+            MassIndex = massIndex;
+            LocationIndex = locationIndex;
+            FlankingResidueIndex = flankingResidueIndex;
             Charge = charge;
         }
+
+        public GroupParameter GetPrecursorGroupParameter()
+        {
+            return new GroupParameter(MassIndex, int.MinValue, int.MinValue, Charge);
+        } 
 
         public static GroupParameter Parse(string s)
         {
@@ -56,19 +63,19 @@ namespace InformedProteomics.Backend.IMSScoring
             if (other != null)
             {
                 return
-                    _massIndex == other._massIndex && _locationIndex == other._locationIndex && _flankingResidueIndex == other._flankingResidueIndex && Charge == other.Charge;
+                    MassIndex == other.MassIndex && LocationIndex == other.LocationIndex && FlankingResidueIndex == other.FlankingResidueIndex && Charge == other.Charge;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return _massIndex.GetHashCode() * _locationIndex.GetHashCode() * _flankingResidueIndex.GetHashCode() * Charge.GetHashCode();
+            return MassIndex.GetHashCode() * LocationIndex.GetHashCode() * FlankingResidueIndex.GetHashCode() * Charge.GetHashCode();
         }
 
         public string ToFileString()
         {
-            return _massIndex + " " + _locationIndex + " " + _flankingResidueIndex + " " + Charge;
+            return MassIndex + " " + LocationIndex + " " + FlankingResidueIndex + " " + Charge;
         }
 
         private static int GetMassIndex(Composition precursorComposition)

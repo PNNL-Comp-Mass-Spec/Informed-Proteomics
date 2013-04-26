@@ -9,9 +9,8 @@ namespace InformedProteomics.Backend.IMSScoring
     public class FragmentFeatureGraph : Dictionary<FeatureNode, List<FeatureEdge>>
     {
         public double Score { get; private set; }
-        public FragmentFeatureGraph(ImsDataCached imsData, Feature precursorFeature, Ion precursorIon, Composition cutComposition, GroupParameter parameter)
+        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature, Ion precursorIon, Composition cutComposition, GroupParameter parameter)
         {
-            var precursorNode = new PrecursorFeatureNode(IsotopomerFeatures.GetPrecursorIsotopomerFeatures(imsData, precursorIon, precursorFeature), parameter);
             Add(precursorNode, new List<FeatureEdge>());
             var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorIon, parameter);
             if (fragmentNodes.Count == 0) return;

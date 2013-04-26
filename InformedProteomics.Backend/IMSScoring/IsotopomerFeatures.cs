@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.IMSScoring
     public class IsotopomerFeatures : List<Feature>
     {
         private readonly float[] _theoreticalIsotopomerEnvelope;
-        private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not this
+        private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not fir this
 
         private IsotopomerFeatures(ImsDataCached imsData, Ion ion, Feature precursorFeature, bool isPrecurosr)
         {
@@ -39,6 +39,12 @@ namespace InformedProteomics.Backend.IMSScoring
         public Feature GetNthFeatureFromTheoreticallyMostIntenseFeature(int n)
         {
             return this[Math.Min(Count - 1, n + _maxIntensityIndex + 1)]; // this[_maxIntensityIndex] corresponds to the max intensity istope - one isotope
+        }
+
+        public float GetTheoreticalIntensityOfNthFeature(int n)
+        {
+            if (n < 0) return 0f;
+            return _theoreticalIsotopomerEnvelope[Math.Min(_theoreticalIsotopomerEnvelope.Length - 1, n + _maxIntensityIndex)];
         }
 
         static private int GetMaximumIndex(float[] e)
