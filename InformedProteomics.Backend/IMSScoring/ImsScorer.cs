@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.IMSScoring
             SubScoreFactory.Read(fileName);
         }
 
-        public ImsScorer(ImsDataCached imsData, Ion precursorIon) // precursorComposition has protons
+        public ImsScorer(ImsDataCached imsData, Ion precursorIon) // precursorComposition does not have protons; however, protons are incorporated when calculating mz
         {
             _imsData = imsData;
             _precursorIon = precursorIon;

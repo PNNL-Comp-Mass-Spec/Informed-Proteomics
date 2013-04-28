@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.IMSScoring
@@ -52,6 +53,7 @@ namespace InformedProteomics.Backend.IMSScoring
             _precursorIsotopeIMSCorrScoreDictionary = new Dictionary<GroupParameter, Dictionary<int, double>>();
             _precursorIsotopeIntensityCorrScoreDictionary = new Dictionary<GroupParameter, Dictionary<int, double>>();
         }
+
 
         internal static void Read(string fileName)//TODO implement ..!!
         {
@@ -177,6 +179,11 @@ namespace InformedProteomics.Backend.IMSScoring
             if (!scoreDictionary.ContainsKey(key)) return LowScore;
             var l1 = scoreDictionary[key];
             return !l1.ContainsKey(rawScore) ? LowScore : l1[rawScore];
+        }
+
+        private static double GetLogLRScore(double targetProb, double decoyProb)
+        {
+            return Math.Log(targetProb/decoyProb);
         }
     }
 }

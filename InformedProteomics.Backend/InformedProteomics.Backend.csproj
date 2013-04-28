@@ -97,6 +97,10 @@
     <Reference Include="NETPrediction">
       <HintPath>..\lib\NETPrediction.dll</HintPath>
     </Reference>
+    <Reference Include="PNNLOmics, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\PNNLOmics.dll</HintPath>
+    </Reference>
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
     </Reference>
@@ -104,6 +108,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -137,6 +142,13 @@
     <Compile Include="IMSScoring\PrecursorFeatureNode.cs" />
     <Compile Include="IMSScoring\StatisticsTools.cs" />
     <Compile Include="IMSScoring\SubScoreFactory.cs" />
+    <Compile Include="IMSTraining\IonTypeTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\IsotopeIntensityCorrelationScoreTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\MgfParser.cs" />
+    <Compile Include="IMSTraining\MSMSSpectrum.cs" />
+    <Compile Include="IMSTraining\MSMSSpectrumPeak.cs" />
+    <Compile Include="IMSTraining\RatioScoreTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\TrainerUsingMgfFile.cs" />
     <Compile Include="IMS\Feature.cs" />
     <Compile Include="IMS\IMSDataCached.cs" />
     <Compile Include="IMS\FeatureSet.cs" />
@@ -216,7 +228,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
