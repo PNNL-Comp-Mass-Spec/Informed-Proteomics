@@ -55,7 +55,7 @@ namespace InformedProteomics.Backend.IMSScoring
             return score;
         }
 
-        static private int GetRatio(double v1, double v2)
+        static public int GetRatio(double v1, double v2)
         {
             if (v1 <= 0)
             {

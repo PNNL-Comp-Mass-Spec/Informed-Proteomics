@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.IMSScoring;
 
 namespace InformedProteomics.Backend.IMSTraining
 {
@@ -24,7 +27,7 @@ namespace InformedProteomics.Backend.IMSTraining
         public MSMSSpectrumPeak GetPeak(double mz, Tolerance tolerance)
         {
             var matchList = GetPeaks(mz, tolerance);
-            if (matchList.Count == 0) return null;
+            if (matchList.Count == 0) return new MSMSSpectrumPeak(mz, 0);
 
             var maxPeak = matchList[0];
             var intensityComparer = new MSMSSpectrumPeak.IntensityComparer();
@@ -54,5 +57,52 @@ namespace InformedProteomics.Backend.IMSTraining
         }
 
 
+        public GroupParameter GetGroupParameter(Sequence annotation, int cutNumber)
+        {
+            var precursorIon = new Ion(annotation.Composition + Composition.H2O, Charge);
+            var prefixComposition = annotation.GetComposition(0, cutNumber);
+            return new GroupParameter(prefixComposition, annotation[cutNumber - 1].Residue, annotation[cutNumber].Residue, precursorIon); 
+        }
+
+        public Tuple<List<MSMSSpectrumPeak>, float[]> GetIsotopomerEnvelop(Sequence annotation, int cutNumber, IonType ionType, Tolerance tolerance)
+        {
+            var prefixComposition = annotation.GetComposition(0, cutNumber);
+            var suffixCompostion = annotation.Composition - prefixComposition;
+            var isotopomerEnvelop = new List<MSMSSpectrumPeak>();
+            var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
+            var ion = ionType.GetIon(composition);
+            for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
+            {
+                var mz = ion.GetIsotopeMz(i);
+                isotopomerEnvelop.Add(GetPeak(mz, tolerance));
+            }
+            return new Tuple<List<MSMSSpectrumPeak>, float[]>(isotopomerEnvelop, ion.Composition.GetApproximatedIsotopomerEnvelop());
+        } 
+
+        public List<MSMSSpectrumPeak> GetExplainedPeaks(Sequence annotation, int cutNumber, List<IonType> ionTypes, Tolerance tolerance)
+        {  
+            var prefixComposition = annotation.GetComposition(0, cutNumber);
+            var suffixCompostion = annotation.Composition - prefixComposition;
+            var peakList = new List<MSMSSpectrumPeak>();
+            foreach (var ionType in ionTypes)
+            {
+                var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
+                var ion = ionType.GetIon(composition);
+                peakList.Add(GetPeak(ion.GetMz(), tolerance));
+            }
+            return peakList;
+        }
+
+        public List<IonType> GetExplainingIonTypes(Sequence annotation, int cutNumber, List<IonType> allKnownIonTypes, Tolerance tolerance)
+        {
+            var ionTypes = new List<IonType>();
+            var peaks = GetExplainedPeaks(annotation, cutNumber, allKnownIonTypes, tolerance);
+            for (var i = 0; i < peaks.Count; i++)
+            {
+                if(peaks[i].Intensity>0)
+                    ionTypes.Add(allKnownIonTypes[i]);
+            }
+            return ionTypes;
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace InformedProteomics.Backend.IMSScoring
             }
             return GetCorrelation(j, i);
         }
-
+        
         static public double GetCorrelation(double[] v1, double[] v2)
         {
             var m1 = GetSampleMean(v1);

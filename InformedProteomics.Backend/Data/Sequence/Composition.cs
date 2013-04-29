@@ -189,7 +189,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var mean = _c*(1 - ProbC12) + _h*(1 - ProbH1) + _n*(1 - ProbN14) + _o*(1 - ProbO16) + _s*(1 - ProbS32);
           
-            var dist = new float[(int)mean + 4];
+            var dist = new float[(int)mean + 5];
             var exp = Math.Exp(-mean);
             for (var i = 0; i < dist.Length; i++)
             {

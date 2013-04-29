@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMSScoring;
 
@@ -25,32 +23,24 @@ namespace InformedProteomics.Backend.IMSTraining
 
         public void Train()
         {
-            var allKnownIonTypes = new IonTypeFactory().GetAllKnownIonTypes();
+            var allKnownIonTypes = new List<IonType>(new IonTypeFactory().GetAllKnownIonTypes());
             foreach (var spectrum in _spectra)
             {
                 var annotation = spectrum.Annotation;
-                if (annotation == null) continue;
-
-                var precursorIon = new Ion(annotation.Composition + Composition.H2O, spectrum.Charge);
-                for (var i = 1; i < annotation.Count; i++)
+                for (var cutNumber = 1; cutNumber < annotation.Count; cutNumber++)
                 {
-                    var prefixComposition = annotation.GetComposition(0, i);
-                    var suffixCompostion = annotation.Composition - prefixComposition;
-                    var groupParameter = new GroupParameter(prefixComposition, annotation[i - 1].Residue, annotation[i].Residue, precursorIon);
+                    var groupParameter = spectrum.GetGroupParameter(annotation, cutNumber);
+                    
                     if (!_ionFrequencyFunction.ContainsKey(groupParameter))
                         _ionFrequencyFunction[groupParameter] = new Dictionary<IonType, double>();
                     var subIonFrequencyFunction = _ionFrequencyFunction[groupParameter];
-                    // ReSharper disable PossibleMultipleEnumeration
-                    foreach (var ionType in allKnownIonTypes)
-                    // ReSharper restore PossibleMultipleEnumeration
+                    var ionTypes = spectrum.GetExplainingIonTypes(annotation, cutNumber, allKnownIonTypes, _tolerance);
+                    foreach (var ionType in ionTypes)
                     {
-                        var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
-                        var mz = ionType.GetMz(composition);
-                        if (spectrum.GetPeaks(mz, _tolerance).Count <= 0) continue;
                         if (!subIonFrequencyFunction.ContainsKey(ionType)) subIonFrequencyFunction[ionType] = 0;
-                        subIonFrequencyFunction[ionType]++;
+                        subIonFrequencyFunction[ionType] = subIonFrequencyFunction[ionType] + 1;
                     }
-                }   
+                }
             }
             GetIonTypes();
         }

@@ -11,14 +11,14 @@ namespace InformedProteomics.Backend.IMSScoring
     public class IsotopomerFeatures : List<Feature>
     {
         private readonly float[] _theoreticalIsotopomerEnvelope;
-        private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not fir this
+        private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not for this
 
         private IsotopomerFeatures(ImsDataCached imsData, Ion ion, Feature precursorFeature, bool isPrecurosr)
         {
             _theoreticalIsotopomerEnvelope = ion.Composition.GetApproximatedIsotopomerEnvelop();
             _maxIntensityIndex = GetMaximumIndex(_theoreticalIsotopomerEnvelope);
 
-            for (var i = -1; i < 3;i++ )
+            for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
             {
                 var mz = ion.GetIsotopeMz(i + _maxIntensityIndex);
                 Add(isPrecurosr? 
@@ -38,13 +38,12 @@ namespace InformedProteomics.Backend.IMSScoring
 
         public Feature GetNthFeatureFromTheoreticallyMostIntenseFeature(int n)
         {
-            return this[Math.Min(Count - 1, n + _maxIntensityIndex + 1)]; // this[_maxIntensityIndex] corresponds to the max intensity istope - one isotope
+            return this[Math.Min(Count - 1, n + _maxIntensityIndex + FeatureNode.NumMinusIsotope)]; // this[_maxIntensityIndex] corresponds to the max intensity istope - FeatureNode.NumMinusIsotope isotope
         }
 
         public float GetTheoreticalIntensityOfNthFeature(int n)
         {
-            if (n < 0) return 0f;
-            return _theoreticalIsotopomerEnvelope[Math.Min(_theoreticalIsotopomerEnvelope.Length - 1, n + _maxIntensityIndex)];
+            return n + _maxIntensityIndex < 0 ? 0f : _theoreticalIsotopomerEnvelope[Math.Min(_theoreticalIsotopomerEnvelope.Length - 1, n + _maxIntensityIndex)];
         }
 
         static private int GetMaximumIndex(float[] e)

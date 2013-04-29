@@ -149,7 +149,7 @@ namespace InformedProteomics.Backend.IMSScoring
             throw new System.NotImplementedException();
         }
 
-        private static int CorrToInt(double corr)
+        public static int CorrToInt(double corr)
         {
             return (int) corr*10;
         }

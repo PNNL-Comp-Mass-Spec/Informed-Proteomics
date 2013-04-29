@@ -4,6 +4,8 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public abstract class FeatureNode
     {
+        public const int NumSupport = 4; // used for training
+        public const int NumMinusIsotope = 1; // used for training
         public GroupParameter Parameter { get; private set; }
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
         public Feature Feature { get; private set; }
@@ -20,21 +22,15 @@ namespace InformedProteomics.Backend.IMSScoring
 
         private void GetCorrelations()
         {
-            var f = new Feature[4];
-
-            f[0] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(-1);
-            f[1] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(0);
-            f[2] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(1);
-            f[3] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(2);
-
-            var i = new double[4];
-            i[0] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(-1);
-            i[1] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(0);
-            i[2] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(1);
-            i[3] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(2);
-
-            LCCorrelation = StatisticsTools.GetLCCorrelation(f[1], f[2]);
-            IMSCorrelation = StatisticsTools.GetIMSCorrelation(f[1], f[2]);
+            var f = new Feature[NumSupport];
+            var i = new double[NumSupport];
+            for (var k = 0; k < NumSupport; k++)
+            {
+                f[k] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(k - NumMinusIsotope);
+                i[k] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(k - NumMinusIsotope);
+            }
+            LCCorrelation = StatisticsTools.GetLCCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
+            IMSCorrelation = StatisticsTools.GetIMSCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             IsotopeCorrelation = StatisticsTools.GetIsotopeCorrelation(f, i);
         }
 
