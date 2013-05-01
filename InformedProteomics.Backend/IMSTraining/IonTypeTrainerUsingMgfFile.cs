@@ -9,13 +9,15 @@ namespace InformedProteomics.Backend.IMSTraining
         private const int NumberPerGroup = 6;
         private readonly List<MSMSSpectrum> _spectra;
         private readonly Tolerance _tolerance;
+        private readonly int _maxCharge;
         private readonly Dictionary<GroupParameter, Dictionary<IonType, double>> _ionFrequencyFunction;
         public Dictionary<GroupParameter, List<IonType>> IonTypes { get; private set; } 
 
-        public IonTypeTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Tolerance tolerance)
+        public IonTypeTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Tolerance tolerance, int maxCharge)
         {
             _spectra = spectra;
             _tolerance = tolerance;
+            _maxCharge = maxCharge;
             _ionFrequencyFunction = new Dictionary<GroupParameter, Dictionary<IonType, double>>();
             IonTypes = new Dictionary<GroupParameter, List<IonType>>();
 
@@ -47,16 +49,17 @@ namespace InformedProteomics.Backend.IMSTraining
 
         private void GetIonTypes()
         {
-            foreach (var groupParameter in _ionFrequencyFunction.Keys)
+            foreach (var groupParameter in GroupParameter.GetAllFragmentParameters(_maxCharge))
             {
                 IonTypes[groupParameter] = new List<IonType>();
-                var subIonTypes = IonTypes[groupParameter];
+                if (!_ionFrequencyFunction.ContainsKey(groupParameter)) continue;
                 var subIonFrequencyFunction = _ionFrequencyFunction[groupParameter];
+                var subIonTypes = IonTypes[groupParameter];
                 var offsets = new List<double>(subIonFrequencyFunction.Values);
                 offsets.Sort();//ascending
                 foreach (var ionType in subIonFrequencyFunction.Keys)
                 {
-                    if (!(subIonFrequencyFunction[ionType] >= offsets[offsets.Count - NumberPerGroup])) continue;
+                    if (offsets.Count <= NumberPerGroup || subIonFrequencyFunction[ionType] < offsets[offsets.Count - NumberPerGroup]) continue;
                     if (subIonTypes.Count < NumberPerGroup) 
                         subIonTypes.Add(ionType);
                 }

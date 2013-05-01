@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.IMSScoring
             MassIndex = GetMassIndex(precursorIon.Composition);
             Charge = precursorIon.Charge;
             LocationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
-            FlankingResidueIndex = GetFlankingResidueIndex(nTermAA, cTermAA); 
+            FlankingResidueIndex =  GetFlankingResidueIndex(nTermAA, cTermAA); 
         }
 
         internal GroupParameter(int massIndex, int locationIndex, int flankingResidueIndex, int charge)

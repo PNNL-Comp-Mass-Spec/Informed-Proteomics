@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.IMSScoring
             var ionTypes = SubScoreFactory.GetIonTypes(parameter);
 
             var nodes = new List<FragmentFeatureNode>();
-            var suffixComposition = precursorIon.Composition - cutComposition;
+            var suffixComposition = precursorIon.Composition -Composition.H2O - cutComposition;
 
             foreach (var ionType in ionTypes)
             {

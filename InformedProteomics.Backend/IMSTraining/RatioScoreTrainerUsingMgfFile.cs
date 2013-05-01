@@ -10,13 +10,15 @@ namespace InformedProteomics.Backend.IMSTraining
         private readonly List<MSMSSpectrum> _spectra;
         private readonly Dictionary<GroupParameter, List<IonType>> _ionTypes;
         private readonly Tolerance _tolerance;
+        private readonly int _maxCharge;
         public Dictionary<GroupParameter, Dictionary<List<IonType>, Dictionary<int, double>>> RatioProbDictionary { get; private set; }
 
-        public RatioScoreTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Dictionary<GroupParameter, List<IonType>> ionTypes, Tolerance tolerance)
+        public RatioScoreTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Dictionary<GroupParameter, List<IonType>> ionTypes, Tolerance tolerance, int maxCharge)
         {
             _spectra = spectra;
             _ionTypes = ionTypes;
             _tolerance = tolerance;
+            _maxCharge = maxCharge;
             RatioProbDictionary = new Dictionary<GroupParameter, Dictionary<List<IonType>, Dictionary<int, double>>>();
         }
 
@@ -53,16 +55,20 @@ namespace InformedProteomics.Backend.IMSTraining
 
         private void Normalize()
         {
-            foreach (var s in RatioProbDictionary.Values)
+            foreach (var groupParameter in GroupParameter.GetAllFragmentParameters(_maxCharge))
             {
-                foreach (var t in s.Values)
+                if(!RatioProbDictionary.ContainsKey(groupParameter))
+                    RatioProbDictionary[groupParameter] = new Dictionary<List<IonType>, Dictionary<int, double>>();
+
+                foreach (var t in RatioProbDictionary[groupParameter].Values)
                 {
                     var sum = 0.0;
                     foreach (var m in t.Values)
                     {
                         sum = sum + m;
                     }
-                    foreach (var ratio in t.Keys)
+                    var keys = new List<int>(t.Keys);
+                    foreach (var ratio in keys)
                     {
                         t[ratio] = Math.Max(double.MinValue, t[ratio] / sum);
                     }

@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.IMSTraining
         public int CompareTo(MSMSSpectrumPeak other)
         {
             if (Mz > other.Mz) return 1;
-            if (other.Mz > Mz) return 1;
+            if (other.Mz > Mz) return -1;
 
             if (Intensity > other.Intensity) return 1;
             if (other.Intensity > Intensity) return -1;

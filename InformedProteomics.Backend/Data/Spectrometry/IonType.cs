@@ -41,10 +41,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public override string ToString()
         {
-            return Name + "," + OffsetComposition + "," + _offsetMass + 
-                "," + Charge + "," + IsPrefixIon;
+            return Name + "," + OffsetComposition + "," + _offsetMass +
+                   "," + Charge + "," + IsPrefixIon;
         }
-
     }
   
 }

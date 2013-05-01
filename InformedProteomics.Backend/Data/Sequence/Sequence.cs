@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 SequenceString += aa.Residue; // added by Kyowon jeong
             }
 
-            Composition = composition;
+            Composition = composition + Composition.H2O; // added by Kyowon Jeong
         }
 
 		/*public Sequence (Composition composition, string sequence)
