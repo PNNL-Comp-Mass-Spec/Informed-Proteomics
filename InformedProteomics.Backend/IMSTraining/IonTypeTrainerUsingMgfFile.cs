@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMSScoring;
 
@@ -45,6 +46,7 @@ namespace InformedProteomics.Backend.IMSTraining
                 }
             }
             GetIonTypes();
+            Console.WriteLine(IonTypes.Count);
         }
 
         private void GetIonTypes()

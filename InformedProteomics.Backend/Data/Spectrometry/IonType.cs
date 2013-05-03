@@ -44,6 +44,34 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return Name + "," + OffsetComposition + "," + _offsetMass +
                    "," + Charge + "," + IsPrefixIon;
         }
+
+        public static IonType Parse(string s)
+        {
+            var t = s.Split(',');
+            if (t.Length < 5) return null;
+            var name = t[0];
+            var composition = Composition.Parse(t[1]);
+            var charge = int.Parse(t[3]);
+            var isPrefixIon = bool.Parse(t[4]);
+            return new IonType(name, composition, charge, isPrefixIon);
+        }
+
+        public override bool Equals(object obj)
+        {
+            var type = obj as IonType;
+            if (type != null)
+            {
+                var other = type;
+                return other.IsPrefixIon.Equals(IsPrefixIon) && other.OffsetComposition.Equals(OffsetComposition) &&
+                       other.Charge == Charge;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return IsPrefixIon.GetHashCode()*OffsetComposition.GetHashCode()*Charge.GetHashCode();
+        }
     }
   
 }

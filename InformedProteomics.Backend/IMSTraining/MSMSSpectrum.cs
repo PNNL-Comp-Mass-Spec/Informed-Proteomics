@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.IMSTraining
 {
     public class MSMSSpectrum : List<MSMSSpectrumPeak>
     {
-        public Sequence Annotation { get; private set; }
+        public Sequence Annotation { get; set; }
         public int Charge { get; private set; }
         public double PrecursorMz { get; private set; }
 

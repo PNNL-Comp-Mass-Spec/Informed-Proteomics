@@ -22,6 +22,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
         private void GetCorrelations()
         {
+            if (Feature.IntensityMax <= 0) return;
             var f = new Feature[NumSupport];
             var i = new double[NumSupport];
             for (var k = 0; k < NumSupport; k++)

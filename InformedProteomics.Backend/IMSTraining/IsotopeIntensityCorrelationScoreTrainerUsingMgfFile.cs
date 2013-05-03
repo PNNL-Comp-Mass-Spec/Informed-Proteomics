@@ -22,11 +22,11 @@ namespace InformedProteomics.Backend.IMSTraining
             IsotopeIntensityCorrProbDictionary = new Dictionary<GroupParameter, Dictionary<IonType, Dictionary<int, double>>>();
         }
 
-        public void Train(bool isDecoy)
+        public void Train()
         {
             foreach (var spectrum in _spectra)
             {
-                var annotation = isDecoy ? TrainerUsingMgfFile.GetReversedSequence(spectrum.Annotation) : spectrum.Annotation;
+                var annotation = spectrum.Annotation;
                 for (var cutNumber = 1; cutNumber < annotation.Count; cutNumber++)
                 {
                     var groupParameter = spectrum.GetGroupParameter(annotation, cutNumber);
@@ -38,6 +38,7 @@ namespace InformedProteomics.Backend.IMSTraining
                         if(!s.ContainsKey(ionType)) s[ionType] = new Dictionary<int, double>();
                         var t = s[ionType];
                         var isotopomerTuple = spectrum.GetIsotopomerEnvelop(annotation, cutNumber, ionType, _tolerance);
+                        if (isotopomerTuple.Item1[FeatureNode.NumMinusIsotope].Intensity <= 0) continue;
                         var score = GetCorrelationScore(isotopomerTuple);
                         if(!t.ContainsKey(score))
                             t[score] = 0;
@@ -46,6 +47,7 @@ namespace InformedProteomics.Backend.IMSTraining
                 }
             }
             Normalize();
+            Console.WriteLine(IsotopeIntensityCorrProbDictionary.Count);
         }
 
         private void Normalize()
@@ -54,18 +56,21 @@ namespace InformedProteomics.Backend.IMSTraining
             {
                 if (!IsotopeIntensityCorrProbDictionary.ContainsKey(groupParameter))
                     IsotopeIntensityCorrProbDictionary[groupParameter] = new Dictionary<IonType, Dictionary<int, double>>();
-
-                foreach (var t in IsotopeIntensityCorrProbDictionary[groupParameter].Values)
+                var si = IsotopeIntensityCorrProbDictionary[groupParameter];
+                foreach (var ionType in _ionTypes[groupParameter])
                 {
+                    if(!si.ContainsKey(ionType)) si[ionType] = new Dictionary<int, double>();
+                    var ssi = si[ionType];
                     var sum = 0.0;
-                    foreach (var m in t.Values)
+                    foreach (var score in SubScoreFactory.GetAllCorrIntScore())
                     {
-                        sum = sum + m;
+                        if (!ssi.ContainsKey(score)) ssi[score] = 1.0;
+                        sum = sum + ssi[score];
                     }
-                    var keys = new List<int>(t.Keys);
+                    var keys = new List<int>(ssi.Keys);
                     foreach (var score in keys)
                     {
-                        t[score] = Math.Max(double.MinValue, t[score]/sum);
+                        ssi[score] = Math.Max(double.MinValue,ssi[score] / sum);
                     }
                 }
             }

@@ -32,55 +32,61 @@ namespace InformedProteomics.Backend.IMSTraining
             Console.WriteLine("Ion Type training Done");
            // return;
             var isotopeIntensityCorrelationScoreTrainerT = new IsotopeIntensityCorrelationScoreTrainerUsingMgfFile(spectra, ionTypeTrainer.IonTypes, tolerance, maxCharge);
-            isotopeIntensityCorrelationScoreTrainerT.Train(false);
+            isotopeIntensityCorrelationScoreTrainerT.Train();
+            WriteIonTypes(outFileName, ionTypeTrainer);
             Console.WriteLine("Isotope Training Done (Target)");
 
             var ratioScoreTrainerT = new RatioScoreTrainerUsingMgfFile(spectra, ionTypeTrainer.IonTypes, tolerance, maxCharge);
-            ratioScoreTrainerT.Train(false);
+            ratioScoreTrainerT.Train();
             Write(outFileName, ionTypeTrainer, isotopeIntensityCorrelationScoreTrainerT, ratioScoreTrainerT, false);
             Console.WriteLine("Ion Ratio Training Done (Target)");
 
+            foreach (var spectrum in spectra)
+            {
+                spectrum.Annotation = GetReversedSequence(spectrum.Annotation);
+            }
+
             var isotopeIntensityCorrelationScoreTrainerD = new IsotopeIntensityCorrelationScoreTrainerUsingMgfFile(spectra, ionTypeTrainer.IonTypes, tolerance, maxCharge);
-            isotopeIntensityCorrelationScoreTrainerD.Train(true);
+            isotopeIntensityCorrelationScoreTrainerD.Train();
             Console.WriteLine("Isotope Training Done (Decoy)");
 
             var ratioScoreTrainerD = new RatioScoreTrainerUsingMgfFile(spectra, ionTypeTrainer.IonTypes, tolerance, maxCharge);
-            ratioScoreTrainerD.Train(true);
-            Write(outFileName, isotopeIntensityCorrelationScoreTrainerD, ratioScoreTrainerD, true);
+            ratioScoreTrainerD.Train();
+            Write(outFileName, ionTypeTrainer, isotopeIntensityCorrelationScoreTrainerD, ratioScoreTrainerD, true);
             Console.WriteLine("Ion Ratio Training Done (Decoy)");
             
         }
 
-        private static void Write(string outFileName, IonTypeTrainerUsingMgfFile ionTypeTrainer, IsotopeIntensityCorrelationScoreTrainerUsingMgfFile isotopeIntensityCorrelationScoreTrainer, RatioScoreTrainerUsingMgfFile ratioScoreTrainer, bool isDecoy)
+        private static void WriteIonTypes(string outFileName, IonTypeTrainerUsingMgfFile ionTypeTrainer)
         {
             var writer = new StreamWriter(outFileName);
             var ionTypes = ionTypeTrainer.IonTypes;
-            writer.Write("#IONTYPES\n");
+            writer.Write("##IONTYPES\n");
             foreach (var groupParameter in ionTypes.Keys)
             {
-                writer.Write("#GROUP\t" + groupParameter.ToFileString()+"\n");
+                writer.Write("#G\t" + groupParameter+"\n");
                 foreach (var ionType in ionTypes[groupParameter])
                 {
-                    writer.Write("#IONTYPE\t" + ionType+"\n");
+                    writer.Write("#I\t" + ionType+"\n");
                 }
             }
             writer.Close();
-            Write(outFileName, isotopeIntensityCorrelationScoreTrainer, ratioScoreTrainer, isDecoy);
         }
 
-        private static void Write(string outFileName, IsotopeIntensityCorrelationScoreTrainerUsingMgfFile isotopeIntensityCorrelationScoreTrainer, RatioScoreTrainerUsingMgfFile ratioScoreTrainer, bool isDecoy)
+        private static void Write(string outFileName, IonTypeTrainerUsingMgfFile ionTypeTrainer, IsotopeIntensityCorrelationScoreTrainerUsingMgfFile isotopeIntensityCorrelationScoreTrainer, RatioScoreTrainerUsingMgfFile ratioScoreTrainer, bool isDecoy)
         {
             var writer = new StreamWriter(outFileName, true);
             if(isDecoy) writer.WriteLine("###DECOY");
             var isotope = isotopeIntensityCorrelationScoreTrainer.IsotopeIntensityCorrProbDictionary; 
-            writer.Write("#ISOTOPE\n");
+            writer.Write("##ISOTOPE\n");
             foreach (var groupParameter in isotope.Keys)
             {
-                writer.Write("#GROUP\t" + groupParameter.ToFileString() + "\n");
+                writer.Write("#G\t" + groupParameter + "\n");
                 var s = isotope[groupParameter];
+                var si = ionTypeTrainer.IonTypes[groupParameter];
                 foreach (var ionType in s.Keys)
                 {
-                    writer.Write("IONTYPE\t" + ionType + "\n");
+                    writer.Write("#I\t" + si.IndexOf(ionType) + "\n");
                     var t = s[ionType];
                     foreach (var k in t.Keys)
                     {
@@ -90,18 +96,17 @@ namespace InformedProteomics.Backend.IMSTraining
                 }
             }
             var ratio = ratioScoreTrainer.RatioProbDictionary;
-            writer.Write("#RATIO\n");
+            writer.Write("##RATIO\n");
             foreach (var groupParameter in ratio.Keys)
             {
-                writer.Write("#GROUP\t" + groupParameter.ToFileString() + "\n");
+                writer.Write("#G\t" + groupParameter + "\n");
                 var s = ratio[groupParameter];
+                var si = ionTypeTrainer.IonTypes[groupParameter];
                 foreach (var ionTypes in s.Keys)
                 {
-                    writer.Write("IONTYPES");
-                    foreach (var ionType in ionTypes)
-                    {
-                        writer.Write("\t" + ionType);
-                    }    
+                    writer.Write("#I");
+                    writer.Write("\t" + si.IndexOf(ionTypes.Item1) + "\t" + si.IndexOf(ionTypes.Item2));
+                        
                     writer.Write("\n");
                     var t = s[ionTypes];
                     foreach (var k in t.Keys)

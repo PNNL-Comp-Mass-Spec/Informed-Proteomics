@@ -10,6 +10,7 @@
 
         internal override sealed double GetScore()
         {
+            if (Feature.IntensityMax <= 0) return 0;
             // when calculating score, only mass index and charge values are used in parameter. When writing the parameter file, only they should be written.
             var lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(LCCorrelation, Parameter);
             var imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(IMSCorrelation, Parameter);

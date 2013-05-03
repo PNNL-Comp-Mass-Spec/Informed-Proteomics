@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace InformedProteomics.Backend.IMSScoring
+﻿namespace InformedProteomics.Backend.IMSScoring
 {
     public class FeatureEdge
     {
@@ -17,7 +15,10 @@ namespace InformedProteomics.Backend.IMSScoring
             LNode = l;
             RNode = r;
 
-            _ratio = GetRatio(l.Feature.IntensityMax, r.Feature.IntensityMax);
+            if (LNode is PrecursorFeatureNode) // TODO fix later when no summed intensity is used
+                _ratio = GetRatioScore(r.Feature.IntensityMax, r.Feature.IntensityMax);
+            else
+                _ratio = GetRatioScore(l.Feature.IntensityMax, r.Feature.IntensityMax);
             _lcCorrelation = StatisticsTools.GetLCCorrelation(l.Feature, r.Feature);
             _imsCorrelation = StatisticsTools.GetIMSCorrelation(l.Feature, r.Feature);
            
@@ -55,23 +56,34 @@ namespace InformedProteomics.Backend.IMSScoring
             return score;
         }
 
-        static public int GetRatio(double v1, double v2)
+        static public int GetRatioScore(double v1, double v2)
         {
             if (v1 <= 0)
             {
-                if (v2 <= 0) return -11;
-                return -12;
+                if (v2 > 0) return -5;
+                return -6;
             }
-            if (v2 <= 0) return 11;
-            double r;
+            if (v2 <= 0) return 5;
             var f = 1;
-            if (v1 > v2) r = v1 / v2;
-            else
+            if (v1 <= v2)
             {
-                r = v2 / v1;
+                var tmp = v1;
+                v1 = v2;
+                v2 = tmp;
                 f = -1;
             }
-            return (int)(Math.Min(10, r) * f);
+            var index = 0;
+            for (; index < 5; index++)
+            {
+                v1 = v1*0.66;
+                if (v1 < v2) break;
+            }
+            return index * f;
+        }
+
+        static public int[] GetAllRatioScores()
+        {
+            return new[] {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
         }
     }
 }

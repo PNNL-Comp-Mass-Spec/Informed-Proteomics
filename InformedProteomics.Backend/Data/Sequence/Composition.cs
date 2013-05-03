@@ -282,6 +282,21 @@ namespace InformedProteomics.Backend.Data.Sequence
 		    return buf.ToString();
 		}
 
+        //added by kyowon, incomplete for additional Elementss
+        public static Composition Parse(string s)
+        {
+            var t = s.Split(' ');
+            if (t.Length < 5) return null;
+            var basicComposition = new int[5];
+            for (var i = 0; i < basicComposition.Length; i++)
+            {
+                basicComposition[i] = int.Parse(t[i].Substring(t[i].IndexOf('(') + 1, t[i].IndexOf(')') - t[i].IndexOf('(') - 1));
+            }
+            if (t.Length == basicComposition.Length)
+                return new Composition(basicComposition[0], basicComposition[1], basicComposition[2], basicComposition[3], basicComposition[4]);
+            throw new System.NotImplementedException();
+        }
+
         #region Masses of Atoms
 
         private static readonly double MassC = Atom.Get("C").Mass;

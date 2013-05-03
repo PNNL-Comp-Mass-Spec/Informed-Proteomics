@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.IMSScoring
             return MassIndex.GetHashCode() * LocationIndex.GetHashCode() * FlankingResidueIndex.GetHashCode() * Charge.GetHashCode();
         }
 
-        public string ToFileString()
+        public override string ToString()
         {
             return MassIndex + " " + LocationIndex + " " + FlankingResidueIndex + " " + Charge;
         }
