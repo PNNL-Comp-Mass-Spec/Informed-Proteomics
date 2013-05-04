@@ -1,4 +1,5 @@
 ﻿
+using System;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.IMSScoring
@@ -16,11 +17,11 @@ namespace InformedProteomics.Backend.IMSScoring
 
         internal override sealed double GetScore()
         {
-            if (Feature.IntensityMax <= 0) return 0;
-            var lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(FragmentIonClassBase, LCCorrelation, Parameter);
-            var imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(FragmentIonClassBase, IMSCorrelation, Parameter);
-            var isotopeScore = SubScoreFactory.GetIsotopeIntensityCorrelationScore(FragmentIonClassBase, IsotopeCorrelation, Parameter);
-            return lcScore + imsScore + isotopeScore;
+            var lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(FragmentIonClassBase, LCCorrelation, GroupParameter);
+            var imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(FragmentIonClassBase, IMSCorrelation, GroupParameter);
+            var isotopeScore = SubScoreFactory.GetIsotopeIntensityCorrelationScore(FragmentIonClassBase, IsotopeCorrelation, GroupParameter);
+            var score = lcScore + imsScore + isotopeScore;
+            return score;
         }
     }
 }

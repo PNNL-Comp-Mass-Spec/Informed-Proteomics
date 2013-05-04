@@ -1,4 +1,5 @@
-﻿using InformedProteomics.Backend.IMS;
+﻿using System;
+using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
@@ -6,23 +7,23 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public const int NumSupport = 4; // used for training
         public const int NumMinusIsotope = 1; // used for training
-        public GroupParameter Parameter { get; private set; }
+        public GroupParameter GroupParameter { get; private set; }
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
         public Feature Feature { get; private set; }
         internal double Score { get; set; }
         internal double IsotopeCorrelation, LCCorrelation, IMSCorrelation;
         
-        protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter)
+        protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter groupParameter)
         {
             IsotopomerFeatures = isotopomerFeatures;
+            //Feature = IsotopomerFeatures.GetMostAbundantFeature();
             Feature = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(0);
-            Parameter = parameter;
+            GroupParameter = groupParameter;
             GetCorrelations();
         }
 
         private void GetCorrelations()
         {
-            if (Feature.IntensityMax <= 0) return;
             var f = new Feature[NumSupport];
             var i = new double[NumSupport];
             for (var k = 0; k < NumSupport; k++)

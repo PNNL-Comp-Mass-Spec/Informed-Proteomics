@@ -196,12 +196,28 @@ namespace InformedProteomics.Backend.Data.Sequence
                 dist[i] = (float) (Math.Pow(mean, i)*exp/MathNet.Numerics.SpecialFunctions.Factorial(i));
 
             }
-            float max = dist.Concat(new float[] {0}).Max();
+            var max = dist.Concat(new float[] {0}).Max();
             for (var i = 0; i < dist.Length; i++)
             {
                 dist[i] = dist[i] / max;
             }
             return dist;
+        }
+
+        public int GetMostAbundantIsotopeZeroBasedIndex()
+        {
+            var index = 0;
+            var isotopeEnvelope = GetApproximatedIsotopomerEnvelop();
+            var max = 0.0f;
+            for (var i = 0; i < isotopeEnvelope.Length; i++)
+            {
+                if (max < isotopeEnvelope[i])
+                {
+                    max = isotopeEnvelope[i];
+                    index = i;
+                }
+            }
+            return index;
         }
 
         public static Composition operator +(Composition c1, Composition c2)

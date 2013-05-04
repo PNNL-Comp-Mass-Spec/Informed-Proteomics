@@ -8,6 +8,7 @@ namespace InformedProteomics.Backend.IMSScoring
     public class ImsScorer
     {
         //TODO for one peptide, check if prefix and suffix compositioins are correct and corresponding XICs are well retrieved!!!!
+        //TODO training and scoirng should be consistant in terms of dealing with the missing peaks! Double check!!
         private readonly ImsDataCached _imsData;
         private readonly Ion _precursorIon;
         private Feature _previousPrecursorFeature; // only for speed-up

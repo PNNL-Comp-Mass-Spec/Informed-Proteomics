@@ -9,6 +9,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         static public double GetLCCorrelation(Feature l, Feature r)
         {
+            if (l == null || r == null) return 0.0;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
             var llc = GetTruncatedLc(l, intersection);
             var rlc = GetTruncatedLc(r, intersection);
@@ -17,6 +18,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
         static public double GetIMSCorrelation(Feature l, Feature r)
         {
+            if (l == null || r == null) return 0.0;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
             var lims = GetTruncatedIms(l, intersection);
             var rims = GetTruncatedIms(r, intersection);
@@ -30,7 +32,7 @@ namespace InformedProteomics.Backend.IMSScoring
             var ep = sp + intersection.Width;
             var lc = new double[intersection.Width];
             for (var i = sp; i < ep; i++)
-                lc[i] = feature.LcApexPeakProfile[i];
+                lc[i-sp] = feature.LcApexPeakProfile[i];
             return lc;
         }
 
@@ -40,7 +42,7 @@ namespace InformedProteomics.Backend.IMSScoring
             var ep = sp + intersection.Height;
             var ims = new double[intersection.Height];
             for (var i = sp; i < ep; i++)
-                ims[i] = feature.ImsApexPeakProfile[i];
+                ims[i-sp] = feature.ImsApexPeakProfile[i];
             return ims;
         }
 
@@ -49,17 +51,19 @@ namespace InformedProteomics.Backend.IMSScoring
             var j = new double[f.Length];
             for (var k = 0; k < j.Length;k++ )
             {
-                j[k] = f[k].IntensityMax;
+                j[k] = f[k]==null? 0.0 : f[k].IntensityMax;
             }
             return GetCorrelation(j, i);
         }
         
         static public double GetCorrelation(double[] v1, double[] v2)
         {
+            if (v1.Length <= 1) return 0.0;
             var m1 = GetSampleMean(v1);
             var m2 = GetSampleMean(v2);
             var s1 = Math.Sqrt(GetSampleVariance(v1, m1));
             var s2 = Math.Sqrt(GetSampleVariance(v2, m2));
+            if (s1 <= 0 || s2 <= 0) return 0;
             var rho = v1.Select((t, i) => (float)((t - m1) * (v2[i] - m2) / s1 / s2)).Sum();
             return Math.Max(0, rho / (v1.Length - 1));
         }

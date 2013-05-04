@@ -7,18 +7,18 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public static class SubScoreFactory
     {
-        // IMPORTANT : if ion1 == ion2 for isotope it means relation between ion1 and precursor!
+        // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
         private const double LowScore = -5;
 
         static private Dictionary<GroupParameter, List<IonType>> _ionTypeDictionary;
 
-        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioScoreDictionary;
-        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioTargetProbDictionary;
-        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioDecoyProbDictionary;
+        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioScoreDictionary; // trained
+        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioTargetProbDictionary; // trained
+        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioDecoyProbDictionary; // trained
 
-        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _lcCorrScoreDictionary;
+        static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _lcCorrScoreDictionary; 
         static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _lcCorrTargetProbDictionary;
         static private Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _lcCorrDecoyProbDictionary;
 
@@ -28,12 +28,14 @@ namespace InformedProteomics.Backend.IMSScoring
 
         private static Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> _isotopeLCCorrScoreDictionary;
         private static Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> _isotopeIMSCorrScoreDictionary;
-        private static Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> _isotopeIntensityCorrScoreDictionary;
+        private static Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> _isotopeIntensityCorrScoreDictionary; // trained
 
         private static Dictionary<GroupParameter, Dictionary<int, double>> _precursorIsotopeLCCorrScoreDictionary;
         private static Dictionary<GroupParameter, Dictionary<int, double>> _precursorIsotopeIMSCorrScoreDictionary;
-        private static Dictionary<GroupParameter, Dictionary<int, double>> _precursorIsotopeIntensityCorrScoreDictionary; 
+        private static Dictionary<GroupParameter, Dictionary<int, double>> _precursorIsotopeIntensityCorrScoreDictionary;
 
+        private static Dictionary<GroupParameter, double> _noIonScore; // trained
+ 
         private static void ClearDictionaries()
         {
             _ionTypeDictionary = new Dictionary<GroupParameter, List<IonType>>();
@@ -56,6 +58,8 @@ namespace InformedProteomics.Backend.IMSScoring
             _precursorIsotopeLCCorrScoreDictionary = new Dictionary<GroupParameter, Dictionary<int, double>>();
             _precursorIsotopeIMSCorrScoreDictionary = new Dictionary<GroupParameter, Dictionary<int, double>>();
             _precursorIsotopeIntensityCorrScoreDictionary = new Dictionary<GroupParameter, Dictionary<int, double>>();
+
+            _noIonScore = new Dictionary<GroupParameter, double>();
         }
 
 
@@ -67,6 +71,10 @@ namespace InformedProteomics.Backend.IMSScoring
             var isotopeIntensityCorrDecoyProbDictionary = new Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>>();
             var isotopeIntensityCorrProbDictionary = isotopeIntensityCorrTargetProbDictionary;
             
+            var noIonTargetProbDictionary = new Dictionary<GroupParameter, double>();
+            var noIonDecoyProbDictionary = new Dictionary<GroupParameter, double>();
+            var noIonProbDictionary = noIonTargetProbDictionary;
+
             var stremaReader = new StreamReader(@fileName);
             string s;
             var mode = -1;
@@ -78,6 +86,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 {
                     ratioProbDictionary = _ratioDecoyProbDictionary;
                     isotopeIntensityCorrProbDictionary = isotopeIntensityCorrDecoyProbDictionary;
+                    noIonProbDictionary = noIonDecoyProbDictionary;
                     continue;
                 }
                 if (s.StartsWith("##IONTYPES"))
@@ -93,6 +102,11 @@ namespace InformedProteomics.Backend.IMSScoring
                 if (s.StartsWith("##RATIO"))
                 {
                     mode = 3;
+                    continue;
+                }
+                if (s.StartsWith("##NOION"))
+                {
+                    mode = 4;
                     continue;
                 }
 
@@ -152,11 +166,26 @@ namespace InformedProteomics.Backend.IMSScoring
                             if(st.Length == 2)
                                 ssr[int.Parse(st[0])] = double.Parse(st[1]);
                         }
+                    }else if (mode == 4)
+                    {
+                        if (groupParameter == null) continue;
+                        noIonProbDictionary[groupParameter] = double.Parse(s);
                     }
                 } 
             }
             
+            foreach (var k in noIonTargetProbDictionary.Keys)
+            {
+                _noIonScore[k] = GetLogLRScore(noIonTargetProbDictionary[k], noIonDecoyProbDictionary[k]);
+            }
+
+            _isotopeIntensityCorrScoreDictionary = GetScoreDictionaryFromProbDictionaries(isotopeIntensityCorrTargetProbDictionary, isotopeIntensityCorrDecoyProbDictionary);
             GetScoreDictionariesFromProbDictionaries();
+        }
+
+        internal static double GetNoIonScore(GroupParameter parameter)
+        {
+            return _noIonScore[parameter];
         }
 
         internal static List<IonType> GetIonTypes(GroupParameter parameter)
@@ -254,13 +283,13 @@ namespace InformedProteomics.Backend.IMSScoring
             }
             if (_lcCorrTargetProbDictionary.ContainsKey(groupParameter))
             {
-                prob1 = prob1 * _lcCorrTargetProbDictionary[groupParameter][ionTypeIndices][ratio];
-                prob2 = prob2 * _lcCorrDecoyProbDictionary[groupParameter][ionTypeIndices][ratio];    
+                prob1 = prob1 * _lcCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt(lcCorrelation)];
+                prob2 = prob2 * _lcCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt(lcCorrelation)];    
             }
             if(_imsCorrTargetProbDictionary.ContainsKey(groupParameter))
             {
-                prob1 = prob1 * _imsCorrTargetProbDictionary[groupParameter][ionTypeIndices][ratio];
-                prob2 = prob2 * _imsCorrDecoyProbDictionary[groupParameter][ionTypeIndices][ratio];   
+                prob1 = prob1 * _imsCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt(imsCorrelation)];
+                prob2 = prob2 * _imsCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt(imsCorrelation)];   
             }
             return GetKLDivergence(prob1, prob2);
         }
@@ -293,11 +322,11 @@ namespace InformedProteomics.Backend.IMSScoring
             return new []{1,2,3,4,5};
         }
 
-        private static double GetScoreFromDictionary(Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> scoreDictionary, IonType ionType1, IonType ionType2, int rawScore, GroupParameter gorupParameter)
+        private static double GetScoreFromDictionary(Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> scoreDictionary, IonType ionType1, IonType ionType2, int rawScore, GroupParameter groupParameter)
         {
-            if (!scoreDictionary.ContainsKey(gorupParameter)) return LowScore;
-            var l1 = scoreDictionary[gorupParameter];
-            var si = _ionTypeDictionary[gorupParameter];
+            if (!scoreDictionary.ContainsKey(groupParameter)) return LowScore;
+            var l1 = scoreDictionary[groupParameter];
+            var si = _ionTypeDictionary[groupParameter];
             var key = new Tuple<int, int> ( si.IndexOf(ionType1), si.IndexOf(ionType2) );
             if (!l1.ContainsKey(key)) return LowScore;
             var l2 = l1[key];
@@ -343,6 +372,30 @@ namespace InformedProteomics.Backend.IMSScoring
             }
             return scoreDictionary;
         }
+
+        private static Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> GetScoreDictionaryFromProbDictionaries(Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> target, Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>> decoy)
+        {
+            var scoreDictionary = new Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>>();
+
+            foreach (var groupParameter in target.Keys)
+            {
+                var st = target[groupParameter];
+                var sd = decoy[groupParameter];
+                scoreDictionary[groupParameter] = new Dictionary<int, Dictionary<int, double>>();
+                foreach (var ionTypes in st.Keys)
+                {
+                    var sst = st[ionTypes];
+                    var ssd = sd[ionTypes];
+                    scoreDictionary[groupParameter][ionTypes] = new Dictionary<int, double>();
+                    foreach (var score in sst.Keys)
+                    {
+                        scoreDictionary[groupParameter][ionTypes][score] = GetLogLRScore(sst[score], ssd[score]);
+                    }
+                }
+            }
+            return scoreDictionary;
+        }
+
         private static void GetScoreDictionariesFromProbDictionaries()
         {
             _ratioScoreDictionary = GetScoreDictionaryFromProbDictionaries(_ratioTargetProbDictionary, _ratioDecoyProbDictionary);

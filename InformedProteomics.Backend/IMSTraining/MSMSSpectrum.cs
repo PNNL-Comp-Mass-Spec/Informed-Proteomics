@@ -72,12 +72,15 @@ namespace InformedProteomics.Backend.IMSTraining
             var isotopomerEnvelop = new List<MSMSSpectrumPeak>();
             var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
             var ion = ionType.GetIon(composition);
+            var write = false;
             for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
             {
                 var mz = ion.GetIsotopeMz(i);
+                var peak = GetPeak(mz, tolerance);
+                if (peak.Intensity > 0) write = true;
                 isotopomerEnvelop.Add(GetPeak(mz, tolerance));
             }
-            return new Tuple<List<MSMSSpectrumPeak>, float[]>(isotopomerEnvelop, ion.Composition.GetApproximatedIsotopomerEnvelop());
+            return write ? new Tuple<List<MSMSSpectrumPeak>, float[]>(isotopomerEnvelop, ion.Composition.GetApproximatedIsotopomerEnvelop()) : null;
         } 
 
         public List<MSMSSpectrumPeak> GetExplainedPeaks(Sequence annotation, int cutNumber, List<IonType> ionTypes, Tolerance tolerance)
@@ -89,7 +92,9 @@ namespace InformedProteomics.Backend.IMSTraining
             {
                 var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
                 var ion = ionType.GetIon(composition);
-                peakList.Add(GetPeak(ion.GetMz(), tolerance));
+                var peak = GetPeak(ion.GetMz(), tolerance);
+                //if(peak.Intensity > 0)
+                peakList.Add(peak);
             }
             return peakList;
         }

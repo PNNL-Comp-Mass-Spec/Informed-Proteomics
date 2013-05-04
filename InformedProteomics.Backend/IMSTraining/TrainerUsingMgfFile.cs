@@ -116,6 +116,13 @@ namespace InformedProteomics.Backend.IMSTraining
                     writer.Write("\n");
                 }
             }
+            writer.Write("##NOION\n");
+            var noIon = ratioScoreTrainer.NoIonProbDictionary;
+            foreach (var groupParameter in noIon.Keys)
+            {
+                writer.Write("#G\t" + groupParameter + "\n");
+                writer.Write(noIon[groupParameter]+"\n");
+            }
             writer.Close();
         }
 

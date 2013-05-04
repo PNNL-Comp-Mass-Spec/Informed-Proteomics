@@ -22,7 +22,7 @@ namespace InformedProteomics.Test
             //int numPrecursorFeatures = imsData.CreatePrecursorFeatures();
             //Console.WriteLine("TotalNumPrecursorFeatures: " + numPrecursorFeatures);            
 
-            const string targetPeptide = "CCAADDKEACFAVEGPK";
+            const string targetPeptide = "CCHGDLLECADDRADLAK";//EYANQFMWEYSTNYGQAPLSLLVSYTK CCAADDKEACFAVEGPK
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             var precursorComposition = aaSet.GetComposition(targetPeptide);
             for (int charge = 3; charge <= 3; charge++)
@@ -46,7 +46,7 @@ namespace InformedProteomics.Test
             //int numFragmentFeatures = imsData.CreateFragmentFeatures();
             //Console.WriteLine("TotalNumFragmentFeatures: " + numFragmentFeatures);
 
-            const string targetFragment = "AADDKEACFAVEGPK";
+            const string targetFragment = "YGQAPLSLLVSYTK";//"AADDKEACFAVEGPK";
             var fragmentComposition = aaSet.GetComposition(targetFragment);
                 for (int charge = 2; charge <= 2; charge++)
             {

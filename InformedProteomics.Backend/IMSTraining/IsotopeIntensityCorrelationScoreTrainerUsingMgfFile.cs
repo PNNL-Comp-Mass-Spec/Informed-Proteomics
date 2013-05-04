@@ -38,7 +38,7 @@ namespace InformedProteomics.Backend.IMSTraining
                         if(!s.ContainsKey(ionType)) s[ionType] = new Dictionary<int, double>();
                         var t = s[ionType];
                         var isotopomerTuple = spectrum.GetIsotopomerEnvelop(annotation, cutNumber, ionType, _tolerance);
-                        if (isotopomerTuple.Item1[FeatureNode.NumMinusIsotope].Intensity <= 0) continue;
+                        if (isotopomerTuple == null) continue;
                         var score = GetCorrelationScore(isotopomerTuple);
                         if(!t.ContainsKey(score))
                             t[score] = 0;

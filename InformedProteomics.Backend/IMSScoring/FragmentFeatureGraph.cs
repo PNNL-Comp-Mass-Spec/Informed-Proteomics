@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
@@ -13,15 +14,20 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             Add(precursorNode, new List<FeatureEdge>());
             var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorIon, parameter);
-            if (fragmentNodes.Count == 0) return;
-            UpdateEdges(this, fragmentNodes); // from precursor to any of fragment nodes
-            var primeNode = (FragmentFeatureNode)this[precursorNode].ElementAt(0).RNode;
+            var usedNodes = new List<FeatureNode> {precursorNode};
+            UpdateEdges(fragmentNodes, usedNodes); // from precursor to any of fragment nodes
+            if (this[precursorNode].Count == 0)
+            {
+                Score = SubScoreFactory.GetNoIonScore(parameter);
+                return;
+            }
+            var primeNode = (FragmentFeatureNode) this[precursorNode][0].RNode;
             var targetNodes = GetTargetNodes(primeNode, fragmentNodes, true, false);
-            UpdateEdges(this, targetNodes); // to the nodes of different terminal ions
+            UpdateEdges(targetNodes, usedNodes); // to the nodes of different terminal ions
             targetNodes = GetTargetNodes(primeNode, fragmentNodes, false, false);
-            UpdateEdges(this, targetNodes); // to the nodes of the same terminal ions
+            UpdateEdges(targetNodes, usedNodes); // to the nodes of the same terminal ions
             targetNodes = GetTargetNodes(primeNode, fragmentNodes, true, true);
-            UpdateEdges(this, targetNodes); // to the nodes of differently charged ions
+            UpdateEdges(targetNodes, usedNodes); // to the nodes of differently charged ions
 
             Score = GetScore(this);
         }
@@ -62,14 +68,16 @@ namespace InformedProteomics.Backend.IMSScoring
             return targetNodes;
         } 
 
-        static private void UpdateEdges(FragmentFeatureGraph graph, IEnumerable<FeatureNode> nodes)
+        private void UpdateEdges(IEnumerable<FeatureNode> nodes, List<FeatureNode> lNodes)
         {
             var maxWeight = double.NegativeInfinity;
             FeatureEdge edgeWithMaxWeight = null;
+            
             foreach (var rnode in nodes)
             {
-                foreach (var lnode in graph.Keys)
+                foreach (var lnode in lNodes)
                 {
+                    if (rnode == lnode) continue;
                     var edge = new FeatureEdge(lnode, rnode);
                     if (maxWeight < edge.Weight)
                     {
@@ -78,7 +86,12 @@ namespace InformedProteomics.Backend.IMSScoring
                     }
                 }
             }
-            if (edgeWithMaxWeight != null) graph[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight); 
+            if (edgeWithMaxWeight != null)
+            {
+                lNodes.Add(edgeWithMaxWeight.RNode);
+                if(!ContainsKey(edgeWithMaxWeight.LNode)) this[edgeWithMaxWeight.LNode] = new List<FeatureEdge>(); 
+                this[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight);
+            } 
         }
 
         static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Ion precursorIon, GroupParameter parameter)
@@ -91,7 +104,9 @@ namespace InformedProteomics.Backend.IMSScoring
             foreach (var ionType in ionTypes)
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
-                nodes.Add(new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter));
+                var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter);
+                if(node.Feature != null)
+                    nodes.Add(node);
             }
             return nodes;
         } 

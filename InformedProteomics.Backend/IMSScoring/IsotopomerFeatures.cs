@@ -17,7 +17,6 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             _theoreticalIsotopomerEnvelope = ion.Composition.GetApproximatedIsotopomerEnvelop();
             _maxIntensityIndex = GetMaximumIndex(_theoreticalIsotopomerEnvelope);
-
             for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
             {
                 var mz = ion.GetIsotopeMz(i + _maxIntensityIndex);
@@ -39,6 +38,22 @@ namespace InformedProteomics.Backend.IMSScoring
         public Feature GetNthFeatureFromTheoreticallyMostIntenseFeature(int n)
         {
             return this[Math.Min(Count - 1, n + _maxIntensityIndex + FeatureNode.NumMinusIsotope)]; // this[_maxIntensityIndex] corresponds to the max intensity istope - FeatureNode.NumMinusIsotope isotope
+        }
+
+        public Feature GetMostAbundantFeature()
+        {
+            var index = 0;
+            var max = 0.0;
+            for (var i = 0; i < Count;i++ )
+            {
+                var feature = this[i];
+                if (feature != null && max < feature.IntensityMax)
+                {
+                    max = feature.IntensityMax;
+                    index = i;
+                }
+            }
+            return this[index];
         }
 
         public float GetTheoreticalIntensityOfNthFeature(int n)
