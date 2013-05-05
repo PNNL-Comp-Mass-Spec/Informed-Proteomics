@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.IMSTraining
                     if (!NoIonProbDictionary.ContainsKey(groupParameter)) NoIonProbDictionary[groupParameter] = 0.0;
                     AllNumberDictionary[groupParameter] = AllNumberDictionary[groupParameter] + 1;
                     var s = RatioProbDictionary[groupParameter];
-                    var writeNoIon = true;
+                    /*var writeNoIon = true;
                     foreach (var peak in explainedPeaks)
                     {
                         if (peak.Intensity > 0)
@@ -50,8 +50,9 @@ namespace InformedProteomics.Backend.IMSTraining
                             writeNoIon = false;
                             break;
                         }
-                    }
-                    if (writeNoIon) NoIonProbDictionary[groupParameter] = NoIonProbDictionary[groupParameter] + 1;
+                    }*/
+                    //if (writeNoIon)
+                    NoIonProbDictionary[groupParameter] = NoIonProbDictionary[groupParameter] + 1;
                     for (var i = 0; i < ionTypes.Count; i++)
                     {
                         for (var j = 0; j < ionTypes.Count; j++)
@@ -60,10 +61,10 @@ namespace InformedProteomics.Backend.IMSTraining
                             var ionPair = new Tuple<IonType, IonType>(ionTypes[i], ionTypes[j]);
                             if(!s.ContainsKey(ionPair)) s[ionPair] = new Dictionary<int, double>();
                             var t = s[ionPair];
-                            if (explainedPeaks[i].Intensity <= 0 || explainedPeaks[j].Intensity <= 0)
-                            {
-                                continue;
-                            }
+                            //if (explainedPeaks[i].Intensity <= 0 || explainedPeaks[j].Intensity <= 0)
+                            //{
+                             //   continue;
+                            //}
                             var ratio = FeatureEdge.GetRatioScore(explainedPeaks[i].Intensity, explainedPeaks[j].Intensity);
                             if (!t.ContainsKey(ratio)) t[ratio] = 0;
                             t[ratio] = t[ratio] + 1;
@@ -77,7 +78,7 @@ namespace InformedProteomics.Backend.IMSTraining
 
         private void Normalize()
         {
-            foreach (var groupParameter in GroupParameter.GetAllFragmentParameters(_maxCharge))
+            foreach (var groupParameter in GroupParameter.GetAllFragmentGroupParameters(_maxCharge))
             {
                 if(!RatioProbDictionary.ContainsKey(groupParameter))
                     RatioProbDictionary[groupParameter] = new Dictionary<Tuple<IonType, IonType>, Dictionary<int, double>>();

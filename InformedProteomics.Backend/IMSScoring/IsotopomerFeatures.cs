@@ -20,8 +20,16 @@ namespace InformedProteomics.Backend.IMSScoring
             for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
             {
                 var mz = ion.GetIsotopeMz(i + _maxIntensityIndex);
-                Add(isPrecurosr? 
-                    imsData.GetPrecursorFeature(mz, precursorFeature) : imsData.GetFramentFeature(mz, precursorFeature));
+                if (isPrecurosr)
+                {
+                    if (mz > imsData.MaxPrecursorMz || mz < imsData.MinPrecursorMz) Add(null);
+                    else Add(imsData.GetPrecursorFeature(mz, precursorFeature));
+                }
+                else
+                {
+                    if (mz > imsData.MaxFragmentMz || mz < imsData.MinFragmentMz) Add(null);
+                    else Add(imsData.GetFramentFeature(mz, precursorFeature));
+                }
             }
         }
 

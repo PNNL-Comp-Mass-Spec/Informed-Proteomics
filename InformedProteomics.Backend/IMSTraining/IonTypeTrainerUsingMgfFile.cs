@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.IMSTraining
 
         private void GetIonTypes()
         {
-            foreach (var groupParameter in GroupParameter.GetAllFragmentParameters(_maxCharge))
+            foreach (var groupParameter in GroupParameter.GetAllFragmentGroupParameters(_maxCharge))
             {
                 IonTypes[groupParameter] = new List<IonType>();
                 if (!_ionFrequencyFunction.ContainsKey(groupParameter)) continue;

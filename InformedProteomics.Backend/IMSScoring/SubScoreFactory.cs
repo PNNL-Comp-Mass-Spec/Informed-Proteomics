@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.IMSScoring
         // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
-        private const double LowScore = -5;
+        private const double LowScore = -3; // TODO how to??
 
         static private Dictionary<GroupParameter, List<IonType>> _ionTypeDictionary;
 

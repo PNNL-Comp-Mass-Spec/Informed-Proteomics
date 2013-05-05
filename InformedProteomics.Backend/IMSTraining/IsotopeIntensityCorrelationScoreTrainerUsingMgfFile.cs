@@ -52,7 +52,7 @@ namespace InformedProteomics.Backend.IMSTraining
 
         private void Normalize()
         {
-            foreach (var groupParameter in GroupParameter.GetAllFragmentParameters(_maxCharge))
+            foreach (var groupParameter in GroupParameter.GetAllFragmentGroupParameters(_maxCharge))
             {
                 if (!IsotopeIntensityCorrProbDictionary.ContainsKey(groupParameter))
                     IsotopeIntensityCorrProbDictionary[groupParameter] = new Dictionary<IonType, Dictionary<int, double>>();

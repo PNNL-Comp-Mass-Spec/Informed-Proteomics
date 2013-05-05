@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 
@@ -10,13 +11,20 @@ namespace InformedProteomics.Backend.IMSScoring
         public int LocationIndex { get; private set; }
         public int FlankingResidueIndex { get; private set; }
         public int Charge { get; private set; }
+        private const int MaxCharge = 3;
+        private const int MinCharge = 2;
 
         public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Ion precursorIon)
         {
             MassIndex = GetMassIndex(precursorIon.Composition);
-            Charge = precursorIon.Charge;
+            Charge = Math.Max(MinCharge, Math.Min(precursorIon.Charge, MaxCharge));
             LocationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
             FlankingResidueIndex =  GetFlankingResidueIndex(nTermAA, cTermAA); 
+        }
+
+        public GroupParameter(Ion precursorIon) : this(precursorIon.Composition, ' ', ' ', precursorIon)
+        {
+            
         }
 
         internal GroupParameter(int massIndex, int locationIndex, int flankingResidueIndex, int charge)
@@ -38,18 +46,34 @@ namespace InformedProteomics.Backend.IMSScoring
             return token.Length != 4 ? null : new GroupParameter(int.Parse(token[0]), int.Parse(token[1]), int.Parse(token[2]), int.Parse(token[3]));
         }
 
-        public static List<GroupParameter> GetAllFragmentParameters(int maxCharge)
+        public static List<GroupParameter> GetAllFragmentGroupParameters(int maxCharge)
         {
             var ret = new List<GroupParameter>();
             for (var i = 1; i <= 3; i++)
             {
                 for (var j = 1; j <= 4; j++)
                 {
-                    for (var k = 0; k <= 15; k++)
+                    for (var k = 0; k <= 15; k++) // 16 for precursor
                     {
                         for (var c = 1; c <= maxCharge;c++ ){
                             ret.Add(new GroupParameter(i, j, k, c));
                         }
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public static List<GroupParameter> GetAllPrecursorGroupParameters(int maxCharge)
+        {
+            var ret = new List<GroupParameter>();
+            for (var i = 1; i <= 3; i++)
+            {
+                for (var j = 1; j <= 4; j++)
+                {
+                    for (var c = 1; c <= maxCharge; c++)
+                    {
+                        ret.Add(new GroupParameter(i, j, 16, c));
                     }
                 }
             }
@@ -97,6 +121,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
         private static int GetFlankingResidueIndex(char nTermAA, char cTermAA)
         {
+            if (nTermAA.Equals(' ')) return 16;
             return ResidueTable[GetResidueIndex(nTermAA), GetResidueIndex(cTermAA)];
         }
 

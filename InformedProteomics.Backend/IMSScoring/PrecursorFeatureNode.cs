@@ -13,9 +13,14 @@ namespace InformedProteomics.Backend.IMSScoring
         internal override sealed double GetScore()
         {
             // when calculating score, only mass index and charge values are used in parameter. When writing the parameter file, only they should be written.
-            var lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(LCCorrelation, GroupParameter);
-            var imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(IMSCorrelation, GroupParameter);
             var isotopeScore = SubScoreFactory.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
+            var lcScore = 0.0;
+            var imsScore = 0.0;
+            if (Feature != null)
+            {
+                lcScore = SubScoreFactory.GetIsotopeLCCorrelationScore(LCCorrelation, GroupParameter);
+                imsScore = SubScoreFactory.GetIsotopeIMSCorrelationScore(IMSCorrelation, GroupParameter);
+            }
             return lcScore + imsScore + isotopeScore;
         }
     }
