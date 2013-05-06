@@ -4,6 +4,7 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.IMS;
+using InformedProteomics.Backend.IMSScoring;
 using NUnit.Framework;
 using UIMFLibrary;
 
@@ -12,6 +13,28 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestIcIms
     {
+        [Test]
+        public void TestImsScoring()
+        {
+            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            const string targetPeptide = "CCAADDKEACFAVEGPK";
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+
+            var seqGraph = new SequenceGraph(aaSet, targetPeptide);
+            var scoringGraph = seqGraph.GetScoringGraph(0);
+            scoringGraph.RegisterImsData(imsData);
+            for (var precursorCharge = 1; precursorCharge <= 4; precursorCharge++)
+            {
+                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
+                Console.WriteLine("Charge: " + precursorCharge);
+                Console.WriteLine("Feature: " + best.Item1);
+                Console.WriteLine("Score: " + best.Item2);
+                
+            }
+        }
+
         [Test]
         public void TestImsFeatureFinding()
         {

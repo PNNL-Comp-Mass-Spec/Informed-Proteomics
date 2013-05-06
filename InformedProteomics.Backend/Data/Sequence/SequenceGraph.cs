@@ -178,6 +178,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             // backtracking
             ScoringGraphNode rootNode = null;
+            ScoringGraphNode leafNode = null;
             var nextNodeMap = new Dictionary<int, List<ScoringGraphNode>>
                 {
                     {sequenceIndex, new List<ScoringGraphNode>()}
@@ -191,7 +192,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     int nodeIndex = entry.Key;
                     var curNode = _graph[seqIndex][nodeIndex];
                     var composition = GetComposition(seqIndex, nodeIndex);
-                    var scoringGraphNode = new ScoringGraphNode(composition);
+                    var scoringGraphNode = new ScoringGraphNode(composition, nodeIndex);
                     scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
 
                     foreach (var prevNodeIndex in curNode.GetPrevIndices())

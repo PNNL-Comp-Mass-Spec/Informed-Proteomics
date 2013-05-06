@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.IMSScoring;
@@ -21,11 +20,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly Dictionary<int,Ion> _precursorIon;
 
         private readonly ScoringGraphNode _rootNode;
+        private readonly ScoringGraphNode[] _nodes;
+
         private readonly int _minPrecursorCharge;
         private readonly int _maxPrecursorCharge;
 
         private ImsDataCached _imsData;
-        private ImsScorer _imsScorer;
 
         public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode)
             : this(aminoAcidSequence, sequenceComposition, rootNode, DefaultMinPrecursorCharge, DefaultMaxPrecursorCharge)
@@ -45,7 +45,29 @@ namespace InformedProteomics.Backend.Data.Sequence
             for (var precursorCharge = _minPrecursorCharge; precursorCharge <= _maxPrecursorCharge; precursorCharge++)
             {
                 _precursorIon[precursorCharge] = new Ion(_sequenceComposition, precursorCharge);
-            } 
+            }
+
+            // store all nodes in an array
+            var nodes = new HashSet<ScoringGraphNode>();
+
+            var curNodes = new HashSet<ScoringGraphNode> { _rootNode };
+            while (curNodes.Any())
+            {
+                var newNodes = new HashSet<ScoringGraphNode>();
+                foreach (var node in curNodes)
+                {
+                    if (nodes.Add(node))    // if node is new
+                    {
+                        foreach (var nextNode in node.GetNextNodes())
+                        {
+                            newNodes.Add(nextNode);
+                        }
+                    }
+                }
+                curNodes = newNodes;
+            }
+
+            _nodes = nodes.ToArray();
         }
 
         public void RegisterImsData(ImsDataCached imsData)
@@ -53,79 +75,68 @@ namespace InformedProteomics.Backend.Data.Sequence
             _imsData = imsData;
         }
 
-        public void ComputeScores()
+        public Tuple<Feature, double> GetBestFeatureAndScore(int precursorCharge)
         {
-            var compositions = new HashSet<Composition>();
+            var precursorIon = new Ion(_sequenceComposition, precursorCharge);
+            var imsScorer = new ImsScorer(_imsData, precursorIon);
 
-            var curNodes = new HashSet<ScoringGraphNode> { _rootNode };
-            int index = -1;
-            while (curNodes.Any())
+            var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMz());
+            var bestScore = double.NegativeInfinity;
+            Feature bestFeature = null;
+            foreach (var precursorFeature in precursorFeatureSet)
             {
-                ++index;
-                var newNodes = new HashSet<ScoringGraphNode>();
-                foreach (var node in curNodes)
+                var curFeatureScore = GetScore(imsScorer, precursorFeature);
+                if (curFeatureScore > bestScore)
                 {
-                    compositions.Add(node.Composition);
-                    foreach (var nextNode in node.GetNextNodes())
-                    {
-                        newNodes.Add(nextNode);
-                    }
+                    bestScore = curFeatureScore;
+                    bestFeature = precursorFeature;
                 }
-                curNodes = newNodes;
             }
+
+            return new Tuple<Feature, double>(bestFeature, bestScore);
         }
 
         public IEnumerable<Composition> GetCompositions()
         {
-            var compositions = new HashSet<Composition>();
-
-            var curNodes = new HashSet<ScoringGraphNode> {_rootNode};
-            while (curNodes.Any())
-            {
-                var newNodes = new HashSet<ScoringGraphNode>();
-                foreach (var node in curNodes)
-                {
-                    compositions.Add(node.Composition);
-                    foreach (var nextNode in node.GetNextNodes())
-                    {
-                        newNodes.Add(nextNode);
-                    }
-                }
-                curNodes = newNodes;
-            }
-
-            return compositions;
+            return _nodes.Select(node => node.Composition).ToArray();
         }
 
-        private double GetCutScore(int index, Composition cutComposition, int precursorCharge)
+        private double GetScore(ImsScorer imsScorer, Feature precursorFeature)
         {
-            Ion precursorIon = _precursorIon[precursorCharge];
-            _imsData.GetPrecursorFeatures(precursorIon.GetMz());
-
-            char nTermAA = _aminoAcidSequence[index - 1].Residue;
-            char cTermAA = _aminoAcidSequence[index].Residue;
-            //_imsScorer.GetCutScore(nTermAA, cTermAA, cutComposition, precursorIon);
-
-            throw new System.NotImplementedException();
+            return GetScore(_rootNode, imsScorer, precursorFeature);
         }
 
-        
+        private double GetScore(ScoringGraphNode node, ImsScorer imsScorer, Feature precursorFeature)
+        {
+            char nTermAA = _aminoAcidSequence[node.Index - 1].Residue;
+            char cTermAA = _aminoAcidSequence[node.Index].Residue;
+            var cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
+            var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetScore(nextNode, imsScorer, precursorFeature));
+            return cutScore + nextNodeScore;
+        }
     }
 
     public class ScoringGraphNode
     {
         private readonly Composition _composition;
+        private readonly int _index;
         private readonly List<ScoringGraphNode> _nextNodes;
 
-        public ScoringGraphNode(Composition composition)
+        public ScoringGraphNode(Composition composition, int index)
         {
             _composition = composition;
+            _index = index;
             _nextNodes = new List<ScoringGraphNode>();
         }
 
         public Composition Composition
         {
             get { return _composition; }
+        }
+
+        public int Index
+        {
+            get { return _index; }
         }
 
         public void AddNextNode(ScoringGraphNode nextNode)

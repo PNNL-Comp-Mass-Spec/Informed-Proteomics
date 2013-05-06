@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text;
+using DeconTools.Backend.Core;
+using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -16,7 +18,7 @@ namespace InformedProteomics.Test
     {
         [Test]
         public void TestSequenceGraph()
-        {
+        { 
             var phosPhoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
             var phosPhoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
             var phosPhoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
@@ -88,7 +90,7 @@ namespace InformedProteomics.Test
             for (int modCombIndex = 0; modCombIndex < numCombinations; modCombIndex++)
             {
                 var modCombination = modParams.GetModificationCombination(modCombIndex);
-                Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination.ToString(), modCombination.Composition, modCombination.Composition.GetMass());
+                Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination, modCombination.Composition, modCombination.Composition.GetMass());
             }
 
             Console.WriteLine(modParams.GetModificationCombinationIndex(8, 0));
@@ -120,9 +122,12 @@ namespace InformedProteomics.Test
             //Console.WriteLine(Path.GetExtension(path));
             //Console.WriteLine(Path.GetDirectoryName(path));
 
-            const int size = int.MaxValue/4-1;
-            var hugeList = new List<int>(size);
-            Console.WriteLine("Success: " + size + " " + hugeList.Capacity);
+            //const int size = int.MaxValue/4-1;
+            //var hugeList = new List<int>(size);
+            //Console.WriteLine("Success: " + size + " " + hugeList.Capacity);
+
+            var set = new HashSet<double>();
+            Console.WriteLine("Max: " + set.DefaultIfEmpty().Max(n => n*2));
         }
 
         [Test]
@@ -156,6 +161,27 @@ namespace InformedProteomics.Test
             }
             var yIon = ionTypeFactory.GetIonType("y2-H2O");
             Console.WriteLine(yIon.GetMz(0));
+        }
+
+        [Test]
+        public void TestIsotopomerProfile()
+        {
+            const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
+
+            IsotopicDistributionCalculator isoCalc = IsotopicDistributionCalculator.Instance;
+            IsotopicProfile profile = isoCalc.GetIsotopePattern(molFormula);
+
+            var sb = new StringBuilder();
+
+            foreach (var peak in profile.Peaklist)
+            {
+                sb.Append(peak.XValue);
+                sb.Append("\t");
+                sb.Append(peak.Height);
+                sb.Append("\n");
+            }
+
+            Console.Write(sb.ToString());
         }
 	}
 }
