@@ -26,6 +26,10 @@ namespace InformedProteomics.Backend.IMSScoring
             _precursorIon = precursorIon;
         }
 
+        public ImsDataCached ImsData
+        {
+            get { return _imsData; }
+        }
         
         private void UpdatePrecursorFeatureNode(Feature precursorFeature)
         {
@@ -65,14 +69,14 @@ namespace InformedProteomics.Backend.IMSScoring
             return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).RatioScore;
         }
 
-        public double GetCutLCScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
+        public double GetCutLcScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
             return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).LCScore;
         }
 
-        public double GetCutIMSScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
+        public double GetCutImsScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
