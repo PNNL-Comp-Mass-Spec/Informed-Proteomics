@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace InformedProteomics.Backend.IMSScoring
+﻿namespace InformedProteomics.Backend.IMSScoring
 {
     public class FeatureEdge
     {
@@ -8,26 +6,30 @@ namespace InformedProteomics.Backend.IMSScoring
         public FeatureNode RNode { get; private set; }
         public double Weight { get; private set; } // used to calculate weight of a path
         public double RatioScore { get; private set; } // used to calculate score
-        public double LCScore { get; private set; }
-        public double IMSScore { get; private set; }
+        public double LcScore { get; private set; }
+        public double ImsScore { get; private set; }
         public double NodeScore { get; private set; }
+
         private readonly int _ratio;
         private readonly double _lcCorrelation;
         private readonly double _imsCorrelation;
 
-        public FeatureEdge(FeatureNode l, FeatureNode r)
+        private readonly SubScoreFactory _scoringParams;
+
+        public FeatureEdge(FeatureNode l, FeatureNode r, SubScoreFactory scoringParams)
         {
             LNode = l;
             RNode = r;
             var ri = r.Feature == null ? 0.0 : r.Feature.IntensityMax;
             var li = l.Feature == null ? 0.0 : l.Feature.IntensityMax;
+            _scoringParams = scoringParams;
             
             if (LNode is PrecursorFeatureNode) // TODO fix later when no summed intensity is used
                 _ratio = GetRatioScore(ri, ri);
             else
                 _ratio = GetRatioScore(li, ri);
-            _lcCorrelation = StatisticsTools.GetLCCorrelation(l.Feature, r.Feature);
-            _imsCorrelation = StatisticsTools.GetIMSCorrelation(l.Feature, r.Feature);
+            _lcCorrelation = StatisticsTools.GetLcCorrelation(l.Feature, r.Feature);
+            _imsCorrelation = StatisticsTools.GetImsCorrelation(l.Feature, r.Feature);
            
             GetScore(); // TODO calculate when Score is needed..
             Weight = GetWeight();
@@ -37,9 +39,9 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             var r = (FragmentFeatureNode)RNode;
             if (LNode is PrecursorFeatureNode)
-                return SubScoreFactory.GetKLDivergence(r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, r.GroupParameter); 
+                return _scoringParams.GetKLDivergence(r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, r.GroupParameter); 
             var l = (FragmentFeatureNode) LNode;
-            return SubScoreFactory.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, l.GroupParameter);
+            return _scoringParams.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, l.GroupParameter);
         }
 
         private void GetScore()
@@ -48,26 +50,26 @@ namespace InformedProteomics.Backend.IMSScoring
             var r = (FragmentFeatureNode)RNode;
             if (LNode is PrecursorFeatureNode)
             {
-                RatioScore = SubScoreFactory.GetRatioScore(r.FragmentIonClassBase, _ratio, r.GroupParameter);
+                RatioScore = _scoringParams.GetRatioScore(r.FragmentIonClassBase, _ratio, r.GroupParameter);
                 //Console.WriteLine("Prec : " + r.FragmentIonClassBase.Name +"\t" + _ratio + "\t" + RatioScore + "\t" + r.Feature);
                 if (r.Feature != null)
                 {
-                    LCScore = SubScoreFactory.GetLCCorrelationScore(r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
-                    IMSScore = SubScoreFactory.GetIMSCorrelationScore(r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);
+                    LcScore = _scoringParams.GetLcCorrelationScore(r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
+                    ImsScore = _scoringParams.GetImsCorrelationScore(r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);
                 }
-                else LCScore = IMSScore = 0;
+                else LcScore = ImsScore = 0;
                 //Console.WriteLine("pre " + score);
             }
             else
             {
                 var l = (FragmentFeatureNode) LNode;
-                RatioScore = SubScoreFactory.GetRatioScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, r.GroupParameter);
+                RatioScore = _scoringParams.GetRatioScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, r.GroupParameter);
                 if (r.Feature != null)
                 {
-                    LCScore = SubScoreFactory.GetLCCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
-                    IMSScore = SubScoreFactory.GetIMSCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase,_imsCorrelation, r.GroupParameter);
+                    LcScore = _scoringParams.GetLcCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
+                    ImsScore = _scoringParams.GetImsCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);
                 }
-                else LCScore = IMSScore = 0;
+                else LcScore = ImsScore = 0;
                 //  Console.WriteLine(this + "\tfrac " + score + "\t" + rscore + "\t" + lscore + "\t" + iscore + "\t" + RNode.Score);
               //  Console.WriteLine("raw " + _lcCorrelation + "\t" + _imsCorrelation + "\t" + RNode.IsotopeCorrelation);
               //  Console.WriteLine(LNode.Feature);

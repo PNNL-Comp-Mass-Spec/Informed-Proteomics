@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.IMS;
@@ -12,27 +10,28 @@ namespace InformedProteomics.Backend.IMSScoring
         public double Score { get; private set; }
         public double NodeScore { get; private set; }
         public double RatioScore { get; private set; }
-        public double LCScore { get; private set; }
-        public double IMSScore { get; private set; }
+        public double LcScore { get; private set; }
+        public double ImsScore { get; private set; }
 
-        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature, Ion precursorIon, Composition cutComposition, GroupParameter parameter)
+        private readonly SubScoreFactory _scoringParams;
+
+        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature, 
+            Ion precursorIon, Composition cutComposition, GroupParameter parameter, SubScoreFactory scoringParams)
         {
             Add(precursorNode, new List<FeatureEdge>());
             var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorIon, parameter);
 
-            var nn = 0;
-            foreach (var no in fragmentNodes)
-            {
-                if (no.Feature != null) nn++;
-            }
+            //var nn = fragmentNodes.Count(no => no.Feature != null);
             //Console.WriteLine(this + "Num features : " + nn);
+
+            _scoringParams = scoringParams;
 
             var usedNodes = new List<FeatureNode> {precursorNode};
             UpdateEdges(fragmentNodes, usedNodes); // from precursor to any of fragment nodes
             if (this[precursorNode].Count == 0)
             {
-                NodeScore = RatioScore = LCScore = IMSScore = -1;
-                Score = NodeScore + RatioScore + LCScore + IMSScore;
+                NodeScore = RatioScore = LcScore = ImsScore = -1;
+                Score = NodeScore + RatioScore + LcScore + ImsScore;
                 return;
             }
             var primeNode = (FragmentFeatureNode) this[precursorNode][0].RNode;
@@ -48,18 +47,18 @@ namespace InformedProteomics.Backend.IMSScoring
         
         private void GetScore()
         {
-            NodeScore = RatioScore = LCScore = IMSScore = 0;
+            NodeScore = RatioScore = LcScore = ImsScore = 0;
             foreach (var node in Keys)
             {
                 foreach (var edge in this[node])
                 {
                     NodeScore += edge.NodeScore;
                     RatioScore += edge.RatioScore;
-                    LCScore += edge.LCScore;
-                    IMSScore += edge.IMSScore;
+                    LcScore += edge.LcScore;
+                    ImsScore += edge.ImsScore;
                 }
             }
-            Score = NodeScore + RatioScore + LCScore + IMSScore;
+            Score = NodeScore + RatioScore + LcScore + ImsScore;
         }
 
         static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
@@ -103,7 +102,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 foreach (var lnode in lNodes)
                 {
                     if (rnode == lnode) continue;
-                    var edge = new FeatureEdge(lnode, rnode);
+                    var edge = new FeatureEdge(lnode, rnode, _scoringParams);
                     if (maxWeight < edge.Weight)
                     {
                         maxWeight = edge.Weight;
@@ -119,9 +118,9 @@ namespace InformedProteomics.Backend.IMSScoring
             } 
         }
 
-        static private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Ion precursorIon, GroupParameter parameter)
+        private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Ion precursorIon, GroupParameter parameter)
         {
-            var ionTypes = SubScoreFactory.GetIonTypes(parameter);
+            var ionTypes = _scoringParams.GetIonTypes(parameter);
 
             var nodes = new List<FragmentFeatureNode>();
             var suffixComposition = precursorIon.Composition -Composition.H2O - cutComposition;
@@ -130,7 +129,7 @@ namespace InformedProteomics.Backend.IMSScoring
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
                 //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + ionType.GetIon(composition).GetMz());
-                var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter);
+                var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter, _scoringParams);
                 //if(node.Feature != null)
                 nodes.Add(node);
             }

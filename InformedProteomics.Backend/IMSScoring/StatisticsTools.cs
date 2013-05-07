@@ -7,7 +7,7 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public class StatisticsTools
     {
-        static public double GetLCCorrelation(Feature l, Feature r)
+        static public double GetLcCorrelation(Feature l, Feature r)
         {
             if (l == null || r == null) return 0.0;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.IMSScoring
             return GetCorrelation(llc, rlc);
         }
 
-        static public double GetIMSCorrelation(Feature l, Feature r)
+        static public double GetImsCorrelation(Feature l, Feature r)
         {
             if (l == null || r == null) return 0.0;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());

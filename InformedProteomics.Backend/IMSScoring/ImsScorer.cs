@@ -12,18 +12,15 @@ namespace InformedProteomics.Backend.IMSScoring
         //TODO Precursor node score should be added later - not through the cutscore thing.
         private readonly ImsDataCached _imsData;
         private readonly Ion _precursorIon;
+        private readonly SubScoreFactory _scoringParams;
         private Feature _previousPrecursorFeature; // only for speed-up
         public PrecursorFeatureNode PrecursorFeatureNode { get; private set; }
 
-        static public void ReadScoringParameterFile(string fileName)
-        {
-            SubScoreFactory.Read(fileName);
-        }
-
-        public ImsScorer(ImsDataCached imsData, Ion precursorIon) // precursorComposition does not have protons; however, protons are incorporated when calculating mz
+        internal ImsScorer(ImsDataCached imsData, Ion precursorIon, SubScoreFactory scoringParams) // precursorComposition does not have protons; however, protons are incorporated when calculating mz
         {
             _imsData = imsData;
             _precursorIon = precursorIon;
+            _scoringParams = scoringParams;
         }
 
         public ImsDataCached ImsData
@@ -38,7 +35,7 @@ namespace InformedProteomics.Backend.IMSScoring
             PrecursorFeatureNode =
                 new PrecursorFeatureNode(
                     IsotopomerFeatures.GetPrecursorIsotopomerFeatures(_imsData, _precursorIon, precursorFeature),
-                    parameter);
+                    parameter, _scoringParams);
             _previousPrecursorFeature = precursorFeature;
         }
 
@@ -52,35 +49,35 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).Score;
+            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).Score;
         }
 
         public double GetCutNodeScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).NodeScore;
+            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).NodeScore;
         }
 
         public double GetCutRatioScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).RatioScore;
+            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).RatioScore;
         }
 
         public double GetCutLcScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).LCScore;
+            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).LcScore;
         }
 
         public double GetCutImsScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter).IMSScore;
+            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).ImsScore;
         }
     }
 }

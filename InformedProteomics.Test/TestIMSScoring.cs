@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -15,7 +16,7 @@ using IonType = InformedProteomics.Backend.Data.Spectrometry.IonType;
 namespace InformedProteomics.Test
 {
     [TestFixture]
-    internal class TestIMSScoring
+    internal class TestImsScoring
     {
         [Test]
         public void TestTrainingUsingMgfFile()
@@ -27,7 +28,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestMSMSSpectrum()
+        public void TestMsMsSpectrum()
         {
             const string mgf = @"C:\Users\kwj\Dropbox\Training\HCD_train.mgf";
             var spectra = MgfParser.Parse(mgf, 5);
@@ -50,13 +51,13 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestImSscoring()
+        public void TestScoring()
         {
             const string uimfFilePath =
                 @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            const string paraFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
+            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsData = new ImsDataCached(uimfFilePath);
-            ImsScorer.ReadScoringParameterFile(paraFile);
+            var imsScorerFactory = new ImsScorerFactory(paramFile);
             
             const string fasta = @"..\..\..\TestFiles\BSA.fasta";
             var targetDist = new int[1000];
@@ -81,7 +82,7 @@ namespace InformedProteomics.Test
                     for (var charge = 2; charge <= 3; charge++)
                     {
                         var precursorIon = new Ion(precursorComposition + Composition.H2O, charge);
-                        var imsScorer = new ImsScorer(imsData, precursorIon);
+                        var imsScorer = imsScorerFactory.GetImsScorer(imsData, precursorIon);
 
                         for (var i = 0; i <= 0; i++)
                         {
@@ -130,8 +131,7 @@ namespace InformedProteomics.Test
                 }
             }
 
-            var decoyScoreList = new List<double>();
-            foreach(var score in decoyScores.Keys) decoyScoreList.Add(score);
+            var decoyScoreList = decoyScores.Keys.ToList();
 
             Console.WriteLine();
             decoyScoreList.Sort();

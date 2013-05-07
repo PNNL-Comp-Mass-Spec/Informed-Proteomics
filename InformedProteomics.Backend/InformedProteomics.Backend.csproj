@@ -138,6 +138,7 @@
     <Compile Include="IMSScoring\GroupParameter.cs" />
     <Compile Include="IMSScoring\ImsScorer.cs" />
     <Compile Include="IMSScoring\FeatureEdge.cs" />
+    <Compile Include="IMSScoring\ImsScorerFactory.cs" />
     <Compile Include="IMSScoring\IsotopomerFeatures.cs" />
     <Compile Include="IMSScoring\PrecursorFeatureNode.cs" />
     <Compile Include="IMSScoring\StatisticsTools.cs" />

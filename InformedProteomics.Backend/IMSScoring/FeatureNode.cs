@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.IMSScoring
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
         public Feature Feature { get; private set; }
         internal double Score { get; set; }
-        internal double IsotopeCorrelation, LCCorrelation, IMSCorrelation;
+        internal double IsotopeCorrelation, LcCorrelation, ImsCorrelation;
         
         protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter groupParameter)
         {
@@ -31,8 +31,8 @@ namespace InformedProteomics.Backend.IMSScoring
                 f[k] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(k - NumMinusIsotope);
                 i[k] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(k - NumMinusIsotope);
             }
-            LCCorrelation = StatisticsTools.GetLCCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
-            IMSCorrelation = StatisticsTools.GetIMSCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
+            LcCorrelation = StatisticsTools.GetLcCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
+            ImsCorrelation = StatisticsTools.GetImsCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             IsotopeCorrelation = StatisticsTools.GetIsotopeCorrelation(f, i);
         }
 

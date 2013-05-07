@@ -26,13 +26,14 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly int _maxPrecursorCharge;
 
         private ImsDataCached _imsData;
+        private ImsScorerFactory _imsScorerFactory;
 
-        public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode)
+        internal ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode)
             : this(aminoAcidSequence, sequenceComposition, rootNode, DefaultMinPrecursorCharge, DefaultMaxPrecursorCharge)
         {
         }
 
-        public ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode,
+        internal ScoringGraph(AminoAcid[] aminoAcidSequence, Composition sequenceComposition, ScoringGraphNode rootNode,
                             int minPrecursorCharge, int maxPrecursorCharge)
         {
             _aminoAcidSequence = aminoAcidSequence;
@@ -70,22 +71,25 @@ namespace InformedProteomics.Backend.Data.Sequence
             _nodes = nodes.ToArray();
         }
 
-        public void RegisterImsData(ImsDataCached imsData)
+        public void RegisterImsData(ImsDataCached imsData, ImsScorerFactory imsScorerFactory)
         {
             _imsData = imsData;
+            _imsScorerFactory = imsScorerFactory;
         }
 
         public Tuple<Feature, double> GetBestFeatureAndScore(int precursorCharge)
         {
             var precursorIon = new Ion(_sequenceComposition, precursorCharge);
-            var imsScorer = new ImsScorer(_imsData, precursorIon);
+            var imsScorer = _imsScorerFactory.GetImsScorer(_imsData, precursorIon);
 
             var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMz());
             var bestScore = double.NegativeInfinity;
             Feature bestFeature = null;
             foreach (var precursorFeature in precursorFeatureSet)
             {
-                var curFeatureScore = GetScore(imsScorer, precursorFeature);
+                var precursorScore = imsScorer.GetPrecursorScore(precursorFeature);
+                var productScore = GetProductIonScore(imsScorer, precursorFeature);
+                var curFeatureScore = precursorScore + productScore;
                 if (curFeatureScore > bestScore)
                 {
                     bestScore = curFeatureScore;
@@ -101,17 +105,26 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _nodes.Select(node => node.Composition).ToArray();
         }
 
-        private double GetScore(ImsScorer imsScorer, Feature precursorFeature)
+        private double GetProductIonScore(ImsScorer imsScorer, Feature precursorFeature)
         {
-            return GetScore(_rootNode, imsScorer, precursorFeature);
+            return GetProductIonScore(_rootNode, imsScorer, precursorFeature);
         }
 
-        private double GetScore(ScoringGraphNode node, ImsScorer imsScorer, Feature precursorFeature)
+        private double GetProductIonScore(ScoringGraphNode node, ImsScorer imsScorer, Feature precursorFeature)
         {
-            char nTermAA = _aminoAcidSequence[node.Index - 1].Residue;
-            char cTermAA = _aminoAcidSequence[node.Index].Residue;
-            var cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
-            var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetScore(nextNode, imsScorer, precursorFeature));
+            Console.WriteLine("Index: " + node.Index);
+            double cutScore;
+            if (node.Index > 0)
+            {
+                char nTermAA = _aminoAcidSequence[node.Index - 1].Residue;
+                char cTermAA = _aminoAcidSequence[node.Index].Residue;
+                cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
+            }
+            else
+            {
+                cutScore = 0;
+            }
+            var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetProductIonScore(nextNode, imsScorer, precursorFeature));
             return cutScore + nextNodeScore;
         }
     }

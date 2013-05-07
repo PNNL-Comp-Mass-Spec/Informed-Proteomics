@@ -100,7 +100,7 @@
   <ItemGroup>
     <Compile Include="TestIcIms.cs" />
     <Compile Include="TestSuffixArray.cs" />
-    <Compile Include="TestIMSScoring.cs" />
+    <Compile Include="TestImsScoring.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDeconToolsWorkflow.cs" />
