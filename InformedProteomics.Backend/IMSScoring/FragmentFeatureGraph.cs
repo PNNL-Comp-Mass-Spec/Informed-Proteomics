@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.IMS;
@@ -18,14 +19,15 @@ namespace InformedProteomics.Backend.IMSScoring
         public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature, 
             Ion precursorIon, Composition cutComposition, GroupParameter parameter, SubScoreFactory scoringParams)
         {
+            _scoringParams = scoringParams;
+
             Add(precursorNode, new List<FeatureEdge>());
             var fragmentNodes = GetFragmentNodes(imsData, precursorFeature, cutComposition, precursorIon, parameter);
 
             //var nn = fragmentNodes.Count(no => no.Feature != null);
             //Console.WriteLine(this + "Num features : " + nn);
 
-            _scoringParams = scoringParams;
-
+            
             var usedNodes = new List<FeatureNode> {precursorNode};
             UpdateEdges(fragmentNodes, usedNodes); // from precursor to any of fragment nodes
             if (this[precursorNode].Count == 0)
