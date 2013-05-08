@@ -79,7 +79,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Tuple<Feature, double> GetBestFeatureAndScore(int precursorCharge)
         {
-            var precursorIon = new Ion(_sequenceComposition, precursorCharge);
+            var precursorIon = new Ion(_sequenceComposition + Composition.H2O, precursorCharge);
             var imsScorer = _imsScorerFactory.GetImsScorer(_imsData, precursorIon);
 
             var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMz());
@@ -112,20 +112,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private double GetProductIonScore(ScoringGraphNode node, ImsScorer imsScorer, Feature precursorFeature)
         {
-            Console.WriteLine("Index: " + node.Index);
-            double cutScore;
-            if (node.Index > 0)
+            //Console.Write("Index: " + node.Index);
+            double cutScore = 0;
+            if (node.Index > 1 && node.Index <= _aminoAcidSequence.Length-3)
             {
-                char nTermAA = _aminoAcidSequence[node.Index - 1].Residue;
-                char cTermAA = _aminoAcidSequence[node.Index].Residue;
+                char nTermAA = _aminoAcidSequence[node.Index].Residue;
+                char cTermAA = _aminoAcidSequence[node.Index + 1].Residue;
                 cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
+                //Console.Write(" " + _aminoAcidSequence[node.Index].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Index + 1].Residue + " " + cutScore);
             }
+            //Console.WriteLine();
+
+            if (node.Index > _aminoAcidSequence.Length - 3)
+                return 0;
             else
             {
-                cutScore = 0;
+                var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetProductIonScore(nextNode, imsScorer, precursorFeature));
+                return cutScore + nextNodeScore;
             }
-            var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetProductIonScore(nextNode, imsScorer, precursorFeature));
-            return cutScore + nextNodeScore;
         }
     }
 

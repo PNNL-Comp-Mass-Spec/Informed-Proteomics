@@ -60,6 +60,7 @@ namespace InformedProteomics.Test
             var imsScorerFactory = new ImsScorerFactory(paramFile);
             
             const string fasta = @"..\..\..\TestFiles\BSA.fasta";
+            //const string fasta = @"..\..\..\TestFiles\CCAADDKEACFAVEGPK.fasta";
             var targetDist = new int[1000];
             var decoyDist = new int[1000];
             var targetScores = new Dictionary<double, List<string>>();
@@ -69,10 +70,12 @@ namespace InformedProteomics.Test
             {
                 var dist = targetDist;
                 var num = 0;
+                var pepIndex = 0;
                 if (q != 0) dist = decoyDist;
-                foreach (var targetPeptide in Misc.GetPeptidesFromFasta(fasta, false, 2, q != 0))
+                foreach (var targetPeptide in Misc.GetPeptidesFromFasta(fasta, true, 2, q != 0))
                     // stupid function made by kyowon.
                 {
+                    Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);
                     var pep = targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
                     //if (pep.Length < 5) continue;
                     var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -94,10 +97,12 @@ namespace InformedProteomics.Test
                             {
                                 //Console.WriteLine("Precursor Feature: " + precursorFeature + "\n");
                                 var score = imsScorer.GetPrecursorScore(precursorFeature);
+                                //Console.WriteLine("Feature: " + precursorFeature);
                                 //Console.WriteLine("Precursor score: " + score);
                                 for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
                                 {
                                     var cutScore = imsScorer.GetCutScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                    //Console.WriteLine("{0} {1} {2} {3}", pep[cutNumber-1], pep[cutNumber], sequence.GetComposition(0, cutNumber), cutScore);
                                     //var cutNodeScore = imsScorer.GetCutNodeScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
                                     //var cutRatioScore = imsScorer.GetCutRatioScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
                                     //var cutLCScore = imsScorer.GetCutLCScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);

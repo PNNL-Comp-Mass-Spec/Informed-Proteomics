@@ -192,7 +192,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     int nodeIndex = entry.Key;
                     var curNode = _graph[seqIndex][nodeIndex];
                     var composition = GetComposition(seqIndex, nodeIndex);
-                    var scoringGraphNode = new ScoringGraphNode(composition, nodeIndex);
+                    var scoringGraphNode = new ScoringGraphNode(composition, seqIndex);
                     scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
 
                     foreach (var prevNodeIndex in curNode.GetPrevIndices())

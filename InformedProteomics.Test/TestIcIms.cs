@@ -19,7 +19,6 @@ namespace InformedProteomics.Test
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             var imsData = new ImsDataCached(uimfFilePath);
 
-            // TODO: this design is bad
             const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsScorerFactory = new ImsScorerFactory(paramFile);
 
@@ -39,7 +38,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine("Charge: " + precursorCharge);
                 Console.WriteLine("Feature: " + best.Item1);
                 Console.WriteLine("Score: " + best.Item2);
-
             }
         }
 
@@ -53,7 +51,7 @@ namespace InformedProteomics.Test
             //int numPrecursorFeatures = imsData.CreatePrecursorFeatures();
             //Console.WriteLine("TotalNumPrecursorFeatures: " + numPrecursorFeatures);            
 
-            const string targetPeptide = "CCHGDLLECADDRADLAK";//EYANQFMWEYSTNYGQAPLSLLVSYTK CCAADDKEACFAVEGPK
+            const string targetPeptide = "CCAADDKEACFAVEGPK";//EYANQFMWEYSTNYGQAPLSLLVSYTK  CCHGDLLECADDRADLAK
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             var precursorComposition = aaSet.GetComposition(targetPeptide);
             for (int charge = 3; charge <= 3; charge++)
@@ -77,7 +75,7 @@ namespace InformedProteomics.Test
             //int numFragmentFeatures = imsData.CreateFragmentFeatures();
             //Console.WriteLine("TotalNumFragmentFeatures: " + numFragmentFeatures);
 
-            const string targetFragment = "YGQAPLSLLVSYTK";//"AADDKEACFAVEGPK";
+            const string targetFragment = "AADDKEACFAVEGPK"; //"YGQAPLSLLVSYTK";
             var fragmentComposition = aaSet.GetComposition(targetFragment);
                 for (int charge = 2; charge <= 2; charge++)
             {
