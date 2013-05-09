@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         private readonly SubScoreFactory _scoringParams;
         public PrecursorFeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter, SubScoreFactory scoringParams)
-            : base(isotopomerFeatures, parameter)
+            : base(isotopomerFeatures, null, parameter)
         {
             _scoringParams = scoringParams;
             Score = GetScore();
@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.IMSScoring
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
             var lcScore = 0.0;
             var imsScore = 0.0;
-            if (Feature != null)
+            if (LcCorrelation >= 0)
             {
                 lcScore = _scoringParams.GetIsotopeLcCorrelationScore(LcCorrelation, GroupParameter);
                 imsScore = _scoringParams.GetIsotopeImsCorrelationScore(ImsCorrelation, GroupParameter);

@@ -11,8 +11,10 @@ namespace InformedProteomics.Backend.IMSScoring
         public int LocationIndex { get; private set; }
         public int FlankingResidueIndex { get; private set; }
         public int Charge { get; private set; }
+        
         private const int MaxCharge = 3;
         private const int MinCharge = 2;
+        private static Dictionary<Tuple<char, char>, int> flankingIndexDictionary = new Dictionary<Tuple<char, char>, int>(); 
 
         public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Ion precursorIon)
         {
@@ -122,8 +124,15 @@ namespace InformedProteomics.Backend.IMSScoring
         private static int GetFlankingResidueIndex(char nTermAA, char cTermAA)
         {
             if (nTermAA.Equals(' ')) return 16;
-            return ResidueTable[GetResidueIndex(nTermAA), GetResidueIndex(cTermAA)];
+            var key = new Tuple<char, char>(nTermAA, cTermAA);
+            if (flankingIndexDictionary.ContainsKey(key))
+                return flankingIndexDictionary[key];
+            var index = ResidueTable[GetResidueIndex(nTermAA), GetResidueIndex(cTermAA)];
+            flankingIndexDictionary[key] = index;
+            return index;
         }
+
+       
 
         static private readonly int[,] ResidueTable =
         {

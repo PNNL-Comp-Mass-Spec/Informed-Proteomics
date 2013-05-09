@@ -11,6 +11,7 @@ using InformedProteomics.Backend.IMSTraining;
 using InformedProteomics.Backend.Scoring;
 using NUnit.Framework;
 using UIMFLibrary;
+using Feature = InformedProteomics.Backend.IMS.Feature;
 using IonType = InformedProteomics.Backend.Data.Spectrometry.IonType;
 
 namespace InformedProteomics.Test
@@ -63,8 +64,11 @@ namespace InformedProteomics.Test
             //const string fasta = @"..\..\..\TestFiles\CCAADDKEACFAVEGPK.fasta";
             var targetDist = new int[1000];
             var decoyDist = new int[1000];
-            var targetScores = new Dictionary<double, List<string>>();
-            var decoyScores = new Dictionary<double, List<string>>();
+
+            var highestScorePerFeature = new Dictionary<Feature, Tuple<double, bool>>();
+
+            var targetTxt = @"..\..\..\TestFiles\BSA_ST.txt";
+            var decoyTxt = @"..\..\..\TestFiles\BSA_ST_Rev.txt";
 
             for (var q = 0; q < 2; q++)
             {
@@ -72,21 +76,23 @@ namespace InformedProteomics.Test
                 var num = 0;
                 var pepIndex = 0;
                 if (q != 0) dist = decoyDist;
-                foreach (var targetPeptide in Misc.GetPeptidesFromFasta(fasta, true, 2, q != 0))
+                foreach (var targetPeptide in  Misc.GetPeptidesFromTxt(q==0? targetTxt : decoyTxt))//Misc.GetPeptidesFromFasta(fasta, false, 2, q != 0))
                     // stupid function made by kyowon.
                 {
-                    Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);
+                    //Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);
                     var pep = targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
-                    //if (pep.Length < 5) continue;
+                    
                     var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
                     var precursorComposition = aaSet.GetComposition(pep);
                     var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
                     var maxScore = double.NegativeInfinity;
-                    for (var charge = 2; charge <= 3; charge++)
+                    var maxPortionOfExplainedFrag = 0.0;
+
+                    Feature maxFeature = null;
+                    for (var charge = 1; charge <= 5; charge++)
                     {
                         var precursorIon = new Ion(precursorComposition + Composition.H2O, charge);
                         var imsScorer = imsScorerFactory.GetImsScorer(imsData, precursorIon);
-
                         for (var i = 0; i <= 0; i++)
                         {
                             var precursorMz = precursorIon.GetIsotopeMz(i + precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex());
@@ -95,68 +101,83 @@ namespace InformedProteomics.Test
                             //Console.WriteLine("Precursor: {0}, Charge: {1}\n", precursorMz, charge + "\t" + precursorComposition);
                             foreach (var precursorFeature in precursorFeatures)
                             {
-                                //Console.WriteLine("Precursor Feature: " + precursorFeature + "\n");
+                              //  Console.WriteLine("Precursor Feature: " + precursorFeature + "\n");
                                 var score = imsScorer.GetPrecursorScore(precursorFeature);
-                                //Console.WriteLine("Feature: " + precursorFeature);
-                                //Console.WriteLine("Precursor score: " + score);
+                             //   Console.WriteLine("Feature: " + precursorFeature);
+                               // Console.WriteLine("Precursor score: " + score);
+                               // if (score < -0.5) continue; 
+                                var portionExplainedFrags = 0.0;
                                 for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
                                 {
+                                    //Console.WriteLine("Cut " + cutNumber);
                                     var cutScore = imsScorer.GetCutScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
                                     //Console.WriteLine("{0} {1} {2} {3}", pep[cutNumber-1], pep[cutNumber], sequence.GetComposition(0, cutNumber), cutScore);
-                                    //var cutNodeScore = imsScorer.GetCutNodeScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                    //var cutRatioScore = imsScorer.GetCutRatioScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                    //var cutLCScore = imsScorer.GetCutLCScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                    //var cutIMSScore = imsScorer.GetCutIMSScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                    //Console.WriteLine(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLCScore + "\t" + cutIMSScore + "\t" +  cutScore);
+                                  //  var cutNodeScore = imsScorer.GetCutNodeScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                  //  var cutRatioScore = imsScorer.GetCutRatioScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   // var cutLCScore = imsScorer.GetCutLcScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   // var cutIMSScore = imsScorer.GetCutImsScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   // Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLCScore + "\t" + cutIMSScore + "\t" +  cutScore);
+                                    //Console.Write(cutNumber + "\t" + cutScore + "\t");
+                                    //foreach(var ion in imsScorer.supportingIonTypes) Console.Write("\t" + ion.Name+", ");
+                                    //Console.WriteLine();
                                     score += cutScore;
+                                    portionExplainedFrags += imsScorer.supportingIonTypes.Count == 0 ? 0 : 1;
                                 }
-                                maxScore = Math.Max(maxScore, score);
-                                //Console.WriteLine("Score = " + score + "\n");
+                                if (maxScore < score)
+                                {
+                                    maxScore = score;
+                                    maxFeature = precursorFeature;
+                                    maxPortionOfExplainedFrag = portionExplainedFrags/sequence.Count;
+                                }
+                                //Console.WriteLine(i + " Score = " + score + "\n");
+                                //break;
                             }
                         }
                     }
-                    if (q == 0)
+
+                    if (maxFeature != null)
                     {
-                        if(!targetScores.ContainsKey(maxScore)) targetScores[maxScore] = new List<string>();
-                        targetScores[maxScore].Add(pep);
+                        if (!highestScorePerFeature.ContainsKey(maxFeature))
+                            highestScorePerFeature[maxFeature] = new Tuple<double, bool>(maxScore, q == 0);
+                        else
+                        {
+                            var prevScore = highestScorePerFeature[maxFeature].Item1;
+                            if(maxScore > prevScore)
+                                highestScorePerFeature[maxFeature] = new Tuple<double, bool>(maxScore, q == 0);
+                        }
                     }
-                    else
-                    {
-                        if (!decoyScores.ContainsKey(maxScore)) decoyScores[maxScore] = new List<string>();
-                        decoyScores[maxScore].Add(pep);
-                    }
+
+                   
                     if (maxScore > 0)
                     {
-                        Console.WriteLine((q==0? "T" : "D") + " " + num++ + " Max Score of this peptide " + pep + " is " + maxScore);
+                        Console.WriteLine((q == 0 ? "T" : "D") + " " + num++ + " Max Score of the peptide " + pep + " is " + maxScore + " Portion of expalined fragmentation is " + maxPortionOfExplainedFrag);
+                        Console.WriteLine("Corresponding max feature is " + maxFeature);
                     }
-                    //break;
+                   // break;
                     var scoreIndex = (int)Math.Min(targetDist.Length - 1, Math.Max(0, maxScore + 50));
                     dist[scoreIndex] = dist[scoreIndex] + 1;
 
                 }
             }
 
-            var decoyScoreList = decoyScores.Keys.ToList();
 
-            Console.WriteLine();
-            decoyScoreList.Sort();
-            var threshold = decoyScoreList[decoyScores.Count - 1];
-            var numTarget = 0;
-            foreach (var score in targetScores.Keys)
+            var threshold = double.NegativeInfinity;
+
+            foreach (var score in highestScorePerFeature.Values)
             {
-                if (score > threshold)
-                {
-                    foreach (var peptide in targetScores[score])
-                    {
-                        Console.WriteLine(peptide);
-                    }
-                    numTarget+=targetScores[score].Count;
-                }
+                if (score.Item2) continue;
+                threshold = Math.Max(threshold, score.Item1);
             }
+            var numTarget = 0;
+            foreach (var score in highestScorePerFeature.Values)
+            {
+                if (!score.Item2) continue;
+                if (score.Item1 > threshold) numTarget++;
+            }
+            
+
             Console.WriteLine("Threshold is "+threshold + "\nNumber of target is "+numTarget);
 
-
-           
             var twriter = new StreamWriter(@"..\..\..\TestFiles\target.m");
             var dwriter = new StreamWriter(@"..\..\..\TestFiles\decoy.m");
             

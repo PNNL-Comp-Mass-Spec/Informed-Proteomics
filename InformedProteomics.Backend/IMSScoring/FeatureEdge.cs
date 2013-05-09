@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.IMSScoring
+﻿using System;
+
+namespace InformedProteomics.Backend.IMSScoring
 {
     public class FeatureEdge
     {
@@ -52,7 +54,7 @@
             {
                 RatioScore = _scoringParams.GetRatioScore(r.FragmentIonClassBase, _ratio, r.GroupParameter);
                 //Console.WriteLine("Prec : " + r.FragmentIonClassBase.Name +"\t" + _ratio + "\t" + RatioScore + "\t" + r.Feature);
-                if (r.Feature != null)
+                if (_lcCorrelation>=0)
                 {
                     LcScore = _scoringParams.GetLcCorrelationScore(r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
                     ImsScore = _scoringParams.GetImsCorrelationScore(r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);
@@ -64,7 +66,7 @@
             {
                 var l = (FragmentFeatureNode) LNode;
                 RatioScore = _scoringParams.GetRatioScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, r.GroupParameter);
-                if (r.Feature != null)
+                if (_lcCorrelation >= 0)
                 {
                     LcScore = _scoringParams.GetLcCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter);
                     ImsScore = _scoringParams.GetImsCorrelationScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);

@@ -1,5 +1,6 @@
 ﻿using System;
-using InformedProteomics.Backend.IMS;
+using InformedProteomics.Backend.Data.Spectrometry;
+using Feature = InformedProteomics.Backend.IMS.Feature;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
@@ -10,12 +11,14 @@ namespace InformedProteomics.Backend.IMSScoring
         public GroupParameter GroupParameter { get; private set; }
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
         public Feature Feature { get; private set; }
+        public IonType FragmentIonClassBase { get; private set; }
         internal double Score { get; set; }
         internal double IsotopeCorrelation, LcCorrelation, ImsCorrelation;
         
-        protected FeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter groupParameter)
+        protected FeatureNode(IsotopomerFeatures isotopomerFeatures, IonType ionType, GroupParameter groupParameter)
         {
             IsotopomerFeatures = isotopomerFeatures;
+            FragmentIonClassBase = ionType;
             //Feature = IsotopomerFeatures.GetMostAbundantFeature();
             Feature = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(0);
             GroupParameter = groupParameter;
@@ -34,6 +37,7 @@ namespace InformedProteomics.Backend.IMSScoring
             LcCorrelation = StatisticsTools.GetLcCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             ImsCorrelation = StatisticsTools.GetImsCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             IsotopeCorrelation = StatisticsTools.GetIsotopeCorrelation(f, i);
+            //Console.WriteLine(this + " Node " + LcCorrelation + " "+ ImsCorrelation + " " + IsotopeCorrelation);
         }
 
         internal abstract double GetScore();

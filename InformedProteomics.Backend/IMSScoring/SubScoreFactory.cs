@@ -11,6 +11,7 @@ namespace InformedProteomics.Backend.IMSScoring
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
         private const double LowScore = -3; // TODO how to??
+        //TODO : ims, lc corr score should be dependent on ratio scores..
 
         private readonly Dictionary<GroupParameter, List<IonType>> _ionTypeDictionary;
 
@@ -204,14 +205,14 @@ namespace InformedProteomics.Backend.IMSScoring
         internal double GetLcCorrelationScore(IonType ionType1, IonType ionType2, double lcCorr, GroupParameter parameter)
         {
             if (_lcCorrScoreDictionary.Count == 0)
-                return lcCorr*(-2*LowScore) + LowScore;
+                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_lcCorrScoreDictionary, ionType1, ionType2, CorrToInt(lcCorr), parameter);
         }
 
         internal double GetImsCorrelationScore(IonType ionType1, IonType ionType2, double imsCorr, GroupParameter parameter)
         {
             if (_imsCorrScoreDictionary.Count == 0)
-                return imsCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(imsCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_imsCorrScoreDictionary, ionType1, ionType2, CorrToInt(imsCorr), parameter);
         }
 
@@ -233,42 +234,42 @@ namespace InformedProteomics.Backend.IMSScoring
         internal double GetIsotopeIntensityCorrelationScore(IonType ionType, double isotopeCorr, GroupParameter groupParameter)
         {
             if (_isotopeIntensityCorrScoreDictionary.Count == 0)
-                return isotopeCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(isotopeCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_isotopeIntensityCorrScoreDictionary, _ionTypeDictionary[groupParameter].IndexOf(ionType), CorrToInt(isotopeCorr), groupParameter);
         }
 
         internal double GetIsotopeLcCorrelationScore(IonType ionType, double lcCorr, GroupParameter parameter)
         {
             if (_isotopeLcCorrScoreDictionary.Count == 0)
-                return lcCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_isotopeLcCorrScoreDictionary, _ionTypeDictionary[parameter].IndexOf(ionType), CorrToInt(lcCorr), parameter);
         }
 
         internal double GetIsotopeImsCorrelationScore(IonType ionType, double imsCorr, GroupParameter groupParameter)
         {
             if (_isotopeImsCorrScoreDictionary.Count == 0)
-                return imsCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(imsCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_isotopeImsCorrScoreDictionary, _ionTypeDictionary[groupParameter].IndexOf(ionType), CorrToInt(imsCorr), groupParameter);
         }
 
         internal double GetIsotopeIntensityCorrelationScore(double isotopeCorr, GroupParameter groupParameter)
         {
             if (_precursorIsotopeIntensityCorrScoreDictionary.Count == 0)
-                return isotopeCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(isotopeCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_precursorIsotopeIntensityCorrScoreDictionary, CorrToInt(isotopeCorr), groupParameter);
         }
 
         internal double GetIsotopeLcCorrelationScore(double lcCorr, GroupParameter parameter)
         {
             if (_precursorIsotopeLcCorrScoreDictionary.Count == 0)
-                return lcCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_precursorIsotopeLcCorrScoreDictionary, CorrToInt(lcCorr), parameter);
         }
 
         internal double GetIsotopeImsCorrelationScore(double imsCorr, GroupParameter parameter)
         {
             if (_precursorIsotopeImsCorrScoreDictionary.Count == 0)
-                return imsCorr * (-2 * LowScore) + LowScore;
+                return CorrToInt(imsCorr)/5.0 * (-2 * LowScore) + LowScore;
             return GetScoreFromDictionary(_precursorIsotopeImsCorrScoreDictionary, CorrToInt(imsCorr), parameter);
         }
 
@@ -305,7 +306,7 @@ namespace InformedProteomics.Backend.IMSScoring
             return prob1*Math.Log(prob1/prob2) + (1 - prob1)*Math.Log((1 - prob1)/(1 - prob2));
         }
 
-        public static int CorrToInt(double corr)
+        public static int CorrToInt(double corr) // the higher the better from 1 to 5
         {
             var m = 1.0;
             var score = 0;

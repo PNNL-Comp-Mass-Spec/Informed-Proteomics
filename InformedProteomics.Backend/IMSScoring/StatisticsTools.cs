@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         static public double GetLcCorrelation(Feature l, Feature r)
         {
-            if (l == null || r == null) return 0.0;
+            if (l == null || r == null) return -1;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
             var llc = GetTruncatedLc(l, intersection);
             var rlc = GetTruncatedLc(r, intersection);
@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
         static public double GetImsCorrelation(Feature l, Feature r)
         {
-            if (l == null || r == null) return 0.0;
+            if (l == null || r == null) return -1;
             var intersection = Rectangle.Intersect(l.GetBoundary(), r.GetBoundary());
             var lims = GetTruncatedIms(l, intersection);
             var rims = GetTruncatedIms(r, intersection);

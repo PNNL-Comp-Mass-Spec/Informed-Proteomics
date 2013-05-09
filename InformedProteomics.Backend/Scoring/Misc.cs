@@ -6,6 +6,24 @@ namespace InformedProteomics.Backend.Scoring
 {
     public class Misc
     {
+        public static List<string> GetPeptidesFromTxt(string fileName)
+        {
+            var peptides = new List<string>();
+
+            var stremaReader = new StreamReader(fileName);
+            string s;
+
+            while ((s = stremaReader.ReadLine()) != null)
+            {
+                s = s.Replace("C!", "C");
+                s = s.Substring(s.IndexOf('.') + 1, s.LastIndexOf('.') - s.IndexOf('.') - 1);
+                peptides.Add(s);
+            }
+
+            stremaReader.Close();
+            return peptides;
+        } 
+
 
         public static IEnumerable<string> GetPeptidesFromProtein(string protein, bool fullyTryptic,
                                                               int missedCleavageNumber)
@@ -65,20 +83,20 @@ namespace InformedProteomics.Backend.Scoring
                         {
                             var revProtein = "";
 
-                            var list = new List<char>();
+                            /*var list = new List<char>();
                             foreach (var aa in protein)
                             {
                                 list.Add(aa);
                             }
                             Shuffle(list);
-
-                            //for (var i = 0; i < protein.Length; i++)
-                            //{
-                             //   revProtein += protein[protein.Length-i-1];
-                            //}
                             foreach (var aa in list)
                                 revProtein += aa;
-
+                            */
+                            for (var i = 0; i < protein.Length; i++)
+                            {
+                                revProtein += protein[protein.Length-i-1];
+                            }
+                            
                             protein = revProtein;
                         }
                         proteins.Add(protein);

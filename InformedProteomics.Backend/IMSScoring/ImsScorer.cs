@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMS;
 using Feature = InformedProteomics.Backend.IMS.Feature;
 
@@ -16,6 +18,7 @@ namespace InformedProteomics.Backend.IMSScoring
         private readonly SubScoreFactory _scoringParams;
         private Feature _previousPrecursorFeature; // only for speed-up
         public PrecursorFeatureNode PrecursorFeatureNode { get; private set; }
+        public List<IonType> supportingIonTypes;
 
         internal ImsScorer(ImsDataCached imsData, Ion precursorIon, SubScoreFactory scoringParams) // precursorComposition does not have protons; however, protons are incorporated when calculating mz
         {
@@ -50,7 +53,10 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             UpdatePrecursorFeatureNode(precursorFeature);
             var parameter = new GroupParameter(cutComposition, nTermAA, cTermAA, _precursorIon);
-            return new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon, cutComposition, parameter, _scoringParams).Score;
+            var graph = new FragmentFeatureGraph(_imsData, PrecursorFeatureNode, precursorFeature, _precursorIon,
+                                                 cutComposition, parameter, _scoringParams);
+            supportingIonTypes = graph.supportingIonTypes;
+            return graph.Score;
         }
 
         public double GetCutNodeScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)//for debug
