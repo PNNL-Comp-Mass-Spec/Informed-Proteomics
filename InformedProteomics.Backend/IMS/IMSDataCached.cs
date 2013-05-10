@@ -160,6 +160,11 @@ namespace InformedProteomics.Backend.IMS
                 }
             }
 
+            //if (precursorFeature.ScanLcStart == 225 && bestFeature != null)
+            //{
+            //    System.Console.WriteLine("**** Mz: {0}\t Feature: {1}", mz, bestFeature);
+            //}
+
             return bestFeature;
         }
     }

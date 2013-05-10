@@ -70,6 +70,9 @@ namespace InformedProteomics.Test
             var targetTxt = @"..\..\..\TestFiles\BSA_ST.txt";
             var decoyTxt = @"..\..\..\TestFiles\BSA_ST_Rev.txt";
 
+            var targetMatches = new List<Tuple<double, string, Feature>>(); // score, peptide, feature
+            var decoyMatches = new List<Tuple<double, string, Feature>>(); // score, peptide, feature
+
             for (var q = 0; q < 2; q++)
             {
                 var dist = targetDist;
@@ -81,7 +84,6 @@ namespace InformedProteomics.Test
                 {
                     //Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);
                     var pep = targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
-                    
                     var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
                     var precursorComposition = aaSet.GetComposition(pep);
                     var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
@@ -152,6 +154,14 @@ namespace InformedProteomics.Test
                     {
                         Console.WriteLine((q == 0 ? "T" : "D") + " " + num++ + " Max Score of the peptide " + pep + " is " + maxScore + " Portion of expalined fragmentation is " + maxPortionOfExplainedFrag);
                         Console.WriteLine("Corresponding max feature is " + maxFeature);
+                        if (q == 0)
+                        {
+                            targetMatches.Add(new Tuple<double, string, Feature>(maxScore, pep, maxFeature));
+                        }
+                        else
+                        {
+                            decoyMatches.Add(new Tuple<double, string, Feature>(maxScore, pep, maxFeature));
+                        }
                     }
                    // break;
                     var scoreIndex = (int)Math.Min(targetDist.Length - 1, Math.Max(0, maxScore + 50));
@@ -168,13 +178,36 @@ namespace InformedProteomics.Test
                 if (score.Item2) continue;
                 threshold = Math.Max(threshold, score.Item1);
             }
+
             var numTarget = 0;
             foreach (var score in highestScorePerFeature.Values)
             {
                 if (!score.Item2) continue;
-                if (score.Item1 > threshold) numTarget++;
+                if (score.Item1 > threshold)
+                {
+                    numTarget++;
+                }
             }
-            
+
+            // Print out target matches
+            Console.WriteLine("Target matches");
+            foreach (var match in targetMatches)
+            {
+                if (match.Item1 > threshold)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}", match.Item1, match.Item2, match.Item3);
+                }
+            }
+            // Print out target matches
+            Console.WriteLine("Decoy matches");
+            foreach (var match in decoyMatches)
+            {
+                if (match.Item1 > threshold)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}", match.Item1, match.Item2, match.Item3);
+                }
+            }
+
 
             Console.WriteLine("Threshold is "+threshold + "\nNumber of target is "+numTarget);
 

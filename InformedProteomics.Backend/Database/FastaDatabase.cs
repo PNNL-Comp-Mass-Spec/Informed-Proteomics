@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.Database
 
         private bool CheckHashCode(string filePath)
         {
-            using (FileStream fs = File.OpenRead(filePath))
+            using (var fs = File.OpenRead(filePath))
             {
                 fs.Seek(-sizeof(int), SeekOrigin.End);
 

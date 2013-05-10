@@ -14,6 +14,16 @@ namespace InformedProteomics.Test
     internal class TestIcIms
     {
         [Test]
+        public void TestDbSearch()
+        {
+            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
+            var imsScorerFactory = new ImsScorerFactory(paramFile);
+        }
+
+        [Test]
         public void TestImsScoring()
         {
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
@@ -22,7 +32,8 @@ namespace InformedProteomics.Test
             const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsScorerFactory = new ImsScorerFactory(paramFile);
 
-            const string targetPeptide = "CCAADDKEACFAVEGPK";
+            //const string targetPeptide = "CCAADDKEACFAVEGPK";
+            const string targetPeptide = "ECCHGDLLECADDRADLAK";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             var seqGraph = new SequenceGraph(aaSet, targetPeptide);
@@ -32,12 +43,14 @@ namespace InformedProteomics.Test
             //    Console.WriteLine(composition);
             //}
             scoringGraph.RegisterImsData(imsData, imsScorerFactory);
-            for (var precursorCharge = 1; precursorCharge <= 4; precursorCharge++)
+            for (var precursorCharge = 3; precursorCharge <= 4; precursorCharge++)
             {
                 var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
+                Console.WriteLine("PrecursorMz: " + scoringGraph.GetPrecursorIon(precursorCharge).GetMz());
                 Console.WriteLine("Charge: " + precursorCharge);
                 Console.WriteLine("Feature: " + best.Item1);
                 Console.WriteLine("Score: " + best.Item2);
+                Console.WriteLine();
             }
         }
 

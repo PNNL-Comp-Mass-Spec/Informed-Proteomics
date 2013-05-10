@@ -10,10 +10,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSuffixArrayGeneration()
         {
-            const string dbFile = @"..\..\..\TestFiles\Shewanella.fasta";
-            //const string dbFile = @"..\..\..\TestFiles\BSA.fasta";
             //const string dbFile = @"C:\cygwin\home\kims336\Research\SuffixArray\uniprot_sprot_bacterial_ALLEntries_fungal_decoy_2009-05-28.fasta";
             //const string dbFile = @"D:\Research\Data\CompRef\H_sapiens_M_musculus_Trypsin_NCBI_Build37_2011-12-02.fasta";
+            const string dbFile = @"..\..\..\TestFiles\BSA.fasta";
             var fileStream = new FileStream(dbFile, FileMode.Open, FileAccess.Read);
             var text = new byte[fileStream.Length];
             var suffixArray = new int[fileStream.Length];

@@ -88,6 +88,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var precursorFeature in precursorFeatureSet)
             {
                 var precursorScore = imsScorer.GetPrecursorScore(precursorFeature);
+                //if (precursorFeature.ScanLcStart == 225)
+                //{
+                //    Console.WriteLine("{0} {1}", precursorFeature, precursorScore);
+                //}
+
                 var productScore = GetProductIonScore(imsScorer, precursorFeature);
                 var curFeatureScore = precursorScore + productScore;
                 if (curFeatureScore > bestScore)
@@ -98,6 +103,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             return new Tuple<Feature, double>(bestFeature, bestScore);
+        }
+
+        public Ion GetPrecursorIon(int charge)
+        {
+            return new Ion(_sequenceComposition+Composition.H2O, charge);
         }
 
         public IEnumerable<Composition> GetCompositions()
