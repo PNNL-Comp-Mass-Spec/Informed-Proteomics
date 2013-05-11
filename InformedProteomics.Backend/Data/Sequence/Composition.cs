@@ -186,39 +186,40 @@ namespace InformedProteomics.Backend.Data.Sequence
             return GetApproximatedIsotopomerEnvelop(10);
         }
 
-        private float GetIsotopeProbability(int[] number)
+        private float GetIsotopeProbability(int[] number, double[] means, double[] exps)
         {
             var prob = 1.0f;
-            for (var i = 1; i <= number.Length; i++)
+            for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)
             {
-                var mean = _c * (i >= ProbC.Length ? 0 : ProbC[i]) + _h * (i >= ProbH.Length ? 0 : ProbH[i]) +
-                           _n * (i >= ProbN.Length ? 0 : ProbN[i]) + _o * (i >= ProbO.Length ? 0 : ProbO[i]) + _s * (i >= ProbS.Length ? 0 : ProbS[i]);
-                var exp = Math.Exp(-mean);
-                prob *= (float)(Math.Pow(mean, number[i - 1]) * exp / MathNet.Numerics.SpecialFunctions.Factorial(number[i - 1]));
+                var mean = means[i];
+                var exp = exps[i];
+                if (number[i - 1] == 0) prob *= (float)exp;
+                else prob *= (float)(Math.Pow(mean, number[i - 1]) * exp / MathNet.Numerics.SpecialFunctions.Factorial(number[i - 1]));
             }
             return prob;
         }
 
-        private static readonly int[][][] PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
-
-        private static int[][][] GetPossibleIsotopeCombinations(int max)
+        private static int[][][] GetPossibleIsotopeCombinations(int max) // called just once. 
         {
-            var comb = new HashSet<Tuple<int, int, int, int>>[max + 1];
-            comb[0] = new HashSet<Tuple<int, int, int, int>> { new Tuple<int, int, int, int>(0, 0, 0, 0) };
+            var comb = new List<int[]>[max + 1];
+            var maxIsotopeNumberInElement = ProbC.Length - 1;
+            comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };
 
             for (var n = 1; n <= max; n++)
             {
-                comb[n] = new HashSet<Tuple<int, int, int, int>>();
-                for (var j = 1; j <= 4; j++)
+                comb[n] = new List<int[]>();
+                for (var j = 1; j <=maxIsotopeNumberInElement; j++)
                 {
                     var index = n - j;
                     if (index < 0) continue;
                     foreach (var t in comb[index])
                     {
-                        var add = new int[4];
+                        var add = new int[maxIsotopeNumberInElement];
                         add[j - 1]++;
-                        var newT = new Tuple<int, int, int, int>(t.Item1 + add[0], t.Item2 + add[1], t.Item3 + add[2], t.Item4 + add[3]);
-                        comb[n].Add(newT);
+                        for (var k = 0; k < t.Length; k++)
+                            add[k] += t[k];
+                        var toAdd = comb[n].Select(v => !v.Where((t1, p) => t1 != add[p]).Any()).All(equal => !equal);
+                        if(toAdd) comb[n].Add(add);
                     }
                 }
             }
@@ -229,8 +230,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var j = 0;
                 foreach (var t in comb[i])
                 {
-                    //Console.WriteLine(i + "\t" + t.Item1 + " " + t.Item2 + " " + t.Item3 + " " + t.Item4);
-                    possibleIsotopeCombinations[i][j++] = new[] { t.Item1, t.Item2, t.Item3, t.Item4 };
+                    possibleIsotopeCombinations[i][j++] = t;
                 }
             }
             return possibleIsotopeCombinations;
@@ -238,17 +238,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public float[] GetApproximatedIsotopomerEnvelop()
         {
-            return GetApproximatedIsotopomerEnvelop(10);
+            return GetApproximatedIsotopomerEnvelop(6);
         }
 
         public float[] GetApproximatedIsotopomerEnvelop(int maxIsotope)
         {
             var dist = new float[Math.Min(maxIsotope, PossibleIsotopeCombinations.Length)];
+            var means = new double[PossibleIsotopeCombinations[0][0].Length + 1];
+            var exps = new double[means.Length];
+            for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
+            {
+                means[i] = _c * ProbC[i] + _h * ProbH[i] + _n * ProbN[i] + _o * ProbO[i] + _s * ProbS[i];
+                exps[i] = Math.Exp(means[i]);
+            }
             for (var i = 0; i < dist.Length; i++)
             {
                 foreach (var isopeCombinations in PossibleIsotopeCombinations[i])
                 {
-                    dist[i] += GetIsotopeProbability(isopeCombinations);
+                    dist[i] += GetIsotopeProbability(isopeCombinations, means, exps);
                 }
             }
             var max = dist.Concat(new float[] { 0 }).Max();
@@ -266,11 +273,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             var max = 0.0f;
             for (var i = 0; i < isotopeEnvelope.Length; i++)
             {
-                if (max < isotopeEnvelope[i])
-                {
-                    max = isotopeEnvelope[i];
-                    index = i;
-                }
+                if (!(max < isotopeEnvelope[i])) continue;
+                max = isotopeEnvelope[i];
+                index = i;
+                if (max >= 1) break;
             }
             return index;
         }
@@ -387,13 +393,18 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #endregion
 
-        #region Isotope probabilities of Atoms // added by kyowon
+        #region Isotope probabilities of Atoms // added by kyowon - the numbers of elements should be the same. Now it is 4.
 
-        private static readonly double[] ProbC = new[] { .9893, 0.0107 };
-        private static readonly double[] ProbH = new[] { .999885, .000115 };
-        private static readonly double[] ProbN = new[] { 0.99632, 0.00368 };
-        private static readonly double[] ProbO = new[] { 0.99757, 0.00038, 0.00205 };
+        private static readonly double[] ProbC = new[] { .9893, 0.0107, 0, 0 };
+        private static readonly double[] ProbH = new[] { .999885, .000115, 0, 0 };
+        private static readonly double[] ProbN = new[] { 0.99632, 0.00368, 0, 0};
+        private static readonly double[] ProbO = new[] { 0.99757, 0.00038, 0.00205, 0};
         private static readonly double[] ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
+        #endregion
+
+        #region Possible combinations of isotopes // added by kyowon
+
+        private static readonly int[][][] PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
 
         #endregion
     }
