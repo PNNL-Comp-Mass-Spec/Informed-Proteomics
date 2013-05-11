@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     public class Composition : IMolecule
     {
         public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
-		public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
+        public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
         public static readonly Composition NH3 = new Composition(0, 3, 1, 0, 0);
         public static readonly Composition NH2 = new Composition(0, 2, 1, 0, 0);
         public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
@@ -30,9 +30,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             : this(c, h, n, o, s, new Tuple<Atom, short>(AtomP, (short)p))
         {
         }
-        
-        public Composition(Composition composition): this(composition.C, composition.H, 
-            composition.N, composition.O, composition.S)
+
+        public Composition(Composition composition)
+            : this(composition.C, composition.H,
+                composition.N, composition.O, composition.S)
         {
             if (composition._additionalElements != null)
             {
@@ -43,7 +44,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public Composition(int c, int h, int n, int o, int s, Tuple<Atom, short> additionalElement)
             : this(c, h, n, o, s)
         {
-            _additionalElements = new Dictionary<Atom, short> {{additionalElement.Item1, additionalElement.Item2}};
+            _additionalElements = new Dictionary<Atom, short> { { additionalElement.Item1, additionalElement.Item2 } };
         }
 
         public Composition(int c, int h, int n, int o, int s, IEnumerable<Tuple<Atom, short>> additionalElements)
@@ -108,9 +109,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         public double GetMass()
         {
-            double mass = _c*MassC + _h*MassH + _n*MassN + _o*MassO + _s*MassS;
+            double mass = _c * MassC + _h * MassH + _n * MassN + _o * MassO + _s * MassS;
             if (_additionalElements != null)
-                mass += _additionalElements.Sum(entry => entry.Key.Mass*entry.Value);
+                mass += _additionalElements.Sum(entry => entry.Key.Mass * entry.Value);
             return mass;
         }
 
@@ -129,7 +130,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         public int GetNominalMass()
         {
-            int nominalMass = _c*NominalMassC + _h*NominalMassH + _n*NominalMassN + _o*NominalMassO + _s*NominalMassS;
+            int nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS;
             if (_additionalElements != null)
                 nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
             return nominalMass;
@@ -182,21 +183,75 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public float[] GetIsotopomerEnvelop()
         {
-            return GetApproximatedIsotopomerEnvelop();
+            return GetApproximatedIsotopomerEnvelop(10);
+        }
+
+        private float GetIsotopeProbability(int[] number)
+        {
+            var prob = 1.0f;
+            for (var i = 1; i <= number.Length; i++)
+            {
+                var mean = _c * (i >= ProbC.Length ? 0 : ProbC[i]) + _h * (i >= ProbH.Length ? 0 : ProbH[i]) +
+                           _n * (i >= ProbN.Length ? 0 : ProbN[i]) + _o * (i >= ProbO.Length ? 0 : ProbO[i]) + _s * (i >= ProbS.Length ? 0 : ProbS[i]);
+                var exp = Math.Exp(-mean);
+                prob *= (float)(Math.Pow(mean, number[i - 1]) * exp / MathNet.Numerics.SpecialFunctions.Factorial(number[i - 1]));
+            }
+            return prob;
+        }
+
+        private static readonly int[][][] PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
+
+        private static int[][][] GetPossibleIsotopeCombinations(int max)
+        {
+            var comb = new HashSet<Tuple<int, int, int, int>>[max + 1];
+            comb[0] = new HashSet<Tuple<int, int, int, int>> { new Tuple<int, int, int, int>(0, 0, 0, 0) };
+
+            for (var n = 1; n <= max; n++)
+            {
+                comb[n] = new HashSet<Tuple<int, int, int, int>>();
+                for (var j = 1; j <= 4; j++)
+                {
+                    var index = n - j;
+                    if (index < 0) continue;
+                    foreach (var t in comb[index])
+                    {
+                        var add = new int[4];
+                        add[j - 1]++;
+                        var newT = new Tuple<int, int, int, int>(t.Item1 + add[0], t.Item2 + add[1], t.Item3 + add[2], t.Item4 + add[3]);
+                        comb[n].Add(newT);
+                    }
+                }
+            }
+            var possibleIsotopeCombinations = new int[max][][];
+            for (var i = 0; i < possibleIsotopeCombinations.Length; i++)
+            {
+                possibleIsotopeCombinations[i] = new int[comb[i].Count][];
+                var j = 0;
+                foreach (var t in comb[i])
+                {
+                    //Console.WriteLine(i + "\t" + t.Item1 + " " + t.Item2 + " " + t.Item3 + " " + t.Item4);
+                    possibleIsotopeCombinations[i][j++] = new[] { t.Item1, t.Item2, t.Item3, t.Item4 };
+                }
+            }
+            return possibleIsotopeCombinations;
         }
 
         public float[] GetApproximatedIsotopomerEnvelop()
         {
-            var mean = _c*(1 - ProbC12) + _h*(1 - ProbH1) + _n*(1 - ProbN14) + _o*(1 - ProbO16) + _s*(1 - ProbS32);
-          
-            var dist = new float[(int)mean + 5];
-            var exp = Math.Exp(-mean);
+            return GetApproximatedIsotopomerEnvelop(10);
+        }
+
+        public float[] GetApproximatedIsotopomerEnvelop(int maxIsotope)
+        {
+            var dist = new float[Math.Min(maxIsotope, PossibleIsotopeCombinations.Length)];
             for (var i = 0; i < dist.Length; i++)
             {
-                dist[i] = (float) (Math.Pow(mean, i)*exp/MathNet.Numerics.SpecialFunctions.Factorial(i));
-
+                foreach (var isopeCombinations in PossibleIsotopeCombinations[i])
+                {
+                    dist[i] += GetIsotopeProbability(isopeCombinations);
+                }
             }
-            var max = dist.Concat(new float[] {0}).Max();
+            var max = dist.Concat(new float[] { 0 }).Max();
             for (var i = 0; i < dist.Length; i++)
             {
                 dist[i] = dist[i] / max;
@@ -232,7 +287,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             int numO = c1._o + c2._o;
             int numS = c1._s + c2._s;
 
-            if(c1._additionalElements == null && c2._additionalElements == null)
+            if (c1._additionalElements == null && c2._additionalElements == null)
                 return new Composition(numC, numH, numN, numO, numS);
 
             Dictionary<Atom, short> additionalElements = null;
@@ -258,7 +313,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 additionalElements = new Dictionary<Atom, short>(c1._additionalElements);
             }
-            else if(c2._additionalElements != null)
+            else if (c2._additionalElements != null)
             {
                 additionalElements = new Dictionary<Atom, short>(c2._additionalElements);
             }
@@ -272,10 +327,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static Composition operator -(Composition c)
         {
-            if(c._additionalElements == null)
+            if (c._additionalElements == null)
                 return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s);
-            var additionalElements = 
-                c._additionalElements.ToDictionary(element => element.Key, element => (short) (-element.Value));
+            var additionalElements =
+                c._additionalElements.ToDictionary(element => element.Key, element => (short)(-element.Value));
             return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s, additionalElements);
         }
 
@@ -284,19 +339,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             return c1 + (-c2);
         }
 
-		public override string ToString()
-		{
-		    string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + ")";
-            if(_additionalElements == null)
+        public override string ToString()
+        {
+            string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + ")";
+            if (_additionalElements == null)
                 return basicCompositionStr;
 
             var buf = new StringBuilder(basicCompositionStr);
-		    foreach (var element in _additionalElements)
-		    {
-		        buf.Append(" " + element.Key.Code + "(" + element.Value + ")");
-		    }
-		    return buf.ToString();
-		}
+            foreach (var element in _additionalElements)
+            {
+                buf.Append(" " + element.Key.Code + "(" + element.Value + ")");
+            }
+            return buf.ToString();
+        }
 
         //added by kyowon, incomplete for additional Elementss
         public static Composition Parse(string s)
@@ -334,11 +389,11 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Isotope probabilities of Atoms // added by kyowon
 
-        private const double ProbC12 = .9890;
-        private const double ProbH1 = .99985;
-        private const double ProbN14 = .99636;
-        private const double ProbO16 = .99762;
-        private const double ProbS32 = .95029;
+        private static readonly double[] ProbC = new[] { .9893, 0.0107 };
+        private static readonly double[] ProbH = new[] { .999885, .000115 };
+        private static readonly double[] ProbN = new[] { 0.99632, 0.00368 };
+        private static readonly double[] ProbO = new[] { 0.99757, 0.00038, 0.00205 };
+        private static readonly double[] ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
 
         #endregion
     }

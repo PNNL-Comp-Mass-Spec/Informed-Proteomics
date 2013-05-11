@@ -183,5 +183,17 @@ namespace InformedProteomics.Test
 
             Console.Write(sb.ToString());
         }
+
+        [Test]
+        public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
+        {
+            //C78H120N22O28S3
+            var composition = new Composition(78, 120, 22, 28, 3);
+            var ff = composition.GetApproximatedIsotopomerEnvelop();
+            foreach (var ii in ff)
+            {
+                Console.WriteLine(ii);
+            }
+        }
 	}
 }
