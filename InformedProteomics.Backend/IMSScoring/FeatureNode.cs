@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.IMSScoring
             LcCorrelation = StatisticsTools.GetLcCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             ImsCorrelation = StatisticsTools.GetImsCorrelation(f[NumMinusIsotope], f[NumMinusIsotope + 1]);
             IsotopeCorrelation = StatisticsTools.GetIsotopeCorrelation(f, i);
-            //Console.WriteLine(this + " Node " + LcCorrelation + " "+ ImsCorrelation + " " + IsotopeCorrelation);
+           // Console.WriteLine(this + " Node " + LcCorrelation + " "+ ImsCorrelation + " " + IsotopeCorrelation);
         }
 
         internal abstract double GetScore();

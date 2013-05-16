@@ -314,7 +314,7 @@ namespace InformedProteomics.Backend.IMSScoring
             {
                 if (1 - m > corr)
                     break;
-                m = m * 0.5;
+                m = m * 0.4;
             }
             return score;
         }

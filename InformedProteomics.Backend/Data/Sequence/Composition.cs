@@ -238,7 +238,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public float[] GetApproximatedIsotopomerEnvelop()
         {
-            return GetApproximatedIsotopomerEnvelop(6);
+            return GetApproximatedIsotopomerEnvelop(7);
         }
 
         public float[] GetApproximatedIsotopomerEnvelop(int maxIsotope)

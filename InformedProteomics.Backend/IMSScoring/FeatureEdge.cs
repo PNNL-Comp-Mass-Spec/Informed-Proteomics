@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 _ratio = GetRatioScore(li, ri);
             _lcCorrelation = StatisticsTools.GetLcCorrelation(l.Feature, r.Feature);
             _imsCorrelation = StatisticsTools.GetImsCorrelation(l.Feature, r.Feature);
-           
+            
             GetScore(); // TODO calculate when Score is needed..
             Weight = GetWeight();
         }
