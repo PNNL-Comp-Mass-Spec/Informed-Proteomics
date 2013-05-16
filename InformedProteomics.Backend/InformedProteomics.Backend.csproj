@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -89,7 +89,7 @@
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="MultiDimensionalPeakFinding">
-      <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>
+      <HintPath>..\lib\$(Platform)\MultiDimensionalPeakFinding.dll</HintPath>
     </Reference>
     <Reference Include="MwtWinDll">
       <HintPath>..\lib\MwtWinDll.dll</HintPath>
@@ -97,9 +97,9 @@
     <Reference Include="NETPrediction">
       <HintPath>..\lib\NETPrediction.dll</HintPath>
     </Reference>
-    <Reference Include="PNNLOmics, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="PNNLOmics, Version=1.0.0.0, Culture=neutral, processorArchitecture=$(Platform)">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\x64\Debug\PNNLOmics.dll</HintPath>
+      <HintPath>..\lib\$(Platform)\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
