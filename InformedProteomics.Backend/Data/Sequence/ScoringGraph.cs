@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.IMSScoring;
@@ -88,12 +89,14 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var precursorFeature in precursorFeatureSet)
             {
                 var precursorScore = imsScorer.GetPrecursorScore(precursorFeature);
-                //if (precursorFeature.ScanLcStart == 225)
+                var productScore = GetProductIonScore(imsScorer, precursorFeature);
+
+                //if (precursorScore > 5)
                 //{
-                //    Console.WriteLine("{0} {1}", precursorFeature, precursorScore);
+                    //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", GetUnmodSequence(), precursorCharge, precursorFeature, precursorScore, productScore);
+                    //Console.WriteLine("{0}\t{1}\t{2}", precursorFeature, precursorScore, productScore);
                 //}
 
-                var productScore = GetProductIonScore(imsScorer, precursorFeature);
                 var curFeatureScore = precursorScore + productScore;
                 if (curFeatureScore > bestScore)
                 {
@@ -115,6 +118,16 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _nodes.Select(node => node.Composition).ToArray();
         }
 
+        public string GetUnmodSequence()
+        {
+            var pepSequence = new StringBuilder();
+            foreach (var aa in _aminoAcidSequence)
+            {
+                pepSequence.Append(aa.Residue);
+            }
+            return pepSequence.ToString();
+        }
+
         private double GetProductIonScore(ImsScorer imsScorer, Feature precursorFeature)
         {
             return GetProductIonScore(_rootNode, imsScorer, precursorFeature);
@@ -129,17 +142,14 @@ namespace InformedProteomics.Backend.Data.Sequence
                 char nTermAA = _aminoAcidSequence[node.Index].Residue;
                 char cTermAA = _aminoAcidSequence[node.Index + 1].Residue;
                 cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
-                //Console.Write(" " + _aminoAcidSequence[node.Index].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Index + 1].Residue + " " + cutScore);
+                //Console.WriteLine(" " + _aminoAcidSequence[node.Index].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Index + 1].Residue + " " + cutScore);
             }
             //Console.WriteLine();
 
             if (node.Index > _aminoAcidSequence.Length - 3)
                 return 0;
-            else
-            {
-                var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetProductIonScore(nextNode, imsScorer, precursorFeature));
-                return cutScore + nextNodeScore;
-            }
+            var nextNodeScore = node.GetNextNodes().DefaultIfEmpty().Max(nextNode => GetProductIonScore(nextNode, imsScorer, precursorFeature));
+            return cutScore + nextNodeScore;
         }
     }
 

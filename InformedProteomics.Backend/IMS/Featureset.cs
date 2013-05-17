@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.IMS
 
         #endregion
 
-        private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(5, 2);
+        private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
 
         public IEnumerator<Feature> GetEnumerator()
         {

@@ -1,18 +1,174 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.IMSScoring;
 using NUnit.Framework;
 using UIMFLibrary;
+using Feature = InformedProteomics.Backend.IMS.Feature;
 
 namespace InformedProteomics.Test
 {
     [TestFixture]
     internal class TestIcIms
     {
+        [Test]
+        public void TestSarcSearch()
+        {
+            const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Collision_Energy_Collapsed.UIMF";
+
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
+            var imsScorerFactory = new ImsScorerFactory(paramFile);
+
+            Console.WriteLine("Finished reading the UIMF file.");
+
+            var dbFilePaths = new string[] 
+                {
+                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt",
+                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides_Reverse.txt"
+                };
+
+            var isDecoy = 0;
+
+            using (var writer = new StreamWriter(@"C:\cygwin\home\kims336\Data\IMS_Sarc\ICResults.txt"))
+            {
+                writer.WriteLine(
+                    "Peptide\tPrecursorMz\tPrecursorCharge\tLCBegin\tLCEnd\tIMSBegin\tIMSEnd\tApexLC\tApexIMS\tSumIntensities\tNumPoints\tScore\tIsDecoy");
+                foreach (var dbFilePath in dbFilePaths)
+                {
+                    var lineNum = 0;
+                    foreach (var annotation in File.ReadLines(dbFilePath))
+                    {
+                        ++lineNum;
+                        if (lineNum%10000 == 1)
+                        {
+                            Console.WriteLine("Processing {0} peptides...", lineNum);
+                        }
+                        var peptide = annotation.Substring(2, annotation.Length - 4);
+
+                        var seqGraph = new SequenceGraph(aaSet, peptide);
+                        foreach (var scoringGraph in seqGraph.GetScoringGraphs())
+                        {
+                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
+                            for (var precursorCharge = 1; precursorCharge <= 5; precursorCharge++)
+                            {
+                                double precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
+                                    continue;
+                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
+                                var feature = best.Item1;
+                                if (best.Item1 != null && best.Item2 > 0)
+                                {
+                                    writer.WriteLine(
+                                        "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}"
+                                        , annotation
+                                        , precursorMz
+                                        , precursorCharge
+                                        , feature.ScanLcStart
+                                        , feature.ScanLcStart + feature.ScanLcLength - 1
+                                        , feature.ScanImsStart
+                                        , feature.ScanImsStart + feature.ScanImsLength - 1
+                                        , feature.ScanLcStart + feature.ScanLcRepOffset
+                                        , feature.ScanImsStart + feature.ScanImsRepOffset
+                                        , feature.SumIntensities
+                                        , feature.NumPoints
+                                        , best.Item2
+                                        , isDecoy
+                                        );
+                                }
+                            }
+                        }
+                    }
+                    ++isDecoy;
+                }
+            }
+        }
+
+        [Test]
+        public void TestBsaSearch()
+        {
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var fixCarbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
+
+            var searchModifications = new List<SearchModification> { fixCarbamidomethylC };
+            const int numMaxModsPepPeptide = 2;
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
+
+            const string uimfFilePath =
+                @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
+            var imsScorerFactory = new ImsScorerFactory(paramFile);
+
+
+            var dbFilePaths = new string[] 
+                {
+                    @"..\..\..\TestFiles\BSAPeptides_ST.txt",
+                    @"..\..\..\TestFiles\BSA_ReversePeptides_ST.txt"
+                };
+
+            var isDecoy = 0;
+
+            //using (var writer = new StreamWriter(@"C:\cygwin\home\kims336\Data\IMS_Sarc\ICResults.txt"))
+            using (var writer = new StreamWriter(@"..\..\..\TestFiles\IC_BSA_Results.txt"))
+            {
+                writer.WriteLine(
+                    "Peptide\tPrecursorMz\tPrecursorCharge\tLCBegin\tLCEnd\tIMSBegin\tIMSEnd\tApexLC\tApexIMS\tSumIntensities\tNumPoints\tScore\tIsDecoy");
+                foreach (var dbFilePath in dbFilePaths)
+                {
+                    foreach (var annotation in File.ReadLines(dbFilePath))
+                    {
+                        var peptide = annotation.Substring(2, annotation.Length - 4);
+
+                        //var scoringGraph = seqGraph.GetScoringGraph(0);
+                        var seqGraph = new SequenceGraph(aaSet, peptide);
+                        foreach (var scoringGraph in seqGraph.GetScoringGraphs())
+                        {
+                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
+                            for (var precursorCharge = 1; precursorCharge <= 5; precursorCharge++)
+                            {
+                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
+                                    continue;
+                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
+                                var feature = best.Item1;
+                                if (best.Item1 != null && best.Item2 > 0)
+                                {
+                                    writer.WriteLine(
+                                        "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}"
+                                        , annotation
+                                        , precursorMz
+                                        , precursorCharge
+                                        , feature.ScanLcStart
+                                        , feature.ScanLcStart + feature.ScanLcLength - 1
+                                        , feature.ScanImsStart
+                                        , feature.ScanImsStart + feature.ScanImsLength - 1
+                                        , feature.ScanLcStart + feature.ScanLcRepOffset
+                                        , feature.ScanImsStart + feature.ScanImsRepOffset
+                                        , feature.SumIntensities
+                                        , feature.NumPoints
+                                        , best.Item2
+                                        , isDecoy
+                                        );
+                                }
+                            }
+                        }
+                    }
+                    ++isDecoy;
+                }
+            }
+        }
+
         [Test]
         public void TestDbSearch()
         {
@@ -27,13 +183,15 @@ namespace InformedProteomics.Test
         public void TestImsScoring()
         {
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            var imsData = new ImsDataCached(uimfFilePath);
-
+            //var imsData = new ImsDataCached(uimfFilePath);
+            var imsData = new ImsDataCached(uimfFilePath, 400.0, 2000.0, 10.0, 2500.0,
+                new Tolerance(25, DataReader.ToleranceType.PPM), new Tolerance(25, DataReader.ToleranceType.PPM));
             const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsScorerFactory = new ImsScorerFactory(paramFile);
 
             //const string targetPeptide = "CCAADDKEACFAVEGPK";
-            const string targetPeptide = "ECCHGDLLECADDRADLAK";
+            //const string targetPeptide = "ECCHGDLLECADDRADLAK";
+            const string targetPeptide = "CHGDLLECADDRADLAK";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             var seqGraph = new SequenceGraph(aaSet, targetPeptide);
@@ -43,7 +201,7 @@ namespace InformedProteomics.Test
             //    Console.WriteLine(composition);
             //}
             scoringGraph.RegisterImsData(imsData, imsScorerFactory);
-            for (var precursorCharge = 3; precursorCharge <= 4; precursorCharge++)
+            for (var precursorCharge = 3; precursorCharge <= 3; precursorCharge++)
             {
                 var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
                 Console.WriteLine("PrecursorMz: " + scoringGraph.GetPrecursorIon(precursorCharge).GetMz());
@@ -184,7 +342,57 @@ namespace InformedProteomics.Test
             var uimfReader = new DataReader(uimfFilePath);         
             Console.WriteLine("NumFrames: " + uimfReader.GetGlobalParameters().NumFrames);
             Console.WriteLine("NumScans: " + uimfReader.GetFrameParameters(1).Scans);
-    
+        }
+
+        [Test]
+        public void TestGeneratingSpectrum()
+        {
+            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            var dataReader = new DataReader(uimfFilePath);
+            const int startFrameNumber = 579;
+            const int endFrameNumber = 581;
+            const int startScanNumber = 124;
+            const int endScanNumber = 135;
+
+            double[] mzArray;
+            int[] intensityArray;
+            dataReader.GetSpectrum(startFrameNumber, endFrameNumber, DataReader.FrameType.MS2, startScanNumber,
+                                   endScanNumber, out mzArray, out intensityArray);
+
+            var size = mzArray.Length;
+            using (var writer = new StreamWriter(@"C:\cygwin\home\kims336\Data\IMS_BSA\testSpec.mgf"))
+            {
+                writer.WriteLine("BEGIN IONS");
+                writer.WriteLine("TITLE=test");
+                writer.WriteLine("PEPMASS=582.3447");
+                writer.WriteLine("CHARGE=2+");
+                const int windowSize = 10;
+                for (var i = 0; i < size; i++)
+                {
+                    bool isPeak = true;
+                    int rank = 0;
+                    for (var j = i - windowSize; j < i + windowSize; j++)
+                    {
+                        if (j >= 0 && j < intensityArray.Length)
+                        {
+                            if (intensityArray[i] < intensityArray[j])
+                            {
+                                isPeak = false;
+                                break;
+                            }
+                            if (mzArray[j] > mzArray[i] - 0.2 && mzArray[j] < mzArray[i] + 0.2)
+                            {
+                                if (intensityArray[j] <= intensityArray[i]) rank++;
+                            }
+                        }
+                    }
+                    //if (rank <= 1)
+                    {
+                        writer.WriteLine(mzArray[i] + "\t" + intensityArray[i]);
+                    }
+                }
+                writer.WriteLine("END IONS");
+            }
         }
     }
 }

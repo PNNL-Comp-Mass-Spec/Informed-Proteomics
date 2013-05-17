@@ -174,11 +174,21 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _prefixComposition[_index];
         }
 
+        public IEnumerable<ScoringGraph> GetScoringGraphs()
+        {
+            int numCompositions = _graph[_index].Length;
+            var scoringGraphs = new ScoringGraph[numCompositions];
+            for (int i = 0; i < numCompositions; i++)
+            {
+                scoringGraphs[i] = GetScoringGraph(i);
+            }
+            return scoringGraphs;
+        }
+
         public ScoringGraph GetScoringGraph(int sequenceIndex)
         {
             // backtracking
             ScoringGraphNode rootNode = null;
-            ScoringGraphNode leafNode = null;
             var nextNodeMap = new Dictionary<int, List<ScoringGraphNode>>
                 {
                     {sequenceIndex, new List<ScoringGraphNode>()}

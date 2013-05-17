@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ProteinFileReader;
 
@@ -24,28 +25,79 @@ namespace InformedProteomics.Backend.Database
             _databaseFilePath = databaseFilePath;
             _lastWriteTimeHash = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
-            string databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
+            var databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
             _seqFilePath = databaseFilePathNoExt + SeqFileExtension;
             _annoFilePath = databaseFilePathNoExt + AnnotationFileExtension;
 
-            if (!File.Exists(_seqFilePath) || !File.Exists(_annoFilePath) || !CheckHashCode(_seqFilePath) || !CheckHashCode(_annoFilePath))
+            if (!File.Exists(_seqFilePath) || !File.Exists(_annoFilePath) || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash) ||
+                !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
+            {
+                Console.WriteLine("Generating " + _seqFilePath + " and " + _annoFilePath);
                 GenerateMetaFiles();
+            }
         }
 
         public void Read()
         {
-            if (!ReadSeqFile(_seqFilePath))
+            if (!ReadSeqFile())
                 throw new FormatException("Error while reading " + _seqFilePath);
-            if (!ReadAnnnoFile(_annoFilePath))
+            if (!ReadAnnnoFile())
                 throw new FormatException("Error while reading " + _annoFilePath);
         }
             
+        public string GetFastaFilePath()
+        {
+            return _databaseFilePath;
+        }
+
+        public byte[] GetSequence()
+        {
+            return _sequence;
+        }
+
+        public void PrintSequence()
+        {
+            Console.WriteLine(_sequence == null ? "Sequence is null!" : Encoding.GetString(_sequence));
+        }
+
+        internal int GetLastWriteTimeHash()
+        {
+            return _lastWriteTimeHash;
+        }
+
+        static internal bool CheckHashCodeBinaryFile(string filePath, int code)
+        {
+            using (var fs = File.OpenRead(filePath))
+            {
+                fs.Seek(-sizeof(int), SeekOrigin.End);
+
+                using (var reader = new BinaryReader(fs))
+                {
+                    int lastWriteTimeHash = reader.ReadInt32();
+                    if (lastWriteTimeHash == code)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        static internal bool CheckHashCodeTextFile(string filePath, int code)
+        {
+            var lastLine = File.ReadLines(filePath).Last(); // TODO: this is not efficient for big files
+            int lastWriteTimeHash = Convert.ToInt32(lastLine);
+            if (lastWriteTimeHash == code) return true;
+
+            return false;
+        }
+
         private readonly string _databaseFilePath;
         private readonly string _seqFilePath;
         private readonly string _annoFilePath;
         private readonly int _lastWriteTimeHash;
-        private IDictionary<long, string> names;
-        private IDictionary<long, string> descriptions;
+
+        private IDictionary<long, string> _names;
+        private IDictionary<long, string> _descriptions;
+        private byte[] _sequence;
 
         private void GenerateMetaFiles()
         {
@@ -71,7 +123,7 @@ namespace InformedProteomics.Backend.Database
                     string description = reader.ProteinDescription;
                     string sequence = Delimiter + reader.ProteinSequence;
                     seqWriter.Write(Encoding.GetBytes(sequence));
-                    annoWriter.Write(offset + ":" + name + ":" + description);
+                    annoWriter.WriteLine(offset + ":" + name + ":" + description);
                     offset += sequence.Length;
                 }
 
@@ -84,34 +136,21 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        private bool CheckHashCode(string filePath)
+        private bool ReadSeqFile()
         {
-            using (var fs = File.OpenRead(filePath))
+            using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
             {
-                fs.Seek(-sizeof(int), SeekOrigin.End);
-
-                using (var reader = new BinaryReader(fs))
-                {
-                    int lastWriteTimeHash = reader.ReadInt32();
-                    if (lastWriteTimeHash == _lastWriteTimeHash)
-                        return true;
-                }
+                _sequence = new byte[fileStream.Length - sizeof(int)];
+                fileStream.Read(_sequence, 0, _sequence.Length);
             }
-            return false;
-        }
 
-        private bool ReadSeqFile(string seqFilePath)
-        {
-            using (var reader = new BinaryReader(File.Open(seqFilePath, FileMode.Open)))
-            {
-            }
             return true;
         }
 
-        private bool ReadAnnnoFile(string annoFilePath)
+        private bool ReadAnnnoFile()
         {
-            names = new Dictionary<long, string>();
-            descriptions = new Dictionary<long, string>();
+            _names = new Dictionary<long, string>();
+            _descriptions = new Dictionary<long, string>();
 
             using (var reader = new StreamReader(_annoFilePath))
             {
@@ -122,12 +161,13 @@ namespace InformedProteomics.Backend.Database
                     if (token.Length != 3)
                         break;
                     var offset = long.Parse(token[0]);
-                    names.Add(offset,token[1]);
-                    descriptions.Add(offset, token[2]);
+                    _names.Add(offset,token[1]);
+                    _descriptions.Add(offset, token[2]);
                 }
             }
 
             return true;
         }
+
     }
 }
