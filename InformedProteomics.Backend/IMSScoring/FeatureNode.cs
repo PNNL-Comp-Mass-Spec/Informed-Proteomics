@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.IMSScoring
 {
     public abstract class FeatureNode
     {
-        public const int NumSupport = 4; // used for training
+        public const int NumMaxSupport = 7; // used for training
         public const int NumMinusIsotope = 1; // used for training
         public GroupParameter GroupParameter { get; private set; }
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
@@ -27,9 +27,10 @@ namespace InformedProteomics.Backend.IMSScoring
 
         private void GetCorrelations()
         {
-            var f = new Feature[NumSupport];
-            var i = new double[NumSupport];
-            for (var k = 0; k < NumSupport; k++)
+            var f = new Feature[IsotopomerFeatures.SupportSize];
+            var i = new double[IsotopomerFeatures.SupportSize];
+            //Console.WriteLine(this + " " + f.Length);
+            for (var k = 0; k < f.Length; k++)
             {
                 f[k] = IsotopomerFeatures.GetNthFeatureFromTheoreticallyMostIntenseFeature(k - NumMinusIsotope);
                 i[k] = IsotopomerFeatures.GetTheoreticalIntensityOfNthFeature(k - NumMinusIsotope);

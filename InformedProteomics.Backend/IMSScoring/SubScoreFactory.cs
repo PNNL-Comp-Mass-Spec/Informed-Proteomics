@@ -10,6 +10,8 @@ namespace InformedProteomics.Backend.IMSScoring
         // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
+        private const int MaxCorrIntScore = 6;
+        private const double CorrIntScoreFactor = 0.15;
         private const double LowScore = -3; // TODO how to??
         //TODO : ims, lc corr score should be dependent on ratio scores..
 
@@ -310,18 +312,21 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             var m = 1.0;
             var score = 0;
-            for (; score < 5; score++)
+            for (; score < MaxCorrIntScore; score++)
             {
                 if (1 - m > corr)
                     break;
-                m = m * 0.4;
+                m = m * CorrIntScoreFactor; // 
             }
             return score;
         }
 
         public static int[] GetAllCorrIntScore()
         {
-            return new []{1,2,3,4,5};
+            var s = new int[MaxCorrIntScore+1];
+            for (var i = 0; i <= MaxCorrIntScore; i++)
+                s[i] = i;
+            return s;
         }
 
         private double GetScoreFromDictionary(Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> scoreDictionary, IonType ionType1, IonType ionType2, int rawScore, GroupParameter groupParameter)

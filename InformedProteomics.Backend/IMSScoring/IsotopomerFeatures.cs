@@ -12,12 +12,14 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         private readonly float[] _theoreticalIsotopomerEnvelope;
         private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not for this
-
+        public int SupportSize { get; private set; }
         private IsotopomerFeatures(ImsDataCached imsData, Ion ion, Feature precursorFeature, bool isPrecurosr)
         {
-            _theoreticalIsotopomerEnvelope = ion.Composition.GetApproximatedIsotopomerEnvelop();
+            _theoreticalIsotopomerEnvelope = ion.Composition.GetApproximatedIsotopomerEnvelop(FeatureNode.NumMaxSupport);
             _maxIntensityIndex = GetMaximumIndex(_theoreticalIsotopomerEnvelope);
-            for (var i = -FeatureNode.NumMinusIsotope; i < FeatureNode.NumSupport - FeatureNode.NumMinusIsotope; i++)
+            SupportSize = _theoreticalIsotopomerEnvelope.Length + FeatureNode.NumMinusIsotope;
+
+            for (var i = -FeatureNode.NumMinusIsotope; i < _theoreticalIsotopomerEnvelope.Length - FeatureNode.NumMinusIsotope; i++)
             {
                 var mz = ion.GetIsotopeMz(i + _maxIntensityIndex);
                 if (isPrecurosr)

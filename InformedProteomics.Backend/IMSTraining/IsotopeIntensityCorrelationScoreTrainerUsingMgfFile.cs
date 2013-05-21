@@ -88,8 +88,8 @@ namespace InformedProteomics.Backend.IMSTraining
                 maxAbundance = theoretical[i];
                 maxIndex = i;
             }
-            var c1 = new double[FeatureNode.NumSupport];
-            var c2 = new double[FeatureNode.NumSupport];
+            var c1 = new double[theoretical.Length + FeatureNode.NumMinusIsotope];
+            var c2 = new double[theoretical.Length + FeatureNode.NumMinusIsotope];
 
             for (var i = 0; i < c1.Length; i++)
             {
@@ -98,6 +98,7 @@ namespace InformedProteomics.Backend.IMSTraining
                 c1[i] = observed[Math.Min(i1, observed.Count -1)].Intensity;
                 c2[i] = i2 < 0 ? 0 : theoretical[Math.Min(i2, theoretical.Length-1)];
             }
+        //    Console.WriteLine(c1.Length);
             return SubScoreFactory.CorrToInt(StatisticsTools.GetCorrelation(c1, c2));
         }
     }

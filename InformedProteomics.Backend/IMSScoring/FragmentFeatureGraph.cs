@@ -75,7 +75,7 @@ namespace InformedProteomics.Backend.IMSScoring
 //                      Console.WriteLine((io == null? "P" : io.Name + " " + (edge.LNode.Feature==null)) + " " + edge.RNode.FragmentIonClassBase.Name + " " + (edge.RNode.Feature==null) + " " +  edge.NodeScore + " " + edge.RatioScore + " " + edge.LcScore + " " + edge.ImsScore);
                 }
             }
-            Score = NodeScore + Math.Max(-4, Math.Min(5, RatioScore + LcScore + ImsScore)); // TODO does not make any sense but for test.. at the end of the day, I need to train them dependently..
+            Score = NodeScore + Math.Max(-6, Math.Min(6, RatioScore + LcScore + ImsScore)); // TODO does not make any sense but for test.. at the end of the day, I need to train them dependently..
         }
 
         static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 

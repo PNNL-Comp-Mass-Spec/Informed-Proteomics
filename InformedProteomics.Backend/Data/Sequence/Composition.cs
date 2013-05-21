@@ -259,11 +259,22 @@ namespace InformedProteomics.Backend.Data.Sequence
                 }
             }
             var max = dist.Concat(new float[] { 0 }).Max();
+            var maxPassed = false;
+            var cutIndex = dist.Length - 1;
             for (var i = 0; i < dist.Length; i++)
             {
                 dist[i] = dist[i] / max;
+                if (dist[i] >= 1) maxPassed = true;
+                if (!maxPassed || dist[i] >= 0.01) continue;
+                cutIndex = i;
+                break;
             }
-            return dist;
+
+            var truncatedDist = new float[cutIndex + 1];
+            for (var i = 0; i < truncatedDist.Length; i++)
+                truncatedDist[i] = dist[i];
+
+            return truncatedDist;
         }
 
         public int GetMostAbundantIsotopeZeroBasedIndex()

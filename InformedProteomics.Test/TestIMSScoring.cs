@@ -84,8 +84,8 @@ namespace InformedProteomics.Test
                 foreach (var targetPeptide in  Misc.GetPeptidesFromTxt(q==0? targetTxt : decoyTxt))//Misc.GetPeptidesFromFasta(fasta, false, 2, q != 0))
                     // stupid function made by kyowon.
                 {
-                    //Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);
-                    var pep = targetPeptide;// "CCAADDKEACFAVEGPK";// "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
+                    //Console.WriteLine("{0}: {1}", ++pepIndex, targetPeptide);"LKTVEVFEAK";//
+                    var pep = targetPeptide;// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
                     var precursorComposition = aaSet.GetComposition(pep);
                     var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
                     var maxScore = double.NegativeInfinity;
@@ -113,14 +113,14 @@ namespace InformedProteomics.Test
                                 //Console.WriteLine("Cut " + cutNumber);
                                 var cutScore = imsScorer.GetCutScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
                                 //Console.WriteLine("{0} {1} {2} {3}", pep[cutNumber-1], pep[cutNumber], sequence.GetComposition(0, cutNumber), cutScore);
-                                //   var cutNodeScore = imsScorer.GetCutNodeScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                //   var cutRatioScore = imsScorer.GetCutRatioScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                //   var cutLCScore = imsScorer.GetCutLcScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                //   var cutIMSScore = imsScorer.GetCutImsScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
-                                //Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLCScore + "\t" + cutIMSScore + "\t" +  cutScore);
-                                //  Console.Write(cutNumber + "\t" + cutScore + "\t");
-                                // foreach(var ion in imsScorer.supportingIonTypes) Console.Write("\t" + ion.Name+", ");
-                                // Console.WriteLine();
+                               /*    var cutNodeScore = imsScorer.GetCutNodeScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   var cutRatioScore = imsScorer.GetCutRatioScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   var cutLCScore = imsScorer.GetCutLcScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                   var cutIMSScore = imsScorer.GetCutImsScore(pep[cutNumber - 1], pep[cutNumber], sequence.GetComposition(0, cutNumber), precursorFeature);
+                                Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLCScore + "\t" + cutIMSScore + "\t" +  cutScore);
+                                  Console.Write(cutNumber + "\t" + cutScore + "\t");
+                                 foreach(var ion in imsScorer.supportingIonTypes) Console.Write("\t" + ion.Name+", ");
+                                 Console.WriteLine();*/
                                 score += cutScore;
                                 portionExplainedFrags += imsScorer.supportingIonTypes.Count == 0 ? 0 : 1;
                             }
@@ -158,7 +158,7 @@ namespace InformedProteomics.Test
                     {
                         decoyMatches.Add(new Tuple<double, string, Feature>(maxScore, pep, maxFeature));
                     }
-                    // break;
+                     //break;
                    // var scoreIndex = (int)Math.Min(targetDist.Length - 1, Math.Max(0, maxScore + 50));
                    // dist[scoreIndex] = dist[scoreIndex] + 1;
 
