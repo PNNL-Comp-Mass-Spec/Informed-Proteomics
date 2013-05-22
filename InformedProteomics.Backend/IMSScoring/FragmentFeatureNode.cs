@@ -15,11 +15,11 @@ namespace InformedProteomics.Backend.IMSScoring
             _scoringParams = scoringParams;
             //if (Feature != null) Console.WriteLine(this + " " + fragmentIonClassBase.Name + " " + Feature);
             
-            Score = GetScore();
         }
 
-        internal override sealed double GetScore()
+        public override sealed double GetScore()
         {
+            if (IsScoreCalculated) return Score;
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(FragmentIonClassBase, IsotopeCorrelation, GroupParameter);
             var lcScore = 0.0;
             var imsScore = 0.0;
@@ -28,10 +28,9 @@ namespace InformedProteomics.Backend.IMSScoring
                 lcScore = _scoringParams.GetIsotopeLcCorrelationScore(FragmentIonClassBase, LcCorrelation, GroupParameter);
                 imsScore = _scoringParams.GetIsotopeImsCorrelationScore(FragmentIonClassBase, ImsCorrelation, GroupParameter);
             }
-            var score = lcScore + imsScore + isotopeScore;
-            //if (Feature != null) Console.WriteLine("Ion Type " + FragmentIonClassBase.Name);
-            
-            return score;
+            Score = lcScore + imsScore + isotopeScore;
+            IsScoreCalculated = true;
+            return Score;
         }
     }
 }

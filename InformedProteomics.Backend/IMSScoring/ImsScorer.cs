@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.IMSScoring
         public double GetPrecursorScore(Feature precursorFeature)
         {
             UpdatePrecursorFeatureNode(precursorFeature);
-            return PrecursorFeatureNode.Score;
+            return PrecursorFeatureNode.GetScore();
         }
 
         public double GetCutScore(char nTermAA, char cTermAA, Composition cutComposition, Feature precursorFeature)

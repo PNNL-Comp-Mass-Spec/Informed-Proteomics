@@ -12,9 +12,10 @@ namespace InformedProteomics.Backend.IMSScoring
             Score = GetScore();
         }
 
-        internal override sealed double GetScore()
+        public override sealed double GetScore()
         {
             // when calculating score, only mass index and charge values are used in parameter. When writing the parameter file, only they should be written.
+            if (IsScoreCalculated) return Score;
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
             var lcScore = 0.0;
             var imsScore = 0.0;
@@ -23,7 +24,9 @@ namespace InformedProteomics.Backend.IMSScoring
                 lcScore = _scoringParams.GetIsotopeLcCorrelationScore(LcCorrelation, GroupParameter);
                 imsScore = _scoringParams.GetIsotopeImsCorrelationScore(ImsCorrelation, GroupParameter);
             }
-            return lcScore + imsScore + isotopeScore;
+            Score = lcScore + imsScore + isotopeScore;
+            IsScoreCalculated = true;
+            return Score;
         }
     }
 }

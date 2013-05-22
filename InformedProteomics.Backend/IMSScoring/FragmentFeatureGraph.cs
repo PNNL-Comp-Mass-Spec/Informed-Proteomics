@@ -65,12 +65,12 @@ namespace InformedProteomics.Backend.IMSScoring
             {
                 foreach (var edge in this[node])
                 {
-                    NodeScore += edge.NodeScore;
-                    RatioScore += edge.RatioScore;
-                    LcScore += edge.LcScore;
-                    ImsScore += edge.ImsScore;
+                    NodeScore += edge.GetNodeScore();
+                    RatioScore += edge.GetRatioScore();
+                    LcScore += edge.GetLcScore();
+                    ImsScore += edge.GetImsScore();
 
-                    var io = edge.LNode.FragmentIonClassBase;
+                    //var io = edge.LNode.FragmentIonClassBase;
 
 //                      Console.WriteLine((io == null? "P" : io.Name + " " + (edge.LNode.Feature==null)) + " " + edge.RNode.FragmentIonClassBase.Name + " " + (edge.RNode.Feature==null) + " " +  edge.NodeScore + " " + edge.RatioScore + " " + edge.LcScore + " " + edge.ImsScore);
                 }

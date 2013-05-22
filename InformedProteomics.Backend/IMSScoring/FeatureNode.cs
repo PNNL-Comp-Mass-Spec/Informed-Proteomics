@@ -12,7 +12,8 @@ namespace InformedProteomics.Backend.IMSScoring
         public IsotopomerFeatures IsotopomerFeatures { get; private set; }
         public Feature Feature { get; private set; }
         public IonType FragmentIonClassBase { get; private set; }
-        internal double Score { get; set; }
+        protected double Score { get; set; }
+        protected bool IsScoreCalculated = false; // for speed-up
         internal double IsotopeCorrelation, LcCorrelation, ImsCorrelation;
         
         protected FeatureNode(IsotopomerFeatures isotopomerFeatures, IonType ionType, GroupParameter groupParameter)
@@ -41,6 +42,6 @@ namespace InformedProteomics.Backend.IMSScoring
            // Console.WriteLine(this + " Node " + LcCorrelation + " "+ ImsCorrelation + " " + IsotopeCorrelation);
         }
 
-        internal abstract double GetScore();
+        public abstract double GetScore();
     }
 }

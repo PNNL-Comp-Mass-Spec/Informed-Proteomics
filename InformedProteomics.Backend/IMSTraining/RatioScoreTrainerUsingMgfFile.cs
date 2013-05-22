@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.IMSTraining
         private readonly int _maxCharge;
         public Dictionary<GroupParameter, Dictionary<Tuple<IonType, IonType>, Dictionary<int, double>>> RatioProbDictionary { get; private set; }
         public Dictionary<GroupParameter, double> NoIonProbDictionary { get; private set; }
-        private Dictionary<GroupParameter, double> AllNumberDictionary;
+        private readonly Dictionary<GroupParameter, double> _allNumberDictionary;
 
         public RatioScoreTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Dictionary<GroupParameter, List<IonType>> ionTypes, Tolerance tolerance, int maxCharge)
         {
@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.IMSTraining
             _maxCharge = maxCharge;
             RatioProbDictionary = new Dictionary<GroupParameter, Dictionary<Tuple<IonType, IonType>, Dictionary<int, double>>>();
             NoIonProbDictionary = new Dictionary<GroupParameter, double>();
-            AllNumberDictionary = new Dictionary<GroupParameter, double>();
+            _allNumberDictionary = new Dictionary<GroupParameter, double>();
         }
 
         public void Train()
@@ -38,9 +38,9 @@ namespace InformedProteomics.Backend.IMSTraining
                     var explainedPeaks = spectrum.GetExplainedPeaks(annotation, cutNumber, ionTypes, _tolerance);
                     if(!RatioProbDictionary.ContainsKey(groupParameter))
                         RatioProbDictionary[groupParameter] = new Dictionary<Tuple<IonType, IonType>, Dictionary<int, double>>();
-                    if (!AllNumberDictionary.ContainsKey(groupParameter)) AllNumberDictionary[groupParameter] = 0.0;
+                    if (!_allNumberDictionary.ContainsKey(groupParameter)) _allNumberDictionary[groupParameter] = 0.0;
                     if (!NoIonProbDictionary.ContainsKey(groupParameter)) NoIonProbDictionary[groupParameter] = 0.0;
-                    AllNumberDictionary[groupParameter] = AllNumberDictionary[groupParameter] + 1;
+                    _allNumberDictionary[groupParameter] = _allNumberDictionary[groupParameter] + 1;
                     var s = RatioProbDictionary[groupParameter];
                     /*var writeNoIon = true;
                     foreach (var peak in explainedPeaks)
@@ -65,7 +65,7 @@ namespace InformedProteomics.Backend.IMSTraining
                             //{
                              //   continue;
                             //}
-                            var ratio = FeatureEdge.GetRatioScore(explainedPeaks[i].Intensity, explainedPeaks[j].Intensity);
+                            var ratio = FeatureEdge.GetRatioIndex(explainedPeaks[i].Intensity, explainedPeaks[j].Intensity);
                             if (!t.ContainsKey(ratio)) t[ratio] = 0;
                             t[ratio] = t[ratio] + 1;
                         }   
@@ -82,13 +82,13 @@ namespace InformedProteomics.Backend.IMSTraining
             {
                 if(!RatioProbDictionary.ContainsKey(groupParameter))
                     RatioProbDictionary[groupParameter] = new Dictionary<Tuple<IonType, IonType>, Dictionary<int, double>>();
-                if (!AllNumberDictionary.ContainsKey(groupParameter))
-                    AllNumberDictionary[groupParameter] = 1.0;
+                if (!_allNumberDictionary.ContainsKey(groupParameter))
+                    _allNumberDictionary[groupParameter] = 1.0;
                 if (!NoIonProbDictionary.ContainsKey(groupParameter))
                     NoIonProbDictionary[groupParameter] = 1.0;
 
                 NoIonProbDictionary[groupParameter] = NoIonProbDictionary[groupParameter]/
-                                                      Math.Max(AllNumberDictionary[groupParameter], 1.0);
+                                                      Math.Max(_allNumberDictionary[groupParameter], 1.0);
 
                 var sr = RatioProbDictionary[groupParameter];
 
@@ -100,7 +100,7 @@ namespace InformedProteomics.Backend.IMSTraining
                         var ionTypes = new Tuple<IonType, IonType> (ionType, ionType2);
                         if(!sr.ContainsKey(ionTypes)) sr[ionTypes] = new Dictionary<int, double>();
                         var ssr = sr[ionTypes];
-                        foreach (var ratio in FeatureEdge.GetAllRatioScores())
+                        foreach (var ratio in FeatureEdge.GetAllRatioIndices())
                         {
                             if (!ssr.ContainsKey(ratio)) ssr[ratio] = 1.0;
                             sum = sum + ssr[ratio];
