@@ -31,6 +31,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             GenerateAllKnownIonTypes();
         }
 
+        // e.g. y2-NH3
         public IonType GetIonType(string name)
         {
             return _ionTypeMap[name];
@@ -50,12 +51,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var chargeStr = charge == 1 ? "" : Convert.ToString(charge);
                 foreach (var baseIonType in _baseIons)
                 {
-                    foreach (var neutralLossComposition in _neutralLosses)
+                    foreach (var neutralLoss in _neutralLosses)
                     {
-                        string name = baseIonType.Symbol + chargeStr + neutralLossComposition.Name;
-                        Composition offsetComposition = baseIonType.OffsetComposition -
-                                                        neutralLossComposition.Composition;
-                        _ionTypeMap[name] = new IonType(name, offsetComposition, charge, baseIonType.IsPrefix);
+                        string name = baseIonType.Symbol + chargeStr + neutralLoss.Name;
+                        var offsetComposition = baseIonType.OffsetComposition -
+                                                        neutralLoss.Composition;
+                        _ionTypeMap[name] = new IonType(name, offsetComposition, charge, baseIonType, neutralLoss);
                     }
                 }
             }

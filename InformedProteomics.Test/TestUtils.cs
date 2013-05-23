@@ -24,10 +24,10 @@ namespace InformedProteomics.Test
 
             var ionTypeFactory = new IonTypeFactory(
                 new[] {BaseIonType.B, BaseIonType.Y}, 
-                new[] {NeutralLoss.NoLoss}, 
+                new[] {NeutralLoss.NoLoss, NeutralLoss.H2O}, 
                 maxCharge: 2);
 
-            Console.WriteLine("Precursor Ion: {0}" + sequence.GetPrecursorIon(charge: 2));
+            Console.WriteLine("Precursor Ion: {0}\t{1}", sequence.GetPrecursorIon(2).Composition, sequence.GetPrecursorIon(2).GetMz());
             Console.WriteLine("Product ions: ");
             var ionTypeDictionary = sequence.GetProductIons(ionTypeFactory.GetAllKnownIonTypes());
             foreach (var ionType in ionTypeDictionary)

@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 Add(aa);
                 composition += aa.Composition;
             }
-            Composition = composition;
+            Composition = composition + Composition.H2O;
         }
 
         public Composition Composition { get; private set; }
@@ -99,9 +99,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var compositions = new Composition[Count];
             var suffixComposition = Composition.Zero;
-            for(var index = Count-1; index >= 0; --index)
+            for(var index = 0; index < Count; ++index)
             {
-                compositions[index] = (suffixComposition += this[index].Composition);
+                compositions[index] = (suffixComposition += this[Count-1-index].Composition);
             }
             return compositions;
         }
@@ -118,24 +118,24 @@ namespace InformedProteomics.Backend.Data.Sequence
             var productIonMap = new Dictionary<string, Ion>();
 
             // prefix
-            var index = 0;
-            foreach (var prefixComposition in GetPrefixCompositions())
+            foreach (var ionType in ionTypeArr.Where(ionType => ionType.IsPrefixIon))
             {
-                ++index;
-                foreach (var ionType in ionTypeArr.Where(ionType => ionType.IsPrefixIon))
+                var index = 0;
+                foreach (var prefixComposition in GetPrefixCompositions())
                 {
-                    productIonMap.Add("(" + ionType.Name + ")" + index, ionType.GetIon(prefixComposition));
+                    ++index;
+                    productIonMap.Add(ionType.GetName(index), ionType.GetIon(prefixComposition));
                 }
             }
 
             // suffix
-            index = 0;
-            foreach (var suffixComposition in GetSuffixCompositions())
+            foreach (var ionType in ionTypeArr.Where(ionType => !ionType.IsPrefixIon))
             {
-                ++index;
-                foreach (var ionType in ionTypeArr.Where(ionType => !ionType.IsPrefixIon))
+                var index = 0;
+                foreach (var suffixComposition in GetSuffixCompositions())
                 {
-                    productIonMap.Add("(" + ionType.Name + ")" + index, ionType.GetIon(suffixComposition));
+                    ++index;
+                    productIonMap.Add(ionType.GetName(index), ionType.GetIon(suffixComposition));
                 }
             }
 
