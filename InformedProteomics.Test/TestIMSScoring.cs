@@ -65,7 +65,7 @@ namespace InformedProteomics.Test
             //var targetDist = new int[1000];
             //var decoyDist = new int[1000];
 
-            var highestScorePerFeature = new Dictionary<Feature, Tuple<double, bool>>();
+            var highestScorePerFeature = new Dictionary<Feature, Tuple<double, bool, string>>();
 
             const string targetTxt = @"..\..\..\TestFiles\BSA_ST.txt";
             const string decoyTxt = @"..\..\..\TestFiles\BSA_ST_Rev.txt";
@@ -135,12 +135,12 @@ namespace InformedProteomics.Test
                     if (maxFeature != null)
                     {
                         if (!highestScorePerFeature.ContainsKey(maxFeature))
-                            highestScorePerFeature[maxFeature] = new Tuple<double, bool>(maxScore, q == 0);
+                            highestScorePerFeature[maxFeature] = new Tuple<double, bool, string>(maxScore, q == 0, pep);
                         else
                         {
                             var prevScore = highestScorePerFeature[maxFeature].Item1;
                             if(maxScore > prevScore)
-                                highestScorePerFeature[maxFeature] = new Tuple<double, bool>(maxScore, q == 0);
+                                highestScorePerFeature[maxFeature] = new Tuple<double, bool, string>(maxScore, q == 0, pep);
                         }  
                     }
 
@@ -175,12 +175,23 @@ namespace InformedProteomics.Test
             }
 
             var numTarget = 0;
-            foreach (var score in highestScorePerFeature.Values)
+            //foreach (var score in highestScorePerFeature.Values)
+            //{
+            //    if (!score.Item2) continue;
+            //    if (score.Item1 > threshold)
+            //    {
+            //        numTarget++;
+            //    }
+            //}
+            foreach (var entry in highestScorePerFeature)
             {
+                var feature = entry.Key;
+                var score = entry.Value;
                 if (!score.Item2) continue;
                 if (score.Item1 > threshold)
                 {
                     numTarget++;
+                    Console.WriteLine("{0}\t{1}\t{2}",score.Item3, feature, score.Item1);
                 }
             }
 

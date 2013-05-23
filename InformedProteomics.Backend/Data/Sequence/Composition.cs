@@ -294,10 +294,12 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Composition operator +(Composition c1, Composition c2)
         {
-            if (c1 == Composition.Zero)
+            // ReSharper disable PossibleUnintendedReferenceComparison
+            if (c1 == Zero)
                 return c2;
-            if (c2 == Composition.Zero)
+            if (c2 == Zero)
                 return c1;
+            // ReSharper restore PossibleUnintendedReferenceComparison
             int numC = c1._c + c2._c;
             int numH = c1._h + c2._h;
             int numN = c1._n + c2._n;

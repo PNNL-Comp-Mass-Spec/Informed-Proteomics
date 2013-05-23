@@ -78,12 +78,14 @@ namespace InformedProteomics.Backend.Data.Sequence
             _imsScorerFactory = imsScorerFactory;
         }
 
-        public Tuple<Feature, double> GetBestFeatureAndScore(int precursorCharge)
+        // Feature, precursorScore, totalScore
+        public Tuple<Feature, double, double> GetBestFeatureAndScore(int precursorCharge)
         {
             var precursorIon = new Ion(_sequenceComposition + Composition.H2O, precursorCharge);
             var imsScorer = _imsScorerFactory.GetImsScorer(_imsData, precursorIon);
 
             var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMz());
+            var bestPrecursorScore = double.NegativeInfinity;
             var bestScore = double.NegativeInfinity;
             Feature bestFeature = null;
             foreach (var precursorFeature in precursorFeatureSet)
@@ -100,12 +102,13 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var curFeatureScore = precursorScore + productScore;
                 if (curFeatureScore > bestScore)
                 {
+                    bestPrecursorScore = precursorScore;
                     bestScore = curFeatureScore;
                     bestFeature = precursorFeature;
                 }
             }
 
-            return new Tuple<Feature, double>(bestFeature, bestScore);
+            return new Tuple<Feature, double, double>(bestFeature, bestPrecursorScore, bestScore);
         }
 
         public Ion GetPrecursorIon(int charge)

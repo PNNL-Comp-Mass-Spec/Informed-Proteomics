@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             for (int charge = 1; charge <= _maxCharge; charge++)
             {
-                string chargeStr = charge == 1 ? "" : Convert.ToString(charge);
+                var chargeStr = charge == 1 ? "" : Convert.ToString(charge);
                 foreach (var baseIonType in _baseIons)
                 {
                     foreach (var neutralLossComposition in _neutralLosses)

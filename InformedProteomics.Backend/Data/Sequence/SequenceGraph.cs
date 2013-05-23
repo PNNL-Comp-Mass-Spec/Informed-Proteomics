@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -226,7 +227,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                 
                 nextNodeMap = newNextNodeMap;
             }
-
             
             var scoringGraph = new ScoringGraph(_aminoAcidSequence, GetComposition(_index, sequenceIndex), rootNode);
 

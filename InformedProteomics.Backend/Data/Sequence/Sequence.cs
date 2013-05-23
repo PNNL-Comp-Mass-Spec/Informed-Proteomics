@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -38,6 +40,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
+        public Sequence(string sequence, AminoAcidSet aminoAcidSet)
+        {
+            Composition composition = Composition.Zero;
+            SequenceString = sequence;
+            foreach (var residue in SequenceString)
+            {
+                var aa = aminoAcidSet.GetAminoAcid(residue);
+                Add(aa);
+                composition += aa.Composition;
+            }
+            Composition = composition;
+        }
+
         public Composition Composition { get; private set; }
     	public string SequenceString { get; set; }
 
@@ -66,6 +81,65 @@ namespace InformedProteomics.Backend.Data.Sequence
             for (var i = from; i < to; i++)
                 composition += this[i].Composition;
             return composition;
+        }
+
+        public IEnumerable<Composition> GetPrefixCompositions()
+        {
+            var compositions = new Composition[Count];
+            var prefixComposition = Composition.Zero;
+            var index = -1;
+            foreach (var aa in this)
+            {
+                compositions[++index] = (prefixComposition += aa.Composition);
+            }
+            return compositions;
+        }
+
+        public IEnumerable<Composition> GetSuffixCompositions()
+        {
+            var compositions = new Composition[Count];
+            var suffixComposition = Composition.Zero;
+            for(var index = Count-1; index >= 0; --index)
+            {
+                compositions[index] = (suffixComposition += this[index].Composition);
+            }
+            return compositions;
+        }
+
+        public Ion GetPrecursorIon(int charge)
+        {
+            return new Ion(Composition, charge);
+        }
+
+        public Dictionary<string, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
+        {
+            var ionTypeArr = ionTypes as IonType[] ?? ionTypes.ToArray();
+
+            var productIonMap = new Dictionary<string, Ion>();
+
+            // prefix
+            var index = 0;
+            foreach (var prefixComposition in GetPrefixCompositions())
+            {
+                ++index;
+                foreach (var ionType in ionTypeArr.Where(ionType => ionType.IsPrefixIon))
+                {
+                    productIonMap.Add("(" + ionType.Name + ")" + index, ionType.GetIon(prefixComposition));
+                }
+            }
+
+            // suffix
+            index = 0;
+            foreach (var suffixComposition in GetSuffixCompositions())
+            {
+                ++index;
+                foreach (var ionType in ionTypeArr.Where(ionType => !ionType.IsPrefixIon))
+                {
+                    productIonMap.Add("(" + ionType.Name + ")" + index, ionType.GetIon(suffixComposition));
+                }
+            }
+
+            return productIonMap;
         }
     }
 }

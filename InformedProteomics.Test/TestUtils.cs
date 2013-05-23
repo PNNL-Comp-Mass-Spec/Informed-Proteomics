@@ -17,6 +17,28 @@ namespace InformedProteomics.Test
     internal class TestUtils
     {
         [Test]
+        public void TestGetProductIons()
+        {
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+            var sequence = new Sequence("CCAADDKEACFAVEGPK", aaSet);
+
+            var ionTypeFactory = new IonTypeFactory(
+                new[] {BaseIonType.B, BaseIonType.Y}, 
+                new[] {NeutralLoss.NoLoss}, 
+                maxCharge: 2);
+
+            Console.WriteLine("Precursor Ion: {0}" + sequence.GetPrecursorIon(charge: 2));
+            Console.WriteLine("Product ions: ");
+            var ionTypeDictionary = sequence.GetProductIons(ionTypeFactory.GetAllKnownIonTypes());
+            foreach (var ionType in ionTypeDictionary)
+            {
+                var name = ionType.Key;
+                var ion = ionType.Value;
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", name, ion.Composition, ion.Charge, ion.GetMz());
+            }
+        }
+
+        [Test]
         public void TestSequenceGraph()
         { 
             var phosPhoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
@@ -166,10 +188,11 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsotopomerProfile()
         {
-            const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
+            //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
+            const string molFormula = "C150H120N220O28S30";    // CCAADDKEACFAVEGPK
 
-            IsotopicDistributionCalculator isoCalc = IsotopicDistributionCalculator.Instance;
-            IsotopicProfile profile = isoCalc.GetIsotopePattern(molFormula);
+            var isoCalc = IsotopicDistributionCalculator.Instance;
+            var profile = isoCalc.GetIsotopePattern(molFormula);
 
             var sb = new StringBuilder();
 
@@ -195,5 +218,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine(ii);
             }
         }
+
 	}
 }
