@@ -111,11 +111,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Ion(Composition, charge);
         }
 
-        public Dictionary<string, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
+        public Dictionary<Tuple<IonType,int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
         {
             var ionTypeArr = ionTypes as IonType[] ?? ionTypes.ToArray();
 
-            var productIonMap = new Dictionary<string, Ion>();
+            var productIonMap = new Dictionary<Tuple<IonType, int>, Ion>();
 
             // prefix
             foreach (var ionType in ionTypeArr.Where(ionType => ionType.IsPrefixIon))
@@ -124,7 +124,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 foreach (var prefixComposition in GetPrefixCompositions())
                 {
                     ++index;
-                    productIonMap.Add(ionType.GetName(index), ionType.GetIon(prefixComposition));
+                    productIonMap.Add(new Tuple<IonType,int> (ionType, index), ionType.GetIon(prefixComposition));
                 }
             }
 
@@ -135,7 +135,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 foreach (var suffixComposition in GetSuffixCompositions())
                 {
                     ++index;
-                    productIonMap.Add(ionType.GetName(index), ionType.GetIon(suffixComposition));
+                    productIonMap.Add(new Tuple<IonType, int>(ionType, index), ionType.GetIon(suffixComposition));
                 }
             }
 

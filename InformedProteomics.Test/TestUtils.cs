@@ -29,12 +29,14 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("Precursor Ion: {0}\t{1}", sequence.GetPrecursorIon(2).Composition, sequence.GetPrecursorIon(2).GetMz());
             Console.WriteLine("Product ions: ");
-            var ionTypeDictionary = sequence.GetProductIons(ionTypeFactory.GetAllKnownIonTypes());
-            foreach (var ionType in ionTypeDictionary)
+            var productIons = sequence.GetProductIons(ionTypeFactory.GetAllKnownIonTypes());
+            foreach (var theoIon in productIons)
             {
-                var name = ionType.Key;
-                var ion = ionType.Value;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", name, ion.Composition, ion.Charge, ion.GetMz());
+                var ionTypeAndIndex = theoIon.Key;
+                var ionType = ionTypeAndIndex.Item1;
+                var index = ionTypeAndIndex.Item2;
+                var ion = theoIon.Value;
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", ionType.Name, index, ion.Composition, ion.Charge, ion.GetMz());
             }
         }
 
