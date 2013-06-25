@@ -12,6 +12,7 @@ namespace InformedProteomics.Backend.Database
         public static readonly string SeqFileExtension = ".icseq";
         public static readonly string AnnotationFileExtension = ".icanno";
         public static readonly char Delimiter = '_';
+        public static readonly byte LastCharacter = (byte)'~';
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 
@@ -32,8 +33,9 @@ namespace InformedProteomics.Backend.Database
             if (!File.Exists(_seqFilePath) || !File.Exists(_annoFilePath) || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash) ||
                 !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
             {
-                Console.WriteLine("Generating " + _seqFilePath + " and " + _annoFilePath);
+                Console.Write("Generating " + _seqFilePath + " and " + _annoFilePath);
                 GenerateMetaFiles();
+                Console.WriteLine("\tDone.");
             }
         }
 
@@ -52,6 +54,7 @@ namespace InformedProteomics.Backend.Database
 
         public byte[] GetSequence()
         {
+            if(_sequence == null)   Read();
             return _sequence;
         }
 
@@ -107,8 +110,6 @@ namespace InformedProteomics.Backend.Database
             if(File.Exists(_annoFilePath))
                 File.Delete(_annoFilePath);
 
-            Console.WriteLine("Generating " + _seqFilePath + " and " + _annoFilePath + ".");
-
             using (var seqWriter = new BinaryWriter(File.Open(_seqFilePath, FileMode.CreateNew)))
             using (var annoWriter = new StreamWriter(_annoFilePath))
             {
@@ -119,15 +120,15 @@ namespace InformedProteomics.Backend.Database
                 long offset = 0;
                 while (reader.ReadNextProteinEntry())
                 {
-                    string name = reader.ProteinName;
-                    string description = reader.ProteinDescription;
-                    string sequence = Delimiter + reader.ProteinSequence;
+                    var name = reader.ProteinName;
+                    var description = reader.ProteinDescription;
+                    var sequence = Delimiter + reader.ProteinSequence;
                     seqWriter.Write(Encoding.GetBytes(sequence));
                     annoWriter.WriteLine(offset + ":" + name + ":" + description);
                     offset += sequence.Length;
                 }
 
-                int hashCode = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
+                var hashCode = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
                 seqWriter.Write(hashCode);
                 annoWriter.Write(hashCode);
@@ -140,8 +141,9 @@ namespace InformedProteomics.Backend.Database
         {
             using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
             {
-                _sequence = new byte[fileStream.Length - sizeof(int)];
+                _sequence = new byte[fileStream.Length - sizeof(int) + 1];
                 fileStream.Read(_sequence, 0, _sequence.Length);
+                _sequence[_sequence.Length - 1] = LastCharacter;
             }
 
             return true;

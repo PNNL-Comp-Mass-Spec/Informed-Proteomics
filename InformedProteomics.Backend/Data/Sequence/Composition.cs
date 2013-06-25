@@ -372,6 +372,16 @@ namespace InformedProteomics.Backend.Data.Sequence
             return buf.ToString();
         }
 
+        public string ToPlainString()
+        {
+            return
+                (C == 0 ? "" : "C" + C)
+                + (H == 0 ? "" : "H" + H)
+                + (N == 0 ? "" : "N" + N)
+                + (O == 0 ? "" : "O" + O)
+                + (S == 0 ? "" : "S" + S);
+        }
+
         //added by kyowon, incomplete for additional Elementss
         public static Composition Parse(string s)
         {

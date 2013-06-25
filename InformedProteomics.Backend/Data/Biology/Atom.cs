@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Xml.Linq;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
@@ -12,13 +16,13 @@ namespace InformedProteomics.Backend.Data.Biology
             Name = name;
         }
 
+        public string Code { get; private set; }
+
         public string Name { get; private set; }
 
         public double Mass { get; private set; }
 
         public int NominalMass { get; private set; }
-
-        public string Code { get; private set; }
 
         public double GetMass()
         {
@@ -78,6 +82,38 @@ namespace InformedProteomics.Backend.Data.Biology
             {
                 AtomMap.Add(atom.Code,atom);
             }
+        }
+
+        private static void ReadFromPnnlOmicsElementDataXmlFile()
+        {
+            const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
+            var xdocument = XDocument.Load(xmlFileName);
+
+            var parameterBaseElement = xdocument.Element("parameters");
+            if (parameterBaseElement == null)
+            {
+                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'parameters' but it was not found");
+            }
+
+            var elementIsotopes = parameterBaseElement.Element("ElementIsotopes");
+            if (elementIsotopes == null)
+            {
+                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'ElementIsotopes' but it was not found");
+            }
+
+            var elements = elementIsotopes.Elements("Element");
+            if (elements == null)
+            {
+                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'Element' but it was not found");
+            }
+
+            foreach (var element in elements)
+            {
+                var symbol = element.Element("Symbol").Value;
+                var name = element.Element("Name").Value;
+                var numIsotopes = int.Parse(element.Element("NumIsotopes").Value);
+            }
+            
         }
     }
 }

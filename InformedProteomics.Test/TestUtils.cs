@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using DeconTools.Backend.Core;
+using DeconTools.Backend.Parameters;
 using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
@@ -191,7 +194,7 @@ namespace InformedProteomics.Test
         public void TestIsotopomerProfile()
         {
             //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
-            const string molFormula = "C150H120N220O28S30";    // CCAADDKEACFAVEGPK
+            const string molFormula = "C83H136N22O24S1"; 
 
             var isoCalc = IsotopicDistributionCalculator.Instance;
             var profile = isoCalc.GetIsotopePattern(molFormula);
@@ -213,13 +216,72 @@ namespace InformedProteomics.Test
         public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
         {
             //C78H120N22O28S3 C150H120N220O28S30
-            var composition = new Composition(150, 120, 220, 28, 30);
-            var ff = composition.GetApproximatedIsotopomerEnvelop(30);
+            //var additionalElements = new[]
+            //    {
+            //        new Tuple<Atom, short>(Atom.Get("P"), 1),
+            //        new Tuple<Atom, short>(Atom.Get("13C"), 3),
+            //        new Tuple<Atom, short>(Atom.Get("15N"), 1),
+            //    };
+            //var composition = new Composition(149, 244, 44, 57, 0, additionalElements);
+            var composition = new Composition(83, 136, 22, 24, 1);
+            var ff = composition.GetApproximatedIsotopomerEnvelop(10);
             foreach (var ii in ff)
             {
                 Console.WriteLine(ii);
             }
         }
 
-	}
+        [Test]
+        public void TestTimeToComputeIsotopomerProfiles()
+        {
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt";
+
+            int numPeptides = 0;
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            var isoCalc = IsotopicDistributionCalculator.Instance;
+            foreach (var annotation in File.ReadLines(dbFilePath))
+            {
+                ++numPeptides;
+                var peptide = annotation.Substring(2, annotation.Length - 4);
+                var composition = aaSet.GetComposition(peptide);
+                var molFormula = composition.ToPlainString();
+                var profile = isoCalc.GetIsotopePattern(molFormula);
+                composition.GetApproximatedIsotopomerEnvelop(5);
+            }
+
+            Console.WriteLine("NumPeptides: " + numPeptides);
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            System.Console.WriteLine(@"{0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestReadingPnnlOmicsXmlFile()
+        {
+            const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
+            var xdocument = XDocument.Load(xmlFileName);
+            var parameterBaseElement = xdocument.Element("parameters");
+
+            if (parameterBaseElement == null)
+            {
+                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'parameters' but it was not found");
+            }
+
+// ReSharper disable PossibleNullReferenceException
+            var elements = parameterBaseElement.Element("ElementIsotopes").Elements("Element");
+// ReSharper restore PossibleNullReferenceException
+            foreach (var element in elements)
+            {
+                var symbol = element.Element("Symbol");
+                var name = element.Element("Name");
+                if (symbol != null && name != null)
+                {
+                    Console.WriteLine("{0} {1}", symbol.Value, name.Value);
+                }
+            }
+        }
+    }
 }
