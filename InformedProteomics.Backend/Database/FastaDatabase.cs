@@ -39,6 +39,27 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        public IEnumerable<char> Characters()
+        {
+            if (_sequence != null)
+            {
+                foreach (var code in _sequence)
+                {
+                    yield return Convert.ToChar(code);
+                }
+            }
+            else
+            {
+                using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    for (var i = 0; i < fileStream.Length - sizeof (int); i++)
+                    {
+                        yield return Convert.ToChar(fileStream.ReadByte());
+                    }
+                }                
+            }
+        }
+
         public void Read()
         {
             if (!ReadSeqFile())

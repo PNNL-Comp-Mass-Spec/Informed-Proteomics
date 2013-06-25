@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
@@ -13,6 +13,10 @@ namespace InformedProteomics.Backend.Database
         private readonly string _pLcpFilePath;
 
         private readonly FastaDatabase _fastaDatabase;
+
+        private readonly int _maxPeptideLength;
+        
+        private LinkedList<char> _curSequence;
 
         public IndexedDatabase(FastaDatabase fastaDatabase)
         {
@@ -29,6 +33,20 @@ namespace InformedProteomics.Backend.Database
                 CreatePermutedLongestCommonPrefixFile();
                 Console.WriteLine("\tDone.");
             }
+
+            _maxPeptideLength = 30;
+            _curSequence = null;
+        }
+
+        public IEnumerable<Tuple<string, short>> Sequence(int maxLength)
+        {
+            using (var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read))
+            {
+                foreach (var residue in _fastaDatabase.Characters())
+                {
+                }
+            }
+            return null;
         }
 
         private void CreatePermutedLongestCommonPrefixFile()
@@ -36,7 +54,7 @@ namespace InformedProteomics.Backend.Database
             if (File.Exists(_pLcpFilePath))
                 File.Delete(_pLcpFilePath);
 
-            byte[] sequence = _fastaDatabase.GetSequence();
+            var sequence = _fastaDatabase.GetSequence();
             //Console.WriteLine("Sequence: {0}", Encoding.ASCII.GetString(sequence));
             var suffixArray = new int[sequence.Length-1];
             SAIS.sufsort(sequence, suffixArray, sequence.Length-1);

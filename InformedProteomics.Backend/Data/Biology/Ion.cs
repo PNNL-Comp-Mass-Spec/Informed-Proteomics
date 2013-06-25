@@ -27,5 +27,16 @@ namespace InformedProteomics.Backend.Data.Biology
         {
             return (Composition.GetIsotopeMass(isotopeIndex) + Charge * Constants.H) / Charge;
         }
+
+        /// <summary>
+        /// Gets the m/z of ith isotope
+        /// </summary>
+        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes.</param>
+        /// <returns></returns>
+        public double GetIsotopeMz(double isotopeIndexInRealNumber)
+        {
+            return (Composition.GetIsotopeMass(isotopeIndexInRealNumber) + Charge * Constants.H) / Charge;
+        }
+
     }
 }

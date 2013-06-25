@@ -77,7 +77,7 @@ namespace InformedProteomics.Test
             sw.Start();
 
             var db = new FastaDatabase(dbFile);
-            db.Read();
+
             var indexedDb = new IndexedDatabase(db);
 
             sw.Stop();

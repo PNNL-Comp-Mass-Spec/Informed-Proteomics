@@ -43,9 +43,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         public SequenceGraph(AminoAcidSet aminoAcidSet, string pepSequence)
             : this(aminoAcidSet, pepSequence.Length)
         {
-            int index = 0;
+            var index = 0;
             PutAminoAcid(index, AminoAcid.PeptideNTerm.Residue);
-            foreach (char aaResidue in pepSequence)
+            foreach (var aaResidue in pepSequence)
             {
                 ++index;
                 PutAminoAcid(index, aaResidue);
@@ -75,6 +75,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             _graph = new Node[_maxIndex][];
             _graph[0] = new[] { new Node(0) };
+        }
+
+        public bool PutPeptideSequence(string sequence)
+        {
+            return PutSequence(sequence, false);
+        }
+
+        public bool PutSequence(string sequence, bool isProtein)
+        {
+            var index = 0;
+            PutAminoAcid(index, isProtein ? AminoAcid.ProteinNTerm.Residue : AminoAcid.PeptideNTerm.Residue);
+
+            foreach (var aaResidue in sequence)
+            {
+                ++index;
+                if (PutAminoAcid(index, aaResidue) == false) return false;
+            }
+            return true;
         }
 
         public bool AddAminoAcid(char residue)

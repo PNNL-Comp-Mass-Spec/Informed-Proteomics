@@ -126,6 +126,17 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
+        /// Gets the m/z of ith isotope
+        /// </summary>
+        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes.</param>
+        /// <returns></returns>
+        public double GetIsotopeMass(double isotopeIndexInRealNumber)
+        {
+            return GetMass() + isotopeIndexInRealNumber * MassIsotope;
+        }
+
+
+        /// <summary>
         /// Gets the mono-isotopic nominal mass
         /// </summary>
         public int GetNominalMass()
