@@ -70,16 +70,29 @@ namespace InformedProteomics.Test
         [Test]
         public void TestDatabaseIndexing()
         {
-            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\test.fasta";
+            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
             //const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\uniprot_sprot.56.6_withContam.fasta";
+            //const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             var db = new FastaDatabase(dbFile);
+            //db.Read();
 
             var indexedDb = new IndexedDatabase(db);
+            //indexedDb.Read();
+            //foreach (var seqAndLcp in indexedDb.SequenceLcpPairs(6,30))
+            //{
+            //    var seq = Encoding.ASCII.GetString(seqAndLcp.Item1);
+            //    var lcp = seqAndLcp.Item2;
+            //    //Console.WriteLine("{0}\t{1}", seq, lcp);
+            //}
 
+            foreach (var peptide in indexedDb.SequencesAsStrings(6, 30, 2, 1, new[] {'K', 'R'}, false))
+            {
+                Console.WriteLine(peptide);
+            }
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             System.Console.WriteLine(@"{0:f4} sec", sec);

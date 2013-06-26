@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.Database
     {
         public static readonly string SeqFileExtension = ".icseq";
         public static readonly string AnnotationFileExtension = ".icanno";
-        public static readonly char Delimiter = '_';
+        public static readonly byte Delimiter = (byte)'_';
         public static readonly byte LastCharacter = (byte)'~';
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
@@ -33,28 +33,38 @@ namespace InformedProteomics.Backend.Database
             if (!File.Exists(_seqFilePath) || !File.Exists(_annoFilePath) || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash) ||
                 !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
             {
-                Console.Write("Generating " + _seqFilePath + " and " + _annoFilePath);
+                Console.Write("Generating " + _seqFilePath + " and " + _annoFilePath + "...");
                 GenerateMetaFiles();
                 Console.WriteLine("\tDone.");
             }
         }
 
-        public IEnumerable<char> Characters()
+        public IEnumerable<byte> Characters()
         {
             if (_sequence != null)
             {
-                foreach (var code in _sequence)
+                for (int i = 0; i < _sequence.Length - 1; i++ )
                 {
-                    yield return Convert.ToChar(code);
+                    yield return _sequence[i];
                 }
             }
             else
             {
+                const int bufferSize = 1 << 16;
+                var buffer = new byte[bufferSize];
+                var count = bufferSize;
+                var numBytesRead = 0;
+
                 using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
                 {
-                    for (var i = 0; i < fileStream.Length - sizeof (int); i++)
+                    var numBytesToRead = fileStream.Length - sizeof (int);
+                    while (count > 0)
                     {
-                        yield return Convert.ToChar(fileStream.ReadByte());
+                        count = fileStream.Read(buffer, 0, bufferSize);
+                        for (var i = 0; i < count && numBytesRead++ < numBytesToRead; i++)
+                        {
+                            yield return buffer[i];
+                        }
                     }
                 }                
             }
@@ -121,6 +131,7 @@ namespace InformedProteomics.Backend.Database
 
         private IDictionary<long, string> _names;
         private IDictionary<long, string> _descriptions;
+
         private byte[] _sequence;
 
         private void GenerateMetaFiles()
@@ -143,7 +154,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     var name = reader.ProteinName;
                     var description = reader.ProteinDescription;
-                    var sequence = Delimiter + reader.ProteinSequence;
+                    var sequence = (char)Delimiter + reader.ProteinSequence;
                     seqWriter.Write(Encoding.GetBytes(sequence));
                     annoWriter.WriteLine(offset + ":" + name + ":" + description);
                     offset += sequence.Length;
