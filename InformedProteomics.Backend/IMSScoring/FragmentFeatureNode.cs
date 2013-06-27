@@ -28,7 +28,8 @@ namespace InformedProteomics.Backend.IMSScoring
                 lcScore = _scoringParams.GetIsotopeLcCorrelationScore(FragmentIonClassBase, LcCorrelation, GroupParameter);
                 imsScore = _scoringParams.GetIsotopeImsCorrelationScore(FragmentIonClassBase, ImsCorrelation, GroupParameter);
             }
-            Score = lcScore + imsScore + isotopeScore;
+            //Score = lcScore + imsScore + isotopeScore;
+            Score = isotopeScore;
             IsScoreCalculated = true;
             return Score;
         }

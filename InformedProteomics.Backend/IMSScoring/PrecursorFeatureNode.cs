@@ -21,10 +21,12 @@ namespace InformedProteomics.Backend.IMSScoring
             var imsScore = 0.0;
             if (LcCorrelation >= 0)
             {
+                //Console.WriteLine("precursor" + LcCorrelation + " " + ImsCorrelation);
                 lcScore = _scoringParams.GetIsotopeLcCorrelationScore(LcCorrelation, GroupParameter);
                 imsScore = _scoringParams.GetIsotopeImsCorrelationScore(ImsCorrelation, GroupParameter);
             }
-            Score = lcScore + imsScore + isotopeScore;
+            //Score = lcScore + imsScore + isotopeScore;
+            Score = isotopeScore;
             IsScoreCalculated = true;
             return Score;
         }

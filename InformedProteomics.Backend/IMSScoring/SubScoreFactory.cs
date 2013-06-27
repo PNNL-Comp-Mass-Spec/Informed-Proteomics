@@ -10,9 +10,13 @@ namespace InformedProteomics.Backend.IMSScoring
         // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
-        private const int MaxCorrIntScore = 6;
+        private const int MaxCorrIntScore = 5;
         private const double CorrIntScoreFactor = 0.15;
-        private const double LowScore = -3; // TODO how to??
+        private const double CorrIntScoreFactor2 = 0.65;
+        private const double LowScore = -3;
+        private const double HighScore = 3;
+
+
         //TODO : ims, lc corr score should be dependent on ratio scores..
 
         private readonly Dictionary<GroupParameter, List<IonType>> _ionTypeDictionary;
@@ -207,15 +211,15 @@ namespace InformedProteomics.Backend.IMSScoring
         internal double GetLcCorrelationScore(IonType ionType1, IonType ionType2, double lcCorr, GroupParameter parameter)
         {
             if (_lcCorrScoreDictionary.Count == 0)
-                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_lcCorrScoreDictionary, ionType1, ionType2, CorrToInt(lcCorr), parameter);
+                return CorrToInt2(lcCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_lcCorrScoreDictionary, ionType1, ionType2, CorrToInt2(lcCorr), parameter);
         }
 
         internal double GetImsCorrelationScore(IonType ionType1, IonType ionType2, double imsCorr, GroupParameter parameter)
         {
             if (_imsCorrScoreDictionary.Count == 0)
-                return CorrToInt(imsCorr) / 5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_imsCorrScoreDictionary, ionType1, ionType2, CorrToInt(imsCorr), parameter);
+                return CorrToInt2(imsCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_imsCorrScoreDictionary, ionType1, ionType2, CorrToInt2(imsCorr), parameter);
         }
 
         internal double GetRatioScore(IonType ionType, int ratio, GroupParameter parameter)  // between precursor and frag ion
@@ -236,43 +240,43 @@ namespace InformedProteomics.Backend.IMSScoring
         internal double GetIsotopeIntensityCorrelationScore(IonType ionType, double isotopeCorr, GroupParameter groupParameter)
         {
             if (_isotopeIntensityCorrScoreDictionary.Count == 0)
-                return CorrToInt(isotopeCorr) / 5.0 * (-2 * LowScore) + LowScore;
+                return CorrToInt(isotopeCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
             return GetScoreFromDictionary(_isotopeIntensityCorrScoreDictionary, _ionTypeDictionary[groupParameter].IndexOf(ionType), CorrToInt(isotopeCorr), groupParameter);
         }
 
         internal double GetIsotopeLcCorrelationScore(IonType ionType, double lcCorr, GroupParameter parameter)
         {
             if (_isotopeLcCorrScoreDictionary.Count == 0)
-                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_isotopeLcCorrScoreDictionary, _ionTypeDictionary[parameter].IndexOf(ionType), CorrToInt(lcCorr), parameter);
+                return CorrToInt2(lcCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_isotopeLcCorrScoreDictionary, _ionTypeDictionary[parameter].IndexOf(ionType), CorrToInt2(lcCorr), parameter);
         }
 
         internal double GetIsotopeImsCorrelationScore(IonType ionType, double imsCorr, GroupParameter groupParameter)
         {
             if (_isotopeImsCorrScoreDictionary.Count == 0)
-                return CorrToInt(imsCorr) / 5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_isotopeImsCorrScoreDictionary, _ionTypeDictionary[groupParameter].IndexOf(ionType), CorrToInt(imsCorr), groupParameter);
+                return CorrToInt2(imsCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_isotopeImsCorrScoreDictionary, _ionTypeDictionary[groupParameter].IndexOf(ionType), CorrToInt2(imsCorr), groupParameter);
         }
 
         internal double GetIsotopeIntensityCorrelationScore(double isotopeCorr, GroupParameter groupParameter)
         {
             if (_precursorIsotopeIntensityCorrScoreDictionary.Count == 0)
-                return CorrToInt(isotopeCorr) / 5.0 * (-2 * LowScore) + LowScore;
+                return CorrToInt(isotopeCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
             return GetScoreFromDictionary(_precursorIsotopeIntensityCorrScoreDictionary, CorrToInt(isotopeCorr), groupParameter);
         }
 
         internal double GetIsotopeLcCorrelationScore(double lcCorr, GroupParameter parameter)
         {
             if (_precursorIsotopeLcCorrScoreDictionary.Count == 0)
-                return CorrToInt(lcCorr) / 5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_precursorIsotopeLcCorrScoreDictionary, CorrToInt(lcCorr), parameter);
+                return CorrToInt2(lcCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_precursorIsotopeLcCorrScoreDictionary, CorrToInt2(lcCorr), parameter);
         }
 
         internal double GetIsotopeImsCorrelationScore(double imsCorr, GroupParameter parameter)
         {
             if (_precursorIsotopeImsCorrScoreDictionary.Count == 0)
-                return CorrToInt(imsCorr)/5.0 * (-2 * LowScore) + LowScore;
-            return GetScoreFromDictionary(_precursorIsotopeImsCorrScoreDictionary, CorrToInt(imsCorr), parameter);
+                return CorrToInt2(imsCorr) / (double)MaxCorrIntScore * (HighScore - LowScore) + LowScore;
+            return GetScoreFromDictionary(_precursorIsotopeImsCorrScoreDictionary, CorrToInt2(imsCorr), parameter);
         }
 
         internal double GetKLDivergence(IonType ionType, IonType ionType1, int ratio, double lcCorrelation, double imsCorrelation, GroupParameter groupParameter)
@@ -287,13 +291,13 @@ namespace InformedProteomics.Backend.IMSScoring
             }
             if (_lcCorrTargetProbDictionary.ContainsKey(groupParameter))
             {
-                prob1 = prob1 * _lcCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt(lcCorrelation)];
-                prob2 = prob2 * _lcCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt(lcCorrelation)];    
+                prob1 = prob1 * _lcCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt2(lcCorrelation)];
+                prob2 = prob2 * _lcCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt2(lcCorrelation)];    
             }
             if(_imsCorrTargetProbDictionary.ContainsKey(groupParameter))
             {
-                prob1 = prob1 * _imsCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt(imsCorrelation)];
-                prob2 = prob2 * _imsCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt(imsCorrelation)];   
+                prob1 = prob1 * _imsCorrTargetProbDictionary[groupParameter][ionTypeIndices][CorrToInt2(imsCorrelation)];
+                prob2 = prob2 * _imsCorrDecoyProbDictionary[groupParameter][ionTypeIndices][CorrToInt2(imsCorrelation)];   
             }
             return GetKLDivergence(prob1, prob2);
         }
@@ -317,6 +321,19 @@ namespace InformedProteomics.Backend.IMSScoring
                 if (1 - m > corr)
                     break;
                 m = m * CorrIntScoreFactor; // 
+            }
+            return score;
+        }
+
+        public static int CorrToInt2(double corr) // the higher the better from 1 to 5
+        {
+            var m = 1.0;
+            var score = 0;
+            for (; score < MaxCorrIntScore; score++)
+            {
+                if (1 - m > corr)
+                    break;
+                m = m * CorrIntScoreFactor2; // 
             }
             return score;
         }
