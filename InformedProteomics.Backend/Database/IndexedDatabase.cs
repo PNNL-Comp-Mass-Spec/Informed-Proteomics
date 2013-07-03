@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using InformedProteomics.Backend.Data.Biology;
 using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
@@ -104,14 +105,32 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini, int numMissedCleavages, char[] enzymaticResidues, bool isNTermEnzyme)
+        public long CountSequences(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, Enzyme enzyme)
+        {
+            long numSequences = 0;
+
+            return numSequences;
+        }
+
+        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, Enzyme enzyme)
+        {
+            return SequencesAsStrings(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
+                               enzyme.IsNTerm);
+        }
+
+        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, char[] enzymaticResidues,
+                                                      bool isNTermEnzyme)
         {
             var isCleavable = new bool[128];
             if (enzymaticResidues != null)
             {
                 foreach (var residue in enzymaticResidues)
                 {
-                    isCleavable[(int)residue] = true;    
+                    isCleavable[(int)residue] = true;
+                    isCleavable[(int) FastaDatabase.Delimiter] = true;
                 }
             }
 
@@ -123,7 +142,8 @@ namespace InformedProteomics.Backend.Database
             }
 
             var encoding = System.Text.Encoding.ASCII;
-            foreach (var seqAndLcp in SequenceLcpPairs(minLength, maxLength+1))
+            // pre, peptide sequence, next
+            foreach (var seqAndLcp in SequenceLcpPairs(minLength, maxLength+2))
             {
                 var seqArr = seqAndLcp.Item1;
                 var lcp = seqAndLcp.Item2;
@@ -137,7 +157,7 @@ namespace InformedProteomics.Backend.Database
                         if (isCleavable[seqArr[0]]) ++ntt;
                         if (ntt < numTolerableTermini-1) continue;
 
-                        for (var i = 1; i < seqArr.Length; i++)
+                        for (var i = 1; i < seqArr.Length-1; i++)
                         {
                             var code = seqArr[i];
                             if (!isStandardAminoAcid[code]) break;
@@ -145,9 +165,9 @@ namespace InformedProteomics.Backend.Database
 
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || i < seqArr.Length-1 && seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return (char)seqArr[0]+"."+encoding.GetString(seqArr, 1, i);
+                                    yield return string.Format("{0}.{1}.{2}",(char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i+1]);
                                 }
                             }
                             if (nmc > numMissedCleavages) break;

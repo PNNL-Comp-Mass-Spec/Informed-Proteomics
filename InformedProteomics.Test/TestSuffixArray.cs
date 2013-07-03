@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Database;
 using NUnit.Framework;
 using SuffixArray;
@@ -89,10 +90,30 @@ namespace InformedProteomics.Test
             //    //Console.WriteLine("{0}\t{1}", seq, lcp);
             //}
 
-            foreach (var peptide in indexedDb.SequencesAsStrings(6, 30, 2, 1, new[] {'K', 'R'}, false))
+            foreach (var peptide in indexedDb.SequencesAsStrings(
+                minLength: 6, 
+                maxLength: 40, 
+                numTolerableTermini: 1, 
+                numMissedCleavages: 2, 
+                enzyme: Enzyme.Trypsin)
+                )
             {
                 Console.WriteLine(peptide);
             }
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            System.Console.WriteLine(@"{0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestGeneratingDecoyDatabase()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
+            var db = new FastaDatabase(dbFile);
+            var decoyDb = db.Decoy(Enzyme.Trypsin);
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             System.Console.WriteLine(@"{0:f4} sec", sec);

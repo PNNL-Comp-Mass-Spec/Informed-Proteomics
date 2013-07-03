@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 using ProteinFileReader;
 
 namespace InformedProteomics.Backend.Database
@@ -11,12 +12,14 @@ namespace InformedProteomics.Backend.Database
     {
         public static readonly string SeqFileExtension = ".icseq";
         public static readonly string AnnotationFileExtension = ".icanno";
+        public static readonly string DecoyDatabaseFileExtension = ".icdecoy.fasta";
+        public static readonly string DecoyProteinPrefix = "XXX";
         public static readonly byte Delimiter = (byte)'_';
         public static readonly byte LastCharacter = (byte)'~';
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 
-        public FastaDatabase(string databaseFilePath)
+        public FastaDatabase(string databaseFilePath, bool isDecoy = false)
         {
             if (!File.Exists(databaseFilePath))
                 throw new FileNotFoundException("File not found: " + databaseFilePath);
@@ -37,13 +40,71 @@ namespace InformedProteomics.Backend.Database
                 GenerateMetaFiles();
                 Console.WriteLine("\tDone.");
             }
+
+            IsDecoy = isDecoy;
+        }
+
+        public bool IsDecoy { get; private set; }
+
+        public FastaDatabase Decoy(Enzyme enzyme)
+        {
+            if (IsDecoy)
+            {
+                throw new InvalidOperationException("Already a decoy database");
+            }
+
+            var decoyDatabasePath = GetDecoyDatabasePath(enzyme);
+            if (!File.Exists(decoyDatabasePath)) CreateDecoyDatabase(enzyme);
+            return new FastaDatabase(decoyDatabasePath, true);
+        }
+
+        public void CreateDecoyDatabase(Enzyme enzyme)
+        {
+            var reader = new FastaFileReader();
+            if (!reader.OpenFile(_databaseFilePath))
+                return;
+
+            var decoyDatabaseFileName = GetDecoyDatabasePath(enzyme);
+
+            Console.WriteLine("Creating " + decoyDatabaseFileName);
+            using (var decoyWriter = new StreamWriter(decoyDatabaseFileName))
+            {
+                while (reader.ReadNextProteinEntry())
+                {
+                    var name = reader.ProteinName;
+                    var description = reader.ProteinDescription;
+                    var sequence = reader.ProteinSequence;
+
+                    decoyWriter.WriteLine(">{0}_{1} {2}", DecoyProteinPrefix, name, description);
+
+                    var decoySequence = new StringBuilder();
+                    
+                    for (var i = sequence.Length - 1; i >= 0; i--)
+                    {
+                        var residue = sequence[i];
+                        if (enzyme.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
+                        {
+                            var residueToBeReplaced = decoySequence[decoySequence.Length-1];
+                            decoySequence.Remove(decoySequence.Length-1, 1);
+                            decoySequence.Append(residue);
+                            decoySequence.Append(residueToBeReplaced);
+                        }
+                        else
+                        {
+                            decoySequence.Append(residue);
+                        }
+                    }
+                    decoyWriter.WriteLine(decoySequence);
+                }
+                reader.CloseFile();
+            }
         }
 
         public IEnumerable<byte> Characters()
         {
             if (_sequence != null)
             {
-                for (int i = 0; i < _sequence.Length - 1; i++ )
+                for (var i = 0; i < _sequence.Length - 1; i++ )
                 {
                     yield return _sequence[i];
                 }
@@ -94,6 +155,16 @@ namespace InformedProteomics.Backend.Database
             Console.WriteLine(_sequence == null ? "Sequence is null!" : Encoding.GetString(_sequence));
         }
 
+        public string GetDecoyDatabasePath(Enzyme enzyme)
+        {
+            string newExtenstion;
+            if (enzyme.Residues.Length > 0) newExtenstion = ".icdecoy." + new string(enzyme.Residues) + ".fasta";
+            else newExtenstion = ".icdecoy.fasta";
+
+            return Path.ChangeExtension(_databaseFilePath, newExtenstion);
+        }
+
+
         internal int GetLastWriteTimeHash()
         {
             return _lastWriteTimeHash;
@@ -118,7 +189,7 @@ namespace InformedProteomics.Backend.Database
         static internal bool CheckHashCodeTextFile(string filePath, int code)
         {
             var lastLine = File.ReadLines(filePath).Last(); // TODO: this is not efficient for big files
-            int lastWriteTimeHash = Convert.ToInt32(lastLine);
+            var lastWriteTimeHash = Convert.ToInt32(lastLine);
             if (lastWriteTimeHash == code) return true;
 
             return false;
@@ -162,6 +233,7 @@ namespace InformedProteomics.Backend.Database
 
                 var hashCode = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
+                seqWriter.Write((char)Delimiter);
                 seqWriter.Write(hashCode);
                 annoWriter.Write(hashCode);
 
