@@ -93,12 +93,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var precursorScore = imsScorer.GetPrecursorScore(precursorFeature);
                 var productScore = GetProductIonScore(imsScorer, precursorFeature);
 
-                //if (precursorScore > 5)
-                //{
-                    //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", GetUnmodSequence(), precursorCharge, precursorFeature, precursorScore, productScore);
-                    //Console.WriteLine("{0}\t{1}\t{2}", precursorFeature, precursorScore, productScore);
-                //}
-
                 var curFeatureScore = precursorScore + productScore;
                 if (curFeatureScore > bestScore)
                 {

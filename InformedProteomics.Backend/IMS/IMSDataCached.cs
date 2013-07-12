@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -8,13 +9,15 @@ namespace InformedProteomics.Backend.IMS
 {
     public class ImsDataCached : ImsData
     {
-        private readonly Dictionary<int, FeatureSet> _precursorFeatureSetMap;
-        private readonly bool[] _isPrecursorCached;
+        private readonly ConcurrentDictionary<int, FeatureSet> _precursorFeatureSetMap;
+        //private readonly bool[] _isPrecursorCached;
+        private bool _isAllPrecursorFeaturesCached = false;
 
-        private readonly Dictionary<int, FeatureSet> _fragmentFeatureSetMap;
-        private readonly bool[] _isFragmentCached;
+        private readonly ConcurrentDictionary<int, FeatureSet> _fragmentFeatureSetMap;
+        //private readonly bool[] _isFragmentCached;
+        private bool _isAllFragmentFeaturesCached = false;
 
-        public ImsDataCached(string filePath) : this(filePath, 400.0, 2000.0, 10.0, 2500.0, 
+        public ImsDataCached(string filePath) : this(filePath, 400.0, 1000.0, 10.0, 2000.0, 
             new Tolerance(25, DataReader.ToleranceType.PPM), new Tolerance(25, DataReader.ToleranceType.PPM))
         {
         }
@@ -30,12 +33,8 @@ namespace InformedProteomics.Backend.IMS
             PrecursorTolerance = precursorTolerance;
             FragmentTolerance = fragmentTolerance;
 
-            _precursorFeatureSetMap = new Dictionary<int, FeatureSet>();
-            _fragmentFeatureSetMap = new Dictionary<int, FeatureSet>();
-
-            var numBins = GetNumberOfBins();
-            _isFragmentCached = new bool[numBins];
-            _isPrecursorCached = new bool[numBins];
+            _precursorFeatureSetMap = new ConcurrentDictionary<int, FeatureSet>();
+            _fragmentFeatureSetMap = new ConcurrentDictionary<int, FeatureSet>();
         }
 
         public double MinPrecursorMz { get; private set; }
@@ -79,37 +78,69 @@ namespace InformedProteomics.Backend.IMS
 
         public int CreatePrecursorFeatures()
         {
+            _isAllPrecursorFeaturesCached = true;
             return CreateFeatures(true);
         }
 
         public int CreateFragmentFeatures()
         {
+            _isAllFragmentFeaturesCached = true;
             return CreateFeatures(false);
+        }
+
+        public int CreatePrecursorFeaturesMultiThreads()
+        {
+            _isAllPrecursorFeaturesCached = true;
+            return CreateFeaturesMultiThreading(true);
+        }
+
+        public int CreateFragmentFeaturesMultiThreads()
+        {
+            _isAllFragmentFeaturesCached = true;
+            return CreateFeaturesMultiThreading(false);
         }
 
         private int CreateFeatures(bool isPrecursor)
         {
             var frameType = isPrecursor ? DataReader.FrameType.MS1 : DataReader.FrameType.MS2;
             var featureSetMap = isPrecursor ? _precursorFeatureSetMap : _fragmentFeatureSetMap;
-            var isCached = isPrecursor ? _isPrecursorCached : _isFragmentCached;
             var tolerance = isPrecursor ? PrecursorTolerance : FragmentTolerance;
             var minTargetBin = isPrecursor ? GetBinFromMz(MinPrecursorMz) : GetBinFromMz(MinFragmentMz);
             var maxTargetBin = isPrecursor ? GetBinFromMz(MaxPrecursorMz) : GetBinFromMz(MaxFragmentMz);
             if (maxTargetBin >= GetNumberOfBins())
                 maxTargetBin = GetNumberOfBins() - 1;
 
-            int totalNumFeatures = 0;
+            var totalNumFeatures = 0;
 
-            for (int targetBin = minTargetBin; targetBin <= maxTargetBin; targetBin++)
+            for (var targetBin = minTargetBin; targetBin <= maxTargetBin; targetBin++)
             {
-                double mz = GetMzFromBin(targetBin);
-                //if(targetBin == 81635)
-                //    Console.WriteLine("***MzBin: " + targetBin + "\tMz: " + mz);
-                FeatureSet featureSet = GetFeatures(mz, tolerance, frameType);
-                if (featureSet.GetFeatures().Any())
-                    featureSetMap.Add(targetBin, featureSet);
+                var mz = GetMzFromBin(targetBin);
+                var featureSet = GetFeatures(mz, tolerance, frameType);
+                featureSetMap.TryAdd(targetBin, featureSet);
                 totalNumFeatures += featureSet.GetFeatures().Count();
-                isCached[targetBin] = true;
+            }
+
+            return totalNumFeatures;
+        }
+
+        private int CreateFeaturesMultiThreading(bool isPrecursor)
+        {
+            var frameType = isPrecursor ? DataReader.FrameType.MS1 : DataReader.FrameType.MS2;
+            var featureSetMap = isPrecursor ? _precursorFeatureSetMap : _fragmentFeatureSetMap;
+            var tolerance = isPrecursor ? PrecursorTolerance : FragmentTolerance;
+            var minTargetBin = isPrecursor ? GetBinFromMz(MinPrecursorMz) : GetBinFromMz(MinFragmentMz);
+            var maxTargetBin = isPrecursor ? GetBinFromMz(MaxPrecursorMz) : GetBinFromMz(MaxFragmentMz);
+            if (maxTargetBin >= GetNumberOfBins())
+                maxTargetBin = GetNumberOfBins() - 1;
+
+            var featureSetDictionary = GetFeaturesMultiThreading(minTargetBin, maxTargetBin, tolerance, frameType);
+            var totalNumFeatures = 0;
+            foreach (var entry in featureSetDictionary)
+            {
+                var targetBin = entry.Key;
+                var featureSet = entry.Value;
+                featureSetMap.TryAdd(targetBin, featureSet);
+                totalNumFeatures += featureSet.Count();
             }
 
             return totalNumFeatures;
@@ -117,19 +148,22 @@ namespace InformedProteomics.Backend.IMS
 
         private FeatureSet GetFeatures(double mz, bool isPrecursor)
         {
-            int mzBin = GetBinFromMz(mz);
-            //Console.WriteLine("*****MzBin: " + mzBin + "\tMz: " + mz);
+            var mzBin = GetBinFromMz(mz);
             var featureSetMap = isPrecursor ? _precursorFeatureSetMap : _fragmentFeatureSetMap;
-            var isCached = isPrecursor ? _isPrecursorCached : _isFragmentCached;
 
-            if (isCached[mzBin])
-                return featureSetMap[mzBin];
-            double recoveredMz = GetMzFromBin(mzBin);
+            var isAllFeaturesCached = isPrecursor ? _isAllPrecursorFeaturesCached : _isAllFragmentFeaturesCached;
+
+            FeatureSet curFeatureSet;
+            if (featureSetMap.TryGetValue(mzBin, out curFeatureSet))
+            {
+                return curFeatureSet;
+            }
+
+            var recoveredMz = GetMzFromBin(mzBin);
             var featureSet = isPrecursor ?
                                  GetFeatures(recoveredMz, PrecursorTolerance, DataReader.FrameType.MS1)
                                  : GetFeatures(recoveredMz, FragmentTolerance, DataReader.FrameType.MS2);
-            featureSetMap.Add(mzBin, featureSet);
-            isCached[mzBin] = true;
+            featureSetMap.TryAdd(mzBin, featureSet);
             return featureSet;
         }
 
@@ -138,18 +172,18 @@ namespace InformedProteomics.Backend.IMS
             Feature bestFeature = null;
             const float portionIntersectioinThreshold = 0.5f; // added by Kyowon - testing
             int bestIntersectionArea = 0;
-            Rectangle precursorBoundary = precursorFeature.GetBoundary();
+            var precursorBoundary = precursorFeature.GetBoundary();
             
             // TODO: this may not be optimal
-            FeatureSet features = GetFeatures(mz, isPrecursor);
-            foreach (Feature feature in features)
+            var features = GetFeatures(mz, isPrecursor);
+            foreach (var feature in features)
             {
                 if (precursorBoundary.Contains(feature.GetHighestPoint()))
                 {
-                    Rectangle boundary = feature.GetBoundary();
-                    Rectangle intersection = Rectangle.Intersect(precursorBoundary, boundary);
-                    int intersectionArea = intersection.Width * intersection.Height;
-                    double portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
+                    var boundary = feature.GetBoundary();
+                    var intersection = Rectangle.Intersect(precursorBoundary, boundary);
+                    var intersectionArea = intersection.Width * intersection.Height;
+                    var portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
                     if (portionIntersection < portionIntersectioinThreshold)
                         continue;
                     if (intersectionArea > bestIntersectionArea)
@@ -159,11 +193,6 @@ namespace InformedProteomics.Backend.IMS
                     }
                 }
             }
-
-            //if (precursorFeature.ScanLcStart == 225 && bestFeature != null)
-            //{
-            //    System.Console.WriteLine("**** Mz: {0}\t Feature: {1}", mz, bestFeature);
-            //}
 
             return bestFeature;
         }

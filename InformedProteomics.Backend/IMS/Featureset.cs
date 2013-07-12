@@ -17,9 +17,17 @@ namespace InformedProteomics.Backend.IMS
 
         public FeatureSet(List<IntensityPoint> intensityPointList)
         {
-            IEnumerable<Point> pointList = WaterShedMapUtil.BuildWatershedMap(intensityPointList);
+            var pointList = WaterShedMapUtil.BuildWatershedMap(intensityPointList);
             Smoother.Smooth(ref pointList);
             FindFeatures(pointList);
+        }
+
+        public FeatureSet(IEnumerable<FeatureBlobStatistics> featureStatistics)
+        {
+            foreach (var featureStat in featureStatistics)
+            {
+                _featureList.Add(new Feature(featureStat));
+            }
         }
 
         public FeatureSet(double[,] intensityBlock)
@@ -40,19 +48,19 @@ namespace InformedProteomics.Backend.IMS
 
         #region Private Methods
 
-        public void FindFeatures(IEnumerable<Point> pointList)
+        private void FindFeatures(IEnumerable<Point> pointList)
         {
-            IEnumerable<FeatureBlob> featureBlobList = FeatureDetection.DoWatershedAlgorithm(pointList);
-            IEnumerable<FeatureBlobStatistics> featureBlobStatList = featureBlobList.Select(featureBlob => featureBlob.Statistics).ToList();
+            var featureBlobList = FeatureDetection.DoWatershedAlgorithm(pointList);
+            var featureBlobStatList = featureBlobList.Select(featureBlob => featureBlob.Statistics).ToList();
 
             _featureList = featureBlobStatList.Select(featureBlobStatistics => new Feature(featureBlobStatistics)).ToList();
         }
-        
-        public void FindFeatures(double[,] intensityBlock)
+
+        private void FindFeatures(double[,] intensityBlock)
         {
-            IEnumerable<Point> pointList = WaterShedMapUtil.BuildWatershedMap(intensityBlock);
-            IEnumerable<FeatureBlob> featureBlobList = FeatureDetection.DoWatershedAlgorithm(pointList);
-            IEnumerable<FeatureBlobStatistics> featureBlobStatList = featureBlobList.Select(featureBlob => featureBlob.Statistics).ToList();
+            var pointList = WaterShedMapUtil.BuildWatershedMap(intensityBlock);
+            var featureBlobList = FeatureDetection.DoWatershedAlgorithm(pointList);
+            var featureBlobStatList = featureBlobList.Select(featureBlob => featureBlob.Statistics).ToList();
 
             _featureList = featureBlobStatList.Select(featureBlobStatistics => new Feature(featureBlobStatistics)).ToList();
         }

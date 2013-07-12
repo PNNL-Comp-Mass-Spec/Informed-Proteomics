@@ -28,29 +28,15 @@ namespace InformedProteomics.Backend.IMS
 
         public Feature(FeatureBlobStatistics featureBlobStatistics)
         {
-            ScanLcStart = (ushort) featureBlobStatistics.ScanLcMin;
-
-            int scanLength = featureBlobStatistics.ScanLcMax - featureBlobStatistics.ScanLcMin + 1;
-            if (scanLength > byte.MaxValue) ScanLcLength = byte.MaxValue;
-            else ScanLcLength = (byte) (scanLength);
-
-            int scanRepOffset = featureBlobStatistics.ScanLcRep - featureBlobStatistics.ScanLcMin;
-            if (scanRepOffset > byte.MaxValue) ScanLcRepOffset = byte.MaxValue;
-            else ScanLcRepOffset = (byte)(scanRepOffset);
-
-            ScanImsStart = (ushort)featureBlobStatistics.ScanImsMin;
-            int imsLength = featureBlobStatistics.ScanImsMax - featureBlobStatistics.ScanImsMin + 1;
-            if (imsLength > byte.MaxValue) ScanImsLength = byte.MaxValue;
-            else ScanImsLength = (byte)(imsLength);
-
-            int imsRepOffset = featureBlobStatistics.ScanImsRep - featureBlobStatistics.ScanImsMin;
-            if (imsRepOffset > byte.MaxValue) ScanImsRepOffset = byte.MaxValue;
-            else ScanImsRepOffset = (byte)(imsRepOffset);
-
-            IntensityMax = (float) featureBlobStatistics.IntensityMax;
-            SumIntensities = (float) featureBlobStatistics.SumIntensities;
-            NumPoints = (ushort) featureBlobStatistics.NumPoints;
-
+            ScanLcStart = featureBlobStatistics.ScanLcStart;
+            ScanLcLength = featureBlobStatistics.ScanLcLength;
+            ScanLcRepOffset = featureBlobStatistics.ScanLcRepOffset;
+            ScanImsStart = featureBlobStatistics.ScanImsStart;
+            ScanImsLength = featureBlobStatistics.ScanImsLength;
+            ScanImsRepOffset = featureBlobStatistics.ScanImsRepOffset;
+            IntensityMax = featureBlobStatistics.IntensityMax;
+            SumIntensities = featureBlobStatistics.SumIntensities;
+            NumPoints = featureBlobStatistics.NumPoints;
             LcApexPeakProfile = featureBlobStatistics.LcApexPeakProfile;
             ImsApexPeakProfile = featureBlobStatistics.ImsApexPeakProfile;
         }

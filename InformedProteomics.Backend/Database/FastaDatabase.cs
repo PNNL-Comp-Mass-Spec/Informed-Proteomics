@@ -253,6 +253,13 @@ namespace InformedProteomics.Backend.Database
             return true;
         }
 
+        //public long NumAminoAcids()
+        //{
+        //    using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
+        //    {
+        //    }
+        //}
+
         private bool ReadAnnnoFile()
         {
             _names = new Dictionary<long, string>();
