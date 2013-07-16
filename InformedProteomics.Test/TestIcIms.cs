@@ -23,16 +23,153 @@ namespace InformedProteomics.Test
     internal class TestIcIms
     {
         [Test]
+        public void TestDbSearchMultiThreading()
+        {
+            // Search parameters
+            const int minPeptideLength = 7;
+            const int maxPeptideLength = 30;
+            const int numTolerableTermini = 2;
+            const int numMissedCleavages = 1;
+            const int numMaxModsPepPeptide = 0;
+            const int minPrecursorCharge = 1;
+            const int maxPrecursorCharge = 4;
+            var enzyme = Enzyme.Trypsin;
+
+            // Configure amino acids
+            //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var fixCarbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
+            var searchModifications = new List<SearchModification> { fixCarbamidomethylC };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
+
+            // Initialize IMS data
+            //const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            // Find features
+            var sw = new System.Diagnostics.Stopwatch();
+            Console.Write("Creating precursor features...");
+            Console.Out.Flush();
+            sw.Start();
+            //imsData.CreatePrecursorFeaturesMultiThreads();
+            imsData.CreatePrecursorFeatures();
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+            Console.Write("Creating fragment features...");
+            Console.Out.Flush();
+            sw.Start();
+            //imsData.CreateFragmentFeaturesMultiThreads();
+            imsData.CreateFragmentFeatures();
+            sw.Stop();
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+            Console.Out.Flush();
+
+            // Initialize scoring
+            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
+            var imsScorerFactory = new ImsScorerFactory(paramFile);
+
+            // Read database
+            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            var targetDb = new FastaDatabase(dbFilePath);
+            var decoyDb = targetDb.Decoy(enzyme);
+
+            var writer = TextWriter.Synchronized(new StreamWriter(Path.ChangeExtension(uimfFilePath, "tsv")));
+            writer.WriteLine(
+            "Peptide\tPrecursorMz\tPrecursorCharge\tLCBegin\tLCEnd\tIMSBegin\tIMSEnd\tApexLC\tApexIMS\tSumIntensities\tNumPoints\tPrecursorScore\tScore\tIsDecoy");
+
+            for (var isDecoy = 0; isDecoy < 2; isDecoy++)
+            {
+                var db = isDecoy == 0 ? targetDb : decoyDb;
+
+                var indexedDb = new IndexedDatabase(db);
+                var numPeptides = indexedDb.NumSequences(minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme);
+                Console.WriteLine("Scoring {0} {1} peptides", numPeptides, isDecoy == 0 ? "target" : "decoy");
+                var decoy = isDecoy;
+                long numProcessedPeptides = 0;
+                Parallel.ForEach(
+                    indexedDb.SequencesAsStrings(
+                        minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme),
+                    annotation =>
+                    {
+                        // annotation: pre + "." + peptide + "." + post (e.g. R.PEPTIDER.G)
+                        var peptide = annotation.Substring(2, annotation.Length - 4);
+
+                        var seqGraph = new SequenceGraph(aaSet, peptide);
+                        foreach (var scoringGraph in seqGraph.GetScoringGraphs())
+                        {
+                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
+                            for (var precursorCharge = minPrecursorCharge; precursorCharge <= maxPrecursorCharge; precursorCharge++)
+                            {
+                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
+                                    continue;
+                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
+                                var feature = best.Item1;
+                                if (best.Item1 != null && best.Item3 > -20)
+                                {
+                                    writer.WriteLine(
+                                        "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}"
+                                        , annotation
+                                        , precursorMz
+                                        , precursorCharge
+                                        , feature.ScanLcStart
+                                        , feature.ScanLcStart + feature.ScanLcLength - 1
+                                        , feature.ScanImsStart
+                                        , feature.ScanImsStart + feature.ScanImsLength - 1
+                                        , feature.ScanLcStart + feature.ScanLcRepOffset
+                                        , feature.ScanImsStart + feature.ScanImsRepOffset
+                                        , feature.SumIntensities
+                                        , feature.NumPoints
+                                        , best.Item2 // precursorScore
+                                        , best.Item3 // score
+                                        , decoy
+                                        );
+                                }
+                            }
+                        }
+                        if(++numProcessedPeptides % 10000 == 0);
+                        {
+                            Console.WriteLine("Database search progress: {0}%", (double)numProcessedPeptides/numPeptides*100);
+                        }
+                    }
+                    );
+            }
+            writer.Close();
+        }
+        
+        [Test]
         public void TestParallelFeatureDetection()
         {
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             var uimfUtil = new UimfUtil(uimfFilePath);
             var featureDetectionUtil = new FeatureDetectionUtil(uimfFilePath);
             var tolerance = new Tolerance(25);
-            int minTargetBin = uimfUtil.GetBinFromMz(500.0);
-            int maxTargetBin = uimfUtil.GetBinFromMz(600.0);
+            const double minPrecursorMz = 500.0;
+            const double maxPrecursorMz = 600.0;
+            var minTargetBin = uimfUtil.GetBinFromMz(500.0);
+            var maxTargetBin = uimfUtil.GetBinFromMz(600.0);
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            // Serial version
+            sw.Start();
+            var imsData = new ImsDataCached(uimfFilePath, minPrecursorMz, maxPrecursorMz, 10, 1500, tolerance, tolerance);
+            imsData.CreatePrecursorFeatures();
+            sw.Stop();
+            double sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Serial: {0:f4} sec", sec);
+
+            // Parallel version
+            sw.Start();
             var targetMzList = Enumerable.Range(minTargetBin, maxTargetBin - minTargetBin + 1).Select(uimfUtil.GetMzFromBin).ToList();
             featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1, tolerance.GetUnit());
+            sw.Stop();
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Parallel: {0:f4} sec", sec);
         }
 
         [Test]
@@ -98,117 +235,6 @@ namespace InformedProteomics.Test
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);
-        }
-
-        [Test]
-        public void TestDbSearchMultiThreading()
-        {
-           // Search parameters
-            const int minPeptideLength = 7;
-            const int maxPeptideLength = 30;
-            const int numTolerableTermini = 2;
-            const int numMissedCleavages = 1;
-            const int numMaxModsPepPeptide = 0;
-            const int minPrecursorCharge = 1;
-            const int maxPrecursorCharge = 4;
-            var enzyme = Enzyme.Trypsin;
-
-            // Configure amino acids
-            //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
-            var fixCarbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
-            var searchModifications = new List<SearchModification> { fixCarbamidomethylC };
-            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
-
-            // Initialize IMS data
-            //const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
-            var imsData = new ImsDataCached(uimfFilePath);
-
-            // Find features
-            var sw = new System.Diagnostics.Stopwatch();
-            Console.Write("Creating precursor features...");
-            Console.Out.Flush();
-            sw.Start();
-            imsData.CreatePrecursorFeaturesMultiThreads();
-            sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Done. {0:f4} sec", sec);
-
-            Console.Write("Creating fragment features...");
-            Console.Out.Flush();
-            sw.Start();
-            imsData.CreateFragmentFeaturesMultiThreads();
-            sw.Stop();
-            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Done. {0:f4} sec", sec);
-            Console.Out.Flush();
-
-            // Initialize scoring
-            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
-            var imsScorerFactory = new ImsScorerFactory(paramFile);
-
-            // Read database
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            var targetDb = new FastaDatabase(dbFilePath);
-            var decoyDb = targetDb.Decoy(enzyme);
-
-            var writer = TextWriter.Synchronized(new StreamWriter(Path.ChangeExtension(uimfFilePath, "tsv")));
-            writer.WriteLine(
-            "Peptide\tPrecursorMz\tPrecursorCharge\tLCBegin\tLCEnd\tIMSBegin\tIMSEnd\tApexLC\tApexIMS\tSumIntensities\tNumPoints\tPrecursorScore\tScore\tIsDecoy");
-
-            for (var isDecoy = 0; isDecoy < 2; isDecoy++)
-            {
-                var db = isDecoy == 0 ? targetDb : decoyDb;
-
-                var indexedDb = new IndexedDatabase(db);
-                Console.WriteLine("Scoring {0} peptides", isDecoy == 0 ? "target" : "decoy");
-                var decoy = isDecoy;
-                Parallel.ForEach(
-                    indexedDb.SequencesAsStrings(
-                        minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme),
-                    annotation =>
-                        {
-                            // annotation: pre + "." + peptide + "." + post (e.g. R.PEPTIDER.G)
-                            var peptide = annotation.Substring(2, annotation.Length - 4);
-
-                            var seqGraph = new SequenceGraph(aaSet, peptide);
-                            foreach (var scoringGraph in seqGraph.GetScoringGraphs())
-                            {
-                                scoringGraph.RegisterImsData(imsData, imsScorerFactory);
-                                for (var precursorCharge = minPrecursorCharge; precursorCharge <= maxPrecursorCharge; precursorCharge++)
-                                {
-                                    var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
-                                    if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
-                                        continue;
-                                    var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
-                                    var feature = best.Item1;
-                                    if (best.Item1 != null && best.Item3 > -20)
-                                    {
-                                        writer.WriteLine(
-                                            "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}"
-                                            , annotation
-                                            , precursorMz
-                                            , precursorCharge
-                                            , feature.ScanLcStart
-                                            , feature.ScanLcStart + feature.ScanLcLength - 1
-                                            , feature.ScanImsStart
-                                            , feature.ScanImsStart + feature.ScanImsLength - 1
-                                            , feature.ScanLcStart + feature.ScanLcRepOffset
-                                            , feature.ScanImsStart + feature.ScanImsRepOffset
-                                            , feature.SumIntensities
-                                            , feature.NumPoints
-                                            , best.Item2 // precursorScore
-                                            , best.Item3 // score
-                                            , decoy
-                                            );
-                                    }
-                                }
-                            }
-                        }
-                    );
-            }
-            writer.Close();
         }
 
         [Test]
