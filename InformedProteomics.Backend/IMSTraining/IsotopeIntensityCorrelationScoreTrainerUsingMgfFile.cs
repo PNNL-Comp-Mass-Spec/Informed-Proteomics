@@ -88,13 +88,13 @@ namespace InformedProteomics.Backend.IMSTraining
                 maxAbundance = theoretical[i];
                 maxIndex = i;
             }
-            var c1 = new double[theoretical.Length + FeatureNode.NumMinusIsotope];
-            var c2 = new double[theoretical.Length + FeatureNode.NumMinusIsotope];
+            var c1 = new double[theoretical.Length + FeatureNode.OffsetFromMonoIsotope];
+            var c2 = new double[theoretical.Length + FeatureNode.OffsetFromMonoIsotope];
 
             for (var i = 0; i < c1.Length; i++)
             {
                 var i1 = maxIndex + i; 
-                var i2 = -FeatureNode.NumMinusIsotope + maxIndex + i;
+                var i2 = -FeatureNode.OffsetFromMonoIsotope + maxIndex + i;
                 c1[i] = observed[Math.Min(i1, observed.Count -1)].Intensity;
                 c2[i] = i2 < 0 ? 0 : theoretical[Math.Min(i2, theoretical.Length-1)];
             }

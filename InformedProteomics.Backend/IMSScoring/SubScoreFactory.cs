@@ -10,11 +10,11 @@ namespace InformedProteomics.Backend.IMSScoring
         // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
-        private const int MaxCorrIntScore = 5;
-        private const double CorrIntScoreFactor = 0.15;
-        private const double CorrIntScoreFactor2 = 0.65;
-        private const double LowScore = -3;
-        private const double HighScore = 3;
+        private const int MaxCorrIntScore = 6;
+        private const double CorrIntScoreFactor = 0.6;// was 15
+        private const double CorrIntScoreFactor2 = 0.7;
+        private const double LowScore = -5;
+        private const double HighScore = 5;
 
 
         //TODO : ims, lc corr score should be dependent on ratio scores..

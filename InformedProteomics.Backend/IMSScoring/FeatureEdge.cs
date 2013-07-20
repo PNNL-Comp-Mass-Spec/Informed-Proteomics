@@ -54,14 +54,14 @@ namespace InformedProteomics.Backend.IMSScoring
             if (LNode is PrecursorFeatureNode)
             {
                 _ratioScore = _scoringParams.GetRatioScore(r.FragmentIonClassBase, _ratio, r.GroupParameter);
-                float rr = 0;
-                if (LNode.Feature != null)
-                {
+                var rr = 0.0;
+                if(LNode.Feature != null)
                     rr = LNode.Feature.IntensityMax;
-                    if (RNode.Feature != null) rr /= RNode.Feature.IntensityMax;
-                }
 
-                if (rr > 100 || rr < .0) _ratioScore -= 4; //TODO 
+                if (RNode.Feature != null) rr /= RNode.Feature.IntensityMax;
+                else rr = 0.0;
+
+                if (rr > 100 || rr < .01) _ratioScore -= 4; //TODO 
                 //Console.WriteLine("Prec : " + r.FragmentIonClassBase.Name +"\t" + _ratio + "\t" + RatioScore + "\t" + r.Feature);
 
                 //Console.WriteLine("pre " + _ratioScore);

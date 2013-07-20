@@ -49,10 +49,14 @@ namespace InformedProteomics.Backend.IMSScoring
         static public double GetIsotopeCorrelation(Feature[] f, double[] i)
         {
             var j = new double[f.Length];
+            var max = 0.1f;
+            for (var k = 0; k < j.Length; k++)
+            {
+                if(f[k]!=null) max = Math.Max(max,f[k].IntensityMax);
+            }
             for (var k = 0; k < j.Length;k++ )
             {
-                j[k] = f[k]==null? 0.0 : f[k].IntensityMax;
-                //Console.WriteLine(i[k] + " " + j[k]);
+                j[k] = f[k] == null? 0.1 : f[k].IntensityMax/max;
             }
             return GetCorrelation(j, i);
         }

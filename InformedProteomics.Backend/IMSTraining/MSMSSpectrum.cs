@@ -74,7 +74,7 @@ namespace InformedProteomics.Backend.IMSTraining
             var ion = ionType.GetIon(composition);
             var theoreticalDist = ion.Composition.GetApproximatedIsotopomerEnvelop();
             var write = false;
-            for (var i = -FeatureNode.NumMinusIsotope; i < theoreticalDist.Length; i++)
+            for (var i = -FeatureNode.OffsetFromMonoIsotope; i < theoreticalDist.Length; i++)
             {
                 var mz = ion.GetIsotopeMz(i);
                 var peak = GetPeak(mz, tolerance);
