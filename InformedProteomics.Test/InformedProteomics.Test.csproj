@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestIcIms.cs" />
+    <Compile Include="TestIcTopDown.cs" />
     <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestImsScoring.cs" />
     <Compile Include="TestUtils.cs" />

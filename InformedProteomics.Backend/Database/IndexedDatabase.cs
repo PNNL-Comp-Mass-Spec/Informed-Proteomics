@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using SuffixArray;
 
@@ -105,12 +108,22 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public long CountSequences(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme)
+        public IEnumerable<byte[]> EntireSequences()
         {
-            long numSequences = 0;
+            List<byte> buf = null;
 
-            return numSequences;
+            foreach (var residue in _fastaDatabase.Characters())
+            {
+                if (residue == FastaDatabase.Delimiter)
+                {
+                    if (buf != null && buf.Count > 0) yield return buf.ToArray();
+                    buf = new List<byte>();
+                }
+                else
+                {
+                    if (buf != null) buf.Add(residue);
+                }
+            }
         }
 
         public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
@@ -256,6 +269,28 @@ namespace InformedProteomics.Backend.Database
                 }
                 else // no enzyme
                 {
+                }
+            }
+        }
+
+
+        public IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength)
+        {
+            var encoding = System.Text.Encoding.ASCII;
+
+            foreach (var seqArr in EntireSequences())
+            {
+                for (var i = 0; i <= numNTermCleavages; i++)
+                {
+                    if (seqArr.Length - i >= minLength)
+                    {
+                        yield return
+                            string.Format("{0}.{1}.{2}", 
+                            (i == 0 ? "_" : encoding.GetString(seqArr, i-1, 1)), 
+                            encoding.GetString(seqArr, i, seqArr.Length - i),
+                            "_"
+                            );
+                    }
                 }
             }
         }

@@ -142,37 +142,42 @@ namespace InformedProteomics.Test
             }
             writer.Close();
         }
-        
+
         [Test]
         public void TestParallelFeatureDetection()
         {
             const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             var uimfUtil = new UimfUtil(uimfFilePath);
-            var featureDetectionUtil = new FeatureDetectionUtil(uimfFilePath);
+            var featureDetectionUtil = new FeatureDetectionUtil(uimfFilePath, 11, 4);
             var tolerance = new Tolerance(25);
-            const double minPrecursorMz = 500.0;
-            const double maxPrecursorMz = 600.0;
-            var minTargetBin = uimfUtil.GetBinFromMz(500.0);
-            var maxTargetBin = uimfUtil.GetBinFromMz(600.0);
+            const double minPrecursorMz = 400.0;
+            const double maxPrecursorMz = 1000.0;
+            var minTargetBin = uimfUtil.GetBinFromMz(400.0);
+            var maxTargetBin = uimfUtil.GetBinFromMz(1000.0);
 
             var sw = new System.Diagnostics.Stopwatch();
-
-            // Serial version
-            sw.Start();
-            var imsData = new ImsDataCached(uimfFilePath, minPrecursorMz, maxPrecursorMz, 10, 1500, tolerance, tolerance);
-            imsData.CreatePrecursorFeatures();
-            sw.Stop();
-            double sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Serial: {0:f4} sec", sec);
+            double sec = 0;
 
             // Parallel version
+            sw.Reset();
             sw.Start();
             var targetMzList = Enumerable.Range(minTargetBin, maxTargetBin - minTargetBin + 1).Select(uimfUtil.GetMzFromBin).ToList();
             featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1, tolerance.GetUnit());
             sw.Stop();
             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Parallel: {0:f4} sec", sec);
+
+            // Serial version
+            sw.Reset();
+            sw.Start();
+            var imsData = new ImsDataCached(uimfFilePath, minPrecursorMz, maxPrecursorMz, 10, 1500, tolerance, tolerance);
+            imsData.CreatePrecursorFeatures();
+            sw.Stop();
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Serial: {0:f4} sec", sec);
         }
+
+
 
         [Test]
         public void TestParallelization()

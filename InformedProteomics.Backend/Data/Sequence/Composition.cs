@@ -311,11 +311,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (c2 == Zero)
                 return c1;
             // ReSharper restore PossibleUnintendedReferenceComparison
-            int numC = c1._c + c2._c;
-            int numH = c1._h + c2._h;
-            int numN = c1._n + c2._n;
-            int numO = c1._o + c2._o;
-            int numS = c1._s + c2._s;
+            var numC = c1._c + c2._c;
+            var numH = c1._h + c2._h;
+            var numN = c1._n + c2._n;
+            var numO = c1._o + c2._o;
+            var numS = c1._s + c2._s;
 
             if (c1._additionalElements == null && c2._additionalElements == null)
                 return new Composition(numC, numH, numN, numO, numS);

@@ -62,6 +62,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification Deamidation = new Modification(7, new Composition(0, -1, -1, 1, 0), "Deamidated");
         public static readonly Modification PyroGluQ = new Modification(28, new Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
 
+        public static readonly Modification GlutathioneC = new Modification(55, new Composition(10, 15, 3, 6, 1), "Glutathione");
+        public static readonly Modification CysteinylC = new Modification(312, new Composition(3, 5, 1, 2, 1), "Cysteinyl");
+        public static readonly Modification Dehydro = new Modification(374, new Composition(0, -1, 0, 0, 0), "Dehydro");
+
         private static readonly Dictionary<string, Modification> NameToModMap;
 
         private static readonly Modification[] CommonModifications =

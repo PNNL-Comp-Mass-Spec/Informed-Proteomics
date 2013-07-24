@@ -110,9 +110,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             _index = index + 1;
 
-            AminoAcid aminoAcid = AminoAcidSet.GetAminoAcid(residue);
+            var aminoAcid = AminoAcidSet.GetAminoAcid(residue);
             if (aminoAcid == null) // residue is not valid
+            {
                 return false;
+            }
 
             _aminoAcidSequence[_index] = aminoAcid;
             _prefixComposition[_index] = _prefixComposition[_index - 1] + aminoAcid.Composition;
@@ -170,14 +172,23 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
+        /// Gets the number of possible compositions of the current sequence 
+        /// </summary>
+        /// <returns>the number of possible compositions</returns>
+        public int GetNumCompositions()
+        {
+            return _graph[_index].Length;
+        }
+
+        /// <summary>
         /// Gets all possible compositions of the current sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>all possible compositions</returns>
         public Composition[] GetSequenceCompositions()
         {
-            int numCompositions = _graph[_index].Length;
+            var numCompositions = _graph[_index].Length;
             var compositions = new Composition[numCompositions];
-            for (int nodeIndex = 0; nodeIndex < numCompositions; nodeIndex++)
+            for (var nodeIndex = 0; nodeIndex < numCompositions; nodeIndex++)
             {
                 compositions[nodeIndex] = GetComposition(_index, nodeIndex);
             }
