@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 
@@ -264,7 +265,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private Composition GetComposition(int seqIndex, int nodeIndex)
         {
-            Node node = _graph[seqIndex][nodeIndex];
+            var node = _graph[seqIndex][nodeIndex];
             var composition = _prefixComposition[seqIndex] +
                               _modificationParams.GetModificationCombination(node.ModificationCombinationIndex)
                                                  .Composition;
@@ -277,32 +278,33 @@ namespace InformedProteomics.Backend.Data.Sequence
         internal Node(int modificationCombinationIndex)
         {
             ModificationCombinationIndex = modificationCombinationIndex;
-            //_prevNodeIndices = new HashSet<int>();
-            _prevNodeIndices = new int[10];
+            _prevNodeIndices = new int[2];
             _count = 0;
         }
 
         internal Node(int modificationCombinationIndex, int prevNodeIndex)
             : this(modificationCombinationIndex)
         {
-            //_prevNodeIndices.Add(prevNodeIndex);
             AddPrevNodeIndex(prevNodeIndex);
         }
 
         public int ModificationCombinationIndex { get; private set; }
 
-        //private readonly HashSet<int> _prevNodeIndices;
-        private readonly int[] _prevNodeIndices;
+        private int[] _prevNodeIndices;
         private int _count = 0;
 
         internal bool AddPrevNodeIndex(int prevNodeIndex)
         {
-            //return _prevNodeIndices.Add(prevNodeIndex);
             for (var i = 0; i < _count; i++)
             {
                 if (_prevNodeIndices[i] == prevNodeIndex) return false;
             }
-            _prevNodeIndices[_count++] = prevNodeIndex;
+            if(_count >= _prevNodeIndices.Length)
+            {
+                Array.Resize(ref _prevNodeIndices, _prevNodeIndices.Length * 2); 
+            }
+            _prevNodeIndices[_count++] = prevNodeIndex; 
+
             return true;
         }
 
