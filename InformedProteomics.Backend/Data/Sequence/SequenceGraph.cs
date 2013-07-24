@@ -125,7 +125,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (!modIndices.Any())  // No modification
             {
                 _graph[_index] = new Node[_graph[_index - 1].Length];
-                for (int i = 0; i < _graph[_index - 1].Length; i++)
+                for (var i = 0; i < _graph[_index - 1].Length; i++)
                 {
                     _graph[_index][i] = new Node(_graph[_index - 1][i].ModificationCombinationIndex, i);
                 }
@@ -133,11 +133,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             else
             {
                 var modCombIndexToNodeMap = new Dictionary<int, Node>();
-                for (int i = 0; i < _graph[_index - 1].Length; i++)
+                for (var i = 0; i < _graph[_index - 1].Length; i++)
                 {
-                    int prevNodeIndex = i;
-                    Node prevNode = _graph[_index - 1][i];
-                    int prevModCombIndex = prevNode.ModificationCombinationIndex;
+                    var prevNodeIndex = i;
+                    var prevNode = _graph[_index - 1][i];
+                    var prevModCombIndex = prevNode.ModificationCombinationIndex;
                     Node newNode;
                     // unmodified
                     if(modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out newNode))
@@ -151,7 +151,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     // modified
                     foreach(var modIndex in modIndices)
                     {
-                        int modCombIndex = ModificationParams.GetModificationCombinationIndex(
+                        var modCombIndex = ModificationParams.GetModificationCombinationIndex(
                                                     prevNode.ModificationCombinationIndex, modIndex);
                         if (modCombIndex < 0)   // too many modifications
                             continue;
@@ -235,7 +235,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     var scoringGraphNode = new ScoringGraphNode(composition, seqIndex);
                     scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
 
-                    foreach (var prevNodeIndex in curNode.GetPrevIndices())
+                    foreach (var prevNodeIndex in curNode.GetPrevNodeIndices())
                     {
                         List<ScoringGraphNode> nextNodes;
                         if (newNextNodeMap.TryGetValue(prevNodeIndex, out nextNodes))
@@ -248,7 +248,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         }
                     }
 
-                    if (!curNode.GetPrevIndices().Any())
+                    if (!curNode.GetPrevNodeIndices().Any())
                     {
                         rootNode = scoringGraphNode;
                     }
@@ -277,25 +277,43 @@ namespace InformedProteomics.Backend.Data.Sequence
         internal Node(int modificationCombinationIndex)
         {
             ModificationCombinationIndex = modificationCombinationIndex;
-            _prevNodeIndices = new HashSet<int>();
+            //_prevNodeIndices = new HashSet<int>();
+            _prevNodeIndices = new int[10];
+            _count = 0;
         }
 
         internal Node(int modificationCombinationIndex, int prevNodeIndex)
             : this(modificationCombinationIndex)
         {
-            _prevNodeIndices.Add(prevNodeIndex);
+            //_prevNodeIndices.Add(prevNodeIndex);
+            AddPrevNodeIndex(prevNodeIndex);
         }
 
         public int ModificationCombinationIndex { get; private set; }
 
-        private readonly HashSet<int> _prevNodeIndices;
+        //private readonly HashSet<int> _prevNodeIndices;
+        private readonly int[] _prevNodeIndices;
+        private int _count = 0;
 
         internal bool AddPrevNodeIndex(int prevNodeIndex)
         {
-            return _prevNodeIndices.Add(prevNodeIndex);
+            //return _prevNodeIndices.Add(prevNodeIndex);
+            for (var i = 0; i < _count; i++)
+            {
+                if (_prevNodeIndices[i] == prevNodeIndex) return false;
+            }
+            _prevNodeIndices[_count++] = prevNodeIndex;
+            return true;
         }
 
-        public IEnumerable<int> GetPrevIndices() { return _prevNodeIndices; }
+        public IEnumerable<int> GetPrevNodeIndices()
+        {
+            //return _prevNodeIndices;
+            for (var i = 0; i < _count; i++)
+            {
+                yield return _prevNodeIndices[i];
+            }
+        }
     }
 
 }

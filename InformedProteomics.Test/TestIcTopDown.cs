@@ -20,9 +20,9 @@ namespace InformedProteomics.Test
             const int numMissedCleavages = 25;
             const int minLength = 7;
             const int numMaxModsPerProtein = 6;
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
+            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
             const string dbFilePath =
-                @"C:\cygwin\home\kims336\Data\SuffixArray\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+                @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             const int maxProteinLength = 10000;
 
             var sw = new System.Diagnostics.Stopwatch();
