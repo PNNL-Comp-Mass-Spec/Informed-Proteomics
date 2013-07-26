@@ -99,7 +99,7 @@ namespace InformedProteomics.Backend.IMSTraining
                 c2[i] = i2 < 0 ? 0 : theoretical[Math.Min(i2, theoretical.Length-1)];
             }
         //    Console.WriteLine(c1.Length);
-            return SubScoreFactory.CorrToInt(StatisticsTools.GetCorrelation(c1, c2));
+            return SubScoreFactory.CorrToIntForIsotopeScore(StatisticsTools.GetCorrelation(c1, c2));
         }
     }
 }

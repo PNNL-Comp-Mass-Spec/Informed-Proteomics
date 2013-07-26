@@ -109,9 +109,9 @@ namespace InformedProteomics.Test
                             var score = imsScorer.GetPrecursorScore(precursorFeature);
                             // Console.WriteLine("Feature: " + precursorFeature);
                             // Console.WriteLine("Precursor score: " + score);
-                            if (score < -2) continue;
+                            //if (score < -2) continue;
                             var portionExplainedFrags = 0.0;
-                            /*for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
+                            for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
                             {
                                 // all 63 node 33 ratio 23 lc 0 ims 0 // node + ratio 47
                                 //Console.WriteLine("Cut " + cutNumber);
@@ -121,14 +121,14 @@ namespace InformedProteomics.Test
                                 //Console.WriteLine("{0} {1} {2} {3}", pep[cutNumber-1], pep[cutNumber], sequence.GetComposition(0, cutNumber), cutScore);
                                 var cutNodeScore = imsScorer.GetNodeScore();
                                 var cutRatioScore = imsScorer.GetRatioScore();
-                                var cutLcScore = imsScorer.GetLcScore();
-                                var cutImsScore = imsScorer.GetImsScore();
+                              //  var cutLcScore = imsScorer.GetLcScore();
+                              //  var cutImsScore = imsScorer.GetImsScore();
                                 // Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLcScore + "\t" + cutImsScore + "\t" +  cutScore);
                                 // foreach(var ion in imsScorer.SupportingIonTypes) Console.Write("\t" + ion.Name+", ");
                                 // Console.WriteLine();
                                 score += cutScore;
                                 portionExplainedFrags += imsScorer.SupportingIonTypes.Count == 0 ? 0 : 1;
-                            }*/
+                            }
                             if (!(maxScore < score)) continue;
                             maxScore = score;
                             maxFeature = precursorFeature;
@@ -304,7 +304,7 @@ namespace InformedProteomics.Test
                         var score = imsScorer.GetPrecursorScore(precursorFeature);
                         // Console.WriteLine("Feature: " + precursorFeature);
                         Console.WriteLine("Precursor score: " + score);
-                        continue;
+                       // continue;
                         // if (score < -0.5) continue; 
                         var portionExplainedFrags = 0.0;
                         for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
@@ -315,9 +315,7 @@ namespace InformedProteomics.Test
                             //Console.WriteLine("{0} {1} {2} {3}", pep[cutNumber-1], pep[cutNumber], sequence.GetComposition(0, cutNumber), cutScore);
                             var cutNodeScore = imsScorer.GetNodeScore();
                             var cutRatioScore = imsScorer.GetRatioScore();
-                            var cutLcScore = imsScorer.GetLcScore();
-                            var cutImsScore = imsScorer.GetImsScore();
-                                Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" + cutLcScore + "\t" + cutImsScore + "\t" +  cutScore);
+                                Console.Write(cutNumber + "\t" + cutNodeScore + "\t" + cutRatioScore + "\t" +  cutScore);
                                 foreach(var ion in imsScorer.SupportingIonTypes) Console.Write("\t" + ion.Name+", ");
                                 Console.WriteLine();
                             score += cutScore;

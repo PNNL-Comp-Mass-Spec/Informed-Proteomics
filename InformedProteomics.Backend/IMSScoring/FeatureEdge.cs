@@ -8,18 +8,14 @@ namespace InformedProteomics.Backend.IMSScoring
         public FeatureNode RNode { get; private set; }
         public double Weight { get; private set; } // used to calculate weight of a path
         private double _ratioScore;
-        private double _lcScore;
-        private double _imsScore;
         private double _nodeScore;
 
         private bool _isScoreCalculated; // for speed-up
         private readonly int _ratio;
-        private readonly double _lcCorrelation;
-        private readonly double _imsCorrelation;
-
+       
         private readonly SubScoreFactory _scoringParams;
 
-        public FeatureEdge(FeatureNode l, FeatureNode r, PrecursorFeatureNode p, SubScoreFactory scoringParams)
+        public FeatureEdge(FeatureNode l, FeatureNode r, SubScoreFactory scoringParams)
         {
             LNode = l;
             RNode = r;
@@ -31,8 +27,6 @@ namespace InformedProteomics.Backend.IMSScoring
                 _ratio = GetRatioIndex(ri, ri);
             else
                 _ratio = GetRatioIndex(li, ri);
-            _lcCorrelation = StatisticsTools.GetLcCorrelation(p.Feature, r.Feature);
-            _imsCorrelation = StatisticsTools.GetImsCorrelation(p.Feature, r.Feature);
             
             Weight = GetWeight();
         }
@@ -41,9 +35,9 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             var r = (FragmentFeatureNode)RNode;
             if (LNode is PrecursorFeatureNode)
-                return _scoringParams.GetKLDivergence(r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, r.GroupParameter); 
+                return _scoringParams.GetKLDivergence(r.FragmentIonClassBase, _ratio, r.GroupParameter); 
             var l = (FragmentFeatureNode) LNode;
-            return _scoringParams.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, _lcCorrelation, _imsCorrelation, l.GroupParameter);
+            return _scoringParams.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, l.GroupParameter);
         }
 
         private void CalculateScores()
@@ -72,12 +66,6 @@ namespace InformedProteomics.Backend.IMSScoring
                 _ratioScore = _scoringParams.GetRatioScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, r.GroupParameter);
                
             }
-            if (_lcCorrelation >= 0)
-            {
-                _lcScore = _scoringParams.GetLcCorrelationScore(r.FragmentIonClassBase, _lcCorrelation, r.GroupParameter); //TODO
-                _imsScore = _scoringParams.GetImsCorrelationScore(r.FragmentIonClassBase, _imsCorrelation, r.GroupParameter);
-            }
-            else _lcScore = _imsScore = 0;
 
             _isScoreCalculated = true;
         }
@@ -92,18 +80,6 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             if (!_isScoreCalculated) CalculateScores(); 
             return _ratioScore;
-        }
-
-        public double GetLcScore()
-        {
-            if (!_isScoreCalculated) CalculateScores();
-            return _lcScore;
-        }
-        
-        public double GetImsScore()
-        {
-            if (!_isScoreCalculated) CalculateScores();
-            return _imsScore;
         }
 
         static public int GetRatioIndex(double v1, double v2)

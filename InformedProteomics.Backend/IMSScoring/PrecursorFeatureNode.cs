@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         private readonly SubScoreFactory _scoringParams;
         public PrecursorFeatureNode(IsotopomerFeatures isotopomerFeatures, GroupParameter parameter, SubScoreFactory scoringParams)
-            : base(isotopomerFeatures, null, parameter)
+            : base(isotopomerFeatures, null, isotopomerFeatures.GetMostAbundantFeature(), parameter)
         {
             _scoringParams = scoringParams;
             Score = GetScore();
@@ -18,17 +18,14 @@ namespace InformedProteomics.Backend.IMSScoring
             if (IsScoreCalculated) return Score;
            // Console.WriteLine(this + " " + IsotopeCorrelation);
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
-            //var lcScore = 0.0;
-            //var imsScore = 0.0;
-            //if (LcCorrelation >= 0)
-            //{
-                //Console.WriteLine("precursor" + LcCorrelation + " " + ImsCorrelation);
-                //lcScore = _scoringParams.GetIsotopeLcCorrelationScore(LcCorrelation, GroupParameter);
-                //imsScore = _scoringParams.GetIsotopeImsCorrelationScore(ImsCorrelation, GroupParameter);
-            //}
-            //Score = lcScore + imsScore + isotopeScore;
-            Score = isotopeScore;
+            
+            var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
+            var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
+           
+            Score = lcScore + imsScore + isotopeScore;
+            //Score = isotopeScore;
             IsScoreCalculated = true;
+            //Console.WriteLine(this + " " + lcScore + " " + imsScore + " " + isotopeScore);
             return Score;
         }
     }

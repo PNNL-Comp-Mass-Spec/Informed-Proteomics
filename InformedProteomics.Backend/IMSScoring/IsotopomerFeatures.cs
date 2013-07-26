@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         public int BinningMultiplyFactor { get; private set; }
         public float[] TheoreticalIsotopomerEnvelope { get; private set; }
-        private readonly int _maxIntensityIndex;// max index for _theoreticalIsotopomerEnvelope, not for this
+        public int MaxIntensityIndex { get; private set; } // max index for _theoreticalIsotopomerEnvelope, not for this
         private IsotopomerFeatures(ImsDataCached imsData, Ion ion, Feature precursorFeature, bool isPrecurosr)
         {
           //  BinningMultiplyFactor = 6;
@@ -28,7 +28,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 TheoreticalIsotopomerEnvelope[i * BinningMultiplyFactor] = te[i - FeatureNode.OffsetFromMonoIsotope];
             }
 
-            _maxIntensityIndex = GetMaximumIndex(TheoreticalIsotopomerEnvelope);
+            MaxIntensityIndex = GetMaximumIndex(TheoreticalIsotopomerEnvelope);
             //
             var start = - FeatureNode.OffsetFromMonoIsotope*BinningMultiplyFactor;
             for (var i = start; i < TheoreticalIsotopomerEnvelope.Length + start; i++)
@@ -75,16 +75,9 @@ namespace InformedProteomics.Backend.IMSScoring
             return this[index];
         }
 
-        public Feature GetNthFeatureFromTheoreticallyMostIntenseFeature(int n)
+        public Feature GetTheoreticallyMostAbundantFeature()
         {
-            return n + _maxIntensityIndex < 0 ? null : this[Math.Min(this.Count - 1, n + _maxIntensityIndex)];
-            //return this[Math.Min(Count - 1, n + FeatureNode.OffsetFromMonoIsotope * BinningMultiplyFactor)]; // this[_maxIntensityIndex] corresponds to the max intensity istope - FeatureNode.OffsetFromMonoIsotope isotope
-        }
-
-
-        public float GetTheoreticalIntensityOfNthFeature(int n)
-        {
-            return n + _maxIntensityIndex < 0 ? 0f : TheoreticalIsotopomerEnvelope[Math.Min(TheoreticalIsotopomerEnvelope.Length - 1, n + _maxIntensityIndex)];
+            return this[MaxIntensityIndex];
         }
 
         static private int GetMaximumIndex(float[] e)

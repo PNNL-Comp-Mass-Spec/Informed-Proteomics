@@ -1,6 +1,7 @@
 ﻿
 using System;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.IMS;
 
 namespace InformedProteomics.Backend.IMSScoring
 {
@@ -8,28 +9,25 @@ namespace InformedProteomics.Backend.IMSScoring
     {
         private readonly SubScoreFactory _scoringParams;
 
-        public FragmentFeatureNode(IsotopomerFeatures isotopomerFeatures, IonType fragmentIonClassBase,
+        public FragmentFeatureNode(IsotopomerFeatures isotopomerFeatures, IonType fragmentIonClassBase, Feature precursorFeature,
             GroupParameter parameter, SubScoreFactory scoringParams)
-            : base(isotopomerFeatures, fragmentIonClassBase, parameter)
+            : base(isotopomerFeatures, fragmentIonClassBase, precursorFeature, parameter)
         {
             _scoringParams = scoringParams;
-            //if (Feature != null) Console.WriteLine(this + " " + fragmentIonClassBase.Name + " " + Feature);
-            
         }
 
         public override sealed double GetScore()
         {
             if (IsScoreCalculated) return Score;
-            var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(FragmentIonClassBase, IsotopeCorrelation, GroupParameter);
-            //var lcScore = 0.0;
-            //var imsScore = 0.0;
-            //if (LcCorrelation >= 0)
-            //{
-            //    lcScore = _scoringParams.GetIsotopeLcCorrelationScore(FragmentIonClassBase, LcCorrelation, GroupParameter);
-            //    imsScore = _scoringParams.GetIsotopeImsCorrelationScore(FragmentIonClassBase, ImsCorrelation, GroupParameter);
-            //}
-            //Score = lcScore + imsScore + isotopeScore;
-            Score = isotopeScore;
+            var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
+            
+            var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
+            var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
+            
+            Score = lcScore + imsScore + isotopeScore;
+            //Score = isotopeScore;
+            //Console.WriteLine(this + " " + lcScore + " " + imsScore + " " + isotopeScore);
+            
             IsScoreCalculated = true;
             return Score;
         }

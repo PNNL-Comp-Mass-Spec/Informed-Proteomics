@@ -13,8 +13,6 @@ namespace InformedProteomics.Backend.IMSScoring
         public double Score { get; private set; }
         public double NodeScore { get; private set; }
         public double RatioScore { get; private set; }
-        public double LcScore { get; private set; }
-        public double ImsScore { get; private set; }
         public List<IonType> supportingIonTypes;
 
         private readonly SubScoreFactory _scoringParams;
@@ -42,8 +40,8 @@ namespace InformedProteomics.Backend.IMSScoring
             UpdateEdges(fragmentNodes, usedNodes); // from precursor to any of fragment nodes
             if (this[precursorNode].Count == 0)
             {
-                NodeScore = RatioScore = LcScore = ImsScore = -1; //TODO should be trained.. 
-                Score = NodeScore + RatioScore + LcScore + ImsScore;
+                NodeScore = RatioScore = -1; //TODO should be trained.. 
+                Score = NodeScore + RatioScore;
                 return;
             }
            // usedNodes.Remove(precursorNode);// exclude precursorNode
@@ -62,15 +60,13 @@ namespace InformedProteomics.Backend.IMSScoring
         
         private void GetScore()
         {
-            NodeScore = RatioScore = LcScore = ImsScore = 0;
+            NodeScore = RatioScore = 0;
             foreach (var node in Keys)
             {
                 foreach (var edge in this[node])
                 {
                     NodeScore += edge.GetNodeScore();
                     RatioScore += edge.GetRatioScore();
-                    LcScore += edge.GetLcScore();
-                    ImsScore += edge.GetImsScore();
                     var io = edge.LNode.FragmentIonClassBase;
                  //   Console.WriteLine((edge.LNode.Feature == null ? "0" : edge.LNode.Feature.IntensityMax.ToString()) + " " + (edge.RNode.Feature == null ? "0" : edge.RNode.Feature.IntensityMax.ToString()) + " " + edge.GetRatioScore());
                   //  Console.WriteLine((io == null? "P" : io.Name) + " " + edge.RNode.FragmentIonClassBase.Name + " " + edge.GetImsScore() + " " + edge.GetLcScore());
@@ -78,7 +74,7 @@ namespace InformedProteomics.Backend.IMSScoring
 //                      Console.WriteLine((io == null? "P" : io.Name + " " + (edge.LNode.Feature==null)) + " " + edge.RNode.FragmentIonClassBase.Name + " " + (edge.RNode.Feature==null) + " " +  edge.NodeScore + " " + edge.RatioScore + " " + edge.LcScore + " " + edge.ImsScore);
                 }
             }
-            Score = NodeScore + RatioScore + Math.Max(-6, Math.Min(6, LcScore + ImsScore)); // TODO does not make any sense but for test.. at the end of the day, I need to train them dependently..
+            Score = NodeScore + RatioScore; 
         }
 
         static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
@@ -123,7 +119,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 foreach (var lnode in lNodes)
                 {
                     if (rnode.FragmentIonClassBase == lnode.FragmentIonClassBase) continue;
-                    var edge = new FeatureEdge(lnode, rnode, _precursorFeatureNode, _scoringParams);
+                    var edge = new FeatureEdge(lnode, rnode, _scoringParams);
                     if (maxWeight < edge.Weight)
                     {
                         maxWeight = edge.Weight;
@@ -169,7 +165,7 @@ namespace InformedProteomics.Backend.IMSScoring
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
                 //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + ionType.GetIon(composition).GetMz());
-                var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, parameter, _scoringParams);
+                var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, precursorFeature, parameter, _scoringParams);
                 //if(node.Feature != null)
                 //    if (20 * node.Feature.IntensityMax < precursorFeature.IntensityMax || node.Feature.IntensityMax > 20 * precursorFeature.IntensityMax) continue; // 
 

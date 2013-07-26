@@ -69,14 +69,5 @@ namespace InformedProteomics.Backend.IMSScoring
             return _graph == null ? double.NaN : _graph.RatioScore;
         }
 
-        public double GetLcScore() // for debug only
-        {
-            return _graph == null ? double.NaN : _graph.LcScore;
-        }
-
-        public double GetImsScore() // for debug only
-        {
-            return _graph == null ? double.NaN : _graph.ImsScore;
-        }
     }
 }
