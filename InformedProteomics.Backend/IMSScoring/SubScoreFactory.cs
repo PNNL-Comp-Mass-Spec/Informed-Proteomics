@@ -11,8 +11,8 @@ namespace InformedProteomics.Backend.IMSScoring
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
         private const int MaxCorrIntScore = 8;
-        private const double CorrIntScoreFactorForIsotopeScore = 0.8;
-        private const double CorrIntScoreFactorForLcImsScore = 0.8;
+        private const double CorrIntScoreFactorForIsotopeScore = 0.75;
+        private const double CorrIntScoreFactorForLcImsScore = 0.75;
         private const double LowScoreForIsotopeScore = -5;
         private const double HighScoreForIsotopeScore = 5;
         private const double LowScoreForLcImsScore = -.5;
