@@ -209,7 +209,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             int numCompositions = _graph[_index].Length;
             var scoringGraphs = new ScoringGraph[numCompositions];
-            for (int i = 0; i < numCompositions; i++)
+            for (var i = 0; i < numCompositions; i++)
             {
                 scoringGraphs[i] = GetScoringGraph(i);
             }

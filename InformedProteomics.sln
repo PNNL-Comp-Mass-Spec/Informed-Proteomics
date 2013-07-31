@@ -1,30 +1,50 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Test", "InformedProteomics.Test\InformedProteomics.Test.csproj", "{800535C0-E5A3-4A05-8ED6-FDF02658D999}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Win32.ActiveCfg = Debug|x86
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Win32.Build.0 = Debug|x86
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x64.ActiveCfg = Debug|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x64.Build.0 = Debug|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x86.ActiveCfg = Debug|x86
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x86.Build.0 = Debug|x86
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Mixed Platforms.Build.0 = Release|x64
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Win32.ActiveCfg = Release|x86
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Win32.Build.0 = Release|x86
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x64.ActiveCfg = Release|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x64.Build.0 = Release|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x86.ActiveCfg = Release|x86
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x86.Build.0 = Release|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|Win32.ActiveCfg = Debug|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|Win32.Build.0 = Debug|x86
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x64.ActiveCfg = Debug|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x64.Build.0 = Debug|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x86.ActiveCfg = Debug|x86
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x86.Build.0 = Debug|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|Mixed Platforms.Build.0 = Release|x64
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|Win32.ActiveCfg = Release|x86
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|Win32.Build.0 = Release|x86
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|x64.ActiveCfg = Release|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|x64.Build.0 = Release|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|x86.ActiveCfg = Release|x86

@@ -26,7 +26,7 @@ namespace InformedProteomics.Test
         public void TestDbSearchMultiThreading()
         {
             // Search parameters
-            const int minPeptideLength = 7;
+            const int minPeptideLength = 6;
             const int maxPeptideLength = 30;
             const int numTolerableTermini = 2;
             const int numMissedCleavages = 1;
@@ -35,30 +35,46 @@ namespace InformedProteomics.Test
             const int maxPrecursorCharge = 4;
             var enzyme = Enzyme.Trypsin;
 
+            var sw = new System.Diagnostics.Stopwatch();
+
             // Configure amino acids
             //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var fixCarbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
             var searchModifications = new List<SearchModification> { fixCarbamidomethylC };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
 
-            // Initialize IMS data
-            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            //const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
-            var imsData = new ImsDataCached(uimfFilePath);
-
-            // Find features
-            var sw = new System.Diagnostics.Stopwatch();
-            Console.Write("Creating precursor features...");
+            // Read database
+            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
+            Console.Write("Reading a database...");
             Console.Out.Flush();
+            sw.Reset();
             sw.Start();
-            //imsData.CreatePrecursorFeaturesMultiThreads();
-            imsData.CreatePrecursorFeatures();
+            const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            var targetDb = new FastaDatabase(dbFilePath);
+            var decoyDb = targetDb.Decoy(enzyme);
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Done. {0:f4} sec", sec);
 
+            // Initialize IMS data
+            //const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
+            var imsData = new ImsDataCached(uimfFilePath);
+
+            // Find features
+            Console.Write("Creating precursor features...");
+            Console.Out.Flush();
+            sw.Reset();
+            sw.Start();
+            //imsData.CreatePrecursorFeaturesMultiThreads();
+            imsData.CreatePrecursorFeatures();
+            sw.Stop();
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
             Console.Write("Creating fragment features...");
             Console.Out.Flush();
+            sw.Reset();
             sw.Start();
             //imsData.CreateFragmentFeaturesMultiThreads();
             imsData.CreateFragmentFeatures();
@@ -70,14 +86,6 @@ namespace InformedProteomics.Test
             // Initialize scoring
             const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsScorerFactory = new ImsScorerFactory(paramFile);
-
-            // Read database
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
-            const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
-            
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            var targetDb = new FastaDatabase(dbFilePath);
-            var decoyDb = targetDb.Decoy(enzyme);
 
             var writer = TextWriter.Synchronized(new StreamWriter(Path.ChangeExtension(uimfFilePath, "tsv")));
             writer.WriteLine(
@@ -111,7 +119,7 @@ namespace InformedProteomics.Test
                                     continue;
                                 var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
                                 var feature = best.Item1;
-                                if (best.Item1 != null && best.Item3 > -20)
+                                if (best.Item1 != null)// && best.Item3 > -20)
                                 {
                                     writer.WriteLine(
                                         "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}"
@@ -133,7 +141,7 @@ namespace InformedProteomics.Test
                                 }
                             }
                         }
-                        if(++numProcessedPeptides % 10000 == 0);
+                        if(++numProcessedPeptides % 10000 == 0)
                         {
                             Console.WriteLine("Database search progress: {0}%", (double)numProcessedPeptides/numPeptides*100);
                         }

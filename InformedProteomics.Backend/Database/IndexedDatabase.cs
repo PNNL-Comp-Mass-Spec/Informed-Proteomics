@@ -152,7 +152,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     foreach (var residue in enzymaticResidues)
                     {
-                        isCleavable[(int)residue] = true;
+                        isCleavable[residue] = true;
                         isCleavable[(int)FastaDatabase.Delimiter] = true;
                     }
                 }
@@ -274,7 +274,7 @@ namespace InformedProteomics.Backend.Database
         }
 
 
-        public IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength)
+        public IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength, int maxLength)
         {
             var encoding = System.Text.Encoding.ASCII;
 
@@ -282,7 +282,7 @@ namespace InformedProteomics.Backend.Database
             {
                 for (var i = 0; i <= numNTermCleavages; i++)
                 {
-                    if (seqArr.Length - i >= minLength)
+                    if (seqArr.Length - i >= minLength && seqArr.Length - i <= maxLength)
                     {
                         yield return
                             string.Format("{0}.{1}.{2}", 
@@ -293,6 +293,11 @@ namespace InformedProteomics.Backend.Database
                     }
                 }
             }
+        }
+
+        public int GetLongestSequenceLength()
+        {
+            return EntireSequences().Select(seqArr => seqArr.Length).Max();
         }
 
         private void CreatePermutedLongestCommonPrefixFile()

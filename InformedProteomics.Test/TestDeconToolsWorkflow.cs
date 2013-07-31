@@ -8,6 +8,7 @@ using DeconTools.Backend.Algorithms;
 using DeconTools.Backend.Core;
 using DeconTools.Backend.ProcessingTasks.ChromatogramProcessing;
 using DeconTools.Workflows.Backend.Core;
+using DeconTools.Workflows.Backend.Core.ChromPeakSelection;
 using InformedProteomics.Backend.Data;
 using InformedProteomics.Backend.Data.Results;
 using InformedProteomics.Backend.Data.Sequence;
@@ -356,8 +357,6 @@ namespace InformedProteomics.Test
 
 			executorParameters.CopyRawFileLocal = false;
 			executorParameters.DeleteLocalDatasetAfterProcessing = false;
-			executorParameters.LoggingFolder = currentDirectory + "/logs";
-			executorParameters.ResultsFolder = currentDirectory + "/results";
 			executorParameters.TargetedAlignmentIsPerformed = false;
 
 			return executorParameters;

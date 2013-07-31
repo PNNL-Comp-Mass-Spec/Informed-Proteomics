@@ -136,8 +136,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             double cutScore = 0;
             if (node.Index > 1 && node.Index <= _aminoAcidSequence.Length-3)
             {
-                char nTermAA = _aminoAcidSequence[node.Index].Residue;
-                char cTermAA = _aminoAcidSequence[node.Index + 1].Residue;
+                var nTermAA = _aminoAcidSequence[node.Index].Residue;
+                var cTermAA = _aminoAcidSequence[node.Index + 1].Residue;
                 cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
                 //Console.WriteLine(" " + _aminoAcidSequence[node.Index].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Index + 1].Residue + " " + cutScore);
             }

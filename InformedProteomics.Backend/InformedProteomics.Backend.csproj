@@ -84,6 +84,10 @@
     <Reference Include="DeconTools.Workflows">
       <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Workflows.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.MSFileReaderLib">
+      <HintPath>..\lib\x64\Interop.MSFileReaderLib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=2.3.0.25, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
@@ -124,6 +128,10 @@
   <ItemGroup>
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
+    <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
+    <Compile Include="Data\Spectrometry\PrecursorInfo.cs" />
+    <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
+    <Compile Include="Data\Spectrometry\Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
@@ -156,6 +164,8 @@
     <Compile Include="IMS\Feature.cs" />
     <Compile Include="IMS\IMSDataCached.cs" />
     <Compile Include="IMS\FeatureSet.cs" />
+    <Compile Include="MassSpecData\DataDependentAcquisitionRun.cs" />
+    <Compile Include="MassSpecData\XCaliburRun.cs" />
     <Compile Include="Scoring\CorrelationCoefficientProbabilityTrainer.cs" />
     <Compile Include="Scoring\CorrelationCoefficientTrainer.cs" />
     <Compile Include="Scoring\FragmentSpectrum.cs" />
@@ -231,7 +241,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
