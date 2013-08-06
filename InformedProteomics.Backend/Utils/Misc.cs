@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace InformedProteomics.Backend.Scoring
+namespace InformedProteomics.Backend.Utils
 {
     public class Misc
     {
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Scoring
 
             stremaReader.Close();
             return peptides;
-        } 
+        }
 
 
         public static IEnumerable<string> GetPeptidesFromProtein(string protein, bool fullyTryptic,
@@ -30,7 +30,7 @@ namespace InformedProteomics.Backend.Scoring
         {
             var peptides = new HashSet<string>();
 
-            for (var sp = 0; sp < protein.Length-5; sp++)
+            for (var sp = 0; sp < protein.Length - 5; sp++)
             {
                 var numKR = 0;
                 var lterm = sp == 0 || protein[sp - 1] == 'K' || protein[sp - 1] == 'R';
@@ -48,7 +48,7 @@ namespace InformedProteomics.Backend.Scoring
                 }
             }
 
-                return peptides;
+            return peptides;
         }
 
         public static void Shuffle<T>(IList<T> list)
@@ -94,9 +94,9 @@ namespace InformedProteomics.Backend.Scoring
                             */
                             for (var i = 0; i < protein.Length; i++)
                             {
-                                revProtein += protein[protein.Length-i-1];
+                                revProtein += protein[protein.Length - i - 1];
                             }
-                            
+
                             protein = revProtein;
                         }
                         proteins.Add(protein);
@@ -117,6 +117,6 @@ namespace InformedProteomics.Backend.Scoring
             }
 
             return peptides;
-        } 
+        }
     }
 }

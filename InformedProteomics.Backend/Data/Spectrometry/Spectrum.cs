@@ -6,12 +6,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Spectrum
     {
-        public Spectrum(IList<double> mzArr, IList<double> intensityArr)
+        public Spectrum(IList<double> mzArr, IList<double> intensityArr, int scanNum)
         {
             Peaks = new Peak[mzArr.Count];
             for(var i=0; i<mzArr.Count; i++) Peaks[i] = new Peak(mzArr[i], intensityArr[i]);
+            ScanNum = scanNum;
         }
 
+        public int ScanNum { get; private set; }
         public int MsLevel
         {
             get { return _msLevel; }

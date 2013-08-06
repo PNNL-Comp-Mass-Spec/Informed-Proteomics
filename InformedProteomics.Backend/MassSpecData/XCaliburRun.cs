@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DeconTools.Backend.ProcessingTasks.PeakDetectors;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -159,9 +158,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var msLevel = GetMsLevel(scanNum);
-            if(msLevel == 1) return new Spectrum(mzArr, intensityArr);
+            if(msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
 
-            return new ProductSpectrum(mzArr, intensityArr)
+            return new ProductSpectrum(mzArr, intensityArr, scanNum)
                 {
                     MsLevel = msLevel,
                     ActivationMethod = GetActivationMethod(scanNum),

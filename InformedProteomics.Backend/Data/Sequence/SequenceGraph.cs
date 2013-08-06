@@ -77,6 +77,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             _graph[0] = new[] { new Node(0) };
         }
 
+        public static SequenceGraph CreateProteinGraph(AminoAcidSet aaSet, string protSeq)
+        {
+            var protGraph = new SequenceGraph(aaSet, protSeq.Length);
+            protGraph.AddAminoAcid(AminoAcid.ProteinNTerm.Residue);
+            var isValidSequence = protSeq.All(protGraph.AddAminoAcid);
+            if (!isValidSequence)
+            {
+                return null;
+            }
+            protGraph.AddAminoAcid(AminoAcid.ProteinCTerm.Residue);
+            return protGraph;
+        }
+
         public bool PutPeptideSequence(string sequence)
         {
             return PutSequence(sequence, false);

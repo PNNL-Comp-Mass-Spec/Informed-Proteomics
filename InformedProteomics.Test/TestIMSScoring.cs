@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.IMS;
 using InformedProteomics.Backend.IMSScoring;
 using InformedProteomics.Backend.IMSTraining;
-using InformedProteomics.Backend.Scoring;
+using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 using UIMFLibrary;
 using Feature = InformedProteomics.Backend.IMS.Feature;

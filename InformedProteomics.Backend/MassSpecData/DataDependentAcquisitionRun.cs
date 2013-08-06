@@ -25,18 +25,29 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">m/z tolerance</param>
         /// <returns>XIC as an array.</returns>
-        public double[] GetExtractedIonChromatogram(double mz, Tolerance tolerance)
+        public XicPeak[] GetExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
-            var xic = new double[_ms1List.Count];
+            var xic = new XicPeak[_ms1List.Count];
             var index = 0;
             foreach (var spec in _ms1List)
             {
                 var peak = spec.FindPeak(mz, tolerance);
-                xic[index++] = peak != null ? peak.Intensity : 0;
+                xic[index++] = peak != null ? new XicPeak(spec.ScanNum, peak.Intensity) : new XicPeak(spec.ScanNum, 0);
             }
             return xic;
         }
-        
+
+
+        /// <summary>
+        /// Gets the scan numbers of the specified msLevel
+        /// </summary>
+        /// <param name="msLevel">MS level</param>
+        /// <returns>scan numbers of the specified msLevel</returns>
+        public IEnumerable<int> GetScanNumbers(int msLevel)
+        {
+            return _rawDataParser.GetScanNumbers(msLevel);
+        }
+
         /// <summary>
         /// Gets MS/MS spectra whose isolation windows contain the most abundant peak of the precursorIon
         /// </summary>

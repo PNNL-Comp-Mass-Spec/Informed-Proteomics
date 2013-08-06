@@ -7,7 +7,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class ProductSpectrum: Spectrum
     {
-        public ProductSpectrum(double[] mzArr, double[] intensityArr) : base(mzArr, intensityArr)
+        public ProductSpectrum(double[] mzArr, double[] intensityArr, int scanNum) : base(mzArr, intensityArr, scanNum)
         {
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
@@ -14,6 +15,48 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestIcTopDown
     {
+        [Test]
+        public void TestGeneratingXics()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = new DataDependentAcquisitionRun(new XCaliburRun(specFilePath));
+            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+
+            var precursorTolerance = new Tolerance(10);
+
+            // Create a sequence graph
+            var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
+            var seqGraph = SequenceGraph.CreateProteinGraph(aaSet, protSeq);
+            foreach (var protComposition in seqGraph.GetSequenceCompositions())
+            {
+                var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();
+                Console.WriteLine("Composition\t{0}", protComposition);
+                Console.WriteLine("MostAbundantIsotopeIndex\t{0}", mostAbundantIsotopeIndex);
+
+                Console.WriteLine("\nScanNum\t{0}",string.Join("\t", run.GetScanNumbers(1).Select(n => n.ToString())));
+                for (var charge = 9; charge <= 18; charge++)
+                {
+                    var precursorIon = new Ion(protComposition+Composition.H2O, charge);
+                    var xic = run.GetExtractedIonChromatogram(precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex), precursorTolerance);
+                    Console.WriteLine("Charge " + charge+"\t"+string.Join("\t", xic.Select(p => p.Intensity.ToString())));
+                }
+
+                Console.WriteLine("\nCharge\tm/z");
+                for (var charge = 9; charge <= 18; charge++)
+                {
+                    var precursorIon = new Ion(protComposition + Composition.H2O, charge);
+                    Console.WriteLine("{0}\t{1}", charge, precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex));
+                }
+            }
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+
         [Test]
         public void TestTopDownSearchOneProtein()
         {
@@ -27,24 +70,14 @@ namespace InformedProteomics.Test
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             // Create a sequence graph
             var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var nTerm = protAnnotation[0] == FastaDatabase.Delimiter
-                                  ? AminoAcid.ProteinNTerm
-                                  : AminoAcid.PeptideNTerm;
-            var cTerm = protAnnotation[protAnnotation.Length - 1] == FastaDatabase.Delimiter
-                                  ? AminoAcid.ProteinCTerm
-                                  : AminoAcid.PeptideCTerm;
-
-            var seqGraph = new SequenceGraph(aaSet, protSeq.Length);
-            seqGraph.AddAminoAcid(nTerm.Residue);
-            var isValidSequence = protSeq.All(seqGraph.AddAminoAcid);
-            if (!isValidSequence)
+            var seqGraph = SequenceGraph.CreateProteinGraph(aaSet, protSeq);
+            if (seqGraph == null)
             {
                 Console.WriteLine("Invalid sequence: {0}", protSeq);
                 return;
             }
-            seqGraph.AddAminoAcid(cTerm.Residue);
 
-            DataDependentAcquisitionRun run;
+            //DataDependentAcquisitionRun run;
 
             foreach (var seqComposition in seqGraph.GetSequenceCompositions())
             {
