@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -182,6 +181,20 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
+        /// Gets the number of possible product compositions of the current sequence
+        /// </summary>
+        /// <returns>the number of possible product compositions</returns>
+        public int GetNumProductCompositions()
+        {
+            var numNodes = 0;
+            for (var index = 2; index < _graph.Length - 2; index++)
+            {
+                numNodes += _graph[index].Length;
+            }
+            return numNodes;
+        }
+
+        /// <summary>
         /// Gets all possible compositions of the current sequence
         /// </summary>
         /// <returns>all possible compositions</returns>
@@ -207,7 +220,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public IEnumerable<ScoringGraph> GetScoringGraphs()
         {
-            int numCompositions = _graph[_index].Length;
+            var numCompositions = _graph[_index].Length;
             var scoringGraphs = new ScoringGraph[numCompositions];
             for (var i = 0; i < numCompositions; i++)
             {
@@ -291,7 +304,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int ModificationCombinationIndex { get; private set; }
 
         private int[] _prevNodeIndices;
-        private int _count = 0;
+        private int _count;
 
         internal bool AddPrevNodeIndex(int prevNodeIndex)
         {

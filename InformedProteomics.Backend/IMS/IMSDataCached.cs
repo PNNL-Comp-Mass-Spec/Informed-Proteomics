@@ -123,6 +123,11 @@ namespace InformedProteomics.Backend.IMS
             return totalNumFeatures;
         }
 
+        private void WriteFeatures(bool isPrecursor)
+        {
+            
+        }
+
         private int CreateFeaturesMultiThreading(bool isPrecursor)
         {
             var frameType = isPrecursor ? DataReader.FrameType.MS1 : DataReader.FrameType.MS2;

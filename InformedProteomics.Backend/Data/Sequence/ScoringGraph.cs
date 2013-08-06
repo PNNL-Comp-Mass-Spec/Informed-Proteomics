@@ -13,6 +13,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class ScoringGraph
     {
+        public const int PrecursorScoreThreshold = -2;
         private const int DefaultMinPrecursorCharge = 1;
         private const int DefaultMaxPrecursorCharge = 4;
 
@@ -91,6 +92,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var precursorFeature in precursorFeatureSet)
             {
                 var precursorScore = imsScorer.GetPrecursorScore(precursorFeature);
+                if (precursorScore < PrecursorScoreThreshold) continue;
                 var productScore = GetProductIonScore(imsScorer, precursorFeature);
 
                 var curFeatureScore = precursorScore + productScore;

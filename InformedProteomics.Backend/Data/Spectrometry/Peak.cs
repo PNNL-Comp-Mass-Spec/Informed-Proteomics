@@ -1,39 +1,35 @@
+using System;
+using System.Collections.Generic;
+
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class Peak
+    public class Peak: IComparable<Peak>
     {
-        public double Mass
+        public Peak(double mz, double intensity)
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
+            Mz = mz;
+            Intensity = intensity;
         }
 
-        public double Intensity
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
+        public double Mz { get; private set; }
+        public double Intensity { get; private set; }
 
-        public int Charge
+        public int CompareTo(Peak other)
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
+            if (Mz < other.Mz) return -1;
+            return Mz > other.Mz ? 1 : 0;
         }
+    }
 
+    /// <summary>
+    /// Sort by reverse order of intensities (highest intensity comes first)
+    /// </summary>
+    public class IntensityComparer : IComparer<Peak>
+    {
+        public int Compare(Peak x, Peak y)
+        {
+            if (x.Intensity < y.Intensity) return 1;
+            return x.Intensity > y.Intensity ? -1 : 0;
+        }
     }
 }

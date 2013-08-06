@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
                                     continue;
                                 var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
                                 var feature = best.Item1;
-                                if (best.Item1 != null)// && best.Item3 > -20)
+                                if (best.Item1 != null)
                                 {
                                     writer.WriteLine(
                                         "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}"
@@ -374,17 +374,18 @@ namespace InformedProteomics.Test
         public void TestImsScoring()
         {
             //const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Collision_Energy_Collapsed.UIMF";
-            //const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
-            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
+            const string uimfFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\SarcCtrl_P21_1mgml_IMS6_AgTOF07_210min_CID_01_05Oct12_Frodo_Precursors_Removed_Collision_Energy_Collapsed.UIMF";
+            //const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             //var imsData = new ImsDataCached(uimfFilePath);
             var imsData = new ImsDataCached(uimfFilePath, 300.0, 2000.0, 10.0, 2500.0,
                 new Tolerance(25, DataReader.ToleranceType.PPM), new Tolerance(25, DataReader.ToleranceType.PPM));
             const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
             var imsScorerFactory = new ImsScorerFactory(paramFile);
 
-            const string targetPeptide = "CCAADDKEACFAVEGPK";
+            //const string targetPeptide = "CCAADDKEACFAVEGPK";
             //const string targetPeptide = "ECCHGDLLECADDRADLAK";
             //const string targetPeptide = "VTLTCVAPLSGVDFQLR";       // charge 2 must show up at (196,173)
+            const string targetPeptide = "CSPHLVLSALTSDNHGATYAFSGTHYWR";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             var seqGraph = new SequenceGraph(aaSet, targetPeptide);

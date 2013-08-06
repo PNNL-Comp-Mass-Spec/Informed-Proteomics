@@ -25,7 +25,6 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet();
 
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
-
             // Create a sequence graph
             var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
             var nTerm = protAnnotation[0] == FastaDatabase.Delimiter
@@ -57,6 +56,73 @@ namespace InformedProteomics.Test
                     
                 }
             }
+
+             
+        }
+
+        [Test]
+        public void TestHistonEnumeration()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            const int numNTermCleavages = 0;
+            const int numMaxModsPerProtein = 11;
+            const string protAnnotation = "-.MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG.-";
+
+            var acetylR = new SearchModification(Modification.Acetylation, 'R', SequenceLocation.Everywhere, false);
+            var acetylK = new SearchModification(Modification.Acetylation, 'K', SequenceLocation.Everywhere, false);
+            var methylR = new SearchModification(Modification.Methylation, 'R', SequenceLocation.Everywhere, false);
+            var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
+            var diMethylR = new SearchModification(Modification.DiMethylation, 'R', SequenceLocation.Everywhere, false);
+            var diMethylK = new SearchModification(Modification.DiMethylation, 'K', SequenceLocation.Everywhere, false);
+            var triMethylR = new SearchModification(Modification.TriMethylation, 'R', SequenceLocation.Everywhere, false);
+            var phosphoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
+            var phosphoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
+            var phosphoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+                {
+                    acetylR, acetylK,
+                    methylR, methylK,
+                    diMethylR, diMethylK,
+                    triMethylR,
+                    phosphoS, phosphoT, phosphoY
+                };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
+            var seqGraph = new SequenceGraph(aaSet, protSeq.Length);
+            seqGraph.AddAminoAcid(AminoAcid.ProteinNTerm.Residue);
+            var isValidSequence = protSeq.All(seqGraph.AddAminoAcid);
+            if (!isValidSequence)
+            {
+                Console.WriteLine("Invalid sequence: {0}", protSeq);
+                return;
+            }
+            seqGraph.AddAminoAcid(AminoAcid.ProteinCTerm.Residue);
+
+            Console.WriteLine("Num sequence compositions: {0}", seqGraph.GetNumCompositions()
+                );
+
+            Console.WriteLine("Num product compositions: {0}", seqGraph.GetNumProductCompositions()
+                );
+
+            //var numProductCompositions = 0L;
+
+            //foreach (var seqComposition in seqGraph.GetSequenceCompositions())
+            //{
+            //    Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.GetMass());
+            //    foreach (var scoringGraph in seqGraph.GetScoringGraphs())
+            //    {
+            //        //numProductCompositions += scoringGraph.GetCompositions().Count();
+            //    }
+            //}
+            //Console.WriteLine("Num product compositions: {0}", numProductCompositions
+            //    );
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
         [Test]
