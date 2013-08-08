@@ -175,7 +175,7 @@ namespace InformedProteomics.Backend.IMS
         private Feature GetFeature(double mz, Feature precursorFeature, bool isPrecursor)
         {
             Feature bestFeature = null;
-            const float portionIntersectioinThreshold = 0.5f; // added by Kyowon - testing
+            const float portionIntersectioinThreshold = 0.1f; // added by Kyowon - testing
             int bestIntersectionArea = 0;
             var precursorBoundary = precursorFeature.GetBoundary();
             
@@ -188,7 +188,7 @@ namespace InformedProteomics.Backend.IMS
                     var boundary = feature.GetBoundary();
                     var intersection = Rectangle.Intersect(precursorBoundary, boundary);
                     var intersectionArea = intersection.Width * intersection.Height;
-                    var portionIntersection = (double)intersectionArea / (boundary.Width * boundary.Height);
+                    var portionIntersection = (double)intersectionArea / (precursorBoundary.Width * precursorBoundary.Height);
                     if (portionIntersection < portionIntersectioinThreshold)
                         continue;
                     if (intersectionArea > bestIntersectionArea)

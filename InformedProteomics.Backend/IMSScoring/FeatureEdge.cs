@@ -55,7 +55,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 if (RNode.Feature != null) rr /= RNode.Feature.IntensityMax;
                 else rr = 0.0;
 
-                if (rr > 100 || rr < .01) _ratioScore -= 4; //TODO 
+                //if (rr > 100 || rr < .01) _ratioScore -= 4; //TODO 
                 //Console.WriteLine("Prec : " + r.FragmentIonClassBase.Name +"\t" + _ratio + "\t" + RatioScore + "\t" + r.Feature);
 
                 //Console.WriteLine("pre " + _ratioScore);
@@ -84,7 +84,33 @@ namespace InformedProteomics.Backend.IMSScoring
 
         static public int GetRatioIndex(double v1, double v2)
         {
+           
+            
+            //if (v2 <= 0) return 0;
+            //if (v2 > v1) return -1;
+            //return 1;
             if (v1 <= 0)
+            {
+                if (v2 > 0) return -4;
+                return -5;
+            }
+            if (v2 <= 0) return 4;
+            var f = 1;
+            if (v1 <= v2)
+            {
+                var tmp = v1;
+                v1 = v2;
+                v2 = tmp;
+                f = -1;
+            }
+            var index = 0;
+            for (; index < 4; index++)
+            {
+                v1 = v1*0.66;
+                if (v1 < v2) break;
+            }
+            return index * f;
+            /*if (v1 <= 0)
             {
                 if (v2 > 0) return -5;
                 return -6;
@@ -104,12 +130,14 @@ namespace InformedProteomics.Backend.IMSScoring
                 v1 = v1*0.66;
                 if (v1 < v2) break;
             }
-            return index * f;
+            return index * f;*/
         }
 
         static public int[] GetAllRatioIndices()
         {
-            return new[] {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
+           // return new[] { -1, 0, 1 };
+            return new[] { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4};
+           // return new[] {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
         }
     }
 }

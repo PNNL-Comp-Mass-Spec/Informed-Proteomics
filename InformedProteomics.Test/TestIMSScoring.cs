@@ -109,7 +109,7 @@ namespace InformedProteomics.Test
                             var score = imsScorer.GetPrecursorScore(precursorFeature);
                             // Console.WriteLine("Feature: " + precursorFeature);
                             // Console.WriteLine("Precursor score: " + score);
-                            //if (score < -2) continue;
+                           // if (score < -2) continue;
                             var portionExplainedFrags = 0.0;
                             for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
                             {
@@ -283,14 +283,14 @@ namespace InformedProteomics.Test
 
              */
 
-            var pep = "NNEGTYYSPNYNPQSR";// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
+            var pep = "CSPHLVLSALTSDNHGATYAFSGTHYWR";// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
             var precursorComposition = aaSet.GetComposition(pep);
             var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
             var maxScore = double.NegativeInfinity;
             var maxPortionOfExplainedFrag = 0.0;
 
             Feature maxFeature = null;
-                for (var charge = 2; charge <= 2; charge++)
+                for (var charge = 4; charge <= 4; charge++)
                 {
                     var precursorIon = new Ion(precursorComposition + Composition.H2O, charge);
                     var imsScorer = imsScorerFactory.GetImsScorer(imsData, precursorIon);

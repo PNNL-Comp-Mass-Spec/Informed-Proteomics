@@ -10,11 +10,12 @@ namespace InformedProteomics.Backend.IMSScoring
         // IMPORTANT : if ion1 == ion2 for isotope it means relaton between ion1 and precursor!
         // Now isotope score for precursor is not trained (mgf does not contain precursor profile), and node score of precursor is zero should be fixed..
 
-        private const int MaxCorrIntScore = 8;
-        private const double CorrIntScoreFactorForIsotopeScore = 0.75;
-        private const double CorrIntScoreFactorForLcImsScore = 0.75;
-        private const double LowScoreForIsotopeScore = -5;
-        private const double HighScoreForIsotopeScore = 5;
+        private const int MaxCorrIntScore = 5;
+        private const double CorrIntScoreFactorForIsotopeScore = 0.75; // the lower the more stringent
+        private const double CorrIntScoreFactorForIsotopeScoreForPrecursor = 0.6;
+        private const double CorrIntScoreFactorForLcImsScore = 0.5;
+        private const double LowScoreForIsotopeScore = -4;
+        private const double HighScoreForIsotopeScore = 4;
         private const double LowScoreForLcImsScore = -.5;
         private const double HighScoreForLcImsScore = 1.5;
 
@@ -235,8 +236,23 @@ namespace InformedProteomics.Backend.IMSScoring
         internal double GetIsotopeIntensityCorrelationScore(double isotopeCorr, GroupParameter groupParameter)
         {
             if (_isotopeIntensityCorrScoreDictionary.Count == 0)
-                return CorrToIntForIsotopeScore(isotopeCorr) / (double)MaxCorrIntScore * (HighScoreForIsotopeScore - LowScoreForIsotopeScore) + LowScoreForIsotopeScore;
+            {
+                var ret =  CorrToIntForIsotopeScore(isotopeCorr)/(double) MaxCorrIntScore*
+                       (HighScoreForIsotopeScore - LowScoreForIsotopeScore) + LowScoreForIsotopeScore;
+                return ret;
+            }
             return GetScoreFromDictionary(_isotopeIntensityCorrScoreDictionary, CorrToIntForIsotopeScore(isotopeCorr), groupParameter, LowScoreForIsotopeScore);
+        }
+
+        internal double GetIsotopeIntensityCorrelationScoreForPrecursor(double isotopeCorr, GroupParameter groupParameter)
+        {
+            if (_isotopeIntensityCorrScoreDictionary.Count == 0)
+            {
+                var ret = CorrToIntForIsotopeScoreForPrecursor(isotopeCorr) / (double)MaxCorrIntScore *
+                       (HighScoreForIsotopeScore - LowScoreForIsotopeScore) + LowScoreForIsotopeScore;
+                return ret;
+            }
+            return GetScoreFromDictionary(_isotopeIntensityCorrScoreDictionary, CorrToIntForIsotopeScoreForPrecursor(isotopeCorr), groupParameter, LowScoreForIsotopeScore);
         }
 
         internal double GetKLDivergence(IonType ionType, IonType ionType1, int ratio, GroupParameter groupParameter)
@@ -272,6 +288,19 @@ namespace InformedProteomics.Backend.IMSScoring
                 if (1 - m > corr)
                     break;
                 m = m * CorrIntScoreFactorForIsotopeScore; // 
+            }
+            return score;
+        }
+
+        public static int CorrToIntForIsotopeScoreForPrecursor(double corr) // the higher the better from 1 to 5
+        {
+            var m = 1.0;
+            var score = 0;
+            for (; score < MaxCorrIntScore; score++)
+            {
+                if (1 - m > corr)
+                    break;
+                m = m * CorrIntScoreFactorForIsotopeScoreForPrecursor; // 
             }
             return score;
         }

@@ -17,12 +17,12 @@ namespace InformedProteomics.Backend.IMSScoring
             // when calculating score, only mass index and charge values are used in parameter. When writing the parameter file, only they should be written.
             if (IsScoreCalculated) return Score;
            // Console.WriteLine(this + " " + IsotopeCorrelation);
-            var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
+            var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScoreForPrecursor(IsotopeCorrelation, GroupParameter);
             
-            var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
-            var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
+            //var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
+            //var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
            
-            Score = lcScore + imsScore + isotopeScore;
+            //Score = lcScore + imsScore + isotopeScore;
             Score = isotopeScore;
             IsScoreCalculated = true;
             //Console.WriteLine(this + " " + lcScore + " " + imsScore + " " + isotopeScore);

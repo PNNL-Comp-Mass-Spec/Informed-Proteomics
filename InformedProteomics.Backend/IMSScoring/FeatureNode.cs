@@ -40,13 +40,14 @@ namespace InformedProteomics.Backend.IMSScoring
                 var lcCorrelation = StatisticsTools.GetLcCorrelation(PrecursorFeature, _isotopomerFeatures[k]);
                 var imsCorrelation = StatisticsTools.GetImsCorrelation(PrecursorFeature, _isotopomerFeatures[k]);
                 
-                if (lcCorrelation >= 0.3 || imsCorrelation >= 0.3) //TODO take the good numbers!!
+                if (lcCorrelation >= 0.25 && imsCorrelation >= 0.25) //TODO take the good numbers!!
                 {
                     f[k] = _isotopomerFeatures[k];
                 }
                 if (k != _isotopomerFeatures.MaxIntensityIndex) continue;
                 LcCorrelation = lcCorrelation;
                 ImsCorrelation = imsCorrelation;
+               // Console.WriteLine((FragmentIonClassBase == null? "p" : FragmentIonClassBase.Name) + "** " + k + " " + (f[k] == null));
                 Feature = f[k]; // if lc correlation score and ims correlation score are too low, Feature = null;
             }
             IsotopeCorrelation = StatisticsTools.GetIsotopeCorrelation(f, i);

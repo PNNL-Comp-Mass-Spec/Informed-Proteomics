@@ -69,7 +69,7 @@ namespace InformedProteomics.Backend.IMSScoring
                     RatioScore += edge.GetRatioScore();
                     var io = edge.LNode.FragmentIonClassBase;
                  //   Console.WriteLine((edge.LNode.Feature == null ? "0" : edge.LNode.Feature.IntensityMax.ToString()) + " " + (edge.RNode.Feature == null ? "0" : edge.RNode.Feature.IntensityMax.ToString()) + " " + edge.GetRatioScore());
-                  //  Console.WriteLine((io == null? "P" : io.Name) + " " + edge.RNode.FragmentIonClassBase.Name + " " + edge.GetImsScore() + " " + edge.GetLcScore());
+                  //  Console.WriteLine((io == null? "P" : io.Name) + " " + edge.RNode.FragmentIonClassBase.Name);
                     //
 //                      Console.WriteLine((io == null? "P" : io.Name + " " + (edge.LNode.Feature==null)) + " " + edge.RNode.FragmentIonClassBase.Name + " " + (edge.RNode.Feature==null) + " " +  edge.NodeScore + " " + edge.RatioScore + " " + edge.LcScore + " " + edge.ImsScore);
                 }
@@ -85,6 +85,7 @@ namespace InformedProteomics.Backend.IMSScoring
 
             foreach (var node in nodes)
             {
+                //Console.WriteLine(node.FragmentIonClassBase);
                 if (node.Equals(primeNode)) continue;
                 if (diffCharge)
                 {
@@ -160,11 +161,13 @@ namespace InformedProteomics.Backend.IMSScoring
 
             var nodes = new List<FragmentFeatureNode>();
             var suffixComposition = precursorIon.Composition -Composition.H2O - cutComposition;
+            
+            //Console.WriteLine(cutComposition.GetMass() + " " + suffixComposition.GetMass());
 
             foreach (var ionType in ionTypes)
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
-                //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + ionType.GetIon(composition).GetMz());
+                //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + composition.GetMass() + "\t" + ionType.GetIon(composition).GetMz());
                 var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, precursorFeature, parameter, _scoringParams);
                 //if(node.Feature != null)
                 //    if (20 * node.Feature.IntensityMax < precursorFeature.IntensityMax || node.Feature.IntensityMax > 20 * precursorFeature.IntensityMax) continue; // 
