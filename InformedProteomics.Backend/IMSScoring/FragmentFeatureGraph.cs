@@ -66,8 +66,9 @@ namespace InformedProteomics.Backend.IMSScoring
                 foreach (var edge in this[node])
                 {
                     NodeScore += edge.GetNodeScore();
-                    RatioScore += edge.GetRatioScore();
-                    var io = edge.LNode.FragmentIonClassBase;
+                    if(edge.GetNodeScore()> -2.5) //TODO
+                        RatioScore += edge.GetRatioScore();
+                  //  var io = edge.LNode.FragmentIonClassBase;
                  //   Console.WriteLine((edge.LNode.Feature == null ? "0" : edge.LNode.Feature.IntensityMax.ToString()) + " " + (edge.RNode.Feature == null ? "0" : edge.RNode.Feature.IntensityMax.ToString()) + " " + edge.GetRatioScore());
                   //  Console.WriteLine((io == null? "P" : io.Name) + " " + edge.RNode.FragmentIonClassBase.Name);
                     //

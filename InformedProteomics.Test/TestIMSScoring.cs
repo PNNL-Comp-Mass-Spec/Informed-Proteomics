@@ -269,28 +269,32 @@ namespace InformedProteomics.Test
             var num = 0;
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
-            /*
-             R.ADSQAQLLLSTVVGVFTAPGLHLK.Q
-    K.LHLETDSLALVALGALDTALYAAGSK.S
-    K.HQPQEFPTYVEPTNDEICEAFR.K
-    R.VHANPLLIDVVTYLVALIPEPSAQQLR.E
-    K.HVEDVPAFQALGSLNDLQFFR.Y
-    K.EVGTPHGIILDSVDAAFICPGSSR.L
-    R.DGWHSWPIAHQWPQGPSAVDAAFSWEEK.L
-    K.NQDVHSINLPFFETLQEYFER.N
-    R.VPSYTLILPSLELPVLHVPR.N
-        K.NNEGTYYSPNYNPQSR.S
+            /*decoy
+             R.QHVILAAKYVFTKGCVNCEYPK.E -121
+             * K.VPELDDEDSSLKLDDELMKTSAR.T -154
+        K.SHQSLMVQSQDQLAEVHEPDK.L -151
+
+             * 
+             * 
+             * 
+             * target
+             * 
+             R.FTVDRPFLFLIYEHR.T 77
+             K.SEVMFFADATSHLEEK.K -55
+        K.GNKPDFHLAMPTEQAEGFYNSFLEQLR.K -209
+        R.DGWHSWPIAHQWPQGPSAVDAAFSWEEK.L 123
+
 
              */
 
-            var pep = "CSPHLVLSALTSDNHGATYAFSGTHYWR";// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
+            var pep = "DGWHSWPIAHQWPQGPSAVDAAFSWEEK";// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
             var precursorComposition = aaSet.GetComposition(pep);
             var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
             var maxScore = double.NegativeInfinity;
             var maxPortionOfExplainedFrag = 0.0;
 
             Feature maxFeature = null;
-                for (var charge = 4; charge <= 4; charge++)
+                for (var charge = 1; charge <= 5; charge++)
                 {
                     var precursorIon = new Ion(precursorComposition + Composition.H2O, charge);
                     var imsScorer = imsScorerFactory.GetImsScorer(imsData, precursorIon);
@@ -328,7 +332,7 @@ namespace InformedProteomics.Test
                         Console.WriteLine(" Score = " + score + "\n");
                     }
                 }
-
+        Console.WriteLine("Max Score " + maxScore);
                 
         }
     
