@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.Backend.Database;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -77,17 +78,30 @@ namespace InformedProteomics.Backend.Data.Sequence
             _graph[0] = new[] { new Node(0) };
         }
 
-        public static SequenceGraph CreateProteinGraph(AminoAcidSet aaSet, string protSeq)
+        /// <summary>
+        /// Create a graph representing the sequence. Sequence is reversed.
+        /// </summary>
+        /// <param name="aaSet">amino acid set</param>
+        /// <param name="annotation">annotation (e.g. G.PEPTIDER.K or _.PEPTIDER._)</param>
+        /// <returns></returns>
+        public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
-            var protGraph = new SequenceGraph(aaSet, protSeq.Length);
-            protGraph.AddAminoAcid(AminoAcid.ProteinNTerm.Residue);
-            var isValidSequence = protSeq.All(protGraph.AddAminoAcid);
-            if (!isValidSequence)
+            string sequence = annotation.Substring(2, annotation.Length - 4);
+            var nTerm = annotation[0] == FastaDatabase.Delimiter
+                                  ? AminoAcid.ProteinNTerm
+                                  : AminoAcid.PeptideNTerm;
+            var cTerm = annotation[annotation.Length - 1] == FastaDatabase.Delimiter
+                                  ? AminoAcid.ProteinCTerm
+                                  : AminoAcid.PeptideCTerm;
+
+            var seqGraph = new SequenceGraph(aaSet, sequence.Length);
+            seqGraph.AddAminoAcid(cTerm.Residue);
+            for (var i = sequence.Length - 1; i >= 0; i--)
             {
-                return null;
+                if (seqGraph.AddAminoAcid(sequence[i]) == false) return null;
             }
-            protGraph.AddAminoAcid(AminoAcid.ProteinCTerm.Residue);
-            return protGraph;
+            seqGraph.AddAminoAcid(nTerm.Residue);
+            return seqGraph;
         }
 
         public bool PutPeptideSequence(string sequence)
@@ -194,6 +208,25 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
+        /// Gets the number of distinct compositions of the current sequence 
+        /// </summary>
+        /// <returns>the number of possible compositions</returns>
+        public int GetNumDistinctCompositions()
+        {
+            var compositions = new HashSet<Composition>();
+            for (var nodeIndex = 0; nodeIndex < _graph[_index].Length; nodeIndex++)
+            {
+                compositions.Add(GetComposition(_index, nodeIndex));
+            }
+            return compositions.Count;
+        }
+        
+        public int GetNumCompositionsWithNTermCleavage(int numNTermCleavages)
+        {
+            return numNTermCleavages >= _index - 3 ? 0 : _graph[_index - numNTermCleavages].Length;
+        }
+
+        /// <summary>
         /// Gets the number of possible product compositions of the current sequence
         /// </summary>
         /// <returns>the number of possible product compositions</returns>
@@ -222,6 +255,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             return compositions;
         }
 
+        public Composition[] GetSequenceCompositionsWithNTermCleavage(int numNTermCleavages)
+        {
+            if (numNTermCleavages >= _index - 3) return new Composition[0];
+
+            var numCompositions = _graph[_index-numNTermCleavages].Length;
+            var compositions = new Composition[numCompositions];
+            for (var nodeIndex = 0; nodeIndex < numCompositions; nodeIndex++)
+            {
+                compositions[nodeIndex] = GetComposition(_index - numNTermCleavages, nodeIndex);
+            }
+            return compositions;
+        }
+        
         /// <summary>
         /// Gets the composition of the sequence without variable modification.
         /// </summary>

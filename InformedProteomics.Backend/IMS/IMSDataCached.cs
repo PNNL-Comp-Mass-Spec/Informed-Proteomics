@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.IMS
         //private readonly bool[] _isFragmentCached;
         private bool _isAllFragmentFeaturesCached = false;
 
-        public ImsDataCached(string filePath) : this(filePath, 400.0, 1000.0, 10.0, 2000.0, 
+        public ImsDataCached(string filePath) : this(filePath, 400.0, 1200.0, 10.0, 2000.0, 
             new Tolerance(25, DataReader.ToleranceType.PPM), new Tolerance(25, DataReader.ToleranceType.PPM))
         {
         }
@@ -57,11 +57,13 @@ namespace InformedProteomics.Backend.IMS
         /// <returns>the precursor feature within the boundary of the precursorFeature</returns>
         public Feature GetPrecursorFeature(double precursorMz, Feature precursorFeature)
         {
+            if (precursorMz < MinPrecursorMz || precursorMz > MaxPrecursorMz) return null;
             return GetFeature(precursorMz, precursorFeature, true);
         }
 
         public FeatureSet GetFragmentFeatures(double fragmentMz)
         {
+            if (fragmentMz < MinPrecursorMz || fragmentMz > MaxPrecursorMz) return null;
             return GetFeatures(fragmentMz, false);
         }
 
@@ -156,14 +158,14 @@ namespace InformedProteomics.Backend.IMS
             var mzBin = GetBinFromMz(mz);
             var featureSetMap = isPrecursor ? _precursorFeatureSetMap : _fragmentFeatureSetMap;
 
-            var isAllFeaturesCached = isPrecursor ? _isAllPrecursorFeaturesCached : _isAllFragmentFeaturesCached;
+            //var isAllFeaturesCached = isPrecursor ? _isAllPrecursorFeaturesCached : _isAllFragmentFeaturesCached;
 
             FeatureSet curFeatureSet;
             if (featureSetMap.TryGetValue(mzBin, out curFeatureSet))
             {
                 return curFeatureSet;
             }
-
+            
             var recoveredMz = GetMzFromBin(mzBin);
             var featureSet = isPrecursor ?
                                  GetFeatures(recoveredMz, PrecursorTolerance, DataReader.FrameType.MS1)

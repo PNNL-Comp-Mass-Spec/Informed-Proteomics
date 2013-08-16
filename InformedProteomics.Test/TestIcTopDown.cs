@@ -16,32 +16,126 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
+        public void TestGeneratingAllXics()
+        {
+            // Search parameters
+            const int numNTermCleavages = 1;  // 30
+            const int minLength = 7;
+            const int maxLength = 1000;
+            const int minCharge = 3; // 3
+            const int maxCharge = 67; // 67
+            const int numMaxModsPerProtein = 0; // 6
+            var precursorTolerance = new Tolerance(20);
+            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
+            const string dbFilePath =
+                @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            Console.Write("Reading raw file...");
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            // Configure amino acid set
+            //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+                {
+                    //pyroGluQ,
+                    dehydro,
+                    cysteinylC,
+                    glutathioneC,
+                    //oxM
+                };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            var targetDb = new FastaDatabase(dbFilePath);
+            var indexedDb = new IndexedDatabase(targetDb);
+
+            var numProteins = 0;
+            long totalProtCompositions = 0;
+            long numXics = 0;
+
+            sw.Reset();
+            sw.Start();
+            Console.WriteLine("Generating XICs...");
+
+            foreach (var protAnnotation in indexedDb.SequencesAsStrings(0, minLength, maxLength))
+            {
+                ++numProteins;
+
+                if (numProteins % 1000 == 0)
+                {
+                    Console.WriteLine("Processed {0} proteins", numProteins);
+                }
+
+                //Console.WriteLine(protAnnotation);
+
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                if (seqGraph == null) continue;
+
+                for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
+                {
+                    var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(nTermCleavages);
+                    foreach (var protComposition in protCompositions)
+                    {
+                        totalProtCompositions++;
+                        var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();
+                        for (var charge = minCharge; charge <= maxCharge; charge++)
+                        {
+                            numXics++;
+                            var precursorIon = new Ion(protComposition + Composition.H2O, charge);
+                            run.GetExtractedIonChromatogram(precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex), precursorTolerance);
+                        }
+                    }
+                }
+            }
+
+            sw.Stop();
+            Console.WriteLine("NumProteins: {0}", numProteins);
+            Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
+            Console.WriteLine("NumXics: {0}", numXics);
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+        
+        [Test]
         public void TestGeneratingXics()
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new DataDependentAcquisitionRun(new XCaliburRun(specFilePath));
+            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
-            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+            var aaSet = new AminoAcidSet();
 
             var precursorTolerance = new Tolerance(10);
 
             // Create a sequence graph
             var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var seqGraph = SequenceGraph.CreateProteinGraph(aaSet, protSeq);
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protSeq);
             foreach (var protComposition in seqGraph.GetSequenceCompositions())
             {
                 var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();
                 Console.WriteLine("Composition\t{0}", protComposition);
                 Console.WriteLine("MostAbundantIsotopeIndex\t{0}", mostAbundantIsotopeIndex);
+                Console.WriteLine();
 
-                Console.WriteLine("\nScanNum\t{0}",string.Join("\t", run.GetScanNumbers(1).Select(n => n.ToString())));
-                for (var charge = 9; charge <= 18; charge++)
+                for (var charge = 14; charge <= 14; charge++)
                 {
                     var precursorIon = new Ion(protComposition+Composition.H2O, charge);
                     var xic = run.GetExtractedIonChromatogram(precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex), precursorTolerance);
-                    Console.WriteLine("Charge " + charge+"\t"+string.Join("\t", xic.Select(p => p.Intensity.ToString())));
+                    Console.WriteLine("ScanNum\t{0}", string.Join("\t", xic.Select(p => p.ScanNum.ToString())));
+                    Console.WriteLine("Charge " + charge + "\t" + string.Join("\t", xic.Select(p => p.Intensity.ToString())));
                 }
 
                 Console.WriteLine("\nCharge\tm/z");
@@ -57,6 +151,8 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
+
+
         [Test]
         public void TestTopDownSearchOneProtein()
         {
@@ -70,7 +166,7 @@ namespace InformedProteomics.Test
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             // Create a sequence graph
             var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var seqGraph = SequenceGraph.CreateProteinGraph(aaSet, protSeq);
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protSeq);
             if (seqGraph == null)
             {
                 Console.WriteLine("Invalid sequence: {0}", protSeq);
@@ -100,7 +196,9 @@ namespace InformedProteomics.Test
             sw.Start();
             const int numNTermCleavages = 0;
             const int numMaxModsPerProtein = 11;
-            const string protAnnotation = "-.MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG.-";
+            //const string protAnnotation = "-.MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG.-";  // Histone H4
+            const string protAnnotation =
+                "-.MARTKQTARKSTGGKAPRKQLATKAARKSAPSTGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQRLVREIAQDFKTDLRFQSAAIGALQEASEAYLVGLFEDTNLCAIHAKRVTIMPKDIQLARRIRGERA.-"; // Histone H3.2
 
             var acetylR = new SearchModification(Modification.Acetylation, 'R', SequenceLocation.Everywhere, false);
             var acetylK = new SearchModification(Modification.Acetylation, 'K', SequenceLocation.Everywhere, false);
@@ -134,7 +232,7 @@ namespace InformedProteomics.Test
             }
             seqGraph.AddAminoAcid(AminoAcid.ProteinCTerm.Residue);
 
-            Console.WriteLine("Num sequence compositions: {0}", seqGraph.GetNumCompositions()
+            Console.WriteLine("Num sequence compositions: {0}, {1}", seqGraph.GetNumCompositions(), seqGraph.GetNumDistinctCompositions()
                 );
 
             Console.WriteLine("Num product compositions: {0}", seqGraph.GetNumProductCompositions()
@@ -174,11 +272,12 @@ namespace InformedProteomics.Test
             sw.Start();
 
             // Configure amino acid set
-            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+//            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
-            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+//            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
                 {

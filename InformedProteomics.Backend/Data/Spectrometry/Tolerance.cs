@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double _value;
         private readonly DataReader.ToleranceType _unit;
 
+        public static readonly Tolerance OnePpm = new Tolerance(1);
+
         public Tolerance(double value) : this(value, DataReader.ToleranceType.PPM)
         {
         }

@@ -44,12 +44,12 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
 
             // Read database
-            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
+//            const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
+            const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             Console.Write("Reading a database...");
             Console.Out.Flush();
             sw.Reset();
             sw.Start();
-            const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var targetDb = new FastaDatabase(dbFilePath);
             var decoyDb = targetDb.Decoy(enzyme);
             sw.Stop();
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
                                     continue;
                                 var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
                                 var feature = best.Item1;
-                                if (best.Item1 != null)
+                                if (best.Item1 != null && best.Item3 > -50)
                                 {
                                     writer.WriteLine(
                                         "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}"

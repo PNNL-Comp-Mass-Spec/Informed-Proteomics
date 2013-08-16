@@ -142,6 +142,7 @@
     <Compile Include="Data\Spectrometry\IonType.cs" />
     <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
+    <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPeak.cs" />
     <Compile Include="IMSScoring\FeatureNode.cs" />
     <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
@@ -165,8 +166,8 @@
     <Compile Include="IMS\IMSDataCached.cs" />
     <Compile Include="IMS\FeatureSet.cs" />
     <Compile Include="MassSpecData\DataDependentAcquisitionRun.cs" />
-    <Compile Include="MassSpecData\IRawDataParser.cs" />
-    <Compile Include="MassSpecData\XCaliburRun.cs" />
+    <Compile Include="MassSpecData\IRawDataReader.cs" />
+    <Compile Include="MassSpecData\XCaliburReader.cs" />
     <Compile Include="Data\Enum\SequenceLocation.cs" />
     <Compile Include="Data\Enum\SequenceType.cs" />
     <Compile Include="Data\Biology\Atom.cs" />

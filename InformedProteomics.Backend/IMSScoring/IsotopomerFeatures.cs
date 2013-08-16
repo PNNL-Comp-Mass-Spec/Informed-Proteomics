@@ -43,7 +43,7 @@ namespace InformedProteomics.Backend.IMSScoring
                 {
                     if (mz > imsData.MaxFragmentMz || mz < imsData.MinFragmentMz) Add(null);
                     else Add(imsData.GetFramentFeature(mz, precursorFeature));
-                    var tt = imsData.GetFramentFeature(mz, precursorFeature);
+                    //var tt = imsData.GetFramentFeature(mz, precursorFeature);
                    // if(mz == 361.198813765) 
                     //    Console.WriteLine(mz + " " + (tt == null ? "NULL" : tt.GetHighestPoint().ToString()));
                 }

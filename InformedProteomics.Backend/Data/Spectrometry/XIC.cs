@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DeconTools.Backend;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class XIC: XYData
+    public class Xic
     {
+        public Xic(XicPeak[] xicPeaks)
+        {
+            XicPeaks = xicPeaks;
+        }
+
+        public XicPeak[] XicPeaks { get; private set; }
     }
 }

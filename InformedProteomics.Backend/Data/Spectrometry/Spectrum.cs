@@ -13,6 +13,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             ScanNum = scanNum;
         }
 
+        public Spectrum(ICollection<Peak> peaks, int scanNum)
+        {
+            Peaks = new Peak[peaks.Count];
+            peaks.CopyTo(Peaks, 0);
+            ScanNum = scanNum;
+        }
+
         public int ScanNum { get; private set; }
         public int MsLevel
         {
@@ -52,7 +59,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var bestIntensity = 0.0;
 
             // go down
-            var i = index;
+            var i = index - 1;
             while (i >= 0 && i < Peaks.Length)
             {
                 if (Peaks[i].Mz <= minMz) break;
@@ -65,7 +72,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             // go up
-            i = index + 1;
+            i = index;
             while (i >= 0 && i < Peaks.Length)
             {
                 if (Peaks[i].Mz >= maxMz) break;
