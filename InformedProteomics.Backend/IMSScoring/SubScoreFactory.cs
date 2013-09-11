@@ -14,8 +14,8 @@ namespace InformedProteomics.Backend.IMSScoring
         private const double CorrIntScoreFactorForIsotopeScore = 0.75; // the lower the more stringent
         private const double CorrIntScoreFactorForIsotopeScoreForPrecursor = 0.6;
         private const double CorrIntScoreFactorForLcImsScore = 0.5;
-        private const double LowScoreForIsotopeScore = -4;
-        private const double HighScoreForIsotopeScore = 4;
+        private const double LowScoreForIsotopeScore = -3;
+        private const double HighScoreForIsotopeScore = 3;
         private const double LowScoreForLcImsScore = -.5;
         private const double HighScoreForLcImsScore = 1.5;
 

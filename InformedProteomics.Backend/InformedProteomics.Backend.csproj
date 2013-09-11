@@ -186,6 +186,9 @@
     <Compile Include="Data\Spectrometry\Precursor.cs" />
     <Compile Include="IMS\IMSData.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
+    <Compile Include="TopDownScoring\SubScoreFactory.cs" />
+    <Compile Include="TopDownScoring\TopDownScorer.cs" />
+    <Compile Include="TopDownScoring\TopDownTrainer.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
