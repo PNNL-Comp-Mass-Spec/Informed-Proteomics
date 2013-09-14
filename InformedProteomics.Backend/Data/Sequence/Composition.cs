@@ -57,6 +57,17 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
+	    static Composition()
+	    {
+		    ProbC = new[] { .9893, 0.0107, 0, 0 };
+			ProbH = new[] { .999885, .000115, 0, 0 };
+			ProbN = new[] { 0.99632, 0.00368, 0, 0};
+			ProbO = new[] { 0.99757, 0.00038, 0.00205, 0};
+			ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
+
+		    _areIsotopeCombinationsCalculated = false;
+	    }
+
         private Composition(int c, int h, int n, int o, int s, Dictionary<Atom, short> additionalElements)
             : this(c, h, n, o, s)
         {
@@ -100,6 +111,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly short _n;
         private readonly short _o;
         private readonly short _s;
+
+	    private static bool _areIsotopeCombinationsCalculated;
 
         #endregion
 
@@ -254,7 +267,13 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public float[] GetApproximatedIsotopomerEnvelop(int maxIsotope)
         {
-            var dist = new float[Math.Min(maxIsotope, PossibleIsotopeCombinations.Length)];
+	        if (!_areIsotopeCombinationsCalculated)
+	        {
+		        PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
+		        _areIsotopeCombinationsCalculated = true;
+	        }
+
+	        var dist = new float[Math.Min(maxIsotope, PossibleIsotopeCombinations.Length)];
             var means = new double[PossibleIsotopeCombinations[0][0].Length + 1];
             var exps = new double[means.Length];
             for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
@@ -438,7 +457,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Possible combinations of isotopes // added by kyowon
 
-        private static readonly int[][][] PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
+        private static int[][][] PossibleIsotopeCombinations;
 
         #endregion
     }
