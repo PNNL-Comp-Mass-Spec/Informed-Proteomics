@@ -153,6 +153,14 @@ namespace InformedProteomics.Backend.MassSpecData
             throw new System.NotImplementedException();
         }
 
+	    /// <summary>
+	    /// Returns the max scan number associated with the run
+	    /// </summary>
+	    public int GetMaxScanNumber()
+	    {
+		    return _numMs1Scans;
+	    }
+
         private readonly IRawDataReader _rawDataReader;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         //private readonly LinkedList<Spectrum> _ms1List; // linked list of MS1 spectra
