@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.Utils
             }
             else
             {
-                int[][] prevCombinations = GetCombinationsWithRepetition(n, length - 1);
+                var prevCombinations = GetCombinationsWithRepetition(n, length - 1);
                 var combinations = new List<int[]>();
                 foreach (var combination in prevCombinations)
                 {
@@ -52,6 +52,46 @@ namespace InformedProteomics.Backend.Utils
                 }
                 return combinations.ToArray();
             }
+        }
+
+        static public double GetCorrelation(double[] v1, double[] v2)
+        {
+            if (v1.Length <= 1) return 0.0;
+
+            /* var d = 0.0;
+             var n = new double[2];
+
+             for (var i = 0; i < v1.Length; i++)
+             {
+                 n[0] += v1[i]*v1[i];
+                 n[1] += v2[i]*v2[i];
+                 d += v1[i]*v2[i];
+             }
+
+             if (n[0] <= 0 || n[1] <= 0) return 0;
+             return d/Math.Sqrt(n[0]*n[1]);
+             //*/
+            var m1 = GetSampleMean(v1);
+            var m2 = GetSampleMean(v2);
+            var s1 = GetSampleVariance(v1, m1);
+            var s2 = GetSampleVariance(v2, m2);
+            if (s1 <= 0 || s2 <= 0) return 0;
+            var div = Math.Sqrt(s1 * s2);
+            var rho = v1.Select((t, i) => (float)((t - m1) * (v2[i] - m2) / div)).Sum();
+            return Math.Min(Math.Max((float)0, rho / (v1.Length - 1)), 1);
+            //*/
+        }
+
+        static public double GetSampleMean(double[] x)
+        {
+            var m = x.Sum();
+            return m / x.Length;
+        }
+
+        static public double GetSampleVariance(double[] x, double m)
+        {
+            var var = x.Sum(v => (v - m) * (v - m));
+            return var / (x.Length - 1);
         }
     }
 }

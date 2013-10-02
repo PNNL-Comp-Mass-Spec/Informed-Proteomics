@@ -277,64 +277,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _prefixComposition[_index];
         }
 
-        public IEnumerable<ScoringGraph> GetScoringGraphs()
-        {
-            var numCompositions = _graph[_index].Length;
-            var scoringGraphs = new ScoringGraph[numCompositions];
-            for (var i = 0; i < numCompositions; i++)
-            {
-                scoringGraphs[i] = GetScoringGraph(i);
-            }
-            return scoringGraphs;
-        }
-
-        public ScoringGraph GetScoringGraph(int sequenceIndex)
-        {
-            // backtracking
-            ScoringGraphNode rootNode = null;
-            var nextNodeMap = new Dictionary<int, List<ScoringGraphNode>>
-                {
-                    {sequenceIndex, new List<ScoringGraphNode>()}
-                };
-            for (int seqIndex = _index; seqIndex >= 0; --seqIndex )
-            {
-                var newNextNodeMap = new Dictionary<int, List<ScoringGraphNode>>();
-
-                foreach (var entry in nextNodeMap)
-                {
-                    int nodeIndex = entry.Key;
-                    var curNode = _graph[seqIndex][nodeIndex];
-                    var composition = GetComposition(seqIndex, nodeIndex);
-                    var scoringGraphNode = new ScoringGraphNode(composition, seqIndex);
-                    scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
-
-                    foreach (var prevNodeIndex in curNode.GetPrevNodeIndices())
-                    {
-                        List<ScoringGraphNode> nextNodes;
-                        if (newNextNodeMap.TryGetValue(prevNodeIndex, out nextNodes))
-                        {
-                            nextNodes.Add(scoringGraphNode);
-                        }
-                        else
-                        {
-                            newNextNodeMap.Add(prevNodeIndex, new List<ScoringGraphNode> { scoringGraphNode });
-                        }
-                    }
-
-                    if (!curNode.GetPrevNodeIndices().Any())
-                    {
-                        rootNode = scoringGraphNode;
-                    }
-                }
-                
-                nextNodeMap = newNextNodeMap;
-            }
-            
-            var scoringGraph = new ScoringGraph(_aminoAcidSequence, GetComposition(_index, sequenceIndex), rootNode);
-
-            return scoringGraph;
-        }
-
         private Composition GetComposition(int seqIndex, int nodeIndex)
         {
             var node = _graph[seqIndex][nodeIndex];
@@ -343,6 +285,65 @@ namespace InformedProteomics.Backend.Data.Sequence
                                                  .Composition;
             return composition;
         }
+
+        //public IEnumerable<ScoringGraph> GetScoringGraphs()
+        //{
+        //    var numCompositions = _graph[_index].Length;
+        //    var scoringGraphs = new ScoringGraph[numCompositions];
+        //    for (var i = 0; i < numCompositions; i++)
+        //    {
+        //        scoringGraphs[i] = GetScoringGraph(i);
+        //    }
+        //    return scoringGraphs;
+        //}
+
+        //public ScoringGraph GetScoringGraph(int sequenceIndex)
+        //{
+        //    // backtracking
+        //    ScoringGraphNode rootNode = null;
+        //    var nextNodeMap = new Dictionary<int, List<ScoringGraphNode>>
+        //        {
+        //            {sequenceIndex, new List<ScoringGraphNode>()}
+        //        };
+        //    for (int seqIndex = _index; seqIndex >= 0; --seqIndex )
+        //    {
+        //        var newNextNodeMap = new Dictionary<int, List<ScoringGraphNode>>();
+
+        //        foreach (var entry in nextNodeMap)
+        //        {
+        //            int nodeIndex = entry.Key;
+        //            var curNode = _graph[seqIndex][nodeIndex];
+        //            var composition = GetComposition(seqIndex, nodeIndex);
+        //            var scoringGraphNode = new ScoringGraphNode(composition, seqIndex);
+        //            scoringGraphNode.AddNextNodes(nextNodes: entry.Value);
+
+        //            foreach (var prevNodeIndex in curNode.GetPrevNodeIndices())
+        //            {
+        //                List<ScoringGraphNode> nextNodes;
+        //                if (newNextNodeMap.TryGetValue(prevNodeIndex, out nextNodes))
+        //                {
+        //                    nextNodes.Add(scoringGraphNode);
+        //                }
+        //                else
+        //                {
+        //                    newNextNodeMap.Add(prevNodeIndex, new List<ScoringGraphNode> { scoringGraphNode });
+        //                }
+        //            }
+
+        //            if (!curNode.GetPrevNodeIndices().Any())
+        //            {
+        //                rootNode = scoringGraphNode;
+        //            }
+        //        }
+                
+        //        nextNodeMap = newNextNodeMap;
+        //    }
+            
+        //    var scoringGraph = new ScoringGraph(_aminoAcidSequence, GetComposition(_index, sequenceIndex), rootNode);
+
+        //    return scoringGraph;
+        //}
+
     }
 
     internal class Node

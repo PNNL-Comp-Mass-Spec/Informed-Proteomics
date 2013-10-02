@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6C14DF30-E8F9-43BA-8E12-3C3AA9E1CCAA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InformedProteomics.IMS</RootNamespace>
+    <AssemblyName>InformedProteomics.IMS</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MultiDimensionalPeakFinding">
+      <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIMFLibrary">
+      <HintPath>..\lib\x64\UIMFLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IMSScoring\FeatureEdge.cs" />
+    <Compile Include="IMSScoring\FeatureNode.cs" />
+    <Compile Include="IMSScoring\FragmentFeatureGraph.cs" />
+    <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
+    <Compile Include="IMSScoring\GroupParameter.cs" />
+    <Compile Include="IMSScoring\ImsScorer.cs" />
+    <Compile Include="IMSScoring\ImsScorerFactory.cs" />
+    <Compile Include="IMSScoring\IsotopomerFeatures.cs" />
+    <Compile Include="IMSScoring\PrecursorFeatureNode.cs" />
+    <Compile Include="IMSScoring\ScoringGraph.cs" />
+    <Compile Include="IMSScoring\StatisticsTools.cs" />
+    <Compile Include="IMSScoring\SubScoreFactory.cs" />
+    <Compile Include="IMSTraining\IonTypeTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\IsotopeIntensityCorrelationScoreTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\MgfParser.cs" />
+    <Compile Include="IMSTraining\MSMSSpectrum.cs" />
+    <Compile Include="IMSTraining\MSMSSpectrumPeak.cs" />
+    <Compile Include="IMSTraining\RatioScoreTrainerUsingMgfFile.cs" />
+    <Compile Include="IMSTraining\TrainerUsingMgfFile.cs" />
+    <Compile Include="IMS\Feature.cs" />
+    <Compile Include="IMS\Featureset.cs" />
+    <Compile Include="IMS\IMSData.cs" />
+    <Compile Include="IMS\IMSDataCached.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
+      <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
+      <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification Oxidation = new Modification(35, new Composition(0, 0, 0, 1, 0), "Oxidation");
         public static readonly Modification Methylation = new Modification(34, new Composition(1, 2, 0, 1, 0), "Methyl");
         public static readonly Modification DiMethylation = new Modification(36, new Composition(2, 4, 0, 1, 0), "Dimethyl");
-        public static readonly Modification TriMethylation = new Modification(37, new Composition(3, 6, 0, 1, 0), "Dimethyl");
+        public static readonly Modification TriMethylation = new Modification(37, new Composition(3, 6, 0, 1, 0), "Trimethyl");
         public static readonly Modification Acetylation = new Modification(1, new Composition(2, 2, 0, 1, 0), "Acetyl");
         public static readonly Modification Deamidation = new Modification(7, new Composition(0, -1, -1, 1, 0), "Deamidated");
         public static readonly Modification PyroGluQ = new Modification(28, new Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");

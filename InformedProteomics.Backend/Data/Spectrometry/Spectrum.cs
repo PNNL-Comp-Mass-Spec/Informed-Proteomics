@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
@@ -100,6 +101,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             sb.Append("--------------------------- end ---------------------------------------\n");
 
             Console.Write(sb.ToString());
+        }
+
+        public virtual void WriteTo(StreamWriter writer)
+        {
+            writer.WriteLine("BEGIN IONS");
+            writer.WriteLine("SCANS={0}", ScanNum);
+            writer.WriteLine("_MSLEVEL={0}", MsLevel);
+            foreach (var peak in Peaks)
+            {
+                writer.WriteLine("{0}\t{1}", Convert.ToSingle(peak.Mz), Convert.ToSingle(peak.Intensity));
+            }
+            writer.WriteLine("END IONS");
         }
 
         private int _msLevel = 1;

@@ -70,13 +70,13 @@ namespace InformedProteomics.Test
                 Console.WriteLine(++index+": "+composition);
             }
 
-            const int seqIndex = 1;
-            Console.WriteLine("Fragment Compositions (" + seqIndex +")");
-            var scoringGraph = graph.GetScoringGraph(seqIndex);
-            foreach (var composition in scoringGraph.GetCompositions())
-            {
-                Console.WriteLine(composition);
-            }
+            //const int seqIndex = 1;
+            //Console.WriteLine("Fragment Compositions (" + seqIndex +")");
+            //var scoringGraph = graph.GetScoringGraph(seqIndex);
+            //foreach (var composition in scoringGraph.GetCompositions())
+            //{
+            //    Console.WriteLine(composition);
+            //}
         }
 
         [Test]
@@ -160,7 +160,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
-            const string sequence = "PEPTIDE";
+            const string sequence = "IVDTNGAGDAFAGGFMAGLTK";
+            //const string sequence =
+            //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             var composition = aaSet.GetComposition(sequence);
 
@@ -171,10 +173,16 @@ namespace InformedProteomics.Test
             Console.WriteLine(composition.GetIsotopeMass(0));
             Console.WriteLine(composition.GetIsotopeMass(1));
             Console.WriteLine(composition.GetIsotopeMass(2));
-            Assert.AreEqual(composition.ToString(), "C34H51N7O14S0");
+            //Assert.AreEqual(composition.ToPlainString(), "C34H51N7O14");
 
-            foreach (var e in composition.GetApproximatedIsotopomerEnvelop())
-                Console.WriteLine(e);
+            Console.WriteLine("Isotopomer Envelope:");
+            foreach (var e in composition.GetIsotopomerEnvelop()) Console.WriteLine(e);
+            Console.WriteLine();
+
+            Console.WriteLine("Isotope ions:");
+            var ion = new Ion(composition + Composition.H2O, 3);
+            foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Item1), p.Item2);
+            Console.WriteLine();
         }
 
         [Test]
@@ -224,7 +232,7 @@ namespace InformedProteomics.Test
             //    };
             //var composition = new Composition(149, 244, 44, 57, 0, additionalElements);
             var composition = new Composition(83, 136, 22, 24, 1);
-            var ff = composition.GetApproximatedIsotopomerEnvelop(10);
+            var ff = composition.GetIsotopomerEnvelop();
             foreach (var ii in ff)
             {
                 Console.WriteLine(ii);
@@ -249,7 +257,7 @@ namespace InformedProteomics.Test
                 var composition = aaSet.GetComposition(peptide);
                 var molFormula = composition.ToPlainString();
                 var profile = isoCalc.GetIsotopePattern(molFormula);
-                composition.GetApproximatedIsotopomerEnvelop(5);
+                composition.GetIsotopomerEnvelop();
             }
 
             Console.WriteLine("NumPeptides: " + numPeptides);

@@ -172,16 +172,13 @@ namespace InformedProteomics.Backend.Database
 
         static internal bool CheckHashCodeBinaryFile(string filePath, int code)
         {
-            using (var fs = File.OpenRead(filePath))
+            var fs = File.OpenRead(filePath);
+            using (var reader = new BinaryReader(fs))
             {
                 fs.Seek(-sizeof(int), SeekOrigin.End);
-
-                using (var reader = new BinaryReader(fs))
-                {
-                    int lastWriteTimeHash = reader.ReadInt32();
-                    if (lastWriteTimeHash == code)
-                        return true;
-                }
+                var lastWriteTimeHash = reader.ReadInt32();
+                if (lastWriteTimeHash == code)
+                    return true;
             }
             return false;
         }

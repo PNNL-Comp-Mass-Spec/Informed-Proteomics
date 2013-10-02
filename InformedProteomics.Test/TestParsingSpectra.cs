@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using DeconTools.Backend;
@@ -15,6 +16,43 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestParsingSpectra
     {
+        [Test]
+        public void TestReadingPgf()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            const string pgfFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.pgf";
+            var run = new LcMsRun(new PgfReader(pgfFilePath));
+
+            //var numSpecs = 0;
+            //var reader = new PgfReader(pgfFilePath);
+            //foreach (var spec in reader.ReadAllSpectra())
+            //{
+            //    ++numSpecs;
+            //}
+            //Console.WriteLine(@"NumSpectra: {0}", numSpecs);
+
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestWritingPgf()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            const string rawFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.raw";
+            var run = new LcMsRun(new XCaliburReader(rawFilePath));
+
+            const string pgfFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.pgf";
+            run.WriteTo(pgfFilePath);
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+        }
+
+        [Test]
         public void TestParsingSpectrumFile()
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -22,9 +60,7 @@ namespace InformedProteomics.Test
             sw.Start();
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            //var peakDetector = new DeconToolsPeakDetectorV2(0, 0);  // basic peak detector
-            //var run = new RunFactory().CreateRun(specFilePath);
-            var run = new XCaliburReader(specFilePath);
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
 
             //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
             //{
@@ -32,18 +68,17 @@ namespace InformedProteomics.Test
             //}
 
             const int scanNum = 810;
-            var spec = run.ReadMassSpectrum(scanNum) as ProductSpectrum;
+            var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec != null)
             {
                 spec.Display();
-                var precursorInfo = spec.PrecursorInfo;
+                var precursorInfo = spec.IsolationInfo;
                 Console.WriteLine("ActivationMethod: {0}", spec.ActivationMethod);
-                Console.WriteLine("PrecursorScan: {0}", precursorInfo.PrecursorScan);
+                Console.WriteLine("PrecursorScan: {0}", run.GetPrecursorScanNum(spec.ScanNum));
                 Console.WriteLine("IsolationWindowTargetMz: {0}", precursorInfo.IsolationWindowTargetMz);
                 Console.WriteLine("IsolationWindowLowerOffset: {0}", precursorInfo.IsolationWindowLowerOffset);
                 Console.WriteLine("IsolationWindowUpperOffset: {0}", precursorInfo.IsolationWindowUpperOffset);
                 Console.WriteLine("MsLevel: {0}", run.GetMsLevel(scanNum));
-                Console.WriteLine("ReadIsCentroidScan: {0}", run.ReadIsCentroidScan(scanNum));
             }
 
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;

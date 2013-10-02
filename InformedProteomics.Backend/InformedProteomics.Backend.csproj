@@ -81,9 +81,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Backend.dll</HintPath>
     </Reference>
-    <Reference Include="DeconTools.Workflows">
-      <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Workflows.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.MSFileReaderLib">
       <HintPath>..\lib\x64\Interop.MSFileReaderLib.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -100,10 +97,6 @@
     </Reference>
     <Reference Include="NETPrediction">
       <HintPath>..\lib\NETPrediction.dll</HintPath>
-    </Reference>
-    <Reference Include="PNNLOmics, Version=1.0.0.0, Culture=neutral, processorArchitecture=$(Platform)">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\$(Platform)\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
@@ -129,44 +122,25 @@
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
-    <Compile Include="Data\Spectrometry\PrecursorInfo.cs" />
+    <Compile Include="Data\Spectrometry\IsolationInfo.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />
-    <Compile Include="Data\Sequence\ScoringGraph.cs" />
     <Compile Include="Data\Sequence\SequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\BaseIonType.cs" />
     <Compile Include="Data\Spectrometry\IonType.cs" />
     <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
+    <Compile Include="Data\Spectrometry\ToleranceUnit.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPeak.cs" />
-    <Compile Include="IMSScoring\FeatureNode.cs" />
-    <Compile Include="IMSScoring\FragmentFeatureNode.cs" />
-    <Compile Include="IMSScoring\FragmentFeatureGraph.cs" />
-    <Compile Include="IMSScoring\GroupParameter.cs" />
-    <Compile Include="IMSScoring\ImsScorer.cs" />
-    <Compile Include="IMSScoring\FeatureEdge.cs" />
-    <Compile Include="IMSScoring\ImsScorerFactory.cs" />
-    <Compile Include="IMSScoring\IsotopomerFeatures.cs" />
-    <Compile Include="IMSScoring\PrecursorFeatureNode.cs" />
-    <Compile Include="IMSScoring\StatisticsTools.cs" />
-    <Compile Include="IMSScoring\SubScoreFactory.cs" />
-    <Compile Include="IMSTraining\IonTypeTrainerUsingMgfFile.cs" />
-    <Compile Include="IMSTraining\IsotopeIntensityCorrelationScoreTrainerUsingMgfFile.cs" />
-    <Compile Include="IMSTraining\MgfParser.cs" />
-    <Compile Include="IMSTraining\MSMSSpectrum.cs" />
-    <Compile Include="IMSTraining\MSMSSpectrumPeak.cs" />
-    <Compile Include="IMSTraining\RatioScoreTrainerUsingMgfFile.cs" />
-    <Compile Include="IMSTraining\TrainerUsingMgfFile.cs" />
-    <Compile Include="IMS\Feature.cs" />
-    <Compile Include="IMS\IMSDataCached.cs" />
-    <Compile Include="IMS\FeatureSet.cs" />
-    <Compile Include="MassSpecData\DataDependentAcquisitionRun.cs" />
-    <Compile Include="MassSpecData\IRawDataReader.cs" />
+    <Compile Include="MassSpecData\LcMsRun.cs" />
+    <Compile Include="MassSpecData\IMassSpecDataReader.cs" />
+    <Compile Include="MassSpecData\MassSpecDataType.cs" />
+    <Compile Include="MassSpecData\PgfReader.cs" />
     <Compile Include="MassSpecData\XCaliburReader.cs" />
     <Compile Include="Data\Enum\SequenceLocation.cs" />
     <Compile Include="Data\Enum\SequenceType.cs" />
@@ -183,16 +157,13 @@
     <Compile Include="Data\Sequence\Sequence.cs" />
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
-    <Compile Include="Data\Spectrometry\Precursor.cs" />
-    <Compile Include="IMS\IMSData.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="TopDownScoring\SubScoreFactory.cs" />
-    <Compile Include="TopDownScoring\TopDownScorer.cs" />
-    <Compile Include="TopDownScoring\TopDownTrainer.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
+    <Compile Include="Utils\TsvFileParser.cs" />
+    <Compile Include="Utils\VennDiagram.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

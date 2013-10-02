@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
@@ -15,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public double GetMz()
         {
-            return (Composition.GetMass() + Charge * Constants.H) / Charge;
+            return (Composition.GetMass() + Charge * Constants.Proton) / Charge;
         }
 
         /// <summary>
@@ -25,7 +28,16 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns></returns>
         public double GetIsotopeMz(int isotopeIndex)
         {
-            return (Composition.GetIsotopeMass(isotopeIndex) + Charge * Constants.H) / Charge;
+            return (Composition.GetIsotopeMass(isotopeIndex) + Charge * Constants.Proton) / Charge;
+        }
+
+        /// <summary>
+        /// Gets the m/z of the most abundant isotope peak
+        /// </summary>
+        /// <returns>m/z of the most abundant isotope peak</returns>
+        public double GetBaseIsotopeMz()
+        {
+            return GetIsotopeMz(Composition.GetMostAbundantIsotopeZeroBasedIndex());
         }
 
         /// <summary>
@@ -35,8 +47,25 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns></returns>
         public double GetIsotopeMz(double isotopeIndexInRealNumber)
         {
-            return (Composition.GetIsotopeMass(isotopeIndexInRealNumber) + Charge * Constants.H) / Charge;
+            return (Composition.GetIsotopeMass(isotopeIndexInRealNumber) + Charge * Constants.Proton) / Charge;
         }
 
+        /// <summary>
+        /// Gets theoretical isotope peaks whose intensities are relative to the most intense isotope
+        /// </summary>
+        /// <param name="relativeIntensityThreshold">relative isotope intensity threshold</param>
+        /// <returns>Enumerable of isotope peaks</returns>
+        public IEnumerable<Tuple<int,float>> GetIsotopes(double relativeIntensityThreshold)
+        {
+            var isotopeIndex = -1;
+            foreach (var isotopeRatio in Composition.GetIsotopomerEnvelop())
+            {
+                ++isotopeIndex;
+                if (isotopeRatio > relativeIntensityThreshold)
+                {
+                    yield return new Tuple<int, float>(isotopeIndex, isotopeRatio);
+                }
+            }
+        }
     }
 }

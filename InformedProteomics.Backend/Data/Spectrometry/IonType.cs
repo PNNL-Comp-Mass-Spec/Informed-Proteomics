@@ -48,7 +48,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public double GetMz(double cutMass)
         {
-            return (cutMass + _offsetMass + Charge * Constants.H) / Charge;
+            return (cutMass + _offsetMass + Charge * Constants.Proton) / Charge;
         }
 
         public double GetMz(Composition prefixComposition)

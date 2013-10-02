@@ -9,15 +9,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class Tolerance
     {
         private readonly double _value;
-        private readonly DataReader.ToleranceType _unit;
+        private readonly ToleranceUnit _unit;
 
         public static readonly Tolerance OnePpm = new Tolerance(1);
 
-        public Tolerance(double value) : this(value, DataReader.ToleranceType.PPM)
+        public Tolerance(double value)
+            : this(value, ToleranceUnit.Ppm)
         {
         }
 
-        public Tolerance(double value, DataReader.ToleranceType unit)
+        public Tolerance(double value, ToleranceUnit unit)
         {
             _value = value;
             _unit = unit;
@@ -28,18 +29,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return _value;
         }
 
-        public DataReader.ToleranceType GetUnit()
+        public ToleranceUnit GetUnit()
         {
             return _unit;
         }
 
         public double GetToleranceAsTh(double mz)
         {
-            if (_unit == DataReader.ToleranceType.Thomson)
-            {
-                return _value;
-            }
-            return mz*_value/1E6;
+            if (_unit == ToleranceUnit.Thomson) return _value;
+            if (_unit == ToleranceUnit.Dalton)
+                throw new System.ArgumentException("This function cannot be called for Dalton unit");
+            return mz * _value / 1E6;
+        }
+
+        public double GetToleranceAsDa(double mz, int charge)
+        {
+            if (_unit == ToleranceUnit.Dalton) return _value;
+            return GetToleranceAsTh(mz)*charge;
         }
     }
 }

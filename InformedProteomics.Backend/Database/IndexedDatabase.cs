@@ -144,7 +144,7 @@ namespace InformedProteomics.Backend.Database
                                  int numMissedCleavages, char[] enzymaticResidues,
                                  bool isNTermEnzyme)
         {
-            long numSequences = 0L;
+            var numSequences = 0L;
 
             {
                 var isCleavable = new bool[128];

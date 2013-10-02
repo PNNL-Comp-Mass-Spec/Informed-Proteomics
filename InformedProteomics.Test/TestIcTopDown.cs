@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.TopDownScoring;
+using InformedProteomics.TopDown.TopDownScoring;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -38,7 +38,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.Write("Reading raw file...");
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
         public void TestTopDownScoring()
         {
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
             const string protAnnotation = "K.METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK.K";
             var aaSet = new AminoAcidSet();
             //..METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK
@@ -187,7 +187,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.Write("Reading raw file...");
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
 
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -266,7 +266,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new DataDependentAcquisitionRun(new XCaliburReader(specFilePath));
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             var aaSet = new AminoAcidSet();
 
@@ -327,7 +327,7 @@ namespace InformedProteomics.Test
                 return;
             }
 
-            //DataDependentAcquisitionRun run;
+            //LcMsRun run;
 
             foreach (var seqComposition in seqGraph.GetSequenceCompositions())
             {

@@ -101,6 +101,7 @@
     <Compile Include="TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="TestParsingSpectra.cs" />
+    <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestImsScoring.cs" />
     <Compile Include="TestUtils.cs" />
@@ -113,6 +114,18 @@
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.DIA\InformedProteomics.DIA.csproj">
+      <Project>{16db0078-9a4c-41d8-9356-4205f03ae04a}</Project>
+      <Name>InformedProteomics.DIA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.IMS\InformedProteomics.IMS.csproj">
+      <Project>{6c14df30-e8f9-43ba-8e12-3c3aa9e1ccaa}</Project>
+      <Name>InformedProteomics.IMS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
+      <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
+      <Name>InformedProteomics.TopDown</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

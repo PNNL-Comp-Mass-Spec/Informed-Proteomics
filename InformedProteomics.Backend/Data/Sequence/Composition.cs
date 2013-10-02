@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
+using MathNet.Numerics;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -15,6 +16,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
         public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
         public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
+
+        public const int MaxNumIsotopes = 20;
+        public const double IsotopeRelativeIntensityThreshold = 0.1;
+
+        #region Constructors
 
         public Composition(int c, int h, int n, int o, int s)
         {
@@ -57,22 +63,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
-	    static Composition()
-	    {
-		    ProbC = new[] { .9893, 0.0107, 0, 0 };
-			ProbH = new[] { .999885, .000115, 0, 0 };
-			ProbN = new[] { 0.99632, 0.00368, 0, 0};
-			ProbO = new[] { 0.99757, 0.00038, 0.00205, 0};
-			ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
-
-		    _areIsotopeCombinationsCalculated = false;
-	    }
-
         private Composition(int c, int h, int n, int o, int s, Dictionary<Atom, short> additionalElements)
             : this(c, h, n, o, s)
         {
             _additionalElements = additionalElements;
-        }
+        } 
+        #endregion
 
         #region Properties
 
@@ -112,11 +108,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly short _o;
         private readonly short _s;
 
-	    private static bool _areIsotopeCombinationsCalculated;
-
         #endregion
 
-
+        #region Methods to get masses
         /// <summary>
         /// Gets the mono-isotopic mass
         /// </summary>
@@ -129,7 +123,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Gets the m/z of ith isotope
+        /// Gets the mass of ith isotope
         /// </summary>
         /// <param name="isotopeIndex">isotope index. 0 means mono-isotope, 1 means 2nd isotope, etc.</param>
         /// <returns></returns>
@@ -158,13 +152,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (_additionalElements != null)
                 nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
             return nominalMass;
-        }
+        } 
+        #endregion
 
         public Composition GetComposition()
         {
             return this;
         }
 
+        #region GetHashCode and Equals
         public override int GetHashCode()
         {
             var hashCode = _c * 0x01000000 + _h * 0x00010000 + _n * 0x00000400 + _o * 0x00000010 + _s;
@@ -203,125 +199,25 @@ namespace InformedProteomics.Backend.Data.Sequence
                 return true;
             }
             return other._additionalElements == null;
-        }
+        } 
+        #endregion
+
+        #region Methods to get Isotopomer Envelpops
 
         public float[] GetIsotopomerEnvelop()
         {
-            return GetApproximatedIsotopomerEnvelop(10);
-        }
-
-        private float GetIsotopeProbability(int[] number, double[] means, double[] exps)
-        {
-            var prob = 1.0f;
-            for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)
-            {
-                var mean = means[i];
-                var exp = exps[i];
-                if (number[i - 1] == 0) prob *= (float)exp;
-                else prob *= (float)(Math.Pow(mean, number[i - 1]) * exp / MathNet.Numerics.SpecialFunctions.Factorial(number[i - 1]));
-            }
-            return prob;
-        }
-
-        private static int[][][] GetPossibleIsotopeCombinations(int max) // called just once. 
-        {
-            var comb = new List<int[]>[max + 1];
-            var maxIsotopeNumberInElement = ProbC.Length - 1;
-            comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };
-
-            for (var n = 1; n <= max; n++)
-            {
-                comb[n] = new List<int[]>();
-                for (var j = 1; j <=maxIsotopeNumberInElement; j++)
-                {
-                    var index = n - j;
-                    if (index < 0) continue;
-                    foreach (var t in comb[index])
-                    {
-                        var add = new int[maxIsotopeNumberInElement];
-                        add[j - 1]++;
-                        for (var k = 0; k < t.Length; k++)
-                            add[k] += t[k];
-                        var toAdd = comb[n].Select(v => !v.Where((t1, p) => t1 != add[p]).Any()).All(equal => !equal);
-                        if(toAdd) comb[n].Add(add);
-                    }
-                }
-            }
-            var possibleIsotopeCombinations = new int[max][][];
-            for (var i = 0; i < possibleIsotopeCombinations.Length; i++)
-            {
-                possibleIsotopeCombinations[i] = new int[comb[i].Count][];
-                var j = 0;
-                foreach (var t in comb[i])
-                {
-                    possibleIsotopeCombinations[i][j++] = t;
-                }
-            }
-            return possibleIsotopeCombinations;
-        }
-
-        public float[] GetApproximatedIsotopomerEnvelop()
-        {
-            return GetApproximatedIsotopomerEnvelop(7);
-        }
-
-        public float[] GetApproximatedIsotopomerEnvelop(int maxIsotope)
-        {
-	        if (!_areIsotopeCombinationsCalculated)
-	        {
-		        PossibleIsotopeCombinations = GetPossibleIsotopeCombinations(100);
-		        _areIsotopeCombinationsCalculated = true;
-	        }
-
-	        var dist = new float[Math.Min(maxIsotope, PossibleIsotopeCombinations.Length)];
-            var means = new double[PossibleIsotopeCombinations[0][0].Length + 1];
-            var exps = new double[means.Length];
-            for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
-            {
-                means[i] = _c * ProbC[i] + _h * ProbH[i] + _n * ProbN[i] + _o * ProbO[i] + _s * ProbS[i];
-                exps[i] = Math.Exp(means[i]);
-            }
-            for (var i = 0; i < dist.Length; i++)
-            {
-                foreach (var isopeCombinations in PossibleIsotopeCombinations[i])
-                {
-                    dist[i] += GetIsotopeProbability(isopeCombinations, means, exps);
-                }
-            }
-            var max = dist.Concat(new float[] { 0 }).Max();
-            var maxPassed = false;
-            var cutIndex = dist.Length - 1;
-            for (var i = 0; i < dist.Length; i++)
-            {
-                dist[i] = dist[i] / max;
-                if (dist[i] >= 1) maxPassed = true;
-                if (!maxPassed || dist[i] >= 0.01) continue;
-                cutIndex = i;
-                break;
-            }
-
-            var truncatedDist = new float[cutIndex + 1];
-            for (var i = 0; i < truncatedDist.Length; i++)
-                truncatedDist[i] = dist[i];
-
-            return truncatedDist;
+            return _isotopomerEnvelop ?? (_isotopomerEnvelop = ComputeIsotopomerEnvelop());
         }
 
         public int GetMostAbundantIsotopeZeroBasedIndex()
         {
-            var index = 0;
-            var isotopeEnvelope = GetApproximatedIsotopomerEnvelop();
-            var max = 0.0f;
-            for (var i = 0; i < isotopeEnvelope.Length; i++)
-            {
-                if (!(max < isotopeEnvelope[i])) continue;
-                max = isotopeEnvelope[i];
-                index = i;
-                if (max >= 1) break;
-            }
-            return index;
-        }
+            if (_mostIntenseIsotopomerIndex == -1) ComputeIsotopomerEnvelop();
+            return _mostIntenseIsotopomerIndex;
+        } 
 
+        #endregion
+
+        #region Operators
         public static Composition operator +(Composition c1, Composition c2)
         {
             // ReSharper disable PossibleUnintendedReferenceComparison
@@ -386,8 +282,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static Composition operator -(Composition c1, Composition c2)
         {
             return c1 + (-c2);
-        }
+        } 
+        #endregion
 
+        #region ToString and Parsing from String
         public override string ToString()
         {
             string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + ")";
@@ -425,7 +323,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (t.Length == basicComposition.Length)
                 return new Composition(basicComposition[0], basicComposition[1], basicComposition[2], basicComposition[3], basicComposition[4]);
             throw new System.NotImplementedException();
-        }
+        } 
+        #endregion
 
         #region Masses of Atoms
 
@@ -455,10 +354,133 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly double[] ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
         #endregion
 
+        #region Private Methods for Computing Isotopomer Envelops
+
+        private float[] _isotopomerEnvelop;
+        private int _mostIntenseIsotopomerIndex = -1;
+
+        private float[] ComputeIsotopomerEnvelop()
+        {
+            if (_possibleIsotopeCombinations == null) _possibleIsotopeCombinations = GetPossibleIsotopeCombinations(MaxNumIsotopes);
+
+            var dist = new float[MaxNumIsotopes];
+            var means = new double[_possibleIsotopeCombinations[0][0].Length + 1];
+            var exps = new double[means.Length];
+            for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
+            {
+                means[i] = _c * ProbC[i] + _h * ProbH[i] + _n * ProbN[i] + _o * ProbO[i] + _s * ProbS[i];
+                exps[i] = Math.Exp(means[i]);
+            }
+
+            // This assumes that the envelop is unimodal.
+            var maxHeight = 0f;
+            var isotopeIndex = 0;
+            var mostIntenseIsotopomerIndex = -1;
+            for (; isotopeIndex < dist.Length; isotopeIndex++)
+            {
+                foreach (var isopeCombinations in _possibleIsotopeCombinations[isotopeIndex])
+                {
+                    dist[isotopeIndex] += GetIsotopeProbability(isopeCombinations, means, exps);
+                }
+                if (dist[isotopeIndex] > maxHeight)
+                {
+                    maxHeight = dist[isotopeIndex];
+                    mostIntenseIsotopomerIndex = isotopeIndex;
+                }
+                else if (dist[isotopeIndex] < maxHeight * IsotopeRelativeIntensityThreshold)
+                {
+                    break;
+                }
+            }
+            _mostIntenseIsotopomerIndex = mostIntenseIsotopomerIndex;
+
+            //var max = dist.Concat(new float[] { 0 }).Max();
+            //var maxPassed = false;
+            //var cutIndex = dist.Length - 1;
+            //for (var i = 0; i < dist.Length; i++)
+            //{
+            //    dist[i] = dist[i] / max;
+            //    if (dist[i] >= 1) maxPassed = true;
+            //    if (!maxPassed || dist[i] >= 0.01) continue;
+            //    cutIndex = i;
+            //    break;
+            //}
+
+            var truncatedDist = new float[isotopeIndex];
+            for (var i = 0; i < isotopeIndex; i++)
+            {
+                truncatedDist[i] = dist[i]/maxHeight;
+            }
+
+            return truncatedDist;
+        }
+
+        private float GetIsotopeProbability(int[] number, double[] means, double[] exps)
+        {
+            var prob = 1.0f;
+            for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)
+            {
+                var mean = means[i];
+                var exp = exps[i];
+                if (number[i - 1] == 0) prob *= (float) exp;
+                else
+                    prob *=
+                        (float)
+                        (Math.Pow(mean, number[i - 1])*exp/SpecialFunctions.Factorial(number[i - 1]));
+            }
+            return prob;
+        }
+        #endregion
+
+        static Composition()
+        {
+            ProbC = new[] { .9893, 0.0107, 0, 0 };
+            ProbH = new[] { .999885, .000115, 0, 0 };
+            ProbN = new[] { 0.99632, 0.00368, 0, 0 };
+            ProbO = new[] { 0.99757, 0.00038, 0.00205, 0 };
+            ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
+        }
+
         #region Possible combinations of isotopes // added by kyowon
 
-        private static int[][][] PossibleIsotopeCombinations;
+        private static int[][][] _possibleIsotopeCombinations;
 
+        private static int[][][] GetPossibleIsotopeCombinations(int max) // called just once. 
+        {
+            var comb = new List<int[]>[max + 1];
+            var maxIsotopeNumberInElement = ProbC.Length - 1;
+            comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };
+
+            for (var n = 1; n <= max; n++)
+            {
+                comb[n] = new List<int[]>();
+                for (var j = 1; j <= maxIsotopeNumberInElement; j++)
+                {
+                    var index = n - j;
+                    if (index < 0) continue;
+                    foreach (var t in comb[index])
+                    {
+                        var add = new int[maxIsotopeNumberInElement];
+                        add[j - 1]++;
+                        for (var k = 0; k < t.Length; k++)
+                            add[k] += t[k];
+                        var toAdd = comb[n].Select(v => !v.Where((t1, p) => t1 != add[p]).Any()).All(equal => !equal);
+                        if (toAdd) comb[n].Add(add);
+                    }
+                }
+            }
+            var possibleIsotopeCombinations = new int[max][][];
+            for (var i = 0; i < possibleIsotopeCombinations.Length; i++)
+            {
+                possibleIsotopeCombinations[i] = new int[comb[i].Count][];
+                var j = 0;
+                foreach (var t in comb[i])
+                {
+                    possibleIsotopeCombinations[i][j++] = t;
+                }
+            }
+            return possibleIsotopeCombinations;
+        }
         #endregion
     }
 }

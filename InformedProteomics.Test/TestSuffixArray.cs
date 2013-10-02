@@ -12,6 +12,29 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestSuffixArray
     {
+        [Test]
+        public void TestCountingNumPeptides()
+        {
+            const int minPeptideLength = 7;
+            const int maxPeptideLength = 30;
+            const int numTolerableTermini = 2;
+            const int numMissedCleavages = 1;
+            var enzyme = Enzyme.Trypsin;
+
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            var targetDb = new FastaDatabase(dbFilePath);
+            var decoyDb = targetDb.Decoy(enzyme);
+
+            var indexedDbTarget = new IndexedDatabase(targetDb);
+            var numPeptidesTarget = indexedDbTarget.NumSequences(minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme);
+
+            var indexedDbDecoy = new IndexedDatabase(decoyDb);
+            var numPeptidesDecoy = indexedDbDecoy.NumSequences(minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme);
+
+            Console.WriteLine("Target: {0}", numPeptidesTarget);
+            Console.WriteLine("Decoy: {0}", numPeptidesDecoy);
+            Console.WriteLine("Sum: {0}", numPeptidesTarget+numPeptidesDecoy);
+        }
 
         [Test]
         public void TestReadingIndexedDatabase()
