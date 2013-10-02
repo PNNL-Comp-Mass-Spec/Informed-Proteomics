@@ -17,58 +17,6 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
-        public void TestTopDownScoring()
-        {
-            const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
-            const string protAnnotation = "K.METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK.K";
-            var aaSet = new AminoAcidSet();
-            //..METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK
-
-            var precursorTolerance = new Tolerance(10);
-
-            // Create a sequence graph
-            var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var seqGraph = SequenceGraph.CreateGraph(aaSet, protSeq);
-
-            TopDownScorer.MaxCharge = 60;
-            TopDownScorer.MinCharge = 3;
-
-            foreach (var protComposition in seqGraph.GetSequenceCompositions())
-            {
-                var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();
-                Console.WriteLine("Composition\t{0}", protComposition);
-                Console.WriteLine("MostAbundantIsotopeIndex\t{0}", mostAbundantIsotopeIndex);
-                Console.WriteLine();
-
-                //for (var charge = TopDownScorer.MinCharge; charge <= TopDownScorer.MaxCharge; charge++)
-                //{
-                    var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
-                    var score = scorer.GetScore();
-
-                    Console.WriteLine(score);
-                    //var precursorIon = new Ion(protComposition + Composition.H2O, charge);
-                    //var xic = run.GetExtractedIonChromatogram(precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex), precursorTolerance);
-                    //Console.WriteLine(xic[0].ScanNum + " " + xic[1].ScanNum);
-
-                    //Console.WriteLine("ScanNum\t{0}", string.Join("\t", xic.Select(p => p.ScanNum.ToString())));
-                    //Console.WriteLine("Charge " + charge + "\t" + string.Join("\t", xic.Select(p => p.Intensity.ToString())));
-               // }
-
-                Console.WriteLine("\nCharge\tm/z");
-                for (var charge = 9; charge <= 18; charge++)
-                {
-                    var precursorIon = new Ion(protComposition + Composition.H2O, charge);
-                    Console.WriteLine("{0}\t{1}", charge, precursorIon.GetIsotopeMz(mostAbundantIsotopeIndex));
-                }
-            }
-
-           // sw.Stop();
-           // var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-           // Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-        }
-
-        [Test]
         public void TestGeneratingAllXics()
         {
             // Search parameters
