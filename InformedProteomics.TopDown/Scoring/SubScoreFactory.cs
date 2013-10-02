@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace InformedProteomics.TopDown.TopDownScoring
+namespace InformedProteomics.TopDown.Scoring
 {
     public class SubScoreFactory
     {

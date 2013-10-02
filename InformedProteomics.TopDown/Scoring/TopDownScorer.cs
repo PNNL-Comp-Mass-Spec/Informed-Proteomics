@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.TopDown.TopDownScoring
+namespace InformedProteomics.TopDown.Scoring
 {
     public class TopDownScorer //TODO consider binning .... 
     {

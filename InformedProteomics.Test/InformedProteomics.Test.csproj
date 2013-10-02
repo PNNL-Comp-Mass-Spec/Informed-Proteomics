@@ -104,6 +104,7 @@
     <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestImsScoring.cs" />
+    <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

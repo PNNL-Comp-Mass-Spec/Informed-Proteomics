@@ -3,7 +3,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 
-namespace InformedProteomics.TopDown.TopDownScoring
+namespace InformedProteomics.TopDown.Scoring
 {
     class TopDownTrainer
     {
