@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using MathNet.Numerics;
+using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -129,7 +130,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public double GetIsotopeMass(int isotopeIndex)
         {
-            return GetMass() + isotopeIndex * MassIsotope;
+            return GetMass() + isotopeIndex * Constants.C13MinusC12;
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public double GetIsotopeMass(double isotopeIndexInRealNumber)
         {
-            return GetMass() + isotopeIndexInRealNumber * MassIsotope;
+            return GetMass() + isotopeIndexInRealNumber * Constants.C13MinusC12;
         }
 
 
@@ -333,7 +334,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly double MassN = Atom.Get("N").Mass;
         private static readonly double MassO = Atom.Get("O").Mass;
         private static readonly double MassS = Atom.Get("S").Mass;
-        private static readonly double MassIsotope = Atom.Get("13C").Mass - MassC;
+        //private static readonly double MassIsotope = Atom.Get("13C").Mass - MassC;
 
         private static readonly Atom AtomP = Atom.Get("P");
 

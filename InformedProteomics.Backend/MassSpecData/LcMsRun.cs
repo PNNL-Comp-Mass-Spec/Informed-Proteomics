@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -21,11 +22,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return run;
         }
 
+        public const double IsolationWindowBinningFactor = 10;
+
         public LcMsRun(IMassSpecDataReader massSpecDataReader)
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
             _msLevel = new Dictionary<int, int>();
+
+            var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
 
             // Read all spectra
             var minScanNum = int.MaxValue;
@@ -42,6 +47,35 @@ namespace InformedProteomics.Backend.MassSpecData
                         _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
                     }
                 }
+                else if(spec.MsLevel == 2)
+                {
+                    var productSpec = spec as ProductSpectrum;
+                    if (productSpec != null)
+                    {
+                        var isolationInfo = productSpec.IsolationInfo;
+                        var minBinNum = (int)(isolationInfo.MinMz*IsolationWindowBinningFactor);
+                        var maxBinNum = (int)((isolationInfo.MaxMz+0.49999999)*IsolationWindowBinningFactor);
+                        for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+                        {
+                            List<int> scanNumList;
+                            if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                            {
+                                scanNumList = new List<int>();
+                                isolationMzBinToScanNums[binNum] = scanNumList;
+                            }
+                            scanNumList.Add(productSpec.ScanNum);
+                        }
+                    }
+                }
+
+                _isolationMzBinToScanNums = new Dictionary<int, IEnumerable<int>>();
+                foreach (var entry in isolationMzBinToScanNums)
+                {
+                    var binNum = entry.Key;
+                    var scanNumList = entry.Value;
+                    _isolationMzBinToScanNums[binNum] = scanNumList.ToArray();
+                }
+
                 if (spec.ScanNum < minScanNum) minScanNum = spec.ScanNum;
                 if (spec.ScanNum > maxScanNum) maxScanNum = spec.ScanNum;
             }
@@ -86,13 +120,52 @@ namespace InformedProteomics.Backend.MassSpecData
         public int MaxLcScan { get; private set; }
 
         /// <summary>
+        /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
+        /// </summary>
+        /// <param name="precursorIon"></param>
+        /// <returns>scan numbers of fragmentation spectra</returns>
+        public IEnumerable<int> GetFragmentationSpectraScanNums(Ion precursorIon)
+        {
+            var precursorBaseMz = precursorIon.GetBaseIsotopeMz();
+            var targetIsoBin = (int)Math.Round(precursorBaseMz*IsolationWindowBinningFactor);
+            IEnumerable<int> scanNums;
+            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+        }
+
+
+        //internal class IsolationWindow: IComparable<IsolationWindow>
+        //{
+        //    public IsolationWindow(int scanNum, double minMz, double maxMz)
+        //    {
+        //        ScanNum = scanNum;
+        //        MinMz = minMz;
+        //        MaxMz = maxMz;
+        //    }
+
+        //    public int ScanNum { get; set; }
+        //    public double MinMz { get; set; }
+        //    public double MaxMz { get; set; }
+
+        //    public bool InRange(double mz)
+        //    {
+        //        return mz >= MinMz && mz <= MaxMz; 
+        //    }
+
+        //    public int CompareTo(IsolationWindow other)
+        //    {
+        //        return ((MinMz + MaxMz)/2).CompareTo((other.MinMz+other.MaxMz)/2);
+        //    }
+        //}
+
+        /// <summary>
         /// Gets the spectrum of the specified scan number
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <returns>spectrum</returns>
         public Spectrum GetSpectrum(int scanNum)
         {
-            return _scanNumSpecMap[scanNum];
+            Spectrum spec;
+            return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
         /// <summary>
@@ -127,6 +200,30 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Gets the extracted ion chromatogram corresponding to an isotope of another XIC
+        /// </summary>
+        /// <param name="xic">base XIC</param>
+        /// <param name="mzDifference">m/z difference</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <returns>XIC corresponding to an isotope of the input XIC</returns>
+        public Xic GetIsotopeExtractedIonChromatogram(Xic xic, double mzDifference, Tolerance tolerance)
+        {
+            var isotopeXic = new Xic();
+            foreach (var xicPeak in xic)
+            {
+                var spec = _scanNumSpecMap[xicPeak.ScanNum];
+                var peak = spec.FindPeak(xicPeak.Mz + mzDifference, tolerance);
+                if (peak != null) isotopeXic.Add(new XicPeak(xicPeak.ScanNum, peak.Mz, peak.Intensity));
+            }
+            //isotopeXic.AddRange(from xicPeak in xic 
+            //                    let spec = _scanNumSpecMap[xicPeak.ScanNum] 
+            //                    let peak = spec.FindPeak(xicPeak.Mz + offsetMz, tolerance) 
+            //                    where peak != null 
+            //                    select new XicPeak(xicPeak.ScanNum, peak.Mz, peak.Intensity));
+            return isotopeXic;
+        }
+
+        /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
         /// </summary>
         /// <param name="minMz">min m/z</param>
@@ -145,7 +242,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz <= minMz) break;
-                xic.Add(new XicPeak(peak.ScanNum, peak.Intensity));
+                xic.Add(new XicPeak(peak.ScanNum, peak.Mz, peak.Intensity));
                 --i;
             }
 
@@ -155,7 +252,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPeak(peak.ScanNum, peak.Intensity));
+                xic.Add(new XicPeak(peak.ScanNum, peak.Mz, peak.Intensity));
                 ++i;
             }
 
@@ -198,13 +295,24 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC around targetScanNum</returns>
         public Xic GetExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum)
         {
-            //TODO: this tolerance value is not optimal for all data (revisit required)
-            const int tolerance = 3;
-
             if (GetMsLevel(targetScanNum) > 1)
                 targetScanNum = GetPrecursorScanNum(targetScanNum);
             var xic = GetExtractedIonChromatogram(minMz, maxMz);
-            var index = xic.BinarySearch(new XicPeak(targetScanNum, 0));
+            return GetTrimmedXic(xic, targetScanNum);
+        }
+
+        /// <summary>
+        /// Get a segment of Xic containing the targetScanNum
+        /// </summary>
+        /// <param name="xic">xic to be trimmed</param>
+        /// <param name="targetScanNum">target scan number to generate xic</param>
+        /// <returns>Trimmed XIC around targetScanNum</returns>
+        public Xic GetTrimmedXic(Xic xic, int targetScanNum)
+        {
+            //TODO: this tolerance value is not optimal for all data (revisit required)
+            const int tolerance = 3;
+
+            var index = xic.BinarySearch(new XicPeak(targetScanNum, 0, 0));
             if(index < 0) index = ~index;
 
             var xicSegment = new Xic();
@@ -279,7 +387,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>MS level</returns>
         public int GetMsLevel(int scanNum)
         {
-            return _msLevel[scanNum];
+            int msLevel;
+            if (_msLevel.TryGetValue(scanNum, out msLevel))
+            {
+                return msLevel;
+            }
+            Console.WriteLine("Strange: {0}" + scanNum);
+            return -1;
         }
 
         /// <summary>
@@ -320,9 +434,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number at the specified level</returns>
         public int GetNextScanNum(int scanNum, int msLevel)
         {
-            for (var curScanNum = scanNum + 1; curScanNum >= MaxLcScan; curScanNum++)
+            for (var curScanNum = scanNum + 1; curScanNum <= MaxLcScan; curScanNum++)
             {
-                if (GetMsLevel(curScanNum) == msLevel) return curScanNum;
+                if (GetMsLevel(curScanNum) == msLevel)
+                {
+                    return curScanNum;
+                }
             }
             return MaxLcScan + 1;
         }
@@ -357,8 +474,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly Dictionary<int, int> _msLevel;
         private readonly int[] _precursorScan;
 
-        private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         private readonly List<LcMsPeak> _ms1PeakList;
+        private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
+        private readonly Dictionary<int, IEnumerable<int>> _isolationMzBinToScanNums;
+
     }
 
     class LcMsPeak: Peak

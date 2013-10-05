@@ -291,5 +291,19 @@ namespace InformedProteomics.Test
                 }
             }
         }
+
+        [Test]
+        public void TestIndexSorting()
+        {
+            var isotopes = new double[] {0.8, 0.9, 0.6, 0.3};
+            var index = Enumerable.Range(0, isotopes.Length).ToArray();
+
+            Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
+
+            for (var i = 0; i < isotopes.Length; i++)
+            {
+                Console.WriteLine("{0}\t{1}", index[i], isotopes[index[i]]);
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace InformedProteomics.Test
             const string specFile = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA_NoCharge.raw";
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
 
-            var postProcessor = new MsGfPostProcessor(specFile, resultPath, new Tolerance(20));
+            var postProcessor = new MsGfPostProcessor(specFile, resultPath, new Tolerance(20), new Tolerance(10));
             var numId = postProcessor.PostProcessing(outputFilePath);
 
             Console.WriteLine("NumId: {0}", numId);
@@ -47,7 +47,7 @@ namespace InformedProteomics.Test
             var specFiles = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
-            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(10));
+            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(20), new Tolerance(10));
             var numId = postProcessor.PostProcessing(outputFilePath);
 
             Console.WriteLine("NumId: {0}", numId);
@@ -60,7 +60,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DIA_130412091220.raw";
             const string outputFilePath = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
 
-            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5));
+            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(3));
             var numId = postProcessor.PostProcessing(outputFilePath);
             
             Console.WriteLine("NumId: {0}", numId);
@@ -73,7 +73,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
             const string outputFilePath = @"D:\Research\Data\UW\Fusion\DDA_Summary.tsv";
 
-            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5));
+            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(3));
             var numId = postProcessor.PostProcessing(outputFilePath);
 
             Console.WriteLine("NumId: {0}", numId);

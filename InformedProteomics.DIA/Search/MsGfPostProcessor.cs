@@ -14,17 +14,20 @@ namespace InformedProteomics.DIA.Search
         const string DecoyPrefix = "XXX";
         const double SpecEValueThreshold = 1E-8;
 
-        // Post-processing parameters
-        const double RelativeIsotopeIntensityThreshold = 0.5;
+        //// Post-processing parameters
+        //const double RelativeIsotopeIntensityThreshold = 0.7;
+        private const int NumIsotopesToCheckForValidation = 2;
 
-        public MsGfPostProcessor(string specFilePath, string msGfResultPath, Tolerance tolerance): this(new[] {specFilePath}, msGfResultPath, tolerance)
+        public MsGfPostProcessor(string specFilePath, string msGfResultPath, Tolerance tolForBaseXic, Tolerance tolFromBaseXic)
+            : this(new[] { specFilePath }, msGfResultPath, tolForBaseXic, tolFromBaseXic)
         {
         }
 
-        public MsGfPostProcessor(IEnumerable<string> specFilePaths, string msGfResultPath, Tolerance tolerance)
+        public MsGfPostProcessor(IEnumerable<string> specFilePaths, string msGfResultPath, Tolerance tolForBaseXic, Tolerance tolFromBaseXic)
         {
             MsGfResultPath = msGfResultPath;
-            Tolerance = tolerance;
+            ToleranceForBaseXic = tolForBaseXic;
+            ToleranceFromBasicXic = tolFromBaseXic;
 
             Run = new Dictionary<string, LcMsRun>();
             foreach (var specFilePath in specFilePaths)
@@ -37,7 +40,8 @@ namespace InformedProteomics.DIA.Search
 
         public Dictionary<string,LcMsRun> Run { get; private set; }
         public string MsGfResultPath { get; private set; }
-        public Tolerance Tolerance { get; private set; }
+        public Tolerance ToleranceForBaseXic { get; private set; }
+        public Tolerance ToleranceFromBasicXic { get; private set; }
 
         //private readonly Tolerance _tolerance = new Tolerance(PrecursorTolerancePpm);
         private readonly AminoAcidSet _aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -123,36 +127,57 @@ namespace InformedProteomics.DIA.Search
 
         private bool IsValid(MsGfMatch match)
         {
-            //// Valid if spectral E-value is below 1E-15
+            // Valid if spectral E-value is below 1E-15
             //if (match.SpecEValue < 1e-15) return true;
 
-            //var precursorIon = new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge);
-            //var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            ////var basePeakIndex = 0;
-            //var specFileKey = Path.GetFileNameWithoutExtension(match.SpecFile);
-            //if (specFileKey == null) return false;
-            //var baseXic = Run[specFileKey].GetExtractedIonChromatogram(precursorIon.GetBaseIsotopeMz(), Tolerance, match.ScanNum);
+            var specFileKey = Path.GetFileNameWithoutExtension(match.SpecFile);
+            if (specFileKey == null) return false;
 
-            //// Check whether isotope peaks exist
+            var precursorIon = new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge);
+            var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
+            var basePeakMz = precursorIon.GetIsotopeMz(basePeakIndex);
+            var baseXic = Run[specFileKey].GetExtractedIonChromatogram(precursorIon.GetBaseIsotopeMz(), ToleranceForBaseXic, match.ScanNum);
+
+            // check whether the most abundant isotope peak exists
+            var prevMs1ScanNum = Run[specFileKey].GetPrecursorScanNum(match.ScanNum);
+            var nextMs1ScanNum = Run[specFileKey].GetNextScanNum(prevMs1ScanNum, 1);
+            if (!baseXic.ContainsScanNum(prevMs1ScanNum) && !baseXic.ContainsScanNum(nextMs1ScanNum))
+            {
+                return false;
+                //if (match.SpecEValue < 1e-15)
+                //{
+                //    Console.WriteLine("{0} {1} {2} ({3}) is rejected (no base peak)", match.Peptide, match.Charge, match.ScanNum, match.SpecEValue);
+                //}
+            }
+
+            // Check whether all abundant isotope peaks exist
             //foreach (var isotope in precursorIon.GetIsotopes(RelativeIsotopeIntensityThreshold))
-            //{
-            //    Xic xic;
-            //    if (isotope.Item1 == basePeakIndex)
-            //    {
-            //        xic = baseXic;
-            //    }
-            //    else
-            //    {
-            //        var isotopeMz = precursorIon.GetIsotopeMz(isotope.Item1);
-            //        xic = Run[specFileKey].GetExtractedIonChromatogram(isotopeMz, Tolerance, match.ScanNum);
-            //    }
+            foreach (var isotope in precursorIon.GetIsotopes(NumIsotopesToCheckForValidation))    // top 2 isotopes
+            {
+                Xic xic;
+                if (isotope.Item1 == basePeakIndex)
+                {
+                    xic = baseXic;
+                }
+                else
+                {
+                    //if(match.Peptide.Equals("HGGEDYVFSLLTGYCEPPTGVSLR"))
+                    //    Console.WriteLine("Debug");
+                    var isotopeIndex = isotope.Item1;
+                    var mzDifference = precursorIon.GetIsotopeMz(isotopeIndex) - basePeakMz;
+                    xic = Run[specFileKey].GetIsotopeExtractedIonChromatogram(baseXic, mzDifference, ToleranceFromBasicXic);
+                }
 
-            //    if (xic.Count == 0)
-            //    {
-            //        //isValid = false;
-            //        return false;
-            //    }
-            //}
+                if (xic.Count == 0)
+                {
+                    if (match.SpecEValue < 1e-15)
+                    {
+                        //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", match.SpecFile, match.Peptide, match.Charge,
+                        //    match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMz(), match.SpecEValue);
+                    }
+                    return false;
+                }
+            }
 
             //if (!hasValid && match.SpecEValue < 1e-15)
             //{
@@ -160,23 +185,57 @@ namespace InformedProteomics.DIA.Search
             //        match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMz(), match.SpecEValue);
             //};
 
-            //// check isotopes at index -1
             //var monoIsotopeMz = precursorIon.GetMz();
-            //var monoIsotopeXic = Run[match.SpecFileKey].GetExtractedIonChromatogram(monoIsotopeMz, Tolerance, match.ScanNum);
-            //var isotopeMzMinus1 = precursorIon.GetIsotopeMz(-1);
-            //var xicAtIndexMinus1 = Run[match.SpecFileKey].GetExtractedIonChromatogram(isotopeMzMinus1, Tolerance, match.ScanNum);
-            //if (xicAtIndexMinus1.Count > 0 && xicAtIndexMinus1.GetCorrelation(monoIsotopeXic) > 0.7) return false;
+            //var monoIsotopeXic = Run[specFileKey].GetExtractedIonChromatogram(monoIsotopeMz, Tolerance, match.ScanNum);
 
-            // check whether the most abundant isotope peak exists
-            //var prevMs1ScanNum = Run.GetPrecursorScanNum(match.ScanNum);
-            //var nextMs1ScanNum = Run.GetNextScanNum(prevMs1ScanNum, 1);
-            //if (!baseXic.ContainsScanNum(prevMs1ScanNum) && !baseXic.ContainsScanNum(nextMs1ScanNum))
+            //// check isotopes at index -1
+            //var isotopeMzMinus1 = precursorIon.GetIsotopeMz(-1);
+            //var xicAtIndexMinus1 = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzMinus1, new Tolerance(5), match.ScanNum);
+            //if (xicAtIndexMinus1.Count > 0 && xicAtIndexMinus1.GetCorrelation(monoIsotopeXic) > 0.7)
             //{
-            //    return false;
-            //    if (match.SpecEValue < 1e-15)
+            //    // Check the ratio
+            //    var abundanceMono = monoIsotopeXic.GetSumIntensities();
+            //    var abundanceMinusOne = xicAtIndexMinus1.GetSumIntensities();
+            //    var isoEnv = _aaSet.GetComposition(match.Peptide).GetIsotopomerEnvelop();
+            //    var approxRato = isoEnv[1]/isoEnv[0];
+            //    var ratioDiff = abundanceMono/abundanceMinusOne/(isoEnv[1]/isoEnv[0]);
+            //    if (ratioDiff > 0.8 && ratioDiff < 1.2)
             //    {
-            //        Console.WriteLine("{0} {1} {2} ({3}) is rejected (no base peak)", match.Peptide, match.Charge, match.ScanNum, match.SpecEValue);
+            //        if (match.SpecEValue < 1e-15)
+            //        {
+            //            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", match.SpecFile, match.Peptide, match.Charge,
+            //                match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMz(), match.SpecEValue, ratioDiff);
+            //        }
+            //        return false;
             //    }
+            //}
+
+            //if (xic.Count > 0)
+            //{
+            //    var isotopeRatio = xic.GetSumIntensities() / baseIntensity / isotope.Item2;
+            //    var correlation = xic.GetCorrelation(baseXic);
+
+            //    if (isotopeRatio > 0.8 && isotopeRatio < 1.2
+            //        && correlation > 0.8)
+            //    {
+            //        isValid = true;
+            //    }
+            //}
+
+            // Check if isotope ratio is within tolerance
+            //if (isotopeRatio > isotopeRatioTolerance || isotopeRatio < 1 / isotopeRatioTolerance)
+            //{
+            //    isValid = false;
+            //    //Console.WriteLine("Off ratio\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMz(), isotopeMz, isotopeRatio);
+            //    break;
+            //}
+
+            // check isotopes at index 0.5
+            //if (match.Charge == 4)
+            //{
+            //    var isotopeMzPointFive = precursorIon.GetIsotopeMz(0.5);
+            //    var xicAtIndexPointFive = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzPointFive, Tolerance, match.ScanNum);
+            //    if (xicAtIndexPointFive.Count > 0 && xicAtIndexPointFive.GetCorrelation(monoIsotopeXic) > 0.7) return false;
             //}
 
             return true;

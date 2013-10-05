@@ -21,5 +21,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double IsolationWindowTargetMz { get; private set; }
         public double IsolationWindowLowerOffset { get; private set; }
         public double IsolationWindowUpperOffset { get; private set; }
+
+        public double MinMz
+        {
+            get 
+            { 
+                return IsolationWindowTargetMz - IsolationWindowLowerOffset;
+            }
+        }
+
+        public double MaxMz
+        {
+            get
+            {
+                return IsolationWindowTargetMz + IsolationWindowUpperOffset;
+            }
+        }
+
     }
 }

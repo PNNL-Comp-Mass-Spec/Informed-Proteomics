@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -67,5 +68,24 @@ namespace InformedProteomics.Backend.Data.Biology
                 }
             }
         }
+
+        /// <summary>
+        /// Gets top n (numIsotopes) theoretical isotope peaks
+        /// </summary>
+        /// <param name="numIsotopes">number of isotopes</param>
+        /// <returns>Enumerable of isotope peaks</returns>
+        public IEnumerable<Tuple<int, float>> GetIsotopes(int numIsotopes)
+        {
+            var isotopes = Composition.GetIsotopomerEnvelop();
+            var index = Enumerable.Range(0, isotopes.Length).ToArray();
+
+            Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
+
+            for (var i = 0; i < numIsotopes; i++)
+            {
+                yield return new Tuple<int, float>(index[i], isotopes[index[i]]);
+            }
+        }
+
     }
 }
