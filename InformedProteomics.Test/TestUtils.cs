@@ -305,5 +305,15 @@ namespace InformedProteomics.Test
                 Console.WriteLine("{0}\t{1}", index[i], isotopes[index[i]]);
             }
         }
+
+        [Test]
+        public void TestEnum()
+        {
+            const ActivationMethod activation = ActivationMethod.ETD;
+            const byte code = (byte) activation;
+            Console.WriteLine((byte)activation);
+            Console.WriteLine(code);
+            Console.WriteLine((ActivationMethod)code);
+        }
     }
 }

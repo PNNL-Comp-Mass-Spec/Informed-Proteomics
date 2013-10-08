@@ -80,6 +80,30 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestQExactiveDdaDataPostProcessingPerFile()
+        {
+            var ranges = new[] { "400to525", "525to650", "650to775", "775to900" };
+            foreach (var range in ranges)
+            {
+                Console.WriteLine("Range: {0}", range);
+                TestQExactiveDdaDataPostProcessingPerFile(range);
+            }
+        }
+
+        private void TestQExactiveDdaDataPostProcessingPerFile(string range)
+        {
+            var resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_" + range + ".tsv";
+            var specFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DIA_5mz_" + range + ".raw";
+            var outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_" + range + "_Summary.tsv";
+
+            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(20), new Tolerance(10));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
+        }
+
+
+        [Test]
         public void GenerateVennDiagrams()
         {
             // Fusion

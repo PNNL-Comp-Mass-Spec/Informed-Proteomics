@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using DeconTools.Backend;
 using DeconTools.Backend.Core;
 using DeconTools.Backend.ProcessingTasks.PeakDetectors;
 using DeconTools.Backend.Runs;
@@ -17,13 +12,16 @@ namespace InformedProteomics.Test
     internal class TestParsingSpectra
     {
         [Test]
-        public void TestReadingPgf()
+        public void TestSpecFiltering()
         {
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            const string pgfFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.pgf";
-            var run = new LcMsRun(new PgfReader(pgfFilePath));
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = new LcMsRun(new XCaliburReader(rawFilePath));
+
+            var spec = run.GetSpectrum(3997);
+            spec.Display();
 
             //var numSpecs = 0;
             //var reader = new PgfReader(pgfFilePath);
@@ -35,6 +33,28 @@ namespace InformedProteomics.Test
 
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Done. {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestReadingPbf()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            const string pbfFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA_NoCharge.pbf";
+            var run = new LcMsRun(new PbfReader(pbfFilePath));
+            Console.WriteLine(run.MaxLcScan);
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+            sw.Reset();
+            sw.Start();
+            const string pgfFilePath = @"D:\Research\Data\UW\QExactive\pgf\82593_lv_mcx_DDA_NoCharge.pgf";
+            var run2 = new LcMsRun(new PgfReader(pgfFilePath));
+            Console.WriteLine(run.MaxLcScan);
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
         }
 
         [Test]

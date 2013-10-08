@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         // Parameters for centroiding spectra
         public const int PeakToBackgroundRatio = 0;
-        public const int SignalToNoiseThreshold = 0;
+        public const int SignalToNoiseRatioThreshold = 3;
 
         public XCaliburReader(string filePath)
         {
@@ -84,7 +84,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (_peakDetector == null)
                 {
-                    _peakDetector = new DeconToolsPeakDetectorV2(PeakToBackgroundRatio, SignalToNoiseThreshold);
+                    _peakDetector = new DeconToolsPeakDetectorV2(PeakToBackgroundRatio, 0);
                 }
                 var peaks = _peakDetector.FindPeaks(mzArr, intensityArr);
                 mzArr = new double[peaks.Count];
@@ -98,8 +98,19 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
+           
+            //// Filter noise
+            //Array.Sort(intensityArr, mzArr);
+            //var noiseLevel = intensityArr[intensityArr.Length / 2]; // Noise level is the median
+            //var filteredPeaks = new List<Peak>();
+            //for (var i = 0; i < intensityArr.Length; i++)
+            //{
+            //    if (intensityArr[i] > noiseLevel * SignalToNoiseRatioThreshold) filteredPeaks.Add(new Peak(mzArr[i], intensityArr[i]));
+            //}
+            //filteredPeaks.Sort();
+
             var msLevel = ReadMsLevel(scanNum);
-            if(msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
+            if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
 
             return new ProductSpectrum(mzArr, intensityArr, scanNum)
                 {

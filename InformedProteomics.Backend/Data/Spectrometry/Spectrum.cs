@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
@@ -28,6 +29,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             set { _msLevel = value; }
         }
 
+        // Peaks are assumed to be sorted according to m/z
         public Peak[] Peaks { get; private set; }
 
         /// <summary>
@@ -103,17 +105,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.Write(sb.ToString());
         }
 
-        public virtual void WriteTo(StreamWriter writer)
-        {
-            writer.WriteLine("BEGIN IONS");
-            writer.WriteLine("SCANS={0}", ScanNum);
-            writer.WriteLine("_MSLEVEL={0}", MsLevel);
-            foreach (var peak in Peaks)
-            {
-                writer.WriteLine("{0}\t{1}", Convert.ToSingle(peak.Mz), Convert.ToSingle(peak.Intensity));
-            }
-            writer.WriteLine("END IONS");
-        }
+        //public void FilterNoise()
+        //{
+        //    Array.Sort(Peaks, new IntensityComparer());
+        //    var medianIntPeak = Peaks[Peaks.Length/2];
+        //    var noiseLevel = medianIntPeak.Intensity;
+
+        //    var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel*3)).ToList();
+
+        //    filteredPeaks.Sort();
+        //    Peaks = filteredPeaks.ToArray();
+        //}
 
         private int _msLevel = 1;
     }

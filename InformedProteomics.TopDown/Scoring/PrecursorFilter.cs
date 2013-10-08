@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 
@@ -11,16 +9,14 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class PrecursorFilter
     {
-        public PrecursorFilter(LcMsRun run, Tolerance toleranceForBaseXic, Tolerance toleranceFromBasicXic)
+        public PrecursorFilter(LcMsRun run, Tolerance mzTolerance)
         {
             Run = run;
-            ToleranceForBaseXic = toleranceForBaseXic;
-            ToleranceFromBasicXic = toleranceFromBasicXic;
+            MzTolerance = mzTolerance;
         }
 
         public LcMsRun Run { get; private set; }
-        public Tolerance ToleranceForBaseXic { get; private set; }
-        public Tolerance ToleranceFromBasicXic { get; private set; }
+        public Tolerance MzTolerance { get; private set; }
 
         public const double RelativeIsotopeIntensityThreshold = 0.5;
 
@@ -49,7 +45,7 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var isotopeIndex = isotope.Item1;
                 var isotopeMz = precursorIon.GetIsotopeMz(isotopeIndex);
-                if (spec.FindPeak(isotopeMz, ToleranceForBaseXic) == null) return false;
+                if (spec.FindPeak(isotopeMz, MzTolerance) == null) return false;
             }
 
             return true;

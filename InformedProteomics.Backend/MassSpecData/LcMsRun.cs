@@ -10,14 +10,17 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
-            var pgfFilePath = Path.ChangeExtension(specFilePath, ".pgf");
-            if(File.Exists(pgfFilePath)) return new LcMsRun(new PgfReader(pgfFilePath));
+            var pbfFilePath = Path.ChangeExtension(specFilePath, ".pbf");
+            if (File.Exists(pbfFilePath))
+            {
+                return new LcMsRun(new PbfReader(pbfFilePath));
+            }
 
             LcMsRun run;
             if (dataType == MassSpecDataType.XCaliburRun) run = new LcMsRun(new XCaliburReader(specFilePath));
             else run = null;
 
-            if(run != null) run.WriteTo(pgfFilePath);
+            if(run != null) run.WriteTo(pbfFilePath);
 
             return run;
         }
@@ -38,6 +41,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             foreach (var spec in massSpecDataReader.ReadAllSpectra())
             {
+                //Console.WriteLine("Reading Scan {0}", spec.ScanNum);
                 _scanNumSpecMap.Add(spec.ScanNum, spec);
                 _msLevel[spec.ScanNum] = spec.MsLevel;
                 if (spec.MsLevel == 1)
@@ -132,30 +136,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
         }
 
-
-        //internal class IsolationWindow: IComparable<IsolationWindow>
-        //{
-        //    public IsolationWindow(int scanNum, double minMz, double maxMz)
-        //    {
-        //        ScanNum = scanNum;
-        //        MinMz = minMz;
-        //        MaxMz = maxMz;
-        //    }
-
-        //    public int ScanNum { get; set; }
-        //    public double MinMz { get; set; }
-        //    public double MaxMz { get; set; }
-
-        //    public bool InRange(double mz)
-        //    {
-        //        return mz >= MinMz && mz <= MaxMz; 
-        //    }
-
-        //    public int CompareTo(IsolationWindow other)
-        //    {
-        //        return ((MinMz + MaxMz)/2).CompareTo((other.MinMz+other.MaxMz)/2);
-        //    }
-        //}
 
         /// <summary>
         /// Gets the spectrum of the specified scan number
@@ -461,12 +441,12 @@ namespace InformedProteomics.Backend.MassSpecData
         // These writing/reading methods are added to speed up the testing
         public void WriteTo(string outputFilePath)
         {
-            using (var writer = new StreamWriter(outputFilePath))
+            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
             {
                 for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++ )
                 {
                     var spec = GetSpectrum(scanNum);
-                    spec.WriteTo(writer);
+                    PbfReader.WriteSpectrumAsPbf(spec, writer);
                 }
             }
         }

@@ -42,7 +42,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
-            var precursorFilter = new PrecursorFilter(run, new Tolerance(10), new Tolerance(5));
+            var precursorFilter = new PrecursorFilter(run, new Tolerance(10));
 
             foreach (var seqComposition in seqGraph.GetSequenceCompositions())
             {
@@ -70,10 +70,89 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestFindingMs2Scans()
+        public void TestMs1BasedFilteringOneProtein()
         {
             // Search parameters
-            const int numNTermCleavages = 30;  // 30
+            const int minCharge = 9;
+            const int maxCharge = 19; // target charge: 14
+            var precursorTolerance = new Tolerance(20);
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            Console.Write("Reading raw file...");
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            var aaSet = new AminoAcidSet();
+
+            var sequences = new[] { "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-" };
+
+            long totalProtCompositions = 0;
+            long numPrecursorIons = 0;
+
+            sw.Reset();
+            sw.Start();
+
+            var precursorFilter = new PrecursorFilter(run, new Tolerance(10));
+
+            var outputFilePath = Path.ChangeExtension(specFilePath, ".icresult");
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                foreach (var protAnnotation in sequences)
+                {
+                    var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                    if (seqGraph == null) continue;
+
+                    var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
+                    foreach (var protComposition in protCompositions)
+                    {
+                        totalProtCompositions++;
+                        for (var charge = minCharge; charge <= maxCharge; charge++)
+                        {
+                            numPrecursorIons++;
+                            var precursorIon = new Ion(protComposition + Composition.H2O, charge);
+                            foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
+                            {
+                                if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
+                                writer.WriteLine("{0}\t{1}\t{2}\t{3}", protAnnotation, charge, precursorIon.GetMz(), ms2ScanNum);
+                            }
+                        }
+                    }
+                }
+            }
+
+            sw.Stop();
+            Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
+            Console.WriteLine("NumPrecursorIons: {0}", numPrecursorIons);
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void CountProteins()
+        {
+            const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.icresult";
+
+            var protSet = new HashSet<string>();
+            foreach (var line in File.ReadLines(filePath))
+            {
+                var token = line.Split('\t');
+                if (token.Length != 4) continue;
+                protSet.Add(token[0]);
+            }
+            Console.WriteLine("NumProteins: {0}", protSet.Count);
+        }
+
+        [Test]
+        public void TestMs1BasedFiltering()
+        {
+            // Search parameters
+            const int numNTermCleavages = 0;  // 30
             const int minLength = 7;
             const int maxLength = 1000;
             const int minCharge = 3; // 3
@@ -112,8 +191,11 @@ namespace InformedProteomics.Test
                 };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            var targetDb = new FastaDatabase(dbFilePath);
-            var indexedDb = new IndexedDatabase(targetDb);
+            //var targetDb = new FastaDatabase(dbFilePath);
+            //var indexedDb = new IndexedDatabase(targetDb);
+            //var sequences = indexedDb.SequencesAsStrings(0, minLength, maxLength);
+
+            var sequences = new[] { "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-" };
 
             var numProteins = 0;
             long totalProtCompositions = 0;
@@ -122,12 +204,12 @@ namespace InformedProteomics.Test
             sw.Reset();
             sw.Start();
 
-            var precursorFilter = new PrecursorFilter(run, new Tolerance(10), new Tolerance(5));
+            var precursorFilter = new PrecursorFilter(run, new Tolerance(10));
 
             var outputFilePath = Path.ChangeExtension(specFilePath, ".icresult");
             using (var writer = new StreamWriter(outputFilePath))
             {
-                foreach (var protAnnotation in indexedDb.SequencesAsStrings(0, minLength, maxLength))
+                foreach (var protAnnotation in sequences)
                 {
                     ++numProteins;
 

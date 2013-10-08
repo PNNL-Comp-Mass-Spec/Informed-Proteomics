@@ -5,7 +5,7 @@ using System.Text;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public enum ActivationMethod
+    public enum ActivationMethod : byte
     {
         CID,
         ETD,

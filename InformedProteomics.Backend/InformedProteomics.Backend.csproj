@@ -140,6 +140,7 @@
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\IMassSpecDataReader.cs" />
     <Compile Include="MassSpecData\MassSpecDataType.cs" />
+    <Compile Include="MassSpecData\PbfReader.cs" />
     <Compile Include="MassSpecData\PgfReader.cs" />
     <Compile Include="MassSpecData\XCaliburReader.cs" />
     <Compile Include="Data\Enum\SequenceLocation.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Utils\Misc.cs" />
+    <Compile Include="Utils\NoiseFilter.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
