@@ -5,9 +5,9 @@ using System.Text;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class IsolationInfo
+    public class IsolationWindow
     {
-        public IsolationInfo(
+        public IsolationWindow(
             double isolationWindowTargetMz,
             double isolationWindowLowerOffset,
             double isolationWindowUpperOffset
@@ -38,5 +38,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        public bool Contains(double mz)
+        {
+            return mz >= MinMz && mz < MaxMz;
+        }
     }
 }

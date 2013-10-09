@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var productSpec = spec as ProductSpectrum;
                     if (productSpec != null)
                     {
-                        var isolationInfo = productSpec.IsolationInfo;
+                        var isolationInfo = productSpec.IsolationWindow;
                         var minBinNum = (int)(isolationInfo.MinMz*IsolationWindowBinningFactor);
                         var maxBinNum = (int)((isolationInfo.MaxMz+0.49999999)*IsolationWindowBinningFactor);
                         for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
@@ -195,11 +195,6 @@ namespace InformedProteomics.Backend.MassSpecData
                 var peak = spec.FindPeak(xicPeak.Mz + mzDifference, tolerance);
                 if (peak != null) isotopeXic.Add(new XicPeak(xicPeak.ScanNum, peak.Mz, peak.Intensity));
             }
-            //isotopeXic.AddRange(from xicPeak in xic 
-            //                    let spec = _scanNumSpecMap[xicPeak.ScanNum] 
-            //                    let peak = spec.FindPeak(xicPeak.Mz + offsetMz, tolerance) 
-            //                    where peak != null 
-            //                    select new XicPeak(xicPeak.ScanNum, peak.Mz, peak.Intensity));
             return isotopeXic;
         }
 
@@ -348,6 +343,26 @@ namespace InformedProteomics.Backend.MassSpecData
 
             xicSegment.Sort();
             return xicSegment;
+        }
+
+        public Xic GetProductIonChromatogram(double productIonMz, double precursorIonMz, Tolerance tolerance, int minScanNum, int maxScanNum)
+        {
+            var productXic = new Xic();
+
+            for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+            {
+                if (_msLevel[scanNum] == 1) continue;
+
+                var productSpec = _scanNumSpecMap[scanNum] as ProductSpectrum;
+                if (productSpec == null) continue;
+
+                if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
+
+                var peak = productSpec.FindPeak(productIonMz, tolerance);
+                if(peak != null) productXic.Add(new XicPeak(scanNum, peak.Mz, peak.Intensity));
+            }
+
+            return productXic;
         }
 
         /// <summary>

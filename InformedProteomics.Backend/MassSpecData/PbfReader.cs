@@ -45,11 +45,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Activation method: 1
                 writer.Write((byte)productSpec.ActivationMethod);
                 // Isolation window target m/z: 8
-                writer.Write(productSpec.IsolationInfo.IsolationWindowTargetMz);
+                writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
                 // Isolation window lower offset: 8
-                writer.Write(productSpec.IsolationInfo.IsolationWindowLowerOffset);
+                writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
                 // Isolation window uppoer offset: 8
-                writer.Write(productSpec.IsolationInfo.IsolationWindowUpperOffset);
+                writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
             }
             // Number of peaks: 4
             writer.Write(spec.Peaks.Length);
@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         MsLevel = msLevel,
                         ActivationMethod = activationMethod,
-                        IsolationInfo = new IsolationInfo(
+                        IsolationWindow = new IsolationWindow(
                             isolationWindowTargetMz,
                             isolationWindowLowerOffset,
                             isolationWindowUpperOffset)
