@@ -18,13 +18,17 @@ namespace InformedProteomics.Test
     internal class TestPeptideCentricAnalysis
     {
         [Test]
+        public void RunPeptideCentricAnalysis()
+        {
+            TestQExactiveDdaDataPostProcessing();
+            TestQExactiveDiaDataPostProcessing();
+            TestFusionDiaDataPostProcessing();
+            TestFusionDdaDataPostProcessing();
+        }
+
+        [Test]
         public void TestQExactiveDdaDataPostProcessing()
         {
-            //const string range = "650to775";
-            //const string resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_" + range + ".tsv";
-            //const string specFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DIA_5mz_" + range + ".raw";
-            //const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_" + range + "_Summary.tsv";
-
             const string resultPath = @"D:\Research\Data\UW\QExactive\DDA_Results\DDA_All.tsv";
             const string specFile = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA_NoCharge.raw";
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
@@ -38,11 +42,6 @@ namespace InformedProteomics.Test
         [Test]
         public void TestQExactiveDiaDataPostProcessing()
         {
-            //const string range = "650to775";
-            //const string resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_" + range + ".tsv";
-            //const string specFilePath = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DIA_5mz_" + range + ".raw";
-            //const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_" + range + "_Summary.tsv";
-
             const string resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_All.tsv";
             var specFiles = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
@@ -112,10 +111,11 @@ namespace InformedProteomics.Test
             const string fusionDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
 
             // Q-Exactive
-            const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_Results\82593_lv_mcx_DDA.tsv";
+            const string qeDdaMsGfResult = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.tsv";
+            const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
             const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
-            const string resultPath1 = fusionDiaResult;
+            const string resultPath1 = fusionDdaResult;
             const string resultPath2 = fusionMsgfResult;
 
             var result1 = new TsvFileParser(resultPath1);
@@ -124,7 +124,96 @@ namespace InformedProteomics.Test
             const double pepQValueThreshold = 0.01;
             var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
                                                       result2.GetPeptides(pepQValueThreshold));
-            Console.WriteLine("{0}\t{1}\t{2}", vennDiagram.Set1Only.Count, vennDiagram.Intersection.Count, vennDiagram.Set2Only.Count);
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count + vennDiagram.Intersection.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
+        }
+
+        [Test]
+        public void TestSpecEValueCalibration()
+        {
+            const int targetCharge = 4;
+            //const string resultFilePath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_All.tsv";
+            const string resultFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary - Copy.tsv";
+            var histSpecEValue = new float[2,500];
+            const int specEValueBinningConstant = 10;
+            
+            var histMsGfScore = new float[2,1000];
+            const int minMsGfScore = -100;
+            var numOccs = new[] {0, 0};
+            MsGfPlusHeaderInformation headerInfo = null;
+            var prevScanNum = new[] {-1, -1};
+            
+            foreach (var line in File.ReadLines(resultFilePath))
+            {
+                if (line.StartsWith("#"))
+                {
+                    if(headerInfo == null) headerInfo = new MsGfPlusHeaderInformation(line);
+                    continue;
+                }
+
+                if (headerInfo == null) continue;
+
+                var token = line.Split('\t');
+                if (token.Length != headerInfo.NumColumns) continue;
+
+                var protein = token[headerInfo.ProteinColNum];
+                var isDecoy = protein.StartsWith("XXX");
+
+                var targetIndex = isDecoy ? 1 : 0;
+
+                var scanNum = Convert.ToInt32(token[headerInfo.ScanNumColNum]);
+                if (scanNum == prevScanNum[targetIndex]) continue;
+                prevScanNum[targetIndex] = scanNum;
+
+                var specFile = token[headerInfo.SpecFileColNum];
+                var precursorMz = Convert.ToDouble(token[headerInfo.PrecursorColNum]);
+                var charge = Convert.ToInt32(token[headerInfo.ChargeColNum]);
+
+                //if (charge == 1) continue;
+                if (targetCharge > 0 && charge != targetCharge) continue;
+                var specEValue = Convert.ToDouble(token[headerInfo.SpecEValueColNum]);
+                var specEValueBin = (int)Math.Round(-Math.Log10(specEValue) * specEValueBinningConstant);
+                histSpecEValue[targetIndex,specEValueBin]++;
+
+                var msgfScore = Convert.ToInt32(token[headerInfo.MsgfScoreColNum]);
+                histMsGfScore[targetIndex, msgfScore - minMsGfScore]++;
+
+                numOccs[targetIndex]++;
+            }
+
+            for (var i = 0; i < histMsGfScore.GetLength(0); i++)
+            {
+                for (var j = 0; j < histMsGfScore.GetLength(1); j++)
+                {
+                    histMsGfScore[i,j] /= numOccs[i];
+                }
+            }
+
+            var specEValueArr = new float[histSpecEValue.GetLength(1)];
+            for (var i = 0; i < histSpecEValue.GetLength(0); i++)
+            {
+                for (var j = 0; j < histSpecEValue.GetLength(1); j++)
+                {
+                    if(i==0) specEValueArr[j] = (float)j / specEValueBinningConstant;
+                    histSpecEValue[i, j] /= numOccs[i];
+                }
+            }
+            
+            Console.WriteLine("specEValueX <- c({0});", string.Join(",", specEValueArr));
+            Console.WriteLine("specEValueHistTarget <- c({0});", string.Join(",", Slice(histSpecEValue, 0)));
+            Console.WriteLine("specEValueHistDecoy <- c({0});", string.Join(",", Slice(histSpecEValue, 1)));
+            Console.WriteLine("#NumTargetOccs: {0}", numOccs[0]);
+            Console.WriteLine("#NumDecoyOccs: {0}", numOccs[1]);
+        }
+
+        public static IEnumerable<float> Slice(float[,] histArray, int targetIndex)
+        {
+            for (var i = 0; i < histArray.GetLength(1); i++)
+            {
+                yield return histArray[targetIndex, i];
+            }
         }
 
         [Test]

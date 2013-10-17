@@ -31,7 +31,6 @@ namespace InformedProteomics.Test
             const int scanNum = 810;
 
             // Create a sequence graph
-            //var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             if (seqGraph == null)
             {
@@ -120,6 +119,7 @@ namespace InformedProteomics.Test
                             {
                                 if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
                                 writer.WriteLine("{0}\t{1}\t{2}\t{3}", protAnnotation, charge, precursorIon.GetMz(), ms2ScanNum);
+
                             }
                         }
                     }
@@ -152,7 +152,7 @@ namespace InformedProteomics.Test
         public void TestMs1BasedFiltering()
         {
             // Search parameters
-            const int numNTermCleavages = 0;  // 30
+            const int numNTermCleavages = 30;  // 30
             const int minLength = 7;
             const int maxLength = 1000;
             const int minCharge = 3; // 3
@@ -223,21 +223,18 @@ namespace InformedProteomics.Test
                     var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
                     if (seqGraph == null) continue;
 
-                    for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
+                    var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavages);
+                    foreach (var protComposition in protCompositions)
                     {
-                        var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(nTermCleavages);
-                        foreach (var protComposition in protCompositions)
+                        totalProtCompositions++;
+                        for (var charge = minCharge; charge <= maxCharge; charge++)
                         {
-                            totalProtCompositions++;
-                            for (var charge = minCharge; charge <= maxCharge; charge++)
+                            numPrecursorIons++;
+                            var precursorIon = new Ion(protComposition + Composition.H2O, charge);
+                            foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
                             {
-                                numPrecursorIons++;
-                                var precursorIon = new Ion(protComposition + Composition.H2O, charge);
-                                foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
-                                {
-                                    if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
-                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}", protAnnotation, charge, precursorIon.GetMz(), ms2ScanNum);
-                                }
+                                if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
+                                writer.WriteLine("{0}\t{1}\t{2}\t{3}", protAnnotation, charge, precursorIon.GetMz(), ms2ScanNum);
                             }
                         }
                     }
@@ -424,21 +421,17 @@ namespace InformedProteomics.Test
                 };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var seqGraph = new SequenceGraph(aaSet, protSeq.Length);
-            seqGraph.AddAminoAcid(AminoAcid.ProteinNTerm.Residue);
-            var isValidSequence = protSeq.All(seqGraph.AddAminoAcid);
-            if (!isValidSequence)
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+            if (seqGraph == null)
             {
-                Console.WriteLine("Invalid sequence: {0}", protSeq);
+                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
                 return;
             }
-            seqGraph.AddAminoAcid(AminoAcid.ProteinCTerm.Residue);
 
-            Console.WriteLine("Num sequence compositions: {0}, {1}", seqGraph.GetNumCompositions(), seqGraph.GetNumDistinctCompositions()
+            Console.WriteLine("Num sequence compositions: {0}, {1}", seqGraph.GetNumSequenceCompositions(), seqGraph.GetNumDistinctSequenceCompositions()
                 );
 
-            Console.WriteLine("Num product compositions: {0}", seqGraph.GetNumProductCompositions()
+            Console.WriteLine("Num product compositions: {0}", seqGraph.GetNumFragmentCompositions()
                 );
 
             //var numProductCompositions = 0L;
@@ -463,7 +456,7 @@ namespace InformedProteomics.Test
         public void TestTopDownEnumeration()
         {
             // Search parameters
-            const int numNTermCleavages = 0;
+            const int numNTermCleavages = 30;
             const int minLength = 7;
             const int maxLength = 1000;
             const int numMaxModsPerProtein = 6;
@@ -479,7 +472,6 @@ namespace InformedProteomics.Test
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
-
 //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
@@ -494,12 +486,10 @@ namespace InformedProteomics.Test
 
             var targetDb = new FastaDatabase(dbFilePath);
             var indexedDb = new IndexedDatabase(targetDb);
-            var maxProteinLength = indexedDb.GetLongestSequenceLength();
 
             var numProteins = 0;
             long totalProtCompositions = 0;
-            long totalProductCompositions = 0;
-            foreach (var protAnnotation in indexedDb.SequencesAsStrings(numNTermCleavages, minLength, maxLength))
+            foreach (var protAnnotation in indexedDb.SequencesAsStrings(minLength, maxLength))
             {
                 ++numProteins;
 
@@ -507,47 +497,19 @@ namespace InformedProteomics.Test
                 {
                     Console.WriteLine("Processed {0} proteins", numProteins);
                 }
-                //if (numProteins > 100)
-                //    break;
 
-                //if (numProteins < 28367) continue;
-                //Console.WriteLine("{0} {1}", protAnnotation.Length, protAnnotation);
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                if (seqGraph == null) continue;
 
-                var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-                var nTerm = protAnnotation[0] == FastaDatabase.Delimiter
-                                      ? AminoAcid.ProteinNTerm
-                                      : AminoAcid.PeptideNTerm;
-                var cTerm = protAnnotation[protAnnotation.Length-1] == FastaDatabase.Delimiter
-                                      ? AminoAcid.ProteinCTerm
-                                      : AminoAcid.PeptideCTerm;
-
-                var seqGraph = new SequenceGraph(aaSet, protSeq.Length);
-                seqGraph.AddAminoAcid(nTerm.Residue);
-                var isValidSequence = protSeq.All(seqGraph.AddAminoAcid);
-
-                if (!isValidSequence) continue;
-
-                seqGraph.AddAminoAcid(cTerm.Residue);
-
-                //var numProtCompositions = seqGraph.GetSequenceCompositions().Length;
-                var numProtCompositions = seqGraph.GetNumCompositions();
-                totalProtCompositions += numProtCompositions;
-
-                long numProductCompositions = 0;
-                //foreach (var scoringGraph in seqGraph.GetScoringGraphs())
-                //{
-                //    //numProductCompositions += scoringGraph.GetCompositions().Count();
-                //}
-                //totalProductCompositions += numProductCompositions;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
-                    numProteins, numProtCompositions, numProductCompositions,
-                    totalProtCompositions, totalProductCompositions);
+                for (var nTermCleavage = 0; nTermCleavage <= numNTermCleavages; nTermCleavage++)
+                {
+                    totalProtCompositions += seqGraph.GetNumSequenceCompositionsWithNTermCleavage(nTermCleavage);
+                }
             }
 
             sw.Stop();
             Console.WriteLine("NumProteins: {0}", numProteins);
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
-            Console.WriteLine("NumScoringGraphs: {0}", totalProductCompositions);
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }

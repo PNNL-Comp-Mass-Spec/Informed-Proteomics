@@ -78,7 +78,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             {
                                 MsLevel = msLevel,
                                 ActivationMethod = activation,
-                                IsolationInfo = new IsolationInfo(
+                                IsolationWindow = new IsolationWindow(
                                     isolationWindowTargetMz,
                                     isolationWindowLowerOffset,
                                     isolationWindowUpperOffset)
@@ -113,9 +113,9 @@ namespace InformedProteomics.Backend.MassSpecData
             if (productSpec != null)
             {
                 writer.WriteLine("_ACTIVATION={0}", productSpec.ActivationMethod);
-                writer.WriteLine("_ISOTARGET={0}", productSpec.IsolationInfo.IsolationWindowTargetMz);
-                writer.WriteLine("_ISOLOWER={0}", productSpec.IsolationInfo.IsolationWindowLowerOffset);
-                writer.WriteLine("_ISOUPPER={0}", productSpec.IsolationInfo.IsolationWindowUpperOffset);
+                writer.WriteLine("_ISOTARGET={0}", productSpec.IsolationWindow.IsolationWindowTargetMz);
+                writer.WriteLine("_ISOLOWER={0}", productSpec.IsolationWindow.IsolationWindowLowerOffset);
+                writer.WriteLine("_ISOUPPER={0}", productSpec.IsolationWindow.IsolationWindowUpperOffset);
             }
             foreach (var peak in spec.Peaks)
             {

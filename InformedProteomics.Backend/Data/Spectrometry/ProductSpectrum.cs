@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         public ActivationMethod ActivationMethod { get; set; }
-        public IsolationInfo IsolationInfo { get; set; }
+        public IsolationWindow IsolationWindow { get; set; }
 
         public void SetMsLevel(int msLevel)
         {

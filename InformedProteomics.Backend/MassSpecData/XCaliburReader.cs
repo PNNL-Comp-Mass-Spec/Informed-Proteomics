@@ -116,7 +116,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     MsLevel = msLevel,
                     ActivationMethod = GetActivationMethod(scanNum),
-                    IsolationInfo = ReadPrecursorInfo(scanNum)
+                    IsolationWindow = ReadPrecursorInfo(scanNum)
                 };
         }
 
@@ -125,7 +125,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <returns>precursor information</returns>
-        public IsolationInfo ReadPrecursorInfo(int scanNum)
+        public IsolationWindow ReadPrecursorInfo(int scanNum)
         {
             if (ReadMsLevel(scanNum) <= 1) return null;
 
@@ -135,7 +135,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Get isolation window width
             var isolationWindowWidth = ReadIsolationWidth(scanNum);
 
-            return new IsolationInfo(isolationTargetMz, isolationWindowWidth / 2, isolationWindowWidth / 2);
+            return new IsolationWindow(isolationTargetMz, isolationWindowWidth / 2, isolationWindowWidth / 2);
         }
 
         public int GetMaxScanNum()

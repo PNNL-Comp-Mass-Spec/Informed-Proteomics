@@ -29,9 +29,12 @@ namespace InformedProteomics.TopDown.Scoring
             var precursorScanNum = Run.GetPrecursorScanNum(scanNum);
             var nextMs1ScanNum = Run.GetNextScanNum(scanNum, 1);
 
-            return
+            var isValid =
                 IsValidForMs1Scan(precursorIon, precursorScanNum, isotopes)
                 || IsValidForMs1Scan(precursorIon, nextMs1ScanNum, isotopes);
+
+            //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMz(), precursorIon.Charge, scanNum, isValid);
+            return isValid;
         }
 
         private bool IsValidForMs1Scan(Ion precursorIon, int scanNum, IEnumerable<Tuple<int,float>> isotopes)

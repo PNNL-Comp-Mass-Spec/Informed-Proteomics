@@ -122,7 +122,7 @@
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
-    <Compile Include="Data\Spectrometry\IsolationInfo.cs" />
+    <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />

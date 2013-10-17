@@ -92,7 +92,7 @@ namespace InformedProteomics.Test
             if (spec != null)
             {
                 spec.Display();
-                var precursorInfo = spec.IsolationInfo;
+                var precursorInfo = spec.IsolationWindow;
                 Console.WriteLine("ActivationMethod: {0}", spec.ActivationMethod);
                 Console.WriteLine("PrecursorScan: {0}", run.GetPrecursorScanNum(spec.ScanNum));
                 Console.WriteLine("IsolationWindowTargetMz: {0}", precursorInfo.IsolationWindowTargetMz);

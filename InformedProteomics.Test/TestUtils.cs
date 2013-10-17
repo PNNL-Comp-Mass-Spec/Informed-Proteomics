@@ -57,14 +57,15 @@ namespace InformedProteomics.Test
             const int numMaxModsPepPeptide = 2;
 
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPepPeptide);
-            const string pepSeq = "STR";
+            const string annotation = "_.STR._";
+            var pepSeq = annotation.Substring(2, annotation.Length - 4);
             Console.WriteLine(aaSet.GetComposition(pepSeq));
-            var graph = new SequenceGraph(aaSet, pepSeq);
+            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
             Console.WriteLine(graph.GetUnmodifiedSequenceComposition());
             Assert.AreEqual(graph.GetUnmodifiedSequenceComposition(), aaSet.GetComposition(pepSeq));
 
             Console.WriteLine("Sequence Compositions:");
-            int index = -1;
+            var index = -1;
             foreach (var composition in graph.GetSequenceCompositions())
             {
                 Console.WriteLine(++index+": "+composition);

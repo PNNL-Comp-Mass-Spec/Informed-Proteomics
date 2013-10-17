@@ -273,10 +273,14 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength)
+        {
+            return SequencesAsStrings(0, minLength, maxLength);
+        }
 
         public IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength, int maxLength)
         {
-            var encoding = System.Text.Encoding.ASCII;
+            var encoding = Encoding.ASCII;
 
             foreach (var seqArr in EntireSequences())
             {

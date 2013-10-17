@@ -47,8 +47,7 @@ namespace InformedProteomics.DIA.Search
                 foreach (var annotation in PeptideEnumerator)
                 {
                     // annotation: pre + "." + peptide + "." + post (e.g. R.PEPTIDER.G)
-                    var peptide = annotation.Substring(2, annotation.Length - 4);
-                    var seqGraph = new SequenceGraph(AminoAcidSet, peptide);
+                    var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
                     foreach (var sequenceComposition in seqGraph.GetSequenceCompositions())
                     {
                         for (var precursorCharge = MinCharge; precursorCharge <= MaxCharge; precursorCharge++)

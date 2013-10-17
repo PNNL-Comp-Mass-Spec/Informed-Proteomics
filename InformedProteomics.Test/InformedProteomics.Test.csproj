@@ -102,6 +102,7 @@
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="TestParsingSpectra.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
+    <Compile Include="TestSequenceGraph.cs" />
     <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestImsScoring.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />

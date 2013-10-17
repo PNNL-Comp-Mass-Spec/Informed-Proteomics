@@ -323,7 +323,7 @@ namespace InformedProteomics.DIA.Search
         }
     }
 
-    internal class MsGfPlusHeaderInformation
+    public class MsGfPlusHeaderInformation
     {
         public MsGfPlusHeaderInformation(string header)
         {
@@ -332,6 +332,7 @@ namespace InformedProteomics.DIA.Search
             NumColumns = token.Length;
 
             SpecFileColNum = -1;
+            PrecursorColNum = -1;
             PeptideColNum = -1;
             ScanNumColNum = -1;
             ChargeColNum = -1;
@@ -344,6 +345,7 @@ namespace InformedProteomics.DIA.Search
             for (var i = 0; i < token.Length; i++)
             {
                 if (token[i].Equals("#SpecFile")) SpecFileColNum = i;
+                else if (token[i].StartsWith("Precursor")) PrecursorColNum = i;
                 else if (token[i].Equals("Peptide")) PeptideColNum = i;
                 else if (token[i].Equals("ScanNum")) ScanNumColNum = i;
                 else if (token[i].Equals("Charge")) ChargeColNum = i;
@@ -356,8 +358,9 @@ namespace InformedProteomics.DIA.Search
         }
 
         public int SpecFileColNum { get; private set; }
-        public int PeptideColNum { get; private set; }
         public int ScanNumColNum { get; private set; }
+        public int PrecursorColNum { get; private set; }
+        public int PeptideColNum { get; private set; }
         public int ChargeColNum { get; private set; }
         public int ProteinColNum { get; private set; }
         public int DeNovoScoreColNum { get; private set; }
