@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using NUnit.Framework;
@@ -34,6 +35,21 @@ namespace InformedProteomics.Test
             foreach (var composition in seqGraph.GetSequenceCompositionsWithNTermCleavage(1))
             {
                 Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
+            }
+        }
+
+        [Test]
+        public void SimpleTest()
+        {
+            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+
+            var aaSet = new AminoAcidSet();
+            // Create a sequence graph
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+            foreach (var composition in seqGraph.GetSequenceCompositions())
+            {
+                var ion = new Ion(composition + Composition.H2O, 11);
+                Console.WriteLine("{0}\t{1}\t{2}", ion.GetMz(), ion.Composition, ion.Composition.GetMass());
             }
         }
     }

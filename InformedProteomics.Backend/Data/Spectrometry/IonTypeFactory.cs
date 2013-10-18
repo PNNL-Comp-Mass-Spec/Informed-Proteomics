@@ -53,7 +53,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     foreach (var neutralLoss in _neutralLosses)
                     {
-                        string name = baseIonType.Symbol + chargeStr + neutralLoss.Name;
+                        var name = baseIonType.Symbol + chargeStr + neutralLoss.Name;
                         var offsetComposition = baseIonType.OffsetComposition -
                                                         neutralLoss.Composition;
                         _ionTypeMap[name] = new IonType(name, offsetComposition, charge, baseIonType, neutralLoss);

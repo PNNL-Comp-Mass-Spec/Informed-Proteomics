@@ -135,6 +135,7 @@
     <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
     <Compile Include="Data\Spectrometry\ToleranceUnit.cs" />
+    <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPeak.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />

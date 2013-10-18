@@ -105,17 +105,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.Write(sb.ToString());
         }
 
-        //public void FilterNoise()
-        //{
-        //    Array.Sort(Peaks, new IntensityComparer());
-        //    var medianIntPeak = Peaks[Peaks.Length/2];
-        //    var noiseLevel = medianIntPeak.Intensity;
+        public void FilterNoise(double signalToNoiseRatio)
+        {
+            Array.Sort(Peaks, new IntensityComparer());
+            var medianIntPeak = Peaks[Peaks.Length / 2];
+            var noiseLevel = medianIntPeak.Intensity;
 
-        //    var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel*3)).ToList();
+            var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel * signalToNoiseRatio)).ToList();
 
-        //    filteredPeaks.Sort();
-        //    Peaks = filteredPeaks.ToArray();
-        //}
+            filteredPeaks.Sort();
+            Peaks = filteredPeaks.ToArray();
+        }
 
         private int _msLevel = 1;
     }
