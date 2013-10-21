@@ -28,7 +28,7 @@ namespace InformedProteomics.TopDown.Scoring
             _xicCorrScoreCounterDecoy = new Dictionary<int, Dictionary<int, int>>();
         }
 
-        private void subTrain(Dictionary<int, Dictionary<int, Composition>> dictionary, bool isTarget)
+        private void SubTrain(Dictionary<int, Dictionary<int, Composition>> dictionary, bool isTarget)
         {
             Dictionary<int, int> missingXicCounter;
             Dictionary<int, Dictionary<int, int>> corrScoreCounter;
@@ -67,12 +67,9 @@ namespace InformedProteomics.TopDown.Scoring
                             t[score] = t[score] + 1;
                         }
                     }
-                    
-                    
                 }
             }
         }
-        
     }
 }
  

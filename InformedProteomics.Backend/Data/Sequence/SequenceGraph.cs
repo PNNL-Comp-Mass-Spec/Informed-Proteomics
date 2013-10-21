@@ -17,7 +17,13 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
-            var sequence = annotation.Substring(2, annotation.Length - 4);
+            var s = annotation.IndexOf('.');
+            s = s > 1 ? -1 : s;
+            var e = annotation.LastIndexOf('.');
+            e = e <= 1 ? annotation.Length : e;
+
+            var sequence = annotation.Substring(s + 1, e - s - 1);
+            
             var nTerm = annotation[0] == FastaDatabase.Delimiter
                                   ? AminoAcid.ProteinNTerm
                                   : AminoAcid.PeptideNTerm;
