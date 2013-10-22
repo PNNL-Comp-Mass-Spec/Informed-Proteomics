@@ -17,6 +17,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
+            if (annotation == null || annotation.Length <= 0) return null;
             var s = annotation.IndexOf('.');
             s = s > 1 ? -1 : s;
             var e = annotation.LastIndexOf('.');

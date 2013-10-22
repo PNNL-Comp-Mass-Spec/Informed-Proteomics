@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
@@ -26,9 +27,11 @@ namespace InformedProteomics.Test
             const int minCharge = 5; // 3
             const int maxCharge = 15; // 67
             const int numMaxModsPerProtein = 0; // 6
-            var precursorTolerance = new Tolerance(20);
-            //const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.fasta";
-            const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            var precursorTolerance = new Tolerance(10);
+            const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.fasta";
+            //const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.icdecoy.KR.fasta";
+            
+            //const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             // const string dbFilePath =
             //    @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
 
@@ -61,14 +64,15 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var targetDb = new FastaDatabase(dbFilePath);
-            //targetDb.CreateDecoyDatabase(Enzyme.Trypsin);
+         //   targetDb.CreateDecoyDatabase(Enzyme.Trypsin);
+         //   System.Environment.Exit(1);
             var indexedDb = new IndexedDatabase(targetDb);
 
             var numProteins = 0;
             long totalProtCompositions = 0;
             long numXics = 0;
-            TopDownScorer.MaxCharge = 60;
-            TopDownScorer.MinCharge = 3;
+            TopDownScorer.MaxCharge = 25;
+            TopDownScorer.MinCharge = 8;
 
             sw.Reset();
             sw.Start();
@@ -78,7 +82,7 @@ namespace InformedProteomics.Test
             {
 
                 ++numProteins;
-                if (numProteins > 4197) break;
+                //if (numProteins > 2000) break;
 
                 if (numProteins % 1000 == 0)
                 {
@@ -87,7 +91,11 @@ namespace InformedProteomics.Test
 
                 //Console.WriteLine(protAnnotation);
 
+
                 var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                
+                //Console.WriteLine(seqGraph.GetSequenceCompositions()[0]);
+                
                 if (seqGraph == null) continue;
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
@@ -96,7 +104,7 @@ namespace InformedProteomics.Test
                     foreach (var protComposition in protCompositions)
                     {
                         totalProtCompositions++;
-
+                       // Console.WriteLine(protComposition);
                         var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
                         var score = scorer.GetScore();
 
@@ -115,28 +123,111 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestMsAlignPlusResults()
+        {
+            TopDownScorer.MaxCharge = 25;
+            TopDownScorer.MinCharge = 8;
+
+            const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
+            const string msAlignPlusResultPath = @"C:\workspace\TopDown\E_coli_iscU_60_mock_MSAlign_ResultTable_sam.txt";
+
+            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+
+
+            var searchModifications = new List<SearchModification>
+                {
+                    //pyroGluQ,
+                    dehydro,
+                    cysteinylC,
+                    glutathioneC,
+                    //oxM
+                };
+            var aaSet = new AminoAcidSet(searchModifications, 0);
+            var precursorTolerance = new Tolerance(10);
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
+            var writer = new StreamWriter(msAlignPlusResultPath+ ".txt");
+            var reader = new StreamReader(msAlignPlusResultPath);
+
+            string s;
+
+            while ((s=reader.ReadLine())!=null)
+            {
+                if (s.StartsWith("Data_file_name	")) 
+                { 
+                    writer.WriteLine(s+"\tScore");
+                    continue; 
+                }
+                var token = s.Split('\t');
+                var annotation = token[13];
+              //  Console.WriteLine("***\t" + annotation);
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
+                if (seqGraph == null)
+                {
+                    writer.WriteLine(s+"\tN/A");
+                    continue;
+                }
+
+                var protCompositions = seqGraph.GetSequenceCompositions();
+                
+                var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance, null);
+                var score = scorer.GetScore();
+
+                writer.WriteLine(s+"\t"+score);
+                Console.WriteLine(score);
+
+            }
+            
+
+            writer.Close();
+            reader.Close();
+        }
+        
+        [Test]
         public void TestTopDownScoring()
         {
+            TopDownScorer.MaxCharge = 25;
+            TopDownScorer.MinCharge = 8;
+
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
-            const string protAnnotation = "K.METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK.K";
-            var aaSet = new AminoAcidSet();
-            //..METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK
+            const string protAnnotation = "A.AHAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.";
+            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
 
+            
+            var searchModifications = new List<SearchModification>
+                {
+                    //pyroGluQ,
+                    dehydro,
+                    cysteinylC,
+                    glutathioneC,
+                    //oxM
+                };
+            //var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+            var aaSet = new AminoAcidSet(searchModifications, 0);
+
+            
             var precursorTolerance = new Tolerance(10);
-
+            //Console.WriteLine(aaSet.GetAminoAcid('C').GetComposition());
             // Create a sequence graph
-            var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
-            var seqGraph = SequenceGraph.CreateGraph(aaSet, protSeq);
+            //var protSeq = protAnnotation.Substring(2, protAnnotation.Length - 4);
 
-            TopDownScorer.MaxCharge = 60;
-            TopDownScorer.MinCharge = 3;
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
 
+          //  TopDownScorer.MaxCharge = 60;
+          //  TopDownScorer.MinCharge = 3;
+            var run = new LcMsRun(new XCaliburReader(specFilePath));
+            
             foreach (var protComposition in seqGraph.GetSequenceCompositions())
             {
                 var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();
                 Console.WriteLine("Composition\t{0}", protComposition);
                 Console.WriteLine("MostAbundantIsotopeIndex\t{0}", mostAbundantIsotopeIndex);
+
+                Console.WriteLine(new Ion(protComposition + Composition.H2O, 11).GetIsotopeMz(mostAbundantIsotopeIndex));
+
                 Console.WriteLine();
 
                 //for (var charge = TopDownScorer.MinCharge; charge <= TopDownScorer.MaxCharge; charge++)

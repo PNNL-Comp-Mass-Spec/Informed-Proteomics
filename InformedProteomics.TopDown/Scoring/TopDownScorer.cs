@@ -10,8 +10,8 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class TopDownScorer //TODO consider binning .... 
     {
-        public static int MinCharge = 14;
-        public static int MaxCharge = 16; 
+        public static int MinCharge = 8;
+        public static int MaxCharge = 25; 
 
         private readonly LcMsRun _run;
         private readonly Tolerance _tolerance;
@@ -239,7 +239,7 @@ namespace InformedProteomics.TopDown.Scoring
                         FilterXic(truncatedXics[charge - MinCharge][charge - MinCharge],
                                   truncatedXics[charge - MinCharge][charge2 - MinCharge]))
                     {
-                        diff = _factory == null ? -1 : _factory.GetMissingXicScore(charge2);
+                        diff = _factory == null ? -.3 : _factory.GetMissingXicScore(charge2);
                       //  Console.WriteLine(charge + "\t" + charge2 + "\t" + "filtered" + "\t**");
 
                     }
