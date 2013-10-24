@@ -10,12 +10,12 @@ namespace InformedProteomics.Backend.Database
 {
     public class FastaDatabase
     {
-        public static readonly string SeqFileExtension = ".icseq";
-        public static readonly string AnnotationFileExtension = ".icanno";
-        public static readonly string DecoyDatabaseFileExtension = ".icdecoy.fasta";
-        public static readonly string DecoyProteinPrefix = "XXX";
-        public static readonly byte Delimiter = (byte)'_';
-        public static readonly byte LastCharacter = (byte)'~';
+        public const string SeqFileExtension = ".icseq";
+        public const string AnnotationFileExtension = ".icanno";
+        public const string DecoyDatabaseFileExtension = ".icdecoy.fasta";
+        public const string DecoyProteinPrefix = "XXX";
+        public const byte Delimiter = (byte)'_';
+        public const byte LastCharacter = (byte)'~';
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 

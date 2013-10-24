@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
@@ -17,13 +18,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
-            if (annotation == null || annotation.Length <= 0) return null;
-            var s = annotation.IndexOf('.');
-            s = s > 1 ? -1 : s;
-            var e = annotation.LastIndexOf('.');
-            e = e <= 1 ? annotation.Length : e;
-
-            var sequence = annotation.Substring(s + 1, e - s - 1);
+            const char delimiter = (char)FastaDatabase.Delimiter;
+            if (annotation == null || !Regex.IsMatch(annotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$")) return null;
             
             var nTerm = annotation[0] == FastaDatabase.Delimiter
                                   ? AminoAcid.ProteinNTerm
@@ -32,6 +28,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                                   ? AminoAcid.ProteinCTerm
                                   : AminoAcid.PeptideCTerm;
 
+            var sequence = annotation.Substring(2, annotation.Length - 4);
             var seqGraph = new SequenceGraph(aaSet, sequence.Length);
             seqGraph.AddAminoAcid(cTerm.Residue);
             for (var i = sequence.Length - 1; i >= 0; i--)

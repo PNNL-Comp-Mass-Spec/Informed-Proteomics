@@ -55,16 +55,16 @@ namespace InformedProteomics.Test
             var searchModifications = new List<SearchModification>
             {
                 pyroGluQ,
-                dehydro,
-                cysteinylC,
-                glutathioneC,
-                oxM
+                //dehydro,
+                //cysteinylC,
+                //glutathioneC,
+                //oxM
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             const string protAnnotation =
-                "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
+                "_.Q._";
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
@@ -78,7 +78,11 @@ namespace InformedProteomics.Test
             foreach (var composition in seqGraph.GetAllNodeCompositions())
             {
                 numNodes++;
-                if (composition.GetMass() < 0) Console.WriteLine(composition);
+
+                //if (composition.GetMass() < 0)
+                {
+                    Console.WriteLine(composition);
+                }
             }
             Console.WriteLine("NumNodes: {0}", numNodes);
         }
