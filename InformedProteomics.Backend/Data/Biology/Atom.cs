@@ -75,9 +75,10 @@ namespace InformedProteomics.Backend.Data.Biology
             return AtomMap[code];
         }
 
-        private static readonly Dictionary<string,Atom> AtomMap = new Dictionary<string, Atom>();
+        private static readonly Dictionary<string, Atom> AtomMap;
         static Atom()
         {
+            AtomMap = new Dictionary<string, Atom>();
             foreach (var atom in AtomArr)
             {
                 AtomMap.Add(atom.Code,atom);

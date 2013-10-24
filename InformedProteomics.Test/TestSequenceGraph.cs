@@ -64,18 +64,19 @@ namespace InformedProteomics.Test
 
             //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             const string protAnnotation =
-                "_.Q._";
+                "_.QQ._";
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
-            Console.WriteLine("NumCompositions: {0}", seqCompositions.Length);
-            //foreach (var composition in seqCompositions)
-            //{
-            //    Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
-            //}
+            Console.WriteLine("SequenceCompositions: {0}", seqCompositions.Length);
+            foreach (var composition in seqCompositions)
+            {
+                Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
+            }
 
+            Console.WriteLine("FragmentCompositions");
             var numNodes = 0;
-            foreach (var composition in seqGraph.GetAllNodeCompositions())
+            foreach (var composition in seqGraph.GetAllFragmentNodeCompositions())
             {
                 numNodes++;
 

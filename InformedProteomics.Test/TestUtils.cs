@@ -332,5 +332,11 @@ namespace InformedProteomics.Test
         {
             Console.WriteLine("{0}", Math.Exp(13021));
         }
+
+        [Test]
+        public void TestAtom()
+        {
+            Console.WriteLine(Atom.Get("C").Mass);
+        }
     }
 }

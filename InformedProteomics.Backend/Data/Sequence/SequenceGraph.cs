@@ -77,20 +77,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Gets the number of possible product compositions of the current sequence
-        /// </summary>
-        /// <returns>the number of possible product compositions</returns>
-        public int GetNumFragmentCompositions()
-        {
-            var numNodes = 0;
-            for (var index = 2; index < _graph.Length - 2; index++)
-            {
-                numNodes += _graph[index].Length;
-            }
-            return numNodes;
-        }
-
-        /// <summary>
         /// Gets all possible compositions of the current sequence
         /// </summary>
         /// <returns>all possible compositions</returns>
@@ -162,7 +148,21 @@ namespace InformedProteomics.Backend.Data.Sequence
             return precursorIonScore + fragmentScore;
         }
 
-        public IEnumerable<Composition> GetAllNodeCompositions()
+        /// <summary>
+        /// Gets the number of possible product compositions of the current sequence
+        /// </summary>
+        /// <returns>the number of possible product compositions</returns>
+        public int GetNumFragmentCompositions()
+        {
+            var numNodes = 0;
+            for (var index = 2; index < _graph.Length - 2; index++)
+            {
+                numNodes += _graph[index].Length;
+            }
+            return numNodes;
+        }
+
+        public IEnumerable<Composition> GetAllFragmentNodeCompositions()
         {
             for (var seqIndex = 2; seqIndex < _maxIndex - 2; seqIndex++)
             {
@@ -172,6 +172,14 @@ namespace InformedProteomics.Backend.Data.Sequence
                 }
             }
         }
+
+        //public IEnumerable<Composition> GetFragmentCompositions(int modIndex, int numNTermCleavages)
+        //{
+        //    var seqIndex = _index - 1 - numNTermCleavages;
+        //    var sink = _graph[seqIndex][modIndex];
+
+        //    var fragmentCompositions = new List<Composition>();
+        //}
 
         private double GetFragmentScore(int seqIndex, int nodeIndex, double[][] nodeScore, double?[][] maxScore)
         {
