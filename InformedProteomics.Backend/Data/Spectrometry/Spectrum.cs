@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -47,6 +48,60 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return FindPeak(minMz, maxMz);
         }
 
+        public bool ContainsIon(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+            var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
+            var baseIsotopePeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
+            if (baseIsotopePeakIndex < 0) return false;
+
+            // go down
+            var peakIndex = baseIsotopePeakIndex;
+            for (var isotopeIndex = baseIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
+            {
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex-1; i >= 0; i--)
+                {
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz < minMz) return false;
+                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // go up
+            peakIndex = baseIsotopePeakIndex;
+            for (var isotopeIndex = baseIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
+            {
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex + 1; i < Peaks.Length; i++)
+                {
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz > maxMz) return false;
+                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
         /// <summary>
         /// Finds the maximum intensity peak within the specified range
         /// </summary>
@@ -55,39 +110,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>maximum intensity peak within the range</returns>
         public Peak FindPeak(double minMz, double maxMz)
         {
-            var index = Array.BinarySearch(Peaks, new Peak((minMz+maxMz)/2, 0));
-            if (index < 0) index = ~index;
-
-            Peak bestPeak = null;
-            var bestIntensity = 0.0;
-
-            // go down
-            var i = index - 1;
-            while (i >= 0 && i < Peaks.Length)
-            {
-                if (Peaks[i].Mz <= minMz) break;
-                if (Peaks[i].Intensity > bestIntensity)
-                {
-                    bestIntensity = Peaks[i].Intensity;
-                    bestPeak = Peaks[i];
-                }
-                --i;
-            }
-
-            // go up
-            i = index;
-            while (i >= 0 && i < Peaks.Length)
-            {
-                if (Peaks[i].Mz >= maxMz) break;
-                if (Peaks[i].Intensity > bestIntensity)
-                {
-                    bestIntensity = Peaks[i].Intensity;
-                    bestPeak = Peaks[i];
-                }
-                ++i;
-            }
-            return bestPeak;
+            var peakIndex = FindPeakIndex(minMz, maxMz);
+            if (peakIndex < 0) return null;
+            return Peaks[peakIndex];
         }
+
+
 
         public void Display()
         {
@@ -118,5 +146,49 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         private int _msLevel = 1;
+
+        private int FindPeakIndex(double mz, Tolerance tolerance)
+        {
+            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var minMz = mz - tolTh;
+            var maxMz = mz + tolTh;
+            return FindPeakIndex(minMz, maxMz);
+        }
+
+        private int FindPeakIndex(double minMz, double maxMz)
+        {
+            var index = Array.BinarySearch(Peaks, new Peak((minMz + maxMz) / 2, 0));
+            if (index < 0) index = ~index;
+
+            var bestPeakIndex = -1;
+            var bestIntensity = 0.0;
+
+            // go down
+            var i = index - 1;
+            while (i >= 0 && i < Peaks.Length)
+            {
+                if (Peaks[i].Mz <= minMz) break;
+                if (Peaks[i].Intensity > bestIntensity)
+                {
+                    bestIntensity = Peaks[i].Intensity;
+                    bestPeakIndex = i;
+                }
+                --i;
+            }
+
+            // go up
+            i = index;
+            while (i >= 0 && i < Peaks.Length)
+            {
+                if (Peaks[i].Mz >= maxMz) break;
+                if (Peaks[i].Intensity > bestIntensity)
+                {
+                    bestIntensity = Peaks[i].Intensity;
+                    bestPeakIndex = i;
+                }
+                ++i;
+            }
+            return bestPeakIndex;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -19,11 +20,13 @@ namespace InformedProteomics.Test
 
             // Configure amino acid set
             var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
             {
                 methylK,
+                //pyroGluQ,
                 oxM
             };
 
@@ -39,18 +42,45 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void SimpleTest()
+        public void TestBuildingSequenceGraphLongProtein()
         {
-            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+            // Configure amino acid set
+            const int numMaxModsPerProtein = 6;
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
-            var aaSet = new AminoAcidSet();
-            // Create a sequence graph
-            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
-            foreach (var composition in seqGraph.GetSequenceCompositions())
+            var searchModifications = new List<SearchModification>
             {
-                var ion = new Ion(composition + Composition.H2O, 11);
-                Console.WriteLine("{0}\t{1}\t{2}", ion.GetMz(), ion.Composition, ion.Composition.GetMass());
+                pyroGluQ,
+                dehydro,
+                cysteinylC,
+                glutathioneC,
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+            const string protAnnotation =
+                "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
+
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+            var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
+            Console.WriteLine("NumCompositions: {0}", seqCompositions.Length);
+            //foreach (var composition in seqCompositions)
+            //{
+            //    Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
+            //}
+
+            var numNodes = 0;
+            foreach (var composition in seqGraph.GetAllNodeCompositions())
+            {
+                numNodes++;
+                if (composition.GetMass() < 0) Console.WriteLine(composition);
             }
+            Console.WriteLine("NumNodes: {0}", numNodes);
         }
     }
 }

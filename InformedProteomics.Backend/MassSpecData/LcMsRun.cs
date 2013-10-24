@@ -10,14 +10,25 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
+            return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
+        }
+
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, 
+            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
+        {
             var pbfFilePath = Path.ChangeExtension(specFilePath, ".pbf");
             if (File.Exists(pbfFilePath))
             {
-                return new LcMsRun(new PbfReader(pbfFilePath));
+                return new LcMsRun(new PbfReader(pbfFilePath),
+                    precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
             }
 
             LcMsRun run;
-            if (dataType == MassSpecDataType.XCaliburRun) run = new LcMsRun(new XCaliburReader(specFilePath));
+            if (dataType == MassSpecDataType.XCaliburRun)
+            {
+                run = new LcMsRun(new XCaliburReader(specFilePath), 
+                    precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+            }
             else run = null;
 
             if(run != null) run.WriteTo(pbfFilePath);
@@ -27,7 +38,12 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public const double IsolationWindowBinningFactor = 10;
 
-        public LcMsRun(IMassSpecDataReader massSpecDataReader)
+        public LcMsRun(IMassSpecDataReader massSpecDataReader) : this(massSpecDataReader, 0.0, 0.0)
+        {
+            
+        }
+
+        public LcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
@@ -42,20 +58,23 @@ namespace InformedProteomics.Backend.MassSpecData
             foreach (var spec in massSpecDataReader.ReadAllSpectra())
             {
                 //Console.WriteLine("Reading Scan {0}", spec.ScanNum);
-                _scanNumSpecMap.Add(spec.ScanNum, spec);
                 _msLevel[spec.ScanNum] = spec.MsLevel;
                 if (spec.MsLevel == 1)
                 {
+                    if (precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(precursorSignalToNoiseRatioThreshold);
                     foreach (var peak in spec.Peaks)
                     {
                         _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
                     }
+                    _scanNumSpecMap.Add(spec.ScanNum, spec);
                 }
                 else if(spec.MsLevel == 2)
                 {
                     var productSpec = spec as ProductSpectrum;
+
                     if (productSpec != null)
                     {
+                        if (productSignalToNoiseRatioThreshold > 0.0) productSpec.FilterNoise(productSignalToNoiseRatioThreshold);
                         var isolationInfo = productSpec.IsolationWindow;
                         var minBinNum = (int)(isolationInfo.MinMz*IsolationWindowBinningFactor);
                         var maxBinNum = (int)((isolationInfo.MaxMz+0.49999999)*IsolationWindowBinningFactor);
@@ -69,6 +88,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             }
                             scanNumList.Add(productSpec.ScanNum);
                         }
+                        _scanNumSpecMap.Add(spec.ScanNum, productSpec);
                     }
                 }
 

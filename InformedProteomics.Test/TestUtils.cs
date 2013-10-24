@@ -161,7 +161,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
-            const string sequence = "IVDTNGAGDAFAGGFMAGLTK";
+            //const string sequence = "PEPTIDE";
+            const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
             //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -204,6 +205,7 @@ namespace InformedProteomics.Test
         {
             //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
             const string molFormula = "C83H136N22O24S1"; 
+//            const string molFormula = "C4195H6470N1164O1213S34";
 
             var isoCalc = IsotopicDistributionCalculator.Instance;
             var profile = isoCalc.GetIsotopePattern(molFormula);
@@ -232,11 +234,17 @@ namespace InformedProteomics.Test
             //        new Tuple<Atom, short>(Atom.Get("15N"), 1),
             //    };
             //var composition = new Composition(149, 244, 44, 57, 0, additionalElements);
-            var composition = new Composition(83, 136, 22, 24, 1);
+//            var composition = new Composition(83, 136, 22, 24, 1);
+            //var composition = new Composition(210, 323, 54, 61, 0);
+            var composition = new Composition(419, 699, 119, 129, 1);
+            const int charge = 14;
+            var ion = new Ion(composition + Composition.H2O, charge);
             var ff = composition.GetIsotopomerEnvelop();
+            var isotopeIndex = -1;
             foreach (var ii in ff)
             {
-                Console.WriteLine(ii);
+                ++isotopeIndex;
+                Console.WriteLine("{0}: {1}\t{2}", isotopeIndex, ion.GetIsotopeMz(isotopeIndex), ii);
             }
         }
 
@@ -315,6 +323,12 @@ namespace InformedProteomics.Test
             Console.WriteLine((byte)activation);
             Console.WriteLine(code);
             Console.WriteLine((ActivationMethod)code);
+        }
+
+        [Test]
+        public void TestOverflow()
+        {
+            Console.WriteLine("{0}", Math.Exp(13021));
         }
     }
 }

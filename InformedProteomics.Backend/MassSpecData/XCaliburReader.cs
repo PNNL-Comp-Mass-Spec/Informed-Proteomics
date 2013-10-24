@@ -10,7 +10,6 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         // Parameters for centroiding spectra
         public const int PeakToBackgroundRatio = 0;
-        public const int SignalToNoiseRatioThreshold = 3;
 
         public XCaliburReader(string filePath)
         {
@@ -112,12 +111,13 @@ namespace InformedProteomics.Backend.MassSpecData
             var msLevel = ReadMsLevel(scanNum);
             if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
 
-            return new ProductSpectrum(mzArr, intensityArr, scanNum)
+            var productSpec = new ProductSpectrum(mzArr, intensityArr, scanNum)
                 {
                     MsLevel = msLevel,
                     ActivationMethod = GetActivationMethod(scanNum),
                     IsolationWindow = ReadPrecursorInfo(scanNum)
                 };
+            return productSpec;
         }
 
         /// <summary>

@@ -24,29 +24,39 @@ namespace InformedProteomics.TopDown.Scoring
         public double GetFragmentScore(Ion precursorIon, Composition suffixFragmentComposition)
         {
             var score = 0.0;
-            var prefixFragmentComposition = precursorIon.Composition - suffixFragmentComposition;
-            for (var charge = _minCharge; charge <= _maxCharge; charge++)
-            {
-                foreach (var baseIonType in BaseIonTypes)
-                {
-                    var fragmentComposition = baseIonType.IsPrefix
-                                  ? prefixFragmentComposition
-                                  : suffixFragmentComposition;
-                    var ion = new Ion(fragmentComposition + baseIonType.OffsetComposition, charge);
-                    var isotopes = ion.GetIsotopes(RelativeIsotopeIntensityThreshold);
 
-                    var allIonsExist = true;
-                    foreach (var isotope in isotopes)
+            var prefixFragmentComposition = precursorIon.Composition - suffixFragmentComposition;
+            foreach (var baseIonType in BaseIonTypes)
+            {
+                var fragmentComposition = baseIonType.IsPrefix
+                              ? prefixFragmentComposition + baseIonType.OffsetComposition
+                              : suffixFragmentComposition + baseIonType.OffsetComposition;
+                fragmentComposition.ComputeApproximateIsotopomerEnvelop();
+
+                if (fragmentComposition.GetMass() < 0)
+                {
+                    Console.WriteLine("************* {0}, {1}, {2}", suffixFragmentComposition, fragmentComposition, baseIonType.Symbol);
+                }
+                for (var charge = _minCharge; charge <= _maxCharge; charge++)
+                {
+                    var ion = new Ion(fragmentComposition, charge);
+                    if (_ms2Spec.ContainsIon(ion, _tolerance, RelativeIsotopeIntensityThreshold))
                     {
-                        var isotopeIndex = isotope.Item1;
-                        var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                        if (_ms2Spec.FindPeak(isotopeMz, _tolerance) == null)
-                        {
-                            allIonsExist = false;
-                            break;
-                        }
+                        score += 1.0;
                     }
-                    if (allIonsExist) score += 1.0;
+                    //var isotopes = ion.GetIsotopes(RelativeIsotopeIntensityThreshold);
+                    //var allIonsExist = true;
+                    //foreach (var isotope in isotopes)
+                    //{
+                    //    var isotopeIndex = isotope.Item1;
+                    //    var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                    //    if (_ms2Spec.FindPeak(isotopeMz, _tolerance) == null)
+                    //    {
+                    //        allIonsExist = false;
+                    //        break;
+                    //    }
+                    //}
+                    //if (allIonsExist) score += 1.0;
                 }
             }
             return score;

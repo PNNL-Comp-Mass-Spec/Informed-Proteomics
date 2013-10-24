@@ -12,6 +12,14 @@ namespace InformedProteomics.Test
     internal class TestParsingSpectra
     {
         [Test]
+        public void TestPeakFiltering()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            run.GetSpectrum(3385).Display();
+        }
+
+        [Test]
         public void TestSpecFiltering()
         {
             var sw = new System.Diagnostics.Stopwatch();

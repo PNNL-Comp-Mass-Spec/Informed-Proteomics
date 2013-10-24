@@ -22,7 +22,28 @@ namespace InformedProteomics.TopDown.Scoring
 
         public bool IsValid(Ion precursorIon, int scanNum)
         {
-            if(Run.GetMsLevel(scanNum) != 2) return false;
+            if (Run.GetMsLevel(scanNum) != 2) return false;
+            var precursorScanNum = Run.GetPrecursorScanNum(scanNum);
+            var nextMs1ScanNum = Run.GetNextScanNum(scanNum, 1);
+
+            var isValid =
+                IsValidForMs1Scan(precursorIon, precursorScanNum)
+                || IsValidForMs1Scan(precursorIon, nextMs1ScanNum);
+
+            //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMz(), precursorIon.Charge, scanNum, isValid);
+            return isValid;
+        }
+
+        private bool IsValidForMs1Scan(Ion precursorIon, int scanNum)
+        {
+            if (Run.GetMsLevel(scanNum) != 1) return true;
+            var spec = Run.GetSpectrum(scanNum);
+            return spec != null && spec.ContainsIon(precursorIon, MzTolerance, RelativeIsotopeIntensityThreshold);
+        }
+
+        public bool IsValid2(Ion precursorIon, int scanNum)
+        {
+            if (Run.GetMsLevel(scanNum) != 2) return false;
 
             var isotopes = precursorIon.GetIsotopes(RelativeIsotopeIntensityThreshold).ToArray();
 
@@ -30,14 +51,14 @@ namespace InformedProteomics.TopDown.Scoring
             var nextMs1ScanNum = Run.GetNextScanNum(scanNum, 1);
 
             var isValid =
-                IsValidForMs1Scan(precursorIon, precursorScanNum, isotopes)
-                || IsValidForMs1Scan(precursorIon, nextMs1ScanNum, isotopes);
+                IsValidForMs1Scan2(precursorIon, precursorScanNum, isotopes)
+                || IsValidForMs1Scan2(precursorIon, nextMs1ScanNum, isotopes);
 
             //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMz(), precursorIon.Charge, scanNum, isValid);
             return isValid;
         }
 
-        private bool IsValidForMs1Scan(Ion precursorIon, int scanNum, IEnumerable<Tuple<int,float>> isotopes)
+        private bool IsValidForMs1Scan2(Ion precursorIon, int scanNum, IEnumerable<Tuple<int, float>> isotopes)
         {
             if (Run.GetMsLevel(scanNum) != 1) return false;
             var spec = Run.GetSpectrum(scanNum);

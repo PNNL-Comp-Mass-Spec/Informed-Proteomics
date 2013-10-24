@@ -144,7 +144,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Composition GetComposition(string sequence)
         {
-            Composition composition = Composition.Zero;
+            var composition = Composition.Zero;
 
             foreach (char residue in sequence)
             {

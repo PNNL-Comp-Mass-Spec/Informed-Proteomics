@@ -18,76 +18,6 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
-        public void TestTopDownSearchOneProtein()
-        {
-            // Parameters
-            const int minCharge = 3;
-            const int maxCharge = 67;
-            var precursorIonTolerance = new Tolerance(10);
-            var productIonTolerance = new Tolerance(10);
-
-            // Configure amino acids
-            var aaSet = new AminoAcidSet();
-
-            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
-            const int scanNum = 810;
-
-            // Create a sequence graph
-            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
-            if (seqGraph == null)
-            {
-                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
-                return;
-            }
-
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
-
-            var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
-
-            var seqCompositionArr = seqGraph.GetSequenceCompositions();
-            for (var modIndex=0; modIndex<seqCompositionArr.Length; modIndex++)
-            {
-                var seqComposition = seqCompositionArr[modIndex];
-                Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.GetMass());
-
-                for (var charge = minCharge; charge <= maxCharge; charge++)
-                {
-                    var precursorIon = new Ion(seqComposition + Composition.H2O, charge);
-                    //Console.WriteLine("Charge: {0}, m/z: {1}", charge, precursorIon.GetMz());
-
-                    //foreach (var isotope in precursorIon.GetIsotopes(relativeIntensityThreshold: 0.1))
-                    //{
-                    //    Console.WriteLine("{0}\t{1}\t{2}", isotope.Item1, precursorIon.GetIsotopeMz(isotope.Item1), isotope.Item2);
-                    //}
-
-                    var bestScore = Double.NegativeInfinity;
-                    var bestScanNum = -1;
-                    foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
-                    {
-                        if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
-
-
-                        var spec = run.GetSpectrum(ms2ScanNum);
-                        spec.FilterNoise(signalToNoiseRatio: 1.5);
-                        var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 6);
-                        var score = seqGraph.GetScore(modIndex, 0, charge, scorer);
-
-                        if (score > bestScore)
-                        {
-                            bestScore = score;
-                            bestScanNum = ms2ScanNum;
-                        }
-                    }
-                    if (bestScore > 10)
-                    {
-                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMz(), bestScanNum, bestScore);
-                    }
-                }
-            }
-        }
-
-        [Test]
         public void TestTopDownSearch()
         {
             // Search parameters
@@ -95,8 +25,8 @@ namespace InformedProteomics.Test
             const int minLength = 7;
             const int maxLength = 1000;
             const int minCharge = 3; // 3
-            const int maxCharge = 67; // 67
-            const int numMaxModsPerProtein = 0; // 6
+            const int maxCharge = 40; // 67
+            const int numMaxModsPerProtein = 6; // 6
 
             var precursorTolerance = new Tolerance(10);
             var productIonTolerance = new Tolerance(10);
@@ -110,27 +40,27 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.Write("Reading raw file...");
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             // Configure amino acid set
-            //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
-            //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
-                {
-                    //pyroGluQ,
-                    //dehydro,
-                    //cysteinylC,
-                    //glutathioneC,
-                    //oxM
-                };
+            {
+                pyroGluQ,
+                dehydro,
+                cysteinylC,
+                glutathioneC,
+                oxM
+            };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var targetDb = new FastaDatabase(dbFilePath);
@@ -155,9 +85,15 @@ namespace InformedProteomics.Test
                 {
                     ++numProteins;
 
-                    //if (numProteins % 100 == 0)
+                    Console.WriteLine(protAnnotation);
+                    if (numProteins % 1 == 0)
                     {
                         Console.WriteLine("Processed {0} proteins", numProteins);
+                        sw.Stop();
+                        sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+                        Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+                        sw.Reset();
+                        sw.Start();
                     }
 
                     //Console.WriteLine(protAnnotation);
@@ -165,28 +101,30 @@ namespace InformedProteomics.Test
                     var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
                     if (seqGraph == null) continue;
 
+                    writer.WriteLine("Sequence\tComposition\tCharge\tBaseIsotopeMz\tScanNum\tNumMatches");
                     for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
                     {
                         var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);
-                        for(var modIndex=0; modIndex<protCompositions.Length; modIndex++)
-                        //foreach (var protComposition in protCompositions)
+                        for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
                         {
                             var protComposition = protCompositions[modIndex];
+                            var protCompositionWithH2O = protComposition + Composition.H2O;
+                            protCompositionWithH2O.GetIsotopomerEnvelop();
+
                             totalProtCompositions++;
                             for (var charge = minCharge; charge <= maxCharge; charge++)
                             {
                                 numPrecursorIons++;
-                                var precursorIon = new Ion(protComposition + Composition.H2O, charge);
+                                var precursorIon = new Ion(protCompositionWithH2O, charge);
 
                                 var bestScore = Double.NegativeInfinity;
                                 var bestScanNum = -1;
                                 foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
                                 {
                                     if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
-                                    
 
                                     var spec = run.GetSpectrum(ms2ScanNum);
-                                    spec.FilterNoise(signalToNoiseRatio: 1.5);
+                                    //spec.FilterNoise(signalToNoiseRatio: 1.5);
                                     var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 6);
                                     var score = seqGraph.GetScore(modIndex, 0, charge, scorer);
 
@@ -198,12 +136,18 @@ namespace InformedProteomics.Test
                                 }
                                 if (bestScore > 10)
                                 {
-                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation.Substring(numNTermCleavage + 2), charge, precursorIon.GetMz(), bestScanNum, bestScore);
+                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", 
+                                        protAnnotation.Substring(numNTermCleavage + 2, protAnnotation.Length-4-numNTermCleavage), 
+                                        precursorIon.Composition,
+                                        charge, 
+                                        precursorIon.GetBaseIsotopeMz(), 
+                                        bestScanNum, 
+                                        bestScore);
                                 }
                             }
                         }
                     }
-                }                
+                }
             }
 
             sw.Stop();
@@ -213,6 +157,124 @@ namespace InformedProteomics.Test
             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
+
+        [Test]
+        public void TestComputingIsotopomerEnvelop()
+        {
+            const string sequence =
+                "MRLNTLSPAEGSKKAGKRLGRGIGSGLGKTGGRGHKGQKSRSGGGVRRGFEGGQMPLYRRLPKFGFTSRKAAITAEIRLSDLAKVEGGVVDLNTLKAANIIGIQIEFAKVILAGEVTTPVTVRGLRVTKGARAAIEAAGGKIEE";
+            const int charge = 17;
+
+            var aaSet = new AminoAcidSet();
+            var composition = aaSet.GetComposition(sequence);
+
+            var precursorIon = new Ion(composition + Composition.H2O, charge);
+
+            Console.WriteLine("{0}\t{1}\t{2}", precursorIon.Composition, charge, precursorIon.GetMz());
+            foreach (var isotope in precursorIon.GetIsotopes(relativeIntensityThreshold: 0.05))
+            {
+                Console.WriteLine("{0}: {1}\t{2}", isotope.Item1, precursorIon.GetIsotopeMz(isotope.Item1), isotope.Item2);
+            }
+        }
+
+        [Test]
+        public void TestTopDownSearchOneProtein()
+        {
+            // Parameters
+            const int minCharge = 3;    // 3
+            const int maxCharge = 67;   // 67
+            var precursorIonTolerance = new Tolerance(10);
+            var productIonTolerance = new Tolerance(10);
+
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+
+            // Configure amino acids
+            //var aaSet = new AminoAcidSet();
+
+
+            // Configure amino acid set
+            const int numMaxModsPerProtein = 6;
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                pyroGluQ,
+                //dehydro,
+                //cysteinylC,
+                //glutathioneC,
+                //oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+            const string protAnnotation =
+                "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
+
+            // Create a sequence graph
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+            if (seqGraph == null)
+            {
+                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
+                return;
+            }
+
+            var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
+
+            var seqCompositionArr = seqGraph.GetSequenceCompositions();
+            Console.WriteLine("Length: {0}\tNumCompositions: {1}", protAnnotation.Length-4, seqCompositionArr.Length);
+
+            for (var modIndex = 0; modIndex < seqCompositionArr.Length; modIndex++)
+            {
+                var seqComposition = seqCompositionArr[modIndex];
+                var peptideComposition = seqComposition + Composition.H2O;
+                peptideComposition.GetIsotopomerEnvelop();
+
+                Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.GetMass());
+
+                //if (Math.Abs(seqComposition.GetMass() - 47162.1844822) > 0.001) continue;
+
+                for (var charge = minCharge; charge <= maxCharge; charge++)
+                {
+                    var precursorIon = new Ion(peptideComposition, charge);
+
+                    var bestScore = Double.NegativeInfinity;
+                    var bestScanNum = -1;
+                    foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
+                    {
+                        if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
+
+                        var spec = run.GetSpectrum(ms2ScanNum);
+                        var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 6);
+                        var score = seqGraph.GetScore(modIndex, 0, charge, scorer);
+
+                        //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetBaseIsotopeMz(), precursorIon.Charge, ms2ScanNum, score);
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            bestScanNum = ms2ScanNum;
+                        }
+                    }
+                    if (bestScore > 10)
+                    {
+                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetBaseIsotopeMz(), bestScanNum, bestScore);
+                    }
+                }
+            }
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+        }
+
 
         [Test]
         public void CountProteins()

@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
         public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
-        public const int MaxNumIsotopes = 20;
+        public const int MaxNumIsotopes = 100;
         public const double IsotopeRelativeIntensityThreshold = 0.1;
 
         #region Constructors
@@ -214,7 +214,32 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             if (_mostIntenseIsotopomerIndex == -1) ComputeIsotopomerEnvelop();
             return _mostIntenseIsotopomerIndex;
-        } 
+        }
+
+        public void ComputeApproximateIsotopomerEnvelop()
+        {
+            if (_isotopomerEnvelop != null) return;
+
+            if (_approxIsotopomerEnvelope == null)
+            {
+                _approxIsotopomerEnvelope = new Dictionary<int, float[]>();
+                _approxIsotopomerEnvelopeBaseOffset = new Dictionary<int, int>();
+            }
+
+            var nominalMass = GetNominalMass();
+            float[] approxEnvelope;
+            if (_approxIsotopomerEnvelope.TryGetValue(nominalMass, out approxEnvelope))
+            {
+                _isotopomerEnvelop = approxEnvelope;
+                _mostIntenseIsotopomerIndex = _approxIsotopomerEnvelopeBaseOffset[nominalMass];
+            }
+            else
+            {
+                _isotopomerEnvelop = ComputeIsotopomerEnvelop();
+                _approxIsotopomerEnvelope[nominalMass] = _isotopomerEnvelop;
+                _approxIsotopomerEnvelopeBaseOffset[nominalMass] = _mostIntenseIsotopomerIndex;
+            }
+        }
 
         #endregion
 
@@ -263,7 +288,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 additionalElements = new Dictionary<Atom, short>(c2._additionalElements);
             }
-            return new Composition(numC, numH, numN, numO, numS, additionalElements);
+
+            var newComposition = new Composition(numC, numH, numN, numO, numS, additionalElements);
+
+            return newComposition;
         }
 
         /// <summary>
@@ -364,7 +392,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             if (_possibleIsotopeCombinations == null) _possibleIsotopeCombinations = GetPossibleIsotopeCombinations(MaxNumIsotopes);
 
-            var dist = new float[MaxNumIsotopes];
+            var dist = new double[MaxNumIsotopes];
             var means = new double[_possibleIsotopeCombinations[0][0].Length + 1];
             var exps = new double[means.Length];
             for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
@@ -374,14 +402,18 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             // This assumes that the envelop is unimodal.
-            var maxHeight = 0f;
+            var maxHeight = 0.0;
             var isotopeIndex = 0;
             var mostIntenseIsotopomerIndex = -1;
-            for (; isotopeIndex < dist.Length; isotopeIndex++)
+            for (; isotopeIndex < MaxNumIsotopes; isotopeIndex++)
             {
                 foreach (var isopeCombinations in _possibleIsotopeCombinations[isotopeIndex])
                 {
                     dist[isotopeIndex] += GetIsotopeProbability(isopeCombinations, means, exps);
+                }
+                if (Double.IsInfinity(dist[isotopeIndex]))
+                {
+                    throw new NotFiniteNumberException();
                 }
                 if (dist[isotopeIndex] > maxHeight)
                 {
@@ -410,23 +442,22 @@ namespace InformedProteomics.Backend.Data.Sequence
             var truncatedDist = new float[isotopeIndex];
             for (var i = 0; i < isotopeIndex; i++)
             {
-                truncatedDist[i] = dist[i]/maxHeight;
+                truncatedDist[i] = (float)(dist[i]/maxHeight);
             }
 
             return truncatedDist;
         }
 
-        private float GetIsotopeProbability(int[] number, double[] means, double[] exps)
+        private double GetIsotopeProbability(int[] number, double[] means, double[] exps)
         {
-            var prob = 1.0f;
+            var prob = 1.0;
             for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)
             {
                 var mean = means[i];
                 var exp = exps[i];
-                if (number[i - 1] == 0) prob *= (float) exp;
+                if (number[i - 1] == 0) prob *= exp;
                 else
                     prob *=
-                        (float)
                         (Math.Pow(mean, number[i - 1])*exp/SpecialFunctions.Factorial(number[i - 1]));
             }
             return prob;
@@ -482,6 +513,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             return possibleIsotopeCombinations;
         }
+
+        private static Dictionary<int, float[]> _approxIsotopomerEnvelope;
+        private static Dictionary<int, int> _approxIsotopomerEnvelopeBaseOffset;
+
         #endregion
     }
 }
