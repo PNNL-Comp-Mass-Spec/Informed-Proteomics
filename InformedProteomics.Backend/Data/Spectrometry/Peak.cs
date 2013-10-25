@@ -16,8 +16,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public int CompareTo(Peak other)
         {
-            if (Mz < other.Mz) return -1;
-            return Mz > other.Mz ? 1 : 0;
+	        return Mz.CompareTo(other.Mz);
         }
     }
 
@@ -28,8 +27,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     {
         public int Compare(Peak x, Peak y)
         {
-            if (x.Intensity < y.Intensity) return 1;
-            return x.Intensity > y.Intensity ? -1 : 0;
+	        return y.Intensity.CompareTo(x.Intensity);
         }
     }
 }

@@ -97,7 +97,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     var binNum = entry.Key;
                     var scanNumList = entry.Value;
-                    _isolationMzBinToScanNums[binNum] = scanNumList.ToArray();
+                    _isolationMzBinToScanNums[binNum] = scanNumList;
                 }
 
                 if (spec.ScanNum < minScanNum) minScanNum = spec.ScanNum;
