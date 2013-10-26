@@ -113,41 +113,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _prefixComposition[_index];
         }
 
-        public double GetScore(int modIndex, int numNTermCleavages, int charge, IScorer scorer)
-        {
-            var seqIndex = _index - 1 - numNTermCleavages;
-            var sink = _graph[seqIndex][modIndex];
-            var sequenceComposition = GetComposition(seqIndex, modIndex);
-            var precursorIon = new Ion(sequenceComposition + Composition.H2O, charge);
-            // Get 
-            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
-
-            var nodeScore = new double[_maxIndex][];
-            var maxScore = new double?[_maxIndex][];
-            for (var si = 0; si < _maxIndex; si++)
-            {
-                nodeScore[si] = new double[_graph[si].Length];
-                maxScore[si] = new double?[_graph[si].Length];
-                if (si <= 1)
-                {
-                    for (var ni = 0; ni < nodeScore[si].Length; ni++) nodeScore[si][ni] = 0.0;
-                }
-                else
-                {
-                    for (var ni = 0; ni < nodeScore[si].Length; ni++)
-                    {
-                        nodeScore[si][ni] = scorer.GetFragmentScore(precursorIon, GetComposition(si, ni));
-                    }
-                }
-            }
-            maxScore[0][0] = 0;
-
-            var fragmentScore =
-                sink.GetPrevNodeIndices()
-                    .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, nodeScore, maxScore));
-            return precursorIonScore + fragmentScore;
-        }
-
         /// <summary>
         /// Gets the number of possible product compositions of the current sequence
         /// </summary>
@@ -173,31 +138,91 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
-        //public IEnumerable<Composition> GetFragmentCompositions(int modIndex, int numNTermCleavages)
-        //{
-        //    var seqIndex = _index - 1 - numNTermCleavages;
-        //    var sink = _graph[seqIndex][modIndex];
+        public IEnumerable<Composition> GetFragmentCompositions(int modIndex, int numNTermCleavages)
+        {
+            var seqIndex = _index - 1 - numNTermCleavages;
 
-        //    var fragmentCompositions = new List<Composition>();
-        //}
+            var fragmentCompositions = new List<Composition>();
 
-        private double GetFragmentScore(int seqIndex, int nodeIndex, double[][] nodeScore, double?[][] maxScore)
+            var modIndexList = new HashSet<int> { modIndex };
+            for (var si = seqIndex; si >= 2; si--)
+            {
+                var newModIndexList = new HashSet<int>();
+                foreach (var mi in modIndexList)
+                {
+                    if (si < seqIndex) fragmentCompositions.Add(GetComposition(si, mi));
+                    var node = _graph[si][mi];
+                    foreach (var prevModIndex in node.GetPrevNodeIndices())
+                    {
+                        newModIndexList.Add(prevModIndex);
+                    }
+                }
+                modIndexList = newModIndexList;
+            }
+
+            return fragmentCompositions;
+        }
+        public double GetScore(int modIndex, int numNTermCleavages, int charge, IScorer scorer)
+        {
+            var seqIndex = _index - 1 - numNTermCleavages;
+            var sink = _graph[seqIndex][modIndex];
+            var sequenceComposition = GetComposition(seqIndex, modIndex);
+            var precursorIon = new Ion(sequenceComposition + Composition.H2O, charge);
+
+            // Get 
+            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
+
+            var nodeScore = new double?[_maxIndex][];
+            var maxScore = new double?[_maxIndex][];
+            for (var si = 0; si < _maxIndex; si++)
+            {
+                nodeScore[si] = new double?[_graph[si].Length];
+                maxScore[si] = new double?[_graph[si].Length];
+                if (si <= 1)
+                {
+                    for (var ni = 0; ni < nodeScore[si].Length; ni++) nodeScore[si][ni] = 0.0;
+                }
+                //else
+                //{
+                //    for (var mi = 0; mi < nodeScore[si].Length; mi++)
+                //    {
+                //        var nodeComposition = GetComposition(si, mi);
+                //        //if (nodeComposition.GetMass() > precursorIon.Composition.GetMass())
+                //        //{
+                //        //    Console.WriteLine("Debug");
+                //        //}
+                //        nodeScore[si][mi] = scorer.GetFragmentScore(precursorIon, nodeComposition);
+                //    }
+                //}
+            }
+            maxScore[0][0] = 0;
+
+            var fragmentScore =
+                sink.GetPrevNodeIndices()
+                    .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, precursorIon, scorer, nodeScore, maxScore));
+            return precursorIonScore + fragmentScore;
+        }
+
+        private double GetFragmentScore(int seqIndex, int nodeIndex, Ion precursorIon, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][nodeIndex];
             if (score != null) return (double)score;
 
             var node = _graph[seqIndex][nodeIndex];
-            var curNodeScore = nodeScore[seqIndex][nodeIndex];
+            var curNodeScore = nodeScore[seqIndex][nodeIndex] ?? 
+                (nodeScore[seqIndex][nodeIndex] = scorer.GetFragmentScore(precursorIon, GetComposition(seqIndex, nodeIndex)));
 
             var prevNodeScore = 0.0;
             if (node.GetPrevNodeIndices().Any())
             {
                 prevNodeScore =
                     node.GetPrevNodeIndices()
-                        .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, nodeScore, maxScore));
+                        .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, precursorIon, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][nodeIndex] = curNodeScore + prevNodeScore;
+// ReSharper disable PossibleInvalidOperationException
             return (double)maxScore[seqIndex][nodeIndex];
+// ReSharper restore PossibleInvalidOperationException
         }
 
         private Composition GetComposition(int seqIndex, int modIndex)

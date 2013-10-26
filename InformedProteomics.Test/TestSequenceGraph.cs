@@ -63,29 +63,29 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
+            //const string protAnnotation =
+            //    "_.QQ._";
+
             const string protAnnotation =
-                "_.QQ._";
+                "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
-            Console.WriteLine("SequenceCompositions: {0}", seqCompositions.Length);
-            foreach (var composition in seqCompositions)
-            {
-                Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
-            }
 
-            Console.WriteLine("FragmentCompositions");
-            var numNodes = 0;
-            foreach (var composition in seqGraph.GetAllFragmentNodeCompositions())
+            //for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
+            const int modIndex = 4;
             {
-                numNodes++;
+                var seqComposition = seqCompositions[modIndex];
+                Console.WriteLine("SequenceComposition: {0}", seqComposition);
 
-                //if (composition.GetMass() < 0)
+                foreach (var composition in seqGraph.GetFragmentCompositions(modIndex, 0))
                 {
-                    Console.WriteLine(composition);
+                    //if (composition.GetMass() > seqComposition.GetMass())
+                    {
+                        Console.WriteLine("***Seq: {0}, Frag: {1}", seqComposition, composition);
+                    }
                 }
             }
-            Console.WriteLine("NumNodes: {0}", numNodes);
         }
     }
 }

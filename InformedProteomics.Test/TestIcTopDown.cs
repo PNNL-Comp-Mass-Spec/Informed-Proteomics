@@ -25,7 +25,7 @@ namespace InformedProteomics.Test
             const int minLength = 7;
             const int maxLength = 1000;
             const int minCharge = 3; // 3
-            const int maxCharge = 40; // 67
+            const int maxCharge = 67;// 67
             const int numMaxModsPerProtein = 6; // 6
 
             var precursorTolerance = new Tolerance(10);
@@ -47,7 +47,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             // Configure amino acid set
-            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
@@ -94,6 +94,7 @@ namespace InformedProteomics.Test
                         Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
+                        if (numProteins == 10) break;
                     }
 
                     //Console.WriteLine(protAnnotation);
@@ -186,12 +187,7 @@ namespace InformedProteomics.Test
             var precursorIonTolerance = new Tolerance(10);
             var productIonTolerance = new Tolerance(10);
 
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-
             var sw = new System.Diagnostics.Stopwatch();
-
-            sw.Start();
 
             // Configure amino acids
             //var aaSet = new AminoAcidSet();
@@ -215,9 +211,9 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
-            const string protAnnotation =
-                "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
+            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
+            //const string protAnnotation =
+            //    "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
 
             // Create a sequence graph
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
@@ -227,6 +223,10 @@ namespace InformedProteomics.Test
                 return;
             }
 
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+
+            sw.Start();
             var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
 
             var seqCompositionArr = seqGraph.GetSequenceCompositions();

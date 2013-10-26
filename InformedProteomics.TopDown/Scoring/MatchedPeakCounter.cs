@@ -33,10 +33,6 @@ namespace InformedProteomics.TopDown.Scoring
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
-                if (fragmentComposition.GetMass() < 0)
-                {
-                    Console.WriteLine("************* {0}, {1}, {2}", suffixFragmentComposition, fragmentComposition, baseIonType.Symbol);
-                }
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);

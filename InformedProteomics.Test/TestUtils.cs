@@ -334,9 +334,12 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestAtom()
+        public void TestRegEx()
         {
-            Console.WriteLine(Atom.Get("C").Mass);
+            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
+            const char delimiter = (char)FastaDatabase.Delimiter;
+            Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
+            Console.WriteLine(Regex.IsMatch(protAnnotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$"));
         }
     }
 }
