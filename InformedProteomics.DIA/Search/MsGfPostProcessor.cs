@@ -43,9 +43,6 @@ namespace InformedProteomics.DIA.Search
         public Tolerance ToleranceForBaseXic { get; private set; }
         public Tolerance ToleranceFromBasicXic { get; private set; }
 
-        //private readonly Tolerance _tolerance = new Tolerance(PrecursorTolerancePpm);
-        private readonly AminoAcidSet _aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
-
         public int PostProcessing(string outputFilePath)
         {
             // Parse MS-GF+ results
@@ -104,9 +101,9 @@ namespace InformedProteomics.DIA.Search
                 {
                     writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}",
                         match.SpecFile
-                        , match.Peptide
+                        , match.Peptide.Replace("C+57.021", "C")
                         , match.ScanNum
-                        , new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMz()
+                        , new Ion(match.Formula, match.Charge).GetMz()
                         , match.Charge
                         , match.Protein
                         , match.NumMatches
@@ -133,7 +130,7 @@ namespace InformedProteomics.DIA.Search
             var specFileKey = Path.GetFileNameWithoutExtension(match.SpecFile);
             if (specFileKey == null) return false;
 
-            var precursorIon = new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge);
+            var precursorIon = new Ion(match.Formula, match.Charge);
             var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             var basePeakMz = precursorIon.GetIsotopeMz(basePeakIndex);
             var baseXic = Run[specFileKey].GetExtractedIonChromatogram(precursorIon.GetBaseIsotopeMz(), ToleranceForBaseXic, match.ScanNum);
@@ -293,7 +290,11 @@ namespace InformedProteomics.DIA.Search
             else
             {
                 SpecFile = token[header.SpecFileColNum];
-                Peptide = token[header.PeptideColNum].Replace("C+57.021", "C");
+                Peptide = token[header.PeptideColNum];
+                if (header.FormulaColNum > 0)
+                {
+                    Formula = Composition.Parse(token[header.FormulaColNum]);
+                }
                 ScanNum = Convert.ToInt32(token[header.ScanNumColNum]);
                 Charge = Convert.ToInt32(token[header.ChargeColNum]);
                 Protein = token[header.ProteinColNum];
@@ -307,6 +308,7 @@ namespace InformedProteomics.DIA.Search
         public bool IsValid { get; private set; }
         public string SpecFile { get; private set; }
         public string Peptide { get; private set; }
+        public Composition Formula { get; private set; }
         public int ScanNum { get; private set; }
         public int Charge { get; private set; }
         public string Protein { get; private set; }
@@ -334,6 +336,7 @@ namespace InformedProteomics.DIA.Search
             SpecFileColNum = -1;
             PrecursorColNum = -1;
             PeptideColNum = -1;
+            FormulaColNum = -1;
             ScanNumColNum = -1;
             ChargeColNum = -1;
             ProteinColNum = -1;
@@ -342,11 +345,13 @@ namespace InformedProteomics.DIA.Search
             SpecEValueColNum = -1;
             QValueColNum = -1;
 
+
             for (var i = 0; i < token.Length; i++)
             {
                 if (token[i].Equals("#SpecFile")) SpecFileColNum = i;
                 else if (token[i].StartsWith("Precursor")) PrecursorColNum = i;
                 else if (token[i].Equals("Peptide")) PeptideColNum = i;
+                else if (token[i].Equals("Formula")) FormulaColNum = i;
                 else if (token[i].Equals("ScanNum")) ScanNumColNum = i;
                 else if (token[i].Equals("Charge")) ChargeColNum = i;
                 else if (token[i].Equals("Protein")) ProteinColNum = i;
@@ -361,6 +366,7 @@ namespace InformedProteomics.DIA.Search
         public int ScanNumColNum { get; private set; }
         public int PrecursorColNum { get; private set; }
         public int PeptideColNum { get; private set; }
+        public int FormulaColNum { get; private set; }
         public int ChargeColNum { get; private set; }
         public int ProteinColNum { get; private set; }
         public int DeNovoScoreColNum { get; private set; }

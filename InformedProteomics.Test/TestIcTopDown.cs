@@ -16,7 +16,38 @@ namespace InformedProteomics.Test
 {
     [TestFixture]
     internal class TestIcTopDown
-    {
+    { 
+        [Test]
+        public void TestTrainingScoringParameters()
+        {
+            var specFiles = Directory.GetFiles(@"D:\Research\Data\TopDown\raw", "*.raw");
+            var resultFiles = Directory.GetFiles(@"D:\Research\Data\TopDown\results", "*_ResultTable.txt");
+
+            var numFiles = 0;
+            foreach (var resultFile in resultFiles)
+            {
+                var resultFileName = Path.GetFileName(resultFile);
+                var hasSpec = false;
+                foreach (var specFile in specFiles)
+                {
+                    var specFileNameNoExt = Path.GetFileNameWithoutExtension(specFile);
+                    if (specFileNameNoExt == null) continue;
+                    if (resultFile.Contains(specFileNameNoExt+"_MSA"))
+                    {
+                        Console.WriteLine("{0}\t{1}", specFileNameNoExt, resultFileName);
+                        ++numFiles;
+                        hasSpec = true;
+                        break;
+                    }
+                }
+                if (!hasSpec)
+                {
+                    throw new FileNotFoundException("No raw file found for {0}", resultFile);
+                }
+            }
+            Console.WriteLine("NumFilesWithResults: {0}", numFiles);
+        }
+
         [Test]
         public void TestTopDownSearch()
         {

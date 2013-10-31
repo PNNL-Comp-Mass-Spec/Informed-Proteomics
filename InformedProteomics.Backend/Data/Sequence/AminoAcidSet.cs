@@ -90,10 +90,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var modList = entry.Value;
 
                 var modIndexArr = new int[modList.Count];
-                int index = -1;
+                var index = -1;
                 foreach (var mod in modList)
                 {
-                    int modIndex = Array.IndexOf(dynModArray, mod);
+                    var modIndex = Array.IndexOf(dynModArray, mod);
                     modIndexArr[++index] = modIndex;
                 }
                 _residueModMap.Add(residue, modIndexArr);
@@ -146,7 +146,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var composition = Composition.Zero;
 
-            foreach (char residue in sequence)
+            foreach (var residue in sequence)
             {
                 var aaArr = GetAminoAcid(residue);
                 if (aaArr == null)

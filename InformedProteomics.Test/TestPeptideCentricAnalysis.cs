@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
@@ -18,12 +19,46 @@ namespace InformedProteomics.Test
     internal class TestPeptideCentricAnalysis
     {
         [Test]
+        public void ProcessPemmrData()
+        {
+            const string resultPath = @"D:\Research\Data\PEMMR\Ox\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_All.tsv";
+            const string outputFilePath = @"D:\Research\Data\PEMMR\Ox\IPA_Summary.tsv";
+            const string specFilePath = @"D:\Research\Data\PEMMR\Spectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.raw";;
+
+            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(5));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
+        }
+
+        [Test]
+        public void ProcessMhcData()
+        {
+            const string resultPath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\carone_C1309_All.tsv";
+            const string outputFilePath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\IPA_Summary.tsv";
+            var specFiles = Directory.GetFiles(@"D:\Research\Data\ImmunoPeptidomics\Benchmarking\raw", "*.raw");
+
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, 2);
+
+            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(5), new Tolerance(3));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
+        }
+
+        [Test]
         public void RunPeptideCentricAnalysis()
         {
-            TestQExactiveDdaDataPostProcessing();
+            //TestQExactiveDdaDataPostProcessing();
             TestQExactiveDiaDataPostProcessing();
-            TestFusionDiaDataPostProcessing();
-            TestFusionDdaDataPostProcessing();
+            //TestFusionDiaDataPostProcessing();
+            //TestFusionDdaDataPostProcessing();
         }
 
         [Test]

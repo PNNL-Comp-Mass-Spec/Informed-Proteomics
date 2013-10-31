@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using MathNet.Numerics;
 using Constants = InformedProteomics.Backend.Data.Biology.Constants;
@@ -339,20 +340,66 @@ namespace InformedProteomics.Backend.Data.Sequence
                 + (S == 0 ? "" : "S" + S);
         }
 
-        //added by kyowon, incomplete for additional Elementss
-        public static Composition Parse(string s)
+        // Initially implemented by Kyowon, re-implemented by Sangtae
+        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2)
+
+        public static Composition Parse(string compositionStr)
         {
-            var t = s.Split(' ');
-            if (t.Length < 5) return null;
-            var basicComposition = new int[5];
-            for (var i = 0; i < basicComposition.Length; i++)
-            {
-                basicComposition[i] = int.Parse(t[i].Substring(t[i].IndexOf('(') + 1, t[i].IndexOf(')') - t[i].IndexOf('(') - 1));
-            }
-            if (t.Length == basicComposition.Length)
-                return new Composition(basicComposition[0], basicComposition[1], basicComposition[2], basicComposition[3], basicComposition[4]);
-            throw new System.NotImplementedException();
+            //var t = s.Split(' ');
+            //if (t.Length < 5) return null;
+            //var basicComposition = new int[5];
+            //for (var i = 0; i < basicComposition.Length; i++)
+            //{
+            //    basicComposition[i] = int.Parse(t[i].Substring(t[i].IndexOf('(') + 1, t[i].IndexOf(')') - t[i].IndexOf('(') - 1));
+            //}
+            //if (t.Length == basicComposition.Length)
+            //    return new Composition(basicComposition[0], basicComposition[1], basicComposition[2], basicComposition[3], basicComposition[4]);
+
+            var c = 0;
+            var h = 0;
+            var n = 0;
+            var o = 0;
+            var s = 0;
+            Dictionary<Atom, short> additionalElements = null;
+
+            var token = compositionStr.Split();
+		    foreach(var e in token)
+		    {
+			    if(Regex.IsMatch(e, @"^\d*[a-zA-Z]+(\(-?\d+\))?$"))
+			    {
+				    string element;
+				    int num;
+                    if (Regex.IsMatch(e, @"^\d*?[a-zA-Z]+$"))
+				    {
+					    element = e;
+					    num = 1;
+				    }
+				    else
+                    {
+                        element = e.Substring(0, e.IndexOf('('));
+                        num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
+				    }
+			        if (element.Equals("C")) c = num;
+                    else if (element.Equals("H")) h = num;
+                    else if (element.Equals("N")) n = num;
+                    else if (element.Equals("O")) o = num;
+                    else if (element.Equals("S")) s = num;
+                    else
+                    {
+                        var atom = Atom.Get(element);
+                        if (atom == null) return null;
+                        if(additionalElements == null) additionalElements = new Dictionary<Atom, short>();
+                        additionalElements.Add(atom, (short)num);
+                    }
+			    }
+			    else // illegal string
+			    {
+			        return null;
+			    }
+		    }
+            return new Composition(c, h, n, o, s, additionalElements);
         } 
+
         #endregion
 
         #region Masses of Atoms

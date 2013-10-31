@@ -336,10 +336,20 @@ namespace InformedProteomics.Test
         [Test]
         public void TestRegEx()
         {
-            const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
-            const char delimiter = (char)FastaDatabase.Delimiter;
-            Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
-            Console.WriteLine(Regex.IsMatch(protAnnotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$"));
+            //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
+            //const char delimiter = (char)FastaDatabase.Delimiter;
+            //Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
+            //Console.WriteLine(Regex.IsMatch(protAnnotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$"));
+            const string s = "H(12)";
+            Console.WriteLine(Regex.IsMatch(s, @"^\d*[a-zA-Z]+$"));
+        }
+
+        [Test]
+        public void TestParsingComposition()
+        {
+            const string compositionStr = "H(230) C(136) N(40) O(46) S 13C(6) 15N(2)";
+            var composition = Composition.Parse(compositionStr);
+            Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
         }
     }
 }
