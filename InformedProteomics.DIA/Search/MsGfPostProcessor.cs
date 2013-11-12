@@ -5,13 +5,14 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.DIA.Search
 {
     public class MsGfPostProcessor
     {
-        const string DecoyPrefix = "XXX";
+        const string DecoyPrefix = FastaDatabase.DecoyProteinPrefix;
         const double SpecEValueThreshold = 1E-8;
 
         //// Post-processing parameters
@@ -99,9 +100,11 @@ namespace InformedProteomics.DIA.Search
                 writer.WriteLine("#SpecFile\tPeptide\tScanNum\tPrecursorMz\tCharge\tProtein\tNumMatches\tDeNovoScore\tMSGFScore\tSpecEValue\tPepQValue");
                 foreach (var match in filteredPsms)
                 {
+                    //if (match.Protein.StartsWith("DecoyPrefix")) continue;
                     writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}",
                         match.SpecFile
-                        , match.Peptide.Replace("C+57.021", "C")
+                        //, match.Peptide.Replace("C+57.021", "C")
+                        , match.Peptide
                         , match.ScanNum
                         , new Ion(match.Formula, match.Charge).GetMz()
                         , match.Charge
@@ -266,7 +269,7 @@ namespace InformedProteomics.DIA.Search
         }
     }
 
-    internal class MsGfMatch : IComparable<MsGfMatch>
+    public class MsGfMatch : IComparable<MsGfMatch>
     {
         public MsGfMatch(string specFile, string peptide, int scanNum, int charge, string protein, int deNovoScore, int msgfScore, double specEValue)
         {
@@ -301,6 +304,14 @@ namespace InformedProteomics.DIA.Search
                 DeNovoScore = Convert.ToInt32(token[header.DeNovoScoreColNum]);
                 MsgfScore = Convert.ToInt32(token[header.MsgfScoreColNum]);
                 SpecEValue = Convert.ToDouble(token[header.SpecEValueColNum]);
+                if (header.QValueColNum > 0)
+                {
+                    QValue = Convert.ToDouble(token[header.QValueColNum]);
+                }
+                if (header.PepQValueColNum > 0)
+                {
+                    PepQValue = Convert.ToDouble(token[header.PepQValueColNum]);
+                }
                 IsValid = true;
             }
         }
@@ -315,6 +326,8 @@ namespace InformedProteomics.DIA.Search
         public int DeNovoScore { get; private set; }
         public int MsgfScore { get; private set; }
         public double SpecEValue { get; private set; }
+        public double QValue { get; private set; }
+        public double PepQValue { get; private set; }
         public int NumMatches { get; set; }
 
         public int CompareTo(MsGfMatch other)
@@ -344,6 +357,7 @@ namespace InformedProteomics.DIA.Search
             MsgfScoreColNum = -1;
             SpecEValueColNum = -1;
             QValueColNum = -1;
+            PepQValueColNum = -1;
 
 
             for (var i = 0; i < token.Length; i++)
@@ -359,6 +373,7 @@ namespace InformedProteomics.DIA.Search
                 else if (token[i].Equals("MSGFScore")) MsgfScoreColNum = i;
                 else if (token[i].Equals("SpecEValue")) SpecEValueColNum = i;
                 else if (token[i].Equals("QValue")) QValueColNum = i;
+                else if (token[i].Equals("PepQValue")) PepQValueColNum = i;
             }
         }
 
@@ -373,6 +388,7 @@ namespace InformedProteomics.DIA.Search
         public int MsgfScoreColNum { get; private set; }
         public int SpecEValueColNum { get; private set; }
         public int QValueColNum { get; private set; }
+        public int PepQValueColNum { get; private set; }
 
         public int NumColumns { get; private set; }
     }

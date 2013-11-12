@@ -98,8 +98,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestDia.cs" />
     <Compile Include="TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
+    <Compile Include="TestMisc.cs" />
     <Compile Include="TestParsingSpectra.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="TestSequenceGraph.cs" />

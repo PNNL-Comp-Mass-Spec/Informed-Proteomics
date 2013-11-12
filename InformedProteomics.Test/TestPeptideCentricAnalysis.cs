@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -32,6 +30,46 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void GenerateVennDiagramsPeMmr()
+        {
+            // No PE-MMR
+            const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
+
+            // PE-MMR Scan based FDR
+            const string scanBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_ScanFDR.tsv";
+
+            // UMC based FDR
+            const string umcBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_UMCFDR.tsv";
+
+            // IPA
+            const string ipa = @"D:\Research\Data\PEMMR\Ox\IPA_Summary_TargetOnly.tsv";
+
+            const string resultPath1 = umcBasedPeMmr;
+            const string resultPath2 = ipa;
+
+            var result1 = new TsvFileParser(resultPath1);
+            var result2 = new TsvFileParser(resultPath2);
+
+            const double pepQValueThreshold = 0.01;
+            var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
+                                                      result2.GetPeptides(pepQValueThreshold));
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count + vennDiagram.Intersection.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count);
+
+            foreach(var peptide in vennDiagram.Set2Only)
+            {
+                Console.WriteLine(peptide);
+                var peptides = result2.GetData("Peptide");
+            }
+        }
+
+        [Test]
         public void ProcessMhcData()
         {
             const string resultPath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\carone_C1309_All.tsv";
@@ -57,6 +95,7 @@ namespace InformedProteomics.Test
         {
             //TestQExactiveDdaDataPostProcessing();
             TestQExactiveDiaDataPostProcessing();
+            //TestQExactiveDiaDataPostProcessingNoEdgeNtt2();
             //TestFusionDiaDataPostProcessing();
             //TestFusionDdaDataPostProcessing();
         }
@@ -80,6 +119,19 @@ namespace InformedProteomics.Test
             const string resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_All.tsv";
             var specFiles = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
+
+            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(20), new Tolerance(10));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
+        }
+
+        [Test]
+        public void TestQExactiveDiaDataPostProcessingNoEdgeNtt2()
+        {
+            const string resultPath = @"D:\Research\Data\UW\QExactive\NoEdge\DIA_All.tsv";
+            var specFiles = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
+            const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Edge_Summary.tsv";
 
             var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(20), new Tolerance(10));
             var numId = postProcessor.PostProcessing(outputFilePath);
