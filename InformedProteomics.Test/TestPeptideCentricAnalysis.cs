@@ -304,35 +304,6 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestMacCossFusionData()
-        {
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-
-            const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
-
-            const string dbFilePath = @"D:\Research\Data\UW\Database\Yeast_SGD_withContam.revCat.fasta";
-            var targetDecoyDb = new FastaDatabase(dbFilePath);
-            var indexedDb = new IndexedDatabase(targetDecoyDb);
-            var sequences = indexedDb.SequencesAsStrings(minLength: 6, maxLength: 40, numTolerableTermini: 1,
-                                                         numMissedCleavages: 2, enzyme: Enzyme.Trypsin);
-
-            var aminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
-
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
-
-            var analyzer = new PeptideCentricAnalysis(run, sequences, aminoAcidSet);
-
-
-            const string outputFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DIA_130412091220.pca.txt";
-            analyzer.IntermediateSearch(outputFilePath);
-
-            sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Done. {0:f4} sec", sec);
-        }
-
-        [Test]
         public void TestXicGen()
         {
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";

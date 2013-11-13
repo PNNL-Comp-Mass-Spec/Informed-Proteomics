@@ -89,7 +89,7 @@ namespace InformedProteomics.Test
     //                var pep = targetPeptide;
     //                    // "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
     //                var precursorComposition = aaSet.GetComposition(pep);
-    //                var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
+    //                var sequence = new Annotation(precursorComposition + Composition.H2O, pep, aaSet);
     //                var maxScore = double.NegativeInfinity;
     //                var maxPortionOfExplainedFrag = 0.0;
 
@@ -289,7 +289,7 @@ namespace InformedProteomics.Test
 
     //        var pep = "DGWHSWPIAHQWPQGPSAVDAAFSWEEK";// "CCAADDKEACFAVEGPK";// LVDINHEGLR "LVNELTEFAK";// targetPeptide;// CACSRKNQVK"GNYKNAYYLLEPAYFYPHR";// "CCAADDKEACFAVEGPK"//targetPeptide; "QLSACKLRQK";
     //        var precursorComposition = aaSet.GetComposition(pep);
-    //        var sequence = new Sequence(precursorComposition + Composition.H2O, pep, aaSet);
+    //        var sequence = new Annotation(precursorComposition + Composition.H2O, pep, aaSet);
     //        var maxScore = double.NegativeInfinity;
     //        var maxPortionOfExplainedFrag = 0.0;
 

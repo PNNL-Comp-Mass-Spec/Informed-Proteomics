@@ -134,14 +134,14 @@ namespace InformedProteomics.IMS.IMSScoring
 
         private double GetProductIonScore(ScoringGraphNode node, ImsScorer imsScorer, Feature precursorFeature)
         {
-            //Console.Write("Index: " + node.Index);
+            //Console.Write("Offset: " + node.Offset);
             double cutScore = 0;
             if (node.Index > 1 && node.Index <= _aminoAcidSequence.Length-3)
             {
                 var nTermAA = _aminoAcidSequence[node.Index].Residue;
                 var cTermAA = _aminoAcidSequence[node.Index + 1].Residue;
                 cutScore = imsScorer.GetCutScore(nTermAA, cTermAA, node.Composition, precursorFeature);
-                //Console.WriteLine(" " + _aminoAcidSequence[node.Index].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Index + 1].Residue + " " + cutScore);
+                //Console.WriteLine(" " + _aminoAcidSequence[node.Offset].Residue + " " + node.Composition + " " + _aminoAcidSequence[node.Offset + 1].Residue + " " + cutScore);
             }
             //Console.WriteLine();
 

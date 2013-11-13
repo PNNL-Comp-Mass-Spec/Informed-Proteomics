@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\PeptideEnumerator.cs" />
+    <Compile Include="Database\AnnotationAndOffset.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />

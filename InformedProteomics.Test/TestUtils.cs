@@ -66,7 +66,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(graph.GetUnmodifiedSequenceComposition());
             Assert.AreEqual(graph.GetUnmodifiedSequenceComposition(), aaSet.GetComposition(pepSeq));
 
-            Console.WriteLine("Sequence Compositions:");
+            Console.WriteLine("Annotation Compositions:");
             var index = -1;
             foreach (var composition in graph.GetSequenceCompositions())
             {

@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             Composition = composition + Composition.H2O; // +H2PO added by Kyowon Jeong
         }
 
-		/*public Sequence (Composition composition, string sequence)
+		/*public Annotation (Composition composition, string sequence)
 		{
 			this.Composition = composition;
 			this.SequenceString = sequence;

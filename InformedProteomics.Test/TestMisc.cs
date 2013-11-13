@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.DIA.Search;
 using NUnit.Framework;
@@ -9,12 +11,14 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestMisc
     {
-        private const double QValueThreshold = 0.01;
         [Test]
         public void TestAbrfSpecCount()
         {
+            const double qValueThreshold = 0.01;
             var names = new[] {"ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN"};
             var accessions = new[] { "P00924", "P00330", "P62894", "P02769"};
+
+            const string databaseFilePath = @"D:\Research\Data\IPRG2014\database\E_coli_K12_uniprot_reviewed_2013-01-31.revCat.fasta";
 
             const string dir = @"D:\Research\Data\IPRG2014\10ppm_TI0_NTT1";
             
@@ -45,7 +49,7 @@ namespace InformedProteomics.Test
                     prevScanNum = match.ScanNum;
 
                     if (!match.IsValid || match.Protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) continue;
-                    if (match.QValue > QValueThreshold) continue;
+                    if (match.QValue > qValueThreshold) continue;
 
                     totalPsm++;
 
@@ -65,6 +69,30 @@ namespace InformedProteomics.Test
                 }
                 Console.WriteLine();
             }
+        }
+
+        [Test]
+        public void CreateTargetList()
+        {
+            const string databaseFilePath = @"D:\Research\Data\IPRG2014\database\SpikedInPeptides.fasta";
+            var database = new FastaDatabase(databaseFilePath);
+            database.Read();
+            var indexedDatabase = new IndexedDatabase(database);
+            var numTargets = 0;
+
+            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+
+            Console.WriteLine("Peptide\tFormula\tProtein");
+            foreach (var annotationAndOffset in indexedDatabase.SequencesAsStrings(6, 30, 1, 1, Enzyme.Trypsin))
+            {
+                var annotation = annotationAndOffset.Annotation;
+                var peptide = annotation.Substring(2, annotation.Length - 4);
+                var offset = annotationAndOffset.Offset;
+
+                Console.WriteLine("{0}\t{1}\t{2}", peptide, (aaSet.GetComposition(peptide)+Composition.H2O).ToPlainString(), database.GetProteinName(offset));
+                numTargets++;
+            }
+            Console.WriteLine("NumTargets: {0}", numTargets);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     public class SequenceGraph
     {
         /// <summary>
-        /// Create a graph representing the sequence. Sequence is reversed.
+        /// Create a graph representing the sequence. Annotation is reversed.
         /// </summary>
         /// <param name="aaSet">amino acid set</param>
         /// <param name="annotation">annotation (e.g. G.PEPTIDER.K or _.PEPTIDER._)</param>

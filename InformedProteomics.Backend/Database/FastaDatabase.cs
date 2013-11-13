@@ -152,7 +152,7 @@ namespace InformedProteomics.Backend.Database
 
         public void PrintSequence()
         {
-            Console.WriteLine(_sequence == null ? "Sequence is null!" : Encoding.GetString(_sequence));
+            Console.WriteLine(_sequence == null ? "Annotation is null!" : Encoding.GetString(_sequence));
         }
 
         public string GetDecoyDatabasePath(Enzyme enzyme)
@@ -164,6 +164,17 @@ namespace InformedProteomics.Backend.Database
             return Path.ChangeExtension(_databaseFilePath, newExtenstion);
         }
 
+        public string GetProteinName(long offset)
+        {
+            var offsetKey = GetOffsetKey(offset);
+            return _names[offsetKey];
+        }
+
+        public string GetProteinDescription(long offset)
+        {
+            var offsetKey = GetOffsetKey(offset);
+            return _descriptions[offsetKey];
+        }
 
         internal int GetLastWriteTimeHash()
         {
@@ -197,6 +208,7 @@ namespace InformedProteomics.Backend.Database
         private readonly string _annoFilePath;
         private readonly int _lastWriteTimeHash;
 
+        private List<long> _offsetList;
         private IDictionary<long, string> _names;
         private IDictionary<long, string> _descriptions;
 
@@ -250,15 +262,9 @@ namespace InformedProteomics.Backend.Database
             return true;
         }
 
-        //public long NumAminoAcids()
-        //{
-        //    using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
-        //    {
-        //    }
-        //}
-
         private bool ReadAnnnoFile()
         {
+            _offsetList = new List<long>();
             _names = new Dictionary<long, string>();
             _descriptions = new Dictionary<long, string>();
 
@@ -271,6 +277,7 @@ namespace InformedProteomics.Backend.Database
                     if (token.Length != 3)
                         break;
                     var offset = long.Parse(token[0]);
+                    _offsetList.Add(offset);
                     _names.Add(offset,token[1]);
                     _descriptions.Add(offset, token[2]);
                 }
@@ -279,5 +286,10 @@ namespace InformedProteomics.Backend.Database
             return true;
         }
 
+        private long GetOffsetKey(long offset)
+        {
+            var index = _offsetList.BinarySearch(offset);
+            return index >= 0 ? _offsetList[index] : _offsetList[~index - 1];
+        }
     }
 }

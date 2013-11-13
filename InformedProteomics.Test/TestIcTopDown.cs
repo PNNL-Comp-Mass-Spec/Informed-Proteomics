@@ -133,7 +133,7 @@ namespace InformedProteomics.Test
                     var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
                     if (seqGraph == null) continue;
 
-                    writer.WriteLine("Sequence\tComposition\tCharge\tBaseIsotopeMz\tScanNum\tNumMatches");
+                    writer.WriteLine("Annotation\tComposition\tCharge\tBaseIsotopeMz\tScanNum\tNumMatches");
                     for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
                     {
                         var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);

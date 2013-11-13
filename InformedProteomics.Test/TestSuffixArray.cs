@@ -31,10 +31,11 @@ namespace InformedProteomics.Test
             var hist = new int[31];
             var numPeptides = 0;
             foreach (
-                var annotation in
+                var annotationAndOffset in
                     indexedDbTarget.SequencesAsStrings(minPeptideLength, maxPeptideLength, numTolerableTermini,
                                                        numMissedCleavages, enzyme))
             {
+                var annotation = annotationAndOffset.Annotation;
                 var pepSequence = annotation.Substring(2, annotation.Length - 4);
                 var pepComposition = aminoAcidSet.GetComposition(pepSequence) + Composition.H2O;
                 var mass = pepComposition.GetMass();
@@ -55,30 +56,6 @@ namespace InformedProteomics.Test
             {
                 Console.WriteLine("{0}\t{1}\t{2}", i*100, hist[i], hist[i]/(float)numPeptides);
             }
-        }
-
-        [Test]
-        public void TestCountingNumPeptides()
-        {
-            const int minPeptideLength = 7;
-            const int maxPeptideLength = 30;
-            const int numTolerableTermini = 2;
-            const int numMissedCleavages = 1;
-            var enzyme = Enzyme.Trypsin;
-
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            var targetDb = new FastaDatabase(dbFilePath);
-            var decoyDb = targetDb.Decoy(enzyme);
-
-            var indexedDbTarget = new IndexedDatabase(targetDb);
-            var numPeptidesTarget = indexedDbTarget.NumSequences(minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme);
-
-            var indexedDbDecoy = new IndexedDatabase(decoyDb);
-            var numPeptidesDecoy = indexedDbDecoy.NumSequences(minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme);
-
-            Console.WriteLine("Target: {0}", numPeptidesTarget);
-            Console.WriteLine("Decoy: {0}", numPeptidesDecoy);
-            Console.WriteLine("Sum: {0}", numPeptidesTarget+numPeptidesDecoy);
         }
 
         [Test]
@@ -132,43 +109,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine(Encoding.ASCII.GetString(text, index, text.Length-index));
             }
 
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            System.Console.WriteLine(@"{0:f4} sec", sec);
-        }
-
-        [Test]
-        public void TestDatabaseIndexing()
-        {
-            //const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
-            //const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\uniprot_sprot.56.6_withContam.fasta";
-            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-
-            var db = new FastaDatabase(dbFile);
-            //db.Read();
-
-            var indexedDb = new IndexedDatabase(db);
-            //indexedDb.Read();
-            //foreach (var seqAndLcp in indexedDb.SequenceLcpPairs(6,30))
-            //{
-            //    var seq = Encoding.ASCII.GetString(seqAndLcp.Item1);
-            //    var lcp = seqAndLcp.Item2;
-            //    //Console.WriteLine("{0}\t{1}", seq, lcp);
-            //}
-
-            foreach (var peptide in indexedDb.SequencesAsStrings(
-                minLength: 6, 
-                maxLength: 40, 
-                numTolerableTermini: 1, 
-                numMissedCleavages: 2, 
-                enzyme: Enzyme.Trypsin)
-                )
-            {
-                Console.WriteLine(peptide);
-            }
-            sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             System.Console.WriteLine(@"{0:f4} sec", sec);
         }

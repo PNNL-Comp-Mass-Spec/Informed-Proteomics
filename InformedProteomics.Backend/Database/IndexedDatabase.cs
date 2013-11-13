@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,7 +15,6 @@ namespace InformedProteomics.Backend.Database
         private readonly string _pLcpFilePath;
 
         private readonly FastaDatabase _fastaDatabase;
-        private readonly int _maxPeptideLength;
         private byte[] _pLcp;        
 
         public IndexedDatabase(FastaDatabase fastaDatabase)
@@ -35,8 +32,6 @@ namespace InformedProteomics.Backend.Database
                 CreatePermutedLongestCommonPrefixFile();
                 Console.WriteLine("\tDone.");
             }
-
-            _maxPeptideLength = 30;
         }
 
         public void Read()
@@ -76,39 +71,7 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<Tuple<byte[], short>> SequenceLcpPairs(int minLength, int maxLength)
-        {
-            var curSequence = new LinkedList<byte>();
-            var lcpList = new LinkedList<byte>();
-            var lcpEnum = PLcps().GetEnumerator();
-
-            foreach (var residue in _fastaDatabase.Characters())
-            {
-                lcpEnum.MoveNext();
-                curSequence.AddLast(residue);
-                lcpList.AddLast(lcpEnum.Current);
-
-                if (curSequence.Count < maxLength) continue;
-
-                var seqArr = new byte[curSequence.Count];
-                curSequence.CopyTo(seqArr, 0);
-
-                yield return new Tuple<byte[], short>(seqArr, lcpList.First.Value);
-                curSequence.RemoveFirst();
-                lcpList.RemoveFirst();
-            }
-
-            while (curSequence.Count >= minLength)
-            {
-                var seqArr = new byte[curSequence.Count];
-                curSequence.CopyTo(seqArr, 0);
-                yield return new Tuple<byte[], short>(seqArr, lcpList.First.Value);
-                curSequence.RemoveFirst();
-                lcpList.RemoveFirst();
-            }
-        }
-
-        public IEnumerable<byte[]> EntireSequences()
+        public IEnumerable<byte[]> SequencesWithNoCleavage()
         {
             List<byte> buf = null;
 
@@ -126,90 +89,16 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme)
-        {
-            return NumSequences(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
-                               enzyme.IsNTerm);
-        }
-
-        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
             return SequencesAsStrings(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
                                enzyme.IsNTerm);
         }
 
-        public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
-                                 int numMissedCleavages, char[] enzymaticResidues,
-                                 bool isNTermEnzyme)
-        {
-            var numSequences = 0L;
 
-            {
-                var isCleavable = new bool[128];
-                if (enzymaticResidues != null)
-                {
-                    foreach (var residue in enzymaticResidues)
-                    {
-                        isCleavable[residue] = true;
-                        isCleavable[(int)FastaDatabase.Delimiter] = true;
-                    }
-                }
 
-                const string standardAAStr = "ACDEFGHIKLMNPQRSTVWY";
-                var isStandardAminoAcid = new bool[128];
-                foreach (var residue in standardAAStr)
-                {
-                    isStandardAminoAcid[(int)residue] = true;
-                }
-
-                var encoding = System.Text.Encoding.ASCII;
-                // pre, peptide sequence, next
-                foreach (var seqAndLcp in SequenceLcpPairs(minLength, maxLength + 2))
-                {
-                    var seqArr = seqAndLcp.Item1;
-                    var lcp = seqAndLcp.Item2;
-                    var ntt = 0;
-                    var nmc = 0;
-
-                    if (enzymaticResidues != null)
-                    {
-                        if (!isNTermEnzyme) // C-term enzyme 
-                        {
-                            if (isCleavable[seqArr[0]]) ++ntt;
-                            if (ntt < numTolerableTermini - 1) continue;
-
-                            for (var i = 1; i < seqArr.Length - 1; i++)
-                            {
-                                var code = seqArr[i];
-                                if (!isStandardAminoAcid[code]) break;
-                                if (isCleavable[code]) ++nmc;
-
-                                if (i >= minLength && i >= lcp)
-                                {
-                                    if (ntt + (isCleavable[code] || i < seqArr.Length - 1 && seqArr[i + 1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
-                                    {
-                                        numSequences++;
-                                    }
-                                }
-                                if (nmc > numMissedCleavages) break;
-                            }
-                        }
-                        else // N-term enzyme
-                        {
-
-                        }
-                    }
-                    else // no enzyme
-                    {
-                    }
-                }
-            }
-            return numSequences;
-        }
-
-        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, char[] enzymaticResidues,
                                                       bool isNTermEnzyme)
         {
@@ -218,8 +107,9 @@ namespace InformedProteomics.Backend.Database
             {
                 foreach (var residue in enzymaticResidues)
                 {
-                    isCleavable[(int)residue] = true;
-                    isCleavable[(int) FastaDatabase.Delimiter] = true;
+                    isCleavable[residue] = true;
+                    if (isCleavable.Length > FastaDatabase.Delimiter)
+                        isCleavable[FastaDatabase.Delimiter] = true;
                 }
             }
 
@@ -227,15 +117,16 @@ namespace InformedProteomics.Backend.Database
             var isStandardAminoAcid = new bool[128];
             foreach (var residue in standardAAStr)
             {
-                isStandardAminoAcid[(int) residue] = true;
+                isStandardAminoAcid[residue] = true;
             }
 
-            var encoding = System.Text.Encoding.ASCII;
+            var encoding = Encoding.ASCII;
             // pre, peptide sequence, next
-            foreach (var seqAndLcp in SequenceLcpPairs(minLength, maxLength+2))
+            foreach (var seqAndLcp in SequenceAndLcps(minLength, maxLength+2))
             {
-                var seqArr = seqAndLcp.Item1;
-                var lcp = seqAndLcp.Item2;
+                var seqArr = seqAndLcp.Sequence;
+                var lcp = seqAndLcp.Lcp;
+                var offset = seqAndLcp.Offset;
                 var ntt = 0;
                 var nmc = 0;
 
@@ -256,7 +147,7 @@ namespace InformedProteomics.Backend.Database
                             {
                                 if (ntt + (isCleavable[code] || i < seqArr.Length-1 && seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return string.Format("{0}.{1}.{2}",(char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i+1]);
+                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                                 }
                             }
                             if (nmc > numMissedCleavages) break;
@@ -278,19 +169,57 @@ namespace InformedProteomics.Backend.Database
             return SequencesAsStrings(0, minLength, maxLength);
         }
 
+        public int GetLongestSequenceLength()
+        {
+            return SequencesWithNoCleavage().Select(seqArr => seqArr.Length).Max();
+        }
+
+        private IEnumerable<SequenceAndLcp> SequenceAndLcps(int minLength, int maxLength)
+        {
+            var curSequence = new LinkedList<byte>();
+            var lcpList = new LinkedList<byte>();
+            var lcpEnum = PLcps().GetEnumerator();
+
+            var offset = -1L;
+            foreach (var residue in _fastaDatabase.Characters())
+            {
+                lcpEnum.MoveNext();
+                curSequence.AddLast(residue);
+                lcpList.AddLast(lcpEnum.Current);
+
+                if (curSequence.Count < maxLength) continue;
+
+                var seqArr = new byte[curSequence.Count];
+                curSequence.CopyTo(seqArr, 0);
+
+                yield return new SequenceAndLcp(seqArr, lcpList.First.Value, ++offset);
+                curSequence.RemoveFirst();
+                lcpList.RemoveFirst();
+            }
+
+            while (curSequence.Count >= minLength)
+            {
+                var seqArr = new byte[curSequence.Count];
+                curSequence.CopyTo(seqArr, 0);
+                yield return new SequenceAndLcp(seqArr, lcpList.First.Value, ++offset);
+                curSequence.RemoveFirst();
+                lcpList.RemoveFirst();
+            }
+        }
+        
         private IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength, int maxLength)
         {
             var encoding = Encoding.ASCII;
 
-            foreach (var seqArr in EntireSequences())
+            foreach (var seqArr in SequencesWithNoCleavage())
             {
                 for (var i = 0; i <= numNTermCleavages; i++)
                 {
                     if (seqArr.Length - i >= minLength && seqArr.Length - i <= maxLength)
                     {
                         yield return
-                            string.Format("{0}.{1}.{2}", 
-                            (i == 0 ? "_" : encoding.GetString(seqArr, i-1, 1)), 
+                            string.Format("{0}.{1}.{2}",
+                            (i == 0 ? "_" : encoding.GetString(seqArr, i - 1, 1)),
                             encoding.GetString(seqArr, i, seqArr.Length - i),
                             "_"
                             );
@@ -299,18 +228,13 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public int GetLongestSequenceLength()
-        {
-            return EntireSequences().Select(seqArr => seqArr.Length).Max();
-        }
-
         private void CreatePermutedLongestCommonPrefixFile()
         {
             if (File.Exists(_pLcpFilePath))
                 File.Delete(_pLcpFilePath);
 
             var sequence = _fastaDatabase.GetSequence();
-            //Console.WriteLine("Sequence: {0}", System.Text.Encoding.ASCII.GetString(sequence));
+            //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
             var suffixArray = new int[sequence.Length-1];
             SAIS.sufsort(sequence, suffixArray, sequence.Length-1);
 
@@ -322,7 +246,7 @@ namespace InformedProteomics.Backend.Database
             {
                 var lcp = GetLcp(sequence, prevIndex, index);
                 pLcp[index] = lcp;
-                //Console.WriteLine("{0}\t{1}", System.Text.Encoding.ASCII.GetString(sequence, index, sequence.Length - index - 1), lcp);
+                //Console.WriteLine("{0}\t{1}", System.Text.Encoding.ASCII.GetString(sequence, offset, sequence.Length - offset - 1), lcp);
                 prevIndex = index;
             }
 
@@ -349,5 +273,96 @@ namespace InformedProteomics.Backend.Database
 
             return lcp;
         }
+
+        //public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
+        //                         int numMissedCleavages, char[] enzymaticResidues,
+        //                         bool isNTermEnzyme)
+        //{
+        //    var numSequences = 0L;
+
+        //    {
+        //        var isCleavable = new bool[128];
+        //        if (enzymaticResidues != null)
+        //        {
+        //            foreach (var residue in enzymaticResidues)
+        //            {
+        //                isCleavable[residue] = true;
+        //                isCleavable[FastaDatabase.Delimiter] = true;
+        //            }
+        //        }
+
+        //        const string standardAAStr = "ACDEFGHIKLMNPQRSTVWY";
+        //        var isStandardAminoAcid = new bool[128];
+        //        foreach (var residue in standardAAStr)
+        //        {
+        //            isStandardAminoAcid[residue] = true;
+        //        }
+
+        //        // pre, peptide sequence, next
+        //        foreach (var seqAndLcp in SequenceAndLcps(minLength, maxLength + 2))
+        //        {
+        //            var seqArr = seqAndLcp.Annotation;
+        //            var lcp = seqAndLcp.Lcp;
+        //            var ntt = 0;
+        //            var nmc = 0;
+
+        //            if (enzymaticResidues != null)
+        //            {
+        //                if (!isNTermEnzyme) // C-term enzyme 
+        //                {
+        //                    if (isCleavable[seqArr[0]]) ++ntt;
+        //                    if (ntt < numTolerableTermini - 1) continue;
+
+        //                    for (var i = 1; i < seqArr.Length - 1; i++)
+        //                    {
+        //                        var code = seqArr[i];
+        //                        if (!isStandardAminoAcid[code]) break;
+        //                        if (isCleavable[code]) ++nmc;
+
+        //                        if (i >= minLength && i >= lcp)
+        //                        {
+        //                            if (ntt + (isCleavable[code] || i < seqArr.Length - 1 && seqArr[i + 1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
+        //                            {
+        //                                numSequences++;
+        //                            }
+        //                        }
+        //                        if (nmc > numMissedCleavages) break;
+        //                    }
+        //                }
+        //                else // N-term enzyme
+        //                {
+
+        //                }
+        //            }
+        //            else // no enzyme
+        //            {
+        //            }
+        //        }
+        //    }
+        //    return numSequences;
+        //}
+
+        //public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
+        //                                              int numMissedCleavages, Enzyme enzyme)
+        //{
+        //    return NumSequences(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
+        //                       enzyme.IsNTerm);
+        //}
+
+
+    }
+
+    internal class SequenceAndLcp
+    {
+        public SequenceAndLcp(byte[] sequence, short lcp, long offset)
+        {
+            Sequence = sequence;
+            Lcp = lcp;
+            Offset = offset;
+        }
+
+        public byte[] Sequence { set; get; }
+        public short Lcp { set; get; }
+        public long Offset { set; get; }
     }
 }
