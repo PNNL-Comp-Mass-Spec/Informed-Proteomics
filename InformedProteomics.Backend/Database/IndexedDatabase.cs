@@ -257,6 +257,7 @@ namespace InformedProteomics.Backend.Database
                     //Console.WriteLine("LCP: {0}", lcp);
                     fs.WriteByte(lcp);
                 }
+                fs.Write(BitConverter.GetBytes(FastaDatabase.FileFormatId), 0, sizeof(int));
                 fs.Write(BitConverter.GetBytes(_fastaDatabase.GetLastWriteTimeHash()), 0, sizeof(int));
             }
         }

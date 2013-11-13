@@ -10,6 +10,7 @@ namespace InformedProteomics.Backend.Database
 {
     public class FastaDatabase
     {
+        public const int FileFormatId = 174;
         public const string SeqFileExtension = ".icseq";
         public const string AnnotationFileExtension = ".icanno";
         public const string DecoyDatabaseFileExtension = ".icdecoy.fasta";
@@ -33,8 +34,10 @@ namespace InformedProteomics.Backend.Database
             _seqFilePath = databaseFilePathNoExt + SeqFileExtension;
             _annoFilePath = databaseFilePathNoExt + AnnotationFileExtension;
 
-            if (!File.Exists(_seqFilePath) || !File.Exists(_annoFilePath) || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash) ||
-                !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
+            if (!File.Exists(_seqFilePath) 
+                || !File.Exists(_annoFilePath) 
+                || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash) 
+                || !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
             {
                 Console.Write("Generating " + _seqFilePath + " and " + _annoFilePath + "...");
                 GenerateMetaFiles();
@@ -176,6 +179,13 @@ namespace InformedProteomics.Backend.Database
             return _descriptions[offsetKey];
         }
 
+        public int GetProteinLength(string name)
+        {
+            int length;
+            if (_nameToLength.TryGetValue(name, out length)) return length;
+            return -1;
+        }
+
         internal int GetLastWriteTimeHash()
         {
             return _lastWriteTimeHash;
@@ -186,10 +196,13 @@ namespace InformedProteomics.Backend.Database
             var fs = File.OpenRead(filePath);
             using (var reader = new BinaryReader(fs))
             {
-                fs.Seek(-sizeof(int), SeekOrigin.End);
+                fs.Seek(-2*sizeof(int), SeekOrigin.End);
+
+                var fileFormatId = reader.ReadInt32();
+                if (fileFormatId != FileFormatId) return false;
+
                 var lastWriteTimeHash = reader.ReadInt32();
-                if (lastWriteTimeHash == code)
-                    return true;
+                if (lastWriteTimeHash == code) return true;
             }
             return false;
         }
@@ -197,7 +210,14 @@ namespace InformedProteomics.Backend.Database
         static internal bool CheckHashCodeTextFile(string filePath, int code)
         {
             var lastLine = File.ReadLines(filePath).Last(); // TODO: this is not efficient for big files
-            var lastWriteTimeHash = Convert.ToInt32(lastLine);
+
+            var token = lastLine.Split(':');
+            if (token.Length != 2) return false;
+
+            var fileFormatId = Convert.ToInt32(token[0]);
+            if (fileFormatId != FileFormatId) return false;
+
+            var lastWriteTimeHash = Convert.ToInt32(token[1]);
             if (lastWriteTimeHash == code) return true;
 
             return false;
@@ -209,6 +229,7 @@ namespace InformedProteomics.Backend.Database
         private readonly int _lastWriteTimeHash;
 
         private List<long> _offsetList;
+        private IDictionary<string, int> _nameToLength;
         private IDictionary<long, string> _names;
         private IDictionary<long, string> _descriptions;
 
@@ -235,16 +256,22 @@ namespace InformedProteomics.Backend.Database
                     var name = reader.ProteinName;
                     var description = reader.ProteinDescription;
                     var sequence = (char)Delimiter + reader.ProteinSequence;
+                    var length = reader.ProteinSequence.Length;
                     seqWriter.Write(Encoding.GetBytes(sequence));
-                    annoWriter.WriteLine(offset + ":" + name + ":" + description);
+                    annoWriter.WriteLine(offset + ":" + length + ":" + name + ":" + description);
                     offset += sequence.Length;
                 }
 
+                seqWriter.Write((char)Delimiter);
+
+                // write file format Id
+                seqWriter.Write(FileFormatId);
+
+                // writer last write time hash
                 var hashCode = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
-                seqWriter.Write((char)Delimiter);
                 seqWriter.Write(hashCode);
-                annoWriter.Write(hashCode);
+                annoWriter.Write(FileFormatId+":"+hashCode);
 
                 reader.CloseFile();
             }
@@ -254,7 +281,7 @@ namespace InformedProteomics.Backend.Database
         {
             using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
             {
-                _sequence = new byte[fileStream.Length - sizeof(int) + 1];
+                _sequence = new byte[fileStream.Length - 2*sizeof(int) + 1];
                 fileStream.Read(_sequence, 0, _sequence.Length);
                 _sequence[_sequence.Length - 1] = LastCharacter;
             }
@@ -265,6 +292,7 @@ namespace InformedProteomics.Backend.Database
         private bool ReadAnnnoFile()
         {
             _offsetList = new List<long>();
+            _nameToLength = new Dictionary<string, int>();
             _names = new Dictionary<long, string>();
             _descriptions = new Dictionary<long, string>();
 
@@ -274,12 +302,15 @@ namespace InformedProteomics.Backend.Database
                 while((s=reader.ReadLine()) != null)
                 {
                     var token = s.Split(':');
-                    if (token.Length != 3)
+                    if (token.Length < 4)
                         break;
                     var offset = long.Parse(token[0]);
                     _offsetList.Add(offset);
-                    _names.Add(offset,token[1]);
-                    _descriptions.Add(offset, token[2]);
+                    var length = int.Parse(token[1]);
+                    var name = token[2];
+                    _nameToLength.Add(name, length);
+                    _names.Add(offset,name);
+                    _descriptions.Add(offset, token[3]);
                 }
             }
 
