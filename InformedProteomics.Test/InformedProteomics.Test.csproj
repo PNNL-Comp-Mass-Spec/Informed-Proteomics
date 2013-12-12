@@ -76,9 +76,6 @@
     <Reference Include="nunit.framework">
       <HintPath>..\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="PNNLOmics">
-      <HintPath>..\lib\$(Platform)\PNNLOmics.dll</HintPath>
-    </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>
     </Reference>
@@ -98,12 +95,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestDia.cs" />
+    <Compile Include="FunctionalTests\TestLcMsRun.cs" />
+    <Compile Include="TestBottomUpScoring.cs" />
+    <Compile Include="TestEdrn.cs" />
     <Compile Include="TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
+    <Compile Include="TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
     <Compile Include="TestParsingSpectra.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
+    <Compile Include="TestProteoWizardWrapper.cs" />
     <Compile Include="TestSequenceGraph.cs" />
     <Compile Include="TestSuffixArray.cs" />
     <Compile Include="TestImsScoring.cs" />

@@ -166,7 +166,7 @@ namespace InformedProteomics.IMS.IMSScoring
             foreach (var ionType in ionTypes)
             {
                 var composition = ionType.IsPrefixIon ? cutComposition : suffixComposition;
-                //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + composition.GetMass() + "\t" + ionType.GetIon(composition).GetMz());
+                //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + composition.GetMass() + "\t" + ionType.GetIon(composition).GetMonoIsotopicMz());
                 var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, precursorFeature, parameter, _scoringParams);
                 //if(node.Feature != null)
                 //    if (20 * node.Feature.IntensityMax < precursorFeature.IntensityMax || node.Feature.IntensityMax > 20 * precursorFeature.IntensityMax) continue; // 

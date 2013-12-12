@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UIMFLibrary;
-
-namespace InformedProteomics.Backend.Data.Spectrometry
+﻿namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Tolerance
     {

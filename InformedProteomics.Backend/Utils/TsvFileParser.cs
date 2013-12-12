@@ -44,7 +44,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = 0; i < pepQValues.Count; i++)
             {
                 var pepQValue = Convert.ToDouble(pepQValues[i]);
-                if(pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i].Replace("C+57.021", "C"));
+                if(pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
             }
             return peptideSet;
         }

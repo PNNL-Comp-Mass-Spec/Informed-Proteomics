@@ -16,7 +16,7 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateAbrfSpecCountAllProteins()
         {
-            const string dir = @"C:\cygwin\home\sangtaekim\Research\Data\IPRG2014";
+            const string dir = @"D:\Research\Data\IPRG2014";
             const double qValueThreshold = 0.01;
             //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
@@ -93,7 +93,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAbrfSpecCount()
         {
-            const string dir = @"C:\cygwin\home\sangtaekim\Research\Data\IPRG2014";
+            const string dir = @"D:\Research\Data\IPRG2014";
             const double qValueThreshold = 0.01;
             var names = new[] {"ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN"};
             var accessions = new[] { "P00924", "P00330", "P62894", "P02769"};
@@ -162,7 +162,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             Console.WriteLine("Peptide\tFormula\tProtein");
-            foreach (var annotationAndOffset in indexedDatabase.SequencesAsStrings(6, 30, 1, 1, Enzyme.Trypsin))
+            foreach (var annotationAndOffset in indexedDatabase.AnnotationsAndOffsets(6, 30, 1, 1, Enzyme.Trypsin))
             {
                 var annotation = annotationAndOffset.Annotation;
                 var peptide = annotation.Substring(2, annotation.Length - 4);

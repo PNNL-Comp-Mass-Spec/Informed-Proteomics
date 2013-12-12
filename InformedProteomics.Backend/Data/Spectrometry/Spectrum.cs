@@ -135,6 +135,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public void FilterNoise(double signalToNoiseRatio)
         {
+            if (Peaks.Length < 2) return;
             Array.Sort(Peaks, new IntensityComparer());
             var medianIntPeak = Peaks[Peaks.Length / 2];
             var noiseLevel = medianIntPeak.Intensity;

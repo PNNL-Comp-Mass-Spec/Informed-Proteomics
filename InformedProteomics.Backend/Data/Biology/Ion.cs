@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -17,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Biology
             Charge = charge;
         }
 
-        public double GetMz()
+        public double GetMonoIsotopicMz()
         {
             return (Composition.GetMass() + Charge * Constants.Proton) / Charge;
         }
@@ -36,7 +37,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// Gets the m/z of the most abundant isotope peak
         /// </summary>
         /// <returns>m/z of the most abundant isotope peak</returns>
-        public double GetBaseIsotopeMz()
+        public double GetMostAbundantIsotopeMz()
         {
             return GetIsotopeMz(Composition.GetMostAbundantIsotopeZeroBasedIndex());
         }
@@ -56,7 +57,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// </summary>
         /// <param name="relativeIntensityThreshold">relative isotope intensity threshold</param>
         /// <returns>Enumerable of isotope peaks</returns>
-        public IEnumerable<Tuple<int,float>> GetIsotopes(double relativeIntensityThreshold)
+        public IEnumerable<Isotope> GetIsotopes(double relativeIntensityThreshold)
         {
             var isotopeIndex = -1;
             foreach (var isotopeRatio in Composition.GetIsotopomerEnvelop())
@@ -64,28 +65,53 @@ namespace InformedProteomics.Backend.Data.Biology
                 ++isotopeIndex;
                 if (isotopeRatio > relativeIntensityThreshold)
                 {
-                    yield return new Tuple<int, float>(isotopeIndex, isotopeRatio);
+                    yield return new Isotope(isotopeIndex, isotopeRatio);
                 }
             }
         }
 
         /// <summary>
-        /// Gets top n (numIsotopes) theoretical isotope peaks
+        /// Gets top n (numIsotopes) theoretical isotope peaks ordered by the ratios of isotopes (higher first)
         /// </summary>
         /// <param name="numIsotopes">number of isotopes</param>
         /// <returns>Enumerable of isotope peaks</returns>
-        public IEnumerable<Tuple<int, float>> GetIsotopes(int numIsotopes)
+        public IEnumerable<Isotope> GetIsotopes(int numIsotopes)
         {
             var isotopes = Composition.GetIsotopomerEnvelop();
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
             Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
 
-            for (var i = 0; i < numIsotopes; i++)
+            for (var i = 0; i < numIsotopes && i<index.Length; i++)
             {
-                yield return new Tuple<int, float>(index[i], isotopes[index[i]]);
+                yield return new Isotope(index[i], isotopes[index[i]]);
             }
         }
+
+        public IList<Isotope> GetTop3Isotopes()
+        {
+            var isotopes = Composition.GetIsotopomerEnvelop();
+
+            var top3 = new List<Isotope>();
+            var indexOfMostAbundantIsotope = Composition.GetMostAbundantIsotopeZeroBasedIndex();
+            if (indexOfMostAbundantIsotope == 0)
+            {
+                for (var i = 0; i < 3 && i < isotopes.Length; i++)
+                {
+                    top3.Add(new Isotope(i, isotopes[i]));
+                }
+            }
+            else
+            {
+                for (var i = indexOfMostAbundantIsotope - 1; i <= indexOfMostAbundantIsotope+1 && i < isotopes.Length; i++)
+                {
+                    top3.Add(new Isotope(i, isotopes[i]));
+                }
+            }
+
+            return top3;
+        }
+        
 
     }
 }

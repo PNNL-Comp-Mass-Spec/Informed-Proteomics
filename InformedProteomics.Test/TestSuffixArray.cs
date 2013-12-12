@@ -32,7 +32,7 @@ namespace InformedProteomics.Test
             var numPeptides = 0;
             foreach (
                 var annotationAndOffset in
-                    indexedDbTarget.SequencesAsStrings(minPeptideLength, maxPeptideLength, numTolerableTermini,
+                    indexedDbTarget.AnnotationsAndOffsets(minPeptideLength, maxPeptideLength, numTolerableTermini,
                                                        numMissedCleavages, enzyme))
             {
                 var annotation = annotationAndOffset.Annotation;
@@ -43,7 +43,7 @@ namespace InformedProteomics.Test
                 for (var charge = 2; charge < 3; charge++)
                 {
                     var ion = new Ion(pepComposition, charge);
-                    var precursorMz = ion.GetMz();
+                    var precursorMz = ion.GetMonoIsotopicMz();
 
                     var massIndex = (int)Math.Round(precursorMz / 100.0);
                     if (massIndex > 30) massIndex = 30;

@@ -47,18 +47,21 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
-            _msLevel = new Dictionary<int, int>();
+            var msLevelMap = new Dictionary<int, int>();
+            
 
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
 
             // Read all spectra
             var minScanNum = int.MaxValue;
             var maxScanNum = int.MinValue;
+            var minMsLevel = int.MaxValue;
+            var maxMsLevel = int.MinValue;
 
             foreach (var spec in massSpecDataReader.ReadAllSpectra())
             {
                 //Console.WriteLine("Reading Scan {0}", spec.ScanNum);
-                _msLevel[spec.ScanNum] = spec.MsLevel;
+                msLevelMap[spec.ScanNum] = spec.MsLevel;
                 if (spec.MsLevel == 1)
                 {
                     if (precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(precursorSignalToNoiseRatioThreshold);
@@ -92,16 +95,21 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
 
-                _isolationMzBinToScanNums = new Dictionary<int, IEnumerable<int>>();
-                foreach (var entry in isolationMzBinToScanNums)
-                {
-                    var binNum = entry.Key;
-                    var scanNumList = entry.Value;
-                    _isolationMzBinToScanNums[binNum] = scanNumList;
-                }
-
                 if (spec.ScanNum < minScanNum) minScanNum = spec.ScanNum;
                 if (spec.ScanNum > maxScanNum) maxScanNum = spec.ScanNum;
+
+                if (spec.MsLevel < minMsLevel) minMsLevel = spec.MsLevel;
+                if (spec.MsLevel > maxMsLevel) maxMsLevel = spec.MsLevel;
+
+            }
+
+            _isolationMzBinToScanNums = new Dictionary<int, IEnumerable<int>>();
+            foreach (var entry in isolationMzBinToScanNums)
+            {
+                var binNum = entry.Key;
+                entry.Value.Sort();
+                var scanNumList = entry.Value.ToArray();
+                _isolationMzBinToScanNums[binNum] = scanNumList;
             }
 
            _ms1PeakList.Sort();
@@ -111,15 +119,29 @@ namespace InformedProteomics.Backend.MassSpecData
            MinLcScan = minScanNum;
            MaxLcScan = maxScanNum;
 
-            _precursorScan = new int[MaxLcScan - MinLcScan + 1];
+            MinMsLevel = minMsLevel;
+            MaxMsLevel = maxMsLevel;
+
             var precursorMap = new Dictionary<int, int>();
-            precursorMap[1] = 0;
+            var nextScanMap = new Dictionary<int, int>();
+
+            for (var msLevel = MinMsLevel; msLevel <= maxMsLevel; msLevel++)
+            {
+                precursorMap[msLevel] = 0;
+                nextScanMap[msLevel] = MaxLcScan + 1;
+            }
+
+            _msLevel = new int[MaxLcScan - MinLcScan + 1];
+            _precursorScan = new int[MaxLcScan - MinLcScan + 1];
 
             var prevMsLevel = int.MinValue;
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
                 var index = scanNum - MinLcScan;
-                var msLevel = _msLevel[scanNum];
+                int msLevel;
+                if (!msLevelMap.TryGetValue(scanNum, out msLevel)) msLevel = 0;
+                _msLevel[index] = msLevel;
+
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
                 {
@@ -137,11 +159,36 @@ namespace InformedProteomics.Backend.MassSpecData
                 prevMsLevel = msLevel;
             }
 
-            massSpecDataReader.Close();
+            _nextScan = new int[MaxLcScan - MinLcScan + 1];
+            var nextMsLevel = int.MinValue;
+            for (var scanNum = MaxLcScan; scanNum >= MinLcScan; scanNum--)
+            {
+                var index = scanNum - MinLcScan;
+                var msLevel = _msLevel[index];
+
+                // determine precursor scan
+                if (msLevel == nextMsLevel)
+                {
+                    _nextScan[index] = _nextScan[index + 1];
+                }
+                else if (msLevel > nextMsLevel)
+                {
+                    _nextScan[index] = scanNum + 1;
+                    nextScanMap[msLevel] = scanNum + 1;
+                }
+                else // msLevel < prevMsLevel
+                {
+                    _nextScan[index] = nextScanMap[msLevel];
+                }
+                nextMsLevel = msLevel;
+            }
         }
 
         public int MinLcScan { get; private set; }
         public int MaxLcScan { get; private set; }
+
+        public int MinMsLevel { get; private set; }
+        public int MaxMsLevel { get; private set; }
 
         /// <summary>
         /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
@@ -150,7 +197,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>scan numbers of fragmentation spectra</returns>
         public IEnumerable<int> GetFragmentationSpectraScanNums(Ion precursorIon)
         {
-            var precursorBaseMz = precursorIon.GetBaseIsotopeMz();
+            var precursorBaseMz = precursorIon.GetMostAbundantIsotopeMz();
             var targetIsoBin = (int)Math.Round(precursorBaseMz*IsolationWindowBinningFactor);
             IEnumerable<int> scanNums;
             return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
@@ -213,7 +260,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var spec = _scanNumSpecMap[xicPeak.ScanNum];
                 var peak = spec.FindPeak(xicPeak.Mz + mzDifference, tolerance);
-                if (peak != null) isotopeXic.Add(new XicPeak(xicPeak.ScanNum, peak.Mz, peak.Intensity));
+                if (peak != null) isotopeXic.Add(new XicPoint(xicPeak.ScanNum, peak.Mz, peak.Intensity));
             }
             return isotopeXic;
         }
@@ -237,7 +284,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz <= minMz) break;
-                xic.Add(new XicPeak(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
                 --i;
             }
 
@@ -247,7 +294,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPeak(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
                 ++i;
             }
 
@@ -307,7 +354,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //TODO: this tolerance value is not optimal for all data (revisit required)
             const int tolerance = 3;
 
-            var index = xic.BinarySearch(new XicPeak(targetScanNum, 0, 0));
+            var index = xic.BinarySearch(new XicPoint(targetScanNum, 0, 0));
             if(index < 0) index = ~index;
 
             var xicSegment = new Xic();
@@ -379,7 +426,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
 
                 var peak = productSpec.FindPeak(productIonMz, tolerance);
-                if(peak != null) productXic.Add(new XicPeak(scanNum, peak.Mz, peak.Intensity));
+                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
             }
 
             return productXic;
@@ -396,19 +443,23 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Gets the next scan number whose ms level is smaller by 1
+        /// </summary>
+        /// <param name="scanNum">scan number</param>
+        /// <returns>next scan number or MaxLc for MS1</returns>
+        public int GetNextScanNum(int scanNum)
+        {
+            return _nextScan[scanNum - MinLcScan];
+        }
+
+        /// <summary>
         /// Gets the MS level of the specified scan
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <returns>MS level</returns>
         public int GetMsLevel(int scanNum)
         {
-            int msLevel;
-            if (_msLevel.TryGetValue(scanNum, out msLevel))
-            {
-                return msLevel;
-            }
-            Console.WriteLine("Strange: {0}" + scanNum);
-            return -1;
+            return _msLevel[scanNum - MinLcScan];
         }
 
         /// <summary>
@@ -427,7 +478,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the greatest scan number smaller than scanNum
+        /// Gets the greatest scan number smaller than ms2ScanNum
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <param name="msLevel">MS level</param>
@@ -442,7 +493,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the smallest scan number larger than scanNum
+        /// Gets the smallest scan number larger than ms2ScanNum
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <param name="msLevel">MS level</param>
@@ -459,19 +510,74 @@ namespace InformedProteomics.Backend.MassSpecData
             return MaxLcScan + 1;
         }
 
-        /// <summary>
-        /// Gets MS/MS spectra whose isolation windows contain the most abundant peak of the precursorIon
-        /// </summary>
-        /// <param name="precursorIon"></param>
-        /// <returns></returns>
-        public IEnumerable<ProductSpectrum> GetMatchingMs2Spectra(Ion precursorIon)
+        private class ComparerWithTolerance : IComparer<double>
         {
-            //var baseIsotopeIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            //var baseXic = GetExtractedIonChromatogram()
-            //var relativeIsotopeIntensityThreshold = 0.5;
-            //precursorIon.GetIsotopes(relativeIsotopeIntensityThreshold);
-            return null;
+            private readonly double _tolerance;
+            public ComparerWithTolerance(double tolerance)
+            {
+                _tolerance = tolerance;
+            }
+            public int Compare(double x, double y)
+            {
+                if (Math.Abs((x - y)/x*1E6) <= _tolerance) return 0;
+                return x.CompareTo(y);
+            }
         }
+        private readonly ComparerWithTolerance _comparer = new ComparerWithTolerance(10);
+
+        public bool CheckMs1Signature(Ion precursorIon, int ms2ScanNum, Tolerance tolerance)
+        {
+            if (GetMsLevel(ms2ScanNum) != 2) return false;
+
+            var prevMs1ScanNum = GetPrecursorScanNum(ms2ScanNum);
+            var nextMs1ScanNum = GetNextScanNum(ms2ScanNum);
+
+            if (_ms1Features != null)
+            {
+                var mostAbundantIsotopeMz = precursorIon.GetMostAbundantIsotopeMz();
+                if (prevMs1ScanNum > 0 &&
+                    _ms1Features[prevMs1ScanNum][precursorIon.Charge - _ms1FeatureMinCharge]
+                    .BinarySearch(mostAbundantIsotopeMz, _comparer) >= 0) return true;
+                if (nextMs1ScanNum <= MaxLcScan
+                    && _ms1Features[nextMs1ScanNum][precursorIon.Charge - _ms1FeatureMinCharge]
+                    .BinarySearch(mostAbundantIsotopeMz, _comparer) >= 0) return true;
+                return false;
+            }
+
+            var isotopes = precursorIon.GetTop3Isotopes();
+            var prevMs1Spec = GetSpectrum(prevMs1ScanNum);
+            if (prevMs1Spec != null)
+            {
+                //if (prevMs1Spec.ContainsIon(precursorIon, ToleranceForBaseXic, 0.9)) return true;
+                var isPrevIsotopeValid = false;
+                foreach (var isotope in isotopes)
+                {
+                    var mz = precursorIon.GetIsotopeMz(isotope.Index);
+                    if (prevMs1Spec.FindPeak(mz, tolerance) != null)  // match
+                    {
+                        if (isPrevIsotopeValid) return true;
+                        isPrevIsotopeValid = true;
+                    }
+                }
+            }
+
+            var nextMs1Spec = GetSpectrum(nextMs1ScanNum);
+            if (nextMs1Spec != null)
+            {
+                var isPrevIsotopeValid = false;
+                foreach (var isotope in isotopes)
+                {
+                    var mz = precursorIon.GetIsotopeMz(isotope.Index);
+                    if (nextMs1Spec.FindPeak(mz, tolerance) != null)  // match
+                    {
+                        if (isPrevIsotopeValid) return true;
+                        isPrevIsotopeValid = true;
+                    }
+                }
+            }                
+            return false;                
+        }
+
 
         // These writing/reading methods are added to speed up the testing
         public void WriteTo(string outputFilePath)
@@ -486,13 +592,41 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private readonly Dictionary<int, int> _msLevel;
+        public void ComputeMs1Features(int minCharge, int maxCharge, Tolerance tolerance)
+        {
+            _ms1Features = new Dictionary<int, List<double>[]>();
+
+            foreach (var scanNum in GetScanNumbers(msLevel: 1))
+            {
+                var spec = GetSpectrum(scanNum);
+                var ms1FeaturesForScan = new List<double>[maxCharge - minCharge + 1];
+                for (var charge = minCharge; charge <= maxCharge; charge++)
+                {
+                    ms1FeaturesForScan[charge - minCharge] = new List<double>();
+                    foreach (var p in spec.Peaks)
+                    {
+                        var mz = p.Mz;
+                        if (spec.FindPeak(mz + Constants.C13MinusC12 / charge, tolerance) != null)
+                        {
+                            ms1FeaturesForScan[charge - minCharge].Add(mz);
+                        }
+                    }
+                }
+                _ms1Features[scanNum] = ms1FeaturesForScan;
+            }
+            _ms1FeatureMinCharge = minCharge;
+        }
+
+        //private readonly Dictionary<int, int> _msLevel;
+        private readonly int[] _msLevel;
         private readonly int[] _precursorScan;
+        private readonly int[] _nextScan;
 
         private readonly List<LcMsPeak> _ms1PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         private readonly Dictionary<int, IEnumerable<int>> _isolationMzBinToScanNums;
-
+        private Dictionary<int, List<double>[]> _ms1Features = null;
+        private int _ms1FeatureMinCharge = 0;
     }
 
     class LcMsPeak: Peak

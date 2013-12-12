@@ -71,16 +71,20 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<byte[]> SequencesWithNoCleavage()
+        public IEnumerable<SequenceAndOffset> SequencesWithOffsetNoCleavage()
         {
             List<byte> buf = null;
+            var curOffset = 0L;
 
+            var offset = -1L;
             foreach (var residue in _fastaDatabase.Characters())
             {
+                ++offset;
                 if (residue == FastaDatabase.Delimiter)
                 {
-                    if (buf != null && buf.Count > 0) yield return buf.ToArray();
+                    if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(buf.ToArray(), curOffset);
                     buf = new List<byte>();
+                    curOffset = offset;
                 }
                 else
                 {
@@ -89,16 +93,16 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<AnnotationAndOffset> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
-            return SequencesAsStrings(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
+            return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
                                enzyme.IsNTerm);
         }
 
 
 
-        public IEnumerable<AnnotationAndOffset> SequencesAsStrings(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, char[] enzymaticResidues,
                                                       bool isNTermEnzyme)
         {
@@ -122,7 +126,7 @@ namespace InformedProteomics.Backend.Database
 
             var encoding = Encoding.ASCII;
             // pre, peptide sequence, next
-            foreach (var seqAndLcp in SequenceAndLcps(minLength, maxLength+2))
+            foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
             {
                 var seqArr = seqAndLcp.Sequence;
                 var lcp = seqAndLcp.Lcp;
@@ -164,17 +168,17 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<string> SequencesAsStrings(int minLength, int maxLength)
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength)
         {
-            return SequencesAsStrings(0, minLength, maxLength);
+            return AnnotationsAndOffsets(0, minLength, maxLength);
         }
 
         public int GetLongestSequenceLength()
         {
-            return SequencesWithNoCleavage().Select(seqArr => seqArr.Length).Max();
+            return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
         }
 
-        private IEnumerable<SequenceAndLcp> SequenceAndLcps(int minLength, int maxLength)
+        private IEnumerable<SequenceLcpAndOffset> SequencesWithLcpAndOffset(int minLength, int maxLength)
         {
             var curSequence = new LinkedList<byte>();
             var lcpList = new LinkedList<byte>();
@@ -192,7 +196,7 @@ namespace InformedProteomics.Backend.Database
                 var seqArr = new byte[curSequence.Count];
                 curSequence.CopyTo(seqArr, 0);
 
-                yield return new SequenceAndLcp(seqArr, lcpList.First.Value, ++offset);
+                yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, ++offset);
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
             }
@@ -201,28 +205,32 @@ namespace InformedProteomics.Backend.Database
             {
                 var seqArr = new byte[curSequence.Count];
                 curSequence.CopyTo(seqArr, 0);
-                yield return new SequenceAndLcp(seqArr, lcpList.First.Value, ++offset);
+                yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, ++offset);
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
             }
         }
-        
-        private IEnumerable<string> SequencesAsStrings(int numNTermCleavages, int minLength, int maxLength)
+
+        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int numNTermCleavages, int minLength, int maxLength)
         {
             var encoding = Encoding.ASCII;
 
-            foreach (var seqArr in SequencesWithNoCleavage())
+            foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
+                var seqArr = seqWithOffset.Sequence;
+                var offset = seqWithOffset.Offset;
                 for (var i = 0; i <= numNTermCleavages; i++)
                 {
                     if (seqArr.Length - i >= minLength && seqArr.Length - i <= maxLength)
                     {
-                        yield return
+                        yield return new AnnotationAndOffset(
+                            offset,
                             string.Format("{0}.{1}.{2}",
                             (i == 0 ? "_" : encoding.GetString(seqArr, i - 1, 1)),
                             encoding.GetString(seqArr, i, seqArr.Length - i),
-                            "_"
+                            "_")
                             );
+                        // yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                     }
                 }
             }
@@ -300,7 +308,7 @@ namespace InformedProteomics.Backend.Database
         //        }
 
         //        // pre, peptide sequence, next
-        //        foreach (var seqAndLcp in SequenceAndLcps(minLength, maxLength + 2))
+        //        foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength + 2))
         //        {
         //            var seqArr = seqAndLcp.Annotation;
         //            var lcp = seqAndLcp.Lcp;
@@ -353,9 +361,9 @@ namespace InformedProteomics.Backend.Database
 
     }
 
-    internal class SequenceAndLcp
+    internal class SequenceLcpAndOffset
     {
-        public SequenceAndLcp(byte[] sequence, short lcp, long offset)
+        public SequenceLcpAndOffset(byte[] sequence, short lcp, long offset)
         {
             Sequence = sequence;
             Lcp = lcp;
@@ -366,4 +374,17 @@ namespace InformedProteomics.Backend.Database
         public short Lcp { set; get; }
         public long Offset { set; get; }
     }
+
+    public class SequenceAndOffset
+    {
+        public SequenceAndOffset(byte[] sequence, long offset)
+        {
+            Sequence = sequence;
+            Offset = offset;
+        }
+
+        public byte[] Sequence { set; get; }
+        public long Offset { set; get; }
+    }
+
 }

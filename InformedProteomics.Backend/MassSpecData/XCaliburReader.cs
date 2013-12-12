@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using DeconTools.Backend.ProcessingTasks.PeakDetectors;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -81,32 +81,29 @@ namespace InformedProteomics.Backend.MassSpecData
             // Centroid spectrum
             if (!ReadIsCentroidScan(scanNum))
             {
-                if (_peakDetector == null)
-                {
-                    _peakDetector = new DeconToolsPeakDetectorV2(PeakToBackgroundRatio, 0);
-                }
-                var peaks = _peakDetector.FindPeaks(mzArr, intensityArr);
-                mzArr = new double[peaks.Count];
-                intensityArr = new double[peaks.Count];
+                //// DeconTools
+                //if (_peakDetector == null)
+                //{
+                //    _peakDetector = new DeconToolsPeakDetectorV2(PeakToBackgroundRatio, 0);
+                //}
+                //var peaks = _peakDetector.FindPeaks(mzArr, intensityArr);
+                //mzArr = new double[peaks.Count];
+                //intensityArr = new double[peaks.Count];
 
-                var index = -1;
-                foreach (var peak in peaks)
-                {
-                    mzArr[++index] = peak.XValue;
-                    intensityArr[index] = peak.Height;
-                }
+                //var index = -1;
+                //foreach (var peak in peaks)
+                //{
+                //    mzArr[++index] = peak.XValue;
+                //    intensityArr[index] = peak.Height;
+                //}
+
+                // ProteoWizard
+                var centroider = new Centroider(mzArr, intensityArr);
+                double[] centroidedMzs, centroidedIntensities;
+                centroider.GetCentroidedData(out centroidedMzs, out centroidedIntensities);
+                mzArr = centroidedMzs;
+                intensityArr = centroidedIntensities;
             }
-
-           
-            //// Filter noise
-            //Array.Sort(intensityArr, mzArr);
-            //var noiseLevel = intensityArr[intensityArr.Length / 2]; // Noise level is the median
-            //var filteredPeaks = new List<Peak>();
-            //for (var i = 0; i < intensityArr.Length; i++)
-            //{
-            //    if (intensityArr[i] > noiseLevel * SignalToNoiseRatioThreshold) filteredPeaks.Add(new Peak(mzArr[i], intensityArr[i]));
-            //}
-            //filteredPeaks.Sort();
 
             var msLevel = ReadMsLevel(scanNum);
             if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
@@ -159,12 +156,19 @@ namespace InformedProteomics.Backend.MassSpecData
             return msLevel;
         }
 
+        public double RtFromScanNum(int scanNum)
+        {
+            var rt = 0.0;
+            _msfileReader.RTFromScanNum(scanNum, ref rt);
+            return rt;
+        }
+
         private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
         private readonly Dictionary<int, int> _msLevel;
 
-        private static DeconToolsPeakDetectorV2 _peakDetector;  // basic peak detector
+        //private static DeconToolsPeakDetectorV2 _peakDetector;  // basic peak detector
 
         /// <summary>
         /// Returns whether the specified scan is a centroid scan

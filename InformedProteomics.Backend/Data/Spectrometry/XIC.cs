@@ -6,8 +6,11 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class Xic: List<XicPeak>
+    public class Xic: List<XicPoint>
     {
+        //public int MinScanNum { get; private set; }
+        //public int MaxScanNum { get; private set; }
+
         public double GetCorrelation(Xic other)
         {
             if (this.Count == 0 || other == null || other.Count == 0) return 0;
@@ -33,6 +36,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public bool ContainsScanNum(int scanNum)
         {
             return this.Any(xicPeak => xicPeak.ScanNum == scanNum);
+        }
+
+        public int GetApexScanNum()
+        {
+            var maxIntensity = double.MinValue;
+            var apexScan = -1;
+            foreach (var p in this)
+            {
+                if (p.Intensity > maxIntensity)
+                {
+                    apexScan = p.ScanNum;
+                    maxIntensity = p.Intensity;
+                }
+            }
+            return apexScan;
         }
     }
 }

@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.WriteLine("Generating XICs...");
 
-            foreach (var protAnnotation in indexedDb.SequencesAsStrings(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
             {
 
                 ++numProteins;
@@ -92,7 +92,7 @@ namespace InformedProteomics.Test
                 //Console.WriteLine(protAnnotation);
 
 
-                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotationAndOffset.Annotation);
                 
                 //Console.WriteLine(seqGraph.GetSequenceCompositions()[0]);
                 

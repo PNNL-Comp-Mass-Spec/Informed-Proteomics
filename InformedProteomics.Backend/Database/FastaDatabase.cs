@@ -10,13 +10,14 @@ namespace InformedProteomics.Backend.Database
 {
     public class FastaDatabase
     {
-        public const int FileFormatId = 174;
+        public const int FileFormatId = 175;
         public const string SeqFileExtension = ".icseq";
         public const string AnnotationFileExtension = ".icanno";
         public const string DecoyDatabaseFileExtension = ".icdecoy.fasta";
         public const string DecoyProteinPrefix = "XXX";
         public const byte Delimiter = (byte)'_';
         public const byte LastCharacter = (byte)'~';
+        public const char AnnotationDelimiter = '/';
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 
@@ -211,7 +212,7 @@ namespace InformedProteomics.Backend.Database
         {
             var lastLine = File.ReadLines(filePath).Last(); // TODO: this is not efficient for big files
 
-            var token = lastLine.Split(':');
+            var token = lastLine.Split(AnnotationDelimiter);
             if (token.Length != 2) return false;
 
             var fileFormatId = Convert.ToInt32(token[0]);
@@ -258,7 +259,14 @@ namespace InformedProteomics.Backend.Database
                     var sequence = (char)Delimiter + reader.ProteinSequence;
                     var length = reader.ProteinSequence.Length;
                     seqWriter.Write(Encoding.GetBytes(sequence));
-                    annoWriter.WriteLine(offset + ":" + length + ":" + name + ":" + description);
+                    annoWriter.WriteLine("{0}{1}{2}{3}{4}{5}{6}", 
+                        offset,
+                        AnnotationDelimiter,
+                        length,
+                        AnnotationDelimiter,
+                        name,
+                        AnnotationDelimiter,
+                        description);
                     offset += sequence.Length;
                 }
 
@@ -271,7 +279,7 @@ namespace InformedProteomics.Backend.Database
                 var hashCode = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
                 seqWriter.Write(hashCode);
-                annoWriter.Write(FileFormatId+":"+hashCode);
+                annoWriter.Write("{0}{1}{2}", FileFormatId, AnnotationDelimiter, hashCode);
 
                 reader.CloseFile();
             }
@@ -301,13 +309,14 @@ namespace InformedProteomics.Backend.Database
                 string s;
                 while((s=reader.ReadLine()) != null)
                 {
-                    var token = s.Split(':');
+                    var token = s.Split(AnnotationDelimiter);
                     if (token.Length < 4)
                         break;
                     var offset = long.Parse(token[0]);
                     _offsetList.Add(offset);
                     var length = int.Parse(token[1]);
                     var name = token[2];
+                    if(_nameToLength.ContainsKey(name)) Console.WriteLine("Duplicate Name: {0}", name);
                     _nameToLength.Add(name, length);
                     _names.Add(offset,name);
                     _descriptions.Add(offset, token[3]);

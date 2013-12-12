@@ -93,7 +93,7 @@ namespace InformedProteomics.IMS.IMSTraining
             {
                 var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
                 var ion = ionType.GetIon(composition);
-                var peak = GetPeak(ion.GetMz(), tolerance);
+                var peak = GetPeak(ion.GetMonoIsotopicMz(), tolerance);
                 //if(peak.Intensity > 0)
                 peakList.Add(peak);
             }

@@ -22,6 +22,35 @@ namespace InformedProteomics.Test
     internal class TestUtils
     {
         [Test]
+        public void TestPeptide()
+        {
+            const string sequence = "KIEEIAAKYKHSVVKKCCYDGACVNNDETCEQRAARISLGPRCIKAFTECCVVASQLRANISHKDMQLGR";
+            //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
+            //const string sequence =
+            //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
+            var aaSet = new AminoAcidSet();
+            var composition = aaSet.GetComposition(sequence);
+
+            Console.WriteLine(composition);
+            Console.WriteLine(composition.GetMass());
+            Console.WriteLine(composition.GetNominalMass());
+            // 2nd isotope
+            Console.WriteLine(composition.GetIsotopeMass(0));
+            Console.WriteLine(composition.GetIsotopeMass(1));
+            Console.WriteLine(composition.GetIsotopeMass(2));
+            //Assert.AreEqual(composition.ToPlainString(), "C34H51N7O14");
+
+            Console.WriteLine("Isotopomer Envelope:");
+            foreach (var e in composition.GetIsotopomerEnvelop()) Console.WriteLine(e);
+            Console.WriteLine();
+
+            Console.WriteLine("Isotope ions:");
+            var ion = new Ion(composition + Composition.H2O, 10);
+            foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Index), p.Ratio);
+            Console.WriteLine();
+        }
+
+        [Test]
         public void TestGetProductIons()
         {
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -32,7 +61,7 @@ namespace InformedProteomics.Test
                 new[] {NeutralLoss.NoLoss, NeutralLoss.H2O}, 
                 maxCharge: 2);
 
-            Console.WriteLine("Precursor Ion: {0}\t{1}", sequence.GetPrecursorIon(2).Composition, sequence.GetPrecursorIon(2).GetMz());
+            Console.WriteLine("Precursor Ion: {0}\t{1}", sequence.GetPrecursorIon(2).Composition, sequence.GetPrecursorIon(2).GetMonoIsotopicMz());
             Console.WriteLine("Product ions: ");
             var productIons = sequence.GetProductIons(ionTypeFactory.GetAllKnownIonTypes());
             foreach (var theoIon in productIons)
@@ -41,7 +70,7 @@ namespace InformedProteomics.Test
                 var ionType = ionTypeAndIndex.Item1;
                 var index = ionTypeAndIndex.Item2;
                 var ion = theoIon.Value;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", ionType.Name, index, ion.Composition, ion.Charge, ion.GetMz());
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", ionType.Name, index, ion.Composition, ion.Charge, ion.GetMonoIsotopicMz());
             }
         }
 
@@ -158,35 +187,6 @@ namespace InformedProteomics.Test
 
             var set = new HashSet<double>();
             Console.WriteLine("Max: " + set.DefaultIfEmpty().Max(n => n*2));
-        }
-
-        [Test]
-        public void TestPeptide()
-        {
-            //const string sequence = "PEPTIDE";
-            const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
-            //const string sequence =
-            //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
-            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
-            var composition = aaSet.GetComposition(sequence);
-
-            Console.WriteLine(composition);
-            Console.WriteLine(composition.GetMass());
-            Console.WriteLine(composition.GetNominalMass());
-            // 2nd isotope
-            Console.WriteLine(composition.GetIsotopeMass(0));
-            Console.WriteLine(composition.GetIsotopeMass(1));
-            Console.WriteLine(composition.GetIsotopeMass(2));
-            //Assert.AreEqual(composition.ToPlainString(), "C34H51N7O14");
-
-            Console.WriteLine("Isotopomer Envelope:");
-            foreach (var e in composition.GetIsotopomerEnvelop()) Console.WriteLine(e);
-            Console.WriteLine();
-
-            Console.WriteLine("Isotope ions:");
-            var ion = new Ion(composition + Composition.H2O, 3);
-            foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Item1), p.Item2);
-            Console.WriteLine();
         }
 
         [Test]

@@ -14,6 +14,14 @@ namespace InformedProteomics.Test
     public class TestSequenceGraph
     {
         [Test]
+        public void TestNTermMods()
+        {
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            const string annotation = "_.MARTKQTARK._";
+
+        }
+
+        [Test]
         public void TestBuildingReverseGraph()
         {
             const string annotation = "_.MARTKQTARK._";

@@ -85,7 +85,7 @@ namespace InformedProteomics.IMS.IMSScoring
             var precursorIon = new Ion(_sequenceComposition + Composition.H2O, precursorCharge);
             var imsScorer = _imsScorerFactory.GetImsScorer(_imsData, precursorIon);
 
-            var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMz());
+            var precursorFeatureSet = _imsData.GetPrecursorFeatures(precursorIon.GetMonoIsotopicMz());
             var bestPrecursorScore = double.NegativeInfinity;
             var bestScore = double.NegativeInfinity;
             Feature bestFeature = null;

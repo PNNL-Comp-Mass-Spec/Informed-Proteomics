@@ -5,7 +5,6 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.DIA.Search;
@@ -17,35 +16,27 @@ namespace InformedProteomics.Test
     internal class TestPeptideCentricAnalysis
     {
         [Test]
-        public void ProcessPemmrData()
+        public void CompareRt()
         {
-            const string resultPath = @"D:\Research\Data\PEMMR\Ox\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_All.tsv";
-            const string outputFilePath = @"D:\Research\Data\PEMMR\Ox\IPA_Summary.tsv";
-            const string specFilePath = @"D:\Research\Data\PEMMR\Spectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.raw";;
+            // Q-Exactive
+            const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
+            const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
-            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(5));
-            var numId = postProcessor.PostProcessing(outputFilePath);
+            const string specFileDda = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.raw";
+            var ddaReader = new XCaliburReader(specFileDda);
 
-            Console.WriteLine("NumId: {0}", numId);
-        }
+            var specFileToReader = new Dictionary<string, XCaliburReader>();
+            var specFilesDia = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
+            foreach (var specFile in specFilesDia)
+            {
+                var specFileNoExt = Path.GetFileNameWithoutExtension(specFile);
+                if (specFileNoExt == null) continue;
+                var reader = new XCaliburReader(specFile);
+                specFileToReader.Add(specFileNoExt, reader);
+            }
 
-        [Test]
-        public void GenerateVennDiagramsPeMmr()
-        {
-            // No PE-MMR
-            const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
-
-            // PE-MMR Scan based FDR
-            const string scanBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_ScanFDR.tsv";
-
-            // UMC based FDR
-            const string umcBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_UMCFDR.tsv";
-
-            // IPA
-            const string ipa = @"D:\Research\Data\PEMMR\Ox\IPA_Summary_TargetOnly.tsv";
-
-            const string resultPath1 = umcBasedPeMmr;
-            const string resultPath2 = ipa;
+            const string resultPath1 = qeDdaResult;
+            const string resultPath2 = qeDiaResult;
 
             var result1 = new TsvFileParser(resultPath1);
             var result2 = new TsvFileParser(resultPath2);
@@ -53,51 +44,43 @@ namespace InformedProteomics.Test
             const double pepQValueThreshold = 0.01;
             var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
                                                       result2.GetPeptides(pepQValueThreshold));
-            Console.WriteLine("{0}\t{1}\t{2}",
-                              vennDiagram.Set1Only.Count + vennDiagram.Intersection.Count,
-                              vennDiagram.Intersection.Count,
-                              vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
-            Console.WriteLine("{0}\t{1}\t{2}",
-                              vennDiagram.Set1Only.Count,
-                              vennDiagram.Intersection.Count,
-                              vennDiagram.Set2Only.Count);
 
-            foreach(var peptide in vennDiagram.Set2Only)
+            var intersectionPeptides = vennDiagram.Intersection;
+
+            var result1Peptides = result1.GetData("Peptide");
+            var result1ScanNums = result1.GetData("ScanNum");
+
+            var result2Peptides = result2.GetData("Peptide");
+            var result2ScanNums = result2.GetData("ScanNum");
+            var result2SpecFile = result2.GetData("#SpecFile");
+
+            Console.WriteLine("Peptide\tScanNum1\tScanNum2\tRt1\tRt2");
+            foreach (var peptide in intersectionPeptides)
             {
-                Console.WriteLine(peptide);
-                var peptides = result2.GetData("Peptide");
+                var index1 = result1Peptides.IndexOf(peptide);
+                var index2 = result2Peptides.IndexOf(peptide);
+
+                var scanNum1 = Convert.ToInt32(result1ScanNums[index1]);
+                var scanNum2 = Convert.ToInt32(result2ScanNums[index2]);
+
+                var diaFile = Path.GetFileNameWithoutExtension(result2SpecFile[index2]);
+
+                var reader1 = ddaReader;
+                var reader2 = specFileToReader[diaFile];
+
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", peptide.Replace("C+57.021", "C"), scanNum1, scanNum2, reader1.RtFromScanNum(scanNum1), reader2.RtFromScanNum(scanNum2));
             }
-        }
-
-        [Test]
-        public void ProcessMhcData()
-        {
-            const string resultPath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\carone_C1309_All.tsv";
-            const string outputFilePath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\IPA_Summary.tsv";
-            var specFiles = Directory.GetFiles(@"D:\Research\Data\ImmunoPeptidomics\Benchmarking\raw", "*.raw");
-
-            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
-
-            var searchModifications = new List<SearchModification>
-            {
-                oxM
-            };
-            var aaSet = new AminoAcidSet(searchModifications, 2);
-
-            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(5), new Tolerance(3));
-            var numId = postProcessor.PostProcessing(outputFilePath);
-
-            Console.WriteLine("NumId: {0}", numId);
         }
 
         [Test]
         public void RunPeptideCentricAnalysis()
         {
             //TestQExactiveDdaDataPostProcessing();
-            TestQExactiveDiaDataPostProcessing();
+            //TestQExactiveDiaDataPostProcessing();
             //TestQExactiveDiaDataPostProcessingNoEdgeNtt2();
             //TestFusionDiaDataPostProcessing();
             //TestFusionDdaDataPostProcessing();
+            TestQExactiveDdaDataPostProcessingPerFile();
         }
 
         [Test]
@@ -121,7 +104,7 @@ namespace InformedProteomics.Test
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
             var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(20), new Tolerance(10));
-            var numId = postProcessor.PostProcessing(outputFilePath);
+            var numId = postProcessor.PostProcessing(outputFilePath); 
 
             Console.WriteLine("NumId: {0}", numId);
         }
@@ -215,6 +198,80 @@ namespace InformedProteomics.Test
                               vennDiagram.Set1Only.Count + vennDiagram.Intersection.Count,
                               vennDiagram.Intersection.Count,
                               vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
+        }
+
+        [Test]
+        public void ProcessPemmrData()
+        {
+            const string resultPath = @"D:\Research\Data\PEMMR\Ox\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_All.tsv";
+            const string outputFilePath = @"D:\Research\Data\PEMMR\Ox\IPA_Summary.tsv";
+            const string specFilePath = @"D:\Research\Data\PEMMR\Spectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.raw"; ;
+
+            var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(5));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
+        }
+
+        [Test]
+        public void GenerateVennDiagramsPeMmr()
+        {
+            // No PE-MMR
+            const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
+
+            // PE-MMR Scan based FDR
+            const string scanBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_ScanFDR.tsv";
+
+            // UMC based FDR
+            const string umcBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_UMCFDR.tsv";
+
+            // IPA
+            const string ipa = @"D:\Research\Data\PEMMR\Ox\IPA_Summary_TargetOnly.tsv";
+
+            const string resultPath1 = umcBasedPeMmr;
+            const string resultPath2 = ipa;
+
+            var result1 = new TsvFileParser(resultPath1);
+            var result2 = new TsvFileParser(resultPath2);
+
+            const double pepQValueThreshold = 0.01;
+            var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
+                                                      result2.GetPeptides(pepQValueThreshold));
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count + vennDiagram.Intersection.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count);
+
+            foreach (var peptide in vennDiagram.Set2Only)
+            {
+                Console.WriteLine(peptide);
+                var peptides = result2.GetData("Peptide");
+            }
+        }
+
+        [Test]
+        public void ProcessMhcData()
+        {
+            const string resultPath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\carone_C1309_All.tsv";
+            const string outputFilePath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\IPA_Summary.tsv";
+            var specFiles = Directory.GetFiles(@"D:\Research\Data\ImmunoPeptidomics\Benchmarking\raw", "*.raw");
+
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, 2);
+
+            var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(5), new Tolerance(3));
+            var numId = postProcessor.PostProcessing(outputFilePath);
+
+            Console.WriteLine("NumId: {0}", numId);
         }
 
         [Test]
@@ -323,7 +380,7 @@ namespace InformedProteomics.Test
             var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
 
             Console.WriteLine("Theoretical isotopomer profile:");
-            foreach(var p in precursorIon.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", precursorIon.GetIsotopeMz(p.Item1), p.Item2);
+            foreach(var p in precursorIon.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", precursorIon.GetIsotopeMz(p.Index), p.Ratio);
 
             var xicArr = new Dictionary<int, Xic>();
             var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -386,14 +443,14 @@ namespace InformedProteomics.Test
 
                 var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
                 var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetBaseIsotopeMz(), tolerance, scanNum);
+                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var baseIntensity = baseXic.GetSumIntensities();
 
                 var isValid = true;
                 foreach (var isotope in precursorIon.GetIsotopes(relativeIntensityThreshold))
                 {
-                    if (isotope.Item1 == basePeakIndex) continue;
-                    var isotopeMz = precursorIon.GetIsotopeMz(isotope.Item1);
+                    if (isotope.Index == basePeakIndex) continue;
+                    var isotopeMz = precursorIon.GetIsotopeMz(isotope.Index);
                     var xic = run.GetExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
 
                     if (xic.Count == 0)
@@ -418,7 +475,7 @@ namespace InformedProteomics.Test
                     //if (isotopeRatio > isotopeRatioTolerance || isotopeRatio < 1 / isotopeRatioTolerance)
                     //{
                     //    isValid = false;
-                    //    //Console.WriteLine("Off ratio\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMz(), isotopeMz, isotopeRatio);
+                    //    //Console.WriteLine("Off ratio\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMonoIsotopicMz(), isotopeMz, isotopeRatio);
                     //    break;
                     //}
 
@@ -426,7 +483,7 @@ namespace InformedProteomics.Test
                     //if (correlation < correlationThreshold)
                     //{
                     //    isValid = false;
-                    //    //Console.WriteLine("Low correlation\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMz(), isotopeMz, correlation);
+                    //    //Console.WriteLine("Low correlation\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMonoIsotopicMz(), isotopeMz, correlation);
                     //    break;
                     //}
                 }
@@ -483,17 +540,17 @@ namespace InformedProteomics.Test
                 var isDecoy = protein.StartsWith("XXX_");
 
                 var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
-                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetBaseIsotopeMz(), tolerance, scanNum);
+                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var baseIntensity = baseXic.GetSumIntensities();
 
-                Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", (isDecoy ? 1 : 0), peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMz());
+                Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", (isDecoy ? 1 : 0), peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMonoIsotopicMz());
 
                 var isotopeIndices = new double[] {0, 1, 2, 3, -1, 0.5};
                 var theoIsotopes = precursorIon.GetIsotopes(0.01);
                 var numIsotopes = 0;
                 foreach (var theoIsotope in theoIsotopes)
                 {
-                   Console.Write("\t"+theoIsotope.Item2);
+                   Console.Write("\t"+theoIsotope.Ratio);
                     if (++numIsotopes == 4) break;
                 }
 

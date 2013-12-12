@@ -64,7 +64,7 @@
     <Compile Include="Scoring\PrecursorOffsetFrequency.cs" />
     <Compile Include="Scoring\RankScorer.cs" />
     <Compile Include="Search\MsGfPostProcessor.cs" />
-    <Compile Include="Search\PeptideCentricAnalysis.cs" />
+    <Compile Include="Search\InformedProteomicsAnalysis.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">

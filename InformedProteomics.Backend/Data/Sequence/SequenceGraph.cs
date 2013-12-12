@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     public class SequenceGraph
     {
         /// <summary>
-        /// Create a graph representing the sequence. Annotation is reversed.
+        /// Create a graph representing the annotation. Annotation is reversed.
         /// </summary>
         /// <param name="aaSet">amino acid set</param>
         /// <param name="annotation">annotation (e.g. G.PEPTIDER.K or _.PEPTIDER._)</param>
@@ -29,6 +29,37 @@ namespace InformedProteomics.Backend.Data.Sequence
                                   : AminoAcid.PeptideCTerm;
 
             var sequence = annotation.Substring(2, annotation.Length - 4);
+            return CreateGraph(aaSet, nTerm, sequence, cTerm);
+        }
+
+        /// <summary>
+        /// Create a graph representing the sequence. Sequence is reversed.
+        /// </summary>
+        /// <param name="aaSet">amino acid set</param>
+        /// <param name="sequence">sequence</param>
+        /// <returns>sequence graph</returns>
+        public static SequenceGraph CreatePeptideGraph(AminoAcidSet aaSet, string sequence)
+        {
+            var seqGraph = new SequenceGraph(aaSet, sequence.Length);
+            seqGraph.AddAminoAcid(AminoAcid.PeptideCTerm.Residue);
+            for (var i = sequence.Length - 1; i >= 0; i--)
+            {
+                if (seqGraph.AddAminoAcid(sequence[i]) == false) return null;
+            }
+            seqGraph.AddAminoAcid(AminoAcid.PeptideNTerm.Residue);
+            return seqGraph;
+        }
+
+        /// <summary>
+        /// Create a graph representing the sequence. Sequence is reversed.
+        /// </summary>
+        /// <param name="aaSet">amino acid set</param>
+        /// <param name="nTerm">N-term amino acid</param>
+        /// <param name="sequence">sequence</param>
+        /// <param name="cTerm">C-term amino acid</param>
+        /// <returns>sequence graph</returns>
+        public static SequenceGraph CreateGraph(AminoAcidSet aaSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
+        {
             var seqGraph = new SequenceGraph(aaSet, sequence.Length);
             seqGraph.AddAminoAcid(cTerm.Residue);
             for (var i = sequence.Length - 1; i >= 0; i--)
@@ -182,18 +213,18 @@ namespace InformedProteomics.Backend.Data.Sequence
                 {
                     for (var ni = 0; ni < nodeScore[si].Length; ni++) nodeScore[si][ni] = 0.0;
                 }
-                //else
-                //{
-                //    for (var mi = 0; mi < nodeScore[si].Length; mi++)
-                //    {
-                //        var nodeComposition = GetComposition(si, mi);
-                //        //if (nodeComposition.GetMass() > precursorIon.Composition.GetMass())
-                //        //{
-                //        //    Console.WriteLine("Debug");
-                //        //}
-                //        nodeScore[si][mi] = scorer.GetFragmentScore(precursorIon, nodeComposition);
-                //    }
-                //}
+                else
+                {
+                    for (var mi = 0; mi < nodeScore[si].Length; mi++)
+                    {
+                        var nodeComposition = GetComposition(si, mi);
+                        //if (nodeComposition.GetMass() > precursorIon.Composition.GetMass())
+                        //{
+                        //    Console.WriteLine("Debug");
+                        //}
+                        nodeScore[si][mi] = scorer.GetFragmentScore(precursorIon, nodeComposition);
+                    }
+                }
             }
             maxScore[0][0] = 0;
 

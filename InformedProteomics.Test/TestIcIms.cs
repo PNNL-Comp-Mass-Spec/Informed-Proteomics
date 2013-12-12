@@ -101,7 +101,7 @@ namespace InformedProteomics.Test
 //                var decoy = isDecoy;
 //                long numProcessedPeptides = 0;
 //                Parallel.ForEach(
-//                    indexedDb.SequencesAsStrings(
+//                    indexedDb.AnnotationsAndOffsets(
 //                        minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme),
 //                    annotation =>
 //                    {
@@ -114,7 +114,7 @@ namespace InformedProteomics.Test
 //                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
 //                            for (var precursorCharge = minPrecursorCharge; precursorCharge <= maxPrecursorCharge; precursorCharge++)
 //                            {
-//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz();
 //                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
 //                                    continue;
 //                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
@@ -210,14 +210,14 @@ namespace InformedProteomics.Test
 //            const string outputPath = @"C:\cygwin\home\kims336\Data\SuffixArray\test.txt";
 //            var writer = new StreamWriter(outputPath);
 
-//            //var annotations = indexedDb.SequencesAsStrings(
+//            //var annotations = indexedDb.AnnotationsAndOffsets(
 //            //    minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme).ToArray();
 
 //            var histThreads = new Dictionary<int, int>();
 
 
 //            Parallel.ForEach(
-//                indexedDb.SequencesAsStrings(
+//                indexedDb.AnnotationsAndOffsets(
 //                    minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme),
 //                //annotations,
 //                annotation =>
@@ -231,7 +231,7 @@ namespace InformedProteomics.Test
 //                );
 
 //            //foreach (var annotation in
-//            //    indexedDb.SequencesAsStrings(
+//            //    indexedDb.AnnotationsAndOffsets(
 //            //    minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme)
 //            //    )
 //            //{
@@ -325,7 +325,7 @@ namespace InformedProteomics.Test
 
 //                    var indexedDb = new IndexedDatabase(db);
 //                    Console.WriteLine("Scoring {0} peptides", isDecoy == 0 ? "target" : "decoy");
-//                    foreach(var annotation in indexedDb.SequencesAsStrings(
+//                    foreach(var annotation in indexedDb.AnnotationsAndOffsets(
 //                            minPeptideLength, maxPeptideLength, numTolerableTermini, numMissedCleavages, enzyme))
 //                    {
 //                        // annotation: pre + "." + peptide + "." + post (e.g. R.PEPTIDER.G)
@@ -339,7 +339,7 @@ namespace InformedProteomics.Test
 //                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
 //                            for (var precursorCharge = minPrecursorCharge; precursorCharge <= maxPrecursorCharge; precursorCharge++)
 //                            {
-//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz();
 //                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
 //                                    continue;
 //                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
@@ -399,7 +399,7 @@ namespace InformedProteomics.Test
 //            for (var precursorCharge = 2; precursorCharge <= 4; precursorCharge++)
 //            {
 //                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
-//                Console.WriteLine("PrecursorMz: " + scoringGraph.GetPrecursorIon(precursorCharge).GetMz());
+//                Console.WriteLine("PrecursorMz: " + scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz());
 //                Console.WriteLine("Charge: " + precursorCharge);
 //                Console.WriteLine("Feature: " + best.Item1);
 //                Console.WriteLine("PrecursorScore: " + best.Item2);
@@ -458,7 +458,7 @@ namespace InformedProteomics.Test
 //                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
 //                            for (var precursorCharge = 1; precursorCharge <= 5; precursorCharge++)
 //                            {
-//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+//                                var precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz();
 //                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
 //                                    continue;
 //                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
@@ -603,7 +603,7 @@ namespace InformedProteomics.Test
 //                        scoringGraph.RegisterImsData(imsData, imsScorerFactory);
 //                        for (var precursorCharge = 1; precursorCharge <= 5; precursorCharge++)
 //                        {
-//                            double precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+//                            double precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz();
 //                            if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
 //                                continue;
 //                            var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
@@ -679,7 +679,7 @@ namespace InformedProteomics.Test
 //                            scoringGraph.RegisterImsData(imsData, imsScorerFactory);
 //                            for (var precursorCharge = 1; precursorCharge <= 5; precursorCharge++)
 //                            {
-//                                double precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMz();
+//                                double precursorMz = scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz();
 //                                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz)
 //                                    continue;
 //                                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
@@ -754,7 +754,7 @@ namespace InformedProteomics.Test
 //            //    for (int charge = 2; charge <= 2; charge++)
 //            //{
 //            //    var y15C2 = new Ion(fragmentComposition + Composition.H2O, 2);
-//            //    double fragmentMz = y15C2.GetMz();
+//            //    double fragmentMz = y15C2.GetMonoIsotopicMz();
 //            //    FeatureSet fragmentFeatures = imsData.GetFragmentFeatures(fragmentMz);
 //            //    Console.WriteLine("Fragment: {0}, Charge: {1}", fragmentMz, charge);
 //            //    foreach (Feature fragmentFeature in fragmentFeatures)

@@ -2,9 +2,9 @@
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class XicPeak: IComparable<XicPeak>
+    public class XicPoint: IComparable<XicPoint>
     {
-        public XicPeak(int scanNum, double mz, double intensity)
+        public XicPoint(int scanNum, double mz, double intensity)
         {
             ScanNum = scanNum;
             Mz = mz;
@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double Mz { get; private set; }
         public double Intensity { get; private set; }
 
-        public int CompareTo(XicPeak other)
+        public int CompareTo(XicPoint other)
         {
             return ScanNum - other.ScanNum;
         }

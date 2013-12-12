@@ -63,12 +63,12 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _minCharge;
         private readonly int _maxCharge;
 
-        private const double RelativeIsotopeIntensityThreshold = 0.7;
+        private const double RelativeIsotopeIntensityThreshold = 0.8;
 
         private static readonly BaseIonType[] BaseIonTypes;
         static MatchedPeakCounter()
         {
-            BaseIonTypes = new[] { BaseIonType.C, BaseIonType.Z };
+            BaseIonTypes = new[] { BaseIonType.B, BaseIonType.Y };
         }
 
     }

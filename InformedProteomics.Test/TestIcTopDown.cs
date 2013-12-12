@@ -52,25 +52,30 @@ namespace InformedProteomics.Test
         public void TestTopDownSearch()
         {
             // Search parameters
-            const int maxNumNTermCleavages = 1;  // 30
-            const int minLength = 7;
-            const int maxLength = 1000;
-            const int minCharge = 3; // 3
-            const int maxCharge = 67;// 67
-            const int numMaxModsPerProtein = 6; // 6
+            const int maxNumNTermCleavages = 30;  // 30
+            const int minLength = 7;    // 7
+            const int maxLength = 1000; // 1000
+            const int minPrecursorIonCharge = 3; // 3
+            const int maxPrecursorIonCharge = 40;// 67
+            const int minProductIonCharge = 1; // 1
+            const int maxProductIonCharge = 10;// 10
+            const int numMaxModsPerProtein = 0; // 6
 
             var precursorTolerance = new Tolerance(10);
             var productIonTolerance = new Tolerance(10);
 
             //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
-            const string dbFilePath =
-                @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
+            //const string dbFilePath =
+            //    @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
+            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\Sigma48_UPS2_2012-11-02.fasta";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\P01031.fasta";
 
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
             Console.Write("Reading raw file...");
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+//            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\Ron_UPS48_2_test_1ug.raw";
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             sw.Stop();
@@ -78,27 +83,28 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             // Configure amino acid set
-            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            //var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            //var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
             {
-                pyroGluQ,
-                dehydro,
-                cysteinylC,
-                glutathioneC,
+                //pyroGluQ,
+                dehydroC,
+                //cysteinylC,
+                //glutathioneC,
                 oxM
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var targetDb = new FastaDatabase(dbFilePath);
+            targetDb.Read();
             var indexedDb = new IndexedDatabase(targetDb);
-            var sequences = indexedDb.SequencesAsStrings(minLength, maxLength);
+            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsets(minLength, maxLength);
 
-            //var sequences = new[] { "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-" };
+//            var sequences = new[] { "_.VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR._" };
 
             var numProteins = 0;
             long totalProtCompositions = 0;
@@ -107,16 +113,21 @@ namespace InformedProteomics.Test
             sw.Reset();
             sw.Start();
 
-            var precursorFilter = new PrecursorFilter(run, precursorTolerance);
+            
+            //var precursorFilter = new PrecursorFilter(run, precursorTolerance);
 
             var outputFilePath = Path.ChangeExtension(specFilePath, ".icresult");
             using (var writer = new StreamWriter(outputFilePath))
             {
-                foreach (var protAnnotation in sequences)
+                writer.WriteLine("Annotation\tProtein\tProteinDesc\tComposition\tCharge\tBaseIsotopeMz\tScanNum\tNumMatches");
+                foreach (var annotationAndOffset in annotationsAndOffsets)
                 {
                     ++numProteins;
 
-                    Console.WriteLine(protAnnotation);
+                    var annotation = annotationAndOffset.Annotation;
+                    var offset = annotationAndOffset.Offset;
+
+                    Console.WriteLine(annotation);
                     if (numProteins % 1 == 0)
                     {
                         Console.WriteLine("Processed {0} proteins", numProteins);
@@ -125,15 +136,14 @@ namespace InformedProteomics.Test
                         Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
-                        if (numProteins == 10) break;
+                        //if (numProteins == 10) break;
                     }
 
                     //Console.WriteLine(protAnnotation);
 
-                    var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                    var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
                     if (seqGraph == null) continue;
 
-                    writer.WriteLine("Annotation\tComposition\tCharge\tBaseIsotopeMz\tScanNum\tNumMatches");
                     for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
                     {
                         var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);
@@ -144,21 +154,31 @@ namespace InformedProteomics.Test
                             protCompositionWithH2O.GetIsotopomerEnvelop();
 
                             totalProtCompositions++;
-                            for (var charge = minCharge; charge <= maxCharge; charge++)
+                            for (var charge = minPrecursorIonCharge; charge <= maxPrecursorIonCharge; charge++)
                             {
                                 numPrecursorIons++;
                                 var precursorIon = new Ion(protCompositionWithH2O, charge);
 
                                 var bestScore = Double.NegativeInfinity;
                                 var bestScanNum = -1;
+                                //Console.WriteLine("Debug: Charge {0}, MonoMz: {1}, MostAbundantMz: {2}"
+                                //    , charge, precursorIon.GetMonoIsotopicMz(), precursorIon.GetMostAbundantIsotopeMz());
+
                                 foreach (var ms2ScanNum in run.GetFragmentationSpectraScanNums(precursorIon))
                                 {
-                                    if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
+                                    //if (!precursorFilter.IsValid(precursorIon, ms2ScanNum)) continue;
+                                    if (run.CheckMs1Signature(precursorIon, ms2ScanNum, precursorTolerance) == false) continue;
 
                                     var spec = run.GetSpectrum(ms2ScanNum);
                                     //spec.FilterNoise(signalToNoiseRatio: 1.5);
-                                    var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 6);
+                                    var scorer = new MatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
                                     var score = seqGraph.GetScore(modIndex, 0, charge, scorer);
+
+                                    //if (charge == 16 && ms2ScanNum == 3917)
+                                    //{
+                                    //Console.WriteLine("Debug: Charge {0}, ScanNum: {1}, Score: {2}"
+                                    //    , charge, ms2ScanNum, score);
+                                    //}
 
                                     if (score > bestScore)
                                     {
@@ -166,13 +186,15 @@ namespace InformedProteomics.Test
                                         bestScanNum = ms2ScanNum;
                                     }
                                 }
-                                if (bestScore > 10)
+                                if (bestScore > 0)
                                 {
-                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", 
-                                        protAnnotation.Substring(numNTermCleavage + 2, protAnnotation.Length-4-numNTermCleavage), 
+                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}", 
+                                        annotation.Substring(numNTermCleavage + 2, annotation.Length-4-numNTermCleavage),
+                                        targetDb.GetProteinName(offset),
+                                        targetDb.GetProteinDescription(offset),
                                         precursorIon.Composition,
                                         charge, 
-                                        precursorIon.GetBaseIsotopeMz(), 
+                                        precursorIon.GetMostAbundantIsotopeMz(), 
                                         bestScanNum, 
                                         bestScore);
                                 }
@@ -202,10 +224,10 @@ namespace InformedProteomics.Test
 
             var precursorIon = new Ion(composition + Composition.H2O, charge);
 
-            Console.WriteLine("{0}\t{1}\t{2}", precursorIon.Composition, charge, precursorIon.GetMz());
+            Console.WriteLine("{0}\t{1}\t{2}", precursorIon.Composition, charge, precursorIon.GetMonoIsotopicMz());
             foreach (var isotope in precursorIon.GetIsotopes(relativeIntensityThreshold: 0.05))
             {
-                Console.WriteLine("{0}: {1}\t{2}", isotope.Item1, precursorIon.GetIsotopeMz(isotope.Item1), isotope.Item2);
+                Console.WriteLine("{0}: {1}\t{2}", isotope.Index, precursorIon.GetIsotopeMz(isotope.Index), isotope.Ratio);
             }
         }
 
@@ -287,7 +309,7 @@ namespace InformedProteomics.Test
                         var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 6);
                         var score = seqGraph.GetScore(modIndex, 0, charge, scorer);
 
-                        //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetBaseIsotopeMz(), precursorIon.Charge, ms2ScanNum, score);
+                        //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMostAbundantIsotopeMz(), precursorIon.Charge, ms2ScanNum, score);
                         if (score > bestScore)
                         {
                             bestScore = score;
@@ -296,7 +318,7 @@ namespace InformedProteomics.Test
                     }
                     if (bestScore > 10)
                     {
-                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetBaseIsotopeMz(), bestScanNum, bestScore);
+                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), bestScanNum, bestScore);
                     }
                 }
             }
@@ -376,7 +398,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.WriteLine("Generating XICs...");
 
-            foreach (var protAnnotation in indexedDb.SequencesAsStrings(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
             {
                 ++numProteins;
 
@@ -387,7 +409,7 @@ namespace InformedProteomics.Test
 
                 //Console.WriteLine(protAnnotation);
 
-                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotationAndOffset.Annotation);
                 if (seqGraph == null) continue;
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
@@ -562,7 +584,7 @@ namespace InformedProteomics.Test
 
             var numProteins = 0;
             long totalProtCompositions = 0;
-            foreach (var protAnnotation in indexedDb.SequencesAsStrings(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
             {
                 ++numProteins;
 
@@ -571,7 +593,7 @@ namespace InformedProteomics.Test
                     Console.WriteLine("Processed {0} proteins", numProteins);
                 }
 
-                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotationAndOffset.Annotation);
                 if (seqGraph == null) continue;
 
                 for (var nTermCleavage = 0; nTermCleavage <= numNTermCleavages; nTermCleavage++)

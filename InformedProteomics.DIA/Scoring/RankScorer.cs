@@ -46,153 +46,154 @@ namespace InformedProteomics.DIA.Scoring
             if (!File.Exists(paramFile))
                 return;
 
-            using (var reader = new BinaryReader(File.Open(paramFile, FileMode.Open)))
+            using (var reader = new BigEndianReader(File.Open(paramFile, FileMode.Open)))
             {
                 // Version
                 var version = reader.ReadInt32();
                 if(verbose) Console.WriteLine("Version: {0}", version);
 
                 // Activation method
-                var actMethod = reader.ReadChars(reader.ReadByte());
+                var actMethodChars = reader.ReadChars(reader.ReadByte());
+                var actMethod = new string(actMethodChars);
 
                 // Instrument type
-                var instType = reader.ReadChars(reader.ReadByte());
+                var instType = new string(reader.ReadChars(reader.ReadByte()));
 
                 // Enzyme
-                var enzyme = reader.ReadChars(reader.ReadByte());
+                var enzyme = new string(reader.ReadChars(reader.ReadByte()));
 
                 // Protocol
-                var protocol = reader.ReadChars(reader.ReadByte());
+                var protocol = new string(reader.ReadChars(reader.ReadByte()));
 
                 if (verbose) Console.WriteLine("Spectral type: {0}_{1}_{2}_{3}", actMethod, instType, enzyme, protocol);
 
                 // TODO: set up spectral type
 
-                // Tolerance
-                var isTolerancePpm = reader.ReadBoolean();
-                var mmeVal = reader.ReadSingle();
-                // Ignore mme
-                //_mme = new Tolerance(mmeVal, isTolerancePpm ? ToleranceUnit.Ppm : ToleranceUnit.Dalton);
+                //// Tolerance
+                //var isTolerancePpm = reader.ReadBoolean();
+                //var mmeVal = reader.ReadSingle();
+                //// Ignore mme
+                ////_mme = new Tolerance(mmeVal, isTolerancePpm ? ToleranceUnit.Ppm : ToleranceUnit.Dalton);
 
-                // Deconvolution information
-                _applyDeconvolution = reader.ReadBoolean();
-                _deconvolutionErrorToleranceDa = reader.ReadSingle();
-                if (verbose) Console.WriteLine("Apply deconvolution: {0}, Tolerance: {1}", _applyDeconvolution, _deconvolutionErrorToleranceDa);
+                //// Deconvolution information
+                //_applyDeconvolution = reader.ReadBoolean();
+                //_deconvolutionErrorToleranceDa = reader.ReadSingle();
+                //if (verbose) Console.WriteLine("Apply deconvolution: {0}, Tolerance: {1}", _applyDeconvolution, _deconvolutionErrorToleranceDa);
 
-                // Charge histogram
-                if (verbose) Console.WriteLine("Charge Histogram");
-                var chargeHistSize = reader.ReadInt32();
-                _chargeHistogram = new Dictionary<int, int>();
-                for (var i = 0; i < chargeHistSize; i++)
-                {
-                    var charge = reader.ReadInt32();
-                    var numSpecs = reader.ReadInt32();
-                    _chargeHistogram[charge] = numSpecs;
-                    if(verbose) Console.WriteLine(charge+"\t"+numSpecs);
-                }
+                //// Charge histogram
+                //if (verbose) Console.WriteLine("Charge Histogram");
+                //var chargeHistSize = reader.ReadInt32();
+                //_chargeHistogram = new Dictionary<int, int>();
+                //for (var i = 0; i < chargeHistSize; i++)
+                //{
+                //    var charge = reader.ReadInt32();
+                //    var numSpecs = reader.ReadInt32();
+                //    _chargeHistogram[charge] = numSpecs;
+                //    if(verbose) Console.WriteLine(charge+"\t"+numSpecs);
+                //}
 
-                // Partition information
-                if (verbose) Console.WriteLine("Partition Information"); 
-                var numPartitions = reader.ReadInt32();
-                _numSegments = reader.ReadInt32();
-                _partitionSet = new SortedSet<Partition>();
+                //// Partition information
+                //if (verbose) Console.WriteLine("Partition Information"); 
+                //var numPartitions = reader.ReadInt32();
+                //_numSegments = reader.ReadInt32();
+                //_partitionSet = new SortedSet<Partition>();
 
-                for (var i = 0; i < numPartitions; i++)
-                {
-                    var charge = reader.ReadInt32();
-                    var neutralPeptideMass = reader.ReadInt32();
-                    var segIndex = reader.ReadInt32();
-                    _partitionSet.Add(new Partition(charge, neutralPeptideMass, segIndex));
-                    if(verbose) Console.WriteLine("{0}\t{1}\t{2}", charge, neutralPeptideMass, segIndex);
-                }
+                //for (var i = 0; i < numPartitions; i++)
+                //{
+                //    var charge = reader.ReadInt32();
+                //    var neutralPeptideMass = reader.ReadInt32();
+                //    var segIndex = reader.ReadInt32();
+                //    _partitionSet.Add(new Partition(charge, neutralPeptideMass, segIndex));
+                //    if(verbose) Console.WriteLine("{0}\t{1}\t{2}", charge, neutralPeptideMass, segIndex);
+                //}
 
-                // Precursor offset frequency function
-                if (verbose) Console.WriteLine("Precursor Offset Frequency Function");
-                _precursorOffMap = new Dictionary<int, IList<PrecursorOffsetFrequency>>();
-                _numPrecursorOffsets = reader.ReadInt32();
-                for (var i = 0; i < _numPrecursorOffsets; i++)
-                {
-                    var charge = reader.ReadInt32();
-                    var reducedCharge = reader.ReadInt32();
-                    var offset = reader.ReadSingle();
-                    var isTolPpm = reader.ReadBoolean();
-                    var tolVal = reader.ReadSingle();
-                    var tolerance = new Tolerance(tolVal, isTolPpm ? ToleranceUnit.Ppm : ToleranceUnit.Dalton);
-                    var frequency = reader.ReadSingle();
+                //// Precursor offset frequency function
+                //if (verbose) Console.WriteLine("Precursor Offset Frequency Function");
+                //_precursorOffMap = new Dictionary<int, IList<PrecursorOffsetFrequency>>();
+                //_numPrecursorOffsets = reader.ReadInt32();
+                //for (var i = 0; i < _numPrecursorOffsets; i++)
+                //{
+                //    var charge = reader.ReadInt32();
+                //    var reducedCharge = reader.ReadInt32();
+                //    var offset = reader.ReadSingle();
+                //    var isTolPpm = reader.ReadBoolean();
+                //    var tolVal = reader.ReadSingle();
+                //    var tolerance = new Tolerance(tolVal, isTolPpm ? ToleranceUnit.Ppm : ToleranceUnit.Dalton);
+                //    var frequency = reader.ReadSingle();
 
-                    IList<PrecursorOffsetFrequency> offList;
-                    if (!_precursorOffMap.TryGetValue(charge, out offList))
-                    {
-                        offList = new List<PrecursorOffsetFrequency>();
-                        _precursorOffMap[charge] = offList;
-                    }
-                    offList.Add(new PrecursorOffsetFrequency(reducedCharge, offset, frequency, tolerance));
-                    if (verbose) Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", 
-                        charge, reducedCharge, offset, tolerance, frequency);
-                }
+                //    IList<PrecursorOffsetFrequency> offList;
+                //    if (!_precursorOffMap.TryGetValue(charge, out offList))
+                //    {
+                //        offList = new List<PrecursorOffsetFrequency>();
+                //        _precursorOffMap[charge] = offList;
+                //    }
+                //    offList.Add(new PrecursorOffsetFrequency(reducedCharge, offset, frequency, tolerance));
+                //    if (verbose) Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", 
+                //        charge, reducedCharge, offset, tolerance, frequency);
+                //}
 
-                // Fragment ion offset frequency function
-                if (verbose) Console.WriteLine("Fragment Offset Frequency Function");
-                _fragmentOffMap = new Dictionary<Partition, IEnumerable<FragmentOffsetFrequency>>();
-                foreach(var partition in _partitionSet)
-                {
-                    if(verbose) Console.WriteLine("{0}\t{1}\t{2}", partition.Charge, partition.SegmentIndex, partition.NeutralPeptideMass);
-                    var numIons = reader.ReadInt32();
-                    var fragmentOff = new FragmentOffsetFrequency[numIons];
-                    for (var ionIndex = 0; ionIndex < numIons; ionIndex++)
-                    {
-                        var isPrefix = reader.ReadBoolean();
-                        var charge = reader.ReadInt32();
-                        var offset = reader.ReadSingle();
-                        var frequency = reader.ReadSingle();
-                    }
-                }
+                //// Fragment ion offset frequency function
+                //if (verbose) Console.WriteLine("Fragment Offset Frequency Function");
+                //_fragmentOffMap = new Dictionary<Partition, IEnumerable<FragmentOffsetFrequency>>();
+                //foreach(var partition in _partitionSet)
+                //{
+                //    if(verbose) Console.WriteLine("{0}\t{1}\t{2}", partition.Charge, partition.SegmentIndex, partition.NeutralPeptideMass);
+                //    var numIons = reader.ReadInt32();
+                //    var fragmentOff = new FragmentOffsetFrequency[numIons];
+                //    for (var ionIndex = 0; ionIndex < numIons; ionIndex++)
+                //    {
+                //        var isPrefix = reader.ReadBoolean();
+                //        var charge = reader.ReadInt32();
+                //        var offset = reader.ReadSingle();
+                //        var frequency = reader.ReadSingle();
+                //    }
+                //}
 
-                // TODO: determine fragment ions
+                //// TODO: determine fragment ions
 
-                // Rank distributions
-                var maxRank = reader.ReadInt32();
-                for (var i = 0; i < numPartitions; i++)
-                {
-                    // repeat this for #Ions
-                    for (var rank = 0; rank < maxRank + 1; rank++)
-                    {
-                        var frequency = reader.ReadSingle();
-                    }
-                }
+                //// Rank distributions
+                //var maxRank = reader.ReadInt32();
+                //for (var i = 0; i < numPartitions; i++)
+                //{
+                //    // repeat this for #Ions
+                //    for (var rank = 0; rank < maxRank + 1; rank++)
+                //    {
+                //        var frequency = reader.ReadSingle();
+                //    }
+                //}
 
-                // Error distributions
-                var errorScalingFactor = reader.ReadInt32();
-                if (errorScalingFactor > 0)
-                {
-                    var numErrorBins = errorScalingFactor*2 + 1;
+                //// Error distributions
+                //var errorScalingFactor = reader.ReadInt32();
+                //if (errorScalingFactor > 0)
+                //{
+                //    var numErrorBins = errorScalingFactor*2 + 1;
 
-                    // Ion error distribution
-                    for (var i = 0; i < numErrorBins; i++)
-                    {
-                        var ionErrorDist = reader.ReadSingle();
-                    }
+                //    // Ion error distribution
+                //    for (var i = 0; i < numErrorBins; i++)
+                //    {
+                //        var ionErrorDist = reader.ReadSingle();
+                //    }
 
-                    // Noise error distribution
-                    for (var i = 0; i < numErrorBins; i++)
-                    {
-                        var noiseErrorDist = reader.ReadSingle();
-                    }
+                //    // Noise error distribution
+                //    for (var i = 0; i < numErrorBins; i++)
+                //    {
+                //        var noiseErrorDist = reader.ReadSingle();
+                //    }
 
-                    // Ion existence table
-                    for (var i = 0; i < 4; i++)
-                    {
-                        var ionExFreq = reader.ReadSingle();
-                    }
-                }
+                //    // Ion existence table
+                //    for (var i = 0; i < 4; i++)
+                //    {
+                //        var ionExFreq = reader.ReadSingle();
+                //    }
+                //}
 
-                // Validation
-                var validationCode = reader.ReadInt32();
-                if (validationCode != Int32.MaxValue)
-                {
-                    Console.WriteLine("Error while reading parameter file {0}", paramFile);
-                    System.Environment.Exit(-1); // Error
-                }
+                //// Validation
+                //var validationCode = reader.ReadInt32();
+                //if (validationCode != Int32.MaxValue)
+                //{
+                //    Console.WriteLine("Error while reading parameter file {0}", paramFile);
+                //    System.Environment.Exit(-1); // Error
+                //}
             }
         }
 
@@ -248,6 +249,28 @@ namespace InformedProteomics.DIA.Scoring
             //        mainIonTable.put(part, mainIon);
             //    }
             //}
+        }
+    }
+
+    public class BigEndianReader : BinaryReader
+    {
+        private byte[] _a16 = new byte[2];
+        private byte[] _a32 = new byte[4];
+        private byte[] _a64 = new byte[8];
+
+        public BigEndianReader(Stream stream) : base(stream, Encoding.UTF8) { }
+
+        public override int ReadInt32()
+        {
+            _a32 = base.ReadBytes(4);
+            Array.Reverse(_a32);
+            return BitConverter.ToInt32(_a32, 0);
+        }
+
+        public override byte ReadByte()
+        {
+            var byteValue = base.ReadByte();
+            return byteValue;
         }
     }
 }

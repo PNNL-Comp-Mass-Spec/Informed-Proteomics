@@ -9,9 +9,9 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.DIA.Search
 {
-    public class PeptideCentricAnalysis
+    public class InformedProteomicsAnalysis
     {
-        public PeptideCentricAnalysis(
+        public InformedProteomicsAnalysis(
             LcMsRun run,
             IEnumerable<string> peptideEnumerator,
             AminoAcidSet aminoAcidSet): this(run, peptideEnumerator, aminoAcidSet, 1, 3)
@@ -19,7 +19,7 @@ namespace InformedProteomics.DIA.Search
             
         }
 
-        public PeptideCentricAnalysis(
+        public InformedProteomicsAnalysis(
             LcMsRun run, 
             IEnumerable<string> peptideEnumerator, 
             AminoAcidSet aminoAcidSet, 
@@ -39,7 +39,7 @@ namespace InformedProteomics.DIA.Search
         public int MinCharge { get; private set; }
         public int MaxCharge { get; private set; }
 
-        public void IntermediateSearch(string outputFilePath)
+        public void ScorePeptides(string outputFilePath)
         {
             using (var writer = new StreamWriter(outputFilePath))
             {
@@ -50,14 +50,13 @@ namespace InformedProteomics.DIA.Search
                     var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
                     foreach (var sequenceComposition in seqGraph.GetSequenceCompositions())
                     {
+                        var peptideComposition = sequenceComposition + Composition.H2O;
                         for (var precursorCharge = MinCharge; precursorCharge <= MaxCharge; precursorCharge++)
                         {
-                            var precursorIon = new Ion(sequenceComposition + Composition.H2O, precursorCharge);
-                            var matchingSpectra = Run.GetMatchingMs2Spectra(precursorIon);
-                            if (matchingSpectra == null) continue;
-                            foreach (var productSpectrum in Run.GetMatchingMs2Spectra(precursorIon))
+                            var precursorIon = new Ion(peptideComposition, precursorCharge);
+                            foreach (var scanNum in Run.GetFragmentationSpectraScanNums(precursorIon))
                             {
-                                writer.WriteLine("{0}\t{1}\t{2}", annotation, precursorCharge, productSpectrum.ScanNum);
+                                writer.WriteLine("{0}\t{1}\t{2}", annotation, precursorCharge, scanNum);
                             }
                         }
                     }
