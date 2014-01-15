@@ -359,7 +359,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
-                if(!hasXicPoint[scanNum-MinLcScan]) xic.Add(new XicPoint(scanNum, 0));
+                if(GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum-MinLcScan]) xic.Add(new XicPoint(scanNum, 0));
             }
             xic.Sort();
             return xic;
