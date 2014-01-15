@@ -8,7 +8,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public enum ToleranceUnit
     {
         Ppm,
-        Dalton,
-        Thomson
+        Da,
+        Th
     }
 }

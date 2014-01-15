@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace InformedProteomics.DIA.Scoring
+namespace InformedProteomics.Scoring.BottomUp
 {
     public class Partition: IComparable<Partition>
     {

@@ -171,7 +171,7 @@ namespace InformedProteomics.Test
 //            sw.Start();
 //            var targetMzList = Enumerable.Range(minTargetBin, maxTargetBin - minTargetBin + 1).Select(uimfUtil.GetMzFromBin).ToList();
 //            featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1, 
-//                tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Thomson);
+//                tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Th);
 //            sw.Stop();
 //            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
 //            Console.WriteLine(@"Parallel: {0:f4} sec", sec);

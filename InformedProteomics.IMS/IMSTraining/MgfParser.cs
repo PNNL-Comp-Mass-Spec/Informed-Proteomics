@@ -65,7 +65,7 @@ namespace InformedProteomics.IMS.IMSTraining
                     var annotationStr = t.Substring(t.LastIndexOf('=') + 1);
                     var precursorComposition = AminoAcidSet.GetComposition(annotationStr);
                     var peptideComposition = precursorComposition + Composition.H2O;
-                    annotation = new Sequence(peptideComposition, annotationStr, AminoAcidSet);
+                    annotation = new Sequence(annotationStr, AminoAcidSet);
                 }
                 else if (t.StartsWith("PEPMASS"))
                 {

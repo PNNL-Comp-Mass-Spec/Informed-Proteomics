@@ -246,24 +246,24 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetExtractedIonChromatogram(minMz, maxMz, targetScanNum);
         }
 
-        /// <summary>
-        /// Gets the extracted ion chromatogram corresponding to an isotope of another XIC
-        /// </summary>
-        /// <param name="xic">base XIC</param>
-        /// <param name="mzDifference">m/z difference</param>
-        /// <param name="tolerance">tolerance</param>
-        /// <returns>XIC corresponding to an isotope of the input XIC</returns>
-        public Xic GetIsotopeExtractedIonChromatogram(Xic xic, double mzDifference, Tolerance tolerance)
-        {
-            var isotopeXic = new Xic();
-            foreach (var xicPeak in xic)
-            {
-                var spec = _scanNumSpecMap[xicPeak.ScanNum];
-                var peak = spec.FindPeak(xicPeak.Mz + mzDifference, tolerance);
-                if (peak != null) isotopeXic.Add(new XicPoint(xicPeak.ScanNum, peak.Mz, peak.Intensity));
-            }
-            return isotopeXic;
-        }
+        ///// <summary>
+        ///// Gets the extracted ion chromatogram corresponding to an isotope of another XIC
+        ///// </summary>
+        ///// <param name="xic">base XIC</param>
+        ///// <param name="mzDifference">m/z difference</param>
+        ///// <param name="tolerance">tolerance</param>
+        ///// <returns>XIC corresponding to an isotope of the input XIC</returns>
+        //public Xic GetIsotopeExtractedIonChromatogram(Xic xic, double mzDifference, Tolerance tolerance)
+        //{
+        //    var isotopeXic = new Xic();
+        //    foreach (var xicPoint in xic)
+        //    {
+        //        var spec = _scanNumSpecMap[xicPoint.ScanNum];
+        //        var peak = spec.FindPeak(xicPoint.Mz + mzDifference, tolerance);
+        //        if (peak != null) isotopeXic.Add(new XicPoint(xicPoint.ScanNum, peak.Mz, peak.Intensity));
+        //    }
+        //    return isotopeXic;
+        //}
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
@@ -284,7 +284,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz <= minMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Intensity));
                 --i;
             }
 
@@ -294,7 +294,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Intensity));
                 ++i;
             }
 
@@ -328,6 +328,44 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)
+        /// XicPoint is created for every MS1 scan.
+        /// </summary>
+        /// <param name="mz">target m/z</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <returns>XIC as an Xic object</returns>
+        public Xic GetFullExtractedIonChromatogram(double mz, Tolerance tolerance)
+        {
+            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var minMz = mz - tolTh;
+            var maxMz = mz + tolTh;
+            return GetFullExtractedIonChromatogram(minMz, maxMz);
+        }
+
+
+        /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
+        /// XicPoint is created for every MS1 scan.
+        /// </summary>
+        /// <param name="minMz">min m/z</param>
+        /// <param name="maxMz">max m/z</param>
+        /// <returns>XIC as an Xic object</returns>
+        public Xic GetFullExtractedIonChromatogram(double minMz, double maxMz)
+        {
+            var xic = GetExtractedIonChromatogram(minMz, maxMz);
+
+            var hasXicPoint = new bool[MaxLcScan - MinLcScan + 1];
+            foreach (var xicPoint in xic) hasXicPoint[xicPoint.ScanNum - MinLcScan] = true;
+
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                if(!hasXicPoint[scanNum-MinLcScan]) xic.Add(new XicPoint(scanNum, 0));
+            }
+            xic.Sort();
+            return xic;
+        }
+
+        /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
         /// Only XicPeaks around the targetScanNum are returned 
         /// </summary>
@@ -354,7 +392,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //TODO: this tolerance value is not optimal for all data (revisit required)
             const int tolerance = 3;
 
-            var index = xic.BinarySearch(new XicPoint(targetScanNum, 0, 0));
+            var index = xic.BinarySearch(new XicPoint(targetScanNum, 0));
             if(index < 0) index = ~index;
 
             var xicSegment = new Xic();
@@ -426,7 +464,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
 
                 var peak = productSpec.FindPeak(productIonMz, tolerance);
-                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Intensity));
             }
 
             return productXic;

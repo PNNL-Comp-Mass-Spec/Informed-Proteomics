@@ -175,121 +175,121 @@ namespace InformedProteomics.DIA.Search
             return false;
         }
 
-        private bool IsValidOld(MsGfMatch match)
-        {
-            // Valid if spectral E-value is below 1E-15
-            //if (match.SpecEValue < 1e-15) return true;
+        //private bool IsValidOld(MsGfMatch match)
+        //{
+        //    // Valid if spectral E-value is below 1E-15
+        //    //if (match.SpecEValue < 1e-15) return true;
 
-            var specFileKey = Path.GetFileNameWithoutExtension(match.SpecFile);
-            if (specFileKey == null) return false;
+        //    var specFileKey = Path.GetFileNameWithoutExtension(match.SpecFile);
+        //    if (specFileKey == null) return false;
 
-            var precursorIon = new Ion(match.Formula, match.Charge);
-            var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            var basePeakMz = precursorIon.GetIsotopeMz(basePeakIndex);
-            var baseXic = Run[specFileKey].GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), ToleranceForBaseXic, match.ScanNum);
+        //    var precursorIon = new Ion(match.Formula, match.Charge);
+        //    var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
+        //    var basePeakMz = precursorIon.GetIsotopeMz(basePeakIndex);
+        //    var baseXic = Run[specFileKey].GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), ToleranceForBaseXic, match.ScanNum);
 
-            // check whether the most abundant isotope peak exists
-            var prevMs1ScanNum = Run[specFileKey].GetPrecursorScanNum(match.ScanNum);
-            var nextMs1ScanNum = Run[specFileKey].GetNextScanNum(prevMs1ScanNum, 1);
-            if (!baseXic.ContainsScanNum(prevMs1ScanNum) && !baseXic.ContainsScanNum(nextMs1ScanNum))
-            {
-                return false;
-                //if (match.SpecEValue < 1e-15)
-                //{
-                //    Console.WriteLine("{0} {1} {2} ({3}) is rejected (no base peak)", match.Peptide, match.Charge, match.ScanNum, match.SpecEValue);
-                //}
-            }
+        //    // check whether the most abundant isotope peak exists
+        //    var prevMs1ScanNum = Run[specFileKey].GetPrecursorScanNum(match.ScanNum);
+        //    var nextMs1ScanNum = Run[specFileKey].GetNextScanNum(prevMs1ScanNum, 1);
+        //    if (!baseXic.ContainsScanNum(prevMs1ScanNum) && !baseXic.ContainsScanNum(nextMs1ScanNum))
+        //    {
+        //        return false;
+        //        //if (match.SpecEValue < 1e-15)
+        //        //{
+        //        //    Console.WriteLine("{0} {1} {2} ({3}) is rejected (no base peak)", match.Peptide, match.Charge, match.ScanNum, match.SpecEValue);
+        //        //}
+        //    }
 
-            // Check whether all abundant isotope peaks exist
-            //foreach (var isotope in precursorIon.GetIsotopes(RelativeIsotopeIntensityThreshold))
-            foreach (var isotope in precursorIon.GetIsotopes(NumIsotopesToCheckForValidation))    // top 2 isotopes
-            {
-                Xic xic;
-                if (isotope.Index == basePeakIndex)
-                {
-                    xic = baseXic;
-                }
-                else
-                {
-                    //if(match.Peptide.Equals("HGGEDYVFSLLTGYCEPPTGVSLR"))
-                    //    Console.WriteLine("Debug");
-                    var isotopeIndex = isotope.Index;
-                    var mzDifference = precursorIon.GetIsotopeMz(isotopeIndex) - basePeakMz;
-                    xic = Run[specFileKey].GetIsotopeExtractedIonChromatogram(baseXic, mzDifference, ToleranceFromBasicXic);
-                }
+        //    // Check whether all abundant isotope peaks exist
+        //    //foreach (var isotope in precursorIon.GetIsotopes(RelativeIsotopeIntensityThreshold))
+        //    foreach (var isotope in precursorIon.GetIsotopes(NumIsotopesToCheckForValidation))    // top 2 isotopes
+        //    {
+        //        Xic xic;
+        //        if (isotope.Index == basePeakIndex)
+        //        {
+        //            xic = baseXic;
+        //        }
+        //        else
+        //        {
+        //            //if(match.Peptide.Equals("HGGEDYVFSLLTGYCEPPTGVSLR"))
+        //            //    Console.WriteLine("Debug");
+        //            var isotopeIndex = isotope.Index;
+        //            var mzDifference = precursorIon.GetIsotopeMz(isotopeIndex) - basePeakMz;
+        //            xic = Run[specFileKey].GetIsotopeExtractedIonChromatogram(baseXic, mzDifference, ToleranceFromBasicXic);
+        //        }
 
-                if (xic.Count == 0)
-                {
-                    if (match.SpecEValue < 1e-15)
-                    {
-                        //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", match.SpecFile, match.Peptide, match.Charge,
-                        //    match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue);
-                    }
-                    return false;
-                }
-            }
+        //        if (xic.Count == 0)
+        //        {
+        //            if (match.SpecEValue < 1e-15)
+        //            {
+        //                //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", match.SpecFile, match.Peptide, match.Charge,
+        //                //    match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue);
+        //            }
+        //            return false;
+        //        }
+        //    }
 
-            //if (!hasValid && match.SpecEValue < 1e-15)
-            //{
-            //    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", match.SpecFileKey, match.Peptide, match.Charge,
-            //        match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue);
-            //};
+        //    //if (!hasValid && match.SpecEValue < 1e-15)
+        //    //{
+        //    //    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", match.SpecFileKey, match.Peptide, match.Charge,
+        //    //        match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue);
+        //    //};
 
-            //var monoIsotopeMz = precursorIon.GetMonoIsotopicMz();
-            //var monoIsotopeXic = Run[specFileKey].GetExtractedIonChromatogram(monoIsotopeMz, Tolerance, match.ScanNum);
+        //    //var monoIsotopeMz = precursorIon.GetMonoIsotopicMz();
+        //    //var monoIsotopeXic = Run[specFileKey].GetExtractedIonChromatogram(monoIsotopeMz, Tolerance, match.ScanNum);
 
-            //// check isotopes at index -1
-            //var isotopeMzMinus1 = precursorIon.GetIsotopeMz(-1);
-            //var xicAtIndexMinus1 = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzMinus1, new Tolerance(5), match.ScanNum);
-            //if (xicAtIndexMinus1.Count > 0 && xicAtIndexMinus1.GetCorrelation(monoIsotopeXic) > 0.7)
-            //{
-            //    // Check the ratio
-            //    var abundanceMono = monoIsotopeXic.GetSumIntensities();
-            //    var abundanceMinusOne = xicAtIndexMinus1.GetSumIntensities();
-            //    var isoEnv = _aaSet.GetComposition(match.Peptide).GetIsotopomerEnvelop();
-            //    var approxRato = isoEnv[1]/isoEnv[0];
-            //    var ratioDiff = abundanceMono/abundanceMinusOne/(isoEnv[1]/isoEnv[0]);
-            //    if (ratioDiff > 0.8 && ratioDiff < 1.2)
-            //    {
-            //        if (match.SpecEValue < 1e-15)
-            //        {
-            //            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", match.SpecFile, match.Peptide, match.Charge,
-            //                match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue, ratioDiff);
-            //        }
-            //        return false;
-            //    }
-            //}
+        //    //// check isotopes at index -1
+        //    //var isotopeMzMinus1 = precursorIon.GetIsotopeMz(-1);
+        //    //var xicAtIndexMinus1 = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzMinus1, new Tolerance(5), match.ScanNum);
+        //    //if (xicAtIndexMinus1.Count > 0 && xicAtIndexMinus1.GetCorrelation(monoIsotopeXic) > 0.7)
+        //    //{
+        //    //    // Check the ratio
+        //    //    var abundanceMono = monoIsotopeXic.GetSumIntensities();
+        //    //    var abundanceMinusOne = xicAtIndexMinus1.GetSumIntensities();
+        //    //    var isoEnv = _aaSet.GetComposition(match.Peptide).GetIsotopomerEnvelop();
+        //    //    var approxRato = isoEnv[1]/isoEnv[0];
+        //    //    var ratioDiff = abundanceMono/abundanceMinusOne/(isoEnv[1]/isoEnv[0]);
+        //    //    if (ratioDiff > 0.8 && ratioDiff < 1.2)
+        //    //    {
+        //    //        if (match.SpecEValue < 1e-15)
+        //    //        {
+        //    //            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", match.SpecFile, match.Peptide, match.Charge,
+        //    //                match.ScanNum, new Ion(_aaSet.GetComposition(match.Peptide) + Composition.H2O, match.Charge).GetMonoIsotopicMz(), match.SpecEValue, ratioDiff);
+        //    //        }
+        //    //        return false;
+        //    //    }
+        //    //}
 
-            //if (xic.Count > 0)
-            //{
-            //    var isotopeRatio = xic.GetSumIntensities() / baseIntensity / isotope.Item2;
-            //    var correlation = xic.GetCorrelation(baseXic);
+        //    //if (xic.Count > 0)
+        //    //{
+        //    //    var isotopeRatio = xic.GetSumIntensities() / baseIntensity / isotope.Item2;
+        //    //    var correlation = xic.GetCorrelation(baseXic);
 
-            //    if (isotopeRatio > 0.8 && isotopeRatio < 1.2
-            //        && correlation > 0.8)
-            //    {
-            //        isValid = true;
-            //    }
-            //}
+        //    //    if (isotopeRatio > 0.8 && isotopeRatio < 1.2
+        //    //        && correlation > 0.8)
+        //    //    {
+        //    //        isValid = true;
+        //    //    }
+        //    //}
 
-            // Check if isotope ratio is within tolerance
-            //if (isotopeRatio > isotopeRatioTolerance || isotopeRatio < 1 / isotopeRatioTolerance)
-            //{
-            //    isValid = false;
-            //    //Console.WriteLine("Off ratio\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMonoIsotopicMz(), isotopeMz, isotopeRatio);
-            //    break;
-            //}
+        //    // Check if isotope ratio is within tolerance
+        //    //if (isotopeRatio > isotopeRatioTolerance || isotopeRatio < 1 / isotopeRatioTolerance)
+        //    //{
+        //    //    isValid = false;
+        //    //    //Console.WriteLine("Off ratio\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy, peptide, scanNum, charge, precursorIon.GetMonoIsotopicMz(), isotopeMz, isotopeRatio);
+        //    //    break;
+        //    //}
 
-            // check isotopes at index 0.5
-            //if (match.Charge == 4)
-            //{
-            //    var isotopeMzPointFive = precursorIon.GetIsotopeMz(0.5);
-            //    var xicAtIndexPointFive = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzPointFive, Tolerance, match.ScanNum);
-            //    if (xicAtIndexPointFive.Count > 0 && xicAtIndexPointFive.GetCorrelation(monoIsotopeXic) > 0.7) return false;
-            //}
+        //    // check isotopes at index 0.5
+        //    //if (match.Charge == 4)
+        //    //{
+        //    //    var isotopeMzPointFive = precursorIon.GetIsotopeMz(0.5);
+        //    //    var xicAtIndexPointFive = Run[specFileKey].GetExtractedIonChromatogram(isotopeMzPointFive, Tolerance, match.ScanNum);
+        //    //    if (xicAtIndexPointFive.Count > 0 && xicAtIndexPointFive.GetCorrelation(monoIsotopeXic) > 0.7) return false;
+        //    //}
 
-            return true;
-        }
+        //    return true;
+        //}
 
         // matchList must have been sorted
         private double[] GetQValues(IList<MsGfMatch> matchList)

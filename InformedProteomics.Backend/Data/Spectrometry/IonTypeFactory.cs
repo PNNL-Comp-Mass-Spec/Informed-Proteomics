@@ -8,12 +8,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class IonTypeFactory
     {
-        private readonly IEnumerable<BaseIonType> _baseIons;
-        private readonly IEnumerable<NeutralLoss> _neutralLosses;
-        private readonly int _maxCharge;
-
-        private Dictionary<string, IonType> _ionTypeMap;
-
         public IonTypeFactory()
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
@@ -37,10 +31,43 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return _ionTypeMap[name];
         }
 
+        public IonType GetIonType(bool isPrefix, int charge, float offset)
+        {
+            //var intOffset = Convert.ToInt32(offset);
+            //if (isPrefix)
+            //{
+            //    if (charge == 1)
+            //    {
+            //        if (intOffset == 1) return GetIonType("b");
+            //        if (intOffset == -16) return GetIonType("b-NH3");
+            //        if (intOffset == -17) return GetIonType("b-H2O");
+            //        if (intOffset == -27) return GetIonType("a");
+            //    }
+            //}
+            //else
+            //{
+            //    if (charge == 1)
+            //    {
+            //        if (intOffset == 19) return GetIonType("y");
+            //        if (intOffset == 2) return GetIonType("y-NH3");
+            //        if (intOffset == 1) return GetIonType("y-H2O");
+            //        if (intOffset == 3) return GetIonType("z");
+            //    }
+            //}
+            //Console.WriteLine("{0}_{1}_{2} doesn't exist!", isPrefix, charge, offset);
+            throw new System.NotImplementedException();
+        }
+
         public IEnumerable<IonType> GetAllKnownIonTypes()
         {
             return _ionTypeMap.Values.ToArray();
         }
+
+        private readonly IEnumerable<BaseIonType> _baseIons;
+        private readonly IEnumerable<NeutralLoss> _neutralLosses;
+        private readonly int _maxCharge;
+
+        private Dictionary<string, IonType> _ionTypeMap;
 
         private void GenerateAllKnownIonTypes()
         {
@@ -61,5 +88,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
             }
         }
+
     }
 }

@@ -112,6 +112,7 @@
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
     <Compile Include="Data\Spectrometry\Isotope.cs" />
+    <Compile Include="Data\Spectrometry\PeptideSpectrumMatch.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="MassSpecData\PbfReader.cs" />
     <Compile Include="MassSpecData\PgfReader.cs" />
     <Compile Include="MassSpecData\ProteoWizardReader.cs" />
+    <Compile Include="MassSpecData\SpectrumType.cs" />
     <Compile Include="MassSpecData\XCaliburReader.cs" />
     <Compile Include="Data\Enum\SequenceLocation.cs" />
     <Compile Include="Data\Enum\SequenceType.cs" />

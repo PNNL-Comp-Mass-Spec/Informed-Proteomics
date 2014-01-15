@@ -68,7 +68,7 @@ namespace InformedProteomics.IMS.IMSTraining
         public Tuple<List<MSMSSpectrumPeak>, float[]> GetIsotopomerEnvelop(Sequence annotation, int cutNumber, IonType ionType, Tolerance tolerance)
         {
             var prefixComposition = annotation.GetComposition(0, cutNumber);
-            var suffixCompostion = annotation.Composition - Composition.H2O - prefixComposition;
+            var suffixCompostion = annotation.Composition - prefixComposition;
             var isotopomerEnvelop = new List<MSMSSpectrumPeak>();
             var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
             var ion = ionType.GetIon(composition);
@@ -87,7 +87,7 @@ namespace InformedProteomics.IMS.IMSTraining
         public List<MSMSSpectrumPeak> GetExplainedPeaks(Sequence annotation, int cutNumber, List<IonType> ionTypes, Tolerance tolerance)
         {  
             var prefixComposition = annotation.GetComposition(0, cutNumber);
-            var suffixCompostion = annotation.Composition - Composition.H2O - prefixComposition;
+            var suffixCompostion = annotation.Composition - prefixComposition;
             var peakList = new List<MSMSSpectrumPeak>();
             foreach (var ionType in ionTypes)
             {

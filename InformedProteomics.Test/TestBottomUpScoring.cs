@@ -10,7 +10,7 @@ namespace InformedProteomics.Test
         public void TestParsingScoringParamFile()
         {
             const string paramFilePath = @"..\..\..\TestFiles\HCD_QExactive_Tryp.param";
-            var scorer = new RankScorer(paramFilePath, true);
+            var scorer = new OldRankScorer(paramFilePath, true);
         }
     }
 }

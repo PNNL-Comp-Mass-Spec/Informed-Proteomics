@@ -115,8 +115,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return Peaks[peakIndex];
         }
 
-
-
         public void Display()
         {
             var sb = new StringBuilder();
@@ -133,7 +131,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.Write(sb.ToString());
         }
 
-        public void FilterNoise(double signalToNoiseRatio)
+        public void FilterNoise(double signalToNoiseRatio = 1.4826)
         {
             if (Peaks.Length < 2) return;
             Array.Sort(Peaks, new IntensityComparer());
