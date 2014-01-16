@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.DIA.Search;
 using NUnit.Framework;
 
@@ -16,11 +17,38 @@ namespace InformedProteomics.Test
     public class TestEdrn
     {
         [Test]
+        public void GenerateVennDiagrams()
+        {
+            // DIA
+            const string rep1 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep1_Summary.tsv";
+            const string rep2 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep2_Summary.tsv";
+            const string rep3 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep3_Summary.tsv";
+            const string rep4 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep4_Summary.tsv";
+            const string rep5 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep5_Summary.tsv";
+
+            const string resultPath1 = rep1;
+            const string resultPath2 = rep5;
+
+            var result1 = new TsvFileParser(resultPath1);
+            var result2 = new TsvFileParser(resultPath2);
+
+            const double pepQValueThreshold = 0.01;
+            var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
+                                                      result2.GetPeptides(pepQValueThreshold));
+            Console.WriteLine("{0}\t{1}\t{2}",
+                              vennDiagram.Set1Only.Count, // + vennDiagram.Intersection.Count,
+                              vennDiagram.Intersection.Count,
+                              vennDiagram.Set2Only.Count //+ vennDiagram.Intersection.Count
+                              );
+        }
+
+
+        [Test]
         public void RunIpa()
         {
-            const string resultPath = @"D:\Research\Data\EDRN\Fraction7\342935_EDRN_Serum_07_DIA_2_12Nov13_Samwise_13-07-28.tsv";
-            const string specFilePath = @"D:\Research\Data\EDRN\RawFiles\DIA\342935_EDRN_Serum_07_DIA_2_12Nov13_Samwise_13-07-28.raw";
-            const string outputFilePath = @"D:\Research\Data\EDRN\Fraction7\DIA_Frac7_2_Summary.tsv";
+            const string resultPath = @"D:\Research\Data\EDRN\Replicates_Frac7\343513_EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28.tsv";
+            const string specFilePath = @"D:\Research\Data\EDRN\RawFiles\DIA_Replicate\343513_EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28.raw";
+            const string outputFilePath = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep5_Summary.tsv";
 
             var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(20), new Tolerance(10));
             var numId = postProcessor.PostProcessing(outputFilePath);

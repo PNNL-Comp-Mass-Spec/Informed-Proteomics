@@ -304,7 +304,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // select one best peak for each scan
             var newXic = new Xic();
 
-            var prevScanNum = -1;
+            var prevScanNum = xic[0].ScanNum;
             var bestPeak = xic[0];
             for (i = 1; i < xic.Count; i++)
             {

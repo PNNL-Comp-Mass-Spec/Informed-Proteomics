@@ -13,6 +13,7 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestLcMsRun
     {
         public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public const string TestTopDownRawFilePath = @"\\protoapps\UserData\Fujimoto\TopDownTesting\Charles_Data\SBEP_STM_001_02222012_Aragon.raw";
 
         public void TestReadingScanNums()
         {
@@ -62,6 +63,21 @@ namespace InformedProteomics.Test.FunctionalTests
             }
             Assert.True(run.GetNextScanNum(31151) == 31153);
             Console.WriteLine(run.GetNextScanNum(89));
+        }
+
+        [Test]
+        public void TestXicGeneration()
+        {
+            var run = LcMsRun.GetLcMsRun(TestTopDownRawFilePath, MassSpecDataType.XCaliburRun);
+            var xic = run.GetFullExtractedIonChromatogram(1021.8995217569998, new Tolerance(15, ToleranceUnit.Ppm));
+
+            var prevScanNum = run.MinLcScan - 1;
+            foreach (var xicPoint in xic)
+            {
+                Console.WriteLine("{0}\t{1}", xicPoint.ScanNum, xicPoint.Intensity);
+                Assert.AreNotEqual(prevScanNum, xicPoint.ScanNum);
+                prevScanNum = xicPoint.ScanNum;
+            }
         }
 
     }
