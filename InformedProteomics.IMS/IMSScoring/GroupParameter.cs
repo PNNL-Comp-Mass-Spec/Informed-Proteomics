@@ -106,13 +106,13 @@ namespace InformedProteomics.IMS.IMSScoring
 
         private static int GetMassIndex(Composition precursorComposition)
         {
-            var m = precursorComposition.GetMass();
+            var m = precursorComposition.Mass;
             return m < 1200 ? 1 : (m < 2400 ? 2 : 3);
         }
 
         private static int GetLocationIndex(Composition precursorComposition, Composition cutComposition)
         {
-            return (int)(cutComposition.GetMass() / precursorComposition.GetMass() * 4 + 1);
+            return (int)(cutComposition.Mass / precursorComposition.Mass * 4 + 1);
         }
 
         private static int GetResidueIndex(char residue)

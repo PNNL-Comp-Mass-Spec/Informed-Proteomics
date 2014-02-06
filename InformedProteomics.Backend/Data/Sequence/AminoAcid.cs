@@ -11,8 +11,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             Residue = residue;
             Name = name;
             Composition = comp;
-            _mass = Composition.GetMass();
-            _nominalMass = Composition.GetNominalMass();
+            _mass = Composition.Mass;
+            _nominalMass = Composition.NominalMass;
         }
 
         #endregion

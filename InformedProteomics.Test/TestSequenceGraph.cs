@@ -45,7 +45,7 @@ namespace InformedProteomics.Test
             var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
             foreach (var composition in seqGraph.GetSequenceCompositionsWithNTermCleavage(1))
             {
-                Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
+                Console.WriteLine("{0}\t{1}", composition, composition.Mass);
             }
         }
 

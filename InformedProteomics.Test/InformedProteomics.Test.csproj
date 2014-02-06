@@ -96,7 +96,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
-    <Compile Include="TestBottomUp.cs" />
+    <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
+    <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestEdrn.cs" />
     <Compile Include="TestOffsetFreq.cs" />

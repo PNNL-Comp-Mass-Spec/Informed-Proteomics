@@ -1,19 +1,18 @@
-﻿using System;
-using InformedProteomics.Backend.Data.Biology;
+﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Scoring
 {
     public class MatchedPeakCounter: IScorer
     {
-        public MatchedPeakCounter(Spectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
+        public MatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
         {
             _ms2Spec = ms2Spec;
             _tolerance = tolerance;
             _minCharge = minCharge;
             _maxCharge = maxCharge;
+            _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
         }
 
         public double GetPrecursorIonScore(Ion precursorIon)
@@ -21,55 +20,54 @@ namespace InformedProteomics.TopDown.Scoring
             return 0;
         }
 
-        public double GetFragmentScore(Ion precursorIon, Composition suffixFragmentComposition)
+        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
         {
+            _numTransitions++;
             var score = 0.0;
 
-            var prefixFragmentComposition = precursorIon.Composition - suffixFragmentComposition;
-            foreach (var baseIonType in BaseIonTypes)
+            foreach (var baseIonType in _baseIonTypes)
             {
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
+                var containsIon = false;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
                     if (_ms2Spec.ContainsIon(ion, _tolerance, RelativeIsotopeIntensityThreshold))
                     {
-                        score += 1.0;
+                        containsIon = true;
+                        break;
                     }
-                    //var isotopes = ion.GetIsotopes(RelativeIsotopeIntensityThreshold);
-                    //var allIonsExist = true;
-                    //foreach (var isotope in isotopes)
-                    //{
-                    //    var isotopeIndex = isotope.Item1;
-                    //    var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                    //    if (_ms2Spec.FindPeak(isotopeMz, _tolerance) == null)
-                    //    {
-                    //        allIonsExist = false;
-                    //        break;
-                    //    }
-                    //}
-                    //if (allIonsExist) score += 1.0;
                 }
+
+                if (containsIon) score += 1.0;
             }
             return score;
         }
 
-        private readonly Spectrum _ms2Spec;
+        private readonly ProductSpectrum _ms2Spec;
         private readonly Tolerance _tolerance;
         private readonly int _minCharge;
         private readonly int _maxCharge;
+        private readonly BaseIonType[] _baseIonTypes;
 
         private const double RelativeIsotopeIntensityThreshold = 0.8;
 
-        private static readonly BaseIonType[] BaseIonTypes;
+        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
+        private static long _numTransitions;
         static MatchedPeakCounter()
         {
-            BaseIonTypes = new[] { BaseIonType.B, BaseIonType.Y };
+            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
+            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+            _numTransitions = 0;
         }
 
+        public static long GetNumTransitions()
+        {
+            return _numTransitions; 
+        }
     }
 }

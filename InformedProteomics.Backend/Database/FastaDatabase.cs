@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Utils;
 using ProteinFileReader;
 
 namespace InformedProteomics.Backend.Database
@@ -18,6 +19,9 @@ namespace InformedProteomics.Backend.Database
         public const byte Delimiter = (byte)'_';
         public const byte LastCharacter = (byte)'~';
         public const char AnnotationDelimiter = '/';
+
+        // For suffled decoys
+        public const int NumMutations = 3;
 
         private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 
@@ -50,25 +54,25 @@ namespace InformedProteomics.Backend.Database
 
         public bool IsDecoy { get; private set; }
 
-        public FastaDatabase Decoy(Enzyme enzyme)
+        public FastaDatabase Decoy(Enzyme enzyme, bool shuffle = false)
         {
             if (IsDecoy)
             {
                 throw new InvalidOperationException("Already a decoy database");
             }
 
-            var decoyDatabasePath = GetDecoyDatabasePath(enzyme);
-            if (!File.Exists(decoyDatabasePath)) CreateDecoyDatabase(enzyme);
+            var decoyDatabasePath = GetDecoyDatabasePath(enzyme, shuffle);
+            if (!File.Exists(decoyDatabasePath)) CreateDecoyDatabase(enzyme, shuffle);
             return new FastaDatabase(decoyDatabasePath, true);
         }
 
-        public void CreateDecoyDatabase(Enzyme enzyme)
+        public void CreateDecoyDatabase(Enzyme enzyme, bool shuffle)
         {
             var reader = new FastaFileReader();
             if (!reader.OpenFile(_databaseFilePath))
                 return;
 
-            var decoyDatabaseFileName = GetDecoyDatabasePath(enzyme);
+            var decoyDatabaseFileName = GetDecoyDatabasePath(enzyme, shuffle);
 
             Console.WriteLine("Creating " + decoyDatabaseFileName);
             using (var decoyWriter = new StreamWriter(decoyDatabaseFileName))
@@ -81,24 +85,30 @@ namespace InformedProteomics.Backend.Database
 
                     decoyWriter.WriteLine(">{0}_{1} {2}", DecoyProteinPrefix, name, description);
 
-                    var decoySequence = new StringBuilder();
-                    
-                    for (var i = sequence.Length - 1; i >= 0; i--)
+                    if (!shuffle)   // Reverse
                     {
-                        var residue = sequence[i];
-                        if (enzyme.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
+                        var decoySequence = new StringBuilder();
+                        for (var i = sequence.Length - 1; i >= 0; i--)
                         {
-                            var residueToBeReplaced = decoySequence[decoySequence.Length-1];
-                            decoySequence.Remove(decoySequence.Length-1, 1);
-                            decoySequence.Append(residue);
-                            decoySequence.Append(residueToBeReplaced);
+                            var residue = sequence[i];
+                            if (enzyme != null && enzyme.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
+                            {
+                                var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
+                                decoySequence.Remove(decoySequence.Length - 1, 1);
+                                decoySequence.Append(residue);
+                                decoySequence.Append(residueToBeReplaced);
+                            }
+                            else
+                            {
+                                decoySequence.Append(residue);
+                            }
                         }
-                        else
-                        {
-                            decoySequence.Append(residue);
-                        }
+                        decoyWriter.WriteLine(decoySequence);
                     }
-                    decoyWriter.WriteLine(decoySequence);
+                    else
+                    {
+                        decoyWriter.WriteLine(SimpleStringProcessing.Mutate(SimpleStringProcessing.Shuffle(sequence), NumMutations));
+                    }
                 }
                 reader.CloseFile();
             }
@@ -159,11 +169,19 @@ namespace InformedProteomics.Backend.Database
             Console.WriteLine(_sequence == null ? "Annotation is null!" : Encoding.GetString(_sequence));
         }
 
-        public string GetDecoyDatabasePath(Enzyme enzyme)
+        public string GetDecoyDatabasePath(Enzyme enzyme, bool shuffle = false)
         {
             string newExtenstion;
-            if (enzyme.Residues.Length > 0) newExtenstion = ".icdecoy." + new string(enzyme.Residues) + ".fasta";
-            else newExtenstion = ".icdecoy.fasta";
+
+            if (!shuffle)   // reverse
+            {
+                if (enzyme != null && enzyme.Residues.Length > 0) newExtenstion = ".icdecoy." + new string(enzyme.Residues) + ".fasta";
+                else newExtenstion = ".icdecoy.fasta";
+            }
+            else
+            {
+                newExtenstion = ".icsfldecoy.fasta";
+            }
 
             return Path.ChangeExtension(_databaseFilePath, newExtenstion);
         }

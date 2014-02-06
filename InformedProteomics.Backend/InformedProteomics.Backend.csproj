@@ -158,6 +158,7 @@
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
+    <Compile Include="Utils\SimpleStringProcessing.cs" />
     <Compile Include="Utils\TsvFileParser.cs" />
     <Compile Include="Utils\VennDiagram.cs" />
   </ItemGroup>

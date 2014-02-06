@@ -26,7 +26,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             )
         {
             Name = name;
-            _offsetMass = offsetComposition.GetMass();
+            _offsetMass = offsetComposition.Mass;
             OffsetComposition = offsetComposition;
             Charge = charge;
             IsPrefixIon = baseIonType.IsPrefix;
@@ -43,7 +43,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Charge = charge;
             IsPrefixIon = isPrefixIon;
             BaseIonType = null;
-            _offsetMass = offsetComposition.GetMass();
+            _offsetMass = offsetComposition.Mass;
         }
 
         public double GetMz(double cutMass)
@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double GetMz(Composition prefixComposition)
         {
             Debug.Assert(prefixComposition != null, "prefixComposition must not be null");
-            return GetMz(prefixComposition.GetMass());
+            return GetMz(prefixComposition.Mass);
         }
 
         public Ion GetIon(Composition cutComposition)

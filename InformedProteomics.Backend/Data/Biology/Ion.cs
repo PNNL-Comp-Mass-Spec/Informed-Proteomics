@@ -20,7 +20,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public double GetMonoIsotopicMz()
         {
-            return (Composition.GetMass() + Charge * Constants.Proton) / Charge;
+            return (Composition.Mass + Charge * Constants.Proton) / Charge;
         }
 
         /// <summary>

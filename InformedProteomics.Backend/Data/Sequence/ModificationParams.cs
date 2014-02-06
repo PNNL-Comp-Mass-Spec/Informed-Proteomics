@@ -98,7 +98,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var modList = (from i in combination where i > 0 select _modifications[i - 1]).ToList();
                 _modificationCombinations[++index] = new ModificationCombination(modList);
-                long hashValue = ToHash(combination);
+                var hashValue = ToHash(combination);
                 _indexToHashValue[index] = hashValue;
                 _hashValueToIndex[hashValue] = index;
             }

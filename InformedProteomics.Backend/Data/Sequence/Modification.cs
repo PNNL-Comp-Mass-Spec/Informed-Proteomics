@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public double GetMass()
         {
-            return Composition.GetMass();
+            return Composition.Mass;
         }
 
         private Modification(int accessionNum, Composition composition, string name)

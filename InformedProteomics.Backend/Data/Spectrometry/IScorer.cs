@@ -6,6 +6,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public interface IScorer
     {
         double GetPrecursorIonScore(Ion precursorIon);
-        double GetFragmentScore(Ion precursorIon, Composition suffixFragmentComposition);
+        double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition);
     }
 }

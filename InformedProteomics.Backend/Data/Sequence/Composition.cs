@@ -1,15 +1,14 @@
+using InformedProteomics.Backend.Data.Biology;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using InformedProteomics.Backend.Data.Biology;
 using MathNet.Numerics;
-using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
-    public class Composition : IMolecule
+    public class Composition
     {
         public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
         public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
@@ -24,24 +23,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Constructors
 
-        public Composition(int c, int h, int n, int o, int s)
+        public Composition(int c, int h, int n, int o, int s, int p)
         {
             _c = (short)c;
             _h = (short)h;
             _n = (short)n;
             _o = (short)o;
             _s = (short)s;
-            _additionalElements = null;
+            _p = (short)p;
         }
 
-        public Composition(int c, int h, int n, int o, int s, int p)
-            : this(c, h, n, o, s, new Tuple<Atom, short>(AtomP, (short)p))
+        public Composition(int c, int h, int n, int o, int s)
+            : this(c, h, n, o, s, 0)
         {
         }
 
         public Composition(Composition composition)
             : this(composition.C, composition.H,
-                composition.N, composition.O, composition.S)
+                composition.N, composition.O, composition.S, composition.P)
         {
             if (composition._additionalElements != null)
             {
@@ -49,14 +48,14 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
-        public Composition(int c, int h, int n, int o, int s, Tuple<Atom, short> additionalElement)
-            : this(c, h, n, o, s)
+        public Composition(int c, int h, int n, int o, int s, int p, Tuple<Atom, short> additionalElement)
+            : this(c, h, n, o, s, p)
         {
             _additionalElements = new Dictionary<Atom, short> { { additionalElement.Item1, additionalElement.Item2 } };
         }
 
-        public Composition(int c, int h, int n, int o, int s, IEnumerable<Tuple<Atom, short>> additionalElements)
-            : this(c, h, n, o, s)
+        public Composition(int c, int h, int n, int o, int s, int p, IEnumerable<Tuple<Atom, short>> additionalElements)
+            : this(c, h, n, o, s, p)
         {
             _additionalElements = new Dictionary<Atom, short>();
             foreach (var element in additionalElements)
@@ -65,11 +64,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
-        private Composition(int c, int h, int n, int o, int s, Dictionary<Atom, short> additionalElements)
-            : this(c, h, n, o, s)
+        private Composition(int c, int h, int n, int o, int s, int p, Dictionary<Atom, short> additionalElements)
+            : this(c, h, n, o, s, p)
         {
             _additionalElements = additionalElements;
-        } 
+        }
         #endregion
 
         #region Properties
@@ -99,6 +98,21 @@ namespace InformedProteomics.Backend.Data.Sequence
             get { return _s; }
         }
 
+        public short P
+        {
+            get { return _p; }
+        }
+
+        public double Mass
+        {
+            get { return (double) (_mass ?? (_mass = GetMonoIsotopicMass())); }
+        }
+
+        public int NominalMass
+        {
+            get { return (int)(_nominalMass ?? (_nominalMass = GetNominalMass())); }
+        }
+
         #endregion
 
         #region Private members
@@ -109,20 +123,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly short _n;
         private readonly short _o;
         private readonly short _s;
-
+        private readonly short _p;
+        private double? _mass;
+        private int? _nominalMass;
         #endregion
 
         #region Methods to get masses
-        /// <summary>
-        /// Gets the mono-isotopic mass
-        /// </summary>
-        public double GetMass()
-        {
-            double mass = _c * MassC + _h * MassH + _n * MassN + _o * MassO + _s * MassS;
-            if (_additionalElements != null)
-                mass += _additionalElements.Sum(entry => entry.Key.Mass * entry.Value);
-            return mass;
-        }
 
         /// <summary>
         /// Gets the mass of ith isotope
@@ -131,7 +137,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public double GetIsotopeMass(int isotopeIndex)
         {
-            return GetMass() + isotopeIndex * Constants.C13MinusC12;
+            return Mass + isotopeIndex * Biology.Constants.C13MinusC12;
         }
 
         /// <summary>
@@ -141,34 +147,15 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public double GetIsotopeMass(double isotopeIndexInRealNumber)
         {
-            return GetMass() + isotopeIndexInRealNumber * Constants.C13MinusC12;
+            return Mass + isotopeIndexInRealNumber * Biology.Constants.C13MinusC12;
         }
 
-
-        /// <summary>
-        /// Gets the mono-isotopic nominal mass
-        /// </summary>
-        public int GetNominalMass()
-        {
-            int nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS;
-            if (_additionalElements != null)
-                nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
-            return nominalMass;
-        } 
         #endregion
-
-        public Composition GetComposition()
-        {
-            return this;
-        }
 
         #region GetHashCode and Equals
         public override int GetHashCode()
         {
-            var hashCode = _c * 0x01000000 + _h * 0x00010000 + _n * 0x00000400 + _o * 0x00000010 + _s;
-            if (_additionalElements == null)
-                return hashCode;
-            return hashCode + _additionalElements.Sum(element => element.Key.GetHashCode() * element.Value);
+            return Mass.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -176,7 +163,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var other = obj as Composition;
             if (other == null)
                 return false;
-            if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S)
+            if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S || _p != other.P)
                 return false;
 
             if (_additionalElements != null)
@@ -201,7 +188,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 return true;
             }
             return other._additionalElements == null;
-        } 
+        }
         #endregion
 
         #region Methods to get Isotopomer Envelpops
@@ -247,20 +234,15 @@ namespace InformedProteomics.Backend.Data.Sequence
         #region Operators
         public static Composition operator +(Composition c1, Composition c2)
         {
-            // ReSharper disable PossibleUnintendedReferenceComparison
-            if (c1 == Zero)
-                return c2;
-            if (c2 == Zero)
-                return c1;
-            // ReSharper restore PossibleUnintendedReferenceComparison
             var numC = c1._c + c2._c;
             var numH = c1._h + c2._h;
             var numN = c1._n + c2._n;
             var numO = c1._o + c2._o;
             var numS = c1._s + c2._s;
+            var numP = c1._p + c2._p;
 
             if (c1._additionalElements == null && c2._additionalElements == null)
-                return new Composition(numC, numH, numN, numO, numS);
+                return new Composition(numC, numH, numN, numO, numS, numP);
 
             Dictionary<Atom, short> additionalElements = null;
             if (c1._additionalElements != null && c2._additionalElements != null)
@@ -290,7 +272,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 additionalElements = new Dictionary<Atom, short>(c2._additionalElements);
             }
 
-            var newComposition = new Composition(numC, numH, numN, numO, numS, additionalElements);
+            var newComposition = new Composition(numC, numH, numN, numO, numS, numP, additionalElements);
 
             return newComposition;
         }
@@ -303,22 +285,23 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static Composition operator -(Composition c)
         {
             if (c._additionalElements == null)
-                return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s);
+                return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s, -c._p);
             var additionalElements =
                 c._additionalElements.ToDictionary(element => element.Key, element => (short)(-element.Value));
-            return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s, additionalElements);
+            return new Composition(-c._c, -c._h, -c._n, -c._o, -c._s, -c._p, additionalElements);
         }
 
         public static Composition operator -(Composition c1, Composition c2)
         {
             return c1 + (-c2);
-        } 
+        }
+
         #endregion
 
         #region ToString and Parsing from String
         public override string ToString()
         {
-            string basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + ")";
+            var basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + (P != 0 ? ") P(" + P + ")" : ")");
             if (_additionalElements == null)
                 return basicCompositionStr;
 
@@ -332,73 +315,100 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public string ToPlainString()
         {
-            return
+            var basicCompositionStr =
                 (C == 0 ? "" : "C" + C)
                 + (H == 0 ? "" : "H" + H)
                 + (N == 0 ? "" : "N" + N)
                 + (O == 0 ? "" : "O" + O)
-                + (S == 0 ? "" : "S" + S);
+                + (S == 0 ? "" : "S" + S)
+                + (P == 0 ? "" : "P" + P);
+
+            if (_additionalElements == null)
+                return basicCompositionStr;
+
+            var buf = new StringBuilder(basicCompositionStr);
+            foreach (var element in _additionalElements)
+            {
+                buf.Append(element.Key.Code + element.Value);
+            }
+            return buf.ToString();
         }
 
         // Initially implemented by Kyowon, re-implemented by Sangtae
         // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2)
-
         public static Composition Parse(string compositionStr)
         {
-            //var t = s.Split(' ');
-            //if (t.Length < 5) return null;
-            //var basicComposition = new int[5];
-            //for (var i = 0; i < basicComposition.Length; i++)
-            //{
-            //    basicComposition[i] = int.Parse(t[i].Substring(t[i].IndexOf('(') + 1, t[i].IndexOf(')') - t[i].IndexOf('(') - 1));
-            //}
-            //if (t.Length == basicComposition.Length)
-            //    return new Composition(basicComposition[0], basicComposition[1], basicComposition[2], basicComposition[3], basicComposition[4]);
-
             var c = 0;
             var h = 0;
             var n = 0;
             var o = 0;
             var s = 0;
+            var p = 0;
             Dictionary<Atom, short> additionalElements = null;
 
             var token = compositionStr.Split();
-		    foreach(var e in token)
-		    {
-			    if(Regex.IsMatch(e, @"^\d*[a-zA-Z]+(\(-?\d+\))?$"))
-			    {
-				    string element;
-				    int num;
+            foreach (var e in token)
+            {
+                if (Regex.IsMatch(e, @"^\d*[a-zA-Z]+(\(-?\d+\))?$"))
+                {
+                    string element;
+                    int num;
                     if (Regex.IsMatch(e, @"^\d*?[a-zA-Z]+$"))
-				    {
-					    element = e;
-					    num = 1;
-				    }
-				    else
+                    {
+                        element = e;
+                        num = 1;
+                    }
+                    else
                     {
                         element = e.Substring(0, e.IndexOf('('));
                         num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
-				    }
-			        if (element.Equals("C")) c = num;
+                    }
+                    if (element.Equals("C")) c = num;
                     else if (element.Equals("H")) h = num;
                     else if (element.Equals("N")) n = num;
                     else if (element.Equals("O")) o = num;
                     else if (element.Equals("S")) s = num;
+                    else if (element.Equals("P")) p = num;
                     else
                     {
                         var atom = Atom.Get(element);
                         if (atom == null) return null;
-                        if(additionalElements == null) additionalElements = new Dictionary<Atom, short>();
+                        if (additionalElements == null) additionalElements = new Dictionary<Atom, short>();
                         additionalElements.Add(atom, (short)num);
                     }
-			    }
-			    else // illegal string
-			    {
-			        return null;
-			    }
-		    }
-            return new Composition(c, h, n, o, s, additionalElements);
-        } 
+                }
+                else // illegal string
+                {
+                    return null;
+                }
+            }
+            return new Composition(c, h, n, o, s, p, additionalElements);
+        }
+
+        #endregion
+
+        #region Private Methods
+        /// <summary>
+        /// Gets the mono-isotopic mass
+        /// </summary>
+        private double GetMonoIsotopicMass()
+        {
+            var mass = _c * MassC + _h * MassH + _n * MassN + _o * MassO + _s * MassS + _p * MassP;
+            if (_additionalElements != null)
+                mass += _additionalElements.Sum(entry => entry.Key.Mass * entry.Value);
+            return mass;
+        }
+
+        /// <summary>
+        /// Gets the mono-isotopic nominal mass
+        /// </summary>
+        private int GetNominalMass()
+        {
+            int nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
+            if (_additionalElements != null)
+                nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
+            return nominalMass;
+        }
 
         #endregion
 
@@ -409,6 +419,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly double MassN = Atom.Get("N").Mass;
         private static readonly double MassO = Atom.Get("O").Mass;
         private static readonly double MassS = Atom.Get("S").Mass;
+        private static readonly double MassP = Atom.Get("P").Mass;
         //private static readonly double MassIsotope = Atom.Get("13C").Mass - MassC;
 
         private static readonly Atom AtomP = Atom.Get("P");
@@ -418,16 +429,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly int NominalMassN = Atom.Get("N").NominalMass;
         private static readonly int NominalMassO = Atom.Get("O").NominalMass;
         private static readonly int NominalMassS = Atom.Get("S").NominalMass;
-
+        private static readonly int NominalMassP = Atom.Get("P").NominalMass;
         #endregion
 
         #region Isotope probabilities of Atoms // added by kyowon - the numbers of elements should be the same. Now it is 4.
 
-        private static readonly double[] ProbC = new[] { .9893, 0.0107, 0, 0 };
-        private static readonly double[] ProbH = new[] { .999885, .000115, 0, 0 };
-        private static readonly double[] ProbN = new[] { 0.99632, 0.00368, 0, 0};
-        private static readonly double[] ProbO = new[] { 0.99757, 0.00038, 0.00205, 0};
-        private static readonly double[] ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
+        private static readonly double[] ProbC = { .9893, 0.0107, 0, 0 };
+        private static readonly double[] ProbH = { .999885, .000115, 0, 0 };
+        private static readonly double[] ProbN = { 0.99632, 0.00368, 0, 0 };
+        private static readonly double[] ProbO = { 0.99757, 0.00038, 0.00205, 0 };
+        private static readonly double[] ProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
         #endregion
 
         #region Private Methods for Computing Isotopomer Envelops
@@ -489,7 +500,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var truncatedDist = new float[isotopeIndex];
             for (var i = 0; i < isotopeIndex; i++)
             {
-                truncatedDist[i] = (float)(dist[i]/maxHeight);
+                truncatedDist[i] = (float)(dist[i] / maxHeight);
             }
 
             return truncatedDist;
@@ -505,7 +516,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 if (number[i - 1] == 0) prob *= exp;
                 else
                     prob *=
-                        (Math.Pow(mean, number[i - 1])*exp/SpecialFunctions.Factorial(number[i - 1]));
+                        (Math.Pow(mean, number[i - 1]) * exp / SpecialFunctions.Factorial(number[i - 1]));
             }
             return prob;
         }
@@ -567,3 +578,4 @@ namespace InformedProteomics.Backend.Data.Sequence
         #endregion
     }
 }
+

@@ -32,8 +32,8 @@ namespace InformedProteomics.Test
             var composition = aaSet.GetComposition(sequence);
 
             Console.WriteLine(composition);
-            Console.WriteLine(composition.GetMass());
-            Console.WriteLine(composition.GetNominalMass());
+            Console.WriteLine(composition.Mass);
+            Console.WriteLine(composition.NominalMass);
             // 2nd isotope
             Console.WriteLine(composition.GetIsotopeMass(0));
             Console.WriteLine(composition.GetIsotopeMass(1));
@@ -111,34 +111,7 @@ namespace InformedProteomics.Test
             //}
         }
 
-        [Test]
-        public void TestCompositions()
-        {
-            var comp1 = Modification.Oxidation.Composition;
-            var comp2 = new Composition(1, 2, 3, 4, 5,
-                                        new[]
-                                            {
-                                                new Tuple<Atom, short>(Atom.Get("Au"), 2),
-                                                new Tuple<Atom, short>(Atom.Get("P"), 2)
-                                            });
-            var comp3 = comp1 + comp2;
 
-            Console.WriteLine(comp1);
-            Console.WriteLine(comp2);
-            Console.WriteLine(comp3);
-            var comp4 = new Composition(1, 2, 3, 4, 5,
-                                        new[]
-                                            {
-                                                new Tuple<Atom, short>(Atom.Get("Au"), 2),
-                                                new Tuple<Atom, short>(Atom.Get("P"), 2)
-                                            });
-
-            Console.WriteLine("Testing GetHashCode() and Equals():");
-            Console.WriteLine(comp2.Equals(comp4));
-            Console.WriteLine(comp2.GetHashCode());
-            Console.WriteLine(comp4.GetHashCode());
-            Console.WriteLine(comp2.Equals(comp2 + Composition.Zero));
-        }
 
         [Test]
         public void TestModificationParams()
@@ -149,7 +122,7 @@ namespace InformedProteomics.Test
             for (int modCombIndex = 0; modCombIndex < numCombinations; modCombIndex++)
             {
                 var modCombination = modParams.GetModificationCombination(modCombIndex);
-                Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination, modCombination.Composition, modCombination.Composition.GetMass());
+                Console.WriteLine("{0}: {1} {2} {3}", modCombIndex, modCombination, modCombination.Composition, modCombination.Composition.Mass);
             }
 
             Console.WriteLine(modParams.GetModificationCombinationIndex(8, 0));
@@ -349,7 +322,28 @@ namespace InformedProteomics.Test
         {
             const string compositionStr = "H(230) C(136) N(40) O(46) S 13C(6) 15N(2)";
             var composition = Composition.Parse(compositionStr);
-            Console.WriteLine("{0}\t{1}", composition, composition.GetMass());
+            Console.WriteLine("{0}\t{1}", composition, composition.Mass);
+        }
+
+        [Test]
+        public void TestIonTypeFactory()
+        {
+            const string sequenceStr = "PEPTIDE";
+            var aminoAcidSet = new AminoAcidSet();
+            var sequence = new Sequence(sequenceStr, aminoAcidSet);
+            var compositionOfFirstPrefix = sequence.GetComposition(0, 2);
+            Console.WriteLine("{0}\t{1}", compositionOfFirstPrefix, compositionOfFirstPrefix.Mass);
+
+            var ionTypeFactory = new IonTypeFactory(new[] { BaseIonType.B, BaseIonType.Y }, new[] { NeutralLoss.NoLoss }, 10);
+            var bIon = ionTypeFactory.GetIonType("b");
+            var yIon = ionTypeFactory.GetIonType("y2");
+            Console.WriteLine("{0}\t{1}\t{2}", bIon, bIon.OffsetComposition, bIon.OffsetComposition.Mass);
+            Console.WriteLine("{0}\t{1}\t{2}", yIon, yIon.OffsetComposition, yIon.OffsetComposition.Mass);
+
+            // Compute mass of y2 = Mass(DE) + OffsetY
+            var compositionOfSecondSuffix = sequence.GetComposition(sequenceStr.Length - 2, sequenceStr.Length);
+            var y2Ion = yIon.GetIon(compositionOfSecondSuffix);
+            Console.WriteLine("m/z of y++: {0}", y2Ion.GetMonoIsotopicMz());
         }
     }
 }

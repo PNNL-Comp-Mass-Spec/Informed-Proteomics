@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public double GetMass()
         {
-            return Composition.GetMass();
+            return Composition.Mass;
         }
 
         public Composition GetComposition()
@@ -47,9 +47,11 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public double GetMass(int from, int to)
         {
-            return GetComposition(from, to).GetMass();
+            return GetComposition(from, to).Mass;
         }
 
+        // from: inclusive
+        // to: exclusive
         public Composition GetComposition(int from, int to)
         {
             from = Math.Max(from, 0);

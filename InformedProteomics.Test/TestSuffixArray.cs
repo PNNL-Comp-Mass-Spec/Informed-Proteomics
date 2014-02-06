@@ -38,7 +38,7 @@ namespace InformedProteomics.Test
                 var annotation = annotationAndOffset.Annotation;
                 var pepSequence = annotation.Substring(2, annotation.Length - 4);
                 var pepComposition = aminoAcidSet.GetComposition(pepSequence) + Composition.H2O;
-                var mass = pepComposition.GetMass();
+                var mass = pepComposition.Mass;
                 numPeptides++;
                 for (var charge = 2; charge < 3; charge++)
                 {

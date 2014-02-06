@@ -8,7 +8,6 @@ namespace InformedProteomics.Scoring.BottomUp
     {
         public float GetRankScore(double cleavageMass, bool isPrefix)
         {
-            for()
             throw new System.NotImplementedException();
         }
 
