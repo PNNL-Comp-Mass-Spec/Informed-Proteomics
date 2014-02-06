@@ -96,24 +96,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
+    <Compile Include="TestBottomUp.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestEdrn.cs" />
+    <Compile Include="TestOffsetFreq.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
+    <Compile Include="TestIMSScoring.cs" />
     <Compile Include="TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
-    <Compile Include="TestParsingSpectra.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="TestParsingSpectra.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="TestProteinReader.cs" />
     <Compile Include="TestProteoWizardWrapper.cs" />
     <Compile Include="TestSequenceGraph.cs" />
     <Compile Include="TestSuffixArray.cs" />
-    <Compile Include="TestImsScoring.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
