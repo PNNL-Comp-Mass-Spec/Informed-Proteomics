@@ -345,5 +345,24 @@ namespace InformedProteomics.Test
             var y2Ion = yIon.GetIon(compositionOfSecondSuffix);
             Console.WriteLine("m/z of y++: {0}", y2Ion.GetMonoIsotopicMz());
         }
+
+        [Test]
+        public void TestRegularExpressions()
+        {
+            const string str = "C2HBr365Ag2";
+            var matches = Regex.Matches(str, @"[A-Z][a-z]?\d*");
+            foreach (var match in matches)
+            {
+                var element = match.ToString();
+                var atom = Regex.Match(element, @"[A-Z][a-z]?");
+                var num = element.Substring(atom.Index + atom.Length);
+                if (num.Length == 0) num = "1";
+                Console.WriteLine("{0} ({1})", atom, num);
+            }
+
+            var comp = Composition.ParseFromPlainString(str);
+            Console.WriteLine(comp.ToPlainString());
+            Console.WriteLine(comp.ToString());
+        }
     }
 }

@@ -334,8 +334,29 @@ namespace InformedProteomics.Backend.Data.Sequence
             return buf.ToString();
         }
 
+        // Parses plain string (e.g. C2H3N1O1S)
+        public static Composition ParseFromPlainString(string plaincompositionStr)
+        {
+            if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?\d*)+")) return null;
+
+            var unimodString = new StringBuilder();
+
+            var matches = Regex.Matches(plaincompositionStr, @"[A-Z][a-z]?\d*");
+            foreach (var match in matches)
+            {
+                var element = match.ToString();
+                var atom = Regex.Match(element, @"[A-Z][a-z]?");
+                var num = element.Substring(atom.Index + atom.Length);
+                if (num.Length == 0) num = "1";
+                if (unimodString.Length != 0) unimodString.Append(" ");
+                unimodString.AppendFormat("{0}({1})", atom, num);
+            }
+
+            return Parse(unimodString.ToString());
+        }
+
         // Initially implemented by Kyowon, re-implemented by Sangtae
-        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2)
+        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2))
         public static Composition Parse(string compositionStr)
         {
             var c = 0;

@@ -14,6 +14,34 @@ namespace InformedProteomics.Test
     public class TestMisc
     {
         [Test]
+        public void AddNaToTable()
+        {
+            const string dir = @"D:\Research\Data\IPRG2014";
+            const string resultFilePath = dir + @"\AMTAllPeptidesMissingValues.tsv";
+            foreach (var line in File.ReadLines(resultFilePath))
+            {
+                var token = line.Split('\t');
+                Console.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : t)));
+            }
+        }
+
+        [Test]
+        public void AddIPrgProteinLengths()
+        {
+            const string dir = @"D:\Research\Data\IPRG2014";
+            const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.fasta";
+            var database = new FastaDatabase(databaseFilePath);
+            database.Read();
+
+            const string proteinListPath = dir + @"\ProteinListIntensity.txt";
+            foreach (var proteinId in File.ReadLines(proteinListPath))
+            {
+                var length = database.GetProteinLength(proteinId);
+                Console.WriteLine("{0}\t{1}", proteinId, length);
+            }
+        }
+
+        [Test]
         public void GenerateAbrfSpecCountAllProteins()
         {
             const string dir = @"D:\Research\Data\IPRG2014";

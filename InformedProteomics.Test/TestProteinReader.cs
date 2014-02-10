@@ -32,7 +32,7 @@ namespace InformedProteomics.Test
                 var trimmed = Trim(i);
                 var composition = aset.GetComposition(trimmed);
                 if (composition != null)
-                    writeFile.WriteLine(trimmed + '\t' + composition.GetMass());
+                    writeFile.WriteLine(trimmed + '\t' + composition.Mass);
             }
             writeFile.Close();
         }
