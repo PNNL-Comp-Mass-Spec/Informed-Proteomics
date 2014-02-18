@@ -7,10 +7,10 @@ namespace InformedProteomics.Backend.Data.Sequence
     public class Modification : IMolecule
     {
         public int AccessionNum { get; private set; }
-        public Composition Composition { get; private set; }
+        public Composition.Composition Composition { get; private set; }
         public string Name { get; private set; }
 
-        public Composition GetComposition()
+        public Composition.Composition GetComposition()
         {
             return Composition;
         }
@@ -20,7 +20,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return Composition.Mass;
         }
 
-        private Modification(int accessionNum, Composition composition, string name)
+        private Modification(int accessionNum, Composition.Composition composition, string name)
         {
             AccessionNum = accessionNum;
             Composition = composition;
@@ -54,20 +54,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             return NameToModMap[psiMsName];
         }
 
-        public static readonly Modification NoModification = new Modification(0, new Composition(0, 0, 0, 0, 0), "No modification");
-        public static readonly Modification Carbamidomethylation = new Modification(4, new Composition(2, 3, 1, 1, 0), "Carbamidomethyl");
-        public static readonly Modification Phosphorylation = new Modification(21, new Composition(0, 1, 0, 3, 0, 1), "Phospho");
-        public static readonly Modification Oxidation = new Modification(35, new Composition(0, 0, 0, 1, 0), "Oxidation");
-        public static readonly Modification Methylation = new Modification(34, new Composition(1, 2, 0, 0, 0), "Methyl");
-        public static readonly Modification DiMethylation = new Modification(36, new Composition(2, 4, 0, 0, 0), "Dimethyl");
-        public static readonly Modification TriMethylation = new Modification(37, new Composition(3, 6, 0, 0, 0), "Trimethyl");
-        public static readonly Modification Acetylation = new Modification(1, new Composition(2, 2, 0, 1, 0), "Acetyl");
-        public static readonly Modification Deamidation = new Modification(7, new Composition(0, -1, -1, 1, 0), "Deamidated");
-        public static readonly Modification PyroGluQ = new Modification(28, new Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
+        public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
+        public static readonly Modification Carbamidomethylation = new Modification(4, new Composition.Composition(2, 3, 1, 1, 0), "Carbamidomethyl");
+        public static readonly Modification Phosphorylation = new Modification(21, new Composition.Composition(0, 1, 0, 3, 0, 1), "Phospho");
+        public static readonly Modification Oxidation = new Modification(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
+        public static readonly Modification Methylation = new Modification(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl");
+        public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
+        public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
+        public static readonly Modification Acetylation = new Modification(1, new Composition.Composition(2, 2, 0, 1, 0), "Acetyl");
+        public static readonly Modification Deamidation = new Modification(7, new Composition.Composition(0, -1, -1, 1, 0), "Deamidated");
+        public static readonly Modification PyroGluQ = new Modification(28, new Composition.Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
 
-        public static readonly Modification GlutathioneC = new Modification(55, new Composition(10, 15, 3, 6, 1), "Glutathione");
-        public static readonly Modification CysteinylC = new Modification(312, new Composition(3, 5, 1, 2, 1), "Cysteinyl");
-        public static readonly Modification Dehydro = new Modification(374, new Composition(0, -1, 0, 0, 0), "Dehydro");
+        public static readonly Modification GlutathioneC = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
+        public static readonly Modification CysteinylC = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
+        public static readonly Modification Dehydro = new Modification(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
 
@@ -75,15 +75,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 Acetylation,
                 Carbamidomethylation,
-                new Modification(5, new Composition(1, 1, 1, 1, 0), "Carbamyl"),
-                new Modification(6, new Composition(2, 2, 2, 0, 0), "Carboxymethyl"),
+                new Modification(5, new Composition.Composition(1, 1, 1, 1, 0), "Carbamyl"),
+                new Modification(6, new Composition.Composition(2, 2, 2, 0, 0), "Carboxymethyl"),
                 Deamidation,
-                new Modification(17, new Composition(5, 9, 1, 1, 0), "NIPCAM"),
+                new Modification(17, new Composition.Composition(5, 9, 1, 1, 0), "NIPCAM"),
                 Phosphorylation,
-                new Modification(26, new Composition(0, -3, -1, 0, 0), "Pyro-carbamidomethyl"),
-                new Modification(27, new Composition(0, -2, 0, -1, 0), "Glu->pyro-Glu"),
+                new Modification(26, new Composition.Composition(0, -3, -1, 0, 0), "Pyro-carbamidomethyl"),
+                new Modification(27, new Composition.Composition(0, -2, 0, -1, 0), "Glu->pyro-Glu"),
                 PyroGluQ,
-                new Modification(34, new Composition(1, 2, 0, 0, 0), "Methyl"),
+                new Modification(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl"),
                 Oxidation
             };
 

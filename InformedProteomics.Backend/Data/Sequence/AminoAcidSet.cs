@@ -142,9 +142,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             throw new System.NotImplementedException();
         }
 
-        public Composition GetComposition(string sequence)
+        public Composition.Composition GetComposition(string sequence)
         {
-            var composition = Composition.Zero;
+            var composition = Composition.Composition.Zero;
 
             foreach (var residue in sequence)
             {

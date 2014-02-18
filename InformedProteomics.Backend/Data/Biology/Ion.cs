@@ -9,10 +9,10 @@ namespace InformedProteomics.Backend.Data.Biology
 {
     public class Ion
     {
-        public Composition Composition { get; private set; }
+        public Composition.Composition Composition { get; private set; }
         public int Charge { get; private set; }
 
-        public Ion(Composition composition, int charge)
+        public Ion(Composition.Composition composition, int charge)
         {
             Composition = composition;
             Charge = charge;

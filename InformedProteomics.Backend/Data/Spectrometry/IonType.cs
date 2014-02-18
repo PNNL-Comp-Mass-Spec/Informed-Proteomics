@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class IonType
     {
         public string Name { get; private set; }
-        public Composition OffsetComposition { get; private set; }
+        public Composition.Composition OffsetComposition { get; private set; }
         public int Charge { get; private set; }
         public bool IsPrefixIon { get; private set; }
         public BaseIonType BaseIonType { get; private set; }
@@ -19,7 +19,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         internal IonType(
             string name, 
-            Composition offsetComposition,
+            Composition.Composition offsetComposition,
             int charge, 
             BaseIonType baseIonType,
             NeutralLoss neutralLoss
@@ -35,7 +35,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         [Obsolete("IonType object should be generated through IonTypeFactory")]
-        public IonType(string name, Composition offsetComposition,
+        public IonType(string name, Composition.Composition offsetComposition,
                        int charge, bool isPrefixIon)
         {
             Name = name;
@@ -51,13 +51,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return (cutMass + _offsetMass + Charge * Constants.Proton) / Charge;
         }
 
-        public double GetMz(Composition prefixComposition)
+        public double GetMz(Composition.Composition prefixComposition)
         {
             Debug.Assert(prefixComposition != null, "prefixComposition must not be null");
             return GetMz(prefixComposition.Mass);
         }
 
-        public Ion GetIon(Composition cutComposition)
+        public Ion GetIon(Composition.Composition cutComposition)
         {
             return new Ion(cutComposition + OffsetComposition, Charge);
         }
@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var t = s.Split(',');
             if (t.Length < 5) return null;
             var name = t[0];
-            var composition = Composition.Parse(t[1]);
+            var composition = Composition.Composition.Parse(t[1]);
             var charge = int.Parse(t[3]);
             var isPrefixIon = bool.Parse(t[4]);
             return new IonType(name, composition, charge, isPrefixIon);

@@ -5,6 +5,6 @@ namespace InformedProteomics.Backend.Data.Biology
 {
     public interface IMolecule : IMatter
     {
-        Composition GetComposition();
+        Composition.Composition GetComposition();
     }
 }

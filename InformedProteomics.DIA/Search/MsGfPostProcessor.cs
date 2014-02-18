@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;

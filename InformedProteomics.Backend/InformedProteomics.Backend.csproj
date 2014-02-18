@@ -109,6 +109,7 @@
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Database\AnnotationAndOffset.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
+    <Compile Include="Data\Composition\CompositionFactory.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
     <Compile Include="Data\Spectrometry\Isotope.cs" />
@@ -145,7 +146,7 @@
     <Compile Include="Data\Biology\Ion.cs" />
     <Compile Include="Data\Sequence\AminoAcid.cs" />
     <Compile Include="Data\Sequence\AminoAcidSet.cs" />
-    <Compile Include="Data\Sequence\Composition.cs" />
+    <Compile Include="Data\Composition\Composition.cs" />
     <Compile Include="Data\Sequence\Modification.cs" />
     <Compile Include="Data\Sequence\SearchModification.cs" />
     <Compile Include="Data\Sequence\Sequence.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Utils\Centroider.cs" />
+    <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\NoiseFilter.cs" />
     <Compile Include="Utils\SimpleMath.cs" />

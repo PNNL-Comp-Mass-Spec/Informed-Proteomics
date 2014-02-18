@@ -1,12 +1,12 @@
-using InformedProteomics.Backend.Data.Biology;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using InformedProteomics.Backend.Data.Biology;
 using MathNet.Numerics;
 
-namespace InformedProteomics.Backend.Data.Sequence
+namespace InformedProteomics.Backend.Data.Composition
 {
     public class Composition
     {

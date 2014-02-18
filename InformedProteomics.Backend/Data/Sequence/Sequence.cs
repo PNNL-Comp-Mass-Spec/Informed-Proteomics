@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
-            var composition = Composition.Zero;
+            var composition = Data.Composition.Composition.Zero;
 
             foreach (var aa in aaArr)
             {
@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Sequence(string sequence, AminoAcidSet aminoAcidSet)
         {
-            var composition = Composition.Zero;
+            var composition = Data.Composition.Composition.Zero;
             foreach (var residue in sequence)
             {
                 var aa = aminoAcidSet.GetAminoAcid(residue);
@@ -33,14 +33,14 @@ namespace InformedProteomics.Backend.Data.Sequence
             Composition = composition;
         }
 
-        public Composition Composition { get; private set; }
+        public Composition.Composition Composition { get; private set; }
 
         public double GetMass()
         {
             return Composition.Mass;
         }
 
-        public Composition GetComposition()
+        public Composition.Composition GetComposition()
         {
             return Composition;
         }
@@ -52,20 +52,20 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         // from: inclusive
         // to: exclusive
-        public Composition GetComposition(int from, int to)
+        public Composition.Composition GetComposition(int from, int to)
         {
             from = Math.Max(from, 0);
             to = Math.Min(to, Count);
-            var composition = Composition.Zero;
+            var composition = Data.Composition.Composition.Zero;
             for (var i = from; i < to; i++)
                 composition += this[i].Composition;
             return composition;
         }
 
-        public IEnumerable<Composition> GetPrefixCompositions()
+        public IEnumerable<Composition.Composition> GetPrefixCompositions()
         {
-            var compositions = new Composition[Count];
-            var prefixComposition = Composition.Zero;
+            var compositions = new Composition.Composition[Count];
+            var prefixComposition = Data.Composition.Composition.Zero;
             var index = -1;
             foreach (var aa in this)
             {
@@ -74,10 +74,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return compositions;
         }
 
-        public IEnumerable<Composition> GetSuffixCompositions()
+        public IEnumerable<Composition.Composition> GetSuffixCompositions()
         {
-            var compositions = new Composition[Count];
-            var suffixComposition = Composition.Zero;
+            var compositions = new Composition.Composition[Count];
+            var suffixComposition = Data.Composition.Composition.Zero;
             for(var index = 0; index < Count; ++index)
             {
                 compositions[index] = (suffixComposition += this[Count-1-index].Composition);
@@ -87,7 +87,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Ion GetPrecursorIon(int charge)
         {
-            return new Ion(Composition + Composition.H2O, charge);
+            return new Ion(Composition + Data.Composition.Composition.H2O, charge);
         }
 
         public Dictionary<Tuple<IonType,int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)

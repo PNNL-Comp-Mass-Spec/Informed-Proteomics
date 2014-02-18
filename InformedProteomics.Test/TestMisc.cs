@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.DIA.Search;
@@ -13,6 +14,12 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestMisc
     {
+        [Test]
+        public void TestDivisionByInfinity()
+        {
+            Console.WriteLine(10f/float.NegativeInfinity);
+        }
+
         [Test]
         public void AddNaToTable()
         {

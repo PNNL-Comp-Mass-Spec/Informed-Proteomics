@@ -9,6 +9,7 @@ using DeconTools.Backend.Core;
 using DeconTools.Backend.Parameters;
 using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
