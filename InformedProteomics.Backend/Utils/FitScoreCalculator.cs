@@ -5,7 +5,8 @@ namespace InformedProteomics.Backend.Utils
 {
     public class FitScoreCalculator
     {
-        public static double GetFit(double[] theorPeakList, double[] observedPeakList)
+        // the smaller the better
+        public static double GetDeconToolsFit(double[] theorPeakList, double[] observedPeakList)
         {
             if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 1.0;
 
@@ -13,17 +14,87 @@ namespace InformedProteomics.Backend.Utils
             if (Math.Abs(maxObs - 0) < float.Epsilon) maxObs = double.PositiveInfinity;
             var normalizedObs = observedPeakList.Select(p => p / maxObs).ToList();
 
-            var maxTheor = theorPeakList.Max();
-            var normalizedTheo = theorPeakList.Select(p => p / maxTheor).ToList();
+            double sumSquareOfDiffs = 0;
+            double sumSquareOfTheor = 0;
+            for (var i = 0; i < theorPeakList.Length; i++)
+            {
+                var diff = normalizedObs[i] - theorPeakList[i];
+
+                sumSquareOfDiffs += (diff * diff);
+                sumSquareOfTheor += (theorPeakList[i] * theorPeakList[i]);
+            }
+
+            var fitScore = sumSquareOfDiffs / sumSquareOfTheor;
+            if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
+
+            return fitScore;
+        }
+
+        public static double GetFitNormalizedByTheoMaxIsotope(double[] theorPeakList, double[] observedPeakList)
+        {
+            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 1.0;
+
+            var maxIndex = -1;
+            var maxIntensity = 0.0;
+            for (var i = 0; i < theorPeakList.Length; i++)
+            {
+                if (theorPeakList[i] > maxIntensity)
+                {
+                    maxIndex = i;
+                    maxIntensity = theorPeakList[i];
+                }
+            }
+
+            var maxObs = observedPeakList[maxIndex];
+            if (Math.Abs(maxObs) <= 0) return 1.0;
+
+            var normalizedObs = new double[observedPeakList.Length];
+            for (var i = 0; i < observedPeakList.Length; i++)
+            {
+                var normalizedValue = observedPeakList[i]/maxObs;
+                normalizedObs[i] = normalizedValue > 1 ? 1 : normalizedValue;
+            }
 
             double sumSquareOfDiffs = 0;
             double sumSquareOfTheor = 0;
-            for (var i = 0; i < normalizedTheo.Count; i++)
+            for (var i = 0; i < theorPeakList.Length; i++)
             {
-                var diff = normalizedObs[i] - normalizedTheo[i];
+                var diff = normalizedObs[i] - theorPeakList[i];
 
                 sumSquareOfDiffs += (diff * diff);
-                sumSquareOfTheor += (normalizedTheo[i] * normalizedTheo[i]);
+                sumSquareOfTheor += (theorPeakList[i] * theorPeakList[i]);
+            }
+
+            var fitScore = sumSquareOfDiffs / sumSquareOfTheor;
+            if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
+
+            return fitScore;
+        }
+
+        // the larger the better
+        public static double GetCosine(double[] theorPeakList, double[] observedPeakList)
+        {
+            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
+
+            var innerProduct = theorPeakList.Select((t, i) => t*observedPeakList[i]).Sum();
+
+            var magnitudeTheo = Math.Sqrt(theorPeakList.Sum(t => t*t));
+            var magnitudeObs = Math.Sqrt(observedPeakList.Sum(t => t*t));
+
+            return innerProduct/(magnitudeTheo*magnitudeObs);
+        }
+
+        public static double GetFitOfNormalizedVectors(double[] normTheorPeakList, double[] normObservedPeakList)
+        {
+            if (normTheorPeakList.Length != normObservedPeakList.Length || normTheorPeakList.Length == 0) return 1.0;
+            double sumSquareOfDiffs = 0;
+            double sumSquareOfTheor = 0;
+            for (var i = 0; i < normTheorPeakList.Length; i++)
+            {
+                var diff = normTheorPeakList[i] - normObservedPeakList[i];
+
+                sumSquareOfDiffs += (diff * diff);
+                sumSquareOfTheor += (normTheorPeakList[i] * normTheorPeakList[i]);
             }
 
             var fitScore = sumSquareOfDiffs / sumSquareOfTheor;

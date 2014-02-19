@@ -8,11 +8,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class IonTypeFactory
     {
+
         public IonTypeFactory()
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
                 NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
                 3   // up to charge 3
+            )
+        {
+        }
+
+        public IonTypeFactory(int maxCharge)
+            : this(
+                BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
+                NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
+                maxCharge   // up to charge 3
             )
         {
         }

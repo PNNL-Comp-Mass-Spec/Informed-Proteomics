@@ -126,7 +126,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var downHill = false;
             var prevTheoIntensity = 0f;
             // Assume that the isotopomer envelop is unimodal
-            for (var isotopeIndex = 0; isotopeIndex <= isotopomerEnvelope.Length; isotopeIndex--)
+            for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
                 var theoIntensity = isotopomerEnvelope[isotopeIndex];
                 if (!downHill && theoIntensity < prevTheoIntensity) downHill = true;
@@ -162,7 +162,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var prevTheoIntensity = 0f;
             var maxObservedIntensity = float.NegativeInfinity;
             // Assume that the isotopomer envelop is unimodal
-            for (var isotopeIndex = 0; isotopeIndex <= isotopomerEnvelope.Length; isotopeIndex--)
+            for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
                 var theoIntensity = isotopomerEnvelope[isotopeIndex];
                 if (!downHill && theoIntensity < prevTheoIntensity) downHill = true;
@@ -185,7 +185,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 prevTheoIntensity = theoIntensity;
             }
 
-            return FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, observedPeaks);
+            var normalizedObs = observedPeaks.Select(p => p / maxObservedIntensity).ToArray();
+            return FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, normalizedObs);
         }
 
         // Added by Chris
