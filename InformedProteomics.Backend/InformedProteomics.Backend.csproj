@@ -81,6 +81,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="MultiDimensionalPeakFinding">
+      <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>
+    </Reference>
     <Reference Include="MwtWinDll">
       <HintPath>..\lib\MwtWinDll.dll</HintPath>
     </Reference>
@@ -153,6 +156,7 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
+    <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\Misc.cs" />
