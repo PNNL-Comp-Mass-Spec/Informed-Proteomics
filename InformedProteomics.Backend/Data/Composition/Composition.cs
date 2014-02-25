@@ -166,28 +166,18 @@ namespace InformedProteomics.Backend.Data.Composition
             if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S || _p != other.P)
                 return false;
 
-            if (_additionalElements != null)
+            if (_additionalElements == null) return other._additionalElements == null;
+
+            if (other._additionalElements == null) return false;
+
+            // Both have additional elements
+            foreach (var entry in _additionalElements)
             {
-                if (other._additionalElements == null)
-                {
-                    return false;
-                }
-                foreach (var entry in _additionalElements)
-                {
-                    short num;
-                    if (_additionalElements.TryGetValue(entry.Key, out num))
-                    {
-                        if (entry.Value != num)
-                            return false;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                short num;
+                if (!(_additionalElements.TryGetValue(entry.Key, out num))) return false;
+                if (entry.Value != num) return false;
             }
-            return other._additionalElements == null;
+            return true;
         }
         #endregion
 
@@ -342,9 +332,9 @@ namespace InformedProteomics.Backend.Data.Composition
             var unimodString = new StringBuilder();
 
             var matches = Regex.Matches(plaincompositionStr, @"[A-Z][a-z]?\d*");
-            foreach (var match in matches)
+            foreach (Match match in matches)
             {
-                var element = match.ToString();
+                var element = match.Value;
                 var atom = Regex.Match(element, @"[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
                 if (num.Length == 0) num = "1";

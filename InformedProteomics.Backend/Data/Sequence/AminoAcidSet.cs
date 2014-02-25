@@ -7,6 +7,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 {
     public class AminoAcidSet
     {
+        public static readonly AminoAcidSet StandardAminoAcidSet = new AminoAcidSet();
+        public static readonly AminoAcidSet StandardAminoAcidSetWithFixedCarbamidoMethyl = new AminoAcidSet(Modification.Carbamidomethylation);
+
         #region Constructors
 
         // Generate an amino acid map with 20 standard amino acids

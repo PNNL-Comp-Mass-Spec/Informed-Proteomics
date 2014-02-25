@@ -13,8 +13,10 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestLcMsRun
     {
         public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
-        public const string TestTopDownRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\E_coli_iscU_60_mock.raw";
+        public const string TestTopDownRawFilePathEtd = @"\\protoapps\UserData\Sangtae\TestData\E_coli_iscU_60_mock.raw";
+        public const string TestTopDownRawFilePathHcd = @"\\protoapps\UserData\Sangtae\TopDownQCShew\raw\QC_Shew_Intact_F4a_11Feb14_Tiger_13-11-14.raw";
 
+        //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()
         {
             var reader = new XCaliburReader(TestRawFilePath);

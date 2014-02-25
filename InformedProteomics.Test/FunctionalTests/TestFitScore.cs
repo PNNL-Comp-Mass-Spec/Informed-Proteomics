@@ -11,9 +11,9 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestFitScore
     {
         [Test]
-        public void TestFitScoreCalculation()
+        public void TestFitScoreCalculationHcd()
         {
-            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePath, MassSpecDataType.XCaliburRun);
+            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(810) as ProductSpectrum;
             Assert.True(spec != null);
 
@@ -21,10 +21,35 @@ namespace InformedProteomics.Test.FunctionalTests
             var suf54Comp = new AminoAcidSet().GetComposition(suf54);
             Assert.True(suf54Comp != null);
 
-            var z6Type = new IonTypeFactory(10).GetIonType("z6");
-            var z54C6 = z6Type.GetIon(suf54Comp);
-            Console.WriteLine("MonoMz: {0}, MonoMass: {1}", z54C6.GetMonoIsotopicMz(), z54C6.Composition.Mass);
-            Console.WriteLine("FitScore: {0}", spec.GetFitScore(z54C6, new Tolerance(15), 0.1));
+            var ionType = new IonTypeFactory(10).GetIonType("z6");
+            var ion = ionType.GetIon(suf54Comp);
+            ion.Composition.ComputeApproximateIsotopomerEnvelop();
+            Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
+
+            var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
+            Console.WriteLine("FitScore: {0}", fitScore);
+            Assert.True(fitScore < 0.15);
+        }
+
+        [Test]
+        public void TestFitScoreCalculationEtd()
+        {
+            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
+            var spec = run.GetSpectrum(810) as ProductSpectrum;
+            Assert.True(spec != null);
+
+            const string suf54 = "ENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK";
+            var suf54Comp = new AminoAcidSet().GetComposition(suf54);
+            Assert.True(suf54Comp != null);
+
+            var ionType = new IonTypeFactory(10).GetIonType("z6");
+            var ion = ionType.GetIon(suf54Comp);
+            ion.Composition.ComputeApproximateIsotopomerEnvelop();
+            Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
+
+            var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
+            Console.WriteLine("FitScore: {0}", fitScore);
+            Assert.True(fitScore < 0.15);
         }
 
         [Test]

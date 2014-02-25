@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Sequence;
 using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
@@ -117,9 +118,8 @@ namespace InformedProteomics.Backend.Database
                 }
             }
 
-            const string standardAAStr = "ACDEFGHIKLMNPQRSTVWY";
             var isStandardAminoAcid = new bool[128];
-            foreach (var residue in standardAAStr)
+            foreach (var residue in AminoAcid.StandardAminoAcidCharacters)
             {
                 isStandardAminoAcid[residue] = true;
             }

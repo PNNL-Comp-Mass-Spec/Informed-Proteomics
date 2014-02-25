@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -119,6 +121,56 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             return productIonMap;
+        }
+
+        // Parse peptide string from MS-GF+ results
+        // e.g. +229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163
+        public static Sequence GetSequenceFromMsGfPlusPeptideStr(string msgfPlusPeptideStr)
+        {
+            const string aminoAcidRegex = @"[" + AminoAcid.StandardAminoAcidCharacters + "]";
+            const string massRegex = @"[+-]?\d+\.\d+";
+
+            if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+")) return null;
+
+            var stdAaSet = AminoAcidSet.StandardAminoAcidSet;
+            var aaList = new List<AminoAcid>();
+
+            var matches = Regex.Matches(msgfPlusPeptideStr, "("+aminoAcidRegex+"|"+massRegex+")");
+            AminoAcid aa = null;
+            var mods = new List<Modification>();
+            foreach (Match match in matches)
+            {
+                var element = match.Value;
+                if (element.Length == 0) continue;
+                if (element.Length == 1 && char.IsLetter(element[0]))   // amino acid
+                {
+                    if (aa != null)
+                    {
+                        aa = mods.Aggregate(aa, (current, mod) => new ModifiedAminoAcid(current, mod));
+                        aaList.Add(aa);
+                        mods = new List<Modification>();
+                    }
+                    aa = stdAaSet.GetAminoAcid(element[0]);
+                    if(aa == null) throw new Exception("Unrecognized amino acid character: " + element[0]);
+//                    Console.WriteLine("{0} {1} {2}", aa.Residue, aa.Composition, aa.GetMass());
+                }
+                else
+                {
+                    var modList = Modification.GetFromMass(element);
+                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modificaion mass: " + element);
+                    var mod = modList[0];
+                    mods.Add(mod);
+//                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.Mass);
+                }
+            }
+
+            if (aa != null)
+            {
+                aa = mods.Aggregate(aa, (current, mod) => new ModifiedAminoAcid(current, mod));
+                aaList.Add(aa);
+            }
+
+            return new Sequence(aaList);
         }
     }
 }

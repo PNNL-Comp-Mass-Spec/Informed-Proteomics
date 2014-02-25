@@ -89,6 +89,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             new AminoAcid('W', "Tryptophan", new Composition.Composition(11, 10, 2, 1, 0))
         };
 
+        public const string StandardAminoAcidCharacters = "ACDEFGHIKLMNPQRSTVWY";
+
         #endregion
 
         # region Private Static Members

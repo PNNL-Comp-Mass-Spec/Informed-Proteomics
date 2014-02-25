@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -35,7 +36,7 @@ namespace InformedProteomics.Backend.Utils
                     char mutatedResidue = str[i];
                     while (mutatedResidue == str[i])
                     {
-                        mutatedResidue = StandardAAStr[Random.Next(StandardAAStr.Length)];
+                        mutatedResidue = AminoAcid.StandardAminoAcidCharacters[Random.Next(AminoAcid.StandardAminoAcidCharacters.Length)];
                     }
                     mutated.Append(mutatedResidue);
                 }
@@ -44,6 +45,5 @@ namespace InformedProteomics.Backend.Utils
         }
 
         private static readonly Random Random = new Random();
-        private const string StandardAAStr = "ACDEFGHIKLMNPQRSTVWY";
     }
 }

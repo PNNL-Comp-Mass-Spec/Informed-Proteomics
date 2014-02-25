@@ -23,6 +23,25 @@ namespace InformedProteomics.Test
     internal class TestUtils
     {
         [Test]
+        public void ParseMsGfString()
+        {
+            const string msgfPepStr = "+229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163";
+            var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(msgfPepStr);
+            var ion = new Ion(sequence.Composition + Composition.H2O, 4);
+            Console.WriteLine("{0} {1} {2}", msgfPepStr, ion.Composition, ion.GetMonoIsotopicMz());
+
+            var comp = Composition.Parse("H(257) C(150) N(42) O(56) S(4) 13C(12) 15N(3)");
+            Console.WriteLine("Mass: " + comp.Mass);
+        }
+
+        [Test]
+        public void TestFormatting()
+        {
+            Console.WriteLine("{0:N3}", Modification.Tmt6Plex.Composition.Mass);
+            Console.WriteLine(Modification.GetFromMass("229.163")[0].Name);
+        }
+
+        [Test]
         public void TestPeptide()
         {
             const string sequence = "KIEEIAAKYKHSVVKKCCYDGACVNNDETCEQRAARISLGPRCIKAFTECCVVASQLRANISHKDMQLGR";
