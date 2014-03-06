@@ -113,39 +113,39 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Done. {0:f4} sec", sec);
         }
 
-        public void TestParsingSpectrumFilesUsingDeconTools()
-        {
-            var sw = new System.Diagnostics.Stopwatch();
+        //public void TestParsingSpectrumFilesUsingDeconTools()
+        //{
+        //    var sw = new System.Diagnostics.Stopwatch();
 
-            sw.Start();
+        //    sw.Start();
             
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            var peakDetector = new DeconToolsPeakDetectorV2(0, 0);  // basic peak detector
-            var run = new RunFactory().CreateRun(specFilePath);
+        //    const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+        //    var peakDetector = new DeconToolsPeakDetectorV2(0, 0);  // basic peak detector
+        //    var run = new RunFactory().CreateRun(specFilePath);
 
-            var numMs2Specs = 0;
-            for (var scanNum = run.GetMinPossibleLCScanNum(); scanNum <= run.GetMaxPossibleLCScanNum(); scanNum++)
-            {
-                if (run.GetMSLevel(scanNum) == 2)
-                {
-                    ++numMs2Specs;
-                    var xyData = run.GetMassSpectrum(new ScanSet(810));
-                    peakDetector.FindPeaks(xyData);
-                }
-            }
-            Console.WriteLine("Num MS2 spectra: {0}", numMs2Specs);
+        //    var numMs2Specs = 0;
+        //    for (var scanNum = run.GetMinPossibleLCScanNum(); scanNum <= run.GetMaxPossibleLCScanNum(); scanNum++)
+        //    {
+        //        if (run.GetMSLevel(scanNum) == 2)
+        //        {
+        //            ++numMs2Specs;
+        //            var xyData = run.GetMassSpectrum(new ScanSet(810));
+        //            peakDetector.FindPeaks(xyData);
+        //        }
+        //    }
+        //    Console.WriteLine("Num MS2 spectra: {0}", numMs2Specs);
 
-            //const int scanNum = 810;
-            //var xyData = run.ReadMassSpectrum(new ScanSet(scanNum));
-            //xyData.Display();
-            //peakDetector.FindPeaks(xyData);
+        //    //const int scanNum = 810;
+        //    //var xyData = run.ReadMassSpectrum(new ScanSet(scanNum));
+        //    //xyData.Display();
+        //    //peakDetector.FindPeaks(xyData);
 
-            //Console.WriteLine("IsolationWindow: {0}", run.GetMS2IsolationWidth(scanNum));
-            //Console.WriteLine("ScanInfo\n{0}", run.GetScanInfo(scanNum));
-            //Console.WriteLine("PrecursorScan\n{0}", run.ReadPrecursorInfo(scanNum).PrecursorScan); 
+        //    //Console.WriteLine("IsolationWindow: {0}", run.GetMS2IsolationWidth(scanNum));
+        //    //Console.WriteLine("ScanInfo\n{0}", run.GetScanInfo(scanNum));
+        //    //Console.WriteLine("PrecursorScan\n{0}", run.ReadPrecursorInfo(scanNum).PrecursorScan); 
             
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Done. {0:f4} sec", sec);
-        }
+        //    var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Done. {0:f4} sec", sec);
+        //}
     }
 }
