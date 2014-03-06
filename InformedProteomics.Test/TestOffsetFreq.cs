@@ -36,6 +36,8 @@ namespace InformedProteomics.Test
 
         private const string PrecChargeHeader = "Charge";
         private const string ScanHeader = "ScanNum";
+        private const string PeptideHeader = "Peptide";
+        private const string PepQValueHeader = "PepQValue";
         const double RelativeIntensityThreshold = 1.0;
         readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
@@ -44,23 +46,30 @@ namespace InformedProteomics.Test
             var tsvParser = new TsvFileParser(txtFileName);
 
             var scans = tsvParser.GetData(ScanHeader);
-            var peptides = tsvParser.GetPeptides(_pepQThreshold);
+            var peptides = tsvParser.GetData(PeptideHeader);
             var charges = tsvParser.GetData(PrecChargeHeader);
+            var pepQValues = tsvParser.GetData(PepQValueHeader);
+
             var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             var clean = new List<Tuple<string, Spectrum>>();
-            using (var chargei = charges.GetEnumerator())
-            using (var scani = scans.GetEnumerator())
-            using (var peptidei = peptides.GetEnumerator())
+            var numRows = scans.Count;
+            var peptideSet = new HashSet<string>();
+
+            for (var i = 0; i < numRows; i++)
             {
-                while (scani.MoveNext() && peptidei.MoveNext() && chargei.MoveNext())
-                {
-                    var spec = lcms.GetSpectrum(Convert.ToInt32(scani.Current));
-                    int precCharge = Convert.ToInt32(chargei.Current);
-                    if (precCharge != _precursorCharge) continue;
-                    clean.Add(new Tuple<string, Spectrum>(peptidei.Current, spec));
-                }
+                if (Convert.ToDouble(pepQValues[i]) > _pepQThreshold) continue;
+
+                var precCharge = Convert.ToInt32(charges[i]);
+                if (precCharge != _precursorCharge) continue;
+
+                var peptide = peptides[i];
+                if (!peptideSet.Add(peptide)) continue;
+                
+                var spec = lcms.GetSpectrum(Convert.ToInt32(scans[i]));
+                clean.Add(new Tuple<string, Spectrum>(peptide, spec));
             }
+
             return clean;
         }
 

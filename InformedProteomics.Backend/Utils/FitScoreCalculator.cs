@@ -121,6 +121,5 @@ namespace InformedProteomics.Backend.Utils
 
             return fitScore;
         }
-
     }
 }
