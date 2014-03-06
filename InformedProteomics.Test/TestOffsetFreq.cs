@@ -89,9 +89,6 @@ namespace InformedProteomics.Test
             {
                 var protein = node.Item1;
                 var spectrum = node.Item2;
-                if (pepDict.ContainsKey(protein)) continue;
-                
-                pepDict.Add(protein, 0);
 
                 var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
                 var spec = spectrum as ProductSpectrum;
@@ -258,12 +255,21 @@ namespace InformedProteomics.Test
         [Test]
         public void OffsetFreq()
         {
-            InitTest(new INIReader(@"\\protoapps\UserData\Wilkins\ForChris\OffsetFreqConfig.ini"));
+            InitTest(new INIReader(@"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig.ini"));
 
             var fileNameParser = new TsvFileParser(_fileList);
 
             var txtFiles = fileNameParser.GetData("text");
             var rawFiles = fileNameParser.GetData("raw");
+
+            var found = new int[_ionTypes.Length];
+            var total = new int[_ionTypes.Length];
+
+            for (int i = 0; i < _ionTypes.Length; i++)
+            {
+                found[i] = 0;
+                total[i] = 0;
+            }
 
             using (var txtFileIt = txtFiles.GetEnumerator())
             using (var rawFileIt = rawFiles.GetEnumerator())
@@ -277,27 +283,15 @@ namespace InformedProteomics.Test
                     var cleanScans = scans as Tuple<string, Spectrum>[] ?? scans.ToArray();
 
                     var offsetCounts = GetOffsetCounts(cleanScans, _ionTypes, _act, _ionTypeFactory);
-                    var outFile = _outPre + rawFileIt.Current + ".Charge" + _precursorCharge + _outSuff;
-                    WriteOffsetCountsFile(outFile, offsetCounts, _ionTypes);
-                    WriteProbFile(outFile + ".prob", offsetCounts, _ionTypes);
+
+                    for (int i = 0; i < _ionTypes.Length; i++)
+                    {
+                        found[i] += Convert.ToInt32(offsetCounts[_ionTypes[i]].Found);
+                        total[i] += Convert.ToInt32(offsetCounts[_ionTypes[i]].Total);
+                    }
                 }
             }
 
-            // Consolidate files
-            var found = new int[_ionTypes.Length];
-            var total = new int[_ionTypes.Length];
-            foreach (var rawFile in rawFiles)
-            {
-                string fileName = _outPre + rawFile + ".Charge" + _precursorCharge + _outSuff;
-                var outReader = new TsvFileParser(fileName);
-                for (int i = 0; i < _ionTypes.Length; i++)
-                {
-                    var foundStr = outReader.GetData(_ionTypes[i] + "Found")[0];
-                    var totalStr = outReader.GetData(_ionTypes[i] + "Total")[0];
-                    found[i] = Convert.ToInt32(foundStr);
-                    total[i] = Convert.ToInt32(totalStr);
-                }
-            }
             using (var finalOutputFile = new StreamWriter(_outFileName))
             {
                 for (int i = 0; i < _ionTypes.Length; i++)
