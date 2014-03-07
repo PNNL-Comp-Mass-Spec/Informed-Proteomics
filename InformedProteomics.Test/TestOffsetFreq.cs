@@ -32,12 +32,12 @@ namespace InformedProteomics.Test
         private string[] _ionTypes;
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
-
-
+        
         private const string PrecChargeHeader = "Charge";
         private const string ScanHeader = "ScanNum";
         private const string PeptideHeader = "Peptide";
         private const string PepQValueHeader = "PepQValue";
+        private const string FormulaHeader = "Formula";
         const double RelativeIntensityThreshold = 1.0;
         readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
@@ -49,8 +49,10 @@ namespace InformedProteomics.Test
             var peptides = tsvParser.GetData(PeptideHeader);
             var charges = tsvParser.GetData(PrecChargeHeader);
             var pepQValues = tsvParser.GetData(PepQValueHeader);
+            var compositions = tsvParser.GetData(FormulaHeader);
 
-            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+//            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 0, 0);
 
             var clean = new List<Tuple<string, Spectrum>>();
             var numRows = scans.Count;
@@ -65,7 +67,10 @@ namespace InformedProteomics.Test
 
                 var peptide = peptides[i];
                 if (!peptideSet.Add(peptide)) continue;
-                
+
+                var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
+                var composition = Composition.Parse(compositions[i]);
+                Assert.True(composition.Equals(sequence.Composition+Composition.H2O));
                 var spec = lcms.GetSpectrum(Convert.ToInt32(scans[i]));
                 clean.Add(new Tuple<string, Spectrum>(peptide, spec));
             }
@@ -93,7 +98,7 @@ namespace InformedProteomics.Test
                 var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
                 var spec = spectrum as ProductSpectrum;
                 if (spec == null) continue;
-                for (int i = 0; i < protein.Length - 1; i++)
+                for (int i = 1; i < protein.Length; i++)
                 {
                     if (spec.ActivationMethod == act)
                     {
@@ -118,6 +123,9 @@ namespace InformedProteomics.Test
                             if (spec.ContainsIon(ion, _defaultTolerance, RelativeIntensityThreshold))
 //                            if (peak != null)
                                 probabilities[ionTypeStr].Found++;
+
+                            // Added by Sangtae for debugging
+                            //Console.WriteLine("{0}{1} {2} {3}", ionTypeStr, i, ion.GetMonoIsotopicMz(), spec.ContainsIon(ion, _defaultTolerance, RelativeIntensityThreshold));
                         }
                     }
                 }
