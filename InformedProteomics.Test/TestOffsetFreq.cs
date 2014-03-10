@@ -3,6 +3,9 @@ using System.Globalization;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -16,12 +19,32 @@ namespace InformedProteomics.Test
     {
         public int Found { get; set; }
         public int Total { get; set; }
-        public IonProbability(int f, int t) { Found = f; Total = t; }
+        public IonType Ion { get; private set; }
+
+        public double Probability
+        {
+            get { return Math.Round((double) (Found)/(Total), 5); }
+        }
+        public IonProbability(int f, int t, IonType ion)
+        {
+            Found = f;
+            Total = t;
+            Ion = ion;
+        }
+
+        public static IonProbability operator +(IonProbability l, IonProbability r)
+        {
+            var added = new IonProbability(0, 0, l.Ion);
+            added.Found = l.Found + r.Found;
+            added.Total = l.Total + r.Total;
+            return added;
+        }
     }
 
     [TestFixture]
     public class OffsetTableTemp
     {
+        private string[] _names;
         private string _preTsv;
         private string _preRaw;
         private string _outPre;
@@ -32,7 +55,8 @@ namespace InformedProteomics.Test
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
         double _relativeIntensityThreshold = 1.0;
-        private bool _precursorOff; 
+        private bool _precursorOff;
+        private bool _combineCharges;
         
         private const string PrecChargeHeader = "Charge";
         private const string ScanHeader = "ScanNum";
@@ -43,7 +67,7 @@ namespace InformedProteomics.Test
         private readonly char[] _suffixes = {'x', 'y', 'z'};
         readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
-        private IEnumerable<Tuple<string, Spectrum>> CleanScans(string txtFileName, string rawFileName)
+        private IEnumerable<Tuple<string, Spectrum>> CleanScans(LcMsRun lcms, string txtFileName, int charge)
         {
             var tsvParser = new TsvFileParser(txtFileName);
 
@@ -52,9 +76,6 @@ namespace InformedProteomics.Test
             var charges = tsvParser.GetData(PrecChargeHeader);
             var pepQValues = tsvParser.GetData(PepQValueHeader);
             var compositions = tsvParser.GetData(FormulaHeader);
-
-//            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 0, 0);
 
             var clean = new List<Tuple<string, Spectrum>>();
             var numRows = scans.Count;
@@ -65,7 +86,7 @@ namespace InformedProteomics.Test
                 if (Convert.ToDouble(pepQValues[i]) > _pepQThreshold) continue;
 
                 var precCharge = Convert.ToInt32(charges[i]);
-                if (precCharge != _precursorCharge) continue;
+                if (precCharge != charge) continue;
 
                 var peptide = peptides[i];
                 if (!peptideSet.Add(peptide)) continue;
@@ -87,7 +108,7 @@ namespace InformedProteomics.Test
             foreach (var ionType in _ionTypes)
             {
                 if (!probabilities.ContainsKey(ionType))
-                    probabilities.Add(ionType, new IonProbability(0, 0));
+                    probabilities.Add(ionType, new IonProbability(0, 0, ionType));
             }
 
             foreach (var node in cleanScans)
@@ -122,7 +143,7 @@ namespace InformedProteomics.Test
             foreach (var ionType in _ionTypes)
             {
                 if (!probabilities.ContainsKey(ionType))
-                    probabilities.Add(ionType, new IonProbability(0, 0));
+                    probabilities.Add(ionType, new IonProbability(0, 0, ionType));
             }
 
             foreach (var node in cleanScans)
@@ -155,7 +176,7 @@ namespace InformedProteomics.Test
                                 probabilities[ionType].Found++;
 
                             // Added by Sangtae for debugging
-                            //Console.WriteLine("{0}{1} {2} {3}", ionTypeStr, i, ion.GetMonoIsotopicMz(), spec.ContainsIon(ion, _defaultTolerance, RelativeIntensityThreshold));
+                            //Console.WriteLine("{0}{1} {2} {3}", ionType.Name, i, ion.GetMonoIsotopicMz(), spec.ContainsIon(ion, _defaultTolerance, RelativeIntensityThreshold));
                         }
                     }
                 }
@@ -185,6 +206,9 @@ namespace InformedProteomics.Test
 
             _precursorOff = (config.Contents.ContainsKey("precursorfrequencies") &&
                              config.Contents["precursorfrequencies"].ToLower() == "true");
+
+            _combineCharges = (config.Contents.ContainsKey("combinecharges") &&
+                 config.Contents["combinecharges"].ToLower() == "true");
 
             _relativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
 
@@ -236,83 +260,125 @@ namespace InformedProteomics.Test
             }
             _ionTypeFactory = new IonTypeFactory(ions, ionLosses, totalCharges);
             _ionTypes = _ionTypeFactory.GetAllKnownIonTypes().ToList();
+            var tempIonList = new List<IonType>();
             if (ionInfo.Contents.ContainsKey("exclusions"))
             {
                 var ionExclusions = ionInfo.Contents["exclusions"].Split(',');
                 foreach (var ionType in _ionTypes)
                 {
-                    if (ionExclusions.Contains(ionType.Name))
-                        _ionTypes.Remove(ionType);
+                    if (!ionExclusions.Contains(ionType.Name))
+                        tempIonList.Add(ionType);
                 }
             }
+            _ionTypes = tempIonList;
+
 
             // Read input and output file names
             var fileInfo = reader.getNodes("fileinfo").First();
-            var name = fileInfo.Contents["name"];
+            _names = fileInfo.Contents["name"].Split(',');
 
-            var tsvtemp = fileInfo.Contents["tsvpath"];
-            _preTsv = tsvtemp.Replace("@", name);
+            _preTsv = fileInfo.Contents["tsvpath"];
 
-            var rawtemp = fileInfo.Contents["rawpath"];
-            _preRaw = rawtemp.Replace("@", name);
+            _preRaw = fileInfo.Contents["rawpath"];
 
             var outPathtemp = fileInfo.Contents["outpath"];
-            outPathtemp = outPathtemp.Replace("@", name);
-            _outPre = outPathtemp.Replace("*", _precursorCharge.ToString(CultureInfo.InvariantCulture));
+            _outPre = outPathtemp;
+//            _outPre = outPathtemp.Replace("*", _precursorCharge.ToString(CultureInfo.InvariantCulture));
 
             var outFiletemp = fileInfo.Contents["outfile"];
-            outFiletemp = outFiletemp.Replace("@", name);
-            _outFileName = _outPre + outFiletemp.Replace("*", _precursorCharge.ToString(CultureInfo.InvariantCulture));
+
+            _outFileName = _outPre + outFiletemp;
+//            _outFileName = _outPre + outFiletemp.Replace("*", _precursorCharge.ToString(CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void OffsetFreq()
         {
-            InitTest(new INIReader(@"\\protoapps\UserData\Wilkins\ForChris\PrecursorOffConfig.ini"));
+            InitTest(new INIReader(@"\\protoapps\UserData\Wilkins\ForChris\OffsetFreqConfig.ini"));
 
-            var txtFiles = Directory.GetFiles(_preTsv).ToList();
-            var rawFilesTemp = Directory.GetFiles(_preRaw).ToList();
-            var rawFiles = rawFilesTemp.Where(rawFile => Path.GetExtension(rawFile) == ".raw").ToList();
-
-            Assert.True(rawFiles.Count == txtFiles.Count);
-
-            var found = new int[_ionTypes.Count];
-            var total = new int[_ionTypes.Count];
-
-            for (int i = 0; i < _ionTypes.Count; i++)
+            foreach (var name in _names)
             {
-                found[i] = 0;
-                total[i] = 0;
-            }
+                var tsvName = _preTsv.Replace("@", name);
+                var rawName = _preRaw.Replace("@", name);
+                var txtFiles = Directory.GetFiles(tsvName).ToList();
+                var rawFilesTemp = Directory.GetFiles(rawName).ToList();
+                var rawFiles = rawFilesTemp.Where(rawFile => Path.GetExtension(rawFile) == ".raw").ToList();
 
-            for (int i=0;i<txtFiles.Count;i++)
-            {
-                string textFile = txtFiles[i];
-                string rawFile = rawFiles[i];
+                Assert.True(rawFiles.Count == txtFiles.Count);
 
-                Console.WriteLine("{0}\t{1}", textFile, rawFile);
-                var scans = CleanScans(textFile, rawFile);
-                var cleanScans = scans as Tuple<string, Spectrum>[] ?? scans.ToArray();
+                var probabilities = new Dictionary<string, IonProbability>[_precursorCharge];
 
-                Dictionary<IonType, IonProbability> offsetCounts;
-
-                if (_precursorOff)
-                    offsetCounts = PrecursorOff(cleanScans);
-                else
-                    offsetCounts = GetOffsetCounts(cleanScans);
-
-                for (int j = 0; j < _ionTypes.Count; j++)
+                for (int i = 0; i < _precursorCharge; i++)
                 {
-                    found[j] += offsetCounts[_ionTypes[j]].Found;
-                    total[j] += offsetCounts[_ionTypes[j]].Total;
+                    probabilities[i] = new Dictionary<string, IonProbability>();
+                    foreach (var ion in _ionTypes)
+                    {
+                        probabilities[i].Add(ion.Name, new IonProbability(0, 0, ion));
+                    }
                 }
-            }
 
-            using (var finalOutputFile = new StreamWriter(_outFileName))
-            {
-                for (int i = 0; i < _ionTypes.Count; i++)
+                for (int i = 0; i < txtFiles.Count; i++)
                 {
-                    finalOutputFile.WriteLine("{0}\t{1}", _ionTypes[i].Name, Math.Round((double)(found[i]) / (total[i]), 5));
+                    string textFile = txtFiles[i];
+                    string rawFile = rawFiles[i];
+
+                    Console.WriteLine("{0}\t{1}", textFile, rawFile);
+
+//                  var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
+
+                    for (int j = 1; j <= _precursorCharge; j++)
+                    {
+                        var scans = CleanScans(lcms, textFile, j);
+                        var cleanScans = scans as Tuple<string, Spectrum>[] ?? scans.ToArray();
+
+                        Dictionary<IonType, IonProbability> offsetCounts;
+
+                        if (_precursorOff)
+                            offsetCounts = PrecursorOff(cleanScans);
+                        else
+                            offsetCounts = GetOffsetCounts(cleanScans);
+
+                        foreach (var ion in _ionTypes)
+                        {
+                            string ionName = ion.Name;
+                            probabilities[j - 1][ionName] += offsetCounts[ion];
+                        }
+                    }
+                }
+
+                var prob = new Dictionary<string, double>[_precursorCharge];
+                for (int i = 0; i < _precursorCharge; i++)
+                {
+                    prob[i] = new Dictionary<string, double>();
+                    foreach (var ionType in _ionTypes)
+                    {
+                        string ionName = ionType.Name;
+                        prob[i].Add(ionType.Name, probabilities[i][ionType.Name].Probability);
+                        if (_combineCharges && ionType.Charge > 1)
+                        {
+                            var chargeRemover = new StringBuilder(ionType.Name);
+                            chargeRemover.Remove(1, 1);
+                            ionName = chargeRemover.ToString();
+                            prob[i][ionName] += probabilities[i][ionType.Name].Probability;
+                        }
+                    }
+                }
+
+
+                var outFile = _outFileName.Replace("@", name);
+
+                for (int i = 0; i < _precursorCharge; i++)
+                {
+                    var outFileCharge = outFile.Replace("*", (i+1).ToString());
+                    using (var finalOutputFile = new StreamWriter(outFileCharge))
+                    {
+                        foreach (var ion in _ionTypes)
+                        {
+                            if (_combineCharges && ion.Charge > 1) continue;
+                            finalOutputFile.WriteLine("{0}\t{1}", ion.Name, prob[i][ion.Name]);
+                        }
+                    }
                 }
             }
         }
@@ -350,7 +416,7 @@ namespace InformedProteomics.Test
         private void read(string fileName)
         {
             Node currentNode = null;
-            Dictionary<String, String> keyvalue = new Dictionary<String, String>();
+            var keyvalue = new Dictionary<String, String>();
             string[] lines = System.IO.File.ReadAllLines(fileName);
             char[] headerbrackets = { '[', ']' };
             string header = "";
