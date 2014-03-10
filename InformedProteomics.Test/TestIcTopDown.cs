@@ -20,6 +20,53 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
+        public void TestSbepSearch()
+        {
+            // Search parameters
+            const int maxNumNTermCleavages = 1;  // 30
+            const int minLength = 7;    // 7
+            const int maxLength = 100; // 1000
+            const int minPrecursorIonCharge = 3; // 3
+            const int maxPrecursorIonCharge = 40;// 67
+            const int minProductIonCharge = 1; // 1
+            const int maxProductIonCharge = 10;// 10
+            const int numMaxModsPerProtein = 0; // 6
+
+            var precursorTolerance = new Tolerance(15);
+            var productIonTolerance = new Tolerance(15);
+
+            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
+            //const string dbFilePath =
+            //    @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_003525_320963E9.fasta";
+            //            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\P01031.fasta";
+
+            //            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\SBEP_STM_001_02222012_Aragon.raw";
+
+            // Configure amino acid set
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            //var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            //var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                //pyroGluQ,
+                dehydroC,
+                //cysteinylC,
+                //glutathioneC,
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+                minPrecursorIonCharge, maxPrecursorIonCharge,
+                minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
+        }
+
+        [Test]
         public void TestQcShewSearch()
         {
             // Search parameters

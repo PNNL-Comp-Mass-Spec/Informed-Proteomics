@@ -80,10 +80,11 @@ namespace InformedProteomics.Test.FunctionalTests
 
             for (var trial = 0; trial < numTrials; trial++)
             {
-                FitScoreCalculator.GetDeconToolsFit(theoretical[trial], observed[trial]);
+                //FitScoreCalculator.GetDeconToolsFit(theoretical[trial], observed[trial]);
                 //FitScoreCalculator.GetFitOfNormalizedVectors(theoretical[trial], observed[trial]);
                 //FitScoreCalculator.GetCosine(theoretical[trial], observed[trial]);
                 //FitScoreCalculator.GetFitNormalizedByTheoMaxIsotope(theoretical[trial], observed[trial]);
+                SimpleMath.GetCorrelation(theoretical[trial], observed[trial]);
             }
 
             sw.Stop();

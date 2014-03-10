@@ -228,29 +228,16 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 nodeScore[si] = new double?[_graph[si].Length];
                 maxScore[si] = new double?[_graph[si].Length];
-                //if (si <= 1)
-                //{
-                //    for (var ni = 0; ni < nodeScore[si].Length; ni++) nodeScore[si][ni] = 0.0;
-                //}
-                //else
-                //{
-                //    for (var mi = 0; mi < nodeScore[si].Length; mi++)
-                //    {
-                //        var suffixComposition = GetComposition(si, mi);
-                //        var prefixComposition = GetComplementaryComposition(si, mi);
-                //        nodeScore[si][mi] = scorer.GetFragmentScore(prefixComposition, suffixComposition);
-                //    }
-                //}
             }
             maxScore[0][0] = 0;
 
             var fragmentScore =
                 _sink.GetPrevNodeIndices()
-                    .Max(prevNodeIndex => GetFragmentScore(_sinkSeqIndex - 1, prevNodeIndex, precursorIon, scorer, nodeScore, maxScore));
+                    .Max(prevNodeIndex => GetFragmentScore(_sinkSeqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
             return precursorIonScore + fragmentScore;
         }
 
-        private double GetFragmentScore(int seqIndex, int modIndex, Ion precursorIon, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
+        private double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
             if (score != null) return (double)score;
@@ -264,7 +251,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 prevNodeScore =
                     node.GetPrevNodeIndices()
-                        .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, precursorIon, scorer, nodeScore, maxScore));
+                        .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
 // ReSharper disable PossibleInvalidOperationException

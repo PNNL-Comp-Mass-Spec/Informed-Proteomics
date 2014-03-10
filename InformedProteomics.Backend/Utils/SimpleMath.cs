@@ -78,7 +78,7 @@ namespace InformedProteomics.Backend.Utils
             if (s1 <= 0 || s2 <= 0) return 0;
             var div = Math.Sqrt(s1 * s2);
             var rho = v1.Select((t, i) => (float)((t - m1) * (v2[i] - m2) / div)).Sum();
-            return Math.Min(Math.Max((float)0, rho / (v1.Length - 1)), 1);
+            return Math.Min(Math.Max(0, rho / (v1.Length - 1)), 1);
             //*/
         }
 

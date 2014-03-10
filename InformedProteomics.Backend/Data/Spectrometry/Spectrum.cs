@@ -118,7 +118,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
         /// <returns>all isotope peaks found in the spectrum</returns>
-        public IEnumerable<Peak> GetAllIonPeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        public IList<Peak> GetAllIonPeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
             var observedPeaks = new List<Peak>();
@@ -187,6 +187,46 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var normalizedObs = observedPeaks.Select(p => p / maxObservedIntensity).ToArray();
             return FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, normalizedObs);
+        }
+
+        /// <summary>
+        /// Computes the cosine between the ion and corresponding peaks in the spectrum
+        /// </summary>
+        /// <param name="ion">ion</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
+        /// <returns>cosine value</returns>
+        public double GetConsineScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+            var observedIntensities = new float[isotopomerEnvelope.Length];
+
+            var downHill = false;
+            var prevTheoIntensity = 0f;
+            // Assume that the isotopomer envelop is unimodal
+            for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
+            {
+                var theoIntensity = isotopomerEnvelope[isotopeIndex];
+                if (!downHill && theoIntensity < prevTheoIntensity) downHill = true;
+                if (theoIntensity < relativeIntensityThreshold)
+                {
+                    if (downHill) break;
+                }
+                else
+                {
+                    var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                    var peak = FindPeak(isotopeMz, tolerance);
+                    if (peak != null)
+                    {
+                        var intensity = (float)peak.Intensity;
+                        observedIntensities[isotopeIndex] = intensity;
+                    }
+                    else observedIntensities[isotopeIndex] = 0f;
+                }
+                prevTheoIntensity = theoIntensity;
+            }
+
+            return FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
         }
 
         // Added by Chris

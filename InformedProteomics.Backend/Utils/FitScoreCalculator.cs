@@ -72,16 +72,16 @@ namespace InformedProteomics.Backend.Utils
         }
 
         // the larger the better
-        public static double GetCosine(double[] theorPeakList, double[] observedPeakList)
+        public static double GetCosine(float[] theorPeakList, float[] observedPeakList)
         {
             if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
 
-            var innerProduct = theorPeakList.Select((t, i) => t*observedPeakList[i]).Sum();
+            var innerProduct = theorPeakList.Select((t, i) => t * observedPeakList[i]).Sum();
 
-            var magnitudeTheo = Math.Sqrt(theorPeakList.Sum(t => t*t));
-            var magnitudeObs = Math.Sqrt(observedPeakList.Sum(t => t*t));
+            var magnitudeTheo = Math.Sqrt(theorPeakList.Sum(t => t * t));
+            var magnitudeObs = Math.Sqrt(observedPeakList.Sum(t => t * t));
 
-            return innerProduct/(magnitudeTheo*magnitudeObs);
+            return innerProduct / (magnitudeTheo * magnitudeObs);
         }
 
         public static double GetFitOfNormalizedVectors(double[] normTheorPeakList, double[] normObservedPeakList)

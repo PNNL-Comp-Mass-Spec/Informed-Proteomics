@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Database
 
         public bool IsDecoy { get; private set; }
 
-        public FastaDatabase Decoy(Enzyme enzyme, bool shuffle = false)
+        public FastaDatabase Decoy(Enzyme enzyme, bool shuffle = false, int numMutations = 0)
         {
             if (IsDecoy)
             {
