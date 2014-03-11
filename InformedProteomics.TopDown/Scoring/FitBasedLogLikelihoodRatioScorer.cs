@@ -1,13 +1,16 @@
-﻿using InformedProteomics.Backend.Data.Biology;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class MatchedPeakCounter: IScorer
+    public class FitBasedLogLikelihoodRatioScorer : IScorer
     {
-        public MatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
+       public FitBasedLogLikelihoodRatioScorer(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
         {
             _ms2Spec = ms2Spec;
             _tolerance = tolerance;
@@ -33,9 +36,12 @@ namespace InformedProteomics.TopDown.Scoring
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
                 var containsIon = false;
+                var bestCharge = 0;
+                var bestFitScore = 0.0;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
+                    var fitScore = _ms2Spec.GetFitScore(ion, _tolerance, 0.1);
                     if (_ms2Spec.ContainsIon(ion, _tolerance, RelativeIsotopeIntensityThreshold))
                     {
                         containsIon = true;
@@ -57,7 +63,7 @@ namespace InformedProteomics.TopDown.Scoring
         private const double RelativeIsotopeIntensityThreshold = 0.8;
 
         private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
-        static MatchedPeakCounter()
+        static FitBasedLogLikelihoodRatioScorer()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };

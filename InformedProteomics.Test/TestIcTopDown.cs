@@ -399,7 +399,6 @@ namespace InformedProteomics.Test
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
             Console.WriteLine("NumPrecursorIons: {0}", numPrecursorIons);
             Console.WriteLine("NumPrecursorIonsWithEvidence: {0}", numPrecursorIonsPassingFilter);
-            Console.WriteLine("NumTransitions: {0}", MatchedPeakCounter.GetNumTransitions());
             Console.WriteLine("Identified PrSMs (#IDs: {0}):", prsmDictionary.Count);
             foreach (var idedScan in prsmDictionary.Keys)
             {
