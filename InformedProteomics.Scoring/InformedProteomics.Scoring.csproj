@@ -61,9 +61,14 @@
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\RankScorer.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
+    <Compile Include="LikelihoodScoring\ConfigFileReader.cs" />
+    <Compile Include="LikelihoodScoring\IonProbability.cs" />
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
+    <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\SpectrumMatch.cs" />
     <Compile Include="GeneratingFunction\ScoreDistribution.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphEdge.cs" />
+    <Compile Include="LikelihoodScoring\SpectrumMatchList.cs" />
     <Compile Include="IFragmentScorer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
