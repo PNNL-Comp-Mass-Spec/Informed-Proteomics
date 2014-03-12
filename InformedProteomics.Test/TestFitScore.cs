@@ -19,6 +19,7 @@ namespace InformedProteomics.Test
         private const double EValueThreshold = 0.1;
         private const int TotalCharges = 10;
         private const int NumMutations = 3;
+
         private static string Trim(string prot)
         {
             int start = prot.IndexOf('.') + 1;
@@ -53,7 +54,7 @@ namespace InformedProteomics.Test
             {
                 foreach (var peak in peaks)
                 {
-                    if (peak.Intensity > intensity)
+                    if (peak != null && peak.Intensity > intensity)
                     {
                         intensity = peak.Intensity;
                         mostIntense = peak;
@@ -63,22 +64,20 @@ namespace InformedProteomics.Test
             return mostIntense;
         }
 
-        private double getBestScore(IEnumerable<double> scores)
+        private Tuple<double, double> getBestScore(IEnumerable<Tuple<double,double>> scores)
         {
+            Tuple<double, double> score = null;
             double bestScore = 0.0;
-            double score = 0.0;
-            if (scores != null)
+
+            foreach (var sc in scores)
             {
-                foreach (var sc in scores)
+                if (sc.Item2 > bestScore)
                 {
-                    if (sc > score)
-                    {
-                        score = sc;
-                        bestScore = sc;
-                    }
+                    score = sc;
+                    bestScore = sc.Item2;
                 }
             }
-            return bestScore;
+            return score;
 
         }
 
@@ -108,7 +107,7 @@ namespace InformedProteomics.Test
                 comp = evalues;
                 thresh = EValueThreshold;
             }
-            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var lcms = LcMsRun.GetLcMsRun(rawFileName, MassSpecDataType.XCaliburRun, 0, 0);
 
             var cleanScans = CleanScans(lcms, scans, peptides, comp, thresh);
 
@@ -117,8 +116,8 @@ namespace InformedProteomics.Test
             new IonTypeFactory(new[] {BaseIonType.B, BaseIonType.Y, BaseIonType.C, BaseIonType.Z},
                                 new[] {NeutralLoss.NoLoss}, TotalCharges);
 
-            StreamWriter preHCDFile = File.AppendText(preOutFile);
-            StreamWriter suffHCDFile = File.AppendText(suffOutFile);
+            StreamWriter preFile = File.AppendText(preOutFile);
+            StreamWriter suffFile = File.AppendText(suffOutFile);
 
             foreach (var node in cleanScans)
             {
@@ -131,47 +130,59 @@ namespace InformedProteomics.Test
                 }
                 var sequence = new Sequence(protein, aset);
                 var spec = spectrum as ProductSpectrum;
-                if (spec == null) continue;
-                for (int i = 0; i < protein.Length - 1; i++)
+                if (spec == null || spec.ActivationMethod != ActivationMethod.CID) continue;
+                for (int i = 1; i < protein.Length; i++)
                 {
                     var suffix = sequence.GetComposition(protein.Length - i, protein.Length);
-                    var bFitScores = new List<double>();
-                    var yFitScores = new List<double>();
+                    var bFitScores = new List<Tuple<double, double>>();
+                    Peak[] bPeaks;
+                    var yFitScores = new List<Tuple<double,double>>();
+                    Peak[] yPeaks;
                     for (int charge = 1; charge <= TotalCharges; charge++)
                     {
-                        if (spec.ActivationMethod == ActivationMethod.HCD)
-                        {
-                            // HCD b
+                            // b
                             var bIon = ionTypeFactory.GetIonType("b" + ChargeToString(charge));
                             var b = bIon.GetIon(suffix);
                             b.Composition.ComputeApproximateIsotopomerEnvelop();
-                            var bFitScore = spectrum.GetFitScore(b, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
-                            bFitScores.Add(bFitScore);
-                            // HCD y
+                            var bFitScore = spectrum.GetConsineScore(b, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
+                            bPeaks = spectrum.GetAllIsotopePeaks(b, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
+                            var highestBPeak = GetMostIntensePeak(bPeaks);
+                            double highestBIntensity = -1.0;
+                            if (highestBPeak != null)
+                                highestBIntensity = highestBPeak.Intensity;
+                            bFitScores.Add(new Tuple<double, double>(highestBIntensity, bFitScore));
+                            // y
                             var yIon = ionTypeFactory.GetIonType("y" + ChargeToString(charge));
                             var y = yIon.GetIon(suffix);
                             y.Composition.ComputeApproximateIsotopomerEnvelop();
-                            var yFitScore = spectrum.GetFitScore(y, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
-                            yFitScores.Add(yFitScore);
-                        }
-
+                            var yFitScore = spectrum.GetConsineScore(y, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
+                            yPeaks = spectrum.GetAllIsotopePeaks(y, new Tolerance(15, ToleranceUnit.Ppm), 0.1);
+                            var highestYPeak = GetMostIntensePeak(yPeaks);
+                            double highestYIntensity = -1.0;
+                            if (highestYPeak != null)
+                                highestYIntensity = highestYPeak.Intensity;
+                            yFitScores.Add(new Tuple<double, double>(highestYIntensity, yFitScore));
                     }
+
                     var bBestScore = getBestScore(bFitScores);
-                    preHCDFile.WriteLine(bBestScore);
+                    preFile.WriteLine("{0}\t{1}", bBestScore.Item1, bBestScore.Item2);
+
+                    var yBestScore = getBestScore(yFitScores);
+                    suffFile.WriteLine("{0}\t{1}", yBestScore.Item1, yBestScore.Item2);
                 }
             }
-            preHCDFile.Close();
-            suffHCDFile.Close();
+            preFile.Close();
+            suffFile.Close();
         }
 
         [Test]
         public void FitScore()
         {
-            const string fileList = @"\\protoapps\UserData\Wilkins\fileList.txt";
-            const string preRes = @"\\protoapps\UserData\Sangtae\TopDownQCShew\msalign\";
-            const string preRaw = @"\\protoapps\UserData\Sangtae\TopDownQCShew\raw\";
-            const string outFile1 = @"\\protoapps\UserData\Wilkins\preHCD.txt";
-            const string outFile2 = @"\\protoapps\UserData\Wilkins\suffHCD.txt";
+            const string fileList = @"C:\Users\wilk011\Documents\DataFiles\oldfileList.txt";
+            const string preRes = @"C:\Users\wilk011\Documents\DataFiles\ForChris\";
+            const string preRaw = @"C:\Users\wilk011\Documents\DataFiles\ForChris\";
+            const string outFile1 = @"C:\Users\wilk011\Documents\DataFiles\Cosine\bCID.txt";
+            const string outFile2 = @"C:\Users\wilk011\Documents\DataFiles\Cosine\yCID.txt";
             const bool decoy = false;
 
             var fileNameParser = new TsvFileParser(fileList);

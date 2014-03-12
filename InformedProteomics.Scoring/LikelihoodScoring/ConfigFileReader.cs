@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-   class Node
+    public class Node
     {
         public string Header { get; private set; }      // The header tag
 
@@ -18,7 +18,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Contents = contents;
         }
     }
-    class ConfigFileReader
+    public class ConfigFileReader
     {
         public List<Node> Nodes { get; protected set; }
 

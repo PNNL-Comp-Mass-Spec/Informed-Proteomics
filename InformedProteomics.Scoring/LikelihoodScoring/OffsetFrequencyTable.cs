@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -16,28 +17,25 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             get { return _offsetFrequencies.Values; }
         }
 
-        public IEnumerable<IonProbability> CombinedChargeTable
+        public IEnumerable<IonProbability> GetCombinedChargeTable(IonTypeFactory ionTypeFactory)
         {
-            get
-            {
-                var tempOff = new Dictionary<string, IonProbability>();
+            var tempOff = new Dictionary<string, IonProbability>();
 
-                foreach (var key in _offsetFrequencies.Keys)
+            foreach (var key in _offsetFrequencies.Keys)
+            {
+                if (_offsetFrequencies[key].Ion.Charge > 1)
                 {
-                    if (_offsetFrequencies[key].Ion.Charge > 1)
-                    {
-                        var reducedChargeName = key.Remove(1, 1);
-                        if (!_offsetFrequencies.ContainsKey(reducedChargeName))
-                            _offsetFrequencies.Add(reducedChargeName, new IonProbability(_offsetFrequencies[key].Ion));
-                        tempOff[reducedChargeName] += _offsetFrequencies[key];
-                    }
-                    else
-                    {
-                        tempOff.Add(key, _offsetFrequencies[key]);
-                    }
+                    var reducedChargeName = key.Remove(1, 1);
+                    if (!_offsetFrequencies.ContainsKey(reducedChargeName))
+                        _offsetFrequencies.Add(reducedChargeName, new IonProbability(ionTypeFactory.GetIonType(reducedChargeName)));
+                    tempOff[reducedChargeName] += _offsetFrequencies[key];
                 }
-                return tempOff.Values;
+                else
+                {
+                    tempOff.Add(key, _offsetFrequencies[key]);
+                }
             }
+            return tempOff.Values;
         }
 
         public void AddOffsetFrequency(IonProbability probability)
