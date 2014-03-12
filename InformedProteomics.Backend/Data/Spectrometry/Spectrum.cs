@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
-using MathNet.Numerics.Interpolation.Algorithms;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -118,18 +115,25 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
         /// <returns>array of observed isotope peaks in the spectrum. null if no peak found.</returns>
-        public Peak[] GetAllIsotopePeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        public Peak[] GetAllIsotopePeaksBinarySearch(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+            var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
+
+            // if the most abundant isotope peak does not exist, return null
+            var observedMostAbundantIonPeak = FindPeak(ion.GetIsotopeMz(mostAbundantIsotopeIndex), tolerance);
+            if (observedMostAbundantIonPeak == null) return null;
+
             var observedPeaks = new Peak[isotopomerEnvelope.Length];
 
             var downHill = false;
             var prevTheoIntensity = 0f;
-            var peakExists = false;
+            //var peakExists = false;
             // Assume that the isotopomer envelop is unimodal
             for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
                 var theoIntensity = isotopomerEnvelope[isotopeIndex];
+                if (isotopeIndex == mostAbundantIsotopeIndex) observedPeaks[isotopeIndex] = observedMostAbundantIonPeak;
                 if (!downHill && theoIntensity < prevTheoIntensity) downHill = true;
                 if (theoIntensity < relativeIntensityThreshold)
                 {
@@ -139,15 +143,94 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
                     var p = FindPeak(isotopeMz, tolerance);
-                    if (!peakExists && p != null) peakExists = true;
+                    //if (!peakExists && p != null) peakExists = true;
                     observedPeaks[isotopeIndex] = p;
                 }
                 prevTheoIntensity = theoIntensity;
             }
 
-            return peakExists ? observedPeaks : null;
+//            return peakExists ? observedPeaks : null;
+            return observedPeaks;
         }
 
+        /// <summary>
+        /// Finds all isotope peaks corresponding to theoretical profiles with relative intensity higher than the threshold
+        /// </summary>
+        /// <param name="ion">ion</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
+        /// <returns>array of observed isotope peaks in the spectrum. null if no peak found.</returns>
+        public Peak[] GetAllIsotopePeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+            var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
+            var baseIsotopePeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
+            if (baseIsotopePeakIndex < 0) return null;
+
+            var observedPeaks = new Peak[isotopomerEnvelope.Length];
+            observedPeaks[baseIsotopeIndex] = Peaks[baseIsotopePeakIndex];
+
+            // go down
+            var peakIndex = baseIsotopePeakIndex - 1;
+            for (var isotopeIndex = baseIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
+            {
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex; i >= 0; i--)
+                {
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz < minMz)
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    {
+                        var peak = Peaks[i];
+                        if (observedPeaks[isotopeIndex] == null ||
+                            peak.Intensity > observedPeaks[isotopeIndex].Intensity)
+                        {
+                            observedPeaks[isotopeIndex] = peak;
+                        }
+                    }
+                }
+            }
+
+            // go up
+            peakIndex = baseIsotopePeakIndex + 1;
+            for (var isotopeIndex = baseIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
+            {
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex; i < Peaks.Length; i++)
+                {
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz > maxMz)
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    {
+                        var peak = Peaks[i];
+                        if (observedPeaks[isotopeIndex] == null ||
+                            peak.Intensity > observedPeaks[isotopeIndex].Intensity)
+                        {
+                            observedPeaks[isotopeIndex] = peak;
+                        }
+                    }
+                }
+            }
+
+            return observedPeaks;
+        }
 
         /// <summary>
         /// Computes the fit score between the ion and corresponding peaks in the spectrum
@@ -179,72 +262,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>cosine value</returns>
         public double GetConsineScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             if (observedPeaks == null) return 0;
 
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
             var theoIntensities = new float[observedPeaks.Length];
             Array.Copy(isotopomerEnvelope, theoIntensities, theoIntensities.Length);
 
             var observedIntensities = observedPeaks.Select(p => p != null ? (float)p.Intensity : 0f).ToArray();
             return FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
-        }
-
-        // Added by Chris
-        public IEnumerable<Peak> GetIonPeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
-        {
-            var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-            var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
-            var baseIsotopePeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
-            var finalPeaks = new List<Peak>();
-            if (baseIsotopePeakIndex < 0) return null;
-
-            // go down
-            var peakIndex = baseIsotopePeakIndex;
-            for (var isotopeIndex = baseIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
-            {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
-                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
-                var minMz = isotopeMz - tolTh;
-                var maxMz = isotopeMz + tolTh;
-                for (var i = peakIndex - 1; i >= 0; i--)
-                {
-                    var peakMz = Peaks[i].Mz;
-                    if (peakMz < minMz) break;
-                    if (peakMz <= maxMz)    // find match, move to prev isotope
-                    {
-                        finalPeaks.Add(Peaks[i]);
-                        peakIndex = i;
-                        break;
-                    }
-                }
-            }
-
-            // go up
-            peakIndex = baseIsotopePeakIndex;
-            for (var isotopeIndex = baseIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
-            {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
-                var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
-                var minMz = isotopeMz - tolTh;
-                var maxMz = isotopeMz + tolTh;
-                for (var i = peakIndex + 1; i < Peaks.Length; i++)
-                {
-                    var peakMz = Peaks[i].Mz;
-                    if (peakMz > maxMz) return null;
-                    if (peakMz >= minMz)    // find match, move to prev isotope
-                    {
-                        finalPeaks.Add(Peaks[i]);
-                        peakIndex = i;
-                        break;
-                    }
-                }
-            }
-
-            return finalPeaks;
         }
 
 

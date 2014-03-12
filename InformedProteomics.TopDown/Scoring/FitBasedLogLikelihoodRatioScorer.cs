@@ -36,47 +36,51 @@ namespace InformedProteomics.TopDown.Scoring
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
+                var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelop();
 
-                var bestFitScore = 1.0;
+                //var bestFitScore = 1.0;
+                var bestCosineScore = 0.0;
                 var bestObsIntensity = -1.0;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
-                    var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-                    var observedPeaks = _ms2Spec.GetAllIsotopePeaks(ion, _tolerance, RelativeIntensityThreshold);
+                    var cosineScore = _ms2Spec.GetConsineScore(ion, _tolerance, RelativeIntensityThreshold);
+                    if (cosineScore > bestCosineScore) bestCosineScore = cosineScore;
+                    //var observedPeaks = _ms2Spec.GetAllIsotopePeaks(ion, _tolerance, RelativeIntensityThreshold);
 
-                    if (observedPeaks == null) continue;
+                    //if (observedPeaks == null) continue;
 
-                    var theoIntensities = new float[observedPeaks.Length];
-                    var observedIntensities = new float[observedPeaks.Length];
-                    var maxObservedIntensity = float.NegativeInfinity;
-                    for (var i = 0; i < observedPeaks.Length; i++)
-                    {
-                        theoIntensities[i] = isotopomerEnvelope[i];
-                        if (observedPeaks[i] != null)
-                        {
-                            var observedIntensity = (float) observedPeaks[i].Intensity;
-                            observedIntensities[i] = observedIntensity;
-                            if (observedIntensity > maxObservedIntensity) maxObservedIntensity = observedIntensity;
-                        }
-                        else
-                        {
-                            observedIntensities[i] = 0;
-                        }
-                    }
+                    //var theoIntensities = new float[observedPeaks.Length];
+                    //var observedIntensities = new float[observedPeaks.Length];
+                    //var maxObservedIntensity = float.NegativeInfinity;
+                    //for (var i = 0; i < observedPeaks.Length; i++)
+                    //{
+                    //    theoIntensities[i] = isotopomerEnvelope[i];
+                    //    if (observedPeaks[i] != null)
+                    //    {
+                    //        var observedIntensity = (float)observedPeaks[i].Intensity;
+                    //        observedIntensities[i] = observedIntensity;
+                    //        if (observedIntensity > maxObservedIntensity) maxObservedIntensity = observedIntensity;
+                    //    }
+                    //    else
+                    //    {
+                    //        observedIntensities[i] = 0;
+                    //    }
+                    //}
 
-                    for (var i = 0; i < observedPeaks.Length; i++)
-                    {
-                        observedIntensities[i] /= maxObservedIntensity;
-                    }
-                    var fitScore = FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, observedIntensities);
-                    if (fitScore < bestFitScore)
-                    {
-                        bestFitScore = fitScore;
-                        bestObsIntensity = maxObservedIntensity;
-                    }
+                    //for (var i = 0; i < observedPeaks.Length; i++)
+                    //{
+                    //    observedIntensities[i] /= maxObservedIntensity;
+                    //}
+                    //var fitScore = FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, observedIntensities);
+                    //if (fitScore < bestFitScore)
+                    //{
+                    //    bestFitScore = fitScore;
+                    //    bestObsIntensity = maxObservedIntensity;
+                    //}
                 }
-                score += GetScore(baseIonType, bestFitScore, bestObsIntensity);
+                //score += GetScore(baseIonType, bestFitScore, bestObsIntensity);
+                score += GetScore(baseIonType, bestCosineScore, bestObsIntensity);
             }
             return score;
         }

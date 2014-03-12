@@ -30,7 +30,7 @@ namespace InformedProteomics.Test
             const int maxPrecursorIonCharge = 40;// 67
             const int minProductIonCharge = 1; // 1
             const int maxProductIonCharge = 10;// 10
-            const int numMaxModsPerProtein = 6; // 6
+            const int numMaxModsPerProtein = 0; // 6
 
             var precursorTolerance = new Tolerance(15);
             var productIonTolerance = new Tolerance(15);
@@ -57,7 +57,7 @@ namespace InformedProteomics.Test
                 //dehydroC,
                 //cysteinylC,
                 //glutathioneC,
-                oxM
+                //oxM
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
@@ -261,6 +261,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.Write("Reading raw file...");
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
@@ -297,15 +298,15 @@ namespace InformedProteomics.Test
                     var offset = annotationAndOffset.Offset;
 
 //                    Console.WriteLine(annotation);
-                    if (numProteins % 100 == 0)
+                    if (numProteins % 10 == 0)
                     {
-                        Console.WriteLine("Processing {0}{1} proteins", numProteins, 
+                        Console.Write("Processing {0}{1} proteins...", numProteins, 
                             numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
                         if (numProteins != 0)
                         {
                             sw.Stop();
                             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-                            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+                            Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
                             sw.Reset();
                             sw.Start();
                         }
@@ -358,7 +359,8 @@ namespace InformedProteomics.Test
                                     numPrecursorIonsPassingFilter++;
                                     var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                                     if (spec == null) continue;
-                                    var scorer = new MatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
+                                    //var scorer = new MatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
+                                    var scorer = new FitBasedLogLikelihoodRatioScorer(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
                                     var score = seqGraph.GetScore(charge, scorer);
 
                                     if (score > bestScore)

@@ -84,9 +84,11 @@ namespace InformedProteomics.Backend.Utils
             var magnitudeObs = 0.0;
             for (var i = 0; i < theorPeakList.Length; i++)
             {
-                innerProduct += theorPeakList[i] * observedPeakList[i];
-                magnitudeTheo += theorPeakList[i] * theorPeakList[i];
-                magnitudeObs += observedPeakList[i] * observedPeakList[i];
+                var theo = theorPeakList[i];
+                var obs = observedPeakList[i];
+                innerProduct += theo * obs;
+                magnitudeTheo += theo * theo;
+                magnitudeObs += obs * obs;
             }
 
             return innerProduct/Math.Sqrt(magnitudeTheo*magnitudeObs);
