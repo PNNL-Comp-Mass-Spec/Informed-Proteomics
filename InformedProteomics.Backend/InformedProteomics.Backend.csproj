@@ -90,7 +90,8 @@
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
     </Reference>
-    <Reference Include="ProteowizardWrapper">
+    <Reference Include="ProteowizardWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\x64\ProteowizardWrapper.dll</HintPath>
     </Reference>
     <Reference Include="SAIS">

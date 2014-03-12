@@ -60,15 +60,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Backend.dll</HintPath>
     </Reference>
-    <Reference Include="DeconTools.Workflows, Version=1.0.4735.28041, Culture=neutral, processorArchitecture=$(Platform)">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\DeconTools\$(Platform)\DeconTools.Workflows.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="MultiAlignEngine">
-      <HintPath>..\lib\DeconTools\$(Platform)\MultiAlignEngine.dll</HintPath>
     </Reference>
     <Reference Include="MultiDimensionalPeakFinding">
       <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>

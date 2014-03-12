@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DeconTools.Backend.Runs;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
@@ -14,7 +10,7 @@ namespace InformedProteomics.Test.FunctionalTests
     {
         public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
         public const string TestTopDownRawFilePathEtd = @"\\protoapps\UserData\Sangtae\TestData\E_coli_iscU_60_mock.raw";
-        public const string TestTopDownRawFilePathHcd = @"\\protoapps\UserData\Sangtae\TopDownQCShew\raw\QC_Shew_Intact_F4a_11Feb14_Tiger_13-11-14.raw";
+        public const string TestTopDownRawFilePathCid = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
 
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()

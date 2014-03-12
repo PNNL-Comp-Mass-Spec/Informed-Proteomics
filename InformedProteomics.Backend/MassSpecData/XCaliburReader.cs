@@ -81,22 +81,6 @@ namespace InformedProteomics.Backend.MassSpecData
             // Centroid spectrum
             if (!ReadIsCentroidScan(scanNum))
             {
-                //// DeconTools
-                //if (_peakDetector == null)
-                //{
-                //    _peakDetector = new DeconToolsPeakDetectorV2(PeakToBackgroundRatio, 0);
-                //}
-                //var peaks = _peakDetector.FindPeaks(mzArr, intensityArr);
-                //mzArr = new double[peaks.Count];
-                //intensityArr = new double[peaks.Count];
-
-                //var index = -1;
-                //foreach (var peak in peaks)
-                //{
-                //    mzArr[++index] = peak.XValue;
-                //    intensityArr[index] = peak.Height;
-                //}
-
                 // ProteoWizard
                 var centroider = new Centroider(mzArr, intensityArr);
                 double[] centroidedMzs, centroidedIntensities;

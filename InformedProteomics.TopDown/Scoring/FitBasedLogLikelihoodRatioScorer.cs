@@ -5,11 +5,13 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.TopDown.Scoring
 {
     public class FitBasedLogLikelihoodRatioScorer : IScorer
     {
+        public const double RelativeIntensityThreshold = 0.1;
        public FitBasedLogLikelihoodRatioScorer(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
         {
             _ms2Spec = ms2Spec;
@@ -35,21 +37,46 @@ namespace InformedProteomics.TopDown.Scoring
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
-                var containsIon = false;
-                var bestCharge = 0;
-                var bestFitScore = 0.0;
+                var bestFitScore = 1.0;
+                var bestObsIntensity = -1.0;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
-                    var fitScore = _ms2Spec.GetFitScore(ion, _tolerance, 0.1);
-                    if (_ms2Spec.ContainsIon(ion, _tolerance, RelativeIsotopeIntensityThreshold))
+                    var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+                    var observedPeaks = _ms2Spec.GetAllIsotopePeaks(ion, _tolerance, RelativeIntensityThreshold);
+
+                    if (observedPeaks == null) continue;
+
+                    var theoIntensities = new float[observedPeaks.Length];
+                    var observedIntensities = new float[observedPeaks.Length];
+                    var maxObservedIntensity = float.NegativeInfinity;
+                    for (var i = 0; i < observedPeaks.Length; i++)
                     {
-                        containsIon = true;
-                        break;
+                        theoIntensities[i] = isotopomerEnvelope[i];
+                        if (observedPeaks[i] != null)
+                        {
+                            var observedIntensity = (float) observedPeaks[i].Intensity;
+                            observedIntensities[i] = observedIntensity;
+                            if (observedIntensity > maxObservedIntensity) maxObservedIntensity = observedIntensity;
+                        }
+                        else
+                        {
+                            observedIntensities[i] = 0;
+                        }
+                    }
+
+                    for (var i = 0; i < observedPeaks.Length; i++)
+                    {
+                        observedIntensities[i] /= maxObservedIntensity;
+                    }
+                    var fitScore = FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, observedIntensities);
+                    if (fitScore < bestFitScore)
+                    {
+                        bestFitScore = fitScore;
+                        bestObsIntensity = maxObservedIntensity;
                     }
                 }
-
-                if (containsIon) score += 1.0;
+                score += GetScore(baseIonType, bestFitScore, bestObsIntensity);
             }
             return score;
         }
@@ -67,6 +94,12 @@ namespace InformedProteomics.TopDown.Scoring
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+        }
+
+        private static double GetScore(BaseIonType baseIonType, double fitScore, double intensity)
+        {
+            if (intensity < 0) return -1;
+            return 0;
         }
     }
 }

@@ -5,15 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using DeconTools.Backend.Core;
-using DeconTools.Backend.Parameters;
 using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
@@ -44,7 +41,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
-            const string sequence = "KIEEIAAKYKHSVVKKCCYDGACVNNDETCEQRAARISLGPRCIKAFTECCVVASQLRANISHKDMQLGR";
+            const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
             //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
@@ -65,7 +62,7 @@ namespace InformedProteomics.Test
             Console.WriteLine();
 
             Console.WriteLine("Isotope ions:");
-            var ion = new Ion(composition + Composition.H2O, 10);
+            var ion = new Ion(composition + Composition.H2O, 20);
             foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Index), p.Ratio);
             Console.WriteLine();
         }
@@ -260,14 +257,14 @@ namespace InformedProteomics.Test
                 var peptide = annotation.Substring(2, annotation.Length - 4);
                 var composition = aaSet.GetComposition(peptide);
                 var molFormula = composition.ToPlainString();
-                var profile = isoCalc.GetIsotopePattern(molFormula);
+                isoCalc.GetIsotopePattern(molFormula);
                 composition.GetIsotopomerEnvelop();
             }
 
             Console.WriteLine("NumPeptides: " + numPeptides);
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            System.Console.WriteLine(@"{0:f4} sec", sec);
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
         }
 
         [Test]
@@ -299,7 +296,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIndexSorting()
         {
-            var isotopes = new double[] {0.8, 0.9, 0.6, 0.3};
+            var isotopes = new[] {0.8, 0.9, 0.6, 0.3};
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
             Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));

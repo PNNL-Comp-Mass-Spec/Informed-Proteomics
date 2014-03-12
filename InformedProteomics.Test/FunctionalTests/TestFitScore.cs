@@ -1,4 +1,6 @@
 ﻿using System;
+using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -11,24 +13,30 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestFitScore
     {
         [Test]
-        public void TestFitScoreCalculationHcd()
+        public void TestFitScoreCalculationCid()
         {
-            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
-            var spec = run.GetSpectrum(810) as ProductSpectrum;
+            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
+            var spec = run.GetSpectrum(5743);
             Assert.True(spec != null);
 
-            const string suf54 = "ENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK";
-            var suf54Comp = new AminoAcidSet().GetComposition(suf54);
-            Assert.True(suf54Comp != null);
+            const string protein = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
+            var protComp = new AminoAcidSet().GetComposition(protein) + Composition.H2O;
+            Assert.True(protComp != null);
 
-            var ionType = new IonTypeFactory(10).GetIonType("z6");
-            var ion = ionType.GetIon(suf54Comp);
-            ion.Composition.ComputeApproximateIsotopomerEnvelop();
+            var ion = new Ion(protComp, 20);
+//            ion.Composition.ComputeApproximateIsotopomerEnvelop();
+            var isotopomerEnvelop = ion.Composition.GetIsotopomerEnvelop();
             Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
+            var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);
+            for (var i = 0; i < matchedPeaks.Length; i++)
+            {
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
+            }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
             Console.WriteLine("FitScore: {0}", fitScore);
-            Assert.True(fitScore < 0.15);
+            Console.WriteLine("Cosine: {0}", spec.GetConsineScore(ion, new Tolerance(15), 0.1));
+            //            Assert.True(fitScore < 0.15);
         }
 
         [Test]

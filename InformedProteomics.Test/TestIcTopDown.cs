@@ -25,12 +25,12 @@ namespace InformedProteomics.Test
             // Search parameters
             const int maxNumNTermCleavages = 1;  // 30
             const int minLength = 7;    // 7
-            const int maxLength = 100; // 1000
+            const int maxLength = 300; // 1000
             const int minPrecursorIonCharge = 3; // 3
             const int maxPrecursorIonCharge = 40;// 67
             const int minProductIonCharge = 1; // 1
             const int maxProductIonCharge = 10;// 10
-            const int numMaxModsPerProtein = 0; // 6
+            const int numMaxModsPerProtein = 6; // 6
 
             var precursorTolerance = new Tolerance(15);
             var productIonTolerance = new Tolerance(15);
@@ -42,19 +42,19 @@ namespace InformedProteomics.Test
             //            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\P01031.fasta";
 
             //            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\SBEP_STM_001_02222012_Aragon.raw";
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
 
             // Configure amino acid set
-            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            var dehydroC = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            //var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            //var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
             {
                 //pyroGluQ,
-                dehydroC,
+                //dehydroC,
                 //cysteinylC,
                 //glutathioneC,
                 oxM
@@ -79,8 +79,8 @@ namespace InformedProteomics.Test
             const int maxProductIonCharge = 10;// 10
             const int numMaxModsPerProtein = 0; // 6
 
-            var precursorTolerance = new Tolerance(10);
-            var productIonTolerance = new Tolerance(10);
+            var precursorTolerance = new Tolerance(15);
+            var productIonTolerance = new Tolerance(15);
 
             //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
             //const string dbFilePath =
@@ -224,7 +224,7 @@ namespace InformedProteomics.Test
 
             // Configure amino acid set
             //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            var dehydroC = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             //var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             //var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -260,7 +260,7 @@ namespace InformedProteomics.Test
 
             sw.Start();
             Console.Write("Reading raw file...");
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
@@ -446,7 +446,7 @@ namespace InformedProteomics.Test
             // Configure amino acid set
             const int numMaxModsPerProtein = 6;
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var dehydro = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -570,7 +570,7 @@ namespace InformedProteomics.Test
 
             // Configure amino acid set
             //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
-            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var dehydro = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
             //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -786,7 +786,7 @@ namespace InformedProteomics.Test
 
             // Configure amino acid set
 //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
-            var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
+            var dehydro = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
 //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);

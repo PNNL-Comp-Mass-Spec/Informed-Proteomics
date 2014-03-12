@@ -117,14 +117,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="ion">ion</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
-        /// <returns>all isotope peaks found in the spectrum</returns>
-        public IList<Peak> GetAllIonPeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        /// <returns>array of observed isotope peaks in the spectrum. null if no peak found.</returns>
+        public Peak[] GetAllIsotopePeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
             var observedPeaks = new Peak[isotopomerEnvelope.Length];
 
             var downHill = false;
             var prevTheoIntensity = 0f;
+            var peakExists = false;
             // Assume that the isotopomer envelop is unimodal
             for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
@@ -137,13 +138,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 else
                 {
                     var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                    observedPeaks[isotopeIndex] = FindPeak(isotopeMz, tolerance);
+                    var p = FindPeak(isotopeMz, tolerance);
+                    if (!peakExists && p != null) peakExists = true;
+                    observedPeaks[isotopeIndex] = p;
                 }
                 prevTheoIntensity = theoIntensity;
             }
 
-            return observedPeaks;
+            return peakExists ? observedPeaks : null;
         }
+
 
         /// <summary>
         /// Computes the fit score between the ion and corresponding peaks in the spectrum
@@ -155,13 +159,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double GetFitScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-            var observedPeaks = GetAllIonPeaks(ion, tolerance, relativeIntensityThreshold);
+            var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
 
-            var theoIntensities = new float[observedPeaks.Count];
+            if (observedPeaks == null) return 1;
+            var theoIntensities = new float[observedPeaks.Length];
             Array.Copy(isotopomerEnvelope, theoIntensities, theoIntensities.Length);
 
-            var maxObservedIntensity = observedPeaks.Select(p => p.Intensity).Max();
-            var normalizedObs = observedPeaks.Select(p => (float)(p.Intensity / maxObservedIntensity)).ToArray();
+            var maxObservedIntensity = observedPeaks.Select(p => p != null ? (float)p.Intensity : 0f).Max();
+            var normalizedObs = observedPeaks.Select(p => p != null ? (float)(p.Intensity / maxObservedIntensity) : 0f).ToArray();
             return FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, normalizedObs);
         }
 
@@ -175,12 +180,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double GetConsineScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-            var observedPeaks = GetAllIonPeaks(ion, tolerance, relativeIntensityThreshold);
+            var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
+            if (observedPeaks == null) return 0;
 
-            var theoIntensities = new float[observedPeaks.Count];
+            var theoIntensities = new float[observedPeaks.Length];
             Array.Copy(isotopomerEnvelope, theoIntensities, theoIntensities.Length);
 
-            var observedIntensities = observedPeaks.Select(p => (float)p.Intensity).ToArray();
+            var observedIntensities = observedPeaks.Select(p => p != null ? (float)p.Intensity : 0f).ToArray();
             return FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
         }
 
