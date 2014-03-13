@@ -58,6 +58,23 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
+        public void RankMatches(IEnumerable<SpectrumMatch> matches, Tolerance tolerance)
+        {
+            foreach (var match in matches)
+            {
+                var ranks = new RankedPeaks(match.Spectrum);
+                foreach (var ionType in _ionTypes)
+                {
+                    var ions = match.GetCleavageIons(ionType);
+                    foreach (var ion in ions)
+                    {
+                        ranks.RankIon(ionType, ion, tolerance);
+                    }
+                }
+                AddRanks(ranks);
+            }
+        }
+
         public void AddRanks(RankedPeaks rankedPeaks)
         {
             var ranks = rankedPeaks.Ranks;

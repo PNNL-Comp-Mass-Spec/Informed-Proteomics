@@ -23,7 +23,6 @@ namespace InformedProteomics.Test
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
         double _relativeIntensityThreshold = 1.0;
-//        private bool _precursorOff;
         private bool _combineCharges;
         private int _precursorCharge;
 
@@ -57,17 +56,10 @@ namespace InformedProteomics.Test
                     Console.WriteLine("{0}\t{1}", textFile, rawFile);
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
                     var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
-                    for (int j = 1; j <= _precursorCharge; j++)
+                    for (int j = 0; j < _precursorCharge; j++)
                     {
-                        var chargeMatches = matchList.GetCharge(j);
-                        foreach (var match in chargeMatches)
-                        {
-                            foreach (var ionType in _ionTypes)
-                            {
-                                var prob = match.ContainsCleavageIons(ionType, _defaultTolerance, _relativeIntensityThreshold);
-                                offsetFrequencyFunctions[j-1].AddOffsetFrequency(prob);
-                            }
-                        }
+                        var chargeMatches = matchList.GetCharge(j+1);
+                        offsetFrequencyFunctions[j].AddCleavageProbabilities(chargeMatches, _ionTypes, _defaultTolerance, _relativeIntensityThreshold);
                     }
                 }
 
@@ -91,6 +83,8 @@ namespace InformedProteomics.Test
                 }
             }
         }
+
+
 
         // Read Configuration file
         private void InitTest(ConfigFileReader reader)

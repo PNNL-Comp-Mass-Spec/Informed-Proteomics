@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
@@ -38,7 +39,35 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return tempOff.Values;
         }
 
-        public void AddOffsetFrequency(IonProbability probability)
+        public void AddCleavageProbabilities(IEnumerable<SpectrumMatch> matches, IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            foreach (var match in matches)
+            {
+                foreach (var ionType in ionTypes)
+                {
+                    var prob = match.ContainsCleavageIons(ionType, tolerance, relativeIntensityThreshold);
+                    AddIonProbability(prob);
+                }
+            }
+        }
+
+        public void AddPrecursorProbabilities(IEnumerable<SpectrumMatch> matches, IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            foreach (var match in matches)
+            {
+                foreach (var ionType in ionTypes)
+                {
+                    var conIon = match.ContainsPrecursorIon(ionType, tolerance, relativeIntensityThreshold);
+                    int found = 0;
+                    int total = 1;
+                    if (conIon) found = 1;
+                    var prob = new IonProbability(ionType, found, total); 
+                    AddIonProbability(prob);
+                }
+            }
+        }
+
+        public void AddIonProbability(IonProbability probability)
         {
             var name = probability.Ion.Name;
             if (_offsetFrequencies.ContainsKey(name))

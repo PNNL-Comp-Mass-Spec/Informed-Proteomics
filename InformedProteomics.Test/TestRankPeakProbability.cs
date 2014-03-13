@@ -50,6 +50,7 @@ namespace InformedProteomics.Test
                     rankTables[i] = new RankTable(_ionTypes.ToArray());
                 }
 
+                // Calculate Rank Probabilities
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
                     string textFile = txtFiles[i];
@@ -57,22 +58,10 @@ namespace InformedProteomics.Test
                     Console.WriteLine("{0}\t{1}", textFile, rawFile);
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
                     var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
-                    for (int j = 1; j <= _precursorCharge; j++)
+                    for (int j = 0; j < _precursorCharge; j++)
                     {
-                        var chargeMatches = matchList.GetCharge(j);
-                        foreach (var match in chargeMatches)
-                        {
-                            var ranks = new RankedPeaks(match.Spectrum);
-                            foreach (var ionType in _ionTypes)
-                            {
-                                var ions = match.GetCleavageIons(ionType);
-                                foreach (var ion in ions)
-                                {
-                                    ranks.RankIon(ionType, ion, _defaultTolerance);
-                                }
-                            }
-                            rankTables[j-1].AddRanks(ranks);
-                        }
+                        var chargeMatches = matchList.GetCharge(j+1);
+                        rankTables[j].RankMatches(chargeMatches, _defaultTolerance);
                     }
                 }
 
