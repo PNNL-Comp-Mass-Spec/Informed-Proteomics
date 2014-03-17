@@ -144,5 +144,39 @@ namespace InformedProteomics.Backend.Utils
             return fitScore;
         }
 
+        static public float GetPearsonCorrelation(float[] v1, float[] v2)
+        {
+            var dimension = v1.Length;
+            if (dimension <= 1 || dimension != v2.Length) return 0f;
+
+            var m1 = 0f;
+            var m2 = 0f;
+
+            for (var i = 0; i < dimension; i++)
+            {
+                m1 += v1[i];
+                m2 += v2[i];
+            }
+
+            m1 /= dimension;
+            m2 /= dimension;
+
+            var cov = 0f;
+            var s1 = 0f;
+            var s2 = 0f;
+
+            for (var i = 0; i < dimension; i++)
+            {
+                var d1 = v1[i] - m1;
+                var d2 = v2[i] - m2;
+                cov += d1*d2;
+                s1 += d1*d1;
+                s2 += d2*d2;
+            }
+
+            if (s1 <= 0 || s2 <= 0) return 0;
+
+            return cov < 0 ? 0f : cov / (float)Math.Sqrt(s1 * s2);
+        }
     }
 }

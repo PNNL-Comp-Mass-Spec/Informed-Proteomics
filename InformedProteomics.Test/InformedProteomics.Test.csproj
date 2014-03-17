@@ -93,6 +93,7 @@
     <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
+    <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestEdrn.cs" />
     <Compile Include="TestFitScore.cs" />

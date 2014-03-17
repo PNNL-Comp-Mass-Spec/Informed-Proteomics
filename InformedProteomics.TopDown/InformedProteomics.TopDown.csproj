@@ -58,8 +58,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\IcTopDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scoring\FitBasedLogLikelihoodRatioScorer.cs" />
+    <Compile Include="Scoring\LikelihoodScoringModel.cs" />
+    <Compile Include="Scoring\LikelihoodScorer.cs" />
     <Compile Include="Scoring\MatchedPeakCounter.cs" />
     <Compile Include="Training\MsAlignParser.cs" />
     <Compile Include="Scoring\PrecursorFilter.cs" />

@@ -36,6 +36,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
             Console.WriteLine("FitScore: {0}", fitScore);
             Console.WriteLine("Cosine: {0}", spec.GetConsineScore(ion, new Tolerance(15), 0.1));
+            Console.WriteLine("Corr: {0}", spec.GetCorrScore(ion, new Tolerance(15), 0.1));
             //            Assert.True(fitScore < 0.15);
         }
 
@@ -90,9 +91,9 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 //FitScoreCalculator.GetDeconToolsFit(theoretical[trial], observed[trial]);
                 //FitScoreCalculator.GetFitOfNormalizedVectors(theoretical[trial], observed[trial]);
-                FitScoreCalculator.GetCosine(theoretical[trial], observed[trial]);
+                //FitScoreCalculator.GetCosine(theoretical[trial], observed[trial]);
                 //FitScoreCalculator.GetFitNormalizedByTheoMaxIsotope(theoretical[trial], observed[trial]);
-                //SimpleMath.GetCorrelation(theoretical[trial], observed[trial]);
+                FitScoreCalculator.GetPearsonCorrelation(theoretical[trial], observed[trial]);
             }
 
             sw.Stop();

@@ -58,19 +58,6 @@ namespace InformedProteomics.Backend.Utils
         {
             if (v1.Length <= 1) return 0.0;
 
-            /* var d = 0.0;
-             var n = new double[2];
-
-             for (var i = 0; i < v1.Length; i++)
-             {
-                 n[0] += v1[i]*v1[i];
-                 n[1] += v2[i]*v2[i];
-                 d += v1[i]*v2[i];
-             }
-
-             if (n[0] <= 0 || n[1] <= 0) return 0;
-             return d/Math.Sqrt(n[0]*n[1]);
-             //*/
             var m1 = GetSampleMean(v1);
             var m2 = GetSampleMean(v2);
             var s1 = GetSampleVariance(v1, m1);
@@ -79,7 +66,6 @@ namespace InformedProteomics.Backend.Utils
             var div = Math.Sqrt(s1 * s2);
             var rho = v1.Select((t, i) => (float)((t - m1) * (v2[i] - m2) / div)).Sum();
             return Math.Min(Math.Max(0, rho / (v1.Length - 1)), 1);
-            //*/
         }
 
         static public double GetSampleMean(double[] x)
@@ -93,5 +79,23 @@ namespace InformedProteomics.Backend.Utils
             var var = x.Sum(v => (v - m) * (v - m));
             return var / (x.Length - 1);
         }
+
+        static public float GetSampleMean(float[] x)
+        {
+            return x.Average();
+        }
+
+        static public float GetSampleVariance(float[] x, float m)
+        {
+            var variance = 0f;
+            var length = x.Length;
+            for (var i = 0; i < length; i++)
+            {
+                var diff = x[i] - m;
+                variance += diff*diff;
+            }
+            return variance / (length - 1);
+        }
+
     }
 }

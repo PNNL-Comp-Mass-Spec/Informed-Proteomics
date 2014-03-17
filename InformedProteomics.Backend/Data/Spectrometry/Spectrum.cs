@@ -267,12 +267,41 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
             var theoIntensities = new float[observedPeaks.Length];
-            Array.Copy(isotopomerEnvelope, theoIntensities, theoIntensities.Length);
+            var observedIntensities = new float[observedPeaks.Length];
 
-            var observedIntensities = observedPeaks.Select(p => p != null ? (float)p.Intensity : 0f).ToArray();
+            for (var i = 0; i < observedPeaks.Length; i++)
+            {
+                theoIntensities[i] = isotopomerEnvelope[i];
+                var observedPeak = observedPeaks[i];
+                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0f;
+            }
             return FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
         }
 
+        /// <summary>
+        /// Computes the Pearson correlation between the ion and corresponding peaks in the spectrum
+        /// </summary>
+        /// <param name="ion">ion</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
+        /// <returns>Pearson correlation</returns>
+        public double GetCorrScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
+            if (observedPeaks == null) return 0;
+
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
+            var theoIntensities = new float[observedPeaks.Length];
+            var observedIntensities = new float[observedPeaks.Length];
+
+            for (var i = 0; i < observedPeaks.Length; i++)
+            {
+                theoIntensities[i] = isotopomerEnvelope[i];
+                var observedPeak = observedPeaks[i];
+                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0f;
+            }
+            return FitScoreCalculator.GetPearsonCorrelation(isotopomerEnvelope, observedIntensities);
+        }
 
         /// <summary>
         /// Finds the maximum intensity peak within the specified range
