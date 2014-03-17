@@ -127,9 +127,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedPeaks = new Peak[isotopomerEnvelope.Length];
 
             var downHill = false;
-            var prevTheoIntensity = 0f;
-            //var peakExists = false;
-            // Assume that the isotopomer envelop is unimodal
+            var prevTheoIntensity = 0.0;
             for (var isotopeIndex = 0; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
                 var theoIntensity = isotopomerEnvelope[isotopeIndex];
@@ -149,7 +147,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 prevTheoIntensity = theoIntensity;
             }
 
-//            return peakExists ? observedPeaks : null;
             return observedPeaks;
         }
 
@@ -245,11 +242,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
 
             if (observedPeaks == null) return 1;
-            var theoIntensities = new float[observedPeaks.Length];
+            var theoIntensities = new double[observedPeaks.Length];
             Array.Copy(isotopomerEnvelope, theoIntensities, theoIntensities.Length);
 
-            var maxObservedIntensity = observedPeaks.Select(p => p != null ? (float)p.Intensity : 0f).Max();
-            var normalizedObs = observedPeaks.Select(p => p != null ? (float)(p.Intensity / maxObservedIntensity) : 0f).ToArray();
+            var maxObservedIntensity = observedPeaks.Select(p => p != null ? p.Intensity : 0).Max();
+            var normalizedObs = observedPeaks.Select(p => p != null ? p.Intensity / maxObservedIntensity : 0).ToArray();
             return FitScoreCalculator.GetFitOfNormalizedVectors(isotopomerEnvelope, normalizedObs);
         }
 
@@ -266,14 +263,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (observedPeaks == null) return 0;
 
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-            var theoIntensities = new float[observedPeaks.Length];
-            var observedIntensities = new float[observedPeaks.Length];
+            var theoIntensities = new double[observedPeaks.Length];
+            var observedIntensities = new double[observedPeaks.Length];
 
             for (var i = 0; i < observedPeaks.Length; i++)
             {
                 theoIntensities[i] = isotopomerEnvelope[i];
                 var observedPeak = observedPeaks[i];
-                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0f;
+                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
             }
             return FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
         }
@@ -291,14 +288,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (observedPeaks == null) return 0;
 
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelop();
-            var theoIntensities = new float[observedPeaks.Length];
-            var observedIntensities = new float[observedPeaks.Length];
+            var theoIntensities = new double[observedPeaks.Length];
+            var observedIntensities = new double[observedPeaks.Length];
 
             for (var i = 0; i < observedPeaks.Length; i++)
             {
                 theoIntensities[i] = isotopomerEnvelope[i];
                 var observedPeak = observedPeaks[i];
-                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0f;
+                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
             }
             return FitScoreCalculator.GetPearsonCorrelation(isotopomerEnvelope, observedIntensities);
         }

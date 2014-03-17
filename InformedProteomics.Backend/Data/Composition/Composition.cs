@@ -183,7 +183,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Methods to get Isotopomer Envelpops
 
-        public float[] GetIsotopomerEnvelop()
+        public double[] GetIsotopomerEnvelop()
         {
             return _isotopomerEnvelop ?? (_isotopomerEnvelop = ComputeIsotopomerEnvelop());
         }
@@ -200,12 +200,12 @@ namespace InformedProteomics.Backend.Data.Composition
 
             if (_approxIsotopomerEnvelope == null)
             {
-                _approxIsotopomerEnvelope = new Dictionary<int, float[]>();
+                _approxIsotopomerEnvelope = new Dictionary<int, double[]>();
                 _approxIsotopomerEnvelopeBaseOffset = new Dictionary<int, int>();
             }
 
             var nominalMass = GetNominalMass();
-            float[] approxEnvelope;
+            double[] approxEnvelope;
             if (_approxIsotopomerEnvelope.TryGetValue(nominalMass, out approxEnvelope))
             {
                 _isotopomerEnvelop = approxEnvelope;
@@ -433,8 +433,6 @@ namespace InformedProteomics.Backend.Data.Composition
         private static readonly double MassP = Atom.Get("P").Mass;
         //private static readonly double MassIsotope = Atom.Get("13C").Mass - MassC;
 
-        private static readonly Atom AtomP = Atom.Get("P");
-
         private static readonly int NominalMassC = Atom.Get("C").NominalMass;
         private static readonly int NominalMassH = Atom.Get("H").NominalMass;
         private static readonly int NominalMassN = Atom.Get("N").NominalMass;
@@ -454,10 +452,10 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Private Methods for Computing Isotopomer Envelops
 
-        private float[] _isotopomerEnvelop;
+        private double[] _isotopomerEnvelop;
         private int _mostIntenseIsotopomerIndex = -1;
 
-        private float[] ComputeIsotopomerEnvelop()
+        private double[] ComputeIsotopomerEnvelop()
         {
             if (_possibleIsotopeCombinations == null) _possibleIsotopeCombinations = GetPossibleIsotopeCombinations(MaxNumIsotopes);
 
@@ -496,22 +494,10 @@ namespace InformedProteomics.Backend.Data.Composition
             }
             _mostIntenseIsotopomerIndex = mostIntenseIsotopomerIndex;
 
-            //var max = dist.Concat(new float[] { 0 }).Max();
-            //var maxPassed = false;
-            //var cutIndex = dist.Length - 1;
-            //for (var i = 0; i < dist.Length; i++)
-            //{
-            //    dist[i] = dist[i] / max;
-            //    if (dist[i] >= 1) maxPassed = true;
-            //    if (!maxPassed || dist[i] >= 0.01) continue;
-            //    cutIndex = i;
-            //    break;
-            //}
-
-            var truncatedDist = new float[isotopeIndex];
+            var truncatedDist = new double[isotopeIndex];
             for (var i = 0; i < isotopeIndex; i++)
             {
-                truncatedDist[i] = (float)(dist[i] / maxHeight);
+                truncatedDist[i] = dist[i] / maxHeight;
             }
 
             return truncatedDist;
@@ -583,7 +569,7 @@ namespace InformedProteomics.Backend.Data.Composition
             return possibleIsotopeCombinations;
         }
 
-        private static Dictionary<int, float[]> _approxIsotopomerEnvelope;
+        private static Dictionary<int, double[]> _approxIsotopomerEnvelope;
         private static Dictionary<int, int> _approxIsotopomerEnvelopeBaseOffset;
 
         #endregion

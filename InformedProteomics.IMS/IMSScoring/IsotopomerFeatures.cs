@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.IMS.IMS;
 
@@ -10,7 +9,7 @@ namespace InformedProteomics.IMS.IMSScoring
     public class IsotopomerFeatures : List<Feature>
     {
         public int BinningMultiplyFactor { get; private set; }
-        public float[] TheoreticalIsotopomerEnvelope { get; private set; }
+        public double[] TheoreticalIsotopomerEnvelope { get; private set; }
         public int MaxIntensityIndex { get; private set; } // max index for _theoreticalIsotopomerEnvelope, not for this
         private IsotopomerFeatures(ImsDataCached imsData, Ion ion, Feature precursorFeature, bool isPrecurosr)
         {
@@ -21,7 +20,7 @@ namespace InformedProteomics.IMS.IMSScoring
             else BinningMultiplyFactor = 2;
 
              var te = ion.Composition.GetIsotopomerEnvelop();
-             TheoreticalIsotopomerEnvelope = new float[(te.Length + FeatureNode.OffsetFromMonoIsotope) * BinningMultiplyFactor];
+             TheoreticalIsotopomerEnvelope = new double[(te.Length + FeatureNode.OffsetFromMonoIsotope) * BinningMultiplyFactor];
              for (var i = FeatureNode.OffsetFromMonoIsotope; i < te.Length + FeatureNode.OffsetFromMonoIsotope; i++)
             {
                 TheoreticalIsotopomerEnvelope[i * BinningMultiplyFactor] = te[i - FeatureNode.OffsetFromMonoIsotope];
@@ -81,10 +80,10 @@ namespace InformedProteomics.IMS.IMSScoring
             return this[MaxIntensityIndex];
         }
 
-        static private int GetMaximumIndex(float[] e)
+        static private int GetMaximumIndex(double[] e)
         {
             var maxIndex = 0;
-            var max = float.NegativeInfinity;
+            var max = double.NegativeInfinity;
             for (var i = 0; i < e.Length; i++)
             {
                 if (!(e[i] > max)) continue;

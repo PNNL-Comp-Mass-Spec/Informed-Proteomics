@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -48,14 +45,14 @@ namespace InformedProteomics.TopDown.Scoring
                     var observedPeaks = _ms2Spec.GetAllIsotopePeaks(ion, _tolerance, RelativeIntensityThreshold);
                     if (observedPeaks == null) continue;
 
-                    var theoIntensities = new float[observedPeaks.Length];
-                    var observedIntensities = new float[observedPeaks.Length];
+                    var theoIntensities = new double[observedPeaks.Length];
+                    var observedIntensities = new double[observedPeaks.Length];
 
                     for (var i = 0; i < observedPeaks.Length; i++)
                     {
                         theoIntensities[i] = isotopomerEnvelope[i];
                         var observedPeak = observedPeaks[i];
-                        observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0f;
+                        observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
                     }
                     var cosineScore = FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
                     if (cosineScore > bestCosineScore)

@@ -77,12 +77,12 @@ namespace InformedProteomics.IMS.IMSTraining
             }
         }
 
-        private int GetCorrelationScore(Tuple<List<MSMSSpectrumPeak>, float[]> isotopomerTuple)
+        private int GetCorrelationScore(Tuple<List<MSMSSpectrumPeak>, double[]> isotopomerTuple)
         {
             var observed = isotopomerTuple.Item1;
             var theoretical = isotopomerTuple.Item2;
             var maxIndex = 0;
-            var maxAbundance = float.NegativeInfinity;
+            var maxAbundance = double.NegativeInfinity;
             for (var i = 0; i < theoretical.Length; i++)
             {
                 if (!(maxAbundance < theoretical[i])) continue;

@@ -68,16 +68,16 @@ namespace InformedProteomics.Test.FunctionalTests
             const int numIsotopes = 20;
 
             var random = new Random();
-            var theoretical = new float[numTrials][];
-            var observed = new float[numTrials][];
+            var theoretical = new double[numTrials][];
+            var observed = new double[numTrials][];
             for (var i = 0; i < numTrials; i++)
             {
-                theoretical[i] = new float[numIsotopes];
-                observed[i] = new float[numIsotopes];
+                theoretical[i] = new double[numIsotopes];
+                observed[i] = new double[numIsotopes];
                 for (var j = 0; j < numIsotopes; j++)
                 {
-                    theoretical[i][j] = (float)random.NextDouble();
-                    observed[i][j] = (float)random.NextDouble();
+                    theoretical[i][j] = random.NextDouble();
+                    observed[i][j] = random.NextDouble();
                 }
             }
 

@@ -663,8 +663,8 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly List<LcMsPeak> _ms1PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         private readonly Dictionary<int, IEnumerable<int>> _isolationMzBinToScanNums;
-        private Dictionary<int, List<double>[]> _ms1Features = null;
-        private int _ms1FeatureMinCharge = 0;
+        private Dictionary<int, List<double>[]> _ms1Features;
+        private int _ms1FeatureMinCharge;
     }
 
     class LcMsPeak: Peak
