@@ -101,12 +101,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public List<Ion> GetCleavageIons(IonType ionType)
         {
-            var compositions = new List<Composition>();
-            if (ionType.BaseIonType == BaseIonType.A || ionType.BaseIonType == BaseIonType.B || ionType.BaseIonType == BaseIonType.C)
-                compositions = Prefixes;
-            else if (ionType.BaseIonType == BaseIonType.X || ionType.BaseIonType == BaseIonType.Y || ionType.BaseIonType == BaseIonType.Z)
-                compositions = Suffixes;
-
+            var compositions = ionType.BaseIonType.IsPrefix ? Prefixes : Suffixes;
             return compositions.Select(ionType.GetIon).ToList();
         }
 

@@ -131,10 +131,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     foreach (var ionType in ionTypes)
                     {
                         var cleavagePoints = new List<Composition>();
-                        if (ionType.BaseIonType == BaseIonType.A || ionType.BaseIonType == BaseIonType.B || ionType.BaseIonType == BaseIonType.C)
-                            cleavagePoints = prefixes;
-                        else if (ionType.BaseIonType == BaseIonType.X || ionType.BaseIonType == BaseIonType.Y || ionType.BaseIonType == BaseIonType.Z)
-                            cleavagePoints = suffixes;
+                        cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
 
                         var ion = ionType.GetIon(cleavagePoints[i]);
 
@@ -150,20 +147,28 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         if (reduceCharges)
                             name = ReducedChargeName(ionType);
 
-                        if (intensity >= 0)
-                        {
-                            if (!ionTypeScores.ContainsKey(name))
-                                ionTypeScores.Add(name, new FitScoreList());
+                        if (!ionTypeScores.ContainsKey(name))
+                            ionTypeScores.Add(name, new FitScoreList());
 
-                            ionTypeScores[name].Add(new FitScore(intensity, score));
-                        }
-                        else
-                            WorstScore.Found++;
+                        ionTypeScores[name].Add(new FitScore(intensity, score));
 
-                        WorstScore.Total++;
                     }
                     var bestScores = SelectBestScores(ionTypeScores);
-                    scores.AddRange(bestScores);
+                    var filteredScores = new FitScoreList();
+                    foreach (var score in bestScores)
+                    {
+                        WorstScore.Total++;
+                        if (score.Intensity.Equals(-1))
+                            WorstScore.Found++;
+                        else if (score.Score.Equals(0))
+                        {
+                            filteredScores.Add(score);
+                            WorstScore.Found++;
+                        }
+                        else
+                            filteredScores.Add(score);
+                    }
+                    scores.AddRange(filteredScores);
                 }
             }
 
