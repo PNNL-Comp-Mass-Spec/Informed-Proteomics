@@ -30,11 +30,11 @@ namespace InformedProteomics.Test
 
         private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
-        private readonly double[] _binEdges =
+        private readonly double[] _scoreBins =
         {0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95};
 
         [Test]
-        public void CosineScore()
+        public void CorrScore()
         {
             InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\CosineScoreConfig.ini"));
 
@@ -48,8 +48,8 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                var prefixTable = new ScoreTable(_method, _intensityBins, _binEdges);
-                var suffixTable = new ScoreTable(_method, _intensityBins, _binEdges);
+                var prefixTable = new ScoreTable(_method, _intensityBins, _scoreBins);
+                var suffixTable = new ScoreTable(_method, _intensityBins, _scoreBins);
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
@@ -69,8 +69,8 @@ namespace InformedProteomics.Test
                 var suffixhistograms = suffixTable.Histograms;
                 var prefixEdges = prefixTable.IntensityBins;
                 var suffixEdges = suffixTable.IntensityBins;
-                var decoyprefixTable = new ScoreTable(_method, prefixEdges, _binEdges);
-                var decoysuffixTable = new ScoreTable(_method, suffixEdges, _binEdges);
+                var decoyprefixTable = new ScoreTable(_method, prefixEdges, _scoreBins);
+                var decoysuffixTable = new ScoreTable(_method, suffixEdges, _scoreBins);
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
@@ -100,7 +100,7 @@ namespace InformedProteomics.Test
         }
 
         // Print tables to output file
-        void PrintOutput(string fileName, double[] edges,
+        void PrintOutput(string fileName, double[] intensities,
                 List<Histogram<FitScore>> targethist, List<Histogram<FitScore>> decoyhist,
                 Probability targetWorst, Probability decoyWorst, string ionName)
         {
@@ -115,7 +115,7 @@ namespace InformedProteomics.Test
                     var decoyprefixfrequencies = decoyhist[i].Frequencies;
                     for (int j = 0; j < prefixfrequencies.Count; j++)
                     {
-                        outFile.WriteLine("{0}\t{1}\t{2}\t{3}", Math.Round(edges[i], 2), _binEdges[j],
+                        outFile.WriteLine("{0}\t{1}\t{2}\t{3}", Math.Round(intensities[i], 2), _scoreBins[j],
                             prefixfrequencies[j].Found, decoyprefixfrequencies[j].Found);
                     }
                 }
