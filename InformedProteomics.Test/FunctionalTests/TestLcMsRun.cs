@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
@@ -9,14 +10,14 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestLcMsRun
     {
         public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public const string TestPbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.pbf";
         public const string TestTopDownRawFilePathEtd = @"\\protoapps\UserData\Sangtae\TestData\E_coli_iscU_60_mock.raw";
         public const string TestTopDownRawFilePathCid = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
 
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()
         {
-            var reader = new XCaliburReader(TestRawFilePath);
-            var run = new LcMsRun(reader);
+            var run = LcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun);
 
             var msLevel = new Dictionary<int, int>();
 
@@ -61,6 +62,51 @@ namespace InformedProteomics.Test.FunctionalTests
             }
             Assert.True(run.GetNextScanNum(31151) == 31153);
             Console.WriteLine(run.GetNextScanNum(89));
+        }
+
+        //[Test]
+        //public void TestReadingPbf()
+        //{
+        //    var sw = new System.Diagnostics.Stopwatch();
+
+        //    sw.Start();
+        //    var run = new LcMsRun(new PbfReader(TestPbfFilePath));
+        //    Console.WriteLine(run.MaxLcScan);
+        //    var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Done. {0:f4} sec", sec);
+        //}
+
+        [Test]
+        public void TestParsingSpectrumFile()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+
+            var run = LcMsRun.GetLcMsRun(TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
+
+            const int scanNum = 810;
+            var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
+            if (spec != null)
+            {
+                spec.Display();
+                var precursorInfo = spec.IsolationWindow;
+                Console.WriteLine("ActivationMethod: {0}", spec.ActivationMethod);
+                Console.WriteLine("PrecursorScan: {0}", run.GetPrecursorScanNum(spec.ScanNum));
+                Console.WriteLine("IsolationWindowTargetMz: {0}", precursorInfo.IsolationWindowTargetMz);
+                Console.WriteLine("IsolationWindowLowerOffset: {0}", precursorInfo.IsolationWindowLowerOffset);
+                Console.WriteLine("IsolationWindowUpperOffset: {0}", precursorInfo.IsolationWindowUpperOffset);
+                Console.WriteLine("MsLevel: {0}", run.GetMsLevel(scanNum));
+            }
+
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Done. {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestNoiseFiltration()
+        {
+            
         }
     }
 }

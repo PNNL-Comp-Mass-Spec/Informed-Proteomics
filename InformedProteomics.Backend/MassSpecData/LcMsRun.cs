@@ -17,33 +17,27 @@ namespace InformedProteomics.Backend.MassSpecData
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
             var pbfFilePath = Path.ChangeExtension(specFilePath, ".pbf");
-            if (File.Exists(pbfFilePath))
+
+            if (!File.Exists(pbfFilePath))
             {
-                return new LcMsRun(new PbfReader(pbfFilePath),
-                    precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+                LcMsRun run;
+                if (dataType == MassSpecDataType.XCaliburRun)
+                {
+                    run = new LcMsRun(new XCaliburReader(specFilePath),
+                        0, 0);
+                }
+                else run = null;
+                if (run != null) run.WriteTo(pbfFilePath);
+                else throw new Exception("Unsupported raw file format!");
             }
 
-            LcMsRun run;
-            if (dataType == MassSpecDataType.XCaliburRun)
-            {
-                run = new LcMsRun(new XCaliburReader(specFilePath), 
-                    precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
-            }
-            else run = null;
-
-            if(run != null) run.WriteTo(pbfFilePath);
-
-            return run;
+            return new LcMsRun(new PbfReader(pbfFilePath),
+                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
         public const double IsolationWindowBinningFactor = 10;
 
-        public LcMsRun(IMassSpecDataReader massSpecDataReader) : this(massSpecDataReader, 0.0, 0.0)
-        {
-            
-        }
-
-        public LcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
+        private LcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();

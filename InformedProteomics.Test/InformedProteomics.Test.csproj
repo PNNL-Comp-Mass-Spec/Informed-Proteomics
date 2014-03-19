@@ -94,7 +94,6 @@
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
     <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
-    <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestEdrn.cs" />
     <Compile Include="TestFitScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -103,12 +102,10 @@
     <Compile Include="TestIMSScoring.cs" />
     <Compile Include="TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
-    <Compile Include="TestParsingSpectra.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
-    <Compile Include="TestProteinReader.cs" />
-    <Compile Include="TestProteoWizardWrapper.cs" />
-    <Compile Include="TestSequenceGraph.cs" />
-    <Compile Include="TestSuffixArray.cs" />
+    <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
+    <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
+    <Compile Include="FunctionalTests\TestSuffixArray.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />
   </ItemGroup>

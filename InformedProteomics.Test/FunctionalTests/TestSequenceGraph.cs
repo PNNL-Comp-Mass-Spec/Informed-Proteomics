@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
 using NUnit.Framework;
 
-namespace InformedProteomics.Test
+namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
     public class TestSequenceGraph

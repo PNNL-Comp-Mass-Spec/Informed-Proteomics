@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -10,6 +9,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Scoring;
 using MathNet.Numerics;
 using NUnit.Framework;
@@ -72,6 +72,47 @@ namespace InformedProteomics.Test
             TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, true);
+        }
+
+        [Test]
+        public void TestDirectInfusion()
+        {
+            // Enolase
+            //var protSequence = "MAVSKVYARSVYDSRGNPTVEVELTTEKGVFRSIVPSGASTGVHEALEMRDGDKSKWMGKGVLHAVKNVNDVIAPAFVKANIDVKDQKAVDDFLISLDGTANKSKLGANAILGVSLAASRAAAAEKNVPLYKHLADLSKSKTSPYVLPVPFLNVLNGGSHAGGALALQEFMIAPTGAKTFAEALRIGSEVYHNLKSLTKKRYGASAGNVGDEGGVAPNIQTAEEALDLIVDAIKAAGHDGKVKIGLDCASSEFFKDGKYDLDFKNPNSDKSKWLTGPQLADLYHSLMKRYPIVSIEDPFAEDDWEAWSHFFKTAGIQIVADDLTVTNPKRIATAIEKKAADALLLKVNQIGTLSESIKAAQDSFAAGWGVMVSHRSGETEDTFIADLVVGLRTGQIKTGAPARSERLAKLNQLLRIEEELGDNAVFAGENFHHGDKL";
+            // Apo-Transferrin
+            var protSequence = "MRLAVGALLVCAVLGLCLAVPDKTVRWCAVSEHEATKCQSFRDHMKSVIPSDGPSVACVKKASYLDCIRAIAANEADAVTLDAGLVYDAYLAPNNLKPVVAEFYGSKEDPQTFYYAVAVVKKDSGFQMNQLRGKKSCHTGLGRSAGWNIPIGLLYCDLPEPRKPLEKAVANFFSGSCAPCADGTDFPQLCQLCPGCGCSTLNQYFGYSGAFKCLKDGAGDVAFVKHSTIFENLANKADRDQYELLCLDNTRKPVDEYKDCHLAQVPSHTVVARSMGGKEDLIWELLNQAQEHFGKDKSKEFQLFSSPHGKDLLFKDSAHGFLKVPPRMDAKMYLGYEYVTAIRNLREGTCPEAPTDECKPVKWCALSHHERLKCDEWSVNSVGKIECVSAETTEDCIAKIMNGEADAMSLDGGFVYIAGKCGLVPVLAENYNKSDNCEDTPEAGYFAVAVVKKSASDLTWDNLKGKKSCHTAVGRTAGWNIPMGLLYNKINHCRFDEFFSEGCAPGSKKDSSLCKLCMGSGLNLCEPNNKEGYYGYTGAFRCLVEKGDVAFVKHQTVPQNTGGKNPDPWAKNLNEKDYELLCLDGTRKPVEEYANCHLARAPNHAVVTRKDKEACVHKILRQQQHLFGSNVTDCSGNFCLFRSETKDLLFRDDTVCLAKLHDRNTYEKYLGEEYVKAVGNLRKCSTSSLLEACTFRRP";
+            //protSequence = SimpleStringProcessing.Mutate(SimpleStringProcessing.Shuffle(protSequence), 3);
+
+            var protAnnotation = "_." + protSequence + "._";
+
+            const int modIndex = 0;
+            var aminoAcidSet = new AminoAcidSet();
+            var seqGraph = SequenceGraph.CreateGraph(aminoAcidSet, protAnnotation);
+
+            // Parameters
+            var productIonTolerance = new Tolerance(10);
+
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownDirect\ApoTransferrin_240k_N2HCD_2261_ETD_50avg.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+
+            var seqCompositionArr = seqGraph.GetSequenceCompositions();
+
+            var seqComposition = seqCompositionArr[modIndex];
+            Console.WriteLine("Protein mass: {0}", seqComposition.Mass);
+            var peptideComposition = seqComposition + Composition.H2O;
+            peptideComposition.GetIsotopomerEnvelop();
+
+            Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.Mass);
+            seqGraph.SetSink(modIndex, 0);
+
+            for (var ms2ScanNum = run.MinLcScan; ms2ScanNum <= run.MaxLcScan; ms2ScanNum++)
+            {
+                var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                Assert.True(spec != null);
+                var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, 1, 20);
+                var score = seqGraph.GetScore(0, scorer);
+                Console.WriteLine("{0}\t{1}", ms2ScanNum, score);
+            }
         }
 
         [Test]
@@ -223,7 +264,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTopDownSearch(
             string dbFilePath, string specFilePath, AminoAcidSet aaSet,
-            int minLength, int maxLength, int maxNumNTermCleavages,
+            int minLength, int maxLength, int maxNumNTermCleavages, 
             int minPrecursorIonCharge, int maxPrecursorIonCharge,
             int minProductIonCharge, int maxProductIonCharge,
             Tolerance precursorTolerance, Tolerance productIonTolerance,
@@ -239,7 +280,7 @@ namespace InformedProteomics.Test
             //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCosineMatches.txt");
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCorrScoreMatches.txt");
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
@@ -280,7 +321,7 @@ namespace InformedProteomics.Test
                     if (numProteins != 0)
                     {
                         sw.Stop();
-                        sec = (double) sw.ElapsedTicks/(double) System.Diagnostics.Stopwatch.Frequency;
+                        sec = sw.ElapsedTicks/(double) System.Diagnostics.Stopwatch.Frequency;
                         Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
@@ -302,8 +343,7 @@ namespace InformedProteomics.Test
                     //var compSet = new HashSet<Composition>();
                     var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);
                     if (ultraMod)
-                        Console.WriteLine("#NTermCleavages: {0}, #ProteinCompositions: ", numNTermCleavage,
-                            protCompositions.Length);
+                        Console.WriteLine("#NTermCleavages: {0}, #ProteinCompositions: ", numNTermCleavage);
                     for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
                     {
                         if (ultraMod)
@@ -331,9 +371,9 @@ namespace InformedProteomics.Test
                                 numPrecursorIonsPassingFilter++;
                                 var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                                 if (spec == null) continue;
-                                //var scorer = new MatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
-                                var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance,
-                                    minProductIonCharge, maxProductIonCharge);
+                                var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
+                                //var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance,
+                                //    minProductIonCharge, maxProductIonCharge);
                                 var score = seqGraph.GetScore(charge, scorer);
 
                                 if (score <= 0) continue;
@@ -615,7 +655,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.-";
             var aaSet = new AminoAcidSet();
 

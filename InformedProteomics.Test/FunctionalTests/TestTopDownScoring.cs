@@ -17,11 +17,11 @@ namespace InformedProteomics.Test.FunctionalTests
     class TestTopDownScoring
     {
         [Test]
-        public void TestCosineLikelihoodScorer()
+        public void TestLikelihoodScorer()
         {
 //            Console.WriteLine(Convert.ToDouble("0"));
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCosineMatches.txt");
-            Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.35, 400));
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCorrScoreMatches.txt");
+            Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.01, 700000));
         }
 
         [Test]

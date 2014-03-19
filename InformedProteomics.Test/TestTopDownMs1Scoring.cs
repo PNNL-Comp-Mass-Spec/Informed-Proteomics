@@ -147,7 +147,7 @@ namespace InformedProteomics.Test
                 };
             var aaSet = new AminoAcidSet(searchModifications, 0);
             var precursorTolerance = new Tolerance(10);
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             var writer = new StreamWriter(msAlignPlusResultPath+ ".txt");
             var reader = new StreamReader(msAlignPlusResultPath);
 
@@ -219,7 +219,7 @@ namespace InformedProteomics.Test
 
           //  TopDownScorer.MaxCharge = 60;
           //  TopDownScorer.MinCharge = 3;
-            var run = new LcMsRun(new XCaliburReader(specFilePath));
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             
             foreach (var protComposition in seqGraph.GetSequenceCompositions())
             {

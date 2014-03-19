@@ -34,8 +34,7 @@ namespace InformedProteomics.Test
             var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
 
             const string rawFilePath = @"D:\Research\Data\EDRN\RawFiles\DIA\342935_EDRN_Serum_07_DIA_2_12Nov13_Samwise_13-07-28.raw";
-            var reader = new XCaliburReader(rawFilePath);
-            var run = new LcMsRun(reader);
+            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
 
             var sw = new System.Diagnostics.Stopwatch();
 

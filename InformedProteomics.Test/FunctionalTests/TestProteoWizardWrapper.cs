@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using InformedProteomics.Backend.MassSpecData;
+﻿using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
-namespace InformedProteomics.Test
+namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
     internal class TestProteoWizardWrapper
@@ -26,18 +24,6 @@ namespace InformedProteomics.Test
             //var intensities = new[] {10000.0};
             //var centroider = new Centroider(mzs, intensities);
             //centroider.GetCentroidedData(out mzs, out intensities);
-        }
-
-        [Test]
-        public void TestReadingXCaliburRun()
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            var run = new LcMsRun(new XCaliburReader(TestRawFilePath));
-            Console.WriteLine("{0}\t{1}", run.MinLcScan, run.MaxLcScan);
-            sw.Stop();
-            var sec = (double)sw.ElapsedTicks / Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
         }
     }
 }

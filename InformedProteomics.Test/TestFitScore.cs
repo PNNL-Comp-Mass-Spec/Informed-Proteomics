@@ -85,29 +85,28 @@ namespace InformedProteomics.Test
                         _relativeIntensityThreshold);
                 }
 
-                var decoyprefixWorstScore = decoysuffixTable.WorstScore;
+                var decoyprefixWorstScore = decoyprefixTable.WorstScore;
                 var decoysuffixWorstScore = decoysuffixTable.WorstScore;
 
                 var decoyprefixhistograms = decoyprefixTable.Histograms;
                 var decoysuffixhistograms = decoysuffixTable.Histograms;
 
                 var outFileName = _outFileName.Replace("@", name);
-                var outFileNameIon = outFileName.Replace("*", "B");
-                PrintOutput(outFileNameIon, prefixEdges, prefixhistograms, decoyprefixhistograms, prefixWorstScore, decoyprefixWorstScore);
+                PrintOutput(outFileName, prefixEdges, prefixhistograms, decoyprefixhistograms, prefixWorstScore, decoyprefixWorstScore, "B");
 
                 outFileName = _outFileName.Replace("@", name);
-                outFileNameIon = outFileName.Replace("*", "Y");
-                PrintOutput(outFileNameIon, suffixEdges, suffixhistograms, decoysuffixhistograms, suffixWorstScore, decoysuffixWorstScore);
+                PrintOutput(outFileName, suffixEdges, suffixhistograms, decoysuffixhistograms, suffixWorstScore, decoysuffixWorstScore, "Y");
             }
         }
 
         // Print tables to output file
         void PrintOutput(string fileName, double[] edges,
                 List<Histogram<FitScore>> targethist, List<Histogram<FitScore>> decoyhist,
-                Probability targetWorst, Probability decoyWorst)
+                Probability targetWorst, Probability decoyWorst, string ionName)
         {
-            using (var outFile = new StreamWriter(fileName))
+            using (StreamWriter outFile = File.AppendText(fileName))
             {
+                outFile.WriteLine("Ion\t{0}", ionName);
                 outFile.WriteLine("Intensity\tScore\tTarget\tDecoy");
                 outFile.WriteLine("None\t0\t{0}\t{1}", targetWorst.Found, decoyWorst.Found);
                 for (int i = 0; i < _intensityBins; i++)

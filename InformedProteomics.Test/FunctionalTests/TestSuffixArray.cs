@@ -1,15 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using NUnit.Framework;
-using SuffixArray;
 
-namespace InformedProteomics.Test
+namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
     public class TestSuffixArray
@@ -23,7 +21,7 @@ namespace InformedProteomics.Test
             const int numMissedCleavages = 1;
             var enzyme = Enzyme.Trypsin;
 
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var targetDb = new FastaDatabase(dbFilePath);
 
             var indexedDbTarget = new IndexedDatabase(targetDb);
@@ -39,7 +37,6 @@ namespace InformedProteomics.Test
                 var annotation = annotationAndOffset.Annotation;
                 var pepSequence = annotation.Substring(2, annotation.Length - 4);
                 var pepComposition = aminoAcidSet.GetComposition(pepSequence) + Composition.H2O;
-                var mass = pepComposition.Mass;
                 numPeptides++;
                 for (var charge = 2; charge < 3; charge++)
                 {
@@ -59,20 +56,6 @@ namespace InformedProteomics.Test
             }
         }
 
-        [Test]
-        public void TestReadingIndexedDatabase()
-        {
-            //const string dbFile = @"C:\cygwin\home\kims336\Research\SuffixArray\uniprot_sprot_bacterial_ALLEntries_fungal_decoy_2009-05-28.fasta";
-            //const string dbFile = @"D:\Research\Data\CompRef\H_sapiens_M_musculus_Trypsin_NCBI_Build37_2011-12-02.fasta";
-            const string dbFile = @"..\..\..\TestFiles\BSA.fasta";
-
-            var database = new FastaDatabase(dbFile);
-            database.Read();
-            database.PrintSequence();
-            Console.WriteLine("Done");
-        }
-
-        [Test]
         public void TestReadingBigFile()
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -81,37 +64,9 @@ namespace InformedProteomics.Test
             var lastLine = File.ReadLines(bigDbFile).Last();
             sw.Stop();
 
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            System.Console.WriteLine(@"{0:f4} sec", sec);
-            System.Console.WriteLine(lastLine);
-        }
-
-        [Test]
-        public void TestSuffixArrayGeneration()
-        {
-            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\test.fasta";
-            //const string dbFile = @"D:\Research\Data\CompRef\H_sapiens_M_musculus_Trypsin_NCBI_Build37_2011-12-02.fasta";
-            //const string dbFile = @"..\..\..\TestFiles\BSA.fasta";
-
-            var fileStream = new FileStream(dbFile, FileMode.Open, FileAccess.Read);
-            var text = new byte[fileStream.Length];
-            var suffixArray = new int[fileStream.Length];
-
-            fileStream.Read(text, 0, text.Length);
-
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            SAIS.sufsort(text, suffixArray, text.Length);
-            sw.Stop();
-
-            Console.WriteLine("Text: " + Encoding.UTF8.GetString(text));
-            foreach (var index in suffixArray)
-            {
-                Console.WriteLine(Encoding.ASCII.GetString(text, index, text.Length-index));
-            }
-
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            System.Console.WriteLine(@"{0:f4} sec", sec);
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+            Console.WriteLine(lastLine);
         }
 
         [Test]
@@ -120,12 +75,12 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\SuffixArray\BSA.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\BSA.fasta";
             var db = new FastaDatabase(dbFile);
-            var decoyDb = db.Decoy(Enzyme.Trypsin);
+            db.Decoy(Enzyme.Trypsin);
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            System.Console.WriteLine(@"{0:f4} sec", sec);
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
         }
     }
 }
