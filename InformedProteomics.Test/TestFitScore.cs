@@ -62,6 +62,9 @@ namespace InformedProteomics.Test
                     suffixTable.AddMatches(matchList, _suffixionTypes.ToArray(), _defaultTolerance, _relativeIntensityThreshold);
                 }
 
+                var prefixWorstScore = prefixTable.WorstScore;
+                var suffixWorstScore = suffixTable.WorstScore;
+
                 var prefixhistograms = prefixTable.Histograms;
                 var suffixhistograms = suffixTable.Histograms;
                 var prefixEdges = prefixTable.IntensityBins;
@@ -82,33 +85,38 @@ namespace InformedProteomics.Test
                         _relativeIntensityThreshold);
                 }
 
+                var decoyprefixWorstScore = decoysuffixTable.WorstScore;
+                var decoysuffixWorstScore = decoysuffixTable.WorstScore;
+
                 var decoyprefixhistograms = decoyprefixTable.Histograms;
                 var decoysuffixhistograms = decoysuffixTable.Histograms;
 
                 var outFileName = _outFileName.Replace("@", name);
                 var outFileNameIon = outFileName.Replace("*", "B");
-                PrintOutput(outFileNameIon, prefixEdges, prefixhistograms, decoyprefixhistograms);
+                PrintOutput(outFileNameIon, prefixEdges, prefixhistograms, decoyprefixhistograms, prefixWorstScore, decoyprefixWorstScore);
 
                 outFileName = _outFileName.Replace("@", name);
                 outFileNameIon = outFileName.Replace("*", "Y");
-                PrintOutput(outFileNameIon, suffixEdges, suffixhistograms, decoysuffixhistograms);
+                PrintOutput(outFileNameIon, suffixEdges, suffixhistograms, decoysuffixhistograms, suffixWorstScore, decoysuffixWorstScore);
             }
         }
 
         // Print tables to output file
         void PrintOutput(string fileName, double[] edges,
-                List<Histogram<FitScore>> targethist, List<Histogram<FitScore>> decoyhist)
+                List<Histogram<FitScore>> targethist, List<Histogram<FitScore>> decoyhist,
+                Probability targetWorst, Probability decoyWorst)
         {
             using (var outFile = new StreamWriter(fileName))
             {
                 outFile.WriteLine("Intensity\tScore\tTarget\tDecoy");
+                outFile.WriteLine("None\t0\t{0}\t{1}", targetWorst.Found, decoyWorst.Found);
                 for (int i = 0; i < _intensityBins; i++)
                 {
                     var prefixfrequencies = targethist[i].Frequencies;
                     var decoyprefixfrequencies = decoyhist[i].Frequencies;
                     for (int j = 0; j < prefixfrequencies.Count; j++)
                     {
-                        outFile.WriteLine("{0}\t{1}\t{2}\t{3}", edges[i], _binEdges[j],
+                        outFile.WriteLine("{0}\t{1}\t{2}\t{3}", Math.Round(edges[i], 2), _binEdges[j],
                             prefixfrequencies[j].Found, decoyprefixfrequencies[j].Found);
                     }
                 }
