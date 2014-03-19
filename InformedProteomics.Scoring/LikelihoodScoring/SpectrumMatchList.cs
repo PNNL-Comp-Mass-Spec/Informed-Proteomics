@@ -23,10 +23,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private const string PrecursorChargeHeader = "Charge";
         private const string PeptideHeader = "Peptide";
+        private const int NumMutations = 3;
 
-        public List<SpectrumMatch> Matches; 
+        public List<SpectrumMatch> Matches;
 
-        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act)
+        private string Trim(string prot)
+        {
+            int start = prot.IndexOf('.') + 1;
+            int length = prot.LastIndexOf('.') - start;
+            return prot.Substring(start, length);
+        }
+
+        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false)
         {
             Matches = new List<SpectrumMatch>();
 
@@ -47,11 +55,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
                 for (int i = 0; i < peptides.Count; i++)
                 {
-                    if (Convert.ToDouble(filterValues[i]) > filterThreshold) continue;
+                    if (peptides[i].Contains('[') || peptides[i].Contains('U') || Convert.ToDouble(filterValues[i]) > filterThreshold) continue;
                     var spectrum = lcms.GetSpectrum(Convert.ToInt32(scans[i]));
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
+                    peptides[i] = Trim(peptides[i]);
+                    if (useDecoy)
+                    {
+                        var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
+                        peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
+                    }
                     Matches.Add(new SpectrumMatch(peptides[i], spectrum, precursorCharge, new Sequence(peptides[i], aset)));
                 }
             }
@@ -71,6 +85,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
+                    if (useDecoy)
+                    {
+                        var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
+                        peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
+                    }
                     if (formulas[i] != null)
                         Matches.Add(new SpectrumMatch(peptides[i], spectrum, precursorCharge, formulas[i]));
                     else

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
@@ -63,7 +64,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 if (_prefixes == null)
                 {
                     _prefixes = new List<Composition>();
-                    for (int i = 1; i <= Peptide.Length; i++)
+                    for (int i = 1; i < Peptide.Length; i++)
                     {
                         _prefixes.Add(_sequence.GetComposition(0, i));
                     }
@@ -79,7 +80,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 if (_suffixes == null)
                 {
                     _suffixes = new List<Composition>();
-                    for (int i = 1; i <= Peptide.Length; i++)
+                    for (int i = 1; i < Peptide.Length; i++)
                     {
                         _suffixes.Add(_sequence.GetComposition(Peptide.Length - i, Peptide.Length));
                     }
@@ -100,11 +101,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public List<Ion> GetCleavageIons(IonType ionType)
         {
-            var ionTypeName = ionType.Name[0];
             var compositions = new List<Composition>();
-            if (ionTypeName == 'a' || ionTypeName == 'b' || ionTypeName == 'c')
+            if (ionType.BaseIonType == BaseIonType.A || ionType.BaseIonType == BaseIonType.B || ionType.BaseIonType == BaseIonType.C)
                 compositions = Prefixes;
-            else if (ionTypeName == 'x' || ionTypeName == 'y' || ionTypeName == 'z')
+            else if (ionType.BaseIonType == BaseIonType.X || ionType.BaseIonType == BaseIonType.Y || ionType.BaseIonType == BaseIonType.Z)
                 compositions = Suffixes;
 
             return compositions.Select(ionType.GetIon).ToList();

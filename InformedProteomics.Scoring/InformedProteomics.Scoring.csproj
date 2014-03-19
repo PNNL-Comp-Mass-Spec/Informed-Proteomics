@@ -63,11 +63,16 @@
     <Compile Include="BottomUp\RankScorer.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
     <Compile Include="LikelihoodScoring\ConfigFileReader.cs" />
+    <Compile Include="LikelihoodScoring\FitScore.cs" />
+    <Compile Include="LikelihoodScoring\FitScoreList.cs" />
+    <Compile Include="LikelihoodScoring\Histogram.cs" />
     <Compile Include="LikelihoodScoring\IonProbability.cs" />
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
     <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\Probability.cs" />
     <Compile Include="LikelihoodScoring\RankedPeaks.cs" />
     <Compile Include="LikelihoodScoring\RankTable.cs" />
+    <Compile Include="LikelihoodScoring\ScoreTable.cs" />
     <Compile Include="LikelihoodScoring\SpectrumMatch.cs" />
     <Compile Include="GeneratingFunction\ScoreDistribution.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphEdge.cs" />
