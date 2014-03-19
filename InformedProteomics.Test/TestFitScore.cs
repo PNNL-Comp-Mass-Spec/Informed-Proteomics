@@ -36,7 +36,7 @@ namespace InformedProteomics.Test
         [Test]
         public void CorrScore()
         {
-            InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\CosineScoreConfig.ini"));
+            InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\TopDown\CorrScore\ScoreConfig.ini"));
 
             foreach (var name in _names)
             {
