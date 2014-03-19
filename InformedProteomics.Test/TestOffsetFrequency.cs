@@ -68,7 +68,7 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < _precursorCharge; i++)
                 {
                     var outFileCharge = outFile.Replace("*", (i + 1).ToString());
-                    var offsetFrequencies = new List<IonProbability>();
+                    List<IonProbability> offsetFrequencies;
                     if (_combineCharges)
                         offsetFrequencies = offsetFrequencyFunctions[i].GetCombinedChargeTable(_ionTypeFactory).ToList();
                     else
@@ -77,7 +77,7 @@ namespace InformedProteomics.Test
                     {
                         foreach (var ionProbability in offsetFrequencies)
                         {
-                            finalOutputFile.WriteLine("{0}\t{1}", ionProbability.Ion.Name, ionProbability.Probability);
+                            finalOutputFile.WriteLine("{0}\t{1}", ionProbability.Ion.Name, ionProbability.Prob);
                         }
                     }
                 }

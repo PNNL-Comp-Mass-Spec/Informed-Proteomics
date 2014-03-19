@@ -14,7 +14,6 @@ namespace InformedProteomics.Test
     [TestFixture]
     class TestRankPeakProbability
     {
-
         private string[] _names;
         private string _preTsv;
         private string _preRaw;
@@ -91,7 +90,7 @@ namespace InformedProteomics.Test
                             outFile.Write(i+1 + "\t");
                             for (int j = 0; j < _ionTypes.Count; j++)
                             {
-                                var ionProbability = rankProbabilites[i, j].Probability;
+                                var ionProbability = rankProbabilites[i, j].Prob;
                                 totalRankProbability += ionProbability;
                                 outFile.Write("{0}\t", ionProbability);
                             }
