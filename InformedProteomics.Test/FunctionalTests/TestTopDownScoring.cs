@@ -20,8 +20,8 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestLikelihoodScorer()
         {
 //            Console.WriteLine(Convert.ToDouble("0"));
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCorrScoreMatches.txt");
-            Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.01, 700000));
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filtration_2.txt");
+            Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.99, 1200));
         }
 
         [Test]

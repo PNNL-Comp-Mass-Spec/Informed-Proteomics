@@ -92,10 +92,14 @@ namespace InformedProteomics.Test
                 var decoysuffixhistograms = decoysuffixTable.Histograms;
 
                 var outFileName = _outFileName.Replace("@", name);
-                PrintOutput(outFileName, prefixEdges, prefixhistograms, decoyprefixhistograms, prefixWorstScore, decoyprefixWorstScore, "B");
-
-                outFileName = _outFileName.Replace("@", name);
-                PrintOutput(outFileName, suffixEdges, suffixhistograms, decoysuffixhistograms, suffixWorstScore, decoysuffixWorstScore, "Y");
+                using (var outFile = File.AppendText(outFileName))
+                {
+                    outFile.WriteLine("Ions\t2\tb\ty");
+                    outFile.WriteLine("NumScoreBins\t{0}", _scoreBins.Length);
+                    outFile.WriteLine("NumIntensityBins\t{0}", _intensityBins);
+                }
+                PrintOutput(outFileName, prefixEdges, prefixhistograms, decoyprefixhistograms, prefixWorstScore, decoyprefixWorstScore, "b");
+                PrintOutput(outFileName, suffixEdges, suffixhistograms, decoysuffixhistograms, suffixWorstScore, decoysuffixWorstScore, "y");
             }
         }
 
@@ -107,17 +111,19 @@ namespace InformedProteomics.Test
             using (StreamWriter outFile = File.AppendText(fileName))
             {
                 outFile.WriteLine("Ion\t{0}", ionName);
-                outFile.WriteLine("Intensity\tScore\tTarget\tDecoy");
-                outFile.WriteLine("None\t0\t{0}\t{1}", targetWorst.Found, decoyWorst.Found);
-                for (int i = 0; i < _intensityBins; i++)
+                outFile.Write("Intensities");
+                for (var i = 0; i < _intensityBins; i++) outFile.Write("\t" + Math.Round(intensities[i], 2));
+                outFile.WriteLine();
+                outFile.WriteLine("Scores\t" + string.Join("\t", _scoreBins));
+                
+                // numbers for missing ions
+                outFile.WriteLine("MissingIons\t{0}\t{1}", targetWorst.Found, decoyWorst.Found);
+
+                // numbers depending on intensities
+                for (var i = 0; i < _intensityBins; i++)
                 {
-                    var prefixfrequencies = targethist[i].Frequencies;
-                    var decoyprefixfrequencies = decoyhist[i].Frequencies;
-                    for (int j = 0; j < prefixfrequencies.Count; j++)
-                    {
-                        outFile.WriteLine("{0}\t{1}\t{2}\t{3}", Math.Round(intensities[i], 2), _scoreBins[j],
-                            prefixfrequencies[j].Found, decoyprefixfrequencies[j].Found);
-                    }
+                    outFile.WriteLine(string.Join("\t", targethist[i].Frequencies.Select(p => p.Found)));
+                    outFile.WriteLine(string.Join("\t", decoyhist[i].Frequencies.Select(p => p.Found)));
                 }
             }
         }

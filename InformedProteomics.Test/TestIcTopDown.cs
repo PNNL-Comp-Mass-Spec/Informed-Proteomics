@@ -277,10 +277,10 @@ namespace InformedProteomics.Test
 
             sw.Start();
             Console.Write("Reading raw file...");
-            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\cidCorrScoreMatches.txt");
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_2.txt");
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
@@ -371,12 +371,11 @@ namespace InformedProteomics.Test
                                 numPrecursorIonsPassingFilter++;
                                 var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                                 if (spec == null) continue;
-                                var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
-                                //var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance,
-                                //    minProductIonCharge, maxProductIonCharge);
+                                //var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
+                                var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
                                 var score = seqGraph.GetScore(charge, scorer);
 
-                                if (score <= 0) continue;
+                                if (score <= -50) continue;
 
                                 double existingBestScore;
                                 if (bestScorePerScan.TryGetValue(ms2ScanNum, out existingBestScore) &&

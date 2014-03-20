@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
                 var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelop();
 
-                var bestCosineScore = 0.0;
+                var bestCorrScore = 0.0;
                 var bestObsIntensity = -1.0;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
@@ -54,15 +54,16 @@ namespace InformedProteomics.TopDown.Scoring
                         var observedPeak = observedPeaks[i];
                         observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
                     }
-                    var cosineScore = FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
-                    if (cosineScore > bestCosineScore)
+//                    var corrScore = FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
+                    var corrScore = FitScoreCalculator.GetPearsonCorrelation(isotopomerEnvelope, observedIntensities);
+                    if (corrScore > bestCorrScore)
                     {
-                        bestCosineScore = cosineScore;
+                        bestCorrScore = corrScore;
                         bestObsIntensity = observedIntensities.Max();
                     }
                 }
 //                Console.WriteLine("{0} {1}: {2}", baseIonType.Symbol, prefixFragmentComposition, _model.GetScore(baseIonType, bestCosineScore, bestObsIntensity));
-                score += _model.GetScore(baseIonType, bestCosineScore, bestObsIntensity);
+                score += _model.GetScore(baseIonType, bestCorrScore, bestObsIntensity);
             }
             return score;
         }
