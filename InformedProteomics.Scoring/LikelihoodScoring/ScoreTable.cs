@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
@@ -22,7 +21,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             {
                 if (IntensityBins == null)
                 {
-                    _intensityHistogram.Equalize(_intensityBinCount);
+                    _intensityHistogram.Equalize(_intensityBinCount, new FitScore(0,0));
                     var edgeList = new FitScoreList(_intensityHistogram.BinEdges);
                     IntensityBins = edgeList.Intensities;
                 }
@@ -116,8 +115,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public void AddMatches(List<SpectrumMatch> matches, IonType[] ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool reduceCharges=true)
         {
-            var scores = new List<FitScore>();
-
             foreach (var match in matches)
             {
                 var spectrum = match.Spectrum;
@@ -130,8 +127,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var ionTypeScores = new Dictionary<string, FitScoreList>();
                     foreach (var ionType in ionTypes)
                     {
-                        var cleavagePoints = new List<Composition>();
-                        cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
+                        var cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
 
                         var ion = ionType.GetIon(cleavagePoints[i]);
 
@@ -154,25 +150,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
                     }
                     var bestScores = SelectBestScores(ionTypeScores);
-                    var filteredScores = new FitScoreList();
-                    foreach (var score in bestScores)
+                    foreach (var bestscore in bestScores)
                     {
+                        var score = bestscore.Score;
+                        if (_method == ScoreMethod.FitScore)
+                            score = 1 - score;
                         WorstScore.Total++;
-                        if (score.Intensity.Equals(-1))
+                        if (score.Equals(0))
                             WorstScore.Found++;
-                        else if (score.Score.Equals(0))
-                        {
-                            filteredScores.Add(score);
-                            WorstScore.Found++;
-                        }
-                        else
-                            filteredScores.Add(score);
                     }
-                    scores.AddRange(filteredScores);
+                    _intensityHistogram.AddData(bestScores);
                 }
             }
-
-            _intensityHistogram.AddData(scores);
         }
     }
 }

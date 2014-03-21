@@ -74,14 +74,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public void Equalize(int bins)
+        private void Equalize(int bins, List<T1> datacollection)
         {
-            var datacollection = new List<T1>();
-            foreach (var bin in Bins)
-            {
-                datacollection.AddRange(bin);
-            }
-
             if (datacollection.Count == 0) return;
             datacollection.Sort(_compare);
 
@@ -94,14 +88,45 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             int binSize = datacollection.Count / bins;
             for (int j = 0; j < bins; j++)
             {
-                int min = j*binSize;
+                int min = j * binSize;
                 Bins[j].AddRange(datacollection.GetRange(min, binSize));
                 BinEdges[j] = datacollection[min];
 
-                if (j == bins-1)
-                    Bins[j].AddRange(datacollection.GetRange(min+binSize, datacollection.Count-(min+binSize)));
+                if (j == bins - 1)
+                    Bins[j].AddRange(datacollection.GetRange(min + binSize, datacollection.Count - (min + binSize)));
             }
             Total = datacollection.Count;
+        }
+
+        public void Equalize(int bins)
+        {
+            var datacollection = new List<T1>();
+            foreach (var bin in Bins)
+            {
+                datacollection.AddRange(bin);
+            }
+            Equalize(bins, datacollection);
+        }
+
+        public void Equalize(int bins, T1 minimum)
+        {
+            var datacollection = new List<T1>();
+            foreach (var bin in Bins)
+            {
+                datacollection.AddRange(bin);
+            }
+
+            var excludeLow = new List<T1>();
+            for (int i = 0; i < datacollection.Count; i++)
+            {
+                if (_compare.Compare(datacollection[i], minimum) >= 0)
+                {
+                    excludeLow.Add(datacollection[i]);
+                }
+            }
+            Equalize(bins, excludeLow);
+            if (bins > 0)
+                BinEdges[0] = minimum;
         }
 
         public void Compute(List<T1> data)

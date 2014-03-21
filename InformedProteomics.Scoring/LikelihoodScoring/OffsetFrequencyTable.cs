@@ -13,45 +13,63 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _offsetFrequencies = new Dictionary<string, IonProbability>();
         }
 
-        public IEnumerable<IonProbability> IonProbabilityTable
+        public List<IonProbability> IonProbabilityTable
         {
-            get { return _offsetFrequencies.Values; }
+            get { return _offsetFrequencies.Values.ToList(); }
         }
 
-        public IEnumerable<IonProbability> GetCombinedChargeTable(IonTypeFactory ionTypeFactory)
+        private string ReducedChargeName(IonType ionType)
         {
-            var tempOff = new Dictionary<string, IonProbability>();
-
-            foreach (var key in _offsetFrequencies.Keys)
-            {
-                if (_offsetFrequencies[key].Ion.Charge > 1)
-                {
-                    var reducedChargeName = key.Remove(1, 1);
-                    if (!_offsetFrequencies.ContainsKey(reducedChargeName))
-                        _offsetFrequencies.Add(reducedChargeName, new IonProbability(ionTypeFactory.GetIonType(reducedChargeName)));
-                    tempOff[reducedChargeName] += _offsetFrequencies[key];
-                }
-                else
-                {
-                    tempOff.Add(key, _offsetFrequencies[key]);
-                }
-            }
-            return tempOff.Values;
+            string name = ionType.Name;
+            if (ionType.Charge > 1 && ionType.Charge < 10)
+                name = name.Remove(1, 1);
+            if (ionType.Charge >= 10)
+                name = name.Remove(1, 2);
+            return name;
         }
 
-        public void AddCleavageProbabilities(IEnumerable<SpectrumMatch> matches, IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold)
+        public void AddCleavageProbabilities(List<SpectrumMatch> matches, List<IonType> ionTypes,
+            Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges)
         {
             foreach (var match in matches)
             {
-                foreach (var ionType in ionTypes)
+                var spectrum = match.Spectrum;
+
+                var prefixes = match.Prefixes;
+                var suffixes = match.Suffixes;
+
+                for (int i = 0; i < prefixes.Count; i++)
                 {
-                    var prob = match.ContainsCleavageIons(ionType, tolerance, relativeIntensityThreshold);
-                    AddIonProbability(prob);
+                    var ionTypeFound = new Dictionary<string, bool>();
+                    foreach (var ionType in ionTypes)
+                    {
+                        var name = ionType.Name;
+                        if (combineCharges)
+                            name = ReducedChargeName(ionType);
+                        if (!ionTypeFound.ContainsKey(name))
+                            ionTypeFound.Add(name, false);
+
+                        var cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
+
+                        var ion = ionType.GetIon(cleavagePoints[i]);
+
+                        if (spectrum.ContainsIon(ion, tolerance, relativeIntensityThreshold))
+                        {
+                            ionTypeFound[name] = true;
+                        }
+                    }
+                    foreach (var key in ionTypeFound.Keys)
+                    {
+                        int found = 0;
+                        int total = 1;
+                        if (ionTypeFound[key]) found = 1;
+                        AddIonProbability(new IonProbability(key, found, total));
+                    }
                 }
             }
         }
 
-        public void AddPrecursorProbabilities(IEnumerable<SpectrumMatch> matches, IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold)
+        public void AddPrecursorProbabilities(List<SpectrumMatch> matches, List<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold)
         {
             foreach (var match in matches)
             {
@@ -61,7 +79,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     int found = 0;
                     int total = 1;
                     if (conIon) found = 1;
-                    var prob = new IonProbability(ionType, found, total); 
+                    var prob = new IonProbability(ionType.Name, found, total); 
                     AddIonProbability(prob);
                 }
             }
@@ -69,7 +87,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public void AddIonProbability(IonProbability probability)
         {
-            var name = probability.Ion.Name;
+            var name = probability.IonName;
             if (_offsetFrequencies.ContainsKey(name))
             {
                 _offsetFrequencies[name].Found += probability.Found;
@@ -80,7 +98,5 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 _offsetFrequencies.Add(name, probability);
             }
         }
-
-
     }
 }

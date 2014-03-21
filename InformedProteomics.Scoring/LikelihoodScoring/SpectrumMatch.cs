@@ -109,7 +109,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             var ions = GetCleavageIons(ionType);
 
-            var probability = new IonProbability(ionType);
+            var probability = new IonProbability(ionType.Name);
             foreach (var ion in ions)
             {
                 probability.Total++;
