@@ -1,18 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.IMS.IMS;
-using InformedProteomics.IMS.IMSScoring;
-using InformedProteomics.IMS.IMSTraining;
-using InformedProteomics.Backend.Utils;
-using NUnit.Framework;
-using UIMFLibrary;
-using Feature = InformedProteomics.IMS.IMS.Feature;
-using IonType = InformedProteomics.Backend.Data.Spectrometry.IonType;
+﻿using NUnit.Framework;
 
 namespace InformedProteomics.Test
 {

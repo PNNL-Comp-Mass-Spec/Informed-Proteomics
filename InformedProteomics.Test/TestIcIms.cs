@@ -1,21 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Enum;
-using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
-using InformedProteomics.IMS.IMS;
-using InformedProteomics.IMS.IMSScoring;
-using MultiDimensionalPeakFinding;
-using NUnit.Framework;
-using UIMFLibrary;
-using Feature = InformedProteomics.IMS.IMS.Feature;
+﻿using NUnit.Framework;
 
 namespace InformedProteomics.Test
 {

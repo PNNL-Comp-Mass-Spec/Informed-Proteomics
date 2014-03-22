@@ -9,7 +9,6 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Scoring;
 using MathNet.Numerics;
 using NUnit.Framework;
@@ -22,12 +21,24 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSbepSearch()
         {
+            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw";
+            foreach (var specFilePath in Directory.GetFiles(dirPath))
+            {
+                if (!specFilePath.EndsWith(".raw")) continue;
+                Console.WriteLine("Processing {0}", specFilePath);
+                TestSbepSearch(specFilePath);
+            }
+        }
+
+        [Test]
+        public void TestSbepSearch(string specFilePath)
+        {
             // Search parameters
             const int maxNumNTermCleavages = 1;  // 30
             const int minLength = 7;    // 7
             const int maxLength = 300; // 1000
             const int minPrecursorIonCharge = 3; // 3
-            const int maxPrecursorIonCharge = 40;// 67
+            const int maxPrecursorIonCharge = 30;// 67
             const int minProductIonCharge = 1; // 1
             const int maxProductIonCharge = 10;// 10
             const int numMaxModsPerProtein = 0; // 6
@@ -43,7 +54,7 @@ namespace InformedProteomics.Test
             //            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\P01031.fasta";
 
             //            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
 
             // Configure amino acid set
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
@@ -277,10 +288,10 @@ namespace InformedProteomics.Test
 
             sw.Start();
             Console.Write("Reading raw file...");
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
-            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_2.txt");
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filteration_SBEP.txt");
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);

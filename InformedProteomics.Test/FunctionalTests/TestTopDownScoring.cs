@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.TopDown.Scoring;
-using MathNet.Numerics.LinearAlgebra.Generic.Solvers.Status;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests
@@ -16,6 +12,14 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     class TestTopDownScoring
     {
+        [Test]
+        public void PrintAllScorers()
+        {
+            //            Console.WriteLine(Convert.ToDouble("0"));
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filteration_SBEP_1.txt");
+            scoringModel.PrintAllScores();
+        }
+
         [Test]
         public void TestLikelihoodScorer()
         {

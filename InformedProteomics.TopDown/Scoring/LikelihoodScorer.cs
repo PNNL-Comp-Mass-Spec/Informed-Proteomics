@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
                 fragmentComposition.ComputeApproximateIsotopomerEnvelop();
                 var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelop();
 
-                var bestCorrScore = 0.0;
+                var bestCorrScore = -1.0;
                 var bestObsIntensity = -1.0;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
@@ -62,7 +62,7 @@ namespace InformedProteomics.TopDown.Scoring
                         bestObsIntensity = observedIntensities.Max();
                     }
                 }
-//                Console.WriteLine("{0} {1}: {2}", baseIonType.Symbol, prefixFragmentComposition, _model.GetScore(baseIonType, bestCosineScore, bestObsIntensity));
+
                 score += _model.GetScore(baseIonType, bestCorrScore, bestObsIntensity);
             }
             return score;

@@ -10,8 +10,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class SpectrumMatchList
     {
-        private const string TopDownScanHeader = "Scan(s)";
-        private const string FdrHeader = "FDR";
+        //private const string TopDownScanHeader = "Scan(s)";
+        //private const string FdrHeader = "FDR";
+        //private const string EvalueHeader = "E-value";
+        //private const double FdrThreshold = 0.01;
+        //private const double EValueThreshold = 0.1;
+
+        // Changed by Sangtae
+        private const string TopDownScanHeader = "ScanNum";
+        private const string FdrHeader = "Qvalue";
         private const string EvalueHeader = "E-value";
         private const double FdrThreshold = 0.01;
         private const double EValueThreshold = 0.1;
@@ -22,7 +29,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private const string FormulaHeader = "Formula";
 
         private const string PrecursorChargeHeader = "Charge";
-        private const string PeptideHeader = "Peptide";
+        private const string PeptideHeader = "Annotation";
         private const int NumMutations = 3;
 
         public List<SpectrumMatch> Matches;
@@ -60,7 +67,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    peptides[i] = Trim(peptides[i]);
+                    //peptides[i] = Trim(peptides[i]);
                     if (useDecoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);

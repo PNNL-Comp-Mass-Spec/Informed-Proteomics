@@ -25,15 +25,27 @@ namespace InformedProteomics.TopDown.Scoring
             var scoreIndex = (int)(score*_numScoreBins);
             if (scoreIndex >= _numScoreBins) scoreIndex = _numScoreBins - 1;
 
-            //if (intensityIndex < 0 || intensityIndex >= _numIntensityBins)
-            //{
-            //    Console.Write("IntensityIndex: {0}", intensityIndex);
-            //}
-            //if (scoreIndex < 0 || scoreIndex >= _numScoreBins)
-            //{
-            //    Console.Write("ScoreIndex: {0}", scoreIndex);
-            //}
             return _ionScore[ionTypeIndex, intensityIndex, scoreIndex];
+        }
+
+        public void PrintAllScores()
+        {
+            for (var ionBin = 0; ionBin < _numIons; ionBin++)
+            {
+                Console.WriteLine("{0} ion", ionBin == 0 ? "b" : "y");
+                Console.WriteLine("\t" + string.Join("\t", _scoreBoundaries[ionBin]));
+                for (var intBin = 0; intBin < _numIntensityBins; intBin++)
+                {
+                    Console.Write("{0:F2}-{1}",
+                        _intensityBoundaries[ionBin][intBin], 
+                        (intBin == _numIntensityBins-1 ? "" : string.Format("{0:F2}",_intensityBoundaries[ionBin][intBin + 1])));
+                    for (var scoreBin = 0; scoreBin < _numScoreBins; scoreBin++)
+                    {
+                        Console.Write("\t"+_ionScore[ionBin, intBin, scoreBin]);
+                    }
+                    Console.WriteLine();
+                }
+            }
         }
 
         private readonly string _scoringParamPath;
@@ -46,6 +58,8 @@ namespace InformedProteomics.TopDown.Scoring
         private double[][] _intensityBoundaries; // ion, intensity
         private double[][] _scoreBoundaries; // ion, score
         private double[, ,] _ionScore;   // ion, intensity, score
+
+        private double[] _existingIonScore; // Dancik
 
         private void ParseScoringParameters()
         {
@@ -133,68 +147,9 @@ namespace InformedProteomics.TopDown.Scoring
             }
 
             if (lineNum != lines.Length) throw new Exception("Illegal scoring parameter file!");
+
+            _existingIonScore = new double[_numIons];
+
         }
-
-        //private void ParseScoringParametersOldFormat()
-        //{
-        //    var lines = File.ReadAllLines(_scoringParamPath);
-
-        //    var intensityBoundList = new List<double>();
-
-        //    foreach (var line in lines)
-        //    {
-        //        if (!line.StartsWith("Intensity")) continue;
-        //        var token = line.Split('\t');
-        //        if (token.Length != 2) throw new Exception("Illegal scoring parameter file!");
-        //        var intensity = Convert.ToDouble(token[1]);
-        //        if (Math.Abs(intensity) <= 0) continue; // ignore zero intensity == 0
-        //        intensityBoundList.Add(intensity);
-        //    }
-        //    _intensityBoundaries = intensityBoundList.ToArray();
-
-        //    _ionScore = new double[_intensityBoundaries.Length+1, _numScoreBins, _numIons];
-        //    _missingIonScore = new double[_numIons];
-
-        //    var intensityIndex = -1;
-        //    var lineNum = 0;
-        //    while(lineNum < lines.Length)
-        //    {
-        //        var line = lines[lineNum++];
-        //        if (line.StartsWith("Range"))
-        //        {
-        //            ++intensityIndex;
-        //            for (var scoreBin = 0; scoreBin < _numScoreBins; scoreBin++)  // this needs to be fixed
-        //            {
-        //                var data = lines[lineNum++];
-        //                var token = data.Split('\t');
-        //                if (token.Length != _numIons*2 + 1) throw new Exception("Illegal scoring parameter file!");
-
-        //                var numbers = token.Select(Convert.ToDouble).ToArray();
-
-        //                for (int i = 1; i < 5; i++)
-        //                {
-        //                    if (numbers[i] <= 0) numbers[i] = 1;
-        //                }
-
-        //                _ionScore[intensityIndex, scoreBin, 0] =
-        //                    Math.Log10(numbers[1] / numbers[2]);
-        //                _ionScore[intensityIndex, scoreBin, 1] =
-        //                    Math.Log10(numbers[3] / numbers[4]);
-        //            }
-        //        }
-        //        else if (line.StartsWith("b"))
-        //        {
-        //            var token = line.Split('\t');
-        //            if (token.Length != 3) throw new Exception("Illegal scoring parameter file!");
-        //            _missingIonScore[0] = Math.Log10(Convert.ToDouble(token[1])/Convert.ToDouble(token[2]));
-        //        }
-        //        else if (line.StartsWith("y"))
-        //        {
-        //            var token = line.Split('\t');
-        //            if (token.Length != 3) throw new Exception("Illegal scoring parameter file!");
-        //            _missingIonScore[1] = Math.Log10(Convert.ToDouble(token[1]) / Convert.ToDouble(token[2]));
-        //        }
-        //    }
-        //}
     }
 }
