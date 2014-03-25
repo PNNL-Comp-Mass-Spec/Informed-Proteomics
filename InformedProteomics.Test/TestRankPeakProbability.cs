@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -94,7 +93,7 @@ namespace InformedProteomics.Test
                                 totalRankProbability += ionProbability;
                                 outFile.Write("{0}\t", ionProbability);
                             }
-                            outFile.Write(totalRankProbability);
+                            outFile.Write(1-totalRankProbability);
                             outFile.WriteLine();
                         }
                     }
@@ -183,8 +182,8 @@ namespace InformedProteomics.Test
                     if (!ionExclusions.Contains(ionType.Name))
                         tempIonList.Add(ionType);
                 }
+                _ionTypes = tempIonList;
             }
-            _ionTypes = tempIonList;
 
             // Read input and output file names
             var fileInfo = reader.GetNodes("fileinfo").First();
