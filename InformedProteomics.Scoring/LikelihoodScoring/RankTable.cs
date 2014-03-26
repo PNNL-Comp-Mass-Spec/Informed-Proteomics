@@ -43,7 +43,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     for (int j = 0; j < _ionTypes.Length; j++)
                     {
                         var ionType = _ionTypes[j];
-                        ranks[i, j] = new IonProbability(ionType, _rankTable[i].IonFrequencies[ionType], _rankTable[i].RankCount);
+                        ranks[i, j] = new IonProbability(ionType.Name, _rankTable[i].IonFrequencies[ionType], _rankTable[i].RankCount);
                     }
                 }
                 return ranks;

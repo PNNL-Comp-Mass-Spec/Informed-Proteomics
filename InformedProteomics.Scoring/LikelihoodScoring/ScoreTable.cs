@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -122,6 +123,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 var prefixes = match.Prefixes;
                 var suffixes = match.Suffixes;
 
+                StreamWriter debugFile = File.AppendText(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\bCID.txt");
+
                 for (int i = 0; i < prefixes.Count; i++)
                 {
                     var ionTypeScores = new Dictionary<string, FitScoreList>();
@@ -147,7 +150,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                             ionTypeScores.Add(name, new FitScoreList());
 
                         ionTypeScores[name].Add(new FitScore(intensity, score));
-
                     }
                     var bestScores = SelectBestScores(ionTypeScores);
                     foreach (var bestscore in bestScores)
@@ -158,9 +160,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         WorstScore.Total++;
                         if (score.Equals(0))
                             WorstScore.Found++;
+                        
+                        debugFile.WriteLine("{0}\t{1}", bestscore.Intensity, score);
                     }
                     _intensityHistogram.AddData(bestScores);
                 }
+                debugFile.Close();
             }
         }
     }

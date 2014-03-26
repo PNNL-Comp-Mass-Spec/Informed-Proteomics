@@ -10,48 +10,36 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class SpectrumMatchList
     {
-        //private const string TopDownScanHeader = "Scan(s)";
-        //private const string FdrHeader = "FDR";
-        //private const string EvalueHeader = "E-value";
-        //private const double FdrThreshold = 0.01;
-        //private const double EValueThreshold = 0.1;
-
-        // Changed by Sangtae
-        private const string TopDownScanHeader = "ScanNum";
-        private const string FdrHeader = "Qvalue";
+        private const string QValueHeader = "Qvalue";
         private const string EvalueHeader = "E-value";
-        private const double FdrThreshold = 0.01;
+        private const string TopDownPeptideHeader = "Annotation";
+        private const double QValueThreshold = 0.01;
         private const double EValueThreshold = 0.1;
 
-        private const string BottomUpScanHeader = "ScanNum";
+        private const string BottomUpPeptideHeader = "Peptide";
         private const string PepQValueHeader = "PepQValue";
-        private const double PepQValueThreshold = 0.01;
         private const string FormulaHeader = "Formula";
+        private const double PepQValueThreshold = 0.01;
 
+        private const string ScanHeader = "ScanNum";
         private const string PrecursorChargeHeader = "Charge";
-        private const string PeptideHeader = "Annotation";
         private const int NumMutations = 3;
 
         public List<SpectrumMatch> Matches;
-
-        private string Trim(string prot)
-        {
-            int start = prot.IndexOf('.') + 1;
-            int length = prot.LastIndexOf('.') - start;
-            return prot.Substring(start, length);
-        }
 
         public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false)
         {
             Matches = new List<SpectrumMatch>();
 
-            var peptides = tsvFile.GetData(PeptideHeader);
             var precursorCharges = tsvFile.GetData(PrecursorChargeHeader);
-            var scans = tsvFile.GetData(TopDownScanHeader);
-            if (scans != null)
+            var scans = tsvFile.GetData(ScanHeader);
+
+            var peptides = tsvFile.GetData(TopDownPeptideHeader);
+            if (peptides != null)
             {
-                var filterThreshold = FdrThreshold;
-                var filterValues = tsvFile.GetData(FdrHeader);
+                var peptideSet = new HashSet<string>();
+                var filterThreshold = QValueThreshold;
+                var filterValues = tsvFile.GetData(QValueHeader);
                 if (filterValues == null)
                 {
                     filterValues = tsvFile.GetData(EvalueHeader);
@@ -62,33 +50,38 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
                 for (int i = 0; i < peptides.Count; i++)
                 {
-                    if (peptides[i].Contains('[') || peptides[i].Contains('U') || Convert.ToDouble(filterValues[i]) > filterThreshold) continue;
-                    var spectrum = lcms.GetSpectrum(Convert.ToInt32(scans[i]));
+                    if (Convert.ToDouble(filterValues[i]) > filterThreshold || peptideSet.Contains(peptides[i])) continue;
+                    peptideSet.Add(peptides[i]);
+                    var scanNum = Convert.ToInt32(scans[i]);
+                    var spectrum = lcms.GetSpectrum(scanNum);
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    //peptides[i] = Trim(peptides[i]);
                     if (useDecoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
                         peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
                     }
-                    Matches.Add(new SpectrumMatch(peptides[i], spectrum, precursorCharge, new Sequence(peptides[i], aset)));
+                    Matches.Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset)));
                 }
             }
             else
             {
-                scans = tsvFile.GetData(BottomUpScanHeader);
+                peptides = tsvFile.GetData(BottomUpPeptideHeader);
                 if (scans == null)
                     throw new FormatException();
 
                 var pepQValues = tsvFile.GetData(PepQValueHeader);
                 var formulas = tsvFile.GetData(FormulaHeader);
 
+                var peptideSet = new HashSet<string>();
+
                 for (int i = 0; i < peptides.Count; i++)
                 {
-                    if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold) continue;
-                    var spectrum = lcms.GetSpectrum(Convert.ToInt32(scans[i]));
+                    if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold || peptideSet.Contains(peptides[i])) continue;
+                    peptideSet.Add(peptides[i]);
+                    var scanNum = Convert.ToInt32(scans[i]);
+                    var spectrum = lcms.GetSpectrum(scanNum);
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
@@ -98,10 +91,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
                     }
                     Matches.Add(formulas[i] != null
-                        ? new SpectrumMatch(peptides[i], spectrum, precursorCharge, formulas[i])
-                        : new SpectrumMatch(peptides[i], spectrum, precursorCharge));
+                        ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i])
+                        : new SpectrumMatch(peptides[i], spectrum, scanNum,  precursorCharge));
                 }
             }
+        }
+
+        public SpectrumMatch GetScan(int scanNum)
+        {
+            return (from i in Matches
+                    where i.ScanNum == scanNum
+                    select i).FirstOrDefault();
         }
 
         public List<SpectrumMatch> GetCharge(int charge)

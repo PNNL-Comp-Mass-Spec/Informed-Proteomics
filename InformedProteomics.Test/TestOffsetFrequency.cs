@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -18,12 +19,15 @@ namespace InformedProteomics.Test
         private string _preRaw;
         private string _outPre;
         private string _outFileName;
+        private double _noiseFiltration;
 
         private List<IonType> _ionTypes;
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
         double _relativeIntensityThreshold = 1.0;
         private bool _combineCharges;
+        private bool _useDecoy;
+        private bool _usePrecursor;
         private int _precursorCharge;
 
         private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
@@ -43,41 +47,74 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                var offsetFrequencyFunctions = new OffsetFrequencyTable[_precursorCharge];
-                for (int i = 0; i < _precursorCharge; i++)
+                int tableCount = 1;
+                if (_precursorCharge > 0)
+                    tableCount = _precursorCharge;
+
+                var offsetFrequencyFunctions = new OffsetFrequencyTable[tableCount];
+                var decoyOffsetFrequencyFunctions = new OffsetFrequencyTable[tableCount];
+                for (int i = 0; i < tableCount; i++)
                 {
                     offsetFrequencyFunctions[i] = new OffsetFrequencyTable();
+                    decoyOffsetFrequencyFunctions[i] = new OffsetFrequencyTable();
                 }
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
-                    Console.WriteLine("{0}\t{1}", textFile, rawFile);
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
+                    Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
+                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
-                    for (int j = 0; j < _precursorCharge; j++)
+                    SpectrumMatchList decoyMatchList = null;
+                    if (_useDecoy)
+                        decoyMatchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act, true);
+
+                    for (int j = 0; j < tableCount; j++)
                     {
-                        var chargeMatches = matchList.GetCharge(j+1);
-                        offsetFrequencyFunctions[j].AddCleavageProbabilities(chargeMatches, _ionTypes, _defaultTolerance, _relativeIntensityThreshold);
+                        var matches = _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList.Matches;
+
+                        if (_usePrecursor)
+                            offsetFrequencyFunctions[j].AddPrecursorProbabilities(matches, _ionTypes,
+                                _defaultTolerance, _relativeIntensityThreshold);
+                        else
+                            offsetFrequencyFunctions[j].AddCleavageProbabilities(matches, _ionTypes,
+                                _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
+
+                        if (decoyMatchList != null)
+                        {
+                            var decoyMatches = _precursorCharge > 0 ? decoyMatchList.GetCharge(j + 1) : decoyMatchList.Matches;
+
+                            if (_usePrecursor)
+                                offsetFrequencyFunctions[j].AddPrecursorProbabilities(matches, _ionTypes,
+                                    _defaultTolerance, _relativeIntensityThreshold);
+                            else
+                                decoyOffsetFrequencyFunctions[j].AddCleavageProbabilities(decoyMatches, _ionTypes,
+                                    _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
+                        }
                     }
                 }
 
                 // Print Offset Frequency tables to output file
                 var outFile = _outFileName.Replace("@", name);
-                for (int i = 0; i < _precursorCharge; i++)
+                for (int i = 0; i < tableCount; i++)
                 {
-                    var outFileCharge = outFile.Replace("*", (i + 1).ToString());
-                    List<IonProbability> offsetFrequencies;
-                    if (_combineCharges)
-                        offsetFrequencies = offsetFrequencyFunctions[i].GetCombinedChargeTable(_ionTypeFactory).ToList();
-                    else
-                        offsetFrequencies = offsetFrequencyFunctions[i].IonProbabilityTable.ToList();
-                    using (var finalOutputFile = new StreamWriter(outFileCharge))
+                    string outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
+                    var offsetFrequencies = offsetFrequencyFunctions[i].IonProbabilityTable;
+                    var decoyOffsetFrequencies = decoyOffsetFrequencyFunctions[i].IonProbabilityTable;
+                    using (var finalOutputFile = new StreamWriter(outFileName))
                     {
-                        foreach (var ionProbability in offsetFrequencies)
+                        finalOutputFile.Write("Ion\tTarget");
+                        if (_useDecoy) finalOutputFile.Write("\tDecoy");
+                        finalOutputFile.WriteLine();
+                        for (int j=0;j<offsetFrequencies.Count;j++)
                         {
-                            finalOutputFile.WriteLine("{0}\t{1}", ionProbability.Ion.Name, ionProbability.Prob);
+                            finalOutputFile.Write("{0}\t{1}", offsetFrequencies[j].IonName, offsetFrequencies[j].Prob);
+                            if (_useDecoy)
+                            {
+                                finalOutputFile.Write("\t{0}", decoyOffsetFrequencies[j]);
+                            }
+                            finalOutputFile.WriteLine();
                         }
                     }
                 }
@@ -106,11 +143,14 @@ namespace InformedProteomics.Test
                     break;
             }
 
-/*            _precursorOff = (config.Contents.ContainsKey("precursorfrequencies") &&
-                             config.Contents["precursorfrequencies"].ToLower() == "true");*/
+            _usePrecursor = (config.Contents.ContainsKey("precursorfrequencies") &&
+                             config.Contents["precursorfrequencies"].ToLower() == "true");
 
             _combineCharges = (config.Contents.ContainsKey("combinecharges") &&
                  config.Contents["combinecharges"].ToLower() == "true");
+
+            _useDecoy = (config.Contents.ContainsKey("usedecoy") &&
+                config.Contents["usedecoy"].ToLower() == "true");
 
             _relativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
 
@@ -118,6 +158,7 @@ namespace InformedProteomics.Test
             var ionInfo = reader.GetNodes("ion").First();
             int totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
             var ionTypeStr = ionInfo.Contents["iontype"].Split(',');
+            _noiseFiltration = Convert.ToDouble(config.Contents["noisefilteration"]);
             var ions = new BaseIonType[ionTypeStr.Length];
             for (int i = 0; i < ionTypeStr.Length; i++)
             {
@@ -166,13 +207,9 @@ namespace InformedProteomics.Test
             if (ionInfo.Contents.ContainsKey("exclusions"))
             {
                 var ionExclusions = ionInfo.Contents["exclusions"].Split(',');
-                foreach (var ionType in _ionTypes)
-                {
-                    if (!ionExclusions.Contains(ionType.Name))
-                        tempIonList.Add(ionType);
-                }
+                tempIonList.AddRange(_ionTypes.Where(ionType => !ionExclusions.Contains(ionType.Name)));
+                _ionTypes = tempIonList;
             }
-            _ionTypes = tempIonList;
 
             // Read input and output file names
             var fileInfo = reader.GetNodes("fileinfo").First();

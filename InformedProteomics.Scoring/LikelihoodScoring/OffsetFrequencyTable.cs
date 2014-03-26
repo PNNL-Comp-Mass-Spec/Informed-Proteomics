@@ -29,7 +29,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         }
 
         public void AddCleavageProbabilities(List<SpectrumMatch> matches, List<IonType> ionTypes,
-            Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges)
+            Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges=false)
         {
             foreach (var match in matches)
             {
@@ -57,6 +57,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         {
                             ionTypeFound[name] = true;
                         }
+/*                        if (spectrum.FindPeak(ion.GetMonoIsotopicMz(), tolerance) != null)
+                        {
+                            ionTypeFound[name] = true;
+                        }*/
                     }
                     foreach (var key in ionTypeFound.Keys)
                     {

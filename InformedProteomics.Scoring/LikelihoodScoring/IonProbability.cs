@@ -1,6 +1,4 @@
-﻿using System;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Spectrometry;
+﻿using System.Collections.Generic;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -19,6 +17,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             var added = new IonProbability(l.IonName) {Found = l.Found + r.Found, Total = l.Total + r.Total};
             return added;
+        }
+    }
+
+    public class CompareIonProbabilityByIon : IComparer<IonProbability>
+    {
+
+        public int Compare(IonProbability x, IonProbability y)
+        {
+            return x.IonName.CompareTo(y.IonName);
         }
     }
 }

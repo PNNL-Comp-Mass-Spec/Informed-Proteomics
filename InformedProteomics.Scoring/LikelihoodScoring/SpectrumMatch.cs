@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
@@ -18,30 +17,34 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public string Peptide { get; private set; }
         public Spectrum Spectrum { get; private set; }
+        public int ScanNum { get; private set; }
         public int PrecursorCharge { get { return _precursorCharge;  } }
 
         public class MismatchException : Exception {}
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int precursorCharge, Sequence sequence)
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence)
         {
             Peptide = peptide;
             Spectrum = spectrum;
+            ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             _sequence = sequence;
         }
 
-        public SpectrumMatch(string protein, Spectrum spectrum, int precursorCharge)
+        public SpectrumMatch(string protein, Spectrum spectrum, int scanNum, int precursorCharge)
         {
             Peptide = protein;
             Spectrum = spectrum;
+            ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             _sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
         }
 
-        public SpectrumMatch(string protein, Spectrum spectrum, int precursorCharge, string formula)
+        public SpectrumMatch(string protein, Spectrum spectrum, int scanNum, int precursorCharge, string formula)
         {
             Peptide = protein;
             Spectrum = spectrum;
+            ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             _sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
 

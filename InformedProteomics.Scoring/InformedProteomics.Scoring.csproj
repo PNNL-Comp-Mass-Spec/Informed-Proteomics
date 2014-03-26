@@ -70,7 +70,9 @@
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
     <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\Probability.cs" />
-    <Compile Include="LikelihoodScoring\RankedPeaks.cs" />
+    <Compile Include="LikelihoodScoring\RankedPeaks.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="LikelihoodScoring\RankTable.cs" />
     <Compile Include="LikelihoodScoring\ScoreTable.cs" />
     <Compile Include="LikelihoodScoring\SpectrumMatch.cs" />
