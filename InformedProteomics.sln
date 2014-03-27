@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Test", "InformedProteomics.Test\InformedProteomics.Test.csproj", "{800535C0-E5A3-4A05-8ED6-FDF02658D999}"
@@ -18,20 +16,33 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x64.ActiveCfg = Debug|x64
 		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|x64.Build.0 = Debug|x64
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x64.ActiveCfg = Release|x64
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|x64.Build.0 = Release|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x64.ActiveCfg = Debug|x64
 		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Debug|x64.Build.0 = Debug|x64
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|x64.ActiveCfg = Release|x64
+		{800535C0-E5A3-4A05-8ED6-FDF02658D999}.Release|x64.Build.0 = Release|x64
 		{16DB0078-9A4C-41D8-9356-4205F03AE04A}.Debug|x64.ActiveCfg = Debug|x64
 		{16DB0078-9A4C-41D8-9356-4205F03AE04A}.Debug|x64.Build.0 = Debug|x64
+		{16DB0078-9A4C-41D8-9356-4205F03AE04A}.Release|x64.ActiveCfg = Release|x64
+		{16DB0078-9A4C-41D8-9356-4205F03AE04A}.Release|x64.Build.0 = Release|x64
 		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Debug|x64.ActiveCfg = Debug|x64
 		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Debug|x64.Build.0 = Debug|x64
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Release|x64.ActiveCfg = Release|x64
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Release|x64.Build.0 = Release|x64
 		{6C14DF30-E8F9-43BA-8E12-3C3AA9E1CCAA}.Debug|x64.ActiveCfg = Debug|x64
 		{6C14DF30-E8F9-43BA-8E12-3C3AA9E1CCAA}.Debug|x64.Build.0 = Debug|x64
+		{6C14DF30-E8F9-43BA-8E12-3C3AA9E1CCAA}.Release|x64.ActiveCfg = Release|x64
+		{6C14DF30-E8F9-43BA-8E12-3C3AA9E1CCAA}.Release|x64.Build.0 = Release|x64
 		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Debug|x64.ActiveCfg = Debug|x64
 		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Debug|x64.Build.0 = Debug|x64
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Release|x64.ActiveCfg = Release|x64
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
