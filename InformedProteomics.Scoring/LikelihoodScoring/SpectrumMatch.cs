@@ -12,9 +12,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     {
         private List<Composition> _prefixes;
         private List<Composition> _suffixes;
-        private readonly Sequence _sequence;
         private readonly int _precursorCharge;
 
+        public Sequence Sequence { get; private set; }
         public string Peptide { get; private set; }
         public Spectrum Spectrum { get; private set; }
         public int ScanNum { get; private set; }
@@ -24,32 +24,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence)
         {
+            Spectrum = spectrum;
+            ScanNum = scanNum;
+            _precursorCharge = precursorCharge;
+            Sequence = sequence;
+        }
+
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge)
+        {
+            Spectrum = spectrum;
+            ScanNum = scanNum;
+            _precursorCharge = precursorCharge;
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
+        }
+
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, string formula)
+        {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
-            _sequence = sequence;
-        }
-
-        public SpectrumMatch(string protein, Spectrum spectrum, int scanNum, int precursorCharge)
-        {
-            Peptide = protein;
-            Spectrum = spectrum;
-            ScanNum = scanNum;
-            _precursorCharge = precursorCharge;
-            _sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
-        }
-
-        public SpectrumMatch(string protein, Spectrum spectrum, int scanNum, int precursorCharge, string formula)
-        {
-            Peptide = protein;
-            Spectrum = spectrum;
-            ScanNum = scanNum;
-            _precursorCharge = precursorCharge;
-            _sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(protein);
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
 
             var composition = Composition.Parse(formula);
-            if (!composition.Equals(_sequence.Composition + Composition.H2O))
+            if (!composition.Equals(Sequence.Composition + Composition.H2O))
             {
                 throw new MismatchException();
             }
@@ -57,7 +55,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public Composition PeptideComposition
         {
-            get { return _sequence.GetComposition(); }
+            get { return Sequence.GetComposition(); }
         }
 
         public List<Composition> Prefixes
@@ -67,9 +65,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 if (_prefixes == null)
                 {
                     _prefixes = new List<Composition>();
-                    for (int i = 1; i < Peptide.Length; i++)
+                    for (int i = 1; i < Sequence.Count; i++)
                     {
-                        _prefixes.Add(_sequence.GetComposition(0, i));
+                        _prefixes.Add(Sequence.GetComposition(0, i));
                     }
                 }
                 return _prefixes;
@@ -83,9 +81,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 if (_suffixes == null)
                 {
                     _suffixes = new List<Composition>();
-                    for (int i = 1; i < Peptide.Length; i++)
+                    for (int i = 1; i < Sequence.Count; i++)
                     {
-                        _suffixes.Add(_sequence.GetComposition(Peptide.Length - i, Peptide.Length));
+                        _suffixes.Add(Sequence.GetComposition(Peptide.Length - i, Peptide.Length));
                     }
                 }
                 return _suffixes;
