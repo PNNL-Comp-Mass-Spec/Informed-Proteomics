@@ -16,7 +16,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void PrintAllScorers()
         {
             //            Console.WriteLine(Convert.ToDouble("0"));
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filteration_SBEP_1.txt");
+            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt");
             scoringModel.PrintAllScores();
         }
 

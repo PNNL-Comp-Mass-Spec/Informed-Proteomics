@@ -16,6 +16,16 @@ namespace InformedProteomics.Backend.Utils
 
         public string FileName { get; private set; }
 
+        public IList<string> GetHeaders()
+        {
+            return _header;
+        }
+
+        public Dictionary<string, List<string>> GetAllData()
+        {
+            return _data;
+        }
+
         public IList<string> GetData(string columnName)
         {
             List<string> columnData;

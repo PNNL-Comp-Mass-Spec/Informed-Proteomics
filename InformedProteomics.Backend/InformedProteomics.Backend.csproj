@@ -158,6 +158,7 @@
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
+    <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\NoiseFilter.cs" />
