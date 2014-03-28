@@ -10,6 +10,15 @@ namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Sequence : List<AminoAcid>, IMolecule
     {
+		public static readonly AminoAcidSet StandardAminoAcidSet;
+		public static readonly AminoAcidSet StandardAminoAcidSetWithFixedCarbamidoMethyl;
+
+	    static Sequence()
+	    {
+			StandardAminoAcidSet = new AminoAcidSet();
+			StandardAminoAcidSetWithFixedCarbamidoMethyl = new AminoAcidSet(Modification.Carbamidomethylation);
+	    }
+
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
             var composition = Data.Composition.Composition.Zero;
@@ -132,7 +141,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+")) return null;
 
-            var stdAaSet = AminoAcidSet.StandardAminoAcidSet;
+            var stdAaSet = StandardAminoAcidSet;
             var aaList = new List<AminoAcid>();
 
             var matches = Regex.Matches(msgfPlusPeptideStr, "("+aminoAcidRegex+"|"+massRegex+")");
