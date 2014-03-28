@@ -57,10 +57,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         {
                             ionTypeFound[name] = true;
                         }
-/*                        if (spectrum.FindPeak(ion.GetMonoIsotopicMz(), tolerance) != null)
-                        {
-                            ionTypeFound[name] = true;
-                        }*/
                     }
                     foreach (var key in ionTypeFound.Keys)
                     {
