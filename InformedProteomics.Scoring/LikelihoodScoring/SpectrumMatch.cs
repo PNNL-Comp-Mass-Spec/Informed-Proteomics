@@ -24,6 +24,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence)
         {
+            Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
@@ -32,6 +33,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge)
         {
+            Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;

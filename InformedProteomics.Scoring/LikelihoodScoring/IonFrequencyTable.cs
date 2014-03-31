@@ -4,11 +4,11 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-    public class OffsetFrequencyTable
+    public class IonFrequencyTable
     {
         private readonly Dictionary<string, IonProbability> _offsetFrequencies;
 
-        public OffsetFrequencyTable()
+        public IonFrequencyTable()
         {
             _offsetFrequencies = new Dictionary<string, IonProbability>();
         }

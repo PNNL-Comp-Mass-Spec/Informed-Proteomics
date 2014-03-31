@@ -91,7 +91,7 @@
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
-    <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />
+    <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
     <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="TestIMSScoring.cs" />
     <Compile Include="TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
-    <Compile Include="TestOffsetFrequency.cs" />
+    <Compile Include="TestIonFrequency.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />

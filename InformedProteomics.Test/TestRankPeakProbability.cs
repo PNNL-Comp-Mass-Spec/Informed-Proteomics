@@ -30,7 +30,7 @@ namespace InformedProteomics.Test
         [Test]
         public void RankPeakProbability()
         {
-            InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\ForChris\RankPeakProbabilityConfig.ini"));
+            InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\BottomUp\RankPeakProbabilityConfig.ini"));
 
             foreach (var name in _names)
             {

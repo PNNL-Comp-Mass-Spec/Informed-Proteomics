@@ -12,7 +12,7 @@ using InformedProteomics.Scoring.LikelihoodScoring;
 namespace InformedProteomics.Test
 {
     [TestFixture]
-    public class TestOffsetFrequency
+    public class TestIonFrequency
     {
         private string[] _names;
         private string _preTsv;
@@ -33,7 +33,7 @@ namespace InformedProteomics.Test
         private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
         [Test]
-        public void OffsetFrequencyFunction()
+        public void IonFrequencyFunction()
         {
             InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig_Test.ini"));
 
@@ -51,12 +51,12 @@ namespace InformedProteomics.Test
                 if (_precursorCharge > 0)
                     tableCount = _precursorCharge;
 
-                var offsetFrequencyFunctions = new OffsetFrequencyTable[tableCount];
-                var decoyOffsetFrequencyFunctions = new OffsetFrequencyTable[tableCount];
+                var offsetFrequencyFunctions = new IonFrequencyTable[tableCount];
+                var decoyOffsetFrequencyFunctions = new IonFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    offsetFrequencyFunctions[i] = new OffsetFrequencyTable();
-                    decoyOffsetFrequencyFunctions[i] = new OffsetFrequencyTable();
+                    offsetFrequencyFunctions[i] = new IonFrequencyTable();
+                    decoyOffsetFrequencyFunctions[i] = new IonFrequencyTable();
                 }
 
                 for (int i = 0; i < txtFiles.Count; i++)

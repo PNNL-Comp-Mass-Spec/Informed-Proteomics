@@ -90,7 +90,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
                         peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
                     }
-                    Matches.Add(formulas[i] != null
+                    Matches.Add((formulas != null && formulas[i] != null)
                         ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i])
                         : new SpectrumMatch(peptides[i], spectrum, scanNum,  precursorCharge));
                 }

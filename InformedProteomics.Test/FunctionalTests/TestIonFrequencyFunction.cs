@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
-    public class TestOffsetFrequencyFunction
+    public class TestIonFrequencyFunction
     {
         public List<IonProbability> ComputeOffsetFrequencies(SpectrumMatch spectrumMatch)
         {
@@ -94,7 +94,7 @@ namespace InformedProteomics.Test.FunctionalTests
             StreamWriter outputFile = File.AppendText(OutputFileName);
             foreach (var spectrumMatch in spectrumMatchList)
             {
-                var offsetFrequencies = new OffsetFrequencyTable();
+                var offsetFrequencies = new IonFrequencyTable();
                 offsetFrequencies.AddCleavageProbabilities(new List<SpectrumMatch>{spectrumMatch}, _ionTypes, _tolerance,
                     RelativeIntensityThreshold);
                 var probabilities = offsetFrequencies.IonProbabilityTable;
@@ -165,7 +165,7 @@ namespace InformedProteomics.Test.FunctionalTests
             StreamWriter outputFile = File.AppendText(OutputFileName);
             foreach (var spectrumMatch in spectrumMatchList)
             {
-                var precursorFrequencies = new OffsetFrequencyTable();
+                var precursorFrequencies = new IonFrequencyTable();
                 precursorFrequencies.AddPrecursorProbabilities(new List<SpectrumMatch> {spectrumMatch}, _ionTypes,
                     _tolerance, RelativeIntensityThreshold);
 
