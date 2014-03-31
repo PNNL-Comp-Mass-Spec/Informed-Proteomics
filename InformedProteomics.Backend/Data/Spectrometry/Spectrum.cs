@@ -344,7 +344,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private int _msLevel = 1;
 
-        private int FindPeakIndex(double mz, Tolerance tolerance)
+        public int FindPeakIndex(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
