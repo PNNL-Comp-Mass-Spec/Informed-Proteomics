@@ -69,6 +69,8 @@
     <Compile Include="LikelihoodScoring\IonProbability.cs" />
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
     <Compile Include="LikelihoodScoring\IonFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\OffsetProbability.cs" />
     <Compile Include="LikelihoodScoring\Probability.cs" />
     <Compile Include="LikelihoodScoring\RankedPeaks.cs">
       <SubType>Code</SubType>

@@ -204,7 +204,7 @@ namespace InformedProteomics.Test.FunctionalTests
         private const int MaxCharge = 4;
         const double RelativeIntensityThreshold = 1.0;
 
-        private readonly BaseIonType[] _baseIons = { BaseIonType.B, BaseIonType.Y };
+        private readonly BaseIonType[] _baseIons = { BaseIonType.Y };
         private readonly NeutralLoss[] _neutralLosses = { NeutralLoss.NoLoss };
         private List<IonType> _ionTypes;
         private readonly Tolerance _tolerance = new Tolerance(15, ToleranceUnit.Ppm);

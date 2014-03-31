@@ -105,6 +105,7 @@
     <Compile Include="TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
     <Compile Include="TestIonFrequency.cs" />
+    <Compile Include="TestOffsetFrequency.cs" />
     <Compile Include="TestPeptideCentricAnalysis.cs" />
     <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />

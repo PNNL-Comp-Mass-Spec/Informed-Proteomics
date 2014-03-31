@@ -352,7 +352,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return FindPeakIndex(minMz, maxMz);
         }
 
-        private int FindPeakIndex(double minMz, double maxMz)
+        public int FindPeakIndex(double minMz, double maxMz)
         {
             var index = Array.BinarySearch(Peaks, new Peak((minMz + maxMz) / 2, 0));
             if (index < 0) index = ~index;
