@@ -33,16 +33,16 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void AddIPrgProteinLengths()
+        public void AddProteinLengths()
         {
-            const string dir = @"D:\Research\Data\IPRG2014";
-            const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.fasta";
+            const string databaseFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
-            const string proteinListPath = dir + @"\ProteinListIntensity.txt";
-            foreach (var proteinId in File.ReadLines(proteinListPath))
+            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\MSAlign\Proteins.txt";
+            foreach (var protein in File.ReadLines(proteinListPath))
             {
+                var proteinId = protein.Split(null)[0];
                 var length = database.GetProteinLength(proteinId);
                 Console.WriteLine("{0}\t{1}", proteinId, length);
             }
@@ -197,7 +197,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             Console.WriteLine("Peptide\tFormula\tProtein");
-            foreach (var annotationAndOffset in indexedDatabase.AnnotationsAndOffsets(6, 30, 1, 1, Enzyme.Trypsin))
+            foreach (var annotationAndOffset in indexedDatabase.FullSequenceAnnotationsAndOffsets(6, 30, 1, 1, Enzyme.Trypsin))
             {
                 var annotation = annotationAndOffset.Annotation;
                 var peptide = annotation.Substring(2, annotation.Length - 4);

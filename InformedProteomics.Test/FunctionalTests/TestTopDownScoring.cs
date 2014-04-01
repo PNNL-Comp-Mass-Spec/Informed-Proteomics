@@ -145,5 +145,64 @@ namespace InformedProteomics.Test.FunctionalTests
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
+
+        [Test]
+        public void TestCorrMatchedPeakCounter()
+        {
+            // Parameters
+            var precursorIonTolerance = new Tolerance(10);
+            var productIonTolerance = new Tolerance(10);
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            var aaSet = new AminoAcidSet();
+
+            const string protAnnotation = "_.TMNITSKQMEITPAIRQHVADRLAKLEKWQTHLINPHIILSKEPQGFIADATINTPNGHLVASAKHEDMYTAINELINKLERQLNKVQHKGEAR._";
+
+            // Create a sequence graph
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
+            if (seqGraph == null)
+            {
+                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
+                return;
+            }
+
+            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+
+            sw.Start();
+            var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
+
+            var seqCompositionArr = seqGraph.GetSequenceCompositions();
+            Console.WriteLine("Length: {0}\tNumCompositions: {1}", protAnnotation.Length - 4, seqCompositionArr.Length);
+
+            const int charge = 9;
+            const int modIndex = 0;
+            const int ms2ScanNum = 3633;
+
+            var seqComposition = seqCompositionArr[modIndex];
+            var peptideComposition = seqComposition + Composition.H2O;
+            peptideComposition.GetIsotopomerEnvelop();
+
+            Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.Mass);
+            seqGraph.SetSink(modIndex, 0);
+
+            var precursorIon = new Ion(peptideComposition, charge);
+
+            Assert.True(precursorFilter.IsValid(precursorIon, ms2ScanNum));
+
+            var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+            Assert.True(spec != null);
+
+            //var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 10);
+            var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, 1, 10);
+            var score = seqGraph.GetScore(charge, scorer);
+
+            Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), ms2ScanNum, score);
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
     }
 }

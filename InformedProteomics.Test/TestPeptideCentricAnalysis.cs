@@ -186,8 +186,13 @@ namespace InformedProteomics.Test
             const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
             const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
-            const string resultPath1 = fusionDdaResult;
-            const string resultPath2 = fusionMsgfResult;
+            // PE-MMR
+            const string pemmrQeDia = @"D:\Research\Data\UW\PEMMR\QE\allFDR.tsv";
+            const string pemmrFusionDda = @"D:\Research\Data\UW\PEMMR\Fusion\WT_D_DDA_130412065618_MX_PEMMR.tsv";
+            const string pemmrFusionDia = @"D:\Research\Data\UW\PEMMR\Fusion\WT_D_DIA_130412091220_MX_PEMMR.tsv";
+
+            const string resultPath1 = pemmrFusionDda;
+            const string resultPath2 = fusionDdaResult;
 
             var result1 = new TsvFileParser(resultPath1);
             var result2 = new TsvFileParser(resultPath2);

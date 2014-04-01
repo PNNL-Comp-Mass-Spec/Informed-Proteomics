@@ -77,7 +77,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.WriteLine("Generating XICs...");
 
-            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength))
             {
 
                 ++numProteins;

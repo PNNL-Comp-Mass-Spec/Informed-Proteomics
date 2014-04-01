@@ -13,7 +13,10 @@ namespace InformedProteomics.Backend.Utils
 
         public FdrCalculator(string targetResultFilePath, string decoyResultFilePath)
         {
-            CalculateQValues(targetResultFilePath, decoyResultFilePath);
+            if (!CalculateQValues(targetResultFilePath, decoyResultFilePath))
+            {
+                throw new Exception("Illegal file format at FdrCalculator");
+            }
         }
 
         public void WriteTo(string outputFilePath, bool includeDecoy = false)
@@ -49,12 +52,7 @@ namespace InformedProteomics.Backend.Utils
 
             _headers = targetHeaders;
 
-            // concatenate target and decoy
-            //var concatenated = new string[targetData.Length + decoyData.Length - 2];
-            //Array.Copy(targetData, 1, concatenated, 0, targetData.Length - 1);
-            //Array.Copy(decoyData, 1, concatenated, targetData.Length-1, decoyData.Length-1);
-
-            var concatenated = targetData.Skip(1).Concat(decoyData.Skip(1)).ToArray();
+            var concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
             var scoreIndex = _headers.IndexOf("Score");
             var scanNumIndex = _headers.IndexOf("ScanNum");
             var proteinIndex = _headers.IndexOf("Protein");

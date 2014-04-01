@@ -71,7 +71,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var indexedDb = new IndexedDatabase(db);
 
-            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsets(minLength, maxLength);
+            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength);
 
             var numProteins = 0;
             long totalProtCompositions = 0;

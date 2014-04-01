@@ -13,8 +13,8 @@ namespace InformedProteomics.Test.FunctionalTests
     {
         public void TestIcTopDown()
         {
-            const string targetResultPath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.icresult";
-            const string decoyResultPath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.decoy.icresult";
+            const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_CorrMatches_IntFrags.icresult";
+            const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_CorrMatches_IntFrags.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);
             fdrCalculator.WriteTo(Path.ChangeExtension(targetResultPath, ".tsv"));
             Console.WriteLine("Done");
@@ -22,7 +22,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
         public void MergeTargetDecoyFiles()
         {
-            const string dir = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches";
+            const string dir = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_Int";
             var rawFileNames = new HashSet<string>();
             foreach (var f in Directory.GetFiles(dir, "*.icresult"))
             {

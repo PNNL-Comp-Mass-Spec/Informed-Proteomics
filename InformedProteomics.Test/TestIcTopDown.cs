@@ -21,7 +21,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSbepSearch()
         {
-            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches";
+            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
             foreach (var specFilePath in Directory.GetFiles(dirPath))
             {
@@ -35,17 +35,18 @@ namespace InformedProteomics.Test
         public void TestSbepSearch(string specFilePath, string dbFilePath)
         {
             // Search parameters
-            const int maxNumNTermCleavages = 1;  // 30
-            const int minLength = 7;    // 7
-            const int maxLength = 300; // 1000
+            const int maxNumNTermCleavages = 0;  // 30
+            const int maxNumCTermCleavages = 0;
+            const int minLength = 20;    // 7
+            const int maxLength = 250; // 1000
             const int minPrecursorIonCharge = 3; // 3
             const int maxPrecursorIonCharge = 30;// 67
             const int minProductIonCharge = 1; // 1
             const int maxProductIonCharge = 10;// 10
             const int numMaxModsPerProtein = 0; // 6
 
-            var precursorTolerance = new Tolerance(15);
-            var productIonTolerance = new Tolerance(15);
+            var precursorTolerance = new Tolerance(10);
+            var productIonTolerance = new Tolerance(10);
 
             //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
             //const string dbFilePath =
@@ -78,10 +79,10 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
-            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, true);
         }
@@ -89,7 +90,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTopDownSearch(
             string dbFilePath, string specFilePath, AminoAcidSet aaSet,
-            int minLength, int maxLength, int maxNumNTermCleavages,
+            int minLength, int maxLength, 
+            int maxNumNTermCleavages, int maxNumCTermCleavages,
             int minPrecursorIonCharge, int maxPrecursorIonCharge,
             int minProductIonCharge, int maxProductIonCharge,
             Tolerance precursorTolerance, Tolerance productIonTolerance,
@@ -118,7 +120,8 @@ namespace InformedProteomics.Test
 
             var indexedDb = new IndexedDatabase(db);
 
-            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsets(minLength, maxLength);
+//            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength);
+            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(minLength, maxLength);
 
             var numProteins = 0;
             long totalProtCompositions = 0;
@@ -246,6 +249,7 @@ namespace InformedProteomics.Test
             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
+
         [Test]
         public void TestDirectInfusion()
         {
@@ -292,6 +296,7 @@ namespace InformedProteomics.Test
         {
             // Search parameters
             const int maxNumNTermCleavages = 1;  // 30
+            const int maxNumCTermCleavages = 0;
             const int minLength = 7;    // 7
             const int maxLength = 1000; // 1000
             const int minPrecursorIonCharge = 3; // 3
@@ -329,7 +334,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
         }
@@ -340,6 +345,7 @@ namespace InformedProteomics.Test
             const bool isDecoy = true;
             // Search parameters
             const int maxNumNTermCleavages = 1;
+            const int maxNumCTermCleavages = 0;
             const int minLength = 7;    // 7
             const int maxLength = 1000; // 1000
             const int minPrecursorIonCharge = 3; // 3
@@ -381,7 +387,7 @@ namespace InformedProteomics.Test
                 };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, true, isDecoy);            
         }
@@ -391,6 +397,8 @@ namespace InformedProteomics.Test
         {
             // Search parameters
             const int maxNumNTermCleavages = 1;  // 30
+            const int maxNumCTermCleavages = 0;
+
             const int minLength = 7;    // 7
             const int maxLength = 1000; // 1000
             const int minPrecursorIonCharge = 3; // 3
@@ -428,7 +436,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages,
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
                 minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
         }
@@ -620,7 +628,7 @@ namespace InformedProteomics.Test
             sw.Start();
             Console.WriteLine("Generating XICs...");
 
-            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength))
             {
                 ++numProteins;
 
@@ -830,7 +838,7 @@ namespace InformedProteomics.Test
 
             var numProteins = 0;
             long totalProtCompositions = 0;
-            foreach (var protAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(minLength, maxLength))
+            foreach (var protAnnotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength))
             {
                 ++numProteins;
 

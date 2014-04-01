@@ -19,7 +19,7 @@ namespace InformedProteomics.Test
             const string dbFilePath = @"D:\Research\Data\EDRN\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var targetDb = new FastaDatabase(dbFilePath);
             var indexedDbTarget = new IndexedDatabase(targetDb);
-            var annotations = indexedDbTarget.AnnotationsAndOffsets(6, 30, 2, 1, Enzyme.Trypsin);
+            var annotations = indexedDbTarget.FullSequenceAnnotationsAndOffsets(6, 30, 2, 1, Enzyme.Trypsin);
 
             //const string spikedInPeptideFile = @"D:\Research\Data\EDRN\SpikedPeptides.txt";
             //var spikedInPeptides = File.ReadAllLines(spikedInPeptideFile);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms.VisualStyles;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using SuffixArray;
@@ -94,7 +95,7 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> FullSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
             return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
@@ -118,7 +119,7 @@ namespace InformedProteomics.Backend.Database
                 }
             }
 
-            var isStandardAminoAcid = new bool[128];
+            var isStandardAminoAcid = new bool[256];
             foreach (var residue in AminoAcid.StandardAminoAcidCharacters)
             {
                 isStandardAminoAcid[residue] = true;
@@ -131,11 +132,11 @@ namespace InformedProteomics.Backend.Database
                 var seqArr = seqAndLcp.Sequence;
                 var lcp = seqAndLcp.Lcp;
                 var offset = seqAndLcp.Offset;
-                var ntt = 0;
-                var nmc = 0;
 
                 if (enzymaticResidues != null)  
                 {
+                    var ntt = 0;
+                    var nmc = 0;
                     if (!isNTermEnzyme) // C-term enzyme 
                     {
                         if (isCleavable[seqArr[0]]) ++ntt;
@@ -149,7 +150,7 @@ namespace InformedProteomics.Backend.Database
 
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] || i < seqArr.Length-1 && seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
                                     yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                                 }
@@ -159,18 +160,59 @@ namespace InformedProteomics.Backend.Database
                     }
                     else // N-term enzyme
                     {
-                        
+                        if (seqArr[0] == FastaDatabase.Delimiter || isCleavable[seqArr[1]]) ++ntt;
+                        if (ntt < numTolerableTermini - 1) continue;
+
+                        for (var i = 2; i < seqArr.Length - 1; i++)
+                        {
+                            var code = seqArr[i];
+                            if (!isStandardAminoAcid[code]) break;
+                            if (isCleavable[code]) ++nmc;
+                            if (nmc > numMissedCleavages) break;
+
+                            if (i >= minLength && i >= lcp)
+                            {
+                                if (ntt + (isCleavable[seqArr[i + 1]] ? 1 : 0) >= numTolerableTermini)
+                                {
+                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                                }
+                            }
+                        }
                     }
                 }
-                else // no enzyme
+                else    // No enzyme
                 {
+                    for (var i = 1; i < seqArr.Length-1; i++)
+                    {
+                        var code = seqArr[i];
+
+                        // TODO: code = 185
+                        //if (code > isStandardAminoAcid.Length)
+                        //{
+                        //    Console.WriteLine("Debug : " + code);
+                        //}
+                        //if (encoding.GetString(seqArr, 1, i).Equals("QQTIAAN_VD"))
+                        //{
+                        //        Console.WriteLine("Debug : " + code);
+                        //}
+                        if (!isStandardAminoAcid[code]) break;
+                        if (i >= minLength && i >= lcp)
+                        {
+                            yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                        }
+                    }
                 }
             }
         }
 
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength)
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
         {
-            return AnnotationsAndOffsets(0, minLength, maxLength);
+            return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
+        }
+
+        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
+        {
+            return IntactSequenceAnnotationsAndOffsets(minLength, maxLength, 0);
         }
 
         public int GetLongestSequenceLength()
@@ -211,7 +253,7 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int numNTermCleavages, int minLength, int maxLength)
+        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
         {
             var encoding = Encoding.ASCII;
 
@@ -219,18 +261,18 @@ namespace InformedProteomics.Backend.Database
             {
                 var seqArr = seqWithOffset.Sequence;
                 var offset = seqWithOffset.Offset;
-                for (var i = 0; i <= numNTermCleavages; i++)
+                for (var i = 0; i <= numCTermCleavages; i++)
                 {
-                    if (seqArr.Length - i >= minLength && seqArr.Length - i <= maxLength)
+                    var length = seqArr.Length - i;
+                    if (length >= minLength && length <= maxLength)
                     {
                         yield return new AnnotationAndOffset(
                             offset,
                             string.Format("{0}.{1}.{2}",
-                            (i == 0 ? "_" : encoding.GetString(seqArr, i - 1, 1)),
-                            encoding.GetString(seqArr, i, seqArr.Length - i),
-                            "_")
+                            "_",
+                            encoding.GetString(seqArr, 0, length),
+                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
                             );
-                        // yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                     }
                 }
             }
