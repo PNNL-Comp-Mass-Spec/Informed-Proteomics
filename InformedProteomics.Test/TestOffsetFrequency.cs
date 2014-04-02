@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -21,8 +23,8 @@ namespace InformedProteomics.Test
         private int _searchWidth;
 
         private ActivationMethod _act;
-        private double _precursorCharge;
-        private int _binWidth;
+        private int _precursorCharge;
+        private double _binWidth;
 
         [Test]
         public void OffsetFrequencyFunction()
@@ -39,7 +41,19 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                var offsetFrequencyTable = new OffsetFrequencyTable(_searchWidth);
+                int tableCount = 1;
+                if (_precursorCharge > 0)
+                    tableCount = _precursorCharge;
+
+                var offsetFrequencyTables = new OffsetFrequencyTable[tableCount];
+                for (int i = 0; i < tableCount; i++)
+                {
+                    if (_precursorCharge > 0)
+                        offsetFrequencyTables[i] = new OffsetFrequencyTable(_searchWidth, i+1, _binWidth/(i+1));
+                    else
+                        offsetFrequencyTables[i] = new OffsetFrequencyTable(_searchWidth, i+1, _binWidth);
+                }
+
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
@@ -49,18 +63,31 @@ namespace InformedProteomics.Test
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
 
-                    offsetFrequencyTable.AddMatches(matchList.GetCharge(1), new Tolerance(0.5, ToleranceUnit.Da));
+                    for (int j = 0; j < tableCount; j++)
+                    {
+                        offsetFrequencyTables[j].AddMatches(
+                            _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList.Matches);
+                    }
                 }
 
-                var offsetFrequencies = offsetFrequencyTable.OffsetFrequencies;
+                var offsetFrequencies = new List<OffsetProbability>[tableCount];
+                for (int i = 0; i < tableCount; i++)
+                {
+                    offsetFrequencies[i] = offsetFrequencyTables[i].OffsetFrequencies;
+                }
 
                 var outFileName = _outFileName.Replace("@", name);
-                using (var outFile = new StreamWriter(outFileName))
+                for (int i = 0; i < tableCount; i++)
                 {
-                    outFile.WriteLine("Offset\tFound");
-                    foreach (var offsetFrequency in offsetFrequencies)
+                    var chargeOutFileName = outFileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
+                    using (var outFile = new StreamWriter(chargeOutFileName))
                     {
-                        outFile.WriteLine("{0}\t{1}", offsetFrequency.Offset, offsetFrequency.Found);
+                        outFile.WriteLine("Offset\tFound");
+                        foreach (var offsetFrequency in offsetFrequencies[i])
+                        {
+//                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
+                            outFile.WriteLine("{0}\t{1}", offsetFrequency.Offset, offsetFrequency.Prob);
+                        }
                     }
                 }
             }
@@ -87,9 +114,9 @@ namespace InformedProteomics.Test
             }
 
             _noiseFiltration = Convert.ToDouble(config.Contents["noisefiltration"]);
-            _precursorCharge = Convert.ToDouble(config.Contents["precursorcharge"]);
+            _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
             _searchWidth = Convert.ToInt32(config.Contents["searchwidth"]);
-            _binWidth = Convert.ToInt32(config.Contents["binwidth"]);
+            _binWidth = Convert.ToDouble(config.Contents["binwidth"]);
 
             // Read input and output file names
             var fileInfo = reader.GetNodes("fileinfo").First();

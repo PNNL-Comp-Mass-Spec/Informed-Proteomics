@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -10,36 +8,42 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     {
         private readonly Histogram<double> _offsetCounts;
 
-        private readonly IonType _precursorIonType;
+        private readonly List<IonType> _precursorIonTypes;
 
         private readonly int _searchWidth;
         private readonly double _binWidth;
 
-        public OffsetFrequencyTable(int searchWidth, double binWidth=1.005, int maxCharge=4)
+        public int Charge { get; private set; }
+
+        public int Total { get; private set; }
+
+        public OffsetFrequencyTable(int searchWidth, int charge=1, double binWidth=1.005)
         {
             _offsetCounts = new Histogram<double>();
             _searchWidth = searchWidth;
             _binWidth = binWidth;
+            Charge = charge;
+            Total = 0;
             GenerateEdges();
 
             BaseIonType[] baseIons = { BaseIonType.Y };
             NeutralLoss[] neutralLosses = { NeutralLoss.NoLoss };
 
-            var ionTypeFactory = new IonTypeFactory(baseIons, neutralLosses, maxCharge);
+            var ionTypeFactory = new IonTypeFactory(baseIons, neutralLosses, charge);
 
-            _precursorIonType = ionTypeFactory.GetIonType("y");
+            _precursorIonTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
         }
 
         private void GenerateEdges()
         {
             var binEdges = new List<double>();
-            for (double i = 0; i >= -1*_searchWidth; i-=_binWidth)
+            for (double width = 0; width >= -1*_searchWidth; width-=_binWidth)
             {
-                binEdges.Add(i);
+                binEdges.Add(width);
             }
-            for (double i = 0; i < _searchWidth; i += _binWidth)
+            for (double width = 0; width < _searchWidth; width += _binWidth)
             {
-                binEdges.Add(i);
+                binEdges.Add(width);
             }
 
             binEdges = binEdges.Distinct().ToList();
@@ -52,54 +56,31 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             get
             {
-                var offsetFrequencies = new List<OffsetProbability>();
                 var bins = _offsetCounts.Bins;
-                for (int i = 0; i < _offsetCounts.BinEdges.Length; i++)
-                {
-                    if (bins[i].Count > 0)
-                        offsetFrequencies.Add(new OffsetProbability(_offsetCounts.BinEdges[i], bins[i].Count));
-                }
-                return offsetFrequencies;
+                return _offsetCounts.BinEdges.Select((t, i) => new OffsetProbability(t, bins[i].Count, Total)).ToList();
             }
         }
 
-        public void AddMatches(List<SpectrumMatch> matches, Tolerance tolerance)
+        public void AddMatches(List<SpectrumMatch> matches)
         {
             foreach (var match in matches)
             {
-                var ion = _precursorIonType.GetIon(match.PeptideComposition);
+                Total++;
+                var ion = _precursorIonTypes[Charge-1].GetIon(match.PeptideComposition);
                 var monoIsotopicMz = ion.GetMonoIsotopicMz();
                 var min = monoIsotopicMz - _searchWidth;
                 var max = monoIsotopicMz + _searchWidth;
-                int basePeakIndex;
-                if (tolerance.GetUnit() == ToleranceUnit.Da)
-                {
-                    var toleranceValue = tolerance.GetValue();
-                    basePeakIndex = match.Spectrum.FindPeakIndex(monoIsotopicMz - toleranceValue, monoIsotopicMz + toleranceValue);
-                }
-                else
-                {
-                    basePeakIndex = match.Spectrum.FindPeakIndex(monoIsotopicMz, tolerance);
-                }
+
                 var peaks = match.Spectrum.Peaks;
                 var offsetMzCollection = new List<double>();
 
-                if (basePeakIndex <= 0 || basePeakIndex >= peaks.Length) continue;
-                
-                for (int i = basePeakIndex;  i >= 0 && peaks[i].Mz >= min; i--)
+                foreach (var peak in peaks)
                 {
-                    var currentMz = peaks[i].Mz;
-                    var offset = currentMz - monoIsotopicMz;
-
-                    offsetMzCollection.Add(offset);
-                }
-
-                for (int i = basePeakIndex; i < peaks.Length && peaks[i].Mz <= max; i++)
-                {
-                    var currentMz = peaks[i].Mz;
-                    var offset = currentMz - monoIsotopicMz;
-
-                    offsetMzCollection.Add(offset);
+                    if (peak.Mz >= min && peak.Mz <= max)
+                    {
+                        var offset = peak.Mz - monoIsotopicMz;
+                        offsetMzCollection.Add(offset);
+                    }
                 }
 
                 _offsetCounts.AddData(offsetMzCollection);
