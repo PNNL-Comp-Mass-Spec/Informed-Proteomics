@@ -1,23 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-    public class OffsetFrequencyTable
+    public abstract class OffsetFrequencyTable
     {
-        private readonly Histogram<double> _offsetCounts;
-
-        private readonly List<IonType> _precursorIonTypes;
-
         private readonly int _searchWidth;
         private readonly double _binWidth;
+        private readonly Histogram<double> _offsetCounts;
 
         public int Charge { get; private set; }
+        public int Total { get; protected set; }
 
-        public int Total { get; private set; }
-
-        public OffsetFrequencyTable(int searchWidth, int charge=1, double binWidth=1.005)
+        protected OffsetFrequencyTable(int searchWidth, int charge=1, double binWidth=1.005)
         {
             _offsetCounts = new Histogram<double>();
             _searchWidth = searchWidth;
@@ -25,13 +20,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Charge = charge;
             Total = 0;
             GenerateEdges();
-
-            BaseIonType[] baseIons = { BaseIonType.Y };
-            NeutralLoss[] neutralLosses = { NeutralLoss.NoLoss };
-
-            var ionTypeFactory = new IonTypeFactory(baseIons, neutralLosses, charge);
-
-            _precursorIonTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
         }
 
         private void GenerateEdges()
@@ -52,6 +40,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _offsetCounts.BinEdges = binEdges.ToArray();
         }
 
+        protected double GetMinMz(double mz)
+        {
+            return (mz - _searchWidth);
+        }
+
+        protected double GetMaxMz(double mz)
+        {
+            return (mz + _searchWidth);
+        }
+
+        protected void AddOffsets(List<double> offsets)
+        {
+            _offsetCounts.AddData(offsets);
+        }
+
         public List<OffsetProbability> OffsetFrequencies
         {
             get
@@ -61,30 +64,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public void AddMatches(List<SpectrumMatch> matches)
-        {
-            foreach (var match in matches)
-            {
-                Total++;
-                var ion = _precursorIonTypes[Charge-1].GetIon(match.PeptideComposition);
-                var monoIsotopicMz = ion.GetMonoIsotopicMz();
-                var min = monoIsotopicMz - _searchWidth;
-                var max = monoIsotopicMz + _searchWidth;
-
-                var peaks = match.Spectrum.Peaks;
-                var offsetMzCollection = new List<double>();
-
-                foreach (var peak in peaks)
-                {
-                    if (peak.Mz >= min && peak.Mz <= max)
-                    {
-                        var offset = peak.Mz - monoIsotopicMz;
-                        offsetMzCollection.Add(offset);
-                    }
-                }
-
-                _offsetCounts.AddData(offsetMzCollection);
-            }
-        }
+        public abstract void AddMatches(List<SpectrumMatch> matches);
     }
 }

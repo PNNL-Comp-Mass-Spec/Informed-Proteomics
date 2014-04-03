@@ -62,6 +62,7 @@
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\RankScorer.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
+    <Compile Include="LikelihoodScoring\CleavageOffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\ConfigFileReader.cs" />
     <Compile Include="LikelihoodScoring\FitScore.cs" />
     <Compile Include="LikelihoodScoring\FitScoreList.cs" />
@@ -71,12 +72,16 @@
     <Compile Include="LikelihoodScoring\IonFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\OffsetProbability.cs" />
+    <Compile Include="LikelihoodScoring\PrecursorFilter.cs" />
+    <Compile Include="LikelihoodScoring\PrecursorOffsetFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\PrecursorOffsets.cs" />
     <Compile Include="LikelihoodScoring\Probability.cs" />
     <Compile Include="LikelihoodScoring\RankedPeaks.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="LikelihoodScoring\RankTable.cs" />
     <Compile Include="LikelihoodScoring\ScoreTable.cs" />
+    <Compile Include="LikelihoodScoring\SpectrumFilter.cs" />
     <Compile Include="LikelihoodScoring\SpectrumMatch.cs" />
     <Compile Include="GeneratingFunction\ScoreDistribution.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphEdge.cs" />

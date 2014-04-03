@@ -22,7 +22,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 foreach (var spectrumMatch in spectrumMatches)
                 {
 
-                    var offsetFrequencyTable = new OffsetFrequencyTable(100, spectrumMatch.PrecursorCharge,
+                    var offsetFrequencyTable = new PrecursorOffsetFrequencyTable(100, spectrumMatch.PrecursorCharge,
                         1.005/spectrumMatch.PrecursorCharge);
 
                     var ionType = _ionTypes[spectrumMatch.PrecursorCharge - 1];

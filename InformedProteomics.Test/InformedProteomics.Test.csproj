@@ -93,6 +93,7 @@
     <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />
+    <Compile Include="FunctionalTests\TestPrecursorFilter.cs" />
     <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
     <Compile Include="FunctionalTests\TestSuffixArray.cs" />
+    <Compile Include="TestRankCorrelation.cs" />
     <Compile Include="TestRankPeakProbability.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />

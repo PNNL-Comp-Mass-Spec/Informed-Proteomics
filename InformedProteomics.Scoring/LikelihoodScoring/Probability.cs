@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -24,8 +21,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public static Probability operator +(Probability l, Probability r)
         {
-            var added = new Probability() {Found = l.Found + r.Found, Total = l.Total + r.Total};
+            var added = new Probability(l.Found + r.Found, l.Total + r.Total);
             return added;
+        }
+    }
+
+    public class CompareByProbability : IComparer<Probability>
+    {
+        public int Compare(Probability x, Probability y)
+        {
+            return x.Prob.CompareTo(y.Prob);
         }
     }
 }
