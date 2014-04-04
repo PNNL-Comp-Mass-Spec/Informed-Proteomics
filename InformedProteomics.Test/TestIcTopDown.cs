@@ -35,7 +35,7 @@ namespace InformedProteomics.Test
         public void TestSbepSearch(string specFilePath, string dbFilePath)
         {
             // Search parameters
-            const int maxNumNTermCleavages = 0;  // 30
+            const int maxNumNTermCleavages = 30;  // 30
             const int maxNumCTermCleavages = 0;
             const int minLength = 20;    // 7
             const int maxLength = 250; // 1000
@@ -47,16 +47,6 @@ namespace InformedProteomics.Test
 
             var precursorTolerance = new Tolerance(10);
             var productIonTolerance = new Tolerance(10);
-
-            //const string dbFilePath = @"..\..\..\TestFiles\BSA.fasta";
-            //const string dbFilePath =
-            //    @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
-            
-//            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\Test.fasta";
-            //            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownSigma48\P01031.fasta";
-
-            //            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\E_coli_iscU_60_mock.raw";
-            //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
 
             // Configure amino acid set
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
@@ -88,6 +78,52 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestModificationSearch()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\TestMod.fasta";
+
+            // Search parameters
+            const int maxNumNTermCleavages = 1;  // 30
+            const int maxNumCTermCleavages = 0;
+            const int minLength = 20;    // 7
+            const int maxLength = 250; // 1000
+            const int minPrecursorIonCharge = 3; // 3
+            const int maxPrecursorIonCharge = 30;// 67
+            const int minProductIonCharge = 1; // 1
+            const int maxProductIonCharge = 10;// 10
+            const int numMaxModsPerProtein = 2; // 6
+
+            var precursorTolerance = new Tolerance(10);
+            var productIonTolerance = new Tolerance(10);
+
+            // Configure amino acid set
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                //pyroGluQ,
+                dehydroC,
+                //cysteinylC,
+                //deamdN,
+                //deamdQ
+                //glutathioneC,
+                //oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
+                minPrecursorIonCharge, maxPrecursorIonCharge,
+                minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
+        }
+
+        [Test]
         public void TestTopDownSearch(
             string dbFilePath, string specFilePath, AminoAcidSet aaSet,
             int minLength, int maxLength, 
@@ -107,7 +143,7 @@ namespace InformedProteomics.Test
             //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt");
+            //var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt");
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
@@ -120,8 +156,8 @@ namespace InformedProteomics.Test
 
             var indexedDb = new IndexedDatabase(db);
 
-//            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength);
-            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(minLength, maxLength);
+            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength, maxNumCTermCleavages);
+            //var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(minLength, maxLength);
 
             var numProteins = 0;
             long totalProtCompositions = 0;
@@ -182,8 +218,8 @@ namespace InformedProteomics.Test
 
                         seqGraph.SetSink(modIndex, numNTermCleavage);
                         var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                        //if (compSet.Contains(protCompositionWithH2O)) continue;
-                        //compSet.Add(protCompositionWithH2O);
+
+                        var modCombinations = seqGraph.ModificationParams.GetModificationCombination(modIndex);
 
                         totalProtCompositions++;
                         for (var charge = minPrecursorIonCharge; charge <= maxPrecursorIonCharge; charge++)
@@ -210,15 +246,24 @@ namespace InformedProteomics.Test
                                     score <= existingBestScore) continue;
 
                                 // new best score
+                                var sequence = annotation.Substring(numNTermCleavage + 2,
+                                    annotation.Length - 4 - numNTermCleavage);
+                                var proteinName = targetDb.GetProteinName(offset);
+                                var start = targetDb.GetZeroBasedPositionInProtein(offset) + 1;
+                                var end = start + sequence.Length - 1;
+                                var protLength = targetDb.GetProteinLength(proteinName);
                                 bestScorePerScan[ms2ScanNum] = score;
-                                bestResultPerScan[ms2ScanNum] = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
-                                    annotation.Substring(numNTermCleavage + 2,
-                                        annotation.Length - 4 - numNTermCleavage),
-                                    (isDecoy ? "XXX_" : "") + targetDb.GetProteinName(offset),
-                                    targetDb.GetProteinDescription(offset),
-                                    precursorIon.Composition,
-                                    charge,
-                                    precursorIon.GetMostAbundantIsotopeMz(),
+                                bestResultPerScan[ms2ScanNum] = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}",
+                                    annotation.Substring(numNTermCleavage + 2, annotation.Length - 4 - numNTermCleavage),   // Sequence
+                                    modCombinations,    // Modifications
+                                    precursorIon.Composition,   // Composition
+                                    (isDecoy ? FastaDatabase.DecoyProteinPrefix + "_" : "") + proteinName,  // ProteinName
+                                    targetDb.GetProteinDescription(offset), // ProteinDescription
+                                    protLength, // ProteinLength
+                                    start,   // Start
+                                    end,    // End
+                                    charge, // Charge
+                                    precursorIon.GetMostAbundantIsotopeMz(),    // MostAbundantIsotopeMz
                                     score);
                             }
                         }
@@ -231,7 +276,8 @@ namespace InformedProteomics.Test
             var outputFilePath = Path.ChangeExtension(specFilePath, icExtension);
             using (var writer = new StreamWriter(outputFilePath))
             {
-                writer.WriteLine("ScanNum\tAnnotation\tProtein\tProteinDesc\tComposition\tCharge\tBaseIsotopeMz\tScore");
+//                writer.WriteLine("ScanNum\tAnnotation\tProtein\tProteinDesc\tComposition\tCharge\tBaseIsotopeMz\tScore");
+                writer.WriteLine("ScanNum\tSequence\tModifications\tComposition\tProteinName\tProteinDesc\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tScore");
                 var ms2Scans = new List<int>(bestScorePerScan.Keys);
                 ms2Scans.Sort();
                 foreach (var ms2ScanNum in bestScorePerScan.OrderByDescending(e => e.Value).Select(scanScorePair => scanScorePair.Key))
@@ -248,6 +294,52 @@ namespace InformedProteomics.Test
 
             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestJia()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\TestMod.fasta";
+
+            // Search parameters
+            const int maxNumNTermCleavages = 1;  // 30
+            const int maxNumCTermCleavages = 0;
+            const int minLength = 20;    // 7
+            const int maxLength = 250; // 1000
+            const int minPrecursorIonCharge = 3; // 3
+            const int maxPrecursorIonCharge = 30;// 67
+            const int minProductIonCharge = 1; // 1
+            const int maxProductIonCharge = 10;// 10
+            const int numMaxModsPerProtein = 2; // 6
+
+            var precursorTolerance = new Tolerance(10);
+            var productIonTolerance = new Tolerance(10);
+
+            // Configure amino acid set
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                //pyroGluQ,
+                dehydroC,
+                //cysteinylC,
+                //deamdN,
+                //deamdQ
+                //glutathioneC,
+                //oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            TestTopDownSearch(dbFilePath, specFilePath, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
+                minPrecursorIonCharge, maxPrecursorIonCharge,
+                minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, false);
         }
 
         [Test]

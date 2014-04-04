@@ -66,10 +66,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 return newModCombIndex;
             }
-            else
-            {
-                return -1;
-            }
+            return -1;
+        }
+
+        public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<ModificationCombination> GetModificationCombinations()
@@ -115,7 +117,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     continue;
                 if (modArray[0] != 0) // this ModificationCombination has _maxNumDynModsPerSequence modifications
                     continue;
-                for (int modIndex = 0; modIndex < _modifications.Length; modIndex++)
+                for (var modIndex = 0; modIndex < _modifications.Length; modIndex++)
                 {
                     var newArray = new int[modArray.Length];
                     Array.Copy(modArray, newArray, modArray.Length);

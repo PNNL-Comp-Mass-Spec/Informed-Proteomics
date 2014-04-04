@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms.VisualStyles;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using SuffixArray;
@@ -95,13 +94,12 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<AnnotationAndOffset> FullSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
             return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
                                enzyme.IsNTerm);
         }
-
 
 
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,

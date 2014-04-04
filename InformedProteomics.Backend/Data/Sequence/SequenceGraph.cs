@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -197,7 +198,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         public void SetSink(int modIndex, int numNTermCleavages)
         {
             _sinkSeqIndex = _index - 1 - numNTermCleavages;
-            _sink = _graph[_sinkSeqIndex][modIndex];
+            _sinkModIndex = modIndex;
+            _sink = _graph[_sinkSeqIndex][_sinkModIndex];
             _sinkSequenceComposition = GetComposition(_sinkSeqIndex, modIndex);
             _sinkSequenceCompositionWithH2O = _sinkSequenceComposition + Composition.Composition.H2O;
             _sinkSequenceCompositionWithH2O.ComputeApproximateIsotopomerEnvelop();
@@ -213,6 +215,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private Composition.Composition _sinkSequenceCompositionWithH2O;
         private Node _sink;
         private int _sinkSeqIndex;
+        private int _sinkModIndex;
         private Composition.Composition[,] _compNodeComposition;
 
         public double GetScore(int charge, IScorer scorer)
@@ -229,11 +232,13 @@ namespace InformedProteomics.Backend.Data.Sequence
                 nodeScore[si] = new double?[_graph[si].Length];
                 maxScore[si] = new double?[_graph[si].Length];
             }
-            maxScore[0][0] = 0;
+            maxScore[0][0] = 0.0;
+            nodeScore[_sinkSeqIndex][_sinkModIndex] = 0.0;
 
-            var fragmentScore =
-                _sink.GetPrevNodeIndices()
-                    .Max(prevNodeIndex => GetFragmentScore(_sinkSeqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
+            //var fragmentScore =
+            //    _sink.GetPrevNodeIndices()
+            //        .Max(prevNodeIndex => GetFragmentScore(_sinkSeqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
+            var fragmentScore = GetFragmentScore(_sinkSeqIndex, _sinkModIndex, scorer, nodeScore, maxScore);
             return precursorIonScore + fragmentScore;
         }
 
@@ -254,10 +259,81 @@ namespace InformedProteomics.Backend.Data.Sequence
                         .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
-// ReSharper disable PossibleInvalidOperationException
+            // ReSharper disable PossibleInvalidOperationException
             return (double)maxScore[seqIndex][modIndex];
-// ReSharper restore PossibleInvalidOperationException
+            // ReSharper restore PossibleInvalidOperationException
         }
+
+        public Tuple<double, string> GetScoreAndModifications(int charge, IScorer scorer)
+        {
+            var precursorIon = new Ion(_sinkSequenceCompositionWithH2O, charge);
+
+            // Get 
+            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
+
+            var nodeScore = new double?[_maxSeqIndex][];
+            var maxScore = new Tuple<double, string>[_maxSeqIndex][];
+            for (var si = 0; si < _maxSeqIndex; si++)
+            {
+                nodeScore[si] = new double?[_graph[si].Length];
+                maxScore[si] = new Tuple<double, string>[_graph[si].Length];
+            }
+            maxScore[0][0] = new Tuple<double, string>(0.0, "");
+            nodeScore[_sinkSeqIndex][_sinkModIndex] = 0.0;
+
+            var fragmentScore = GetFragmentScoreAndModifications(_sinkSeqIndex, _sinkModIndex, scorer, nodeScore,
+                maxScore);
+
+            return new Tuple<double, string>(fragmentScore.Item1 + precursorIonScore, fragmentScore.Item2);
+        }
+
+        private Tuple<double, string> GetFragmentScoreAndModifications(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, Tuple<double, string>[][] maxScoreAndMods)
+        {
+            var scoreAndMods = maxScoreAndMods[seqIndex][modIndex];
+            if (scoreAndMods != null) return scoreAndMods;
+
+            var node = _graph[seqIndex][modIndex];
+            var curNodeScore = nodeScore[seqIndex][modIndex] ??
+                (nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex)));
+
+            var bestPrevNodeIndex = -1;
+            var bestPrevNodeScore = double.NegativeInfinity;
+            string bestPrevSequence = null;
+            foreach (var prevNodeIndex in node.GetPrevNodeIndices())
+            {
+                var prevNodeScoreAndSequence = GetFragmentScoreAndModifications(seqIndex - 1, prevNodeIndex, scorer,
+                    nodeScore, maxScoreAndMods);
+                var prevNodeScore = prevNodeScoreAndSequence.Item1;
+                if (prevNodeScore > bestPrevNodeScore)
+                {
+                    bestPrevNodeIndex = prevNodeIndex;
+                    bestPrevNodeScore = prevNodeScore;
+                    bestPrevSequence = prevNodeScoreAndSequence.Item2;
+                }
+            }
+
+            if (bestPrevNodeIndex < 0)  // source
+            {
+                return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>((double)curNodeScore, "");
+            }
+
+            var prevModCombIndex = _graph[seqIndex - 1][bestPrevNodeIndex].ModificationCombinationIndex;
+            var curModCombIndex = node.ModificationCombinationIndex;
+            if (prevModCombIndex != curModCombIndex) // modified
+            {
+                var modificationName = ModificationParams.GetModificationIndexBetween(prevModCombIndex, curModCombIndex).Name;
+                string newModSequence;
+                if (string.IsNullOrEmpty(bestPrevSequence)) newModSequence = modificationName + " " + (seqIndex - 1);
+                else newModSequence = "," + modificationName + " " + (seqIndex - 1);
+                
+                return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
+                    ((double)curNodeScore + bestPrevNodeScore, newModSequence);
+            }
+
+            return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
+                ((double)curNodeScore + bestPrevNodeScore, bestPrevSequence);
+        }
+
 
         private Composition.Composition GetComposition(int seqIndex, int modIndex)
         {

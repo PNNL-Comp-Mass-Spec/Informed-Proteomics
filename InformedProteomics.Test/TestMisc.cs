@@ -23,7 +23,7 @@ namespace InformedProteomics.Test
         [Test]
         public void AddNaToTable()
         {
-            const string dir = @"D:\Research\Data\IPRG2014";
+            const string dir = @"D:\Research\Data\IPRG2015";
             const string resultFilePath = dir + @"\AMTAllPeptidesMissingValues.tsv";
             foreach (var line in File.ReadLines(resultFilePath))
             {
@@ -39,7 +39,7 @@ namespace InformedProteomics.Test
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
-            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\MSAlign\Proteins.txt";
+            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\MSAlign_NoBlindMod\Proteins.txt";
             foreach (var protein in File.ReadLines(proteinListPath))
             {
                 var proteinId = protein.Split(null)[0];
@@ -51,12 +51,12 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateAbrfSpecCountAllProteins()
         {
-            const string dir = @"D:\Research\Data\IPRG2014";
+            const string dir = @"H:\Research\IPRG2015";
             const double qValueThreshold = 0.01;
             //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
-            const string resultDir = dir + @"\10ppm_TI0_NTT1";
+            const string resultDir = dir + @"\mzid";
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
 
             var specCount = new Dictionary<string, int[]>();  // protein name => array of counts
@@ -97,16 +97,16 @@ namespace InformedProteomics.Test
             }
 
             // Writing
-            const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.fasta";
+            const string databaseFilePath = dir + @"\yeast6mix.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
-            var spikeInAccessions = new[] { "P00924", "P00330", "P62894", "P02769"};
+//            var spikeInAccessions = new[] { "STANDARD_Alpha-Casein", "STANDARD_Beta-Lactoglobulin", "STANDARD_Carbonic-Anhydrase", "P02769"};
 
             const string outputFilePath = dir + @"\SpecCountAllProteins.tsv";
             using (var writer = new StreamWriter(outputFilePath))
             {
-                var fileIds = msgfResultFiles.Select(f => f.Substring(f.LastIndexOf('_') + 1, 3));
+                var fileIds = msgfResultFiles.Select(f => f.Substring(f.LastIndexOf('_') + 1, f.LastIndexOf('.') - f.LastIndexOf('_') - 1));
                 writer.WriteLine("Protein\tLength\t" + string.Join("\t", fileIds) + "\tSpikeIn");
                 foreach (var entry in specCount)
                 {
@@ -116,7 +116,8 @@ namespace InformedProteomics.Test
                     var counts = entry.Value;
                     Assert.True(counts.Length == msgfResultFiles.Length);
                     var spikeIn = 0;
-                    if (spikeInAccessions.Any(spikeInAccession => proteinId.StartsWith("sp|" + spikeInAccession)))
+                    //if (spikeInAccessions.Any(spikeInAccession => proteinId.StartsWith("sp|" + spikeInAccession)))
+                    if(proteinId.StartsWith("STANDARD"))
                     {
                         spikeIn = 1;
                     }
@@ -197,7 +198,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
             Console.WriteLine("Peptide\tFormula\tProtein");
-            foreach (var annotationAndOffset in indexedDatabase.FullSequenceAnnotationsAndOffsets(6, 30, 1, 1, Enzyme.Trypsin))
+            foreach (var annotationAndOffset in indexedDatabase.AnnotationsAndOffsets(6, 30, 1, 1, Enzyme.Trypsin))
             {
                 var annotation = annotationAndOffset.Annotation;
                 var peptide = annotation.Substring(2, annotation.Length - 4);

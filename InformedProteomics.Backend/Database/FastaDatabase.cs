@@ -205,6 +205,11 @@ namespace InformedProteomics.Backend.Database
             return -1;
         }
 
+        public int GetZeroBasedPositionInProtein(long offset)
+        {
+            return (int)(offset - GetOffsetKey(offset));
+        }
+
         internal int GetLastWriteTimeHash()
         {
             return _lastWriteTimeHash;

@@ -52,7 +52,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(20, 250).LongCount();
@@ -60,6 +60,26 @@ namespace InformedProteomics.Test.FunctionalTests
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestGettingProteinLengthAndPosition()
+        {
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            var db = new FastaDatabase(dbFile);
+            db.Read();
+            var indexedDb = new IndexedDatabase(db);
+            foreach (var peptideAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(6, 20, 2, 0, Enzyme.Trypsin))
+            {
+                var annotation = peptideAnnotationAndOffset.Annotation;
+                var offset = peptideAnnotationAndOffset.Offset;
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
+                    annotation, 
+                    offset, 
+                    db.GetProteinName(offset), 
+                    db.GetProteinLength(db.GetProteinName(offset)), 
+                    db.GetZeroBasedPositionInProtein(offset)+1);
+            }
         }
 
         //[Test]
