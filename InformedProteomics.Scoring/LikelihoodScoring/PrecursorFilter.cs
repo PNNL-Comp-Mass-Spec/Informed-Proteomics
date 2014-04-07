@@ -9,16 +9,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly Dictionary<int, PrecursorOffsets> _offsets; 
         private readonly List<IonType> _precursorIonTypes;
         private readonly Tolerance _tolerance;
-        private readonly double _searchWidth;
-        private readonly int _retentionCount;
 
-        public PrecursorFilter(Dictionary<int, PrecursorOffsets> offsets, Tolerance tolerance,
-                               double searchWidth, int retentionCount)
+        public PrecursorFilter(Dictionary<int, PrecursorOffsets> offsets, Tolerance tolerance)
         {
             _offsets = offsets;
             _tolerance = tolerance;
-            _searchWidth = searchWidth;
-            _retentionCount = retentionCount;
 
             var maxCharge = offsets.Keys.Max();
 
@@ -30,19 +25,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _precursorIonTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
         }
 
-        private SpectrumMatch Filter(SpectrumMatch specMatch, bool filterNoise)
+        private SpectrumMatch Filter(SpectrumMatch specMatch)
         {
             var charge = specMatch.PrecursorCharge;
             var peaks = specMatch.Spectrum.Peaks.ToList();
             var offsetLists = _offsets[charge];
 
-            for (int i = 0; i < _precursorIonTypes.Count; i++)
+            for (int i = 0; i < offsetLists.Charge; i++)
             {
                 var ion = _precursorIonTypes[i].GetIon(specMatch.PeptideComposition);
                 var mz = ion.GetMonoIsotopicMz();
-
-                if (filterNoise)
-                    peaks = (SpectrumFilter.FilterNoisePeaks(specMatch.Spectrum)).Peaks.ToList();
 
                 var offsets = offsetLists.GetChargeOffsets(i + 1);
 
@@ -63,11 +55,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return filteredSpecMatch;
         }
 
-        public List<SpectrumMatch> FilterMatches(List<SpectrumMatch> matches, bool filterNoise=true)
+        public List<SpectrumMatch> FilterMatches(List<SpectrumMatch> matches)
         {
             for (int i = 0; i < matches.Count; i++)
             {
-                matches[i] = Filter(matches[i], filterNoise);
+                matches[i] = Filter(matches[i]);
             }
             return matches;
         }

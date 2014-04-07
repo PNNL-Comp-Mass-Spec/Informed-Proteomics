@@ -94,84 +94,11 @@ namespace InformedProteomics.Test.FunctionalTests
             StreamWriter outputFile = File.AppendText(OutputFileName);
             foreach (var spectrumMatch in spectrumMatchList)
             {
-                var offsetFrequencies = new IonFrequencyTable();
-                offsetFrequencies.AddCleavageProbabilities(new List<SpectrumMatch>{spectrumMatch}, _ionTypes, _tolerance,
-                    RelativeIntensityThreshold);
+                var offsetFrequencies = new CleavageIonFrequencyTable(_ionTypes, _tolerance, RelativeIntensityThreshold);
+                offsetFrequencies.AddMatches(new List<SpectrumMatch>{spectrumMatch});
                 var probabilities = offsetFrequencies.IonProbabilityTable;
 
                 var testProbabilities = ComputeOffsetFrequencies(spectrumMatch);
-
-                Assert.True(probabilities.Count == testProbabilities.Count);
-
-                probabilities.Sort(new CompareIonProbabilityByIon());
-                testProbabilities.Sort(new CompareIonProbabilityByIon());
-
-                outputFile.WriteLine("Scan:\t{0}\tPeptide:\t{1}\tCharge:\t{2}", spectrumMatch.ScanNum, spectrumMatch.Peptide, spectrumMatch.PrecursorCharge);
-                outputFile.WriteLine("Ion\tFound\tTotal\tTestFound\tTestTotal\tEqual?");
-                for (int i = 0; i < probabilities.Count; i++)
-                {
-                    Assert.True(probabilities[i].IonName == testProbabilities[i].IonName);
-
-                    bool foundEqual = probabilities[i].Found == testProbabilities[i].Found;
-                    bool totalEqual = probabilities[i].Total == testProbabilities[i].Total;
-
-                    outputFile.Write(probabilities[i].IonName + "\t");
-                    outputFile.Write("{0}\t{1}\t", probabilities[i].Found, probabilities[i].Total);
-                    outputFile.Write("{0}\t{1}\t", testProbabilities[i].Found, testProbabilities[i].Total);
-                    outputFile.WriteLine(foundEqual && totalEqual);
-                }
-                outputFile.WriteLine();
-            }
-            outputFile.Close();
-        }
-
-
-        List<IonProbability> ComputePrecursorFrequencies(SpectrumMatch spectrumMatch)
-        {
-            var debugFile = File.AppendText(DebugFileName);
-
-            var peptide = spectrumMatch.Peptide;
-            var spectrum = spectrumMatch.Spectrum;
-
-            var probabilities = new Dictionary<IonType, IonProbability>();
-
-            debugFile.WriteLine("Scan:\t{0}\tPeptide:\t{1}\tCharge:\t{2}", spectrumMatch.ScanNum, peptide, spectrumMatch.PrecursorCharge);
-            debugFile.WriteLine("Ion\tM/Z\tFound");
-
-            foreach (var ionType in _ionTypes)
-            {
-                if (!probabilities.ContainsKey(ionType))
-                    probabilities.Add(ionType, new IonProbability(ionType.Name));
-
-                var ion = ionType.GetIon(spectrumMatch.PeptideComposition);
-                double mz = ion.GetMonoIsotopicMz();
-                var present = spectrum.ContainsIon(ion, _tolerance, RelativeIntensityThreshold);
-                probabilities[ionType].Total++;
-                if (present)
-                    probabilities[ionType].Found++;
-
-                debugFile.WriteLine("{0}\t{1}\t{2}", ionType.Name, mz, present);
-            }
-
-            debugFile.Close();
-            return probabilities.Values.ToList();
-        }
-
-        [Test]
-        public void PrecursorIonPresent()
-        {
-            var spectrumMatchList = InitTest();
-
-            StreamWriter outputFile = File.AppendText(OutputFileName);
-            foreach (var spectrumMatch in spectrumMatchList)
-            {
-                var precursorFrequencies = new IonFrequencyTable();
-                precursorFrequencies.AddPrecursorProbabilities(new List<SpectrumMatch> {spectrumMatch}, _ionTypes,
-                    _tolerance, RelativeIntensityThreshold);
-
-                var probabilities = precursorFrequencies.IonProbabilityTable;
-
-                var testProbabilities = ComputePrecursorFrequencies(spectrumMatch);
 
                 Assert.True(probabilities.Count == testProbabilities.Count);
 
@@ -221,7 +148,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 
-            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act)).Matches;
+            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act));
 
             return spectrumMatches;
         }

@@ -1,33 +1,42 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class SpectrumFilter
     {
+        /// <summary>
+        /// For each peak in the spectrum, get all peaks within mzWidth m/z of the peak.
+        /// Keep the peak if it is one of the top retentionCount peaks in that range.
+        /// </summary>
+        /// <param name="spectrum">The spectrum of peaks to filter.</param>
+        /// <param name="mzWidth">The the m/z distance to look at in each direction around each peak.</param>
+        /// <param name="retentionCount">The number of peaks to keep within the range [peakMz-mzWidth, peakMz+mzWidth]</param>
+        /// <returns>Spectrum of filtered peaks.</returns>
         public static Spectrum FilterNoisePeaks(Spectrum spectrum, int mzWidth=100, int retentionCount=6)
         {
             var peaks = spectrum.Peaks;
             var filteredPeaks = new List<Peak>();
 
-            var startingPeak = 0;
-
-            while (startingPeak < peaks.Length)
+            foreach (var peak in peaks)
             {
-                var currentMz = peaks[startingPeak].Mz;
-                var maxMz = currentMz + mzWidth;
-                var peakSnapshot = new List<Peak>();
-                int i;
-                for (i = startingPeak; (i < peaks.Length && peaks[i].Mz <= maxMz); i++)
+                var minMz = peak.Mz - mzWidth;
+                var maxMz = peak.Mz + mzWidth;
+                var searchRange = (from index in peaks
+                                   where (index.Mz >= minMz && index.Mz <= maxMz)
+                                   select index).ToList();
+                if (searchRange.Count > retentionCount)
                 {
-                    peakSnapshot.Add(peaks[i]);
+                    searchRange.Sort(new ComparePeakByIntensity());
+                    var topRange = searchRange.GetRange(0, retentionCount);
+                    if (topRange.Contains(peak))
+                        filteredPeaks.Add(peak);
                 }
-                peakSnapshot.Sort(new ComparePeakByIntensity());
-                int rangeWidth = retentionCount;
-                if (peakSnapshot.Count < retentionCount)
-                    rangeWidth = peakSnapshot.Count;
-                filteredPeaks.AddRange(peakSnapshot.GetRange(0, rangeWidth));
-                startingPeak = i;
+                else
+                {
+                    filteredPeaks.Add(peak);
+                }
             }
             filteredPeaks.Sort();
             var filteredSpectrum = new Spectrum(filteredPeaks.ToArray(), spectrum.ScanNum);

@@ -65,7 +65,7 @@ namespace InformedProteomics.Test
                     for (int j = 0; j < tableCount; j++)
                     {
                         offsetFrequencyTables[j].AddMatches(
-                            _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList.Matches);
+                            _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList);
                     }
                 }
 

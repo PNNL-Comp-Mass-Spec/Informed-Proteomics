@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
@@ -7,6 +8,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     {
         public Dictionary<IonType, int> IonFrequencies { get; private set; }
         public int RankCount { get; set; }
+
+        public Dictionary<IonType, IonProbability> IonProbabilities
+        {
+            get
+            {
+                var probDict = IonFrequencies.Keys.ToDictionary(ionType => ionType, ionType => new IonProbability(ionType.Name, IonFrequencies[ionType], RankCount));
+                return probDict;
+            }
+        }
 
         public RankProbability(IEnumerable<IonType> ionTypes)
         {
@@ -31,6 +41,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             _ionTypes = ionTypes;
             _rankTable = new List<RankProbability>();
+        }
+
+        public List<Dictionary<IonType, IonProbability>> IonProbabilities
+        {
+            get
+            {
+                return _rankTable.Select(rankProbability => rankProbability.IonProbabilities).ToList();
+            }
         }
 
         public IonProbability[,] RankProbabilities

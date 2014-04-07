@@ -38,10 +38,10 @@ namespace InformedProteomics.Test.FunctionalTests
             charge4.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge4.txt");
             precOff.Add(4, charge4);
 
-            var filter = new PrecursorFilter(precOff, new Tolerance(10, ToleranceUnit.Ppm), searchWidth, retentionCount);
+            var filter = new PrecursorFilter(precOff, new Tolerance(10, ToleranceUnit.Ppm));
 
             var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
-            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(tsvFile), ActivationMethod.HCD)).Matches;
+            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(tsvFile), ActivationMethod.HCD));
 
             var specMatch = spectrumMatches.First();
             var filteredSpecMatch = (filter.FilterMatches(new List<SpectrumMatch> {specMatch})).First();

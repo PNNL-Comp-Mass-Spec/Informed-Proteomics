@@ -57,7 +57,7 @@ namespace InformedProteomics.Test
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
-                    var matchList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act)).Matches;
+                    var matchList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act));
                     prefixTable.AddMatches(matchList, _prefixionTypes.ToArray(), _defaultTolerance, _relativeIntensityThreshold);
                     suffixTable.AddMatches(matchList, _suffixionTypes.ToArray(), _defaultTolerance, _relativeIntensityThreshold);
                 }
@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
-                    var decoyList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act, true)).Matches;
+                    var decoyList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act, true));
                     decoyprefixTable.AddMatches(decoyList, _prefixionTypes.ToArray(), _defaultTolerance,
                         _relativeIntensityThreshold);
                     decoysuffixTable.AddMatches(decoyList, _suffixionTypes.ToArray(), _defaultTolerance,

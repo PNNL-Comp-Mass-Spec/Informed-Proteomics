@@ -55,8 +55,10 @@ namespace InformedProteomics.Test
                 var decoyOffsetFrequencyFunctions = new IonFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    offsetFrequencyFunctions[i] = new IonFrequencyTable();
-                    decoyOffsetFrequencyFunctions[i] = new IonFrequencyTable();
+                    offsetFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                                _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
+                    decoyOffsetFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                                _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
                 }
 
                 for (int i = 0; i < txtFiles.Count; i++)
@@ -72,25 +74,14 @@ namespace InformedProteomics.Test
 
                     for (int j = 0; j < tableCount; j++)
                     {
-                        var matches = _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList.Matches;
+                        var matches = _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList;
 
-                        if (_usePrecursor)
-                            offsetFrequencyFunctions[j].AddPrecursorProbabilities(matches, _ionTypes,
-                                _defaultTolerance, _relativeIntensityThreshold);
-                        else
-                            offsetFrequencyFunctions[j].AddCleavageProbabilities(matches, _ionTypes,
-                                _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
+                        offsetFrequencyFunctions[j].AddMatches(matches);
 
                         if (decoyMatchList != null)
                         {
-                            var decoyMatches = _precursorCharge > 0 ? decoyMatchList.GetCharge(j + 1) : decoyMatchList.Matches;
-
-                            if (_usePrecursor)
-                                offsetFrequencyFunctions[j].AddPrecursorProbabilities(matches, _ionTypes,
-                                    _defaultTolerance, _relativeIntensityThreshold);
-                            else
-                                decoyOffsetFrequencyFunctions[j].AddCleavageProbabilities(decoyMatches, _ionTypes,
-                                    _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
+                            var decoyMatches = _precursorCharge > 0 ? decoyMatchList.GetCharge(j + 1) : decoyMatchList;
+                            decoyOffsetFrequencyFunctions[j].AddMatches(decoyMatches);
                         }
                     }
                 }
@@ -142,9 +133,6 @@ namespace InformedProteomics.Test
                     _act = ActivationMethod.ETD;
                     break;
             }
-
-            _usePrecursor = (config.Contents.ContainsKey("precursorfrequencies") &&
-                             config.Contents["precursorfrequencies"].ToLower() == "true");
 
             _combineCharges = (config.Contents.ContainsKey("combinecharges") &&
                  config.Contents["combinecharges"].ToLower() == "true");

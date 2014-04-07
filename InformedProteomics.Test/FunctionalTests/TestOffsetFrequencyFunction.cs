@@ -66,7 +66,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 
-            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act)).Matches;
+            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act));
 
             return spectrumMatches;
         }

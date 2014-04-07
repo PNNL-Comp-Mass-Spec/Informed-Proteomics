@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -19,13 +20,35 @@ namespace InformedProteomics.Test
         private string _outPre;
         private string _outFileName;
         private int _maxRanks;
+        private double _relativeIntensityThreshold;
 
         private List<IonType> _ionTypes;
+        private double _selectedIonThreshold;
+        private List<IonType>[] _selectedIons;
+        private List<IonType>[] _unselectedIons; 
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
         private int _precursorCharge;
 
         private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
+
+        private PrecursorFilter _precursorFilter;
+        private int _retentionCount;
+        private int _searchWidth;
+        private double _precursorOffsetThreshold;
+        private string _precursorOffsetFileName;
+
+        private List<SpectrumMatch> FilterNoise(IEnumerable<SpectrumMatch> matchList)
+        {
+            var filteredList = new SpectrumMatchList(_act);
+            foreach (var match in matchList)
+            {
+                var spectrum = match.Spectrum;
+                spectrum = SpectrumFilter.FilterNoisePeaks(spectrum, _searchWidth, _retentionCount);
+                filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
+            }
+            return filteredList;
+        }
 
         [Test]
         public void RankPeakProbability()
@@ -42,66 +65,107 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
+                var precursorOffsetFileName = _precursorOffsetFileName.Replace("@", name);
+                InitPrecursorFilter(precursorOffsetFileName);
+
+                // Initialize rank probability tables and ion probability tables
                 var rankTables = new RankTable[_precursorCharge];
+                var ionFrequencyTables = new CleavageIonFrequencyTable[_precursorCharge];
                 for (int i = 0; i < _precursorCharge; i++)
                 {
                     rankTables[i] = new RankTable(_ionTypes.ToArray());
+                    ionFrequencyTables[i] = new CleavageIonFrequencyTable(_ionTypes, _defaultTolerance, _relativeIntensityThreshold);
                 }
 
-                // Calculate Rank Probabilities
+                // Read files
+                var matchList = new SpectrumMatchList(_act);
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", textFile, rawFile);
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
-                    var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
-                    for (int j = 0; j < _precursorCharge; j++)
-                    {
-                        var chargeMatches = matchList.GetCharge(j+1);
-                        rankTables[j].RankMatches(chargeMatches, _defaultTolerance);
-                    }
+                    matchList.AddMatchesFromFile(lcms, new TsvFileParser(txtFiles[i]));
                 }
 
-                // Write Rank Probability Table to file
+                // Calculate ion probabilites
+                for (int j = 0; j < _precursorCharge; j++)
+                {
+                    var chargeMatches = FilterNoise(matchList.GetCharge(j + 1));
+                    _precursorFilter.FilterMatches(chargeMatches);
+                    ionFrequencyTables[j].AddMatches(matchList.GetCharge(j + 1));
+                }
+
+                // Select ion types
+                for (int j = 0; j < _precursorCharge; j++)
+                {
+                    var selected = ionFrequencyTables[j].SelectIons(_selectedIonThreshold);
+                    foreach (var selectedIonProb in selected)
+                    {
+                        _selectedIons[j].Add(_ionTypeFactory.GetIonType(selectedIonProb.IonName));
+                    }
+                    _unselectedIons[j] = _ionTypes.Except(_selectedIons[j]).ToList();
+                }
+
+                // Calculate rank probabilities
+                for (int j = 0; j < _precursorCharge; j++)
+                {
+                    var chargeMatches = matchList.GetCharge(j+1);
+                    chargeMatches = _precursorFilter.FilterMatches(chargeMatches);
+                    rankTables[j].RankMatches(chargeMatches, _defaultTolerance);
+                }
+
+                // Write output files
                 var outFileName = _outFileName.Replace("@", name);
                 for (int charge = 0; charge < _precursorCharge; charge++)
                 {
-                    var outFileCharge = outFileName.Replace("*", (charge + 1).ToString());
-                    var rankProbabilites = rankTables[charge].RankProbabilities;
-                    using (var outFile = new StreamWriter(outFileCharge))
-                    {
-                        outFile.Write("Rank\t");
-                        for (int i = 0; i < _ionTypes.Count; i++)
-                        {
-                            outFile.Write(_ionTypes[i].Name + "\t");
-                        }
-                        outFile.Write("Unexplained");
-                        outFile.WriteLine();
-
-                        int maxRanks = _maxRanks;
-                        if (rankTables[charge].TotalRanks < _maxRanks)
-                            maxRanks = rankTables[charge].TotalRanks;
-
-                        for (int i = 0; i < maxRanks; i++)
-                        {
-                            double totalRankProbability = 0.0;
-                            outFile.Write(i+1 + "\t");
-                            for (int j = 0; j < _ionTypes.Count; j++)
-                            {
-                                var ionProbability = rankProbabilites[i, j].Prob;
-                                totalRankProbability += ionProbability;
-                                outFile.Write("{0}\t", ionProbability);
-                            }
-                            outFile.Write(1-totalRankProbability);
-                            outFile.WriteLine();
-                        }
-                    }
+                    var outFileCharge = outFileName.Replace("*", (charge + 1).ToString(CultureInfo.InvariantCulture));
+                    var ionProbabilities = rankTables[charge].IonProbabilities;
+                    WriteRankProbabilities(ionProbabilities, charge, rankTables[charge].TotalRanks, outFileCharge);
                 }
             }
         }
 
+        private void WriteRankProbabilities(List<Dictionary<IonType, IonProbability>> ionProbabilities, int charge, int totalRanks, string outFileCharge)
+        {
+            using (var outFile = new StreamWriter(outFileCharge))
+            {
+                // Write headers
+                outFile.Write("Rank\t");
+                foreach (var ionType in _selectedIons[charge])
+                {
+                    outFile.Write(ionType.Name + "\t");
+                }
+                outFile.Write("Unexplained");
+                outFile.WriteLine();
 
+                int maxRanks = _maxRanks;
+                if (totalRanks < _maxRanks)
+                    maxRanks = totalRanks;
+
+                for (int i = 0; i < maxRanks; i++)
+                {
+                    outFile.Write(i + 1 + "\t");
+                    // Write explained ion counts
+                    for (int j = 0; j < _selectedIons[charge].Count; j++)
+                    {
+                        var ionFound = ionProbabilities[i][_selectedIons[charge][j]].Found;
+                        outFile.Write("{0}\t", ionFound);
+                    }
+
+                    // Write average count for unexplained ions
+                    int totalUnselected = 0;
+                    int unselectedCount = 0;
+                    for (int j = 0; j < _unselectedIons[charge].Count; j++)
+                    {
+                        totalUnselected += ionProbabilities[i][_unselectedIons[charge][j]].Found;
+                        unselectedCount++;
+                    }
+                    outFile.Write(Math.Round((double)totalUnselected / unselectedCount, 2));
+                    outFile.WriteLine();
+                }
+            }
+        }
 
         // Read Configuration file
         private void InitTest(ConfigFileReader reader)
@@ -109,6 +173,11 @@ namespace InformedProteomics.Test
             // Read program variables
             var config = reader.GetNodes("vars").First();
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
+            _precursorOffsetThreshold = Convert.ToDouble(config.Contents["precursoroffsetthreshold"]);
+            _searchWidth = Convert.ToInt32(config.Contents["searchwidth"]);
+            _retentionCount = Convert.ToInt32(config.Contents["retentioncount"]);
+            _relativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
+            _selectedIonThreshold = Convert.ToDouble(config.Contents["selectedionthreshold"]);
             var actStr = config.Contents["activationmethod"].ToLower();
             switch (actStr)
             {
@@ -121,6 +190,17 @@ namespace InformedProteomics.Test
                 case "etd":
                     _act = ActivationMethod.ETD;
                     break;
+            }
+
+            _selectedIons = new List<IonType>[_precursorCharge];
+            for (int i = 0; i < _precursorCharge; i++)
+            {
+                _selectedIons[i] = new List<IonType>();
+            }
+            _unselectedIons = new List<IonType>[_precursorCharge];
+            for (int i = 0; i < _precursorCharge; i++)
+            {
+                _unselectedIons[i] = new List<IonType>();
             }
 
             _maxRanks = Convert.ToInt32(config.Contents["maxranks"]);
@@ -177,11 +257,7 @@ namespace InformedProteomics.Test
             if (ionInfo.Contents.ContainsKey("exclusions"))
             {
                 var ionExclusions = ionInfo.Contents["exclusions"].Split(',');
-                foreach (var ionType in _ionTypes)
-                {
-                    if (!ionExclusions.Contains(ionType.Name))
-                        tempIonList.Add(ionType);
-                }
+                tempIonList.AddRange(_ionTypes.Where(ionType => !ionExclusions.Contains(ionType.Name)));
                 _ionTypes = tempIonList;
             }
 
@@ -194,7 +270,20 @@ namespace InformedProteomics.Test
             _outPre = outPathtemp;
             var outFiletemp = fileInfo.Contents["outfile"];
             _outFileName = _outPre + outFiletemp;
+            _precursorOffsetFileName = _outPre + fileInfo.Contents["precursoroffsetfilename"];
         }
 
+        void InitPrecursorFilter(string fileName)
+        {
+            var precOff = new Dictionary<int, PrecursorOffsets>();
+            for (int i = 0; i < _precursorCharge; i++)
+            {
+                var chargeFileName = fileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
+                var precursorOffsets = new PrecursorOffsets(i+1, _precursorOffsetThreshold);
+                precursorOffsets.AddOffsetsFromFile(chargeFileName);
+                precOff.Add(i+1, precursorOffsets);
+            }
+            _precursorFilter = new PrecursorFilter(precOff, _defaultTolerance);
+        }
     }
 }

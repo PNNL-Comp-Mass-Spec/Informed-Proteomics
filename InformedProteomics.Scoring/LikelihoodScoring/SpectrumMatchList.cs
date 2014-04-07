@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-    public class SpectrumMatchList
+    public class SpectrumMatchList: List<SpectrumMatch>
     {
         private const string QValueHeader = "Qvalue";
         private const string EvalueHeader = "E-value";
@@ -25,12 +25,24 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private const string PrecursorChargeHeader = "Charge";
         private const int NumMutations = 3;
 
-        public List<SpectrumMatch> Matches;
+        public bool Decoy { get; private set; }
+        public ActivationMethod Act { get; private set; }
 
         public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false)
         {
-            Matches = new List<SpectrumMatch>();
+            Decoy = useDecoy;
+            Act = act;
+            AddMatchesFromFile(lcms, tsvFile);
+        }
 
+        public SpectrumMatchList(ActivationMethod act, bool useDecoy=false)
+        {
+            Decoy = useDecoy;
+            Act = act;
+        }
+
+        public void AddMatchesFromFile(LcMsRun lcms, TsvFileParser tsvFile)
+        {
             var precursorCharges = tsvFile.GetData(PrecursorChargeHeader);
             var scans = tsvFile.GetData(ScanHeader);
 
@@ -55,14 +67,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var scanNum = Convert.ToInt32(scans[i]);
                     var spectrum = lcms.GetSpectrum(scanNum);
                     var spec = spectrum as ProductSpectrum;
-                    if (spec == null || spec.ActivationMethod != act) continue;
+                    if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    if (useDecoy)
+                    if (Decoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
                         peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
                     }
-                    Matches.Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset)));
+                    Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset)));
                 }
             }
             else
@@ -83,30 +95,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var scanNum = Convert.ToInt32(scans[i]);
                     var spectrum = lcms.GetSpectrum(scanNum);
                     var spec = spectrum as ProductSpectrum;
-                    if (spec == null || spec.ActivationMethod != act) continue;
+                    if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    if (useDecoy)
+                    if (Decoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
                         peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
                     }
-                    Matches.Add((formulas != null && formulas[i] != null)
+                    Add((formulas != null && formulas[i] != null)
                         ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i])
-                        : new SpectrumMatch(peptides[i], spectrum, scanNum,  precursorCharge));
+                        : new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge));
                 }
             }
         }
 
         public SpectrumMatch GetScan(int scanNum)
         {
-            return (from i in Matches
+            return (from i in this
                     where i.ScanNum == scanNum
                     select i).FirstOrDefault();
         }
 
         public List<SpectrumMatch> GetCharge(int charge)
         {
-            return (from i in Matches
+            return (from i in this
                     where i.PrecursorCharge == charge
                     select i).ToList();
         }

@@ -62,7 +62,7 @@
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\RankScorer.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
-    <Compile Include="LikelihoodScoring\CleavageOffsetFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\CleavageIonFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\ConfigFileReader.cs" />
     <Compile Include="LikelihoodScoring\FitScore.cs" />
     <Compile Include="LikelihoodScoring\FitScoreList.cs" />
