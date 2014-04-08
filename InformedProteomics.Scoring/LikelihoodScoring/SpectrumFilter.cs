@@ -6,49 +6,37 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class SpectrumFilter
     {
-        /// <summary>
-        /// For each peak in the spectrum, get all peaks within mzWidth m/z of the peak.
-        /// Keep the peak if it is one of the top retentionCount peaks in that range.
-        /// </summary>
-        /// <param name="spectrum">The spectrum of peaks to filter.</param>
-        /// <param name="mzWidth">The the m/z distance to look at in each direction around each peak.</param>
-        /// <param name="retentionCount">The number of peaks to keep within the range [peakMz-mzWidth, peakMz+mzWidth]</param>
-        /// <returns>Spectrum of filtered peaks.</returns>
         public static Spectrum FilterNoisePeaks(Spectrum spectrum, int mzWidth=100, int retentionCount=6)
         {
             var peaks = spectrum.Peaks;
             var filteredPeaks = new List<Peak>();
 
-            foreach (var peak in peaks)
+            for (int peakIndex = 0; peakIndex < peaks.Count(); peakIndex++)
             {
-                var minMz = peak.Mz - mzWidth;
-                var maxMz = peak.Mz + mzWidth;
-                var searchRange = (from index in peaks
-                                   where (index.Mz >= minMz && index.Mz <= maxMz)
-                                   select index).ToList();
-                if (searchRange.Count > retentionCount)
+                int rank = 1;
+                var peak = peaks[peakIndex];
+
+                int prevIndex = peakIndex - 1;
+                while (prevIndex >= 0)
                 {
-                    searchRange.Sort(new ComparePeakByIntensity());
-                    var topRange = searchRange.GetRange(0, retentionCount);
-                    if (topRange.Contains(peak))
-                        filteredPeaks.Add(peak);
+                    var prevPeak = peaks[prevIndex];
+                    if ((peak.Mz - prevPeak.Mz) > mzWidth) break;
+                    if (prevPeak.Intensity > peak.Intensity) rank++;
+                    prevIndex--;
                 }
-                else
+
+                int nextIndex = peakIndex + 1;
+                while (nextIndex < peaks.Length)
                 {
-                    filteredPeaks.Add(peak);
+                    var nextPeak = peaks[nextIndex];
+                    if ((nextPeak.Mz - peak.Mz) > mzWidth) break;
+                    if (nextPeak.Intensity > peak.Intensity) rank++;
+                    nextIndex++;
                 }
+                if (rank <= retentionCount) filteredPeaks.Add(peak);
             }
-            filteredPeaks.Sort();
             var filteredSpectrum = new Spectrum(filteredPeaks.ToArray(), spectrum.ScanNum);
             return filteredSpectrum;
-        }
-    }
-
-    class ComparePeakByIntensity : IComparer<Peak>
-    {
-        public int Compare(Peak x, Peak y)
-        {
-            return x.Intensity.CompareTo(y.Intensity);
         }
     }
 }
