@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _offsets = offsets;
             _tolerance = tolerance;
 
-            var maxCharge = offsets.Keys.Max();
+            var maxCharge = _offsets.Keys.Max();
 
             BaseIonType[] baseIons = { BaseIonType.Y };
             NeutralLoss[] neutralLosses = { NeutralLoss.NoLoss };
@@ -23,6 +23,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             var ionTypeFactory = new IonTypeFactory(baseIons, neutralLosses, maxCharge);
 
             _precursorIonTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
+        }
+
+        public PrecursorFilter(int maxCharge, Tolerance tolerance)
+        {
+            _offsets = new Dictionary<int, PrecursorOffsets>();
+            _tolerance = tolerance;
+
+            for (int i = 0; i < maxCharge; i++)
+            {
+                _offsets.Add(i+1, new PrecursorOffsets(i+1));
+            }
+
+            BaseIonType[] baseIons = { BaseIonType.Y };
+            NeutralLoss[] neutralLosses = { NeutralLoss.NoLoss };
+
+            var ionTypeFactory = new IonTypeFactory(baseIons, neutralLosses, maxCharge);
+
+            _precursorIonTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
+        }
+
+        public void SetChargeOffsets(PrecursorOffsets precursorOffsets)
+        {
+            var charge = precursorOffsets.Charge;
+            _offsets[charge] = precursorOffsets;
         }
 
         private SpectrumMatch Filter(SpectrumMatch specMatch)
@@ -63,5 +87,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
             return matches;
         }
+
+
     }
 }

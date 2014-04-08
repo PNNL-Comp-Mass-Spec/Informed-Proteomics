@@ -29,30 +29,18 @@ namespace InformedProteomics.Test
         private IonTypeFactory _ionTypeFactory;
         private ActivationMethod _act;
         private int _precursorCharge;
+        private const double BinWidth = 1.005;
 
         private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
 
-        private PrecursorFilter _precursorFilter;
         private int _retentionCount;
         private int _searchWidth;
         private double _precursorOffsetThreshold;
-        private string _precursorOffsetFileName;
-
-        private List<SpectrumMatch> FilterNoise(IEnumerable<SpectrumMatch> matchList)
-        {
-            var filteredList = new SpectrumMatchList(_act);
-            foreach (var match in matchList)
-            {
-                var spectrum = match.Spectrum;
-                spectrum = SpectrumFilter.FilterNoisePeaks(spectrum, _searchWidth, _retentionCount);
-                filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
-            }
-            return filteredList;
-        }
 
         [Test]
         public void RankPeakProbability()
         {
+            // read configuration settings
             InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\BottomUp\RankPeakProbabilityConfig.ini"));
 
             foreach (var name in _names)
@@ -65,20 +53,23 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                var precursorOffsetFileName = _precursorOffsetFileName.Replace("@", name);
-                InitPrecursorFilter(precursorOffsetFileName);
-
-                // Initialize rank probability tables and ion probability tables
+                // Initialize probability tables
                 var rankTables = new RankTable[_precursorCharge];
                 var ionFrequencyTables = new CleavageIonFrequencyTable[_precursorCharge];
+                var offsetFrequencyTables = new List<PrecursorOffsetFrequencyTable>[_precursorCharge];
                 for (int i = 0; i < _precursorCharge; i++)
                 {
-                    rankTables[i] = new RankTable(_ionTypes.ToArray());
+                    rankTables[i] = new RankTable(_ionTypes.ToArray(), _maxRanks);
                     ionFrequencyTables[i] = new CleavageIonFrequencyTable(_ionTypes, _defaultTolerance, _relativeIntensityThreshold);
+                    offsetFrequencyTables[i] = new List<PrecursorOffsetFrequencyTable>();
+                    for (int j = 1; j <= (i + 1); j++)
+                    {
+                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth / j, j, BinWidth / j));
+                    }
                 }
 
                 // Read files
-                var matchList = new SpectrumMatchList(_act);
+                var matchList = new SpectrumMatchList(_act, false, _precursorCharge);
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
                     string textFile = txtFiles[i];
@@ -88,12 +79,22 @@ namespace InformedProteomics.Test
                     matchList.AddMatchesFromFile(lcms, new TsvFileParser(txtFiles[i]));
                 }
 
-                // Calculate ion probabilites
+                // Calculate probability tables
                 for (int j = 0; j < _precursorCharge; j++)
                 {
-                    var chargeMatches = FilterNoise(matchList.GetCharge(j + 1));
-                    _precursorFilter.FilterMatches(chargeMatches);
-                    ionFrequencyTables[j].AddMatches(matchList.GetCharge(j + 1));
+                    // Calculate ion probabilities
+                    var chargeMatches = matchList.GetCharge(j + 1);
+                    chargeMatches.FilterSpectra(_searchWidth, _retentionCount);
+                    ionFrequencyTables[j].AddMatches(chargeMatches);
+
+                    // Calculate precursor offset probabilities
+                    for (int i = 0; i < _precursorCharge; i++)
+                    {
+                        foreach (var offsetFrequencyTable in offsetFrequencyTables[i])
+                        {
+                            offsetFrequencyTable.AddMatches(chargeMatches);
+                        }
+                    }
                 }
 
                 // Select ion types
@@ -107,11 +108,17 @@ namespace InformedProteomics.Test
                     _unselectedIons[j] = _ionTypes.Except(_selectedIons[j]).ToList();
                 }
 
+                // Initialize precursor filter
+                var precursorFilter = new PrecursorFilter(_precursorCharge, _defaultTolerance);
+                for (int j = 0; j < _precursorCharge; j++)
+                {
+                    precursorFilter.SetChargeOffsets(new PrecursorOffsets(offsetFrequencyTables[j], j + 1, _precursorOffsetThreshold));
+                }
+
                 // Calculate rank probabilities
                 for (int j = 0; j < _precursorCharge; j++)
                 {
-                    var chargeMatches = matchList.GetCharge(j+1);
-                    chargeMatches = _precursorFilter.FilterMatches(chargeMatches);
+                    var chargeMatches = precursorFilter.FilterMatches(matchList.GetCharge(j+1));
                     rankTables[j].RankMatches(chargeMatches, _defaultTolerance);
                 }
 
@@ -270,20 +277,6 @@ namespace InformedProteomics.Test
             _outPre = outPathtemp;
             var outFiletemp = fileInfo.Contents["outfile"];
             _outFileName = _outPre + outFiletemp;
-            _precursorOffsetFileName = _outPre + fileInfo.Contents["precursoroffsetfilename"];
-        }
-
-        void InitPrecursorFilter(string fileName)
-        {
-            var precOff = new Dictionary<int, PrecursorOffsets>();
-            for (int i = 0; i < _precursorCharge; i++)
-            {
-                var chargeFileName = fileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                var precursorOffsets = new PrecursorOffsets(i+1, _precursorOffsetThreshold);
-                precursorOffsets.AddOffsetsFromFile(chargeFileName);
-                precOff.Add(i+1, precursorOffsets);
-            }
-            _precursorFilter = new PrecursorFilter(precOff, _defaultTolerance);
         }
     }
 }

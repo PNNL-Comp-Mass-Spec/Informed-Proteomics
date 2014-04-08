@@ -26,16 +26,16 @@ namespace InformedProteomics.Test.FunctionalTests
             var precOff = new Dictionary<int, PrecursorOffsets>();
 
             var charge1 = new PrecursorOffsets(1, probabilityThreshold);
-            charge1.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge1.txt");
+//            charge1.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge1.txt");
             precOff.Add(1, charge1);
             var charge2 = new PrecursorOffsets(2, probabilityThreshold);
-            charge2.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge2.txt");
+//            charge2.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge2.txt");
             precOff.Add(2, charge2);
             var charge3 = new PrecursorOffsets(3, probabilityThreshold);
-            charge3.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge3.txt");
+//            charge3.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge3.txt");
             precOff.Add(3, charge3);
             var charge4 = new PrecursorOffsets(4, probabilityThreshold);
-            charge4.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge4.txt");
+//            charge4.AddOffsetsFromFile(@"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\HCD_QCShew_PrecursorOffsetFrequencies_Charge4.txt");
             precOff.Add(4, charge4);
 
             var filter = new PrecursorFilter(precOff, new Tolerance(10, ToleranceUnit.Ppm));

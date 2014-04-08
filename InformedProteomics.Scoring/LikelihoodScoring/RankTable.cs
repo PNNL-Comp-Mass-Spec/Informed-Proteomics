@@ -35,12 +35,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly IonType[] _ionTypes;
         private readonly List<RankProbability> _rankTable;
 
+        public int MaxRanks { get; private set; }
         public int TotalRanks { get { return _rankTable.Count;  } }
 
-        public RankTable(IonType[] ionTypes)
+        public RankTable(IonType[] ionTypes, int maxRanks)
         {
             _ionTypes = ionTypes;
-            _rankTable = new List<RankProbability>();
+            MaxRanks = maxRanks;
+            _rankTable = new List<RankProbability> {Capacity = MaxRanks};
+            for (int i = 0; i < MaxRanks; i++)
+            {
+                _rankTable.Add(new RankProbability(_ionTypes));
+            }
         }
 
         public List<Dictionary<IonType, IonProbability>> IonProbabilities
@@ -68,14 +74,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        private void ExtendRankTable(int size)
-        {
-            while (_rankTable.Count < size)
-            {
-                _rankTable.Add(new RankProbability(_ionTypes));
-            }
-        }
-
         public void RankMatches(IEnumerable<SpectrumMatch> matches, Tolerance tolerance)
         {
             foreach (var match in matches)
@@ -96,13 +94,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public void AddRanks(RankedPeaks rankedPeaks)
         {
             var ranks = rankedPeaks.Ranks;
-            ExtendRankTable(ranks.Count);
 
-            for (int i = 0; i < ranks.Count; i++)
+            for (int i = 0; (i < ranks.Count && i < MaxRanks-1); i++)
             {
                 _rankTable[i].RankCount++;
                 if (ranks[i].Iontype != null)
                     _rankTable[i].IonFrequencies[ranks[i].Iontype]++;
+            }
+            if (ranks.Count > MaxRanks - 1)
+            {
+                for (int i = MaxRanks - 1; i < ranks.Count; i++)
+                {
+                    _rankTable[MaxRanks - 1].RankCount++;
+                    if (ranks[i].Iontype != null)
+                        _rankTable[MaxRanks - 1].IonFrequencies[ranks[i].Iontype]++;
+                }
             }
         }
     }

@@ -25,19 +25,22 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private const string PrecursorChargeHeader = "Charge";
         private const int NumMutations = 3;
 
+        public int MaxCharge { get; private set; }
         public bool Decoy { get; private set; }
         public ActivationMethod Act { get; private set; }
 
-        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false)
+        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false, int maxCharge=0)
         {
             Decoy = useDecoy;
             Act = act;
+            MaxCharge = maxCharge;
             AddMatchesFromFile(lcms, tsvFile);
         }
 
-        public SpectrumMatchList(ActivationMethod act, bool useDecoy=false)
+        public SpectrumMatchList(ActivationMethod act, bool useDecoy=false, int maxCharge=0)
         {
             Decoy = useDecoy;
+            MaxCharge = maxCharge;
             Act = act;
         }
 
@@ -69,6 +72,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
+                    if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
                     if (Decoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
@@ -97,6 +101,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     var spec = spectrum as ProductSpectrum;
                     if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
+                    if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
                     if (Decoy)
                     {
                         var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
@@ -109,6 +114,19 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
+        public void FilterSpectra(int searchWidth=100, int retentionCount=6)
+        {
+            var filteredList = new SpectrumMatchList(Act);
+            foreach (var match in this)
+            {
+                var spectrum = match.Spectrum;
+                spectrum = SpectrumFilter.FilterNoisePeaks(spectrum, searchWidth, retentionCount);
+                filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
+            }
+            Clear();
+            AddRange(filteredList);
+        }
+
         public SpectrumMatch GetScan(int scanNum)
         {
             return (from i in this
@@ -116,11 +134,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     select i).FirstOrDefault();
         }
 
-        public List<SpectrumMatch> GetCharge(int charge)
+        public SpectrumMatchList GetCharge(int charge)
         {
-            return (from i in this
+            var chargeMatchList = new SpectrumMatchList(Act);
+            chargeMatchList.AddRange(from i in this
                     where i.PrecursorCharge == charge
-                    select i).ToList();
+                    select i);
+            return chargeMatchList;
         }
     }
 }

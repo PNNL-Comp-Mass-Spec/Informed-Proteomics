@@ -49,7 +49,7 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < tableCount; i++)
                 {
                     if (_precursorCharge > 0)
-                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth, i+1, _binWidth/(i+1));
+                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth/(i+1), i+1, _binWidth/(i+1));
                     else
                         offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth, i+1, _binWidth);
                 }
@@ -114,7 +114,7 @@ namespace InformedProteomics.Test
                     offsetFrequencyTables[i] = new List<PrecursorOffsetFrequencyTable>();
                     for (int j = 1; j <= (i + 1); j++)
                     {
-                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth, j, _binWidth/(i+1)));
+                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth/j, j, _binWidth/j));
                     }
                 }
 

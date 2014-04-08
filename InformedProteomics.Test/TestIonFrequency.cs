@@ -19,7 +19,7 @@ namespace InformedProteomics.Test
         private string _preRaw;
         private string _outPre;
         private string _outFileName;
-        private double _noiseFiltration;
+        private const double NoiseFiltration = 0;
 
         private List<IonType> _ionTypes;
         private IonTypeFactory _ionTypeFactory;
@@ -27,15 +27,14 @@ namespace InformedProteomics.Test
         double _relativeIntensityThreshold = 1.0;
         private bool _combineCharges;
         private bool _useDecoy;
-        private bool _usePrecursor;
         private int _precursorCharge;
 
-        private readonly Tolerance _defaultTolerance = new Tolerance(15, ToleranceUnit.Ppm);
+        private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Th);
 
         [Test]
         public void IonFrequencyFunction()
         {
-            InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig_Test.ini"));
+            InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\IonFreqConfig.ini"));
 
             foreach (var name in _names)
             {
@@ -51,13 +50,13 @@ namespace InformedProteomics.Test
                 if (_precursorCharge > 0)
                     tableCount = _precursorCharge;
 
-                var offsetFrequencyFunctions = new IonFrequencyTable[tableCount];
-                var decoyOffsetFrequencyFunctions = new IonFrequencyTable[tableCount];
+                var ionFrequencyFunctions = new IonFrequencyTable[tableCount];
+                var decoyionFrequencyFunctions = new IonFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    offsetFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                    ionFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
-                    decoyOffsetFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                    decoyionFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
                 }
 
@@ -66,7 +65,7 @@ namespace InformedProteomics.Test
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
+                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
                     SpectrumMatchList decoyMatchList = null;
                     if (_useDecoy)
@@ -76,12 +75,14 @@ namespace InformedProteomics.Test
                     {
                         var matches = _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList;
 
-                        offsetFrequencyFunctions[j].AddMatches(matches);
+                        matches.FilterSpectra();
+                        ionFrequencyFunctions[j].AddMatches(matches);
 
                         if (decoyMatchList != null)
                         {
                             var decoyMatches = _precursorCharge > 0 ? decoyMatchList.GetCharge(j + 1) : decoyMatchList;
-                            decoyOffsetFrequencyFunctions[j].AddMatches(decoyMatches);
+                            decoyMatches.FilterSpectra();
+                            decoyionFrequencyFunctions[j].AddMatches(decoyMatches);
                         }
                     }
                 }
@@ -91,19 +92,19 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < tableCount; i++)
                 {
                     string outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                    var offsetFrequencies = offsetFrequencyFunctions[i].IonProbabilityTable;
-                    var decoyOffsetFrequencies = decoyOffsetFrequencyFunctions[i].IonProbabilityTable;
+                    var ionFrequencies = ionFrequencyFunctions[i].IonProbabilityTable;
+                    var decoyionFrequencies = decoyionFrequencyFunctions[i].IonProbabilityTable;
                     using (var finalOutputFile = new StreamWriter(outFileName))
                     {
                         finalOutputFile.Write("Ion\tTarget");
                         if (_useDecoy) finalOutputFile.Write("\tDecoy");
                         finalOutputFile.WriteLine();
-                        for (int j=0;j<offsetFrequencies.Count;j++)
+                        for (int j=0;j<ionFrequencies.Count;j++)
                         {
-                            finalOutputFile.Write("{0}\t{1}", offsetFrequencies[j].IonName, offsetFrequencies[j].Prob);
+                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].IonName, ionFrequencies[j].Prob);
                             if (_useDecoy)
                             {
-                                finalOutputFile.Write("\t{0}", decoyOffsetFrequencies[j]);
+                                finalOutputFile.Write("\t{0}", decoyionFrequencies[j]);
                             }
                             finalOutputFile.WriteLine();
                         }
@@ -146,7 +147,6 @@ namespace InformedProteomics.Test
             var ionInfo = reader.GetNodes("ion").First();
             int totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
             var ionTypeStr = ionInfo.Contents["iontype"].Split(',');
-            _noiseFiltration = Convert.ToDouble(config.Contents["noisefilteration"]);
             var ions = new BaseIonType[ionTypeStr.Length];
             for (int i = 0; i < ionTypeStr.Length; i++)
             {
