@@ -70,6 +70,7 @@
     <Compile Include="LikelihoodScoring\IonProbability.cs" />
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
     <Compile Include="LikelihoodScoring\IonFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\MassErrorTable.cs" />
     <Compile Include="LikelihoodScoring\OffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\OffsetProbability.cs" />
     <Compile Include="LikelihoodScoring\PrecursorFilter.cs" />

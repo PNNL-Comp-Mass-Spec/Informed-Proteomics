@@ -159,6 +159,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Total += total;
         }
 
+        public void AddDatum(T1 datum)
+        {
+            if (BinEdges != null)
+                Compute(new List<T1>{datum});
+            else
+            {
+                Bins[0].Add(datum);
+                Total++;
+            }
+        }
+
         public void AddData(List<T1> data)
         {
             if (BinEdges != null)

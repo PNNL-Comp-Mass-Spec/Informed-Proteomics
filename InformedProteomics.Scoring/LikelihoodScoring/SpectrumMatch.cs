@@ -60,6 +60,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             get { return Sequence.GetComposition(); }
         }
 
+        public string GetCleanPeptide()
+        {
+            var aaset = new AminoAcidSet();
+            var cleanPeptide = "";
+            foreach (var aminoacid in Peptide)
+            {
+                if (aaset.GetAminoAcid(aminoacid) != null)
+                    cleanPeptide += aminoacid;
+            }
+            return cleanPeptide;
+        }
+
+        public string GetPeptidePrefix()
+        {
+            var cleanPeptide = GetCleanPeptide();
+            return cleanPeptide.Substring(0, cleanPeptide.Length - 1);
+        }
+
+        public string GetPeptideSuffix()
+        {
+            var cleanPeptide = GetCleanPeptide();
+            return cleanPeptide.Substring(1, cleanPeptide.Length);
+        }
+
         public List<Composition> Prefixes
         {
             get
