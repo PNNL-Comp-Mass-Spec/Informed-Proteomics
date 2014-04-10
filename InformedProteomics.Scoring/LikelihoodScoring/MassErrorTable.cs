@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Sequence;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
@@ -8,8 +8,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     public enum IonPairFound
     {
         Neither = 0,
-        SecondIon = 1,
-        FirstIon = 2,
+        Second = 1,
+        First = 2,
         Both = 3
     };
 
@@ -18,63 +18,94 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly IonType[] _ionTypes;
         private readonly Tolerance _tolerance;
 
-        public Histogram<double> MassError { get; private set; }
-        public Histogram<IonPairFound> IonPairFrequency { get; private set; } 
+        private readonly Histogram<double> _massError;
+        private int _totalPairs;
+        private readonly Histogram<IonPairFound> _ionPairFrequency;
 
-        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double binWidth=0.01)
+        public List<Probability<double>> MassError
         {
-            _ionTypes = ionTypes;
-            _tolerance = tolerance;
-            MassError = new Histogram<double>();
-            IonPairFrequency = new Histogram<IonPairFound>((IonPairFound[])Enum.GetValues(typeof(IonPairFound)));
-            GenerateEdges(binWidth);
+            get
+            {
+                var bins = _massError.Bins;
+                var binEdges = _massError.BinEdges;
+                return binEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, _totalPairs)).ToList();
+            }
         }
 
-        private void GenerateEdges(double binWidth)
+        public List<Probability<IonPairFound>> IonPairFrequency
         {
-            const double searchWidth = 100;
+            get
+            {
+                var bins = _ionPairFrequency.Bins;
+                var binEdges = _ionPairFrequency.BinEdges;
+                return binEdges.Select((t, i) => new Probability<IonPairFound>(t, bins[i].Count, _ionPairFrequency.Total)).ToList();
+            }
+        }
+
+        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double searchWidth=0.2, double binWidth=0.01)
+        {
+            _ionTypes = ionTypes;
+            _totalPairs = 0;
+            _tolerance = tolerance;
+            _massError = new Histogram<double>();
+            _ionPairFrequency = new Histogram<IonPairFound>((IonPairFound[])Enum.GetValues(typeof(IonPairFound)));
+            GenerateEdges(searchWidth, binWidth);
+        }
+
+        private void GenerateEdges(double searchWidth, double binWidth)
+        {
             var binEdges = new List<double>();
+            for (double width = 0; width >= -1 * searchWidth; width -= binWidth)
+            {
+                binEdges.Add(width);
+            }
             for (double width = 0; width < searchWidth; width += binWidth)
             {
                 binEdges.Add(width);
             }
-            MassError.BinEdges = binEdges.ToArray();
+
+            binEdges = binEdges.Distinct().ToList();
+            binEdges.Sort();
+            _massError.BinEdges = binEdges.ToArray();
         }
 
         public void AddMatches(List<SpectrumMatch> matchList)
         {
-            var aminoAcidSet = new AminoAcidSet();
             foreach (var match in matchList)
             {
                 foreach (var ionType in _ionTypes)
                 {
                     var charge = ionType.Charge;
-                    var peptide = ionType.IsPrefixIon ? match.GetPeptidePrefix() : match.GetPeptideSuffix();
+                    var sequence = match.Sequence;
+                    var pepSeq = ionType.IsPrefixIon ? sequence.GetRange(0, sequence.Count - 1) : 
+                                                        sequence.GetRange(1, sequence.Count - 1);
                     var ions = match.GetCleavageIons(ionType);
-                    int nextIonIndex = 1;
+
+                    var nextIonIndex = 1;
                     while(nextIonIndex < ions.Count)
                     {
-                        // look for peak for current ion and next ion
+                        // look for peaks for current ion and next ion
+                        _totalPairs++;
                         var currIonIndex = nextIonIndex - 1;
                         var currMz = ions[currIonIndex].GetMonoIsotopicMz();
-                        var nextMz = ions[nextIonIndex].GetMonoIsotopicMz();
                         var currPeak = match.Spectrum.FindPeak(currMz, _tolerance);
+                        var nextMz = ions[nextIonIndex].GetMonoIsotopicMz();
                         var nextPeak = match.Spectrum.FindPeak(nextMz, _tolerance);
 
                         if (currPeak == null && nextPeak == null)
-                            IonPairFrequency.AddDatum(IonPairFound.Neither);
+                            _ionPairFrequency.AddDatum(IonPairFound.Neither);
                         else if (nextPeak == null)
-                            IonPairFrequency.AddDatum(IonPairFound.FirstIon);
+                            _ionPairFrequency.AddDatum(IonPairFound.First);
                         else if (currPeak == null)
-                            IonPairFrequency.AddDatum(IonPairFound.SecondIon);
+                            _ionPairFrequency.AddDatum(IonPairFound.Second);
                         else
                         {
                             // found both peaks, compute mass error
-                            IonPairFrequency.AddDatum(IonPairFound.Both);
-                            var aminoAcid = aminoAcidSet.GetAminoAcid(peptide[currIonIndex]);
-                            var aaMass = aminoAcid.GetMass() / charge;
-                            var massError = Math.Abs(Math.Abs(currMz - nextMz) - aaMass);
-                            MassError.AddDatum(massError);
+                            _ionPairFrequency.AddDatum(IonPairFound.Both);
+                            var aaIndex = (ionType.IsPrefixIon ? nextIonIndex : currIonIndex);
+                            var aaMz = pepSeq[aaIndex].GetMass() / charge;
+                            var massError = Math.Abs(nextPeak.Mz - currPeak.Mz) - aaMz;
+                            _massError.AddDatum(massError);
                         }
                         nextIonIndex++;
                     }

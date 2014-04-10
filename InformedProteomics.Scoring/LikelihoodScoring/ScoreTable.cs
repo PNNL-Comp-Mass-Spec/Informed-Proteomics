@@ -14,7 +14,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly Histogram<FitScore> _intensityHistogram;
         private readonly int _intensityBinCount;
         public double[] IntensityBins { get; private set; }
-        public Probability WorstScore { get; private set; }
+        public Probability<int> WorstScore { get; private set; }
 
         public List<Histogram<FitScore>> Histograms
         {
@@ -41,7 +41,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _binEdges = binEdges;
             IntensityBins = null;
             _intensityBinCount = intensityBins;
-            WorstScore = new Probability();
+            WorstScore = new Probability<int>(0);
 
             _intensityHistogram = new Histogram<FitScore>(new CompareFitScoreByIntensity());
         }
@@ -52,7 +52,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _binEdges = binEdges;
             IntensityBins = intensityBins;
             _intensityBinCount = intensityBins.Length;
-            WorstScore = new Probability();
+            WorstScore = new Probability<int>(0);
 
             _intensityHistogram = new Histogram<FitScore>(new CompareFitScoreByIntensity());
 

@@ -9,11 +9,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public Dictionary<IonType, int> IonFrequencies { get; private set; }
         public int RankCount { get; set; }
 
-        public Dictionary<IonType, IonProbability> IonProbabilities
+        public Dictionary<IonType, Probability<string>> IonProbabilities
         {
             get
             {
-                var probDict = IonFrequencies.Keys.ToDictionary(ionType => ionType, ionType => new IonProbability(ionType.Name, IonFrequencies[ionType], RankCount));
+                var probDict = IonFrequencies.Keys.ToDictionary(ionType => ionType, ionType => new Probability<string>(ionType.Name, IonFrequencies[ionType], RankCount));
                 return probDict;
             }
         }
@@ -49,7 +49,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public List<Dictionary<IonType, IonProbability>> IonProbabilities
+        public List<Dictionary<IonType, Probability<string>>> IonProbabilities
         {
             get
             {
@@ -57,17 +57,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public IonProbability[,] RankProbabilities
+        public Probability<string>[,] RankProbabilities
         {
             get
             {
-                var ranks = new IonProbability[_rankTable.Count, _ionTypes.Length];
+                var ranks = new Probability<string>[_rankTable.Count, _ionTypes.Length];
                 for (int i = 0; i < _rankTable.Count; i++)
                 {
                     for (int j = 0; j < _ionTypes.Length; j++)
                     {
                         var ionType = _ionTypes[j];
-                        ranks[i, j] = new IonProbability(ionType.Name, _rankTable[i].IonFrequencies[ionType], _rankTable[i].RankCount);
+                        ranks[i, j] = new Probability<string>(ionType.Name, _rankTable[i].IonFrequencies[ionType], _rankTable[i].RankCount);
                     }
                 }
                 return ranks;

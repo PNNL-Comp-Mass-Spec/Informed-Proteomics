@@ -5,23 +5,23 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public abstract class IonFrequencyTable
     {
-        private readonly Dictionary<string, IonProbability> _offsetFrequencies;
+        private readonly Dictionary<string, Probability<string>> _offsetFrequencies;
 
         protected IonFrequencyTable()
         {
-            _offsetFrequencies = new Dictionary<string, IonProbability>();
+            _offsetFrequencies = new Dictionary<string, Probability<string>>();
         }
 
-        public List<IonProbability> IonProbabilityTable
+        public List<Probability<string>> IonProbabilityTable
         {
             get { return _offsetFrequencies.Values.ToList(); }
         }
 
         public abstract void AddMatches(List<SpectrumMatch> matches);
 
-        protected void AddIonProbability(IonProbability probability)
+        protected void AddIonProbability(Probability<string> probability)
         {
-            var name = probability.IonName;
+            var name = probability.DataLabel;
             if (_offsetFrequencies.ContainsKey(name))
                 _offsetFrequencies[name] += probability;
             else

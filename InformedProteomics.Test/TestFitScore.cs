@@ -106,7 +106,7 @@ namespace InformedProteomics.Test
         // Print tables to output file
         void PrintOutput(string fileName, double[] intensities,
                 List<Histogram<FitScore>> targethist, List<Histogram<FitScore>> decoyhist,
-                Probability targetWorst, Probability decoyWorst, string ionName)
+                Probability<int> targetWorst, Probability<int> decoyWorst, string ionName)
         {
             using (StreamWriter outFile = File.AppendText(fileName))
             {

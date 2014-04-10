@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -42,7 +41,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public PrecursorOffsets(IEnumerable<OffsetProbability>[] offsets, int charge,
+        public PrecursorOffsets(IEnumerable<Probability<double>>[] offsets, int charge,
             double probabilityThreshold = 0.0)
         {
             Charge = charge;
@@ -59,7 +58,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public void AddOffsets(int charge, IEnumerable<OffsetProbability> offsetProbabilities)
+        public void AddOffsets(int charge, IEnumerable<Probability<double>> offsetProbabilities)
         {
             if (charge > Charge)
             {

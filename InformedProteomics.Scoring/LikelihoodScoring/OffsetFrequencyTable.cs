@@ -55,12 +55,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _offsetCounts.AddData(offsets);
         }
 
-        public List<OffsetProbability> OffsetFrequencies
+        public List<Probability<double>> OffsetFrequencies
         {
             get
             {
                 var bins = _offsetCounts.Bins;
-                return _offsetCounts.BinEdges.Select((t, i) => new OffsetProbability(t, bins[i].Count, Total)).ToList();
+                return _offsetCounts.BinEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, Total)).ToList();
             }
         }
 

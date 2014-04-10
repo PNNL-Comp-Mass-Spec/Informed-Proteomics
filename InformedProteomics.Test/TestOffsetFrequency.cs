@@ -69,7 +69,7 @@ namespace InformedProteomics.Test
                     }
                 }
 
-                var offsetFrequencies = new List<OffsetProbability>[tableCount];
+                var offsetFrequencies = new List<Probability<double>>[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
                     offsetFrequencies[i] = offsetFrequencyTables[i].OffsetFrequencies;
@@ -85,7 +85,7 @@ namespace InformedProteomics.Test
                         foreach (var offsetFrequency in offsetFrequencies[i])
                         {
 //                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
-                            outFile.WriteLine("{0}\t{1}", offsetFrequency.Offset, offsetFrequency.Prob);
+                            outFile.WriteLine("{0}\t{1}", offsetFrequency.DataLabel, offsetFrequency.Prob);
                         }
                     }
                 }
@@ -144,7 +144,7 @@ namespace InformedProteomics.Test
                     using (var outFile = new StreamWriter(chargeOutFileName))
                     {
                         outFile.Write("Offset\t");
-                        var offsetFrequencyList = new List<List<OffsetProbability>>();
+                        var offsetFrequencyList = new List<List<Probability<double>>>();
                         for (int j = offsetFrequencyTables[i].Count-1; j >=0; j--)
                         {
                             offsetFrequencyList.Add(offsetFrequencyTables[i][j].OffsetFrequencies);
@@ -155,7 +155,7 @@ namespace InformedProteomics.Test
                         outFile.WriteLine();
                         for (int j = 0; j < offsetFrequencyList.First().Count; j++)
                         {
-                            var offset = offsetFrequencyList.First()[j].Offset;
+                            var offset = offsetFrequencyList.First()[j].DataLabel;
                             var integerOffset = Math.Round(offset*(1/_binWidth), 2);
                             outFile.Write(integerOffset+"\t");
                             for (int k = 0; k < offsetFrequencyList.Count; k++)

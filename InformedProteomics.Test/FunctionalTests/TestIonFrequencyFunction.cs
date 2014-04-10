@@ -13,7 +13,7 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestIonFrequencyFunction
     {
-        public List<IonProbability> ComputeOffsetFrequencies(SpectrumMatch spectrumMatch)
+        public List<Probability<string>> ComputeOffsetFrequencies(SpectrumMatch spectrumMatch)
         {
             var debugFile = File.AppendText(DebugFileName);
 
@@ -26,7 +26,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var prefixIonTypes = _ionTypes.Where(ionType => ionType.IsPrefixIon).ToList();
             var suffixIonTypes = _ionTypes.Where(ionType => !ionType.IsPrefixIon).ToList();
 
-            var probabilities = new Dictionary<IonType, IonProbability>();
+            var probabilities = new Dictionary<IonType, Probability<string>>();
 
             debugFile.WriteLine("Scan:\t{0}\tPeptide:\t{1}\tCharge:\t{2}", spectrumMatch.ScanNum, peptide, spectrumMatch.PrecursorCharge);
             debugFile.WriteLine("Prefixes");
@@ -42,7 +42,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 foreach (var ionType in prefixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))
-                        probabilities.Add(ionType, new IonProbability(ionType.Name));
+                        probabilities.Add(ionType, new Probability<string>(ionType.Name));
 
                     var ion = ionType.GetIon(prefixes[i-1]);
                     double mz = ion.GetMonoIsotopicMz();
@@ -67,7 +67,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 foreach (var ionType in suffixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))
-                        probabilities.Add(ionType, new IonProbability(ionType.Name));
+                        probabilities.Add(ionType, new Probability<string>(ionType.Name));
 
                     var ion = ionType.GetIon(suffixes[i-1]);
                     double mz = ion.GetMonoIsotopicMz();
@@ -109,12 +109,12 @@ namespace InformedProteomics.Test.FunctionalTests
                 outputFile.WriteLine("Ion\tFound\tTotal\tTestFound\tTestTotal\tEqual?");
                 for (int i = 0; i < probabilities.Count; i++)
                 {
-                    Assert.True(probabilities[i].IonName == testProbabilities[i].IonName);
+                    Assert.True(probabilities[i].DataLabel == testProbabilities[i].DataLabel);
 
                     bool foundEqual = probabilities[i].Found == testProbabilities[i].Found;
                     bool totalEqual = probabilities[i].Total == testProbabilities[i].Total;
 
-                    outputFile.Write(probabilities[i].IonName + "\t");
+                    outputFile.Write(probabilities[i].DataLabel + "\t");
                     outputFile.Write("{0}\t{1}\t", probabilities[i].Found, probabilities[i].Total);
                     outputFile.Write("{0}\t{1}\t", testProbabilities[i].Found, testProbabilities[i].Total);
                     outputFile.WriteLine(foundEqual && totalEqual);
@@ -151,6 +151,14 @@ namespace InformedProteomics.Test.FunctionalTests
             var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act));
 
             return spectrumMatches;
+        }
+    }
+
+    class CompareIonProbabilityByIon : IComparer<Probability<string>>
+    {
+        public int Compare(Probability<string> x, Probability<string> y)
+        {
+            return System.String.Compare(x.DataLabel, y.DataLabel, System.StringComparison.Ordinal);
         }
     }
 }

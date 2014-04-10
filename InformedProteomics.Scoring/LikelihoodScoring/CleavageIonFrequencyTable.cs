@@ -29,7 +29,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return name;
         }
 
-        public IEnumerable<IonProbability> SelectIons(double probability)
+        public IEnumerable<Probability<string>> SelectIons(double probability)
         {
             var ionProbabilities = IonProbabilityTable;
 
@@ -71,7 +71,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         int found = 0;
                         const int total = 1;
                         if (ionTypeFound[key]) found = 1;
-                        AddIonProbability(new IonProbability(key, found, total));
+                        AddIonProbability(new Probability<string>(key, found, total));
                     }
                 }
             }

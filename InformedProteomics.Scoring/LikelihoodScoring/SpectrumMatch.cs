@@ -60,30 +60,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             get { return Sequence.GetComposition(); }
         }
 
-        public string GetCleanPeptide()
-        {
-            var aaset = new AminoAcidSet();
-            var cleanPeptide = "";
-            foreach (var aminoacid in Peptide)
-            {
-                if (aaset.GetAminoAcid(aminoacid) != null)
-                    cleanPeptide += aminoacid;
-            }
-            return cleanPeptide;
-        }
-
-        public string GetPeptidePrefix()
-        {
-            var cleanPeptide = GetCleanPeptide();
-            return cleanPeptide.Substring(0, cleanPeptide.Length - 1);
-        }
-
-        public string GetPeptideSuffix()
-        {
-            var cleanPeptide = GetCleanPeptide();
-            return cleanPeptide.Substring(1, cleanPeptide.Length);
-        }
-
         public List<Composition> Prefixes
         {
             get
@@ -109,7 +85,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     _suffixes = new List<Composition>();
                     for (int i = 1; i < Sequence.Count; i++)
                     {
-                        _suffixes.Add(Sequence.GetComposition(Peptide.Length - i, Peptide.Length));
+                        _suffixes.Add(Sequence.GetComposition(i, Sequence.Count));
                     }
                 }
                 return _suffixes;
@@ -132,11 +108,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return compositions.Select(ionType.GetIon).ToList();
         }
 
-        public IonProbability ContainsCleavageIons(IonType ionType, Tolerance tolerance, double relativeIntensityThreshold)
+        public Probability<string> ContainsCleavageIons(IonType ionType, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var ions = GetCleavageIons(ionType);
 
-            var probability = new IonProbability(ionType.Name);
+            var probability = new Probability<string>(ionType.Name);
             foreach (var ion in ions)
             {
                 probability.Total++;
