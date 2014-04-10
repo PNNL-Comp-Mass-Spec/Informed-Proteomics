@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modificaion mass: " + element);
                     var mod = modList[0];
                     mods.Add(mod);
-//                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.Mass);
+//                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);
                 }
             }
 

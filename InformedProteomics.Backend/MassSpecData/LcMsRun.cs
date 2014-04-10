@@ -42,7 +42,6 @@ namespace InformedProteomics.Backend.MassSpecData
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
             var msLevelMap = new Dictionary<int, int>();
-            
 
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
 
@@ -97,7 +96,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             }
 
-            _isolationMzBinToScanNums = new Dictionary<int, IEnumerable<int>>();
+            _isolationMzBinToScanNums = new Dictionary<int, int[]>();
             foreach (var entry in isolationMzBinToScanNums)
             {
                 var binNum = entry.Key;
@@ -189,14 +188,23 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="precursorIon"></param>
         /// <returns>scan numbers of fragmentation spectra</returns>
-        public IEnumerable<int> GetFragmentationSpectraScanNums(Ion precursorIon)
+        public int[] GetFragmentationSpectraScanNums(Ion precursorIon)
         {
-            var precursorBaseMz = precursorIon.GetMostAbundantIsotopeMz();
-            var targetIsoBin = (int)Math.Round(precursorBaseMz*IsolationWindowBinningFactor);
-            IEnumerable<int> scanNums;
-            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+            var mostAbundantIsotopeMz = precursorIon.GetMostAbundantIsotopeMz();
+            return GetFragmentationSpectraScanNums(mostAbundantIsotopeMz);
         }
 
+        /// <summary>
+        /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
+        /// </summary>
+        /// <param name="mostAbundantIsotopeMz"></param>
+        /// <returns>scan numbers of fragmentation spectra</returns>
+        public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
+        {
+            var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * IsolationWindowBinningFactor);
+            int[] scanNums;
+            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+        }
 
         /// <summary>
         /// Gets the spectrum of the specified scan number
@@ -656,7 +664,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private readonly List<LcMsPeak> _ms1PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
-        private readonly Dictionary<int, IEnumerable<int>> _isolationMzBinToScanNums;
+        private readonly Dictionary<int, int[]> _isolationMzBinToScanNums;
         private Dictionary<int, List<double>[]> _ms1Features;
         private int _ms1FeatureMinCharge;
     }

@@ -52,10 +52,15 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
-            var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(20, 250).LongCount();
+            //var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(30, 250).LongCount();
+            var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(30, 250, 0)
+                .Select(annotationAndSequence => annotationAndSequence.Annotation.Length - 4)
+                .Aggregate(0L, (current, length) => current + Math.Min(length - 29, 30));
+
             Console.WriteLine("NumPeptides: {0}", numPeptides);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -119,7 +124,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //        }
         //    }
 
-        //    Console.WriteLine("Mass\t#Pep\tRatio");
+        //    Console.WriteLine("AveragineMass\t#Pep\tRatio");
         //    for (var i = 1; i < hist.Length; i++)
         //    {
         //        Console.WriteLine("{0}\t{1}\t{2}", i*100, hist[i], hist[i]/(float)numPeptides);

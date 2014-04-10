@@ -64,9 +64,9 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqComposition = seqCompositionArr[modIndex];
             var peptideComposition = seqComposition + Composition.H2O;
-            peptideComposition.GetIsotopomerEnvelop();
+            peptideComposition.GetIsotopomerEnvelope();
 
-            Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.Mass);
+            Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
             seqGraph.SetSink(modIndex, 0);
 
             var precursorIon = new Ion(peptideComposition, charge);
@@ -121,16 +121,16 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqComposition = seqCompositionArr[modIndex];
             var peptideComposition = seqComposition + Composition.H2O;
-            peptideComposition.GetIsotopomerEnvelop();
+            peptideComposition.GetIsotopomerEnvelope();
 
-            Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.Mass);
+            Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
             seqGraph.SetSink(modIndex, 0);
 
             var precursorIon = new Ion(peptideComposition, charge);
 
             //                                 if (run.CheckMs1Signature(precursorIon, ms2ScanNum, precursorTolerance) == false)
 
-            //Assert.True(precursorFilter.IsValid(precursorIon, ms2ScanNum));
+            //Assert.True(precursorFilter.GetMs2Matches(precursorIon, ms2ScanNum));
             Assert.True(run.CheckMs1Signature(precursorIon, ms2ScanNum, precursorIonTolerance));
 
             var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -182,9 +182,9 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqComposition = seqCompositionArr[modIndex];
             var peptideComposition = seqComposition + Composition.H2O;
-            peptideComposition.GetIsotopomerEnvelop();
+            peptideComposition.GetIsotopomerEnvelope();
 
-            Console.WriteLine("Composition: {0}, Mass: {1}", seqComposition, seqComposition.Mass);
+            Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
             seqGraph.SetSink(modIndex, 0);
 
             var precursorIon = new Ion(peptideComposition, charge);

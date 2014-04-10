@@ -245,7 +245,7 @@ namespace InformedProteomics.DIA.Search
         //    //    // Check the ratio
         //    //    var abundanceMono = monoIsotopeXic.GetSumIntensities();
         //    //    var abundanceMinusOne = xicAtIndexMinus1.GetSumIntensities();
-        //    //    var isoEnv = _aaSet.GetComposition(match.Peptide).GetIsotopomerEnvelop();
+        //    //    var isoEnv = _aaSet.GetComposition(match.Peptide).GetIsotopomerEnvelopeFromNominalMass();
         //    //    var approxRato = isoEnv[1]/isoEnv[0];
         //    //    var ratioDiff = abundanceMono/abundanceMinusOne/(isoEnv[1]/isoEnv[0]);
         //    //    if (ratioDiff > 0.8 && ratioDiff < 1.2)

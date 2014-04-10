@@ -123,7 +123,7 @@ namespace InformedProteomics.Backend.Database
                 isStandardAminoAcid[residue] = true;
             }
 
-            var encoding = Encoding.ASCII;
+            var encoding = FastaDatabase.Encoding;
             // pre, peptide sequence, next
             foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
             {

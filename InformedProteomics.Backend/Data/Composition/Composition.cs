@@ -183,7 +183,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Methods to get Isotopomer Envelpops
 
-        public double[] GetIsotopomerEnvelop()
+        public double[] GetIsotopomerEnvelope()
         {
             return _isotopomerEnvelop ?? (_isotopomerEnvelop = ComputeIsotopomerEnvelop());
         }
@@ -431,7 +431,7 @@ namespace InformedProteomics.Backend.Data.Composition
         private static readonly double MassO = Atom.Get("O").Mass;
         private static readonly double MassS = Atom.Get("S").Mass;
         private static readonly double MassP = Atom.Get("P").Mass;
-        //private static readonly double MassIsotope = Atom.Get("13C").Mass - MassC;
+        //private static readonly double MassIsotope = Atom.Get("13C").AveragineMass - MassC;
 
         private static readonly int NominalMassC = Atom.Get("C").NominalMass;
         private static readonly int NominalMassH = Atom.Get("H").NominalMass;

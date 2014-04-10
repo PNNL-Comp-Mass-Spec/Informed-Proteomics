@@ -6,17 +6,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class SpectrumFilter
     {
-        public static Spectrum FilterNoisePeaks(Spectrum spectrum, int mzWidth=100, int retentionCount=6)
+        public static Spectrum GetFilteredSpectrum(Spectrum spectrum, double mzWidth=100.0, int retentionCount=6)
         {
             var peaks = spectrum.Peaks;
             var filteredPeaks = new List<Peak>();
 
-            for (int peakIndex = 0; peakIndex < peaks.Count(); peakIndex++)
+            for (var peakIndex = 0; peakIndex < peaks.Count(); peakIndex++)
             {
-                int rank = 1;
+                var rank = 1;
                 var peak = peaks[peakIndex];
 
-                int prevIndex = peakIndex - 1;
+                var prevIndex = peakIndex - 1;
                 while (prevIndex >= 0)
                 {
                     var prevPeak = peaks[prevIndex];
@@ -25,7 +25,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     prevIndex--;
                 }
 
-                int nextIndex = peakIndex + 1;
+                var nextIndex = peakIndex + 1;
                 while (nextIndex < peaks.Length)
                 {
                     var nextPeak = peaks[nextIndex];

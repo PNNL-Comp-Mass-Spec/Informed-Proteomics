@@ -28,7 +28,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("{0} {1} {2}", msgfPepStr, ion.Composition, ion.GetMonoIsotopicMz());
 
             var comp = Composition.Parse("H(257) C(150) N(42) O(56) S(4) 13C(12) 15N(3)");
-            Console.WriteLine("Mass: " + comp.Mass);
+            Console.WriteLine("AveragineMass: " + comp.Mass);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace InformedProteomics.Test
             //Assert.AreEqual(composition.ToPlainString(), "C34H51N7O14");
 
             Console.WriteLine("Isotopomer Envelope:");
-            foreach (var e in composition.GetIsotopomerEnvelop()) Console.WriteLine(e);
+            foreach (var e in composition.GetIsotopomerEnvelope()) Console.WriteLine(e);
             Console.WriteLine();
 
             Console.WriteLine("Isotope ions:");
@@ -232,7 +232,7 @@ namespace InformedProteomics.Test
             var composition = new Composition(419, 699, 119, 129, 1);
             const int charge = 14;
             var ion = new Ion(composition + Composition.H2O, charge);
-            var ff = composition.GetIsotopomerEnvelop();
+            var ff = composition.GetIsotopomerEnvelope();
             var isotopeIndex = -1;
             foreach (var ii in ff)
             {
@@ -259,7 +259,7 @@ namespace InformedProteomics.Test
                 var composition = aaSet.GetComposition(peptide);
                 var molFormula = composition.ToPlainString();
                 isoCalc.GetIsotopePattern(molFormula);
-                composition.GetIsotopomerEnvelop();
+                composition.GetIsotopomerEnvelope();
             }
 
             Console.WriteLine("NumPeptides: " + numPeptides);
@@ -358,7 +358,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("{0}\t{1}\t{2}", bIon, bIon.OffsetComposition, bIon.OffsetComposition.Mass);
             Console.WriteLine("{0}\t{1}\t{2}", yIon, yIon.OffsetComposition, yIon.OffsetComposition.Mass);
 
-            // Compute mass of y2 = Mass(DE) + OffsetY
+            // Compute mass of y2 = AveragineMass(DE) + OffsetY
             var compositionOfSecondSuffix = sequence.GetComposition(sequenceStr.Length - 2, sequenceStr.Length);
             var y2Ion = yIon.GetIon(compositionOfSecondSuffix);
             Console.WriteLine("m/z of y++: {0}", y2Ion.GetMonoIsotopicMz());

@@ -30,7 +30,7 @@ namespace InformedProteomics.TopDown.Scoring
                 IsValidForMs1Scan(precursorIon, precursorScanNum)
                 || IsValidForMs1Scan(precursorIon, nextMs1ScanNum);
 
-            //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMonoIsotopicMz(), precursorIon.Charge, scanNum, isValid);
+            //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMonoIsotopicMz(), precursorIon.precursorCharge, scanNum, isValid);
             return isValid;
         }
 
@@ -55,7 +55,7 @@ namespace InformedProteomics.TopDown.Scoring
         //        IsValidForMs1Scan2(precursorIon, precursorScanNum, isotopes)
         //        || IsValidForMs1Scan2(precursorIon, nextMs1ScanNum, isotopes);
 
-        //    //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMonoIsotopicMz(), precursorIon.Charge, scanNum, isValid);
+        //    //Console.WriteLine("{0}\t{1}\t{2}\t{3}", precursorIon.GetMonoIsotopicMz(), precursorIon.precursorCharge, scanNum, isValid);
         //    return isValid;
         //}
 

@@ -31,19 +31,19 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public static readonly Atom[] AtomArr =
             {
-                new Atom("H", 1.007825035, 1, "Hydrogen"),
+                new Atom("H", H, 1, "Hydrogen"),
                 new Atom("2H", 2.014101779, 2, "Deuterium"),
                 new Atom("Li", 7.016003, 7, "Lithium"),
-                new Atom("C", 12.0, 12, "Carbon"),
+                new Atom("C", C, 12, "Carbon"),
                 new Atom("13C", Constants.C13, 13, "Carbon13"),
-                new Atom("N", 14.003074, 14, "Nitrogen"),
+                new Atom("N", N, 14, "Nitrogen"),
                 new Atom("15N", 15.00010897, 15, "Nitrogen15"),
-                new Atom("O", 15.99491463, 16, "Oxigen"),
+                new Atom("O", O, 16, "Oxigen"),
                 new Atom("18O", 17.9991603, 18, "Oxigen"),
                 new Atom("F", 18.99840322, 19, "Fluorine"),
                 new Atom("Na", 22.9897677, 23, "Sodium"),
                 new Atom("P", 30.973762, 13, "Phosphorous"),
-                new Atom("S", 31.9720707, 32, "Sulfur"),
+                new Atom("S", S, 32, "Sulfur"),
                 new Atom("Cl", 34.96885272, 35, "Chlorine"),
                 new Atom("K", 38.9637074, 39, "Potassium"),
                 new Atom("Ca", 39.9625906, 40, "Calcium"),
@@ -69,6 +69,12 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("As", 74.92159, 75, "Arsenic"),
                 new Atom("Mg",  23.985043, 24, "Magnesium")
             };
+
+        public const double C = 12.0;
+        public const double H = 1.007825035;
+        public const double N = 14.003074;
+        public const double O = 15.99491463;
+        public const double S = 31.9720707;
 
         public static Atom Get(string code)
         {
@@ -114,7 +120,6 @@ namespace InformedProteomics.Backend.Data.Biology
                 var name = element.Element("Name").Value;
                 var numIsotopes = int.Parse(element.Element("NumIsotopes").Value);
             }
-            
         }
     }
 }

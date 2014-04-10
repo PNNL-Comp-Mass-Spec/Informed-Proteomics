@@ -25,7 +25,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var ion = new Ion(protComp, 20);
 //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
-            var isotopomerEnvelop = ion.Composition.GetIsotopomerEnvelop();
+            var isotopomerEnvelop = ion.Composition.GetIsotopomerEnvelope();
             Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
             var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);

@@ -48,8 +48,8 @@ namespace InformedProteomics.Test
             // Configure amino acid set
             //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             //            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>
@@ -131,8 +131,8 @@ namespace InformedProteomics.Test
             const string msAlignPlusResultPath = @"C:\workspace\TopDown\E_coli_iscU_60_mock_MSAlign_ResultTable_sam.txt";
 
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
 
 
             var searchModifications = new List<SearchModification>
@@ -192,8 +192,8 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
             const string protAnnotation = "A.AHAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK.";
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
 
             
             var searchModifications = new List<SearchModification>
@@ -240,7 +240,7 @@ namespace InformedProteomics.Test
                 //Console.WriteLine(xic[0].ScanNum + " " + xic[1].ScanNum);
 
                 //Console.WriteLine("ScanNum\t{0}", string.Join("\t", xic.Select(p => p.ScanNum.ToString())));
-                //Console.WriteLine("Charge " + charge + "\t" + string.Join("\t", xic.Select(p => p.Intensity.ToString())));
+                //Console.WriteLine("precursorCharge " + charge + "\t" + string.Join("\t", xic.Select(p => p.Intensity.ToString())));
                 // }
 
                 Console.WriteLine("\nCharge\tm/z");

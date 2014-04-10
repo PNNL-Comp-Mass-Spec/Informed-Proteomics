@@ -13,7 +13,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly Modification[] _modifications;
         private ModificationCombination[] _modificationCombinations;
         private readonly int _maxNumDynModsPerSequence;
-        private Dictionary<int, int> _modCombMap;
+        private Dictionary<int, int> _modCombMap;   
+        private Dictionary<int, int> _modCombsToModMap;
 
         /// <summary>
         /// No modification
@@ -71,7 +72,12 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
         {
-            throw new NotImplementedException();
+            int modIndex;
+            if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out modIndex))
+            {
+                return _modifications[modIndex];
+            }
+            return null;
         }
 
         public IEnumerable<ModificationCombination> GetModificationCombinations()
@@ -109,6 +115,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private void GenerateModCombMap()
         {
             _modCombMap = new Dictionary<int, int>();
+            _modCombsToModMap = new Dictionary<int, int>();
             for (int modCombIndex = 0; modCombIndex < _modificationCombinations.Length; modCombIndex++)
             {
                 long hashValue = _indexToHashValue[modCombIndex];
@@ -126,6 +133,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     long newHashValue = ToHash(newArray);
                     int newIndex = _hashValueToIndex[newHashValue];
                     _modCombMap[modCombIndex*_maxNumDynModsPerSequence + modIndex] = newIndex;
+                    _modCombsToModMap[modCombIndex*_modificationCombinations.Length + newIndex] = modIndex;
                     //Console.WriteLine("{0},{1} -> {2}", _modificationCombinations[modCombIndex], 
                     //    _modifications[modIndex], _modificationCombinations[newIndex]);
                 }

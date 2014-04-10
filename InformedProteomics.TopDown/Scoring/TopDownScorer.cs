@@ -38,7 +38,7 @@ namespace InformedProteomics.TopDown.Scoring
             _factory = factory;
 
             _maxIntensityIsotopeIndex = _proteinCompositionPlusWater.GetMostAbundantIsotopeZeroBasedIndex();
-            var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelop();
+            var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelope();
 
             
 
@@ -370,7 +370,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var precursorIon = new Ion(_proteinCompositionPlusWater, charge);
 
 
-               // Console.Write("Charge " + charge);
+               // Console.Write("precursorCharge " + charge);
 
                 for (var k = 0; k < xicArrayForThisCharge.Length; k++)
                 {

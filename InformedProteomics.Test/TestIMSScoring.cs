@@ -88,7 +88,7 @@ namespace InformedProteomics.Test
     //                        precursorIon.GetIsotopeMz(precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex());
     //                    if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz) continue;
     //                    var precursorFeatures = imsData.GetPrecursorFeatures(precursorMz);
-    //                    // Console.WriteLine("Precursor: {0}, Charge: {1}\n", precursorMz, charge + "\t" + precursorComposition);
+    //                    // Console.WriteLine("Precursor: {0}, precursorCharge: {1}\n", precursorMz, charge + "\t" + precursorComposition);
     //                    foreach (var precursorFeature in precursorFeatures)
     //                    {
     //                        //  Console.WriteLine("Precursor Feature: " + precursorFeature);
@@ -287,7 +287,7 @@ namespace InformedProteomics.Test
     //                var precursorMz = precursorIon.GetIsotopeMz(0);
     //                if (precursorMz > imsData.MaxPrecursorMz || precursorMz < imsData.MinPrecursorMz) continue;
     //                var precursorFeatures = imsData.GetPrecursorFeatures(precursorMz);
-    //                Console.WriteLine("Precursor: {0}, Charge: {1}\n", precursorMz, charge + "\t" + precursorComposition);
+    //                Console.WriteLine("Precursor: {0}, precursorCharge: {1}\n", precursorMz, charge + "\t" + precursorComposition);
     //                foreach (var precursorFeature in precursorFeatures)
     //                {
     //                   Console.WriteLine("Precursor Feature: " + precursorFeature);

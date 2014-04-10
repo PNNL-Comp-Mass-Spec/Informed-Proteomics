@@ -52,8 +52,8 @@ namespace InformedProteomics.Test.FunctionalTests
             const int numMaxModsPerProtein = 6;
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
             var dehydro = new SearchModification(Modification.PyroGluQ, 'C', SequenceLocation.Everywhere, false);
-            var cysteinylC = new SearchModification(Modification.CysteinylC, 'C', SequenceLocation.Everywhere, false);
-            var glutathioneC = new SearchModification(Modification.GlutathioneC, 'C', SequenceLocation.Everywhere, false);
+            var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
 
             var searchModifications = new List<SearchModification>

@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Execution\IcTopDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scoring\CachedLcMsRun.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
     <Compile Include="Scoring\LikelihoodScoringModel.cs" />
     <Compile Include="Scoring\LikelihoodScorer.cs" />
@@ -74,6 +75,10 @@
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Scoring\InformedProteomics.Scoring.csproj">
+      <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
+      <Name>InformedProteomics.Scoring</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

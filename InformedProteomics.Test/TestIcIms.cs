@@ -383,7 +383,7 @@ namespace InformedProteomics.Test
 //            {
 //                var best = scoringGraph.GetBestFeatureAndScore(precursorCharge);
 //                Console.WriteLine("PrecursorMz: " + scoringGraph.GetPrecursorIon(precursorCharge).GetMonoIsotopicMz());
-//                Console.WriteLine("Charge: " + precursorCharge);
+//                Console.WriteLine("precursorCharge: " + precursorCharge);
 //                Console.WriteLine("Feature: " + best.Item1);
 //                Console.WriteLine("PrecursorScore: " + best.Item2);
 //                Console.WriteLine("Score: " + best.Item3);
@@ -490,7 +490,7 @@ namespace InformedProteomics.Test
 //        [Test]
 //        public void ExtractBestMatchPerFeature()
 //        {
-//            var isotopeMass = Atom.Get("13C").Mass - Atom.Get("C").Mass;
+//            var isotopeMass = Atom.Get("13C").AveragineMass - Atom.Get("C").AveragineMass;
 
 //            const string resultFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\ICResults_Human.txt";
 //            const string outputFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\ICResults_Filtered_Human.tsv";
@@ -715,7 +715,7 @@ namespace InformedProteomics.Test
 //                {
 //                    double precursorMz = precursorIon.GetIsotopeMz(isotopeIndex);
 //                    FeatureSet precursorFeatures = imsData.GetPrecursorFeatures(precursorMz);
-//                    Console.WriteLine("PrecursorMz: {0}, Charge: {1}, Isotope: {2}\n", precursorMz, charge, isotopeIndex);
+//                    Console.WriteLine("PrecursorMz: {0}, precursorCharge: {1}, Isotope: {2}\n", precursorMz, charge, isotopeIndex);
 //                    foreach (Feature precursorFeature in precursorFeatures)
 //                    {
 //                        Console.WriteLine(precursorFeature);
@@ -739,7 +739,7 @@ namespace InformedProteomics.Test
 //            //    var y15C2 = new Ion(fragmentComposition + Composition.H2O, 2);
 //            //    double fragmentMz = y15C2.GetMonoIsotopicMz();
 //            //    FeatureSet fragmentFeatures = imsData.GetFragmentFeatures(fragmentMz);
-//            //    Console.WriteLine("Fragment: {0}, Charge: {1}", fragmentMz, charge);
+//            //    Console.WriteLine("Fragment: {0}, precursorCharge: {1}", fragmentMz, charge);
 //            //    foreach (Feature fragmentFeature in fragmentFeatures)
 //            //    {
 //            //        Console.WriteLine(fragmentFeature);

@@ -57,7 +57,7 @@ namespace InformedProteomics.TopDown.Scoring
         private const double RelativeIsotopeIntensityThreshold = 0.1;
         private const double CorrScoreThreshold = 0.7;
 
-        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
+        public static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         static CorrMatchedPeakCounter()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };

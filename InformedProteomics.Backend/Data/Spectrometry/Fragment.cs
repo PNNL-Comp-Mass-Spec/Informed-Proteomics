@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
 		public override string ToString()
 		{
-			return string.Format("ChargeState: {0}, Mz: {1}, Mass: {2}, ResidueNumber: {3}, FragmentIonClassBase: {4}, IonSymbol: {5}", ChargeState, Mz, Mass, ResidueNumber, IonType, IonSymbol);
+			return string.Format("ChargeState: {0}, Mz: {1}, AveragineMass: {2}, ResidueNumber: {3}, FragmentIonClassBase: {4}, IonSymbol: {5}", ChargeState, Mz, Mass, ResidueNumber, IonType, IonSymbol);
 		}
 	}
 }

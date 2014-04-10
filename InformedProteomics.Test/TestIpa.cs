@@ -59,7 +59,7 @@ namespace InformedProteomics.Test
                 foreach (var sequenceComposition in seqGraph.GetSequenceCompositions())
                 {
                     var peptideComposition = sequenceComposition + Composition.H2O;
-                    peptideComposition.GetIsotopomerEnvelop();
+                    peptideComposition.GetIsotopomerEnvelope();
                     for (var precursorCharge = minCharge; precursorCharge <= maxCharge; precursorCharge++)
                     {
                         var precursorIon = new Ion(peptideComposition, precursorCharge);

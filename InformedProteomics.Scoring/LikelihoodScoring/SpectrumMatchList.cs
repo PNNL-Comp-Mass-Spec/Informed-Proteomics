@@ -120,7 +120,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             foreach (var match in this)
             {
                 var spectrum = match.Spectrum;
-                spectrum = SpectrumFilter.FilterNoisePeaks(spectrum, searchWidth, retentionCount);
+                spectrum = SpectrumFilter.GetFilteredSpectrum(spectrum, searchWidth, retentionCount);
                 filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
             }
             Clear();

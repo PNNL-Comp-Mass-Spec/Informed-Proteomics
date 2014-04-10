@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Database
         // For suffled decoys
         public const int NumMutations = 3;
 
-        private static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
+        public static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
 
         public FastaDatabase(string databaseFilePath, bool isDecoy = false)
         {
@@ -205,6 +205,15 @@ namespace InformedProteomics.Backend.Database
             return -1;
         }
 
+        public string GetProteinSequence(string name)
+        {
+            long offset;
+            if (!_nameToOffset.TryGetValue(name, out offset)) return null;
+
+            var length = _nameToLength[name];
+            return Encoding.GetString(_sequence, (int)(offset + 1), length);
+        }
+
         public int GetZeroBasedPositionInProtein(long offset)
         {
             return (int)(offset - GetOffsetKey(offset));
@@ -253,9 +262,10 @@ namespace InformedProteomics.Backend.Database
         private readonly int _lastWriteTimeHash;
 
         private List<long> _offsetList;
-        private IDictionary<string, int> _nameToLength;
-        private IDictionary<long, string> _names;
-        private IDictionary<long, string> _descriptions;
+        private IDictionary<string, int> _nameToLength; // name -> length
+        private IDictionary<long, string> _names;   // offsetKey -> name
+        private IDictionary<long, string> _descriptions;    // offsetKey -> description
+        private IDictionary<string, long> _nameToOffset;    // name -> offsetKey
 
         private byte[] _sequence;
 
@@ -326,6 +336,7 @@ namespace InformedProteomics.Backend.Database
             _nameToLength = new Dictionary<string, int>();
             _names = new Dictionary<long, string>();
             _descriptions = new Dictionary<long, string>();
+            _nameToOffset = new Dictionary<string, long>();
 
             using (var reader = new StreamReader(_annoFilePath))
             {
@@ -342,6 +353,7 @@ namespace InformedProteomics.Backend.Database
                     if(_nameToLength.ContainsKey(name)) Console.WriteLine("Duplicate Name: {0}", name);
                     _nameToLength.Add(name, length);
                     _names.Add(offset,name);
+                    _nameToOffset.Add(name, offset);
                     _descriptions.Add(offset, token[3]);
                 }
             }

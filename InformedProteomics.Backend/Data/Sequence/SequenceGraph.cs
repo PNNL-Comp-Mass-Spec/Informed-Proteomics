@@ -323,11 +323,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var modificationName = ModificationParams.GetModificationIndexBetween(prevModCombIndex, curModCombIndex).Name;
                 string newModSequence;
-                if (string.IsNullOrEmpty(bestPrevSequence)) newModSequence = modificationName + " " + (seqIndex - 1);
-                else newModSequence = "," + modificationName + " " + (seqIndex - 1);
+                var modPos = _graph.Length - 3 - (seqIndex - 1);
+                if (string.IsNullOrEmpty(bestPrevSequence)) newModSequence = modificationName + " " + modPos;
+                else newModSequence = modificationName + " " + modPos + ",";
                 
                 return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
-                    ((double)curNodeScore + bestPrevNodeScore, newModSequence);
+                    ((double)curNodeScore + bestPrevNodeScore, newModSequence+bestPrevSequence);
             }
 
             return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>

@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Biology
         public IEnumerable<Isotope> GetIsotopes(double relativeIntensityThreshold)
         {
             var isotopeIndex = -1;
-            foreach (var isotopeRatio in Composition.GetIsotopomerEnvelop())
+            foreach (var isotopeRatio in Composition.GetIsotopomerEnvelope())
             {
                 ++isotopeIndex;
                 if (isotopeRatio > relativeIntensityThreshold)
@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns>Enumerable of isotope peaks</returns>
         public IEnumerable<Isotope> GetIsotopes(int numIsotopes)
         {
-            var isotopes = Composition.GetIsotopomerEnvelop();
+            var isotopes = Composition.GetIsotopomerEnvelope();
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
             Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
@@ -90,7 +90,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public IList<Isotope> GetTop3Isotopes()
         {
-            var isotopes = Composition.GetIsotopomerEnvelop();
+            var isotopes = Composition.GetIsotopomerEnvelope();
 
             var top3 = new List<Isotope>();
             var indexOfMostAbundantIsotope = Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -111,7 +111,12 @@ namespace InformedProteomics.Backend.Data.Biology
 
             return top3;
         }
-        
+
+        public static double GetIsotopeMz(double monoIsotopicMass, int charge, int isotopeIndex)
+        {
+            var isotopeMass = monoIsotopicMass + isotopeIndex*Biology.Constants.C13MinusC12;
+            return isotopeMass/charge + Constants.Proton;
+        }
 
     }
 }

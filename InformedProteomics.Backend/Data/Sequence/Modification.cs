@@ -79,12 +79,15 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
         public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
 
-        public static readonly Modification GlutathioneC = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
-        public static readonly Modification CysteinylC = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
+        public static readonly Modification Glutathione = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
+        public static readonly Modification Cysteinyl = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
         public static readonly Modification Dehydro = new Modification(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
 
         public static readonly Modification Itraq4Plex = new Modification(214, Data.Composition.Composition.Parse("H(12) C(4) 13C(3) N 15N O"), "iTRAQ4plex");
         public static readonly Modification Tmt6Plex = new Modification(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
+
+        public static readonly Modification Nethylmaleimide = new Modification(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
+        public static readonly Modification Nitrosyl = new Modification(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
         private static readonly Dictionary<string, IList<Modification>> MassToModMap;
