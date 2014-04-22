@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace InformedProteomics.Backend.Data.Spectrometry
+﻿namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Tolerance
     {

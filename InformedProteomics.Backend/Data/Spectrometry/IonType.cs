@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

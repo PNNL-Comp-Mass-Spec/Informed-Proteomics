@@ -97,5 +97,14 @@ namespace InformedProteomics.Backend.Utils
             return variance / (length - 1);
         }
 
+        static public IEnumerable<int> GetFactors(int x)
+        {
+            for (var factor = 1; factor * factor <= x; factor++)
+            {
+                if (x % factor != 0) continue;
+                yield return factor;
+                if (factor * factor != x) yield return x / factor;
+            }
+        }
     }
 }

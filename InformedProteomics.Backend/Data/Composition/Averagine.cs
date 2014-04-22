@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
@@ -10,6 +11,20 @@ namespace InformedProteomics.Backend.Data.Composition
         {
             var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
             return GetIsotopomerEnvelopeFromNominalMass(nominalMass);
+        }
+
+        public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1)
+        {
+            var peakList = new List<Peak>();
+            var envelope = GetIsotopomerEnvelope(monoIsotopeMass);
+            for (var isotopeIndex = 0; isotopeIndex < envelope.Envolope.Length; isotopeIndex++)
+            {
+                var intensity = envelope.Envolope[isotopeIndex];
+                if (intensity < relativeIntensityThreshold) continue;
+                var mz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
+                peakList.Add(new Peak(mz, intensity));
+            }
+            return peakList;
         }
 
         public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass)

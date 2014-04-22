@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -217,6 +218,37 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
+        private static readonly MzComparerWithPpmTolerance MzComparer = new MzComparerWithPpmTolerance(5);
+        public Spectrum GetSummedMs1Spectrum(int scanNum, int numMs1ScansAround = 2)
+        {
+            if (scanNum < MinLcScan || scanNum > MaxLcScan) return null;
+            if (GetMsLevel(scanNum) != 2) scanNum = GetNextScanNum(scanNum, 2);
+
+            var summedPeakList = new List<Peak>();
+
+            // Go down
+            var curScanNum = scanNum;
+            for (var i = 0; i < numMs1ScansAround; i++)
+            {
+                curScanNum = GetPrevScanNum(curScanNum, 1);
+                var prevSpec = GetSpectrum(curScanNum);
+                if (prevSpec == null) break;
+                summedPeakList = PeakListUtils.Sum(summedPeakList, prevSpec.Peaks, MzComparer);
+            }
+
+            // Go up
+            curScanNum = scanNum;
+            for (var i = 0; i < numMs1ScansAround; i++)
+            {
+                curScanNum = GetNextScanNum(curScanNum, 1);
+                var nextSpec = GetSpectrum(curScanNum);
+                if (nextSpec == null) break;
+                summedPeakList = PeakListUtils.Sum(summedPeakList, nextSpec.Peaks, MzComparer);
+            }
+            
+            return new Spectrum(summedPeakList, scanNum);
+        }
+
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)
         /// </summary>
@@ -238,8 +270,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="targetScanNum">target scan number to generate xic</param>
+        /// <param name="maxNumConsecutiveScansWithoutPeak">maximum number of consecutive scans with a peak</param>
         /// <returns>XIC around targetScanNum</returns>
-        public Xic GetExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum)
+        public Xic GetExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum, int maxNumConsecutiveScansWithoutPeak = 3)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
@@ -374,8 +407,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
         /// <param name="targetScanNum">target scan number to generate xic</param>
+        /// <param name="tolerance">max number of consecutive scans without a peak</param>
         /// <returns>XIC around targetScanNum</returns>
-        public Xic GetExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum)
+        public Xic GetExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum, int tolerance = 3)
         {
             if (GetMsLevel(targetScanNum) > 1)
                 targetScanNum = GetPrecursorScanNum(targetScanNum);
@@ -388,12 +422,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="xic">xic to be trimmed</param>
         /// <param name="targetScanNum">target scan number to generate xic</param>
+        /// <param name="tolerance">number of scans that can be tolerated</param>
         /// <returns>Trimmed XIC around targetScanNum</returns>
-        public Xic GetTrimmedXic(Xic xic, int targetScanNum)
+        public Xic GetTrimmedXic(Xic xic, int targetScanNum, int tolerance = 3)
         {
-            //TODO: this tolerance value is not optimal for all data (revisit required)
-            const int tolerance = 3;
-
             var index = xic.BinarySearch(new XicPoint(targetScanNum, 0));
             if(index < 0) index = ~index;
 

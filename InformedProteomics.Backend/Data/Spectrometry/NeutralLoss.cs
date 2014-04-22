@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.Data.Sequence;
+﻿using System.Collections.Generic;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

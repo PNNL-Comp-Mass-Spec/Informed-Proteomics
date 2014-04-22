@@ -39,9 +39,21 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestAveragine()
+        {
+            const double monoMass = 10247.5293287335;
+            const int charge = 14;
+            var profile = Averagine.GetTheoreticalIsotopeProfile(monoMass, charge);
+
+            Console.WriteLine("Isotope ions:");
+            foreach (var p in profile) Console.WriteLine("{0}\t{1}", p.Mz, p.Intensity);
+            Console.WriteLine();
+        }
+
+        [Test]
         public void TestPeptide()
         {
-            const string sequence = "SDKIIHLTDDSFDTDVLKADGAILVDFWAEWCGPCKMIAPILDEIADEYQGKLTVAKLNIDQNPGTAPKYGIRGIPTLLLFKNGEVAATKVGALSKGQLKEFLDANLA";
+            const string sequence = "MNKTQLIDVIADKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
@@ -63,7 +75,7 @@ namespace InformedProteomics.Test
             Console.WriteLine();
 
             Console.WriteLine("Isotope ions:");
-            var ion = new Ion(composition + Composition.H2O, 8);
+            var ion = new Ion(composition + Composition.H2O, 13);
             foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Index), p.Ratio);
             Console.WriteLine();
         }

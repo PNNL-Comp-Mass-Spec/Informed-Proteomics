@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class CachedLcMsRun
+    public class CachedLcMsRun: ISequenceFilter
     {
         public CachedLcMsRun(
             LcMsRun run, 
             int minPrecursorCharge, int maxPrecursorCharge,
             int minProductCharge, int maxProductCharge,
-            double minPrecursorMz, double maxPrecursorMz, 
+            double minPrecursorMz, double maxPrecursorMz,
             Tolerance precursorTolerance,
             Tolerance productTolerance)
         {
@@ -23,45 +23,53 @@ namespace InformedProteomics.TopDown.Scoring
             _maxPrecursorCharge = maxPrecursorCharge;
             _minProductCharge = minProductCharge;
             _maxProductCharge = maxProductCharge;
-            _precursorTolerance = precursorTolerance;
-            _productTolerance = productTolerance;
             _minBinNum = GetBinNumber(minPrecursorMz);
             _maxBinNum = GetBinNumber(maxPrecursorMz);
-
-            // binNum (most abundant isotop mz), precursor charge => ms2 scan numbers
-            _cachedMatchedMs2ScanNums = new List<int>[_maxBinNum - _minBinNum + 1, maxPrecursorCharge - minPrecursorCharge + 1];
-            _deconvolutedMs2Spectra = new Dictionary<int, ProductSpectrum>();
-            CachePrecursorMatches();
-            CacheProductSpectra();
+            _precursorTolerance = precursorTolerance;
+            _productTolerance = productTolerance;
+            _sequenceMassBinToScanNumsMap = new Dictionary<int, IList<int>>();
         }
 
-        public List<Match> GetMs2Matches(Composition protCompositionWithH2O)
+        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
-            var matches = new List<Match>();
+            var sequenceMassBinNum = GetBinNumber(sequenceMass);
+            IList<int> ms2ScanNums;
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(sequenceMassBinNum, out ms2ScanNums)) return ms2ScanNums;
+
+            ms2ScanNums = new List<int>();
+            var averagineEnvelope = Averagine.GetIsotopomerEnvelope(sequenceMass);
+            var mostAbundantIsotopeIndex = averagineEnvelope.MostAbundantIsotopeIndex;
             for (var precursorCharge = _minPrecursorCharge; precursorCharge <= _maxPrecursorCharge; precursorCharge++)
             {
-                var mostAbundantIsotopeMz = new Ion(protCompositionWithH2O, precursorCharge).GetMostAbundantIsotopeMz();
+                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(sequenceMass, precursorCharge,mostAbundantIsotopeIndex);
                 var binNumber = GetBinNumber(mostAbundantIsotopeMz);
                 if (binNumber < _minBinNum || binNumber > _maxBinNum) continue;
                 foreach (
                     var ms2ScanNum in
                         _cachedMatchedMs2ScanNums[binNumber - _minBinNum, precursorCharge - _minPrecursorCharge])
                 {
-                    matches.Add(new Match(precursorCharge, ms2ScanNum));
+                    ms2ScanNums.Add(ms2ScanNum);
                 }
             }
-            return matches;
+
+            _sequenceMassBinToScanNumsMap.Add(sequenceMassBinNum, ms2ScanNums);
+            return ms2ScanNums;
         }
 
         public IScorer GetMs2Scorer(int scanNum)
         {
-            ProductSpectrum productSpectrum;
-            if(_deconvolutedMs2Spectra.TryGetValue(scanNum, out productSpectrum)) return new DeconvScorer(productSpectrum, _productTolerance);
+            //ProductSpectrum deconvolutedMs2Spectrum;
+            //if(_deconvolutedMs2Spectra.TryGetValue(scanNum, out deconvolutedMs2Spectrum)) return new DeconvScorer(deconvolutedMs2Spectrum, _productTolerance);
+            //return null;
+            IScorer scorer;
+            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
             return null;
         }
 
-        private void CachePrecursorMatches()
+        public void CachePrecursorMatchesBinCentric()
         {
+            _cachedMatchedMs2ScanNums = new List<int>[_maxBinNum - _minBinNum + 1, _maxPrecursorCharge - _minPrecursorCharge + 1];
+
             var numBins = (float)(_maxBinNum - _minBinNum + 1);
 
             var cachedXic = new Dictionary<int, Xic>();
@@ -82,7 +90,7 @@ namespace InformedProteomics.TopDown.Scoring
                 for (var precursorCharge = _minPrecursorCharge; precursorCharge <= _maxPrecursorCharge; precursorCharge++)
                 {
                     var matchedMs2ScanNums = new List<int>();
-                    var deltaMz = Constants.C13MinusC12/precursorCharge;
+                    var deltaMz = Constants.C13MinusC12 / precursorCharge;
                     var isotopeMinusOneBinNum = GetBinNumber(mostAbundantIsotopeMz - deltaMz);
                     var xicMostAbundantIsotopeMinusOne = isotopeMinusOneBinNum >= _minBinNum ? cachedXic[isotopeMinusOneBinNum] : null;
                     var isotopePlusOneBinNum = GetBinNumber(mostAbundantIsotopeMz + deltaMz);
@@ -90,131 +98,100 @@ namespace InformedProteomics.TopDown.Scoring
 
                     foreach (var ms2ScanNumber in ms2ScanNumArr)
                     {
+                        var isPrecursorValid = true;
                         var precursorMs1ScanNum = _run.GetPrecursorScanNum(ms2ScanNumber);
-                        if (!xicMostAbundantIsotope.ContainsScanNum(precursorMs1ScanNum)) continue;
+                        if (!xicMostAbundantIsotope.ContainsScanNum(precursorMs1ScanNum)) isPrecursorValid = false;
+                        if (isPrecursorValid && xicMostAbundantIsotopeMinusOne != null &&
+                            !xicMostAbundantIsotopeMinusOne.ContainsScanNum(precursorMs1ScanNum)) isPrecursorValid = false; 
+                        if (isPrecursorValid && xicMostAbundantIsotopePlusOne != null &&
+                            !xicMostAbundantIsotopePlusOne.ContainsScanNum(precursorMs1ScanNum)) isPrecursorValid = false;
+
+                        if (isPrecursorValid)
+                        {
+                            matchedMs2ScanNums.Add(ms2ScanNumber);
+                            continue;
+                        }
+                        var nextMs1ScanNum = _run.GetNextScanNum(ms2ScanNumber, 1);
+                        if (!xicMostAbundantIsotope.ContainsScanNum(nextMs1ScanNum)) continue;
                         if (xicMostAbundantIsotopeMinusOne != null &&
-                            !xicMostAbundantIsotopeMinusOne.ContainsScanNum(precursorMs1ScanNum)) continue;
+                            !xicMostAbundantIsotopeMinusOne.ContainsScanNum(nextMs1ScanNum)) continue;
                         if (xicMostAbundantIsotopePlusOne != null &&
-                            !xicMostAbundantIsotopePlusOne.ContainsScanNum(precursorMs1ScanNum)) continue;
-                        matchedMs2ScanNums.Add( ms2ScanNumber);
+                            !xicMostAbundantIsotopePlusOne.ContainsScanNum(nextMs1ScanNum)) continue;
+                        matchedMs2ScanNums.Add(ms2ScanNumber);
                     }
                     _cachedMatchedMs2ScanNums[binIndex, precursorCharge - _minPrecursorCharge] = matchedMs2ScanNums;
                 }
             }
         }
 
-        public void CacheProductSpectra()
+        public void DeconvoluteProductSpectra()
         {
-            //var numMs2Spectra = 0;
-            //var numMonoIsotopePeaks = 0;
-
-            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            //_deconvolutedMs2Spectra = new Dictionary<int, ProductSpectrum>();
+            _ms2Scorer = new Dictionary<int, IScorer>();
+            foreach (var scanNum in _run.GetScanNumbers(2))
             {
-                if (_run.GetMsLevel(scanNum) != 2) continue;
-
-                //++numMs2Spectra;
                 var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
                 if (spec == null) continue;
-                var peaks = spec.Peaks;
 
-                var monoIsotopePeakList = new List<Peak>();
-                var massHash = new HashSet<int>();
-                for (var peakIndex = 0; peakIndex < peaks.Length; peakIndex++)
+                var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
+                if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
+            }
+        }
+
+        public static Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
+        {
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec, minCharge, maxCharge, IsotopeOffsetTolerance, FilteringWindowSize, tolerance, corrThreshold);
+            var peakList = new List<Peak>();
+            var binHash = new HashSet<int>();
+            foreach (var deconvolutedPeak in deconvolutedPeaks)
+            {
+                var mass = deconvolutedPeak.Mass;
+                var binNum = GetBinNumber(mass);
+                if (!binHash.Add(binNum)) continue;
+                peakList.Add(new Peak(mass, deconvolutedPeak.Intensity));
+            }
+
+            var productSpec = spec as ProductSpectrum;
+            if (productSpec != null)
+            {
+                return new ProductSpectrum(peakList, spec.ScanNum)
                 {
-                    var peak = peaks[peakIndex];
-
-                    // Check whether peak has the maximum intensity within the window
-                    var isBest = true;
-
-                    var prevIndex = peakIndex - 1;
-                    while (prevIndex >= 0)
-                    {
-                        var prevPeak = peaks[prevIndex];
-                        if ((peak.Mz - prevPeak.Mz) > FilteringWindowSize) break;
-                        if (prevPeak.Intensity > peak.Intensity)
-                        {
-                            isBest = false;
-                            break;
-                        }
-                        prevIndex--;
-                    }
-
-                    if (!isBest) continue;
-
-                    var nextIndex = peakIndex + 1;
-                    while (nextIndex < peaks.Length)
-                    {
-                        var nextPeak = peaks[nextIndex];
-                        if ((nextPeak.Mz - peak.Mz) > FilteringWindowSize) break;
-                        if (nextPeak.Intensity > peak.Intensity)
-                        {
-                            isBest = false;
-                            break;
-                        }
-                        nextIndex++;
-                    }
-
-                    if (!isBest) continue;
-
-                    // peak has the maximum intensity, window = [prevIndex+1,nextIndex-1]
-
-                    var window = new Peak[nextIndex - prevIndex - 1];
-                    Array.Copy(peaks, prevIndex+1, window, 0, window.Length);
-                    var windowSpectrum = new Spectrum(window, spec.ScanNum);
-                    var peakMz = peak.Mz;
-                    for (var productCharge = _minProductCharge; productCharge <= _maxProductCharge; productCharge++)
-                    {
-                        var mass = peak.Mz * productCharge;
-                        var mostAbundantIsotopeIndex = Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex;
-
-                        for (var isotopeIndex = mostAbundantIsotopeIndex - IsotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex+IsotopeOffsetTolerance; isotopeIndex++)
-                        {
-                            var monoIsotopeMass = (peakMz - Constants.Proton)*productCharge -
-                                           isotopeIndex*Constants.C13MinusC12;
-                            var massBinNum = (int) Math.Round(monoIsotopeMass*RescalingConstantHighPrecision);
-                            if (massHash.Contains(massBinNum)) continue;
-
-                            var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
-                            var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, productCharge, isotopomerEnvelope,
-                                _productTolerance, 0.1);
-                            if (observedPeaks == null) continue;
-
-                            var envelop = isotopomerEnvelope.Envolope; 
-                            var observedIntensities = new double[observedPeaks.Length];
-                            
-                            for (var i = 0; i < observedPeaks.Length; i++)
-                            {
-                                var observedPeak = observedPeaks[i];
-                                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
-                            }
-                            var corr = FitScoreCalculator.GetPearsonCorrelation(envelop, observedIntensities);
-                            if (corr <= 0.7) continue;
-
-                            // monoIsotopeMass is valid
-                            monoIsotopePeakList.Add(new Peak(monoIsotopeMass, 1.0));
-                            massHash.Add(massBinNum);
-                        }
-                    }
-                }
-                //numMonoIsotopePeaks += monoIsotopePeakList.Count;
-                _deconvolutedMs2Spectra[scanNum] = new ProductSpectrum(monoIsotopePeakList, scanNum)
-                {
-                    ActivationMethod = spec.ActivationMethod
+                    MsLevel = spec.MsLevel,
+                    ActivationMethod = productSpec.ActivationMethod,
+                    IsolationWindow = productSpec.IsolationWindow
                 };
             }
+
+            return new Spectrum(peakList, spec.ScanNum);
         }
 
         internal class DeconvScorer : IScorer
         {
-            private readonly Spectrum _deconvolutedSpectrum;
+//            private readonly Spectrum _deconvolutedSpectrum;
             private readonly Tolerance _productTolerance;
             private readonly BaseIonType[] _baseIonTypes;
+            private readonly HashSet<int> _ionMassBins;
             internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance)
             {
-                _deconvolutedSpectrum = deconvolutedSpectrum;
+//                _deconvolutedSpectrum = deconvolutedSpectrum;
                 _productTolerance = productTolerance;
                 _baseIonTypes = deconvolutedSpectrum.ActivationMethod != ActivationMethod.ETD
                     ? CorrMatchedPeakCounter.BaseIonTypesCID : CorrMatchedPeakCounter.BaseIonTypesETD;
+                _ionMassBins = new HashSet<int>();
+                foreach (var p in deconvolutedSpectrum.Peaks)
+                {
+                    var mass = p.Mz;
+                    var deltaMass = productTolerance.GetToleranceAsDa(mass, 1);
+                    var minMass = mass - deltaMass;
+                    var maxMass = mass + deltaMass;
+
+                    var minBinNum = GetBinNumber(minMass);
+                    var maxBinNum = GetBinNumber(maxMass);
+                    for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+                    {
+                        _ionMassBins.Add(binNum);
+                    }
+                }
             }
 
             public double GetPrecursorIonScore(Ion precursorIon)
@@ -231,25 +208,38 @@ namespace InformedProteomics.TopDown.Scoring
                     var fragmentComposition = baseIonType.IsPrefix
                                   ? prefixFragmentComposition + baseIonType.OffsetComposition
                                   : suffixFragmentComposition + baseIonType.OffsetComposition;
-                    var matchedPeak = _deconvolutedSpectrum.FindPeak(fragmentComposition.Mass, _productTolerance);
-                    if (matchedPeak != null) score += matchedPeak.Intensity;
+                    if (_ionMassBins.Contains(GetBinNumber(fragmentComposition.Mass))) score += 1;
                 }
                 return score;
             }
         }
 
-        private int GetBinNumber(double mass)
+        public static int GetBinNumber(double mass)
         {
             return (int) Math.Round(mass*RescalingConstantHighPrecision);
         }
 
-        private double GetMz(int binNum)
+        public static double GetMz(int binNum)
         {
             return binNum/RescalingConstantHighPrecision;
         }
 
-        private readonly List<int>[,] _cachedMatchedMs2ScanNums;
-        private readonly Dictionary<int, ProductSpectrum> _deconvolutedMs2Spectra;  // scan number -> list of mono masses
+        public void WriteToFile(string outputFilePath)
+        {
+            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
+            {
+                writer.Write(_minPrecursorCharge);
+                writer.Write(_maxPrecursorCharge);
+                writer.Write(_minProductCharge);
+                writer.Write(_maxProductCharge);
+            }
+        }
+
+        private Dictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
+//        private Dictionary<int, ProductSpectrum> _deconvolutedMs2Spectra;  // scan number -> list of mono masses
+        private List<int>[,] _cachedMatchedMs2ScanNums;
+
+        private readonly Dictionary<int, IList<int>> _sequenceMassBinToScanNumsMap; // mass bin -> scan numbers
 
         private readonly LcMsRun _run;
         private readonly int _minPrecursorCharge;
@@ -263,17 +253,6 @@ namespace InformedProteomics.TopDown.Scoring
         private const double RescalingConstantHighPrecision = Constants.RescalingConstantHighPrecision;
         private const double FilteringWindowSize = 1.1;
         private const int IsotopeOffsetTolerance = 2;
-
-        public class Match
-        {
-            public Match(int precursorCharge, int scanNum)
-            {
-                PrecursorCharge = precursorCharge;
-                ScanNum = scanNum;
-            }
-            public int PrecursorCharge { get; private set; }
-            public int ScanNum { get; private set; }
-        }
+        private const double CorrScoreThresholdMs2 = 0.7;
     }
-
 }

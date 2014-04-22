@@ -21,14 +21,14 @@ namespace InformedProteomics.Backend.Utils
 
         public void WriteTo(string outputFilePath, bool includeDecoy = false)
         {
-            var proteinIndex = _headers.IndexOf("Protein");
+            var sequenceIndex = _headers.IndexOf("ProteinName");
 
             using (var writer = new StreamWriter(outputFilePath))
             {
                 writer.WriteLine(string.Join("\t", _headers));
                 foreach (var r in _results)
                 {
-                    if (!includeDecoy && r.Split('\t')[proteinIndex].StartsWith(FastaDatabase.DecoyProteinPrefix))
+                    if (!includeDecoy && r.Split('\t')[sequenceIndex].StartsWith(FastaDatabase.DecoyProteinPrefix))
                     {
                         continue;
                     }
@@ -55,7 +55,7 @@ namespace InformedProteomics.Backend.Utils
             var concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
             var scoreIndex = _headers.IndexOf("Score");
             var scanNumIndex = _headers.IndexOf("ScanNum");
-            var proteinIndex = _headers.IndexOf("Protein");
+            var proteinIndex = _headers.IndexOf("ProteinName");
             if (scoreIndex < 0 || scanNumIndex < 0 || proteinIndex < 0) return false;
 
             var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))

@@ -1,5 +1,4 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

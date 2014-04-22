@@ -381,11 +381,11 @@ namespace InformedProteomics.TopDown.Scoring
 
                     foreach (var xicPeak in xic)
                     {
-                       // Console.WriteLine(xicPeak.ScanNum);
+                       // Console.WriteLine(xicPeak.MostAbundantIsotopeMz);
                         xicArrayForThisCharge[k][scanNumberIndex[xicPeak.ScanNum]] = xicPeak.Intensity;
                        // if (k == _maxIntensityIsotopeIndex-_minIsotopeIndex) 
-                     //       Console.WriteLine(charge + "\t" + xicPeak.ScanNum + "\t" + xicPeak.Intensity + "\t" + scanNumberIndex[xicPeak.ScanNum]);
-                        //if(k == 0 && charge == 13) Console.WriteLine(xicPeak.ScanNum + " " + xicPeak.Intensity);
+                     //       Console.WriteLine(charge + "\t" + xicPeak.MostAbundantIsotopeMz + "\t" + xicPeak.Intensity + "\t" + scanNumberIndex[xicPeak.MostAbundantIsotopeMz]);
+                        //if(k == 0 && charge == 13) Console.WriteLine(xicPeak.MostAbundantIsotopeMz + " " + xicPeak.Intensity);
 
                     }
                   //  Console.WriteLine();
