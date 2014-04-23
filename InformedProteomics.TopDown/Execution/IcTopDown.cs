@@ -13,13 +13,13 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDown
     {
-        // Consider all subsequenes of lengths [minProteinLength,maxProteinLength]
+        // Consider all subsequenes of lengths [minSequenceLength,maxSequenceLength]
         public IcTopDown(
             string dbFilePath,
             string specFilePath,
             AminoAcidSet aaSet,
-            int minProteinLength = 30,
-            int maxProteinLength = 250,
+            int minSequenceLength = 30,
+            int maxSequenceLength = 250,
             int minPrecursorIonCharge = 3,
             int maxPrecursorIonCharge = 30,
             int minProductIonCharge = 1,
@@ -36,8 +36,8 @@ namespace InformedProteomics.TopDown.Execution
             string dbFilePath, 
             string specFilePath, 
             AminoAcidSet aaSet,
-            int minProteinLength = 30, 
-            int maxProteinLength = 250, 
+            int minSequenceLength = 30, 
+            int maxSequenceLength = 250, 
             int maxNumNTermCleavages = 30,
             int maxNumCTermCleavages = 0,
             int minPrecursorIonCharge = 3, 
@@ -51,16 +51,9 @@ namespace InformedProteomics.TopDown.Execution
             
         }
 
-        public void TestTopDownSearch(
-            string dbFilePath, string specFilePath, AminoAcidSet aaSet,
-            int minLength, int maxLength, int maxNumNTermCleavages,
-            int minPrecursorIonCharge, int maxPrecursorIonCharge,
-            int minProductIonCharge, int maxProductIonCharge,
-            Tolerance precursorTolerance, Tolerance productIonTolerance,
-            bool ultraMod,
-            bool isDecoy
-            )
+        public void RunSearch()
         {
+
         }
     }
 }

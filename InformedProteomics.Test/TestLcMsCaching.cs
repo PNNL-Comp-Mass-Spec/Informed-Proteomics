@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
@@ -71,16 +72,17 @@ namespace InformedProteomics.Test
             var scanNums = tsvReader.GetData("ScanNum");
             var charges = tsvReader.GetData("Charge");
             var scores = tsvReader.GetData("Score");
+            var sequences = tsvReader.GetData("Sequence");
 
             //var sequences = tsvReader.GetData("Annotation");
 
-            var hist = new int[11];
+            var seqSet = new HashSet<string>();
             var numUnfilteredSpecs = 0;
             var totalSpecs = 0;
             for (var i = 0; i < compositions.Count; i++)
             {
                 var score = Convert.ToDouble(scores[i]);
-                if (score < 10) continue;
+                if (score < 13) continue;
                 ++totalSpecs;
                 var composition = Composition.Parse(compositions[i]);
                 var scanNum = Convert.ToInt32(scanNums[i]);
@@ -97,7 +99,11 @@ namespace InformedProteomics.Test
                 var corr2 = nextSpec.GetCorrScore(precursorIon, tolerance, 0.1);
 
                 var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
-                if (corr3 == 1) numUnfilteredSpecs++;
+                if (corr3 == 1)
+                {
+                    numUnfilteredSpecs++;
+                    seqSet.Add(sequences[i]);
+                }
 
                 var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
                 var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
@@ -110,7 +116,6 @@ namespace InformedProteomics.Test
 
                 var corrMax = new[] { corr1, corr2, corr3 }.Max();
                 var histIndex = (int)Math.Round(corrMax * 10);
-                hist[histIndex]++;
 
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}", scanNum, precursorScanNum, corr1, nextScanNum, corr2, corr3, corrMax, isValid);
             }
@@ -118,6 +123,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("TotalNumComparisons: {0}", numComparisons);
             Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons/(double)(maxBinNum-minBinNum+1));
             Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs/(double)totalSpecs, numUnfilteredSpecs, totalSpecs);
+            Console.WriteLine("NumUniqueSequences: {0}", seqSet.Count);
             sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
