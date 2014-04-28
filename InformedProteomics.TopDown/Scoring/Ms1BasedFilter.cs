@@ -26,7 +26,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
-            var sequenceMassBinNum = CachedLcMsRun.GetBinNumber(sequenceMass);
+            var sequenceMassBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(sequenceMass);
             IList<int> ms2ScanNums;
             if (_sequenceMassBinToScanNumsMap.TryGetValue(sequenceMassBinNum, out ms2ScanNums)) return ms2ScanNums;
 
@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
             for (var precursorCharge = _minCharge; precursorCharge <= _maxCharge; precursorCharge++)
             {
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(sequenceMass, precursorCharge, mostAbundantIsotopeIndex);
-                var binNumber = CachedLcMsRun.GetBinNumber(mostAbundantIsotopeMz);
+                var binNumber = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(mostAbundantIsotopeMz);
                 IList<ChargeAndScanNum> chargeAndScanNumList;
                 if (!_mostAbundantIsotopeMzIndexToChargeAndScanNums.TryGetValue(binNumber, out chargeAndScanNumList))
                 {
@@ -75,8 +75,8 @@ namespace InformedProteomics.TopDown.Scoring
                     var deltaMz = mostAbundantIsotopeMz * _ppmTolerance * 1e-6;
                     var minMz = mostAbundantIsotopeMz - deltaMz;
                     var maxMz = mostAbundantIsotopeMz + deltaMz;
-                    var minBinNum = CachedLcMsRun.GetBinNumber(minMz);
-                    var maxBinNum = CachedLcMsRun.GetBinNumber(maxMz);
+                    var minBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(minMz);
+                    var maxBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(maxMz);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
                         IList<ChargeAndScanNum> chargeAndScanNums;

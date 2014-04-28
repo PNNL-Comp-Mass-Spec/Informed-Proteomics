@@ -83,15 +83,16 @@ namespace InformedProteomics.Test.FunctionalTests
 
             sw.Start();
 
-            var run = LcMsRun.GetLcMsRun(TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
+            var run = LcMsRun.GetLcMsRun(TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
 
-            const int scanNum = 810;
+            const int scanNum = 425;
             var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec != null)
             {
                 spec.Display();
                 var precursorInfo = spec.IsolationWindow;
                 Console.WriteLine("ActivationMethod: {0}", spec.ActivationMethod);
+                Console.WriteLine("Rt: {0}", spec.ElutionTime);
                 Console.WriteLine("PrecursorScan: {0}", run.GetPrecursorScanNum(spec.ScanNum));
                 Console.WriteLine("IsolationWindowTargetMz: {0}", precursorInfo.IsolationWindowTargetMz);
                 Console.WriteLine("IsolationWindowLowerOffset: {0}", precursorInfo.IsolationWindowLowerOffset);
@@ -104,9 +105,24 @@ namespace InformedProteomics.Test.FunctionalTests
         }
 
         [Test]
-        public void TestNoiseFiltration()
+        public void TestXCaliburReader()
         {
-            
+            var xcaliburReader = new XCaliburReader(TestTopDownRawFilePathCid);
+            var scans = new[] {423, 425};
+            foreach (var scan in scans)
+            {
+                var spec = xcaliburReader.ReadMassSpectrum(scan) as ProductSpectrum;
+                Assert.True(spec != null);
+                var isolationWindow = spec.IsolationWindow;
+                Console.WriteLine("MsLevel: {0}", spec.MsLevel);
+                Console.WriteLine("ActivationMethod: {0}", spec.ActivationMethod);
+                Console.WriteLine("Rt: {0}", spec.ElutionTime);
+                Console.WriteLine("IsolationWindowTargetMz: {0}", isolationWindow.IsolationWindowTargetMz);
+                Console.WriteLine("IsolationWindowLowerOffset: {0}", isolationWindow.IsolationWindowLowerOffset);
+                Console.WriteLine("IsolationWindowUpperOffset: {0}", isolationWindow.IsolationWindowUpperOffset);
+                Console.WriteLine("MonoisotopicMz: {0}", isolationWindow.MonoisotopicMz);
+                Console.WriteLine("PrecursorCharge: {0}", isolationWindow.Charge);
+            }
         }
     }
 }

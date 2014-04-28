@@ -145,6 +145,15 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        //public IEnumerable<byte> Characters(int index, int numCharacters)
+        //{
+        //    if (_sequence == null) throw new SystemException("Fasta sequence must be loaded!");
+        //    for (var i = index; i < index+numCharacters && i < _sequence.Length - 1; i++)
+        //    {
+        //        yield return _sequence[i];
+        //    }
+        //}
+
         public void Read()
         {
             if (!ReadSeqFile())

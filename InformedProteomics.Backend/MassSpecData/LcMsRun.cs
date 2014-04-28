@@ -19,7 +19,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var pbfFilePath = Path.ChangeExtension(specFilePath, ".pbf");
 
-            if (!File.Exists(pbfFilePath))
+            if (!File.Exists(pbfFilePath) || !PbfReader.CheckFileFormatVersion(pbfFilePath))
             {
                 LcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
@@ -661,6 +661,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var spec = GetSpectrum(scanNum);
                     PbfReader.WriteSpectrumAsPbf(spec, writer);
                 }
+                writer.Write(PbfReader.FileFormatId);
             }
         }
 

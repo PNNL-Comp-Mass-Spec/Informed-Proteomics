@@ -35,11 +35,11 @@ namespace InformedProteomics.Test
         [Test]
         public void AddProteinLengths()
         {
-            const string databaseFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            const string databaseFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
-            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\MSAlign_NoBlindMod\Proteins.txt";
+            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\Proteins.txt";
             foreach (var protein in File.ReadLines(proteinListPath))
             {
                 var proteinId = protein.Split(null)[0];

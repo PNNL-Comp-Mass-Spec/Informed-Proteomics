@@ -28,7 +28,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
-            var sequenceMassBinNum = CachedLcMsRun.GetBinNumber(sequenceMass);
+            var sequenceMassBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(sequenceMass);
             IList<int> ms2ScanNums;
             if (_sequenceMassBinToScanNumsMap.TryGetValue(sequenceMassBinNum, out ms2ScanNums)) return ms2ScanNums;
             return new int[0];
@@ -57,8 +57,8 @@ namespace InformedProteomics.TopDown.Scoring
                     var dMass = sequenceMass * _ppmTolerance * 1e-6;
                     var minMass = sequenceMass - dMass;
                     var maxMass = sequenceMass + dMass;
-                    var minBinNum = CachedLcMsRun.GetBinNumber(minMass);
-                    var maxBinNum = CachedLcMsRun.GetBinNumber(maxMass);
+                    var minBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(minMass);
+                    var maxBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(maxMass);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
                         if (!binNumHash.Add(binNum)) continue;
@@ -164,7 +164,7 @@ namespace InformedProteomics.TopDown.Scoring
             internal DeisotopedPeak(double monoIsotopicMass, int charge, double score)
             {
                 MonoIsotopicMass = monoIsotopicMass;
-                MonoIsotopicMassIndex = CachedLcMsRun.GetBinNumber(MonoIsotopicMass);
+                MonoIsotopicMassIndex = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(MonoIsotopicMass);
                 Charge = charge;
                 Score = score;
             }

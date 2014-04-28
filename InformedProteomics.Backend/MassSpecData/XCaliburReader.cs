@@ -89,14 +89,21 @@ namespace InformedProteomics.Backend.MassSpecData
                 intensityArr = centroidedIntensities;
             }
 
+            var elutionTime = RtFromScanNum(scanNum);
             var msLevel = ReadMsLevel(scanNum);
-            if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum);
+            if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum)
+                {
+                    ElutionTime = elutionTime
+                };
+
+            var isolationWindow = ReadPrecursorInfo(scanNum);
 
             var productSpec = new ProductSpectrum(mzArr, intensityArr, scanNum)
                 {
                     MsLevel = msLevel,
+                    ElutionTime = elutionTime,
                     ActivationMethod = GetActivationMethod(scanNum),
-                    IsolationWindow = ReadPrecursorInfo(scanNum)
+                    IsolationWindow = isolationWindow
                 };
             return productSpec;
         }
@@ -114,9 +121,20 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationTargetMz = ReadIsolationWindowTargetMz(scanNum);
 
             // Get isolation window width
-            var isolationWindowWidth = ReadIsolationWidth(scanNum);
+            //var isolationWindowWidth = ReadIsolationWidth(scanNum);
+            var precursorInfo = ReadPrecursorInfoFromTrailerExtra(scanNum);
+            
+            var isolationWindowWidth = precursorInfo.IsolationWidth;
+            var monoisotopicMz = precursorInfo.MonoisotopicMz;
+            var charge = precursorInfo.Charge;
 
-            return new IsolationWindow(isolationTargetMz, isolationWindowWidth / 2, isolationWindowWidth / 2);
+            return new IsolationWindow(
+                isolationTargetMz, 
+                isolationWindowWidth / 2, 
+                isolationWindowWidth / 2,
+                monoisotopicMz,
+                charge
+                );
         }
 
         public int GetMaxScanNum()
@@ -184,17 +202,70 @@ namespace InformedProteomics.Backend.MassSpecData
             return isolationTargetMz;
         }
 
-        /// <summary>
-        /// Reads the isolation window width in Th (e.g. 3 if +/- 1.5 Th)
-        /// </summary>
-        /// <param name="scanNum">scan number</param>
-        /// <returns>isolation width</returns>
-        private double ReadIsolationWidth(int scanNum)
-        {
-            object value = null;
-            _msfileReader.GetTrailerExtraValueForScanNum(scanNum, "MS2 Isolation Width:", ref value);
+        ///// <summary>
+        ///// Reads the isolation window width in Th (e.g. 3 if +/- 1.5 Th)
+        ///// </summary>
+        ///// <param name="scanNum">scan number</param>
+        ///// <returns>isolation width</returns>
+        //private double ReadIsolationWidth(int scanNum)
+        //{
+        //    object value = null;
+        //    _msfileReader.GetTrailerExtraValueForScanNum(scanNum, "MS2 Isolation Width:", ref value);
 
-            return Convert.ToDouble(value);
+        //    return Convert.ToDouble(value);
+        //}
+
+        private PrecursorInfo ReadPrecursorInfoFromTrailerExtra(int scanNum)
+        {
+            if (ReadMsLevel(scanNum) == 1) return null;
+
+            object objLabels = null;
+            object objValues = null;
+            var intArrayCount = 0;
+
+            _msfileReader.GetTrailerExtraForScanNum(scanNum, ref objLabels, ref objValues, ref intArrayCount);
+
+            var labels = objLabels as string[];
+            var values = objValues as string[];
+
+            if (labels == null || values == null || intArrayCount <= 0) return null;
+
+            var isolationWidth = 0.0;
+            double? monoIsotopicMz = 0.0;
+            int? charge = null;
+            for (var i = 0; i < intArrayCount; i++)
+            {
+                //Console.WriteLine("{0}\t{1}", labels[i], values[i]);
+                if (labels[i].Equals("Monoisotopic M/Z:"))
+                {
+                    monoIsotopicMz = Convert.ToDouble(values[i]);
+                    if (monoIsotopicMz == 0.0) monoIsotopicMz = null;
+                }
+                else if (labels[i].Equals("Charge State:"))
+                {
+                    charge = Convert.ToInt32(values[i]);
+                    if (charge == 0) charge = null;
+                }
+                else if (labels[i].Equals("MS2 Isolation Width:"))
+                {
+                    isolationWidth = Convert.ToDouble(values[i]);
+                }
+            }
+            return new PrecursorInfo(isolationWidth, monoIsotopicMz, charge);
+        }
+
+        internal class PrecursorInfo
+        {
+            public PrecursorInfo(double isolationWidth, double? monoisotopicMz, int? charge)
+            {
+                MonoisotopicMz = monoisotopicMz;
+                IsolationWidth = isolationWidth;
+                Charge = charge;
+            }
+
+            internal double IsolationWidth { get; private set; }
+            internal double? MonoisotopicMz { get; private set; }
+            internal int? Charge { get; private set; }
         }
 
         private static double ParseMzValueFromThermoScanInfo(string scanFilterString)

@@ -64,7 +64,7 @@
   <ItemGroup>
     <Compile Include="Execution\IcTopDown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scoring\CachedLcMsRun.cs" />
+    <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
     <Compile Include="Scoring\LikelihoodScoringModel.cs" />
     <Compile Include="Scoring\LikelihoodScorer.cs" />

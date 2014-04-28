@@ -31,6 +31,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             set { _msLevel = value; }
         }
 
+        public double ElutionTime { get; set; }
+
         // Peaks are assumed to be sorted according to m/z
         public Peak[] Peaks { get; private set; }
 

@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.Database
         private readonly string _pLcpFilePath;
 
         private readonly FastaDatabase _fastaDatabase;
-        private byte[] _pLcp;        
+        protected byte[] PLcp;        
 
         public IndexedDatabase(FastaDatabase fastaDatabase)
         {
@@ -39,14 +39,61 @@ namespace InformedProteomics.Backend.Database
         {
             using (var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read))
             {
-                _pLcp = new byte[fileStream.Length - sizeof(int)];
-                fileStream.Read(_pLcp, 0, _pLcp.Length);
+                PLcp = new byte[fileStream.Length - sizeof(int)];
+                fileStream.Read(PLcp, 0, PLcp.Length);
             }
         }
 
-        public IEnumerable<byte> PLcps()
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, Enzyme enzyme)
         {
-            if (_pLcp == null)
+            return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
+                               enzyme.IsNTerm);
+        }
+
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
+        {
+            return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
+        }
+
+        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
+        {
+            return IntactSequenceAnnotationsAndOffsets(minLength, maxLength, 0);
+        }
+
+        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
+        {
+            var encoding = Encoding.ASCII;
+
+            foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
+            {
+                var seqArr = seqWithOffset.Sequence;
+                var offset = seqWithOffset.Offset;
+                for (var i = 0; i <= numCTermCleavages; i++)
+                {
+                    var length = seqArr.Length - i;
+                    if (length >= minLength && length <= maxLength)
+                    {
+                        yield return new AnnotationAndOffset(
+                            offset,
+                            string.Format("{0}.{1}.{2}",
+                            "_",
+                            encoding.GetString(seqArr, 0, length),
+                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
+                            );
+                    }
+                }
+            }
+        }
+
+        public int GetLongestSequenceLength()
+        {
+            return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
+        }
+
+        private IEnumerable<byte> PLcps()
+        {
+            if (PLcp == null)
             {
                 const int bufferSize = 1 << 16;
                 var buffer = new byte[bufferSize];
@@ -68,11 +115,11 @@ namespace InformedProteomics.Backend.Database
             }
             else
             {
-                foreach (var lcp in _pLcp) yield return lcp;
+                foreach (var lcp in PLcp) yield return lcp;
             }
         }
 
-        public IEnumerable<SequenceAndOffset> SequencesWithOffsetNoCleavage()
+        private IEnumerable<SequenceAndOffset> SequencesWithOffsetNoCleavage()
         {
             List<byte> buf = null;
             var curOffset = 0L;
@@ -94,17 +141,10 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme)
-        {
-            return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
-                               enzyme.IsNTerm);
-        }
-
-
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, char[] enzymaticResidues,
-                                                      bool isNTermEnzyme)
+        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, IEnumerable<char> enzymaticResidues,
+                                                      bool isNTermEnzyme
+            )
         {
             var isCleavable = new bool[128];
             if (enzymaticResidues != null)
@@ -184,15 +224,6 @@ namespace InformedProteomics.Backend.Database
                     {
                         var code = seqArr[i];
 
-                        // TODO: code = 185
-                        //if (code > isStandardAminoAcid.Length)
-                        //{
-                        //    Console.WriteLine("Debug : " + code);
-                        //}
-                        //if (encoding.GetString(seqArr, 1, i).Equals("QQTIAAN_VD"))
-                        //{
-                        //        Console.WriteLine("Debug : " + code);
-                        //}
                         if (!isStandardAminoAcid[code]) break;
                         if (i >= minLength && i >= lcp)
                         {
@@ -201,21 +232,6 @@ namespace InformedProteomics.Backend.Database
                     }
                 }
             }
-        }
-
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
-        {
-            return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
-        }
-
-        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
-        {
-            return IntactSequenceAnnotationsAndOffsets(minLength, maxLength, 0);
-        }
-
-        public int GetLongestSequenceLength()
-        {
-            return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
         }
 
         private IEnumerable<SequenceLcpAndOffset> SequencesWithLcpAndOffset(int minLength, int maxLength)
@@ -248,31 +264,6 @@ namespace InformedProteomics.Backend.Database
                 yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, ++offset);
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
-            }
-        }
-
-        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
-        {
-            var encoding = Encoding.ASCII;
-
-            foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
-            {
-                var seqArr = seqWithOffset.Sequence;
-                var offset = seqWithOffset.Offset;
-                for (var i = 0; i <= numCTermCleavages; i++)
-                {
-                    var length = seqArr.Length - i;
-                    if (length >= minLength && length <= maxLength)
-                    {
-                        yield return new AnnotationAndOffset(
-                            offset,
-                            string.Format("{0}.{1}.{2}",
-                            "_",
-                            encoding.GetString(seqArr, 0, length),
-                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
-                            );
-                    }
-                }
             }
         }
 

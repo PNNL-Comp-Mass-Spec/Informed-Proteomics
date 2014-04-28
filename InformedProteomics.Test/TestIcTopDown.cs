@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -22,11 +25,11 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSbepSearch()
         {
-            //const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw";
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
 
-            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw";
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            //const string dirPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw";
+            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
             
             foreach (var specFilePath in Directory.GetFiles(dirPath))
             {
@@ -52,7 +55,7 @@ namespace InformedProteomics.Test
             const bool considerInternalCleavages = true;
 
             var precursorTolerance = new Tolerance(10);
-            var productIonTolerance = new Tolerance(10);
+            const int productIonTolerancePpm = 10;
 
             // Configure amino acid set
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
@@ -75,35 +78,34 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var lcMsCache = new CachedLcMsRun(run,
-                minPrecursorIonCharge, maxPrecursorIonCharge,
+            var productScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(run,
                 minProductIonCharge, maxProductIonCharge,
-                600.0, 1800.0, precursorTolerance, productIonTolerance);
-            lcMsCache.DeconvoluteProductSpectra();
+                productIonTolerancePpm);
+            productScorerFactory.DeconvoluteProductSpectra();
             var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run);
 
             //lcMsCache.CachePrecursorMatchesBinCentric();
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorIonCharge, maxPrecursorIonCharge, 15, 0.7, 100);
             //var ms1BasedFilter = new Ms1BasedFilter(run, minPrecursorIonCharge, maxPrecursorIonCharge, 15);
 
-            TestTopDownSearchCache(dbFilePath, specFilePath, run, lcMsCache, ms1BasedFilter, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
+            TestTopDownSearchCache(dbFilePath, specFilePath, run, productScorerFactory, ms1BasedFilter, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
-                minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, considerInternalCleavages, false);
-            TestTopDownSearchCache(dbFilePath, specFilePath, run, lcMsCache, ms1BasedFilter, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
+                minProductIonCharge, maxProductIonCharge, precursorTolerance, false, considerInternalCleavages, false);
+            TestTopDownSearchCache(dbFilePath, specFilePath, run, productScorerFactory, ms1BasedFilter, aaSet, minLength, maxLength, maxNumNTermCleavages, maxNumCTermCleavages,
                 minPrecursorIonCharge, maxPrecursorIonCharge,
-                minProductIonCharge, maxProductIonCharge, precursorTolerance, productIonTolerance, false, considerInternalCleavages, true);
+                minProductIonCharge, maxProductIonCharge, precursorTolerance, false, considerInternalCleavages, true);
         }
 
         [Test]
         public void TestTopDownSearchCache(
             string dbFilePath, 
-            string specFilePath, LcMsRun run, CachedLcMsRun lcMsCache, ISequenceFilter ms1BasedFilter,
+            string specFilePath, LcMsRun run, ProductScorerBasedOnDeconvolutedSpectra lcMsCache, ISequenceFilter ms1BasedFilter,
             AminoAcidSet aaSet,
             int minLength, int maxLength,
             int maxNumNTermCleavages, int maxNumCTermCleavages,
             int minPrecursorIonCharge, int maxPrecursorIonCharge,
             int minProductIonCharge, int maxProductIonCharge,
-            Tolerance precursorTolerance, Tolerance productIonTolerance,
+            Tolerance precursorTolerance,
             bool ultraMod,
             bool considerInternalCleavages,
             bool isDecoy
@@ -142,7 +144,7 @@ namespace InformedProteomics.Test
 
             var numProteins = 0;
             long totalProtCompositions = 0;
-
+            var numPrSms = 0L;
             sw.Reset();
             sw.Start();
 
@@ -169,10 +171,7 @@ namespace InformedProteomics.Test
                         sw.Reset();
                         sw.Start();
                     }
-                    //if (numProteins == 10) break;
                 }
-
-                //Console.WriteLine(protAnnotation);
 
                 var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
                 if (seqGraph == null)
@@ -190,7 +189,7 @@ namespace InformedProteomics.Test
                     {
                         if (ultraMod)
                         {
-                            if (modIndex%100 == 0) Console.WriteLine("ModIndex: " + modIndex);
+                            if (modIndex % 100 == 0) Console.WriteLine("ModIndex: " + modIndex);
                             //                                if (modIndex >= 100) break;
                         }
 
@@ -203,15 +202,15 @@ namespace InformedProteomics.Test
 
                         foreach (var ms2ScanNum in ms1BasedFilter.GetMatchingMs2ScanNums(sequenceMass))
                         {
+                            ++numPrSms;
                             var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                             if (spec == null) continue;
-                            var scorer = lcMsCache.GetMs2Scorer(ms2ScanNum);
                             var charge =
                                 (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
+                            var scorer = lcMsCache.GetMs2Scorer(ms2ScanNum);
 
                             //var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
                             var score = seqGraph.GetScore(charge, scorer);
-
                             if (score <= -50) continue;
 
                             double existingBestScore;
@@ -223,7 +222,7 @@ namespace InformedProteomics.Test
                             var sequence = annotation.Substring(numNTermCleavage + 2,
                                 annotation.Length - 4 - numNTermCleavage);
                             var proteinName = targetDb.GetProteinName(offset);
-                            var start = targetDb.GetZeroBasedPositionInProtein(offset) + 1;
+                            var start = targetDb.GetZeroBasedPositionInProtein(offset) + 1 + numNTermCleavage;
                             var end = start + sequence.Length - 1;
                             var protLength = targetDb.GetProteinLength(proteinName);
                             bestScorePerScan[ms2ScanNum] = score;
@@ -265,6 +264,192 @@ namespace InformedProteomics.Test
             sw.Stop();
             Console.WriteLine("NumProteins: {0}", numProteins);
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
+            Console.WriteLine("NumPrSMs: {0}", numPrSms);
+
+            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestTopDownSearchParallel(
+            string dbFilePath,
+            string specFilePath, LcMsRun run, ProductScorerBasedOnDeconvolutedSpectra lcMsCache, ISequenceFilter ms1BasedFilter,
+            AminoAcidSet aaSet,
+            int minLength, int maxLength,
+            int maxNumNTermCleavages, int maxNumCTermCleavages,
+            int minPrecursorIonCharge, int maxPrecursorIonCharge,
+            int minProductIonCharge, int maxProductIonCharge,
+            Tolerance precursorTolerance, Tolerance productIonTolerance,
+            bool ultraMod,
+            bool considerInternalCleavages,
+            bool isDecoy
+            )
+        {
+
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            Console.Write("Reading raw file...");
+            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+
+            //var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt");
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+
+            var targetDb = new FastaDatabase(dbFilePath);
+            targetDb.Read();
+
+            var db = !isDecoy ? targetDb : targetDb.Decoy(null, true);  // shuffled decoy
+
+            var indexedDb = new IndexedDatabase(db);
+            indexedDb.Read();
+
+            IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
+            if (!considerInternalCleavages)
+            {
+                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength, maxNumCTermCleavages);
+            }
+            else
+            {
+                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(minLength, maxLength);
+                maxNumNTermCleavages = 0;
+            }
+
+            var numProteins = 0;
+            long totalProtCompositions = 0;
+            var numPrSms = 0L;
+            sw.Reset();
+            sw.Start();
+
+            var bestScorePerScan = new ConcurrentDictionary<int, double>();
+            var bestResultPerScan = new ConcurrentDictionary<int, string>();
+
+
+            foreach (var annotationAndOffset in annotationsAndOffsets)
+            {
+                
+            }
+
+            Parallel.ForEach(annotationsAndOffsets, annotationAndOffset =>
+            {
+                Interlocked.Increment(ref numProteins);
+
+                var annotation = annotationAndOffset.Annotation;
+                var offset = annotationAndOffset.Offset;
+
+                //                    Console.WriteLine(annotation);
+                if (numProteins % 100000 == 0)
+                {
+                    Console.Write("Processing {0}{1} proteins...", numProteins,
+                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
+                    if (numProteins != 0)
+                    {
+                        sw.Stop();
+                        sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
+                        sw.Reset();
+                        sw.Start();
+                    }
+                }
+
+                var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
+                if (seqGraph == null)
+                {
+                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
+                    return;
+                }
+
+                for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
+                {
+                    var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);
+                    if (ultraMod)
+                        Console.WriteLine("#NTermCleavages: {0}, #ProteinCompositions: ", numNTermCleavage);
+                    for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+                    {
+                        if (ultraMod)
+                        {
+                            if (modIndex % 100 == 0) Console.WriteLine("ModIndex: " + modIndex);
+                            //                                if (modIndex >= 100) break;
+                        }
+
+                        seqGraph.SetSink(modIndex, numNTermCleavage);
+                        var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+                        totalProtCompositions++;
+                        var sequenceMass = protCompositionWithH2O.Mass;
+                        //var matches = lcMsCache.GetMs2Matches(protCompositionWithH2O);
+                        var modCombinations = seqGraph.ModificationParams.GetModificationCombination(modIndex);
+
+                        foreach (var ms2ScanNum in ms1BasedFilter.GetMatchingMs2ScanNums(sequenceMass))
+                        {
+                            ++numPrSms;
+                            var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                            if (spec == null) continue;
+                            var charge =
+                                (int)
+                                    Math.Round(sequenceMass /
+                                               (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
+                            var scorer = lcMsCache.GetMs2Scorer(ms2ScanNum);
+
+                            //var scorer = new LikelihoodScorer(scoringModel, spec, productIonTolerance, minProductIonCharge, maxProductIonCharge);
+                            var score = seqGraph.GetScore(charge, scorer);
+                            if (score <= -50) continue;
+
+                            //double existingBestScore;
+                            //if (bestScorePerScan.TryGetValue(ms2ScanNum, out existingBestScore) &&
+                            //    score <= existingBestScore) continue;
+
+                            //// new best score
+                            //var precursorIon = new Ion(protCompositionWithH2O, charge);
+                            //var sequence = annotation.Substring(numNTermCleavage + 2,
+                            //    annotation.Length - 4 - numNTermCleavage);
+                            //var proteinName = targetDb.GetProteinName(offset);
+                            //var start = targetDb.GetZeroBasedPositionInProtein(offset) + 1;
+                            //var end = start + sequence.Length - 1;
+                            //var protLength = targetDb.GetProteinLength(proteinName);
+                            //bestScorePerScan[ms2ScanNum] = score;
+                            //bestResultPerScan[ms2ScanNum] =
+                            //    string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
+                            //        annotation.Substring(numNTermCleavage + 2, annotation.Length - 4 - numNTermCleavage),
+                            //        // Sequence
+                            //        modCombinations, // Modifications
+                            //        protCompositionWithH2O, // Composition
+                            //        (isDecoy ? FastaDatabase.DecoyProteinPrefix + "_" : "") + proteinName,
+                            //        // ProteinName
+                            //        targetDb.GetProteinDescription(offset), // ProteinDescription
+                            //        protLength, // ProteinLength
+                            //        start, // Start
+                            //        end, // End
+                            //        charge, // precursorCharge
+                            //        precursorIon.GetMostAbundantIsotopeMz(), // MostAbundantIsotopeMz
+                            //        protCompositionWithH2O.Mass,
+                            //        score);
+                        }
+                    }
+                }
+            }
+                );
+
+            // write results into a file
+            var icExtension = !isDecoy ? ".icresult" : "decoy.icresult";
+            var outputFilePath = Path.ChangeExtension(specFilePath, icExtension);
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                //                writer.WriteLine("ScanNum\tAnnotation\tProtein\tProteinDesc\tComposition\tCharge\tBaseIsotopeMz\tMass\tScore");
+                writer.WriteLine("ScanNum\tSequence\tModifications\tComposition\tProteinName\tProteinDesc\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\tScore");
+                var ms2Scans = new List<int>(bestScorePerScan.Keys);
+                ms2Scans.Sort();
+                foreach (var ms2ScanNum in bestScorePerScan.OrderByDescending(e => e.Value).Select(scanScorePair => scanScorePair.Key))
+                {
+                    writer.WriteLine(ms2ScanNum + "\t" + bestResultPerScan[ms2ScanNum]);
+                }
+            }
+
+            sw.Stop();
+            Console.WriteLine("NumProteins: {0}", numProteins);
+            Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
+            Console.WriteLine("NumPrSMs: {0}", numPrSms);
 
             sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
