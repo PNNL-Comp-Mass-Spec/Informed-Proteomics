@@ -18,60 +18,114 @@ namespace InformedProteomics.Test
     internal class TestLcMsCaching
     {
         [Test]
-        public void TestFloatingPointRounding()
+        public void FilteringEfficiencyQcShew()
         {
-            const double value = 7655.9568537625;
-            var converted = BitConverter.DoubleToInt64Bits(value);
-            var rounded = (converted >> 37) << 37;
-            Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, (converted >> 37) << 37);
-            Console.WriteLine("{0}\t{1}", value, BitConverter.Int64BitsToDouble(rounded));
-        }
-
-        [Test]
-        public void TestDeconvolutionMs2()
-        {
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var numSpecs = 0;
-            var numPeaks = 0;
-            //foreach (var ms2ScanNum in run.GetScanNumbers(2))
-            var ms2ScanNum = 1575;
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Reading run: {0:f4} sec", sec);
+
+            const int minPrecursorCharge = 3;
+            const int maxPrecursorCharge = 30;
+            const int tolerancePpm = 10;
+            var tolerance = new Tolerance(tolerancePpm);
+            sw.Reset();
+            sw.Start();
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.7, 0.7, 40);
+            //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
+
+            sw.Stop();
+            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sec);
+
+            ISequenceFilter ms1Filter = ms1BasedFilter;
+            
+            sw.Reset();
+            sw.Start();
+            const double minProteinMass = 3000.0;
+            const double maxProteinMass = 30000.0;
+            var minBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(minProteinMass);
+            var maxBinNum = ProductScorerBasedOnDeconvolutedSpectra.GetBinNumber(maxProteinMass);
+            var numComparisons = 0L;
+            for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                //if (spec == null) continue;
-                var deconvolutedSpec = ProductScorerBasedOnDeconvolutedSpectra.GetDeconvolutedSpectrum(spec, 2, 10, new Tolerance(10), 0.7) as ProductSpectrum;
-                if (deconvolutedSpec != null)
-                {
-                    deconvolutedSpec.Display();
-                    var nPeaks = deconvolutedSpec.Peaks.Length;
-                    //Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
-                    ++numSpecs;
-                    numPeaks += nPeaks;
-                    var hist = new Dictionary<double, int>();
-                    for(var i=0; i<nPeaks-1; i++)
-                    {
-                        for (var j = i + 1; j < nPeaks; j++)
-                        {
-                            var sum = deconvolutedSpec.Peaks[i].Mz + deconvolutedSpec.Peaks[j].Mz;
-                            var rounded = BitConverter.Int64BitsToDouble((BitConverter.DoubleToInt64Bits(sum) >> 37) << 37);
-                            int num;
-                            if (hist.TryGetValue(rounded, out num)) hist[rounded] = num + 1;
-                            else hist[rounded] = 1;
-                        }
-                    }
-                    Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
-                    foreach (var entry in hist.OrderByDescending(e => e.Value))
-                    {
-                        var mass = entry.Key;
-                        var charge = (int)Math.Round(mass/spec.IsolationWindow.IsolationWindowTargetMz);
-                        if(spec.IsolationWindow.Contains(Ion.GetIsotopeMz(mass, charge, Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex)))
-                        {
-                            Console.WriteLine("{0}\t{1}\t{2}", entry.Key, entry.Value, charge);
-                        }
-                    }
-                }
+                var mass = ProductScorerBasedOnDeconvolutedSpectra.GetMz(binNum);
+                numComparisons += ms1Filter.GetMatchingMs2ScanNums(mass).Count();
             }
-            Console.WriteLine("NumPeaks: {0:f2} {1}/{2}", numPeaks/(double)numSpecs, numPeaks, numSpecs);
+            sw.Stop();
+            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sec);
+
+            //const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
+            //var tsvReader = new TsvFileParser(resultFilePath);
+            //var scanNums = tsvReader.GetData("Scan(s)");
+            //var charges = tsvReader.GetData("Charge");
+            //var scores = tsvReader.GetData("E-value");
+            //var sequences = tsvReader.GetData("Peptide");
+
+            const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_N30_C30.tsv";
+            var tsvReader = new TsvFileParser(resultFilePath);
+            var scanNums = tsvReader.GetData("ScanNum");
+            var charges = tsvReader.GetData("Charge");
+            var scores = tsvReader.GetData("Score");
+            var sequences = tsvReader.GetData("Sequence");
+
+            var aaSet = new AminoAcidSet();
+
+            var seqSet = new HashSet<string>();
+            var allSeqSet = new HashSet<string>();
+            var numUnfilteredSpecs = 0;
+            var totalSpecs = 0;
+            for (var i = 0; i < scores.Count; i++)
+            {
+                var score = Convert.ToDouble(scores[i]);
+                //if (score > 1E-4) continue;
+                if (score < 10) continue;
+
+                var scanNum = Convert.ToInt32(scanNums[i]);
+                var charge = Convert.ToInt32(charges[i]);
+
+                //var sequence = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
+                //if (sequence == null || sequence.Contains("(")) continue;
+                var sequence = sequences[i];
+                var composition = aaSet.GetComposition(sequence) + Composition.H2O;
+
+                var precursorIon = new Ion(composition, charge);
+                var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
+                var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
+                if (!isValid) continue;
+                ++totalSpecs;
+
+                var precursorScanNum = run.GetPrecursorScanNum(scanNum);
+                var precursorSpec = run.GetSpectrum(precursorScanNum);
+                var corr1 = precursorSpec.GetCorrScore(precursorIon, tolerance, 0.1);
+
+                var nextScanNum = run.GetNextScanNum(scanNum, 1);
+                var nextSpec = run.GetSpectrum(nextScanNum);
+                var corr2 = nextSpec.GetCorrScore(precursorIon, tolerance, 0.1);
+
+                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
+                if (corr3 == 1)
+                {
+                    numUnfilteredSpecs++;
+                    seqSet.Add(sequences[i]);
+                }
+                allSeqSet.Add(sequences[i]);
+
+                var corrMax = new[] { corr1, corr2, corr3 }.Max();
+
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", scanNum, precursorScanNum, corr1, nextScanNum, corr2, corr3, corrMax);
+            }
+
+            Console.WriteLine("TotalNumComparisons: {0}", numComparisons);
+            Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons / (double)(maxBinNum - minBinNum + 1));
+            Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
+            Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
+            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
         [Test]
@@ -79,7 +133,7 @@ namespace InformedProteomics.Test
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -222,18 +276,76 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
+        [Test]
+        public void TestFloatingPointRounding()
+        {
+            const double value = 7655.9568537625;
+            var converted = BitConverter.DoubleToInt64Bits(value);
+            var rounded = (converted >> 37) << 37;
+            Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, (converted >> 37) << 37);
+            Console.WriteLine("{0}\t{1}", value, BitConverter.Int64BitsToDouble(rounded));
+        }
+
+        [Test]
+        public void TestDeconvolutionMs2()
+        {
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var numSpecs = 0;
+            var numPeaks = 0;
+            //foreach (var ms2ScanNum in run.GetScanNumbers(2))
+            var ms2ScanNum = 1575;
+            {
+                var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                //if (spec == null) continue;
+                var deconvolutedSpec = ProductScorerBasedOnDeconvolutedSpectra.GetDeconvolutedSpectrum(spec, 2, 10, new Tolerance(10), 0.7) as ProductSpectrum;
+                if (deconvolutedSpec != null)
+                {
+                    deconvolutedSpec.Display();
+                    var nPeaks = deconvolutedSpec.Peaks.Length;
+                    //Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
+                    ++numSpecs;
+                    numPeaks += nPeaks;
+                    var hist = new Dictionary<double, int>();
+                    for (var i = 0; i < nPeaks - 1; i++)
+                    {
+                        for (var j = i + 1; j < nPeaks; j++)
+                        {
+                            var sum = deconvolutedSpec.Peaks[i].Mz + deconvolutedSpec.Peaks[j].Mz;
+                            var rounded = BitConverter.Int64BitsToDouble((BitConverter.DoubleToInt64Bits(sum) >> 37) << 37);
+                            int num;
+                            if (hist.TryGetValue(rounded, out num)) hist[rounded] = num + 1;
+                            else hist[rounded] = 1;
+                        }
+                    }
+                    Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
+                    foreach (var entry in hist.OrderByDescending(e => e.Value))
+                    {
+                        var mass = entry.Key;
+                        var charge = (int)Math.Round(mass / spec.IsolationWindow.IsolationWindowTargetMz);
+                        if (spec.IsolationWindow.Contains(Ion.GetIsotopeMz(mass, charge, Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex)))
+                        {
+                            Console.WriteLine("{0}\t{1}\t{2}", entry.Key, entry.Value, charge);
+                        }
+                    }
+                }
+            }
+            Console.WriteLine("NumPeaks: {0:f2} {1}/{2}", numPeaks / (double)numSpecs, numPeaks, numSpecs);
+        }
 
         [Test]
         public void TestPossibleSequenceMasses()
         {
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+
             var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, 3, 30, 15, 0.7, 1000);
             var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run);
-//          var masses = ms1BasedFilter.GetPossibleSequenceMasses(1113);
+            //var masses = ms1BasedFilter.GetPossibleSequenceMasses(1113);
 
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, 3, 30, 15);
             //var masses = ms1BasedFilter.GetPossibleSequenceMasses(2819, 20);

@@ -55,6 +55,7 @@ namespace InformedProteomics.TopDown.Scoring
             var ms2ScanNums = _run.GetScanNumbers(2);
             foreach (var ms2ScanNum in ms2ScanNums)
             {
+                //if (ms2ScanNum != 6458) continue;
                 SetLcMsMatches(ms2ScanNum);
             }
         }
@@ -107,6 +108,19 @@ namespace InformedProteomics.TopDown.Scoring
             var remainingPeakList = new LinkedList<Peak>(peakList);
 
             SetLcMsMatches(remainingPeakList, ms2ScanNumber, precursorSpecWindow, nextMs1SpecWindow, MaxNumPeaksToConsider);
+
+            //if (isolationWindow.MonoisotopicMz != null)
+            //{
+            //    var monoisotopicMass = isolationWindow.MonoisotopicMass;
+            //    if (monoisotopicMass != null)
+            //    {
+            //        var xic = _run.GetExtractedIonChromatogram((double)isolationWindow.MonoisotopicMz, _tolerance, ms2ScanNumber);
+            //        if (xic.Count > 2)
+            //        {
+            //            _lcMsMatchMap.SetMatches((double)monoisotopicMass, xic[0].ScanNum, xic[xic.Count-1].ScanNum);
+            //        }
+            //    }
+            //}
         }
 
         private void SetLcMsMatches(LinkedList<Peak> remainingPeakList, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow, int numPeaksToConsider)
@@ -133,7 +147,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var nextIsotopeMz = peakMz + Constants.C13MinusC12 / charge;
                 var xicNextIsotope = _run.GetExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
                 if (!xicNextIsotope.Any()) continue;
-                if (xicThisPeak.GetCorrelation(xicNextIsotope) < 0.5) continue;
+                if (xicThisPeak.GetCorrelation(xicNextIsotope) < 0.7) continue;
 
                 //var nextIsotopePeak = PeakListUtils.FindPeak(specWindow, nextIsotopeMz, _tolerance);
                 //if (nextIsotopePeak == null) continue;

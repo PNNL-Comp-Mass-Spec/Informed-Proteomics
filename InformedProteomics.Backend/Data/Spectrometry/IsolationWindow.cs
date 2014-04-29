@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.Data.Spectrometry
+﻿using InformedProteomics.Backend.Data.Biology;
+
+namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class IsolationWindow
     {
@@ -36,6 +38,15 @@
             get
             {
                 return IsolationWindowTargetMz + IsolationWindowUpperOffset;
+            }
+        }
+
+        public double? MonoisotopicMass
+        {
+            get
+            {
+                if (MonoisotopicMz != null && Charge != null) return (MonoisotopicMz - Constants.Proton)*Charge;
+                return null;
             }
         }
 

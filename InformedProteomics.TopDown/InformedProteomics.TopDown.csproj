@@ -62,7 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Execution\IcTopDown.cs" />
+    <Compile Include="Execution\IcTopDownLauncher.cs" />
+    <Compile Include="Execution\ProteinSpectrumMatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />

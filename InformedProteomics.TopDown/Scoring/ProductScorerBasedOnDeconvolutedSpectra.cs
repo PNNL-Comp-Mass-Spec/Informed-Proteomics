@@ -14,11 +14,19 @@ namespace InformedProteomics.TopDown.Scoring
             LcMsRun run, 
             int minProductCharge = 1, int maxProductCharge = 10,
             double productTolerancePpm = 10)
+            : this(run, minProductCharge, maxProductCharge, new Tolerance(productTolerancePpm))
+        {
+        }
+
+        public ProductScorerBasedOnDeconvolutedSpectra(
+            LcMsRun run,
+            int minProductCharge, int maxProductCharge,
+            Tolerance productTolerance)
         {
             _run = run;
             _minProductCharge = minProductCharge;
             _maxProductCharge = maxProductCharge;
-            _productTolerance = new Tolerance(productTolerancePpm);
+            _productTolerance = productTolerance;
         }
 
         public IScorer GetMs2Scorer(int scanNum)

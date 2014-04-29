@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Utils
@@ -42,6 +43,15 @@ namespace InformedProteomics.Backend.Utils
                 }
             }
             return mutated.ToString();
+        }
+
+        public static string GetStringBetweenDots(string str)
+        {
+            if (!Regex.IsMatch(str, @"^[A-Z]?\.[A-Z]+\.[A-Z]?$")) return null;
+            var firstDotIndex = str.IndexOf('.');
+            var lastDotIndex = str.LastIndexOf('.');
+            if (firstDotIndex >= lastDotIndex) return null;
+            return str.Substring(firstDotIndex + 1, lastDotIndex - firstDotIndex - 1);
         }
 
         private static readonly Random Random = new Random();
