@@ -13,18 +13,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTopDownSearch()
         {
-            //const string dirPath = @"C:\cygwin\home\kims336\Data\TopDown\raw";
-            //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            //// Salmonella
+            //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
+            //const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002166_F86E3B2F.fasta";
 
-            const string dirPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw";
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            // QC_Shew
+            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002216_235ACCEA.fasta";
 
-            foreach (var specFilePath in Directory.GetFiles(dirPath))
-            {
-                if (!specFilePath.EndsWith(".raw")) continue;
-                Console.WriteLine("Processing {0}", specFilePath);
-                TestTopDownSearch(specFilePath, dbFilePath, true);
-            }
+            TestTopDownSearch(specFilePath, dbFilePath, true);
         }
 
         [Test]
