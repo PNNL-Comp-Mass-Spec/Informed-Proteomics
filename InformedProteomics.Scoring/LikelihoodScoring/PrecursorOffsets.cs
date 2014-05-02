@@ -36,7 +36,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             for (int i=0; i < offsetFrequencyTables.Count; i++)
             {
-                var offsetProbabilities = offsetFrequencyTables[i].OffsetFrequencies;
+                var offsetProbabilities = offsetFrequencyTables[i].GetProbabilities();
                 AddOffsets(i+1, offsetProbabilities);
             }
         }

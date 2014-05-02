@@ -119,6 +119,7 @@
     <Compile Include="FunctionalTests\TestSuffixArray.cs" />
     <Compile Include="TestRankPeakProbability.cs" />
     <Compile Include="TestLcMsCaching.cs" />
+    <Compile Include="TestSpectrumScore.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />
   </ItemGroup>

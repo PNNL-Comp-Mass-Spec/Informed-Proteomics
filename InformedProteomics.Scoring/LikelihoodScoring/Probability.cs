@@ -6,18 +6,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     public class Probability <T1>
     {
         public T1 DataLabel { get; private set; }
-        public int Found { get; set; }
-        public int Total { get; set; }
+        public double Found { get; set; }
+        public double Total { get; set; }
 
         public double Prob
         {
-            get { return Math.Round((double)(Found) / (Total), 5); }
+            get { return (Found / Total); }
         }
-        public Probability(T1 dataLabel, int f=0, int t=0)
+        public Probability(T1 dataLabel, double found=0, double total=0)
         {
             DataLabel = dataLabel;
-            Found = f;
-            Total = t;
+            Found = found;
+            Total = total;
         }
 
 

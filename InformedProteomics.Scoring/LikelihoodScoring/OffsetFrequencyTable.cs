@@ -3,16 +3,16 @@ using System.Linq;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-    public abstract class OffsetFrequencyTable
+    public abstract class OffsetFrequencyTable: I1DProbabilityTable<double>
     {
-        private readonly int _searchWidth;
+        private readonly double _searchWidth;
         private readonly double _binWidth;
         private readonly Histogram<double> _offsetCounts;
 
         public int Charge { get; private set; }
         public int Total { get; protected set; }
 
-        protected OffsetFrequencyTable(int searchWidth, int charge=1, double binWidth=1.005)
+        protected OffsetFrequencyTable(double searchWidth, int charge=1, double binWidth=1.005)
         {
             _offsetCounts = new Histogram<double>();
             _searchWidth = searchWidth;
@@ -55,15 +55,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _offsetCounts.AddData(offsets);
         }
 
-        public List<Probability<double>> OffsetFrequencies
+        public abstract void AddMatches(List<SpectrumMatch> matches);
+
+        public Probability<double>[] GetProbabilities()
         {
-            get
-            {
-                var bins = _offsetCounts.Bins;
-                return _offsetCounts.BinEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, Total)).ToList();
-            }
+            var bins = _offsetCounts.Bins;
+            return _offsetCounts.BinEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, Total)).ToArray();
         }
 
-        public abstract void AddMatches(List<SpectrumMatch> matches);
+        public double[] GetBinEdges()
+        {
+            return _offsetCounts.BinEdges;
+        }
     }
 }

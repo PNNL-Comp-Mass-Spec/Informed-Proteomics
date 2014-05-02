@@ -75,7 +75,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
 
             var spectrum = new Spectrum(peaks, specMatch.ScanNum);
-            var filteredSpecMatch = new SpectrumMatch(specMatch.Peptide, spectrum, specMatch.ScanNum, charge);
+            var filteredSpecMatch = new SpectrumMatch(specMatch.Peptide, spectrum, specMatch.ScanNum, charge, specMatch.Sequence);
             return filteredSpecMatch;
         }
 

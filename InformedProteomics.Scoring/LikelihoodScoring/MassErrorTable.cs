@@ -13,24 +13,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         Both = 3
     };
 
-    public class MassErrorTable
+    public class MassErrorTable: I1DProbabilityTable<double>
     {
         private readonly IonType[] _ionTypes;
         private readonly Tolerance _tolerance;
+        private readonly double _width;
+        private readonly double _binWidth;
+        private readonly double _offset;
 
         private readonly Histogram<double> _massError;
-        private int _totalPairs;
         private readonly Histogram<IonPairFound> _ionPairFrequency;
-
-        public List<Probability<double>> MassError
-        {
-            get
-            {
-                var bins = _massError.Bins;
-                var binEdges = _massError.BinEdges;
-                return binEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, _totalPairs)).ToList();
-            }
-        }
+        private int _totalPairs;
 
         public List<Probability<IonPairFound>> IonPairFrequency
         {
@@ -42,24 +35,47 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double searchWidth=0.2, double binWidth=0.01)
+        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double width=0.2, double binWidth=0.01, double offset=0.0)
         {
             _ionTypes = ionTypes;
             _totalPairs = 0;
             _tolerance = tolerance;
+            _width = width;
+            _binWidth = binWidth;
+            _offset = offset;
             _massError = new Histogram<double>();
             _ionPairFrequency = new Histogram<IonPairFound>((IonPairFound[])Enum.GetValues(typeof(IonPairFound)));
-            GenerateEdges(searchWidth, binWidth);
+            GenerateEdges();
         }
 
-        private void GenerateEdges(double searchWidth, double binWidth)
+        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double[] bins, List<double> data)
+        {
+            _ionTypes = ionTypes;
+            _totalPairs = 0;
+            _width = bins[bins.Length - 1] - bins[0];
+            _binWidth = bins[1] - bins[0];
+            double offset = 0.0;
+            _massError = new Histogram<double>(bins);
+            for (int i = 0; i < data.Count; i++)
+            {
+                var dataList = new List<double>();
+                for (int j = 0; j < data[i]; j++)
+                {
+                    dataList.Add(bins[i]);
+                }
+                _massError.AddData(dataList);
+            }
+            _ionPairFrequency = new Histogram<IonPairFound>((IonPairFound[]) Enum.GetValues(typeof (IonPairFound)));
+        }
+
+        private void GenerateEdges()
         {
             var binEdges = new List<double>();
-            for (double width = 0; width >= -1 * searchWidth; width -= binWidth)
+            for (double width = -1*_offset; width >= -1 * _width; width -= _binWidth)
             {
                 binEdges.Add(width);
             }
-            for (double width = 0; width < searchWidth; width += binWidth)
+            for (double width = _offset; width < _width; width += _binWidth)
             {
                 binEdges.Add(width);
             }
@@ -111,6 +127,26 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     }
                 }
             }
+        }
+
+        public Probability<double> GetMassErrorProbability(double massError)
+        {
+            var index = _massError.GetBinIndex(massError);
+            var found = _massError.Bins[index].Count;
+            var total = _massError.Total;
+            return new Probability<double>(massError, found, total);
+        }
+
+        public Probability<double>[] GetProbabilities()
+        {
+            var bins = _massError.Bins;
+            var binEdges = _massError.GetAlignedBinEdges(BinEdgeAlignment.Center, _binWidth);
+            return binEdges.Select((t, i) => new Probability<double>(t, bins[i].Count, _totalPairs)).ToArray();
+        }
+
+        public double[] GetBinEdges()
+        {
+            return _massError.BinEdges;
         }
     }
 }

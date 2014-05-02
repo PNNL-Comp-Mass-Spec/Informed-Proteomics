@@ -30,7 +30,7 @@ namespace InformedProteomics.Test.FunctionalTests
                     var mz = ion.GetMonoIsotopicMz();
 
                     offsetFrequencyTable.AddMatches(new List<SpectrumMatch> {spectrumMatch});
-                    var offsetFrequencies = offsetFrequencyTable.OffsetFrequencies;
+                    var offsetFrequencies = offsetFrequencyTable.GetProbabilities();
 
                     debugFile.WriteLine("ScanNum\tM/Z\tPrecursor Charge\tIon Type\tPeptide");
                     debugFile.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",

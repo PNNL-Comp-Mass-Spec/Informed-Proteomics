@@ -11,7 +11,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     public class SpectrumMatch
     {
         private List<Composition> _prefixes;
-        private List<Composition> _suffixes;
+        private List<Composition> _suffixes; 
         private readonly int _precursorCharge;
 
         public Sequence Sequence { get; private set; }
@@ -19,39 +19,48 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public Spectrum Spectrum { get; private set; }
         public int ScanNum { get; private set; }
         public int PrecursorCharge { get { return _precursorCharge;  } }
+        public bool Decoy { get; private set; }
 
         public class MismatchException : Exception {}
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence)
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
+            Decoy = decoy;
             Sequence = sequence;
+            if (decoy) Sequence = DecoySequence;
         }
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge)
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
+            Decoy = decoy;
             Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
+            if (decoy) Sequence = DecoySequence;
         }
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, string formula)
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, string formula, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
+            Decoy = decoy;
             Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
-
-            var composition = Composition.Parse(formula);
-            if (!composition.Equals(Sequence.Composition + Composition.H2O))
+            if (decoy) Sequence = DecoySequence;
+            else
             {
-                throw new MismatchException();
+                var composition = Composition.Parse(formula);
+                if (!composition.Equals(Sequence.Composition + Composition.H2O))
+                {
+                    throw new MismatchException();
+                }
             }
         }
 
@@ -89,6 +98,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     }
                 }
                 return _suffixes;
+            }
+        }
+
+        public Sequence DecoySequence
+        {
+            get
+            {
+                var decoySequence = new List<AminoAcid>();
+                var random = new Random();
+                for (int i = 0; i < Sequence.Count; i++)
+                {
+                    int randomNumber = random.Next(0, Sequence.Count);
+                    decoySequence.Add(Sequence[randomNumber]);
+                }
+                return new Sequence(decoySequence);
             }
         }
 

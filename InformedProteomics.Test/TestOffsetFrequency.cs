@@ -20,7 +20,7 @@ namespace InformedProteomics.Test
         private string _outPre;
         private string _outFileName;
         private double _noiseFiltration;
-        private int _searchWidth;
+        private double _searchWidth;
 
         private ActivationMethod _act;
         private int _precursorCharge;
@@ -72,7 +72,7 @@ namespace InformedProteomics.Test
                 var offsetFrequencies = new List<Probability<double>>[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    offsetFrequencies[i] = offsetFrequencyTables[i].OffsetFrequencies;
+                    offsetFrequencies[i] = offsetFrequencyTables[i].GetProbabilities().ToList();
                 }
 
                 var outFileName = _outFileName.Replace("@", name);
@@ -147,7 +147,7 @@ namespace InformedProteomics.Test
                         var offsetFrequencyList = new List<List<Probability<double>>>();
                         for (int j = offsetFrequencyTables[i].Count-1; j >=0; j--)
                         {
-                            offsetFrequencyList.Add(offsetFrequencyTables[i][j].OffsetFrequencies);
+                            offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
                             outFile.Write("{0}", (j+1));
                             if (j != 0)
                                 outFile.Write("\t");
@@ -193,7 +193,7 @@ namespace InformedProteomics.Test
 
             _noiseFiltration = Convert.ToDouble(config.Contents["noisefiltration"]);
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
-            _searchWidth = Convert.ToInt32(config.Contents["searchwidth"]);
+            _searchWidth = Convert.ToDouble(config.Contents["searchwidth"]);
             _binWidth = Convert.ToDouble(config.Contents["binwidth"]);
 
             // Read input and output file names

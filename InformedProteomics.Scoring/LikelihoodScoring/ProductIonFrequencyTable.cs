@@ -4,36 +4,40 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
-    public class CleavageIonFrequencyTable: IonFrequencyTable
+    public class ProductIonFrequencyTable: IonFrequencyTable
     {
-        private readonly List<IonType> _ionTypes;
+        private readonly IonType[] _ionTypes;
         private readonly Tolerance _tolerance;
         private readonly double _relativeIntensityThreshold;
         private readonly bool _combineCharges;
+        private readonly IonTypeFactory _ionTypeFactory;
 
-        public CleavageIonFrequencyTable(List<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges=false)
+        public ProductIonFrequencyTable(IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges=false)
         {
             _combineCharges = combineCharges;
-            _ionTypes = ionTypes;
+            _ionTypes = ionTypes.ToArray();
             _tolerance = tolerance;
             _relativeIntensityThreshold = relativeIntensityThreshold;
+
+            var charges = _ionTypes.Select(ionType => ionType.Charge).ToList();
+            _ionTypeFactory = new IonTypeFactory(charges.Max());
         }
 
-        private string ReducedChargeName(IonType ionType)
+        private IonType ReducedChargeIonType(IonType ionType)
         {
             string name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)
                 name = name.Remove(1, 1);
             if (ionType.Charge >= 10)
                 name = name.Remove(1, 2);
-            return name;
+            return _ionTypeFactory.GetIonType(name);
         }
 
-        public IEnumerable<Probability<string>> SelectIons(double probability)
+        public Probability<IonType>[] SelectIons(double probability)
         {
-            var ionProbabilities = IonProbabilityTable;
+            var ionProbabilities = GetProbabilities();
 
-            var selectedIons = ionProbabilities.Where(ionProbability => ionProbability.Prob >= probability).ToList();
+            var selectedIons = ionProbabilities.Where(ionProbability => ionProbability.Prob >= probability).ToArray();
             return selectedIons;
         }
 
@@ -48,14 +52,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
                 for (int i = 0; i < prefixes.Count; i++)
                 {
-                    var ionTypeFound = new Dictionary<string, bool>();
+                    var ionTypeFound = new Dictionary<IonType, bool>();
                     foreach (var ionType in _ionTypes)
                     {
-                        var name = ionType.Name;
+                        var it = ionType;
                         if (_combineCharges)
-                            name = ReducedChargeName(ionType);
-                        if (!ionTypeFound.ContainsKey(name))
-                            ionTypeFound.Add(name, false);
+                            it = ReducedChargeIonType(ionType);
+                        if (!ionTypeFound.ContainsKey(it))
+                            ionTypeFound.Add(it, false);
 
                         var cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
 
@@ -63,7 +67,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
                         if (spectrum.ContainsIon(ion, _tolerance, _relativeIntensityThreshold))
                         {
-                            ionTypeFound[name] = true;
+                            ionTypeFound[it] = true;
                         }
                     }
                     foreach (var key in ionTypeFound.Keys)
@@ -71,10 +75,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         int found = 0;
                         const int total = 1;
                         if (ionTypeFound[key]) found = 1;
-                        AddIonProbability(new Probability<string>(key, found, total));
+                        AddIonProbability(new Probability<IonType>(key, found, total));
                     }
                 }
             }
+        }
+
+        public override IonType[] GetBinEdges()
+        {
+            return _ionTypes;
         }
     }
 }

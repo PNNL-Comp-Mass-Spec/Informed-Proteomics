@@ -129,10 +129,26 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 BinEdges[0] = minimum;
         }
 
+        public int GetBinIndex(T1 datum)
+        {
+            int i = 0;
+            while (i < BinEdges.Length && (_compare.Compare(datum, BinEdges[i]) >= 0))
+            {
+                i++;
+            }
+            if (_compare.Compare(datum, BinEdges[BinEdges.Length - 1]) >= 0)
+            {
+                return BinEdges.Length - 1;
+            }
+            if (i != 0)
+            {
+                return i - 1;
+            }
+            return -1;
+        }
+
         public void Compute(List<T1> data)
         {
-            int total = 0;
-
             while (Bins.Count < BinEdges.Length)
             {
                 Bins.Add(new List<T1>());
@@ -140,23 +156,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             foreach (var datum in data)
             {
-                int i = 0;
-                while (i < BinEdges.Length && (_compare.Compare(datum, BinEdges[i]) >= 0))
+                int binIndex = GetBinIndex(datum);
+                if (binIndex >= 0)
                 {
-                    i++;
-                }
-                if (_compare.Compare(datum, BinEdges[BinEdges.Length - 1]) >= 0)
-                {
-                    Bins[BinEdges.Length - 1].Add(datum);
-                    total++;
-                }
-                else if (i != 0)
-                {
-                    Bins[i - 1].Add(datum);
-                    total++;
+                    Bins[binIndex].Add(datum);
+                    Total++;
                 }
             }
-            Total += total;
         }
 
         public void AddDatum(T1 datum)
@@ -179,6 +185,80 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 Bins[0].AddRange(data);
                 Total += data.Count;
             }
+        }
+
+        public int GetBinProbability(T1 value)
+        {
+            return GetBinIndex(value);
+        }
+    }
+
+    public enum BinEdgeAlignment
+    {
+        Low,        // bin edge = low end of bin
+        Center,     // bin edge = center of bin
+        High        // bin edge = high end of bin
+    };
+
+    // bin edge alignment functions only for Histogram<double>, Histogram<float> and Histogram<int>
+    static class NumericHistogramAlignment
+    {
+        public static double[] GetAlignedBinEdges(this Histogram<double> hist, BinEdgeAlignment align, double binWidth)
+        {
+            var binEdges = hist.BinEdges;
+            var alignedEdges = new double[binEdges.Length];
+            for (int i = 0; i < binEdges.Length; i++)
+            {
+                alignedEdges[i] = binEdges[i];
+                if (align == BinEdgeAlignment.Center)
+                {
+                    var offset = binWidth/2;
+                    alignedEdges[i] += offset;
+                }
+                else if (align == BinEdgeAlignment.High)
+                {
+                    alignedEdges[i] += binWidth;
+                }
+            }
+            return alignedEdges;
+        }
+        public static float[] GetAlignedBinEdges(this Histogram<float> hist, BinEdgeAlignment align, float binWidth)
+        {
+            var binEdges = hist.BinEdges;
+            var alignedEdges = new float[binEdges.Length];
+            for (int i = 0; i < binEdges.Length; i++)
+            {
+                alignedEdges[i] = binEdges[i];
+                if (align == BinEdgeAlignment.Center)
+                {
+                    var offset = binWidth / 2;
+                    alignedEdges[i] += offset;
+                }
+                else if (align == BinEdgeAlignment.High)
+                {
+                    alignedEdges[i] += binWidth;
+                }
+            }
+            return alignedEdges;
+        }
+        public static int[] GetAlignedBinEdges(this Histogram<int> hist, BinEdgeAlignment align, int binWidth)
+        {
+            var binEdges = hist.BinEdges;
+            var alignedEdges = new int[binEdges.Length];
+            for (int i = 0; i < binEdges.Length; i++)
+            {
+                alignedEdges[i] = binEdges[i];
+                if (align == BinEdgeAlignment.Center)
+                {
+                    var offset = binWidth / 2;
+                    alignedEdges[i] += offset;
+                }
+                else if (align == BinEdgeAlignment.High)
+                {
+                    alignedEdges[i] += binWidth;
+                }
+            }
+            return alignedEdges;
         }
     }
 }

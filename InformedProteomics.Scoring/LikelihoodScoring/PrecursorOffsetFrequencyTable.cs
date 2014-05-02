@@ -8,7 +8,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     {
         private readonly List<IonType> _precursorIonTypes;
 
-        public PrecursorOffsetFrequencyTable(int searchWidth, int charge = 1, double binWidth = 1.005):
+        public PrecursorOffsetFrequencyTable(double searchWidth, int charge = 1, double binWidth = 1.005):
             base(searchWidth, charge, binWidth)
         {
             BaseIonType[] baseIons = { BaseIonType.Y };

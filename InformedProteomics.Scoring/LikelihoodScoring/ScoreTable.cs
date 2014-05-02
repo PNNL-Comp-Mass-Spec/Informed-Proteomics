@@ -58,7 +58,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         }
 
-        private string ReducedChargeName(IonType ionType)
+        private static string ReducedChargeName(IonType ionType)
         {
             string name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)

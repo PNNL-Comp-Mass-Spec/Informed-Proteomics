@@ -54,9 +54,9 @@ namespace InformedProteomics.Test
                 var decoyionFrequencyFunctions = new IonFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    ionFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                    ionFrequencyFunctions[i] = new ProductIonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
-                    decoyionFrequencyFunctions[i] = new CleavageIonFrequencyTable(_ionTypes,
+                    decoyionFrequencyFunctions[i] = new ProductIonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
                 }
 
@@ -92,16 +92,16 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < tableCount; i++)
                 {
                     string outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                    var ionFrequencies = ionFrequencyFunctions[i].IonProbabilityTable;
-                    var decoyionFrequencies = decoyionFrequencyFunctions[i].IonProbabilityTable;
+                    var ionFrequencies = ionFrequencyFunctions[i].GetProbabilities();
+                    var decoyionFrequencies = decoyionFrequencyFunctions[i].GetProbabilities();
                     using (var finalOutputFile = new StreamWriter(outFileName))
                     {
                         finalOutputFile.Write("Ion\tTarget");
                         if (_useDecoy) finalOutputFile.Write("\tDecoy");
                         finalOutputFile.WriteLine();
-                        for (int j=0;j<ionFrequencies.Count;j++)
+                        for (int j=0;j<ionFrequencies.Length;j++)
                         {
-                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].DataLabel, ionFrequencies[j].Prob);
+                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].DataLabel.Name, ionFrequencies[j].Prob);
                             if (_useDecoy)
                             {
                                 finalOutputFile.Write("\t{0}", decoyionFrequencies[j]);

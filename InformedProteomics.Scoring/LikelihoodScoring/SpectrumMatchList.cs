@@ -23,7 +23,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private const string ScanHeader = "ScanNum";
         private const string PrecursorChargeHeader = "Charge";
-        private const int NumMutations = 3;
 
         public int MaxCharge { get; private set; }
         public bool Decoy { get; private set; }
@@ -73,12 +72,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
-                    if (Decoy)
-                    {
-                        var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
-                        peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
-                    }
-                    Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset)));
+                    Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset), Decoy));
                 }
             }
             else
@@ -102,25 +96,34 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
-                    if (Decoy)
-                    {
-                        var shuffled = SimpleStringProcessing.Shuffle(peptides[i]);
-                        peptides[i] = SimpleStringProcessing.Mutate(shuffled, NumMutations);
-                    }
                     Add((formulas != null && formulas[i] != null)
-                        ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i])
-                        : new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge));
+                        ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i], Decoy)
+                        : new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, Decoy));
                 }
             }
         }
 
-        public void FilterSpectra(int searchWidth=100, int retentionCount=6)
+        public void AddMatch(SpectrumMatch match)
+        {
+            var newMatch = new SpectrumMatch(match.Peptide, match.Spectrum, match.ScanNum,
+                                 match.PrecursorCharge, Decoy);
+            Add(newMatch);
+        }
+
+        public void AddMatches(IEnumerable<SpectrumMatch> matches)
+        {
+            foreach (var match in matches)
+            {
+                AddMatch(match);
+            }
+        }
+
+        public void FilterSpectra(double windowWidth=100, int retentionCount=6)
         {
             var filteredList = new SpectrumMatchList(Act);
             foreach (var match in this)
             {
-                var spectrum = match.Spectrum;
-                spectrum = SpectrumFilter.GetFilteredSpectrum(spectrum, searchWidth, retentionCount);
+                var spectrum = SpectrumFilter.GetFilteredSpectrum(match.Spectrum, windowWidth, retentionCount);
                 filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
             }
             Clear();
