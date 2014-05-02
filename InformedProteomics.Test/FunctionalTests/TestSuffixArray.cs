@@ -34,10 +34,10 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
-            foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsets(10, 300, 3))
+            foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(10, 300, 3))
             {
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
@@ -62,6 +62,88 @@ namespace InformedProteomics.Test.FunctionalTests
             //    .Aggregate(0L, (current, length) => current + Math.Min(length - 29, 30));
 
             Console.WriteLine("NumPeptides: {0}", numPeptides);
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+        }
+
+        [Test]
+        public void TestCountingProteoformsWithNTermOrCTermCleavages()
+        {
+            const int minSequenceLength = 21;   // 21
+            const int maxSequenceLength = 300;  // 300
+            const int maxNumNTermCleavages = 1;
+            const int maxNumCTermCleavages = 1;
+
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            var db = new FastaDatabase(dbFile);
+            var indexedDb = new IndexedDatabase(db);
+
+            var both = 0L;
+            var nTermOnly = 0L;
+            var cTermOnly = 0L;
+            
+            foreach (
+                var annotationAndOffset in
+                    indexedDb.IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue,
+                        maxNumCTermCleavages))
+            {
+                // numCTermCleavages <= maxNumCTermCleavages
+                var annotation = annotationAndOffset.Annotation;
+                var length = (annotation.Length - 4);
+                var numNTermCleavage = 0;
+                int cleavedLength;
+                while ((cleavedLength = length - numNTermCleavage) >= minSequenceLength)
+                {
+                    if (cleavedLength <= maxSequenceLength)
+                    {
+                        if (numNTermCleavage <= maxNumNTermCleavages)
+                        {
+                            ++both;
+                        }
+                        else
+                        {
+                            ++cTermOnly;
+                        }
+                        var anno = numNTermCleavage == 0 
+                            ? annotation 
+                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                        Console.WriteLine(anno);
+                    }
+                    ++numNTermCleavage;
+                }
+            }
+
+            foreach (
+                var annotationAndOffset in
+                    indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(minSequenceLength, int.MaxValue,
+                        maxNumCTermCleavages))
+            {
+                // numCTermCleavages > maxNumCTermCleavages
+                var annotation = annotationAndOffset.Annotation;
+                var length = (annotation.Length - 4);
+                for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
+                {
+                    var cleavedLength = length - numNTermCleavage;
+                    if (cleavedLength >= minSequenceLength && cleavedLength <= maxSequenceLength)
+                    {
+                        ++nTermOnly;
+                        var anno = numNTermCleavage == 0
+                            ? annotation
+                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                        Console.WriteLine(anno);
+                    }
+                }
+            }
+
+            Console.WriteLine("Both: {0}", both);
+            Console.WriteLine("N-term only: {0}", nTermOnly);
+            Console.WriteLine("C-term only: {0}", cTermOnly);
+            Console.WriteLine("All: {0}", both + nTermOnly + cTermOnly);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);

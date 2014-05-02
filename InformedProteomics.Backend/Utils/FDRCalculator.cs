@@ -53,7 +53,8 @@ namespace InformedProteomics.Backend.Utils
             _headers = targetHeaders;
 
             var concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
-            var scoreIndex = _headers.IndexOf("Score");
+            var scoreIndex = _headers.IndexOf("Ms2Score");
+            if (scoreIndex < 0) scoreIndex = _headers.IndexOf("Score");
             var scanNumIndex = _headers.IndexOf("ScanNum");
             var proteinIndex = _headers.IndexOf("ProteinName");
             if (scoreIndex < 0 || scanNumIndex < 0 || proteinIndex < 0) return false;

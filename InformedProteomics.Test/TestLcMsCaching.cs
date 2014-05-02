@@ -34,7 +34,7 @@ namespace InformedProteomics.Test
             var tolerance = new Tolerance(tolerancePpm);
             sw.Reset();
             sw.Start();
-            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.7, 0.7, 40);
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.7, 0.7, 0.7, 40);
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
@@ -59,19 +59,24 @@ namespace InformedProteomics.Test
             sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sec);
 
-            //const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
-            //var tsvReader = new TsvFileParser(resultFilePath);
-            //var scanNums = tsvReader.GetData("Scan(s)");
-            //var charges = tsvReader.GetData("Charge");
-            //var scores = tsvReader.GetData("E-value");
-            //var sequences = tsvReader.GetData("Peptide");
+            //const string prot =
+            //    "ADVFHLGLTKAMLDGATLAIVPGDPERVKRIAELMDNATFLASHREYTSYLAYADGKPVVICSTGIGGPSTSIAVEELAQLGVNTFLRVGTTGAIQPHVNVGDVIVTQASVRLDGASLHFAPMEFPAVANFECTTAMVAACRDAGVEPHIGVTASSDTFYPGQERYDTVTGRVTRRFAGSMKEWQDMGVLNYEMESATLFTMCATQGWRAACVAGVIVNRTQQEIPDEATMKKTEVSAVSIVVAAAKKLLA";
+            //var protMass = (new AminoAcidSet().GetComposition(prot) + Composition.H2O).Mass;
+            //Console.WriteLine("************ScanNums: " + string.Join("\t", ms1Filter.GetMatchingMs2ScanNums(protMass)));
 
-            const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_N30_C30.tsv";
+            const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
             var tsvReader = new TsvFileParser(resultFilePath);
-            var scanNums = tsvReader.GetData("ScanNum");
+            var scanNums = tsvReader.GetData("Scan(s)");
             var charges = tsvReader.GetData("Charge");
-            var scores = tsvReader.GetData("Score");
-            var sequences = tsvReader.GetData("Sequence");
+            var scores = tsvReader.GetData("E-value");
+            var sequences = tsvReader.GetData("Peptide");
+
+            //const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_N30_C30.tsv";
+            //var tsvReader = new TsvFileParser(resultFilePath);
+            //var scanNums = tsvReader.GetData("ScanNum");
+            //var charges = tsvReader.GetData("Charge");
+            //var scores = tsvReader.GetData("Score");
+            //var sequences = tsvReader.GetData("Sequence");
 
             var aaSet = new AminoAcidSet();
 
@@ -82,15 +87,15 @@ namespace InformedProteomics.Test
             for (var i = 0; i < scores.Count; i++)
             {
                 var score = Convert.ToDouble(scores[i]);
-                //if (score > 1E-4) continue;
-                if (score < 10) continue;
+                if (score > 1E-4) continue;
+                //if (score < 10) continue;
 
                 var scanNum = Convert.ToInt32(scanNums[i]);
                 var charge = Convert.ToInt32(charges[i]);
 
-                //var sequence = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
-                //if (sequence == null || sequence.Contains("(")) continue;
-                var sequence = sequences[i];
+                var sequence = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
+                if (sequence == null || sequence.Contains("(")) continue;
+                //var sequence = sequences[i];
                 var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
                 var precursorIon = new Ion(composition, charge);
@@ -153,7 +158,7 @@ namespace InformedProteomics.Test
             //    0, 0,
             //    600.0, 1800.0, new Tolerance(tolerancePpm), null);
             //ms1BasedFilter.CachePrecursorMatchesBinCentric();
-            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.5, 0.5, 40);
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.5, 0.5, 0.5, 40);
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
@@ -345,6 +350,7 @@ namespace InformedProteomics.Test
             sw.Start();
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, 3, 30, 15, 0.7, 1000);
             var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run);
+            
             //var masses = ms1BasedFilter.GetPossibleSequenceMasses(1113);
 
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, 3, 30, 15);

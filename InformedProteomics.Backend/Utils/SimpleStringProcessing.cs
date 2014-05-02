@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Database;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -47,13 +48,12 @@ namespace InformedProteomics.Backend.Utils
 
         public static string GetStringBetweenDots(string str)
         {
-            if (!Regex.IsMatch(str, @"^[A-Z]?\.[A-Z]+\.[A-Z]?$")) return null;
+            //if (!Regex.IsMatch(str, @"^[A-Z" + FastaDatabase.Delimiter + @"]\.[A-Z]+\.[A-Z" + FastaDatabase.Delimiter + @"]$")) return null;
             var firstDotIndex = str.IndexOf('.');
             var lastDotIndex = str.LastIndexOf('.');
             if (firstDotIndex >= lastDotIndex) return null;
             return str.Substring(firstDotIndex + 1, lastDotIndex - firstDotIndex - 1);
         }
-
         private static readonly Random Random = new Random();
     }
 }

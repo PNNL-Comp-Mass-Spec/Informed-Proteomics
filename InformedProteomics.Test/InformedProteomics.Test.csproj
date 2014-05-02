@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
+    <Compile Include="FunctionalTests\TestIcTopDownResults.cs" />
     <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />

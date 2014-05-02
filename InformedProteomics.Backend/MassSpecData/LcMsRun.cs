@@ -319,7 +319,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz <= minMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
                 --i;
             }
 
@@ -329,7 +329,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = _ms1PeakList[i];
                 if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Intensity));
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
                 ++i;
             }
 
@@ -394,7 +394,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
-                if(GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum-MinLcScan]) xic.Add(new XicPoint(scanNum, 0));
+                if(GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum-MinLcScan]) xic.Add(new XicPoint(scanNum, 0, 0));
             }
             xic.Sort();
             return xic;
@@ -426,7 +426,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>Trimmed XIC around targetScanNum</returns>
         public Xic GetTrimmedXic(Xic xic, int targetScanNum, int tolerance = 3)
         {
-            var index = xic.BinarySearch(new XicPoint(targetScanNum, 0));
+            var index = xic.BinarySearch(new XicPoint(targetScanNum, 0, 0));
             if(index < 0) index = ~index;
 
             var xicSegment = new Xic();
@@ -498,7 +498,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
 
                 var peak = productSpec.FindPeak(productIonMz, tolerance);
-                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Intensity));
+                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
             }
 
             return productXic;

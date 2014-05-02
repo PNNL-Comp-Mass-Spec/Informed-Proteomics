@@ -107,7 +107,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                 Methylation,
                 Oxidation,
                 Itraq4Plex,
-                Tmt6Plex
+                Tmt6Plex,
+                Glutathione,
+                Dehydro,
+                Nethylmaleimide,
+                Nitrosyl
             };
 
         static Modification()

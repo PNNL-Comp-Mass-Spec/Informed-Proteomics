@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -14,31 +14,33 @@ namespace InformedProteomics.TopDown.Execution
     public class IcTopDownLauncher
     {
         public const int NumMatchesPerSpectrum = 1;
-        public const string TargetFileExtension = ".ictresult";
-        public const string DecoyFileExtension = ".icdresult";
+        public const string TargetFileExtension = ".ic2tresult";
+        public const string DecoyFileExtension = ".ic2dresult";
 
-        // Consider all subsequenes of lengths [minSequenceLength,maxSequenceLength]
         public IcTopDownLauncher(
             string specFilePath,
             string dbFilePath,
             AminoAcidSet aaSet,
-            int minSequenceLength = 30,
-            int maxSequenceLength = 250,
-            int minPrecursorIonCharge = 3,
+            int minSequenceLength = 21,
+            int maxSequenceLength = 300,
+            int maxNumNTermCleavages = 1,
+            int maxNumCTermCleavages = 0,
+            int minPrecursorIonCharge = 2,
             int maxPrecursorIonCharge = 30,
             int minProductIonCharge = 1,
-            int maxProductIonCharge = 10,
+            int maxProductIonCharge = 15,
             double precursorIonTolerancePpm = 10,
-            double productIonTolerancePpm = 15,
-            bool runTargetDecoyAnalysis = true)
+            double productIonTolerancePpm = 10,
+            bool? runTargetDecoyAnalysis = true,
+            int searchMode = 1)
         {
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
             MinSequenceLength = minSequenceLength;
             MaxSequenceLength = maxSequenceLength;
-            MaxNumNTermCleavages = null;
-            MaxNumCTermCleavages = null;
+            MaxNumNTermCleavages = maxNumNTermCleavages;
+            MaxNumCTermCleavages = maxNumCTermCleavages;
             MinPrecursorIonCharge = minPrecursorIonCharge;
             MaxPrecursorIonCharge = maxPrecursorIonCharge;
             MinProductIonCharge = minProductIonCharge;
@@ -46,40 +48,41 @@ namespace InformedProteomics.TopDown.Execution
             PrecursorIonTolerance = new Tolerance(precursorIonTolerancePpm);
             ProductIonTolerance = new Tolerance(productIonTolerancePpm);
             RunTargetDecoyAnalysis = runTargetDecoyAnalysis;
+            SearchMode = 0;
+            SearchMode = searchMode;
         }
-
-        // Consider intact sequences with N- and C-terminal cleavages
+        
+        // Consider all subsequenes of lengths [minSequenceLength,maxSequenceLength]
         public IcTopDownLauncher(
             string specFilePath,
-            string dbFilePath, 
+            string dbFilePath,
             AminoAcidSet aaSet,
-            int minSequenceLength = 30, 
-            int maxSequenceLength = 250, 
-            int maxNumNTermCleavages = 30,
-            int maxNumCTermCleavages = 0,
-            int minPrecursorIonCharge = 3, 
+            int minSequenceLength = 21,
+            int maxSequenceLength = 300,
+            int minPrecursorIonCharge = 2,
             int maxPrecursorIonCharge = 30,
-            int minProductIonCharge = 1, 
-            int maxProductIonCharge = 10,
+            int minProductIonCharge = 1,
+            int maxProductIonCharge = 15,
             double precursorIonTolerancePpm = 10,
-            double productIonTolerancePpm = 15,
-            bool runTargetDecoyAnalysis = true): 
-            this(
-            specFilePath, 
-            dbFilePath, 
-            aaSet, 
-            minSequenceLength, 
-            maxSequenceLength, 
-            minPrecursorIonCharge, 
-            maxPrecursorIonCharge, 
-            minProductIonCharge, 
-            maxProductIonCharge, 
-            precursorIonTolerancePpm, 
-            productIonTolerancePpm, 
-            runTargetDecoyAnalysis)
+            double productIonTolerancePpm = 10,
+            bool? runTargetDecoyAnalysis = true) : this(
+            specFilePath,
+            dbFilePath,
+            aaSet,
+            minSequenceLength,
+            maxSequenceLength,
+            0,
+            0,
+            minPrecursorIonCharge,
+            maxPrecursorIonCharge,
+            minProductIonCharge,
+            maxProductIonCharge,
+            precursorIonTolerancePpm,
+            productIonTolerancePpm,
+            runTargetDecoyAnalysis,
+            0
+            )
         {
-            MaxNumNTermCleavages = maxNumNTermCleavages;
-            MaxNumCTermCleavages = maxNumCTermCleavages;
         }
 
         public string SpecFilePath { get; private set; }
@@ -87,36 +90,41 @@ namespace InformedProteomics.TopDown.Execution
         public AminoAcidSet AminoAcidSet { get; private set; }
         public int MinSequenceLength { get; private set; }
         public int MaxSequenceLength { get; private set; }
-        public int? MaxNumNTermCleavages { get; private set; }
-        public int? MaxNumCTermCleavages { get; private set; }
+        public int MaxNumNTermCleavages { get; private set; }
+        public int MaxNumCTermCleavages { get; private set; }
         public int MinPrecursorIonCharge { get; private set; }
         public int MaxPrecursorIonCharge { get; private set; }
         public int MinProductIonCharge { get; private set; }
         public int MaxProductIonCharge { get; private set; }
         public Tolerance PrecursorIonTolerance { get; private set; }
         public Tolerance ProductIonTolerance { get; private set; }
-        public bool RunTargetDecoyAnalysis { get; private set; }
+        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
+
+        // 0: all internal sequences, 
+        // 1: #NCleavges <= Max OR Cleavages <= Max (Default)
+        // 2: 1: #NCleavges <= Max AND Cleavages <= Max
+        public int SearchMode { get; private set; } 
 
         private LcMsRun _run;
-        private ISequenceFilter _ms1Filter;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
 
-        public void RunSearch()
+        public void RunSearch(double corrThreshold)
         {
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
 
             Console.Write("Reading raw file...");
             sw.Start();
             _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             sw.Reset();
             Console.Write("Determining precursor masses...");
             sw.Start();
-            _ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge, 10, 3000, 50000, 0.7, 0.7);
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge, 
+                10, 3000, 50000, corrThreshold, corrThreshold, corrThreshold);
+            sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             sw.Reset();
@@ -129,57 +137,88 @@ namespace InformedProteomics.TopDown.Execution
                 );
             _ms2ScorerFactory.DeconvoluteProductSpectra();
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             // Target database
-            sw.Reset();
-            Console.Write("Reading the target database...");
-            sw.Start();
             var targetDb = new FastaDatabase(DatabaseFilePath);
-            targetDb.Read();
-            var indexedDbTarget = new IndexedDatabase(targetDb);
-            var annotationsAndOffsets = MaxNumNTermCleavages != null && MaxNumCTermCleavages != null
-                ? indexedDbTarget.IntactSequenceAnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength, (int)MaxNumCTermCleavages) 
-                : indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-            sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
-            sw.Reset();
-            Console.WriteLine("Searching the target database");
-            sw.Start();
-            var targetMatches = RunSearch(annotationsAndOffsets);
-            var targetOutputFilePath = Path.ChangeExtension(SpecFilePath, TargetFileExtension);
-            WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
-            sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Target database search elapsed Time: {0:f4} sec", sec);
-
-            // Decoy database
-            if (RunTargetDecoyAnalysis)
+            if (RunTargetDecoyAnalysis != null)
             {
+                sw.Reset();
+                Console.Write("Reading the target database...");
+                sw.Start();
+                targetDb.Read();
+                var indexedDbTarget = new IndexedDatabase(targetDb);
+                IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
+                if (SearchMode == 0)
+                {
+                    annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                }
+                else if (SearchMode == 2)
+                {
+                    annotationsAndOffsets = indexedDbTarget.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
+                        MaxSequenceLength, MaxNumCTermCleavages);
+                }
+                else
+                {
+                    annotationsAndOffsets = indexedDbTarget
+                        .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+                            MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
+                }
+
+                //var annotationsAndOffsets = (MaxNumNTermCleavages != null && MaxNumCTermCleavages != null)
+                sw.Stop();
+                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+                sw.Reset();
+                Console.WriteLine("Searching the target database");
+                sw.Start();
+                var targetMatches = RunSearch(annotationsAndOffsets, ms1Filter);
+                var targetOutputFilePath = Path.ChangeExtension(SpecFilePath, TargetFileExtension);
+                WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
+                sw.Stop();
+                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+                Console.WriteLine(@"Target database search elapsed Time: {0:f4} sec", sec);                
+            }
+
+            if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
+            {
+                // Decoy database
                 sw.Reset();
                 Console.Write("Reading the decoy database...");
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
                 decoyDb.Read();
                 var indexedDbDecoy = new IndexedDatabase(decoyDb);
-                var annotationsAndOffsetsDecoy = MaxNumNTermCleavages != null
-                    ? indexedDbDecoy.IntactSequenceAnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength, (int)MaxNumNTermCleavages)
-                    : indexedDbDecoy.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-                sw.Stop();
-                sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+                IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
+                if (SearchMode == 0)
+                {
+                    annotationsAndOffsets = indexedDbDecoy.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                }
+                else if (SearchMode == 2)
+                {
+                    annotationsAndOffsets = indexedDbDecoy.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
+                        MaxSequenceLength, MaxNumCTermCleavages);
+                }
+                else
+                {
+                    annotationsAndOffsets = indexedDbDecoy
+                        .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+                            MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
+                } 
+                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
                 Console.WriteLine("Searching the decoy database");
                 sw.Start();
-                var decoyMatches = RunSearch(annotationsAndOffsetsDecoy);
+                var decoyMatches = RunSearch(annotationsAndOffsets, ms1Filter);
                 var decoyOutputFilePath = Path.ChangeExtension(SpecFilePath, DecoyFileExtension);
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
-                sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
             }
             Console.WriteLine("Done.");
@@ -222,14 +261,16 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        private SortedSet<ProteinSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets)
+        private SortedSet<ProteinSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets, ISequenceFilter ms1Filter)
         {
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
             var numProteins = 0;
             sw.Reset();
             sw.Start();
 
             var matches = new SortedSet<ProteinSpectrumMatch>[_run.MaxLcScan+1];
+
+            var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
 
             foreach (var annotationAndOffset in annotationsAndOffsets)
             {
@@ -245,7 +286,7 @@ namespace InformedProteomics.TopDown.Execution
                     if (numProteins != 0)
                     {
                         sw.Stop();
-                        var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+                        var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                         Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
@@ -255,11 +296,11 @@ namespace InformedProteomics.TopDown.Execution
                 var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
                 if (seqGraph == null)
                 {
-                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
+//                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
                     continue;
                 }
 
-                for (var numNTermCleavage = 0; numNTermCleavage <= (MaxNumNTermCleavages ?? 0); numNTermCleavage++)
+                for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
                 {
                     var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(numNTermCleavage);
                     for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
@@ -269,7 +310,7 @@ namespace InformedProteomics.TopDown.Execution
                         var sequenceMass = protCompositionWithH2O.Mass;
                         var modCombinations = seqGraph.ModificationParams.GetModificationCombination(modIndex);
 
-                        foreach (var ms2ScanNum in _ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
+                        foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                         {
                             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                             if (spec == null) continue;
@@ -311,5 +352,60 @@ namespace InformedProteomics.TopDown.Execution
 
             return matches;
         }
+
+        //public void RunIntactProteinSearch()
+        //{
+        //    var sw = new System.Diagnostics.Stopwatch();
+
+        //    Console.Write("Reading the raw file...");
+        //    sw.Start();
+        //    _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+        //    sw.Stop();
+        //    var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+        //    sw.Reset();
+        //    Console.Write("Determining precursor masses...");
+        //    sw.Start();
+        //    var ms1Filter = new Ms1IsotopeMostAbundantPlusOneFilter(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge,
+        //        10, 3000, 50000);
+        //    sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+        //    sw.Reset();
+        //    Console.Write("Deconvoluting MS2 spectra...");
+        //    sw.Start();
+        //    _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
+        //        _run,
+        //        MinProductIonCharge, MaxProductIonCharge,
+        //        ProductIonTolerance
+        //        );
+        //    _ms2ScorerFactory.DeconvoluteProductSpectra();
+        //    sw.Stop();
+        //    sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+        //    // Target database
+        //    sw.Reset();
+        //    Console.Write("Reading the target database...");
+        //    sw.Start();
+        //    var targetDb = new FastaDatabase(DatabaseFilePath);
+        //    targetDb.Read();
+        //    var indexedDbTarget = new IndexedDatabase(targetDb);
+        //    sw.Stop();
+        //    sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+        //    Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+        //    sw.Reset();
+        //    Console.WriteLine("Initial search to determine search parameters");
+        //    sw.Start();
+        //    var annotationsAndOffsets = indexedDbTarget.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
+        //        MaxSequenceLength, 0);
+        //    var targetMatches = RunSearch(annotationsAndOffsets, ms1Filter);
+        //    var targetOutputFilePath = Path.ChangeExtension(SpecFilePath, ".icintact");
+
+        //    WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
+        //    Console.WriteLine("Done.");
+        //}
     }
 }

@@ -1,18 +1,18 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
     public class CorrMatchedPeakCounter : IScorer
     {
-        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
+        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7)
         {
             _ms2Spec = ms2Spec;
             _tolerance = tolerance;
             _minCharge = minCharge;
             _maxCharge = maxCharge;
+            _corrScoreThreshold = corrScoreThreshold;
             _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
         }
 
@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
-                    if (_ms2Spec.GetCorrScore(ion, _tolerance, RelativeIsotopeIntensityThreshold) > CorrScoreThreshold)
+                    if (_ms2Spec.GetCorrScore(ion, _tolerance) > _corrScoreThreshold)
                     {
                         containsIon = true;
                         break;
@@ -53,9 +53,7 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _minCharge;
         private readonly int _maxCharge;
         private readonly BaseIonType[] _baseIonTypes;
-
-        private const double RelativeIsotopeIntensityThreshold = 0.1;
-        private const double CorrScoreThreshold = 0.7;
+        private readonly double _corrScoreThreshold;
 
         public static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         static CorrMatchedPeakCounter()

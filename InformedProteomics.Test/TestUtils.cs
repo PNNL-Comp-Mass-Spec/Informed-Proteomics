@@ -51,15 +51,35 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestAaSet()
+        {
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+            var nitrosylC = new SearchModification(Modification.Nitrosyl, 'C', SequenceLocation.Everywhere, false);
+            var nethylmaleimideC = new SearchModification(Modification.Nethylmaleimide, 'C', SequenceLocation.Everywhere, false);
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                glutathioneC,
+                nitrosylC,
+                nethylmaleimideC,
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+        }
+
+        [Test]
         public void TestPeptide()
         {
-            const string sequence = "MNKTQLIDVIADKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
+            const string sequence = "ANATVKMGSDSGALVFEPSTVTIKAGEEVKWVNNKLSPHNIVFAADGVDADTAAKLSHKGLAFAAGESFTSTFTEPGTYTYYCEPHRGAGMVGKVVVE";
             //const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
             //    "METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK";
             var aaSet = new AminoAcidSet();
-            var composition = aaSet.GetComposition(sequence);
+            var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
             Console.WriteLine(composition);
             Console.WriteLine(composition.Mass);

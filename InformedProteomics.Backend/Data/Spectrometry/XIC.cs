@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
 				for(var i = 0; i < Count; i++)
 				{
-					xicPointList.Add(new XicPoint(this[i].ScanNum, intensityValues[i]));
+					xicPointList.Add(new XicPoint(this[i].ScanNum, this[i].Mz, intensityValues[i]));
 				}
 			}
 			else
@@ -122,7 +122,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 			}
 
 			// Find the XIC Point that is closest to the input scan number
-			var searchPoint = new XicPoint(scanNumber, 0);
+			var searchPoint = new XicPoint(scanNumber, 0, 0);
 			int indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
 			indexOfClosestScan = indexOfClosestScan < 0 ? ~indexOfClosestScan : indexOfClosestScan;
 		    if (indexOfClosestScan >= xicPointList.Count) indexOfClosestScan = xicPointList.Count - 1;

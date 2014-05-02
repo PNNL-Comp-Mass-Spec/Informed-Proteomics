@@ -305,7 +305,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
         /// <returns>Pearson correlation</returns>
-        public double GetCorrScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
+        public double GetCorrScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             if (observedPeaks == null) return 0;

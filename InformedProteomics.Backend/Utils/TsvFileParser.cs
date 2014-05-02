@@ -16,6 +16,11 @@ namespace InformedProteomics.Backend.Utils
 
         public string FileName { get; private set; }
 
+        public int NumData
+        {
+            get { return _rows.Length; }
+        }
+
         public IList<string> GetHeaders()
         {
             return _header;
@@ -30,6 +35,11 @@ namespace InformedProteomics.Backend.Utils
         {
             List<string> columnData;
             return _data.TryGetValue(columnName, out columnData) ? columnData : null;
+        }
+
+        public IList<string> GetRows()
+        {
+            return _rows;
         }
 
         public ISet<string> GetPeptides(double pepQValueThreshold)
@@ -60,9 +70,11 @@ namespace InformedProteomics.Backend.Utils
         }
 
         private string[] _header;
+        private string[] _rows;
         private Dictionary<string, List<string>> _data;
         private void Parse()
         {
+            var rows = new List<string>();
             _data = new Dictionary<string, List<string>>();
             // parse header
             var firstRow = true;
@@ -86,7 +98,9 @@ namespace InformedProteomics.Backend.Utils
                 {
                     _data[_header[i]].Add(token[i]);
                 }
+                rows.Add(line);
             }
+            _rows = rows.ToArray();
         }
     }
 }

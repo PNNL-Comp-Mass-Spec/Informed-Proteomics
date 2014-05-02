@@ -86,6 +86,85 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(int minLength, int maxLength, int numCTermCleavages)
+        {
+            var encoding = Encoding.ASCII;
+
+            foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
+            {
+                var seqArr = seqWithOffset.Sequence;
+                var offset = seqWithOffset.Offset;
+                for (var i = numCTermCleavages + 1; i <= seqArr.Length - minLength; i++)
+                {
+                    var length = seqArr.Length - i;
+                    if (length <= maxLength)
+                    {
+                        yield return new AnnotationAndOffset(
+                            offset,
+                            string.Format("{0}.{1}.{2}",
+                            "_",
+                            encoding.GetString(seqArr, 0, length),
+                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
+                            );
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<AnnotationAndOffset> SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+            int minSequenceLength, int maxSequenceLength
+            , int maxNumNTermCleavages, int maxNumCTermCleavages)
+        {
+            foreach (
+                var annotationAndOffset in
+                    IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue,
+                        maxNumCTermCleavages))
+            {
+                // numCTermCleavages <= maxNumCTermCleavages
+                var annotation = annotationAndOffset.Annotation;
+                var offset = annotationAndOffset.Offset;
+                var length = (annotation.Length - 4);
+                var numNTermCleavage = 0;
+                int cleavedLength;
+                while ((cleavedLength = length - numNTermCleavage) >= minSequenceLength)
+                {
+                    if (cleavedLength <= maxSequenceLength)
+                    {
+                        //  if (numNTermCleavage <= maxNumNTermCleavages) "both" else "cterm"
+                        var cleavedAnnotation = numNTermCleavage == 0
+                            ? annotation
+                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                        yield return new AnnotationAndOffset(offset + numNTermCleavage, cleavedAnnotation);
+
+                    }
+                    ++numNTermCleavage;
+                }
+            }
+
+            foreach (
+                var annotationAndOffset in
+                    IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(minSequenceLength, int.MaxValue,
+                        maxNumCTermCleavages))
+            {
+                // numCTermCleavages > maxNumCTermCleavages
+                var annotation = annotationAndOffset.Annotation;
+                var offset = annotationAndOffset.Offset;
+                var length = (annotation.Length - 4);
+                for (var numNTermCleavage = 0; numNTermCleavage <= maxNumNTermCleavages; numNTermCleavage++)
+                {
+                    var cleavedLength = length - numNTermCleavage;
+                    if (cleavedLength >= minSequenceLength && cleavedLength <= maxSequenceLength)
+                    {
+                        // N only
+                        var cleavedAnnotation = numNTermCleavage == 0
+                            ? annotation
+                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                        yield return new AnnotationAndOffset(offset + numNTermCleavage, cleavedAnnotation);
+                    }
+                }
+            }
+        }
+
         public int GetLongestSequenceLength()
         {
             return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
