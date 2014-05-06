@@ -15,7 +15,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestIcResultsWithModifications()
         {
-            const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.ictresult";
+            const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.tsv";
             var parser = new TsvFileParser(resultFilePath);
             var sequences = parser.GetData("Sequence");
             var modifications = parser.GetData("Modifications");
@@ -33,16 +33,12 @@ namespace InformedProteomics.Test.FunctionalTests
                 {
                     if (modStr.Length == 0) continue;
                     var modName = modStr.Split()[0];
-                    //Console.WriteLine(modName);
                     var mod = Modification.Get(modName);
                     modComposition += mod.Composition;
                 }
 
                 var compFromSeqAndMods = sequenceComp + modComposition;
-                if (!compFromSeqAndMods.Equals(compositions[i]))
-                {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", scanNums[i], modsStr, compFromSeqAndMods, compositions[i], compositions[i] - compFromSeqAndMods);
-                }
+                Assert.True(compFromSeqAndMods.Equals(compositions[i]));
             }
         }
     }

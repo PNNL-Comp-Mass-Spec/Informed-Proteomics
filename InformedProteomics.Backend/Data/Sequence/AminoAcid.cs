@@ -50,17 +50,17 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #endregion
 
-        public static AminoAcid GetStandardAminoAcid(char residue)
-        {
-            return StandardAaSet.GetAminoAcid(residue);
-        }
+        //public static AminoAcid GetStandardAminoAcid(char residue)
+        //{
+        //    return StandardAaSet.GetAminoAcid(residue);
+        //}
 
         # region Public Static Members
 
-        public static readonly AminoAcid ProteinNTerm = new AminoAcid('[', "Protein-C-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid ProteinNTerm = new AminoAcid('[', "Protein-N-terminus", Data.Composition.Composition.Zero);
         public static readonly AminoAcid ProteinCTerm = new AminoAcid(']', "Protein-C-terminus", Data.Composition.Composition.Zero);
 
-        public static readonly AminoAcid PeptideNTerm = new AminoAcid('(', "Peptide-C-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid PeptideNTerm = new AminoAcid('(', "Peptide-N-terminus", Data.Composition.Composition.Zero);
         public static readonly AminoAcid PeptideCTerm = new AminoAcid(')', "Peptide-C-terminus", Data.Composition.Composition.Zero);
 
         public static readonly AminoAcid Empty = new AminoAcid('\0', "Empty", Data.Composition.Composition.Zero);
@@ -95,7 +95,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         # region Private Static Members
 
-        private static readonly AminoAcidSet StandardAaSet = new AminoAcidSet();
+//        private static readonly AminoAcidSet StandardAaSet = new AminoAcidSet();
 
         #endregion
     }

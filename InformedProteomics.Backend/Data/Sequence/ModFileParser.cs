@@ -44,16 +44,23 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 // Comment 
                 if (buf.Length == 0 || buf.StartsWith("#")) continue;
+                if(buf.StartsWith("NumMods"))
+                {
+
+                }
                 //
                 var token = buf.Split(null);
                 // TODO: Parse Search Modifications
                 // TODO: set up maxNumDynModsPerPeptide
+                //var searchModification = new SearchModification(mod, targetResidue, location, isFixedModification);
             }
 
             textReader.Close();
 
             //return searchModList.ToArray();
             maxNumDynModsPerPeptide = 0;
+
+            // TODO: * cannot come with any
             return null;
         }
     }

@@ -34,6 +34,7 @@ namespace InformedProteomics.Test
             // Jia's data
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2";
 
             // Configure amino acid set
             //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
@@ -59,11 +60,11 @@ namespace InformedProteomics.Test
 
             const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
             bool? tda = true;   // true: target & decoy, false: target, null: decoy
-            TestTopDownSearch(specFilePath, dbFilePath, aaSet, tda, searchMode);
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
         [Test]
-        public void TestTopDownSearch(string specFilePath, string dbFilePath, AminoAcidSet aaSet, bool? tda, int searchMode)
+        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int searchMode)
         {
             // Search parameters
             const int maxNumNTermCleavages = 1; // 30
@@ -81,6 +82,7 @@ namespace InformedProteomics.Test
             var topDownLauncher = new IcTopDownLauncher(
                     specFilePath,
                     dbFilePath,
+                    outputDir,
                     aaSet,
                     minSequenceLength,
                     maxSequenceLength,
@@ -117,7 +119,7 @@ namespace InformedProteomics.Test
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
 
             var graph = SequenceGraph.CreateGraph(aaSet, annotation);
-            graph.SetSink(0, 0);
+            graph.SetSink(0);
             var score = graph.GetScore(charge, scorer);
             Console.WriteLine("Fast search score: " + score);
             var composition = graph.GetSinkSequenceCompositionWithH2O();
@@ -147,8 +149,8 @@ namespace InformedProteomics.Test
             //const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re_Rescored.icdresult";
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
-            const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.icdresult";
-            const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.icdresult";
+            const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.ictresult";
+            const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.ictresult";
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);

@@ -12,26 +12,52 @@ namespace InformedProteomics.Backend.Data.Sequence
         // Generate an amino acid map with 20 standard amino acids
         public AminoAcidSet()
         {
-            _residueMap.Add(AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinNTerm);
-            _residueMap.Add(AminoAcid.ProteinCTerm.Residue, AminoAcid.ProteinCTerm);
-            _residueMap.Add(AminoAcid.PeptideNTerm.Residue, AminoAcid.PeptideNTerm);
-            _residueMap.Add(AminoAcid.PeptideCTerm.Residue, AminoAcid.PeptideCTerm);
+            // Initialization
+            _modificationParams = new ModificationParams();
 
-            foreach (var aa in AminoAcid.StandardAminoAcidArr)
-			{
-				_residueMap.Add(aa.Residue, aa);
-			}
+            _locationSpecificResidueMap = new Dictionary<SequenceLocation, Dictionary<char, AminoAcid>>();
+            _locationSpecificResidueModMap = new Dictionary<SequenceLocation, Dictionary<char, int[]>>();
+            foreach (var loc in AllSequenceLocations)
+            {
+                _locationSpecificResidueModMap[loc] = new Dictionary<char, int[]>();
+            }
 
-        	_modificationParams = new ModificationParams();
-            _residueModMap = new Dictionary<char, int[]>();
+            // Initialize standard amino acid set
+            foreach (var loc in AllSequenceLocations)
+            {
+                var residueMap = new Dictionary<char, AminoAcid>();
+                switch (loc)
+                {
+                    case SequenceLocation.PeptideNTerm:
+                        residueMap.Add(AminoAcid.PeptideNTerm.Residue, AminoAcid.PeptideNTerm);
+                        break;
+                    case SequenceLocation.PeptideCTerm:
+                        residueMap.Add(AminoAcid.PeptideCTerm.Residue, AminoAcid.PeptideCTerm);
+                        break;
+                    case SequenceLocation.ProteinNTerm:
+                        residueMap.Add(AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinNTerm);
+                        break;
+                    case SequenceLocation.ProteinCTerm:
+                        residueMap.Add(AminoAcid.ProteinCTerm.Residue, AminoAcid.ProteinCTerm);
+                        break;
+                }
+
+                foreach (var aa in AminoAcid.StandardAminoAcidArr)
+                {
+                    residueMap.Add(aa.Residue, aa);
+                }
+                _locationSpecificResidueMap[loc] = residueMap;
+            }
         }
 
         // Generate an amino acid map with Cys static modification
         public AminoAcidSet(Modification cysMod): this()
         {
-            var cys = AminoAcid.GetStandardAminoAcid('C');
-            var modCys = new ModifiedAminoAcid(cys, cysMod);
-            _residueMap['C'] = modCys;
+            foreach (var loc in AllSequenceLocations)
+            {
+                var residueMap = _locationSpecificResidueMap[loc];
+                residueMap['C'] = new ModifiedAminoAcid(residueMap['C'], cysMod);
+            }
         }
 
         public AminoAcidSet(string modFilePath): this(new ModFileParser(modFilePath))
@@ -46,34 +72,56 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence): this()
         {
+            if (searchModifications == null) return;
+
             var modifications = searchModifications as SearchModification[] ?? searchModifications.ToArray();
+
             // apply fixed modifications
-            foreach (var searchModification in modifications)
+            foreach (var loc in AllSequenceLocations)
             {
-                if (searchModification.IsFixedModification)
+                var residueMap = _locationSpecificResidueMap[loc];
+                foreach (var searchModification in modifications)
                 {
-                    var targetResidue = searchModification.TargetResidue;
-                    _residueMap[targetResidue] = new ModifiedAminoAcid(_residueMap[targetResidue], searchModification.Modification);
+                    if (searchModification.IsFixedModification)
+                    {
+                        var targetResidue = searchModification.TargetResidue;
+                        if (targetResidue == '*') targetResidue = SequenceLocationToLocationResidue[loc];
+                        residueMap[targetResidue] = new ModifiedAminoAcid(residueMap[targetResidue], searchModification.Modification);
+                    }
                 }
             }
 
+            if (maxNumModsPerSequence <= 0) return;
+
             // apply dynamic modifications
             var dynamicModifications = new HashSet<Modification>();
-            var residueModMap = new Dictionary<char, List<Modification>>();
+            var locationSpecificResidueModMap = new Dictionary<SequenceLocation,Dictionary<char, List<Modification>>>();
+            foreach (SequenceLocation loc in AllSequenceLocations)
+            {
+                locationSpecificResidueModMap[loc] = new Dictionary<char, List<Modification>>();
+            }
+
             foreach (var searchModification in modifications)
             {
                 if (!searchModification.IsFixedModification)
                 {
                     dynamicModifications.Add(searchModification.Modification);
+                    var location = searchModification.Location;
                     var targetResidue = searchModification.TargetResidue;
-                    List<Modification> modList;
-                    if (residueModMap.TryGetValue(targetResidue, out modList))
+
+                    foreach (var loc in AffectedLocations[location])
                     {
-                        modList.Add(searchModification.Modification);
-                    }
-                    else
-                    {
-                        residueModMap.Add(targetResidue, new List<Modification> {searchModification.Modification});
+                        var residueModMap = locationSpecificResidueModMap[loc];
+                        var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
+                        List<Modification> modList;
+                        if (residueModMap.TryGetValue(appliedResidue, out modList))
+                        {
+                            modList.Add(searchModification.Modification);
+                        }
+                        else
+                        {
+                            residueModMap.Add(appliedResidue, new List<Modification> { searchModification.Modification });
+                        }
                     }
                 }
             }
@@ -81,23 +129,25 @@ namespace InformedProteomics.Backend.Data.Sequence
             var dynModArray = dynamicModifications.ToArray();
             _modificationParams = new ModificationParams(dynModArray, maxNumModsPerSequence);
 
-            // initialize resideModMap
-            _residueModMap = new Dictionary<char, int[]>();
-
-            foreach (var entry in residueModMap)
+            foreach (SequenceLocation loc in AllSequenceLocations)
             {
-                var residue = entry.Key;
-                var modList = entry.Value;
-
-                var modIndexArr = new int[modList.Count];
-                var index = -1;
-                foreach (var mod in modList)
+                var residueModMap = locationSpecificResidueModMap[loc];
+                foreach (var entry in residueModMap)
                 {
-                    var modIndex = Array.IndexOf(dynModArray, mod);
-                    modIndexArr[++index] = modIndex;
+                    var residue = entry.Key;
+                    var modList = entry.Value;
+
+                    var modIndexArr = new int[modList.Count];
+                    var index = -1;
+                    foreach (var mod in modList)
+                    {
+                        var modIndex = Array.IndexOf(dynModArray, mod);
+                        modIndexArr[++index] = modIndex;
+                    }
+                    _locationSpecificResidueModMap[loc].Add(residue, modIndexArr);
                 }
-                _residueModMap.Add(residue, modIndexArr);
             }
+
         }
 
         #endregion
@@ -108,12 +158,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         
         public AminoAcid GetAminoAcid(char residue)
         {
-            AminoAcid aminoAcid;
-            if (_residueMap.TryGetValue(residue, out aminoAcid))
-            {
-                return aminoAcid;
-            }
-            return null;
+            return GetAminoAcid(residue, SequenceLocation.Everywhere);
         }
 
         public AminoAcid GetAminoAcid(char residue, SequenceLocation location)
@@ -129,19 +174,21 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public int[] GetModificationIndices(char residue)
         {
+            return GetModificationIndices(residue, SequenceLocation.Everywhere);
+        }
+
+        public int[] GetModificationIndices(char residue, SequenceLocation location)
+        {
+            var residueModMap = _locationSpecificResidueModMap[location];
             int[] modIndexArr;
-            if (_residueModMap.TryGetValue(residue, out modIndexArr))
+            if (residueModMap.TryGetValue(residue, out modIndexArr))
             {
                 return modIndexArr;
             }
             return new int[0];
         }
 
-        public int[] GetModificationIndices(char residue, SequenceLocation location)
-        {
-            throw new System.NotImplementedException();
-        }
-
+        [Obsolete("This method ignores N- and C-term specific modifications.")]
         public Composition.Composition GetComposition(string sequence)
         {
             var composition = Composition.Composition.Zero;
@@ -159,20 +206,86 @@ namespace InformedProteomics.Backend.Data.Sequence
             return composition;
         }
 
+        //public Composition.Composition GetComposition(AminoAcid nTerm, string sequence, AminoAcid cTerm)
+
         public ModificationParams GetModificationParams()
         {
             return _modificationParams;
         }
 
+        public void Display()
+        {
+            foreach (var location in AllSequenceLocations)
+            {
+                Console.WriteLine("===== " + location + " =====");
+                var keys = _locationSpecificResidueMap[location].Keys.ToArray();
+                Array.Sort(keys);
+                foreach (var residue in keys)
+                {
+                    var aa = GetAminoAcid(residue, location);
+                    Console.Write("{0}\t{1}\t{2}", residue, aa.GetMass(), aa.Composition);
+                    foreach (var modIndex in GetModificationIndices(residue, location))
+                    {
+                        Console.Write("\t" + _modificationParams.GetModification(modIndex));
+                    }
+                    Console.WriteLine();
+                }
+            }            
+        }
+
         #region Private Members
 
-        private readonly Dictionary<char, AminoAcid> _residueMap = new Dictionary<char, AminoAcid>();
-        private readonly Dictionary<SequenceLocation, Dictionary<char, AminoAcid>> _locationSpecificResidueMap = new Dictionary<SequenceLocation, Dictionary<char, AminoAcid>>();
-        private readonly Dictionary<char, int[]> _residueModMap;
+        //private readonly Dictionary<char, AminoAcid> _residueMap = new Dictionary<char, AminoAcid>();
+        private readonly Dictionary<SequenceLocation, Dictionary<char, AminoAcid>> _locationSpecificResidueMap;
+        private readonly Dictionary<SequenceLocation, Dictionary<char, int[]>> _locationSpecificResidueModMap;
 
         private readonly ModificationParams _modificationParams;
 
         #endregion
+
+        private static readonly IEnumerable<SequenceLocation> AllSequenceLocations;
+        private readonly static Dictionary<SequenceLocation, char> SequenceLocationToLocationResidue;
+        private readonly static Dictionary<SequenceLocation, IEnumerable<SequenceLocation>> AffectedLocations;
+
+        static AminoAcidSet()
+        {
+            AllSequenceLocations = System.Enum.GetValues(typeof(SequenceLocation)) as SequenceLocation[];
+            SequenceLocationToLocationResidue = new Dictionary<SequenceLocation, char>
+            {
+                {SequenceLocation.PeptideNTerm, AminoAcid.PeptideNTerm.Residue},
+                {SequenceLocation.PeptideCTerm, AminoAcid.PeptideCTerm.Residue},
+                {SequenceLocation.ProteinNTerm, AminoAcid.ProteinNTerm.Residue},
+                {SequenceLocation.ProteinCTerm, AminoAcid.ProteinCTerm.Residue}
+            };
+
+            AffectedLocations = new Dictionary<SequenceLocation, IEnumerable<SequenceLocation>>();
+            AffectedLocations[SequenceLocation.Everywhere] = new[]
+            {
+                SequenceLocation.Everywhere,
+                SequenceLocation.PeptideNTerm,
+                SequenceLocation.PeptideCTerm,
+                SequenceLocation.ProteinNTerm,
+                SequenceLocation.ProteinCTerm
+            };
+            AffectedLocations[SequenceLocation.PeptideNTerm] = new[]
+            {
+                SequenceLocation.PeptideNTerm,
+                SequenceLocation.ProteinNTerm
+            };
+            AffectedLocations[SequenceLocation.PeptideCTerm] = new[]
+            {
+                SequenceLocation.PeptideCTerm,
+                SequenceLocation.ProteinCTerm
+            };
+            AffectedLocations[SequenceLocation.ProteinNTerm] = new[]
+            {
+                SequenceLocation.ProteinNTerm
+            };
+            AffectedLocations[SequenceLocation.ProteinCTerm] = new[]
+            {
+                SequenceLocation.ProteinCTerm
+            };
+        }
     }
 
     public class ModifiedAminoAcid: AminoAcid

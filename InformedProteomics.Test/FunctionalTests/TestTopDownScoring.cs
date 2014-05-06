@@ -67,7 +67,7 @@ namespace InformedProteomics.Test.FunctionalTests
             peptideComposition.GetIsotopomerEnvelope();
 
             Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
-            seqGraph.SetSink(modIndex, 0);
+            seqGraph.SetSink(modIndex);
 
             var precursorIon = new Ion(peptideComposition, charge);
 
@@ -124,7 +124,7 @@ namespace InformedProteomics.Test.FunctionalTests
             peptideComposition.GetIsotopomerEnvelope();
 
             Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
-            seqGraph.SetSink(modIndex, 0);
+            seqGraph.SetSink(modIndex);
 
             var precursorIon = new Ion(peptideComposition, charge);
 
@@ -185,7 +185,7 @@ namespace InformedProteomics.Test.FunctionalTests
             peptideComposition.GetIsotopomerEnvelope();
 
             Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
-            seqGraph.SetSink(modIndex, 0);
+            seqGraph.SetSink(modIndex);
 
             var precursorIon = new Ion(peptideComposition, charge);
 

@@ -6,6 +6,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.DIA.Search;
 using NUnit.Framework;
 
@@ -21,14 +22,97 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void ProcessIprg2015()
+        {
+            const string dir = @"H:\Research\IPRG2015";
+
+            const string databaseFilePath = dir + @"\yeast6mix.fasta";
+            var database = new FastaDatabase(databaseFilePath);
+            database.Read();
+
+            const string jobFilePath = dir + @"\Jobs.tsv";
+            var jobParser = new TsvFileParser(jobFilePath);
+            var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32(j)).ToArray();
+            var experiments = jobParser.GetData("Experiments").Select(e => e.Split('_')[2]).ToArray();
+
+            //const string resultFilePath = dir + @"\AMT_Proteins_NA.tsv";
+            //const string outputFilePath = dir + @"\AMT_Proteins.tsv";
+
+            const string resultFilePath = dir + @"\AMT_Peptides_NA.tsv";
+            const string outputFilePath = dir + @"\AMT_Peptides.tsv";
+
+            var parser = new TsvFileParser(resultFilePath);
+            var headers = parser.GetHeaders();
+            var jobColNum = new int[jobs.Length];
+            for (var i = 0; i < jobs.Length; i++)
+            {
+                for (var j = 0; j < headers.Count; j++)
+                {
+                    if (headers[j].Contains("" + jobs[i]))
+                    {
+                        jobColNum[i] = j;
+                        break;
+                    }
+                }
+            }
+
+            for (var i = 0; i < jobs.Length; i++)
+            {
+                Console.WriteLine("{0}\t{1}\t{2}", jobs[i], jobColNum[i], experiments[i]);
+            }
+
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                var peptides = parser.GetData("Peptide");   // Peptides
+                var proteins = parser.GetData("Reference");     // Proteins
+                var abundances = new string[jobs.Length][];
+                for (var i = 0; i < jobs.Length; i++)
+                {
+                    abundances[i] = parser.GetData(headers[jobColNum[i]]).ToArray();
+                }
+
+                if(peptides != null) writer.Write("Peptide\t");
+                writer.Write("Protein\tLength");
+                for (var i = 0; i < jobs.Length; i++)
+                {
+                    writer.Write("\t"+experiments[i]);
+                }
+                writer.WriteLine("\tSpikeIn");
+                for (var i = 0; i < proteins.Count; i++)
+                {
+                    var protein = proteins[i];
+                    if (protein.StartsWith("XXX") || protein.StartsWith("Contaminant")) continue;
+                    var length = database.GetProteinLength(protein);
+                    //if (length <= 0)
+                    //{
+                    //    Console.WriteLine("Shit!");
+                    //    return;
+                    //}
+                    if(peptides != null) writer.Write(peptides[i]+"\t");
+                    writer.Write(protein+"\t"+length);
+                    for (var j = 0; j < jobs.Length; j++)
+                    {
+                        writer.Write("\t"+abundances[j][i]);
+                    }
+                    writer.WriteLine("\t"+ (protein.StartsWith("STANDARD") ? 1 : 0));
+                }
+            }
+        }
+
+        [Test]
         public void AddNaToTable()
         {
-            const string dir = @"D:\Research\Data\IPRG2015";
-            const string resultFilePath = dir + @"\AMTAllPeptidesMissingValues.tsv";
-            foreach (var line in File.ReadLines(resultFilePath))
+            const string dir = @"H:\Research\IPRG2015";
+            const string resultFilePath = dir + @"\AMT_Peptides.tsv";
+
+            const string outputFilePath = dir + @"\AMT_Peptides_NA.tsv";
+            using (var writer = new StreamWriter(outputFilePath))
             {
-                var token = line.Split('\t');
-                Console.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : t)));
+                foreach (var line in File.ReadLines(resultFilePath))
+                {
+                    var token = line.Split('\t');
+                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : t)));
+                }
             }
         }
 
@@ -87,8 +171,7 @@ namespace InformedProteomics.Test
                     var proteins = match.Protein.Split(';');
                     foreach (var protein in proteins)
                     {
-                        var proteinName = protein.Substring(0,
-                                                            protein.LastIndexOf("(pre=", System.StringComparison.Ordinal));
+                        var proteinName = protein.Substring(0, protein.LastIndexOf("(pre=", StringComparison.Ordinal));
                         int[] countArr;
                         if (!specCount.TryGetValue(proteinName, out countArr)) specCount[proteinName] = new int[msgfResultFiles.Length];
                         specCount[proteinName][i]++;
@@ -208,6 +291,28 @@ namespace InformedProteomics.Test
                 numTargets++;
             }
             Console.WriteLine("NumTargets: {0}", numTargets);
+        }
+
+        [Test]
+        public void TestPathUtils()
+        {
+            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
+            Console.WriteLine(Path.ChangeExtension(rawFilePath, "_Target.tsv"));
+            Console.WriteLine(Path.GetDirectoryName(rawFilePath));
+            Console.WriteLine(Path.GetDirectoryName(rawFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFilePath)+"_IcTarget.tsv");
+
+            var outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2\Synocho_L1_1_IcTarget.tsv";
+            if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
+            if (!Directory.Exists(outputDir))
+            {
+                if (!File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
+                {
+                    throw new Exception(outputDir + " is not a directory!");
+                } 
+                Directory.CreateDirectory(outputDir);
+            }
+            Console.WriteLine(outputDir);
+
         }
     }
 }

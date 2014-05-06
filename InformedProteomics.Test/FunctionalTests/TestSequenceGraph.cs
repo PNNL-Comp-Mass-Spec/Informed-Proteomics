@@ -10,14 +10,6 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestSequenceGraph
     {
         [Test]
-        public void TestNTermMods()
-        {
-            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
-            const string annotation = "_.MARTKQTARK._";
-
-        }
-
-        [Test]
         public void TestBuildingReverseGraph()
         {
             const string annotation = "_.MARTKQTARK._";
@@ -39,33 +31,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
-            foreach (var composition in seqGraph.GetSequenceCompositionsWithNTermCleavage(0))
-            {
-                Console.WriteLine("{0}\t{1}", composition, composition.Mass);
-            }
-        }
-
-        [Test]
-        public void TestNTermMod()
-        {
-            const string annotation = "_.MARTKQTARK._";
-
-            // Configure amino acid set
-            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
-
-            var searchModifications = new List<SearchModification>
-            {
-                pyroGluQ,
-                //oxM
-            };
-
-            const int numMaxModsPerProtein = 2;
-
-            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
-
-            var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
-            foreach (var composition in seqGraph.GetSequenceCompositionsWithNTermCleavage(0))
+            foreach (var composition in seqGraph.GetSequenceCompositions())
             {
                 Console.WriteLine("{0}\t{1}", composition, composition.Mass);
             }
@@ -100,7 +66,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 "_.MKLYNLKDHNEQVSFAQAVTQGLGKNQGLFFPHDLPEFSLTEIDEMLKLDFVTRSAKILSAFIGDEIPQEILEERVRAAFAFPAPVANVESDVGCLELFHGPTLAFKDFGGRFMAQMLTHIAGDKPVTILTATSGDTGAAVAHAFYGLPNVKVVILYPRGKISPLQEKLFCTLGGNIETVAIDGDFDACQALVKQAFDDEELKVALGLNSANSINISRLLAQICYYFEAVAQLPQETRNQLVVSVPSGNFGDLTAGLLAKSLGLPVKRFIAATNVNDTVPRFLHDGQWSPKATQATLSNAMDVSQPNNWPRVEELFRRKIWQLKELGYAAVDDETTQQTMRELKELGYTSEPHAAVAYRALRDQLNPGEYGLFLGTAHPAKFKESVEAILGETLDLPKELAERADLPLLSHNLPADFAALRKLMMNHQ._";
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
-            var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
+            var seqCompositions = seqGraph.GetSequenceCompositions();
 
             //for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             const int modIndex = 4;
@@ -141,21 +107,72 @@ namespace InformedProteomics.Test.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
-            var seqCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
+            var seqCompositions = seqGraph.GetSequenceCompositions();
+            var modCombs = seqGraph.GetModificationCombinations();
 
             for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             {
                 var seqComposition = seqCompositions[modIndex];
-                
-                var modCombinations = seqGraph.ModificationParams.GetModificationCombination(modIndex);
-                Console.WriteLine("SequenceComposition: {0}, ModComb: {1}", seqComposition, modCombinations);
-                //foreach (var composition in seqGraph.GetFragmentCompositions(modIndex, 0))
-                //{
-                //    //if (composition.GetMass() > seqComposition.GetMass())
-                //    {
-                //        Console.WriteLine("***Seq: {0}, Frag: {1}", seqComposition, composition);
-                //    }
-                //}
+                Console.WriteLine("SequenceComposition: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+            }
+        }
+
+        [Test]
+        public void TestCreatingAminoAcidSet()
+        {
+            // Configure amino acid set
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.PeptideNTerm, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                acetylN,
+                pyroGluQ,
+                oxM
+            };
+
+            const int numMaxModsPerProtein = 2;
+
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            //var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
+            aaSet.Display();
+        }
+
+        [Test]
+        public void TestNTermMods()
+        {
+            const string annotation = "_.QARTKQTARK._";
+
+            // Configure amino acid set
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                acetylN,
+                pyroGluQ,
+                //oxM
+            };
+
+            const int numMaxModsPerProtein = 2;
+
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            //aaSet.Display();
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
+            foreach (var composition in seqGraph.GetSequenceCompositions())
+            {
+                Console.WriteLine("{0}\t{1}", composition, composition.Mass);
+            }
+
+            Console.WriteLine("*** Cleave N-term");
+            seqGraph.CleaveNTerm();
+            foreach (var composition in seqGraph.GetSequenceCompositions())
+            {
+                Console.WriteLine("{0}\t{1}", composition, composition.Mass);
             }
 
         }

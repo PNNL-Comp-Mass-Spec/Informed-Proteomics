@@ -47,15 +47,15 @@ namespace InformedProteomics.Test
             Console.WriteLine("Peptide\tMonoMz\tCharge\tNumMs2Matches\tMs2Scans");
             var numPeptides = 0;
             var numValidScans = 0;
-            foreach(var peptide in annotations.Select(a => a.Annotation.Substring(2, a.Annotation.Length-4)))
-//            foreach (var peptide in spikedInPeptides)
+            foreach(var annotation in annotations.Select(a => a.Annotation))    //.Substring(2, a.Annotation.Length-4)))
             {
                 if (++numPeptides%1000 == 0)
                 {
                     Console.WriteLine("Processed {0} peptides.", numPeptides);
                     if (numPeptides == 100000) break;
                 }
-                var seqGraph = SequenceGraph.CreatePeptideGraph(aminoAcidSet, peptide);
+                //var seqGraph = SequenceGraph.CreatePeptideGraph(aminoAcidSet, peptide);
+                var seqGraph = SequenceGraph.CreateGraph(aminoAcidSet, annotation);
                 foreach (var sequenceComposition in seqGraph.GetSequenceCompositions())
                 {
                     var peptideComposition = sequenceComposition + Composition.H2O;

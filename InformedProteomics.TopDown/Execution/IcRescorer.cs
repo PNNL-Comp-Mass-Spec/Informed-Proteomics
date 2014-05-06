@@ -54,10 +54,6 @@ namespace InformedProteomics.TopDown.Execution
                         else writer.Write("["+scores.Modifications+"]"+"\t");
                     }
                     writer.WriteLine(scores);
-
-                    //var scores = _scorer.GetScores(sequence, charge, scanNum);
-                    //if (scores == null) continue;
-                    //writer.WriteLine("{0}\t{1}", row, scores);
                 }
             }
         }

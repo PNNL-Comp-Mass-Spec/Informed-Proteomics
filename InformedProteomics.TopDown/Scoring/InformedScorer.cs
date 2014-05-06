@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -43,10 +42,10 @@ namespace InformedProteomics.TopDown.Scoring
 
             Tuple<double, string> scoreAndModifications = null;
             var bestScore = double.NegativeInfinity;
-            var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(0);
+            var protCompositions = seqGraph.GetSequenceCompositions();
             for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
             {
-                seqGraph.SetSink(modIndex, 0);
+                seqGraph.SetSink(modIndex);
                 var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                 if (!protCompositionWithH2O.Equals(composition)) continue;
                 

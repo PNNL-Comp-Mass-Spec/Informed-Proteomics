@@ -99,7 +99,8 @@ namespace InformedProteomics.Test
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
                 {
-                    var protCompositions = seqGraph.GetSequenceCompositionsWithNTermCleavage(nTermCleavages);
+                    if(nTermCleavages > 0) seqGraph.CleaveNTerm();
+                    var protCompositions = seqGraph.GetSequenceCompositions();
                     foreach (var protComposition in protCompositions)
                     {
                         totalProtCompositions++;

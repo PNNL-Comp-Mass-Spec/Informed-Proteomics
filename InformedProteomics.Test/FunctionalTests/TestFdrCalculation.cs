@@ -11,12 +11,13 @@ namespace InformedProteomics.Test.FunctionalTests
     {
         public void TestIcTopDown()
         {
-            const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.ictresult";
-            const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.icdresult";
+            const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_L1_1_IcTarget.tsv";
+            const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_L1_1_IcDecoy.tsv";
+            const string tdaResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_L1_1_IcTda.tsv";
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);
-            fdrCalculator.WriteTo(Path.ChangeExtension(targetResultPath, ".tsv"));
+            fdrCalculator.WriteTo(tdaResultPath);
             Console.WriteLine("Done");
         }
 
