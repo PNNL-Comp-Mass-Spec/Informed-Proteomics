@@ -27,7 +27,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             // Calculate rank score
             var rank = _rankedPeaks.RankMz(mz, tolerance);
-            if (rank < 0) return 0;
             var rankScore = _rankScorer.GetScore(ionType, rank);
 
             // Calculate mass error score

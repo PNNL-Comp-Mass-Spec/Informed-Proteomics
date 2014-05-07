@@ -298,7 +298,9 @@ namespace InformedProteomics.Test
                                 outFile.Write("{0}\t{0}-De\t", selectedIon.Name);
                             outFile.Write("Unexplained\tUnexplained-De\tTotal");
                             outFile.WriteLine();
-                            var massErrorLength = selectedMassErrors[charge][0].Count;
+                            int massErrorLength = 0;
+                            if (selectedMassErrors[charge].Count > 0)
+                                massErrorLength = selectedMassErrors[charge][0].Count;
                             for (var i = 0; i < massErrorLength; i++)
                             {
                                 outFile.Write(Math.Round(selectedMassErrors[charge][0][i].DataLabel, 3)+"\t");
