@@ -12,25 +12,27 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly RankScore _rankScorer;
         private readonly MassErrorScore _massErrorScorer;
         private readonly Spectrum _spectrum;
+        private readonly Tolerance _tolerance;
 
-        public SpectrumScore(Spectrum spectrum, string rankSetFileName, string massErrorSetFileName)
+        public SpectrumScore(Spectrum spectrum, Tolerance tolerance, string rankSetFileName, string massErrorSetFileName)
         {
             _rankedPeaks = new RankedPeaks(spectrum);
             _rankScorer = new RankScore(rankSetFileName);
             _massErrorScorer = new MassErrorScore(massErrorSetFileName);
             _spectrum = spectrum;
+            _tolerance = tolerance;
         }
 
-        public double GetMassScore(IonType ionType, double mass, Tolerance tolerance)
+        public double GetMassScore(IonType ionType, double mass)
         {
             var mz = ionType.GetMz(mass);
 
             // Calculate rank score
-            var rank = _rankedPeaks.RankMz(mz, tolerance);
+            var rank = _rankedPeaks.RankMz(mz, _tolerance);
             var rankScore = _rankScorer.GetScore(ionType, rank);
 
             // Calculate mass error score
-            var peak = _spectrum.FindPeak(mz, tolerance);
+            var peak = _spectrum.FindPeak(mz, _tolerance);
             var massErrorScore = 0.0;
             if (peak != null)
             {
@@ -40,7 +42,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return (rankScore + massErrorScore);
         }
 
-        public double GetPeptideScore(string peptide, Tolerance tolerance)
+        public double GetPeptideScore(string peptide)
         {
             var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
             var prefixes = new List<Composition>();
@@ -58,7 +60,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             foreach (var ionType in ionTypes)
             {
                 var compositions = (ionType.IsPrefixIon ? prefixes : suffixes);
-                totalScore += compositions.Sum(composition => GetMassScore(ionType, composition.GetIsotopeMass(0), tolerance));
+                totalScore += compositions.Sum(composition => GetMassScore(ionType, composition.GetIsotopeMass(0)));
             }
             return totalScore;
         }
