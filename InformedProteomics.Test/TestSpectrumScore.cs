@@ -12,13 +12,13 @@ namespace InformedProteomics.Test
         [Test]
         public void SpectrumScore()
         {
-            const int scanNum = 7394;
-            const string trainingPath = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_Velos_TMT10_Charles\";
-            const string path = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_Velos_TMT10_Charles\";
-            const string rawFile = path + @"raw\Leishmania_TMT_test_01_01Jan14_Frodo_13-06-25.raw";
-            const string trainingSet = trainingPath + "HCD_Velos_TMT10_Charles_RankProbabilities_Charge3.txt";
-            const string massErrorSet = trainingPath + "HCD_Velos_TMT10_Charles_MassErrorProbabilities_Charge3.txt";
-            const string peptide = "+229.163AVEC+57.021C+57.021GGAVYGPGDVEAAK+229.163";
+            const int scanNum = 22383;
+            const string trainingPath = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QE_TMT10_Charles\";
+            const string path = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QE_TMT10_Charles\";
+            const string rawFile = path + @"raw\Leishmania_TMT_NiNTA_FT_01_R2_20Jan14_Samwise_13-07-28.raw";
+            const string trainingSet = trainingPath + "HCD_QE_TMT10_Charles_RankProbabilities_Charge3.txt";
+            const string massErrorSet = trainingPath + "HCD_QE_TMT10_Charles_MassErrorProbabilities_Charge3.txt";
+            const string peptide = "+229.163SAEALQQLNDASFNASATSAAQAAADVYK+229.163";
             const string decoy = "+229.163AC+57.021C+57.021GGDGYAVGVEPAAVEK+229.163";
             var tolerance = new Tolerance(0.5, ToleranceUnit.Th);
 

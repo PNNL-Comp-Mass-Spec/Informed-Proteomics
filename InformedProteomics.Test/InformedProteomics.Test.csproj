@@ -118,8 +118,8 @@
     <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
     <Compile Include="FunctionalTests\TestSuffixArray.cs" />
-    <Compile Include="TestRankPeakProbability.cs" />
     <Compile Include="TestLcMsCaching.cs" />
+    <Compile Include="TestRankProbability.cs" />
     <Compile Include="TestSpectrumScore.cs" />
     <Compile Include="TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />

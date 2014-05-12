@@ -132,6 +132,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public Probability<double> GetMassErrorProbability(double massError)
         {
             var index = _massError.GetBinIndex(massError);
+            if (index < 0) return new Probability<double>(massError, 0, _massError.Total);
             var found = _massError.Bins[index].Count;
             var total = _massError.Total;
             return new Probability<double>(massError, found, total);

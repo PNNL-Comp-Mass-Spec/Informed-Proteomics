@@ -12,9 +12,9 @@ using NUnit.Framework;
 namespace InformedProteomics.Test
 {
     [TestFixture]
-    class TestRankPeakProbability
+    public class TestRankProbability
     {
-        private string[] _names;
+        private string[] _dataSets;
         private string _preTsv;
         private string _preRaw;
         private string _outPre;
@@ -32,9 +32,6 @@ namespace InformedProteomics.Test
 
         private bool _writeMassErrorProbabilities;
         private string _massErrorProbabilityOutFileName;
-
-        private bool _writeIonPairProbabilities;
-        private string _ionPairProbabilityOutFileName;
         
         private List<IonType> _ionTypes;
         private double _selectedIonThreshold;
@@ -54,16 +51,15 @@ namespace InformedProteomics.Test
         private const double MassErrorStartPoint = 0.005;
 
         [Test]
-        public void RankPeakProbability()
+        public void RankProbability()
         {
-            // read configuration settings
             InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\BottomUp\RankPeakProbabilityConfig.ini"));
 
-            foreach (var name in _names)
+            foreach (var dataSet in _dataSets)
             {
                 // Read directory
-                var tsvName = _preTsv.Replace("@", name);
-                var rawName = _preRaw.Replace("@", name);
+                var tsvName = _preTsv.Replace("@", dataSet);
+                var rawName = _preRaw.Replace("@", dataSet);
                 var txtFiles = Directory.GetFiles(tsvName).ToList();
                 var rawFilesTemp = Directory.GetFiles(rawName).ToList();
                 var rawFiles = rawFilesTemp.Where(rawFile => Path.GetExtension(rawFile) == ".raw").ToList();
@@ -83,151 +79,110 @@ namespace InformedProteomics.Test
                 var decoyRankTables = new RankTable[_precursorCharge];
                 var ionFrequencyTables = new ProductIonFrequencyTable[_precursorCharge];
                 var offsetFrequencyTables = new List<PrecursorOffsetFrequencyTable>[_precursorCharge];
-                for (int i = 0; i < _precursorCharge; i++)
+                var massErrorTables = new MassErrorTable[_precursorCharge, _ionTypes.Count];
+                var dMassErrorTables = new MassErrorTable[_precursorCharge, _ionTypes.Count];
+                for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    rankTables[i] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
-                    decoyRankTables[i] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
-                    ionFrequencyTables[i] = new ProductIonFrequencyTable(_ionTypes, _defaultTolerance, _relativeIntensityThreshold);
-                    offsetFrequencyTables[i] = new List<PrecursorOffsetFrequencyTable>();
-                    for (int j = 1; j <= (i + 1); j++)
+                    rankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
+                    decoyRankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
+                    ionFrequencyTables[chargeIndex] = new ProductIonFrequencyTable(_ionTypes, _defaultTolerance,
+                        _relativeIntensityThreshold);
+                    offsetFrequencyTables[chargeIndex] = new List<PrecursorOffsetFrequencyTable>();
+                    for (int j = 1; j <= (chargeIndex + 1); j++)
                     {
-                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_windowWidth / j, j, BinWidth / j));
+                        offsetFrequencyTables[chargeIndex].Add(new PrecursorOffsetFrequencyTable(_windowWidth/j, j, BinWidth/j));
+                    }
+                    for (int j = 0; j < _ionTypes.Count; j++)
+                    {
+                        massErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _defaultTolerance,
+                                                                             MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
+                        dMassErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _defaultTolerance,
+                                                        MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
                     }
                 }
 
                 // Read files
-                var matchList = new SpectrumMatchList(_act, false, _precursorCharge);
-                var decoyList = new SpectrumMatchList(_act, true, _precursorCharge);
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
+                    var matchList = new SpectrumMatchList(_act, false, _precursorCharge);
+                    var decoyList = new SpectrumMatchList(_act, true, _precursorCharge);
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", textFile, rawFile);
                     var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
                     matchList.AddMatchesFromFile(lcms, new TsvFileParser(txtFiles[i]));
-                }
-                decoyList.AddMatches(matchList);
+                    decoyList.AddMatches(matchList);
 
-                // Calculate probability tables
-                for (int j = 0; j < _precursorCharge; j++)
-                {
-                    // Calculate ion probabilities
-                    var chargeMatches = matchList.GetCharge(j + 1);
-                    chargeMatches.FilterSpectra(_windowWidth, _retentionCount);
-                    ionFrequencyTables[j].AddMatches(chargeMatches);
-
-                    // Calculate precursor offset probabilities
-                    for (int i = 0; i < _precursorCharge; i++)
+                    for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                     {
-                        foreach (var offsetFrequencyTable in offsetFrequencyTables[i])
+                        var chargeMatches = matchList.GetCharge(chargeIndex + 1);
+                        var dChargeMatches = decoyList.GetCharge(chargeIndex + 1);
+
+                        // Calculate ion probabilities
+                        chargeMatches.FilterSpectra(_windowWidth, _retentionCount);
+                        ionFrequencyTables[chargeIndex].AddMatches(chargeMatches);
+
+                        // Calculate precursor offset probabilities
+                        foreach (var offsetFrequencyTable in offsetFrequencyTables[chargeIndex])
                         {
                             offsetFrequencyTable.AddMatches(chargeMatches);
                         }
+
+                        // Calculate mass error tables
+                        for (var j = 0; j < _ionTypes.Count; j++)
+                        {
+                            massErrorTables[chargeIndex, j].AddMatches(chargeMatches);
+                            dMassErrorTables[chargeIndex, j].AddMatches(dChargeMatches);
+                        }
+
+                        // Initialize precursor filter
+                        var precursorFilter = new PrecursorFilter(_precursorCharge, _defaultTolerance);
+                        precursorFilter.SetChargeOffsets(new PrecursorOffsets(offsetFrequencyTables[chargeIndex],
+                            chargeIndex + 1,
+                            _precursorOffsetThreshold));
+
+                        // Calculate rank probabilities
+                        var filteredMatches = precursorFilter.FilterMatches(chargeMatches);
+                        var dFilteredMatches = precursorFilter.FilterMatches(dChargeMatches);
+                        rankTables[chargeIndex].AddMatches(filteredMatches);
+                        decoyRankTables[chargeIndex].AddMatches(dFilteredMatches);
                     }
                 }
 
                 // Select ion types
-                for (int j = 0; j < _precursorCharge; j++)
+                for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    var selected = ionFrequencyTables[j].SelectIons(_selectedIonThreshold);
+                    var selected = ionFrequencyTables[chargeIndex].SelectIons(_selectedIonThreshold);
                     foreach (var selectedIonProb in selected)
                     {
-                        selectedIons[j].Add(_ionTypeFactory.GetIonType(selectedIonProb.DataLabel.Name));
+                        selectedIons[chargeIndex].Add(_ionTypeFactory.GetIonType(selectedIonProb.DataLabel.Name));
                     }
-                    unselectedIons[j] = _ionTypes.Except(selectedIons[j]).ToList();
+                    unselectedIons[chargeIndex] = _ionTypes.Except(selectedIons[chargeIndex]).ToList();
                 }
 
-                // Create Mass Error tables and Ion Pair Frequency tables
-                var selectedMassErrors = new List<List<Probability<double>>>[_precursorCharge];
-                var decoySelectedMassErrors = new List<List<Probability<double>>>[_precursorCharge];
-                var selectedIonPairFrequencies = new List<List<Probability<IonPairFound>>>[_precursorCharge];
-                var decoySelectedIonPairFrequencies = new List<List<Probability<IonPairFound>>>[_precursorCharge];
-                var unselectedMassErrors = new List<List<Probability<double>>>[_precursorCharge];
-                var decoyUnselectedMassErrors = new List<List<Probability<double>>>[_precursorCharge];
-                var unselectedIonPairFrequencies = new List<List<Probability<IonPairFound>>>[_precursorCharge];
-                var decoyUnselectedIonPairFrequencies = new List<List<Probability<IonPairFound>>>[_precursorCharge];
-                for (int i = 0; i < _precursorCharge; i++)
+                // Smooth ranks
+                for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    var chargeMatches = matchList.GetCharge(i + 1);
-                    var decoyChargeMatches = decoyList.GetCharge(i + 1);
-                    // create tables for selected ions
-                    selectedMassErrors[i] = new List<List<Probability<double>>>();
-                    decoySelectedMassErrors[i] = new List<List<Probability<double>>>();
-                    selectedIonPairFrequencies[i] = new List<List<Probability<IonPairFound>>>();
-                    decoySelectedIonPairFrequencies[i] = new List<List<Probability<IonPairFound>>>();
-                    var selectedMassErrorTables = new MassErrorTable[selectedIons[i].Count];
-                    var decoySelectedMassErrorTables = new MassErrorTable[selectedIons[i].Count];
-                    for (var j = 0; j < selectedIons[i].Count; j++)
-                    {
-                        selectedMassErrorTables[j] = new MassErrorTable(new[] { selectedIons[i][j] }, _defaultTolerance,
-                                                        MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
-                        decoySelectedMassErrorTables[j] = new MassErrorTable(new[] { selectedIons[i][j] }, _defaultTolerance,
-                                                        MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
-                        selectedMassErrorTables[j].AddMatches(chargeMatches);
-                        decoySelectedMassErrorTables[j].AddMatches(decoyChargeMatches);
-                        selectedMassErrors[i].Add(selectedMassErrorTables[j].GetProbabilities().ToList());
-                        decoySelectedMassErrors[i].Add(decoySelectedMassErrorTables[j].GetProbabilities().ToList());
-                        selectedIonPairFrequencies[i].Add(selectedMassErrorTables[j].IonPairFrequency);
-                        decoySelectedIonPairFrequencies[i].Add(decoySelectedMassErrorTables[j].IonPairFrequency);
-                    }
-                    // create tables for unselected ions
-                    unselectedMassErrors[i] = new List<List<Probability<double>>>();
-                    decoyUnselectedMassErrors[i] = new List<List<Probability<double>>>();
-                    unselectedIonPairFrequencies[i] = new List<List<Probability<IonPairFound>>>();
-                    decoyUnselectedIonPairFrequencies[i] = new List<List<Probability<IonPairFound>>>();
-                    var unselectedMassErrorTables = new MassErrorTable[unselectedIons[i].Count];
-                    var decoyUnselectedMassErrorTables = new MassErrorTable[unselectedIons[i].Count];
-                    for (var j = 0; j < unselectedIons[i].Count; j++)
-                    {
-                        unselectedMassErrorTables[j] = new MassErrorTable(new[] { unselectedIons[i][j] }, _defaultTolerance,
-                                                        MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
-                        decoyUnselectedMassErrorTables[j] = new MassErrorTable(new[] { unselectedIons[i][j] }, _defaultTolerance,
-                                                        MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
-                        unselectedMassErrorTables[j].AddMatches(chargeMatches);
-                        decoyUnselectedMassErrorTables[j].AddMatches(decoyChargeMatches);
-                        unselectedMassErrors[i].Add(unselectedMassErrorTables[j].GetProbabilities().ToList());
-                        decoyUnselectedMassErrors[i].Add(decoyUnselectedMassErrorTables[j].GetProbabilities().ToList());
-                        unselectedIonPairFrequencies[i].Add(unselectedMassErrorTables[j].IonPairFrequency);
-                        decoyUnselectedIonPairFrequencies[i].Add(decoyUnselectedMassErrorTables[j].IonPairFrequency);
-                    }
-                }
-
-                // Initialize precursor filter
-                var precursorFilter = new PrecursorFilter(_precursorCharge, _defaultTolerance);
-                for (int j = 0; j < _precursorCharge; j++)
-                {
-                    precursorFilter.SetChargeOffsets(new PrecursorOffsets(offsetFrequencyTables[j], j + 1, _precursorOffsetThreshold));
-                }
-
-                // Calculate rank probabilities
-                for (int j = 0; j < _precursorCharge; j++)
-                {
-                    var chargeMatches = precursorFilter.FilterMatches(matchList.GetCharge(j+1));
-                    var decoyChargeMatches = precursorFilter.FilterMatches(decoyList.GetCharge(j + 1));
-                    rankTables[j].AddMatches(chargeMatches);
-                    decoyRankTables[j].AddMatches(decoyChargeMatches);
-                    
-                    // smooth ranks
-                    rankTables[j].Smooth(2, 10, 30);
-                    rankTables[j].Smooth(3, 30, 50);
-                    rankTables[j].Smooth(5, 50, 90);
-                    rankTables[j].Smooth(7, 90, 120);
-                    rankTables[j].Smooth(10, 120);
-                    decoyRankTables[j].Smooth(5, 10, 20);
-                    decoyRankTables[j].Smooth(3, 20, 40);
-                    decoyRankTables[j].Smooth(7, 40, 90);
-                    decoyRankTables[j].Smooth(10, 90, 120);
-                    decoyRankTables[j].Smooth(15, 120);
+                    rankTables[chargeIndex].Smooth(2, 10, 30);
+                    rankTables[chargeIndex].Smooth(3, 30, 50);
+                    rankTables[chargeIndex].Smooth(5, 50, 90);
+                    rankTables[chargeIndex].Smooth(7, 90, 120);
+                    rankTables[chargeIndex].Smooth(10, 120);
+                    decoyRankTables[chargeIndex].Smooth(5, 10, 20);
+                    decoyRankTables[chargeIndex].Smooth(3, 20, 40);
+                    decoyRankTables[chargeIndex].Smooth(7, 40, 90);
+                    decoyRankTables[chargeIndex].Smooth(10, 90, 120);
+                    decoyRankTables[chargeIndex].Smooth(15, 120);
                 }
 
                 // Write ion probability output files
                 if (_writeIonProbabilities)
                 {
-                    var outFile = _ionProbabilityOutFileName.Replace("@", name);
-                    for (int i = 0; i < _precursorCharge; i++)
+                    var outFile = _ionProbabilityOutFileName.Replace("@", dataSet);
+                    for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                     {
-                        string outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                        var ionProbabilities = ionFrequencyTables[i].GetProbabilities();
+                        string outFileName = outFile.Replace("*", (chargeIndex + 1).ToString(CultureInfo.InvariantCulture));
+                        var ionProbabilities = ionFrequencyTables[chargeIndex].GetProbabilities();
                         using (var finalOutputFile = new StreamWriter(outFileName))
                         {
                             finalOutputFile.WriteLine("Ion\tTarget");
@@ -242,40 +197,40 @@ namespace InformedProteomics.Test
                 // Write rank probability output files
                 if (_writeRankProbabilities)
                 {
-                    var outFileName = _rankProbabilityOutFileName.Replace("@", name);
+                    var outFileName = _rankProbabilityOutFileName.Replace("@", dataSet);
                     for (int charge = 0; charge < _precursorCharge; charge++)
                     {
                         var chargeOutFileName = outFileName.Replace("*",
                             (charge + 1).ToString(CultureInfo.InvariantCulture));
-                        WriteRankProbabilities(rankTables[charge], decoyRankTables[charge], 
-                                               selectedIons,
-                                               charge, rankTables[charge].TotalRanks,
-                                               chargeOutFileName);
+                        WriteRankProbabilities(rankTables[charge], decoyRankTables[charge],
+                                                selectedIons,
+                                                charge, rankTables[charge].TotalRanks,
+                                                chargeOutFileName);
                     }
                 }
 
-                // Write precursor offset probability output files
+                // write precursor offset probability output files
                 if (_writePrecursorOffsetProbabilities)
                 {
-                    var outFileName = _precursorOffsetProbabilityOutFileName.Replace("@", name);
+                    var outFileName = _precursorOffsetProbabilityOutFileName.Replace("@", dataSet);
                     for (int charge = 0; charge < _precursorCharge; charge++)
                     {
                         var chargeOutFileName = outFileName.Replace("*",
                             (charge + 1).ToString(CultureInfo.InvariantCulture));
                         using (var outFile = new StreamWriter(chargeOutFileName))
                         {
-                            for (int i = 0; i < offsetFrequencyTables[charge].Count; i++)
+                            for (int j = 0; j < offsetFrequencyTables[charge].Count; j++)
                             {
-                                outFile.WriteLine("Charge\t{0}", i+1);
-                                var offsetprob = offsetFrequencyTables[charge][i].GetProbabilities();
+                                outFile.WriteLine("Charge\t{0}", j + 1);
+                                var offsetprob = offsetFrequencyTables[charge][j].GetProbabilities();
                                 foreach (var prob in offsetprob)
                                 {
-                                    var integerOffset = Math.Round(prob.DataLabel * (1 / BinWidth)* (i+1));
+                                    var integerOffset = Math.Round(prob.DataLabel * (1 / BinWidth) * (j + 1));
                                     outFile.Write(integerOffset + "\t");
                                 }
                                 outFile.WriteLine();
                                 foreach (var prob in offsetprob)
-                                    outFile.Write(Math.Round(prob.Prob, 3)+"\t");
+                                    outFile.Write(Math.Round(prob.Prob, 3) + "\t");
                                 outFile.WriteLine();
                                 outFile.WriteLine();
                             }
@@ -286,74 +241,58 @@ namespace InformedProteomics.Test
                 // Write mass error probability output files
                 if (_writeMassErrorProbabilities)
                 {
-                    var outFileName = _massErrorProbabilityOutFileName.Replace("@", name);
-                    for (var charge = 0; charge < _precursorCharge; charge++)
+                    var outFileName = _massErrorProbabilityOutFileName.Replace("@", dataSet);
+                    for (var chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                     {
                         var chargeOutFileName = outFileName.Replace("*",
-                            (charge + 1).ToString(CultureInfo.InvariantCulture));
+                            (chargeIndex + 1).ToString(CultureInfo.InvariantCulture));
                         using (var outFile = new StreamWriter(chargeOutFileName))
                         {
                             outFile.Write("Error\t");
-                            foreach (var selectedIon in selectedIons[charge]) 
+                            foreach (var selectedIon in selectedIons[chargeIndex])
                                 outFile.Write("{0}\t{0}-De\t", selectedIon.Name);
                             outFile.Write("Unexplained\tUnexplained-De\tTotal");
                             outFile.WriteLine();
+
+                            var selectedMassErrors = new List<Probability<double>[]>();
+                            var dSelectedMassErrors = new List<Probability<double>[]>();
+                            var unselectedMassErrors = new List<Probability<double>[]>();
+                            var dUnselectedMassErrors = new List<Probability<double>[]>();
+                            for (int i = 0; i < _ionTypes.Count; i++)
+                            {
+                                if (selectedIons[chargeIndex].Contains(_ionTypes[i]))
+                                {
+                                    selectedMassErrors.Add(massErrorTables[chargeIndex, i].GetProbabilities());
+                                    dSelectedMassErrors.Add(dMassErrorTables[chargeIndex, i].GetProbabilities());
+                                }
+                                else
+                                {
+                                    unselectedMassErrors.Add(massErrorTables[chargeIndex, i].GetProbabilities());
+                                    dUnselectedMassErrors.Add(dMassErrorTables[chargeIndex, i].GetProbabilities());
+                                }
+                            }
                             int massErrorLength = 0;
-                            if (selectedMassErrors[charge].Count > 0)
-                                massErrorLength = selectedMassErrors[charge][0].Count;
+                            if (selectedMassErrors.Count > 0)
+                                massErrorLength = selectedMassErrors[0].Length;
                             for (var i = 0; i < massErrorLength; i++)
                             {
-                                outFile.Write(Math.Round(selectedMassErrors[charge][0][i].DataLabel, 3)+"\t");
-                                for (var j = 0; j < selectedIons[charge].Count; j++)
+                                outFile.Write(Math.Round(selectedMassErrors[0][i].DataLabel, 3) + "\t");
+                                for (var j = 0; j < selectedIons[chargeIndex].Count; j++)
                                 {
-                                    var prob = selectedMassErrors[charge][j][i].Found;
-                                    var decoyProb = decoySelectedMassErrors[charge][j][i].Found;
+                                    var prob = selectedMassErrors[j][i].Found;
+                                    var decoyProb = dSelectedMassErrors[j][i].Found;
                                     outFile.Write("{0}\t{1}\t", prob, decoyProb);
                                 }
                                 var probTotal = 0.0;
                                 var decoyProbTotal = 0.0;
-                                for (var j = 0; j < unselectedIons[charge].Count; j++)
+                                for (var j = 0; j < unselectedIons[chargeIndex].Count; j++)
                                 {
-                                    probTotal += unselectedMassErrors[charge][j][i].Found;
-                                    decoyProbTotal += decoyUnselectedMassErrors[charge][j][i].Found;
+                                    probTotal += unselectedMassErrors[j][i].Found;
+                                    decoyProbTotal += dUnselectedMassErrors[j][i].Found;
                                 }
                                 outFile.Write("{0}\t{1}\t{2}", Math.Round(probTotal / unselectedIons.Length, 2),
-                                                Math.Round(decoyProbTotal/unselectedIons.Length, 2),
-                                                selectedMassErrors[charge][0][1].Total);
-                                outFile.WriteLine();
-                            }
-                        }
-                    }
-                }
-
-                // Write ion pair probability table to output files
-                if (_writeIonPairProbabilities)
-                {
-                    var outFileName = _ionPairProbabilityOutFileName.Replace("@", name);
-                    for (var charge = 0; charge < _precursorCharge; charge++)
-                    {
-                        var chargeOutFileName = outFileName.Replace("*",
-                            (charge + 1).ToString(CultureInfo.InvariantCulture));
-                        using (var outFile = new StreamWriter(chargeOutFileName))
-                        {
-                            outFile.Write("Found\t");
-                            foreach (var selectedIon in selectedIons[charge]) outFile.Write(selectedIon.Name + "\t");
-                            outFile.Write("Unexplained");
-                            outFile.WriteLine();
-                            var probLength = selectedIonPairFrequencies[charge][0].Count;
-                            for (var i = 0; i < probLength; i++)
-                            {
-                                outFile.Write(selectedIonPairFrequencies[charge][0][i].DataLabel + "\t");
-                                for (var j = 0; j < selectedIons[charge].Count; j++)
-                                {
-                                    outFile.Write(Math.Round(selectedIonPairFrequencies[charge][j][i].Prob, 3) + "\t");
-                                }
-                                var probTotal = 0.0;
-                                for (var j = 0; j < unselectedIons[charge].Count; j++)
-                                {
-                                    probTotal += unselectedIonPairFrequencies[charge][j][i].Prob;
-                                }
-                                outFile.Write(Math.Round(probTotal / unselectedIons.Length, 3));
+                                                Math.Round(decoyProbTotal / unselectedIons.Length, 2),
+                                                selectedMassErrors[0][1].Total);
                                 outFile.WriteLine();
                             }
                         }
@@ -363,9 +302,9 @@ namespace InformedProteomics.Test
         }
 
         private void WriteRankProbabilities(RankTable targetRanks,
-                                            RankTable decoyRanks,
-                                            List<IonType>[] selectedIons, 
-                                            int charge, int totalRanks, string outFileCharge)
+                                        RankTable decoyRanks,
+                                        List<IonType>[] selectedIons,
+                                        int charge, int totalRanks, string outFileCharge)
         {
             var targetProb = targetRanks.GetProbabilities();
             var decoyProb = decoyRanks.GetProbabilities();
@@ -384,7 +323,7 @@ namespace InformedProteomics.Test
                 if (totalRanks < _maxRanks)
                     maxRanks = totalRanks;
 
-                for (int i = 0; i < maxRanks+1; i++)
+                for (int i = 0; i < maxRanks + 1; i++)
                 {
                     if (i == maxRanks)
                         outFile.Write("None" + "\t");
@@ -419,9 +358,10 @@ namespace InformedProteomics.Test
                                 Math.Round(decoyTotalUnselected / decoyUnselectedCount, 2),
                                 targetProb[i, 0].Total);
                     outFile.WriteLine();
-                 }
+                }
             }
         }
+
 
         // Read Configuration file
         private void InitTest(ConfigFileReader reader)
@@ -508,7 +448,7 @@ namespace InformedProteomics.Test
 
             // Read input and output file names
             var fileInfo = reader.GetNodes("fileinfo").First();
-            _names = fileInfo.Contents["name"].Split(',');
+            _dataSets = fileInfo.Contents["name"].Split(',');
             _preTsv = fileInfo.Contents["tsvpath"];
             _preRaw = fileInfo.Contents["rawpath"];
             var outPathtemp = fileInfo.Contents["outpath"];
@@ -529,10 +469,6 @@ namespace InformedProteomics.Test
             _writeMassErrorProbabilities = fileInfo.Contents.ContainsKey("masserrorprobabilityoutput");
             if (_writeMassErrorProbabilities)
                 _massErrorProbabilityOutFileName = _outPre + fileInfo.Contents["masserrorprobabilityoutput"];
-
-            _writeIonPairProbabilities = fileInfo.Contents.ContainsKey("ionpairprobabilityoutput");
-            if (_writeIonPairProbabilities)
-                _ionPairProbabilityOutFileName = _outPre + fileInfo.Contents["ionpairprobabilityoutput"];
         }
     }
 }
