@@ -53,7 +53,7 @@ namespace InformedProteomics.Test
         [Test]
         public void RankProbability()
         {
-            InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\BottomUp\RankPeakProbabilityConfig.ini"));
+            InitTest(new ConfigFileReader(@"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini"));
 
             foreach (var dataSet in _dataSets)
             {
@@ -118,9 +118,12 @@ namespace InformedProteomics.Test
                         var chargeMatches = matchList.GetCharge(chargeIndex + 1);
                         var dChargeMatches = decoyList.GetCharge(chargeIndex + 1);
 
+                        // Filter spectra
+                        var filteredSpectra = new SpectrumMatchList(_act, false, _precursorCharge);
+                        filteredSpectra.AddRange(chargeMatches);
+                        filteredSpectra.FilterSpectra(_windowWidth, _retentionCount);
                         // Calculate ion probabilities
-                        chargeMatches.FilterSpectra(_windowWidth, _retentionCount);
-                        ionFrequencyTables[chargeIndex].AddMatches(chargeMatches);
+                        ionFrequencyTables[chargeIndex].AddMatches(filteredSpectra);
 
                         // Calculate precursor offset probabilities
                         foreach (var offsetFrequencyTable in offsetFrequencyTables[chargeIndex])
@@ -141,11 +144,12 @@ namespace InformedProteomics.Test
                             chargeIndex + 1,
                             _precursorOffsetThreshold));
 
+                        // Filter precursor peaks
+                        var precfilteredMatches = precursorFilter.FilterMatches(chargeMatches);
+                        var dPrecFilteredMatches = precursorFilter.FilterMatches(dChargeMatches);
                         // Calculate rank probabilities
-                        var filteredMatches = precursorFilter.FilterMatches(chargeMatches);
-                        var dFilteredMatches = precursorFilter.FilterMatches(dChargeMatches);
-                        rankTables[chargeIndex].AddMatches(filteredMatches);
-                        decoyRankTables[chargeIndex].AddMatches(dFilteredMatches);
+                        rankTables[chargeIndex].AddMatches(precfilteredMatches);
+                        decoyRankTables[chargeIndex].AddMatches(dPrecFilteredMatches);
                     }
                 }
 
