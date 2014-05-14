@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -33,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Decoy = useDecoy;
             Act = act;
             MaxCharge = maxCharge;
-            AddMatchesFromFile(lcms, tsvFile);
+            AddMatchesFromTsvFile(lcms, tsvFile);
         }
 
         public SpectrumMatchList(ActivationMethod act, bool useDecoy=false, int maxCharge=0)
@@ -43,7 +44,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Act = act;
         }
 
-        public void AddMatchesFromFile(LcMsRun lcms, TsvFileParser tsvFile)
+        public void AddMatchesFromTsvFile(LcMsRun lcms, TsvFileParser tsvFile)
         {
             var precursorCharges = tsvFile.GetData(PrecursorChargeHeader);
             var scans = tsvFile.GetData(ScanHeader);
@@ -99,6 +100,74 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     Add((formulas != null && formulas[i] != null)
                         ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i], Decoy)
                         : new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, Decoy));
+                }
+            }
+        }
+
+        private enum MgfState { Label, Parameter, Peak };
+        public void AddMatchesFromMgfFile(string fileName)
+        {
+            var file = File.ReadLines(fileName);
+            var mgfState = MgfState.Label;
+
+            string title="", sequence="";
+            int scanNum=0, charge=0;
+            var peaks = new List<Peak>();
+
+            foreach (var line in file)
+            {
+                switch (mgfState)
+                {
+                    case MgfState.Label:
+                        if (line == "BEGIN IONS") mgfState = MgfState.Parameter;
+                        else throw new FormatException("Invalid MGF file.");
+                        break;
+                    case MgfState.Parameter:
+                        var parameter = line.Split('=');
+                        if (parameter.Length < 2) throw new FormatException("Invalid line in MGF file: "+line);
+                        if (parameter[0] == "TITLE") title = parameter[1];
+                        else if (parameter[0] == "SEQ") sequence = parameter[1];
+                        else if (parameter[0] == "SCANS") scanNum = Convert.ToInt32(parameter[1]);
+                        else if (parameter[0] == "CHARGE")
+                        {
+                            var chargeStr = parameter[1].Substring(0, parameter[1].Length - 1);
+                            charge = Convert.ToInt32(chargeStr);
+                            mgfState = MgfState.Peak;
+                            if (title == "" || sequence == "" || scanNum == 0 || charge == 0)
+                                throw new FormatException("Incomplete spectrum entry.");
+                        }
+                        break;
+                    case MgfState.Peak:
+                        if (line == "END IONS")
+                        {
+                            if (peaks.Count == 0) throw new FormatException("Empty peak list.");
+                            mgfState = MgfState.Label;
+                            if (sequence.Contains('(') || charge > MaxCharge)
+                            {
+                                title = "";
+                                sequence = "";
+                                scanNum = 0;
+                                charge = 0;
+                                continue;
+                            }
+                            var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
+                            var specMatch = new SpectrumMatch(sequence, spectrum, scanNum, charge);
+                            title = "";
+                            sequence = "";
+                            scanNum = 0;
+                            charge = 0;
+                            Add(specMatch);
+                            peaks.Clear();
+                        }
+                        else
+                        {
+                            var parts = line.Split('\t');
+                            if (parts.Length < 2) throw new FormatException("Invalid line in MGF file: " + line);
+                            var mz = Convert.ToDouble(parts[0]);
+                            var intensity = Convert.ToDouble(parts[1]);
+                            peaks.Add(new Peak(mz, intensity));
+                        }
+                        break;
                 }
             }
         }

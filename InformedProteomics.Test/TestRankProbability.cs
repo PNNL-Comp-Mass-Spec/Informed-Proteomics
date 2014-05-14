@@ -16,8 +16,9 @@ namespace InformedProteomics.Test
     {
         private string[] _dataSets;
         private string _preTsv;
-        private string _preRaw;
+        private string _preData;
         private string _outPre;
+        private string _dataFormat;
         private int _maxRanks;
         private double _relativeIntensityThreshold;
 
@@ -40,7 +41,10 @@ namespace InformedProteomics.Test
         private int _precursorCharge;
         private const double BinWidth = 1.005;
 
-        private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Th);
+        private readonly Tolerance _defaultTolerancePpm = new Tolerance(10, ToleranceUnit.Ppm);
+        private readonly Tolerance _defaultToleranceTh = new Tolerance(0.5, ToleranceUnit.Th);
+        private Tolerance _tolerance;
+        private readonly Tolerance _massErrorTolerance = new Tolerance(0.5, ToleranceUnit.Th);
 
         private int _retentionCount;
         private double _windowWidth;
@@ -57,13 +61,25 @@ namespace InformedProteomics.Test
 
             foreach (var dataSet in _dataSets)
             {
-                // Read directory
                 var tsvName = _preTsv.Replace("@", dataSet);
-                var rawName = _preRaw.Replace("@", dataSet);
-                var txtFiles = Directory.GetFiles(tsvName).ToList();
-                var rawFilesTemp = Directory.GetFiles(rawName).ToList();
-                var rawFiles = rawFilesTemp.Where(rawFile => Path.GetExtension(rawFile) == ".raw").ToList();
-                Assert.True(rawFiles.Count == txtFiles.Count);
+                var rawName = _preData.Replace("@", dataSet);
+                var txtFiles = new List<string>();
+                var dataFiles = new List<string>();
+
+                if (_dataFormat == "raw")
+                {
+                    // Read directory
+                    var txtFilesTemp = Directory.GetFiles(tsvName).ToList();
+                    txtFiles = txtFilesTemp.Where(txtFile => Path.GetExtension(txtFile) == ".tsv").ToList();
+                    var dataFilesTemp = Directory.GetFiles(rawName).ToList();
+                    dataFiles =
+                        dataFilesTemp.Where(dataFile => Path.GetExtension(dataFile) == "." + _dataFormat).ToList();
+                    Assert.True(dataFiles.Count == txtFiles.Count);
+                }
+                else
+                {
+                    dataFiles.Add(_preData+dataSet+"."+_dataFormat);
+                }
 
                 // Initialize ion lists
                 var selectedIons = new List<IonType>[_precursorCharge];
@@ -83,9 +99,9 @@ namespace InformedProteomics.Test
                 var dMassErrorTables = new MassErrorTable[_precursorCharge, _ionTypes.Count];
                 for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    rankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
-                    decoyRankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _defaultTolerance, _maxRanks);
-                    ionFrequencyTables[chargeIndex] = new ProductIonFrequencyTable(_ionTypes, _defaultTolerance,
+                    rankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _tolerance, _maxRanks);
+                    decoyRankTables[chargeIndex] = new RankTable(_ionTypes.ToArray(), _tolerance, _maxRanks);
+                    ionFrequencyTables[chargeIndex] = new ProductIonFrequencyTable(_ionTypes, _tolerance,
                         _relativeIntensityThreshold);
                     offsetFrequencyTables[chargeIndex] = new List<PrecursorOffsetFrequencyTable>();
                     for (int j = 1; j <= (chargeIndex + 1); j++)
@@ -94,23 +110,33 @@ namespace InformedProteomics.Test
                     }
                     for (int j = 0; j < _ionTypes.Count; j++)
                     {
-                        massErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _defaultTolerance,
+                        massErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _massErrorTolerance,
                                                                              MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
-                        dMassErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _defaultTolerance,
+                        dMassErrorTables[chargeIndex, j] = new MassErrorTable(new[] { _ionTypes[j] }, _massErrorTolerance,
                                                         MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
                     }
                 }
 
                 // Read files
-                for (int i = 0; i < txtFiles.Count; i++)
+                for (int i = 0; i < dataFiles.Count; i++)
                 {
                     var matchList = new SpectrumMatchList(_act, false, _precursorCharge);
                     var decoyList = new SpectrumMatchList(_act, true, _precursorCharge);
-                    string textFile = txtFiles[i];
-                    string rawFile = rawFiles[i];
-                    Console.WriteLine("{0}\t{1}", textFile, rawFile);
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
-                    matchList.AddMatchesFromFile(lcms, new TsvFileParser(txtFiles[i]));
+
+                    if (_dataFormat == "raw")
+                    {
+                        string textFile = txtFiles[i];
+                        string rawFile = dataFiles[i];
+                        Console.WriteLine("{0}\t{1}", textFile, rawFile);
+                        var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
+                        matchList.AddMatchesFromTsvFile(lcms, new TsvFileParser(txtFiles[i]));
+                    }
+                    else
+                    {
+                        Console.WriteLine(dataSet+"."+_dataFormat);
+                        matchList.AddMatchesFromMgfFile(dataFiles[i]);
+                    }
+
                     decoyList.AddMatches(matchList);
 
                     for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
@@ -139,7 +165,7 @@ namespace InformedProteomics.Test
                         }
 
                         // Initialize precursor filter
-                        var precursorFilter = new PrecursorFilter(_precursorCharge, _defaultTolerance);
+                        var precursorFilter = new PrecursorFilter(_precursorCharge, _tolerance);
                         precursorFilter.SetChargeOffsets(new PrecursorOffsets(offsetFrequencyTables[chargeIndex],
                             chargeIndex + 1,
                             _precursorOffsetThreshold));
@@ -186,6 +212,8 @@ namespace InformedProteomics.Test
                     for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                     {
                         string outFileName = outFile.Replace("*", (chargeIndex + 1).ToString(CultureInfo.InvariantCulture));
+                        var file = new FileInfo(outFileName);
+                        file.Directory.Create();
                         var ionProbabilities = ionFrequencyTables[chargeIndex].GetProbabilities();
                         using (var finalOutputFile = new StreamWriter(outFileName))
                         {
@@ -206,6 +234,8 @@ namespace InformedProteomics.Test
                     {
                         var chargeOutFileName = outFileName.Replace("*",
                             (charge + 1).ToString(CultureInfo.InvariantCulture));
+                        var file = new FileInfo(chargeOutFileName);
+                        file.Directory.Create();
                         WriteRankProbabilities(rankTables[charge], decoyRankTables[charge],
                                                 selectedIons,
                                                 charge, rankTables[charge].TotalRanks,
@@ -221,6 +251,8 @@ namespace InformedProteomics.Test
                     {
                         var chargeOutFileName = outFileName.Replace("*",
                             (charge + 1).ToString(CultureInfo.InvariantCulture));
+                        var file = new FileInfo(chargeOutFileName);
+                        file.Directory.Create();
                         using (var outFile = new StreamWriter(chargeOutFileName))
                         {
                             for (int j = 0; j < offsetFrequencyTables[charge].Count; j++)
@@ -250,6 +282,8 @@ namespace InformedProteomics.Test
                     {
                         var chargeOutFileName = outFileName.Replace("*",
                             (chargeIndex + 1).ToString(CultureInfo.InvariantCulture));
+                        var file = new FileInfo(chargeOutFileName);
+                        file.Directory.Create();
                         using (var outFile = new StreamWriter(chargeOutFileName))
                         {
                             outFile.Write("Error\t");
@@ -383,12 +417,15 @@ namespace InformedProteomics.Test
             {
                 case "hcd":
                     _act = ActivationMethod.HCD;
+                    _tolerance = _defaultTolerancePpm;
                     break;
                 case "cid":
                     _act = ActivationMethod.CID;
+                    _tolerance = _defaultToleranceTh;
                     break;
                 case "etd":
                     _act = ActivationMethod.ETD;
+                    _tolerance = _defaultTolerancePpm;
                     break;
             }
 
@@ -453,8 +490,9 @@ namespace InformedProteomics.Test
             // Read input and output file names
             var fileInfo = reader.GetNodes("fileinfo").First();
             _dataSets = fileInfo.Contents["name"].Split(',');
+            _dataFormat = fileInfo.Contents["format"];
             _preTsv = fileInfo.Contents["tsvpath"];
-            _preRaw = fileInfo.Contents["rawpath"];
+            _preData = fileInfo.Contents["datapath"];
             var outPathtemp = fileInfo.Contents["outpath"];
             _outPre = outPathtemp;
 

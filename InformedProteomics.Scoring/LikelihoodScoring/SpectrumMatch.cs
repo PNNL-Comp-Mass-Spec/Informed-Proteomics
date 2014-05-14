@@ -41,7 +41,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             Decoy = decoy;
-            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
+            var sequenceReader = new SequenceReader();
+            Sequence = sequenceReader.GetSequence(peptide);
             if (decoy) Sequence = DecoySequence;
         }
 
@@ -52,7 +53,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             Decoy = decoy;
-            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(peptide);
+            var sequenceReader = new SequenceReader();
+            Sequence = sequenceReader.GetSequence(peptide);
             if (decoy) Sequence = DecoySequence;
             else
             {

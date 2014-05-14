@@ -68,6 +68,8 @@
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
     <Compile Include="LikelihoodScoring\I1DProbabilityTable.cs" />
     <Compile Include="LikelihoodScoring\I2DProbabilityTable.cs" />
+    <Compile Include="LikelihoodScoring\ISequenceReader.cs" />
+    <Compile Include="LikelihoodScoring\MgfSequenceReader.cs" />
     <Compile Include="LikelihoodScoring\ProductIonFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\ConfigFileReader.cs" />
     <Compile Include="LikelihoodScoring\FitScore.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="LikelihoodScoring\RankProbability.cs" />
     <Compile Include="LikelihoodScoring\RankTable.cs" />
     <Compile Include="LikelihoodScoring\ScoreTable.cs" />
+    <Compile Include="LikelihoodScoring\SequenceReader.cs" />
     <Compile Include="LikelihoodScoring\SpectrumFilter.cs" />
     <Compile Include="LikelihoodScoring\SpectrumMatch.cs" />
     <Compile Include="GeneratingFunction\ScoreDistribution.cs" />
