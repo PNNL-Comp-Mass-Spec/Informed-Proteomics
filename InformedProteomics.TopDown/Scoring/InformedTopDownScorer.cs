@@ -7,9 +7,9 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class InformedScorer
+    public class InformedTopDownScorer
     {
-        public InformedScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7)
+        public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7)
         {
             Run = run;
             AminoAcidSet = aaSet;
@@ -26,15 +26,15 @@ namespace InformedProteomics.TopDown.Scoring
         public Tolerance Tolerance { get; private set; }
         public double Ms2CorrThreshold { get; private set; }
 
-        public IcScores GetScores(string seqStr, Composition composition, int charge, int ms2ScanNum)
+        public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
             var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             if (spec == null) return null;
 
-            var annotation = "_." + seqStr + "._";
+            //var annotation = "_." + seqStr + "._";
             var scorer = new CorrMatchedPeakCounter(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge), Ms2CorrThreshold);
 
-            var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
+            var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
             if (seqGraph == null)
             {
                 return null;

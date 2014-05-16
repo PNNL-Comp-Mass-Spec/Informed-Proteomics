@@ -53,7 +53,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             sw.Start();
-            var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
+            var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
 
             var seqCompositionArr = seqGraph.GetSequenceCompositions();
             Console.WriteLine("Length: {0}\tNumCompositions: {1}", protAnnotation.Length - 4, seqCompositionArr.Length);
@@ -171,7 +171,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             sw.Start();
-            var precursorFilter = new PrecursorFilter(run, precursorIonTolerance);
+            var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
 
             var seqCompositionArr = seqGraph.GetSequenceCompositions();
             Console.WriteLine("Length: {0}\tNumCompositions: {1}", protAnnotation.Length - 4, seqCompositionArr.Length);

@@ -91,6 +91,11 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public const string StandardAminoAcidCharacters = "ACDEFGHIKLMNPQRSTVWY";
 
+        public static bool IsStandardAminoAcidResidue(char residue)
+        {
+            return StandardAminoAcidCharacters.IndexOf(residue) >= 0;
+        }
+
         #endregion
 
         # region Private Static Members

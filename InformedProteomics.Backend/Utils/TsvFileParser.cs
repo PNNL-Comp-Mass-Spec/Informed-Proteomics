@@ -69,6 +69,33 @@ namespace InformedProteomics.Backend.Utils
             return peptideSet;
         }
 
+        public ISet<string> GetPeptidesAboveQValueThreshold(double qValueThreshold)
+        {
+            var peptideColumnIndex = -1;
+            var pepQValueColumnIndex = -1;
+            var proteinColumnIndex = -1;
+
+            for (var i = 0; i < _header.Length; i++)
+            {
+                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence")) peptideColumnIndex = i;
+                if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName")) proteinColumnIndex = i;
+                if (_header[i].Equals("QValue")) pepQValueColumnIndex = i;
+            }
+
+            var peptideSet = new HashSet<string>();
+            if (pepQValueColumnIndex < 0 || peptideColumnIndex < 0 || proteinColumnIndex < 0) return null;
+
+            var peptides = _data[_header[peptideColumnIndex]];
+            var proteins = _data[_header[proteinColumnIndex]];
+            var pepQValues = _data[_header[pepQValueColumnIndex]];
+            for (var i = 0; i < pepQValues.Count; i++)
+            {
+                var pepQValue = Convert.ToDouble(pepQValues[i]);
+                if (pepQValue <= qValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
+            }
+            return peptideSet;
+        }
+
         private string[] _header;
         private string[] _rows;
         private Dictionary<string, List<string>> _data;

@@ -218,7 +218,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
-        private static readonly MzComparerWithPpmTolerance MzComparer = new MzComparerWithPpmTolerance(5);
+        private static readonly MzComparerWithTolerance MzComparer = new MzComparerWithTolerance(5);
         public Spectrum GetSummedMs1Spectrum(int scanNum, int numMs1ScansAround = 2)
         {
             if (scanNum < MinLcScan || scanNum > MaxLcScan) return null;

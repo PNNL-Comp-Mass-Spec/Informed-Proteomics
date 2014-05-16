@@ -73,7 +73,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
-            const string sequence = "ANATVKMGSDSGALVFEPSTVTIKAGEEVKWVNNKLSPHNIVFAADGVDADTAAKLSHKGLAFAAGESFTSTFTEPGTYTYYCEPHRGAGMVGKVVVE";
+            const string sequence = "NCVISFPQTKFLPLSLEFNACLAEYLTPDNSPILFGCRTGLCGTCLVKVVGEILSPEAEEREILAILAPDDVQARLACQIKLTGDIAIRAYQSDEI";
             //const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
@@ -363,8 +363,11 @@ namespace InformedProteomics.Test
             //const char delimiter = (char)FastaDatabase.Delimiter;
             //Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
             //Console.WriteLine(Regex.IsMatch(protAnnotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$"));
-            const string s = "H(12)";
-            Console.WriteLine(Regex.IsMatch(s, @"^\d*[a-zA-Z]+$"));
+            //const string s = "H(12)";
+            //Console.WriteLine(Regex.IsMatch(s, @"^\d*[a-zA-Z]+$"));
+            //const string plaincompositionStr = "H(12) C(4) 13C(3) N 15N O asdf1";
+            const string plaincompositionStr = "H(12)";
+            Console.WriteLine(Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?\d*)+$"));
         }
 
         [Test]

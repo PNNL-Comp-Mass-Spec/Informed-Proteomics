@@ -13,8 +13,8 @@ namespace InformedProteomics.TopDown.Scoring
     {
         public Ms1IsotopeAndChargeCorrFilter(
             LcMsRun run,
+            Tolerance tolerance,
             int minCharge = 3, int maxCharge = 30,
-            double ppmTolerance = 10,
             double minMass = 3000.0,
             double maxMass = 50000.0,
             double isotopeCorrThreshold = 0.7,
@@ -29,8 +29,8 @@ namespace InformedProteomics.TopDown.Scoring
             _chargeCorrThresholdThreshold = chargeCorrThreshold;
             _mostAbundantPlusOneIsotopeCorrThreshold = mostAbundantPlusOneIsotopeCorrThreshold;
             MaxNumPeaksToConsider = maxNumPeaksToConsider;
-            _tolerance = new Tolerance(ppmTolerance);
-            _comparer = new MzComparerWithPpmTolerance(ppmTolerance);
+            _tolerance = tolerance;
+            _comparer = new MzComparerWithTolerance(tolerance);
             _lcMsMatchMap = new LcMsMatchMap();
             PrecomputePossibleSequenceMasses();
             _lcMsMatchMap.CreateSequenceMassToMs2ScansMap(_run, _tolerance, minMass, maxMass);
@@ -47,7 +47,7 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _minCharge;
         private readonly int _maxCharge;
         private readonly Tolerance _tolerance;
-        private readonly MzComparerWithPpmTolerance _comparer;
+        private readonly MzComparerWithTolerance _comparer;
         private readonly double _chargeCorrThresholdThreshold;
         private readonly double _isotopeCorrThresholdThreshold;
         private readonly double _mostAbundantPlusOneIsotopeCorrThreshold;
@@ -151,16 +151,27 @@ namespace InformedProteomics.TopDown.Scoring
                 var isotopeCorr = Math.Max(precursorIsotopeCorr, nextMs1IsotopeCorr);
                 if (isotopeCorr < _isotopeCorrThresholdThreshold) continue;
 
-                var mzChargePlusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge + 1, approxMostAbundantIsotopeIndex);
-                var xicPlusOneCharge = _run.GetExtractedIonChromatogram(mzChargePlusOne, _tolerance, scanNum);
-                var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
+                if (_chargeCorrThresholdThreshold > 0.0)
+                {
+                    var mzChargePlusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge + 1, approxMostAbundantIsotopeIndex);
+                    var xicPlusOneCharge = _run.GetExtractedIonChromatogram(mzChargePlusOne, _tolerance, scanNum);
+                    var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
 
-                var mzChargeMinusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge - 1, approxMostAbundantIsotopeIndex);
-                var xicMinusOneCharge = _run.GetExtractedIonChromatogram(mzChargeMinusOne, _tolerance, scanNum);
-                var corrMinusOneCharge = xicMinusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicMinusOneCharge) : 0;
+                    double corrMinusOneCharge;
+                    if (charge > 1)
+                    {
+                        var mzChargeMinusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge - 1, approxMostAbundantIsotopeIndex);
+                        var xicMinusOneCharge = _run.GetExtractedIonChromatogram(mzChargeMinusOne, _tolerance, scanNum);
+                        corrMinusOneCharge = xicMinusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicMinusOneCharge) : 0;
+                    }
+                    else
+                    {
+                        corrMinusOneCharge = 0.0;
+                    }
 
-                var chargeCorr = Math.Max(corrPlusOneCharge, corrMinusOneCharge);
-                if (chargeCorr < _chargeCorrThresholdThreshold) continue;                    
+                    var chargeCorr = Math.Max(corrPlusOneCharge, corrMinusOneCharge);
+                    if (chargeCorr < _chargeCorrThresholdThreshold) continue;                               
+                }
 
                 _lcMsMatchMap.SetMatches(monoIsotopicMass, xicThisPeak[0].ScanNum, xicThisPeak[xicThisPeak.Count-1].ScanNum);
             }

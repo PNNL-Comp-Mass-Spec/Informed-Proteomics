@@ -34,7 +34,7 @@ namespace InformedProteomics.Test
             var tolerance = new Tolerance(tolerancePpm);
             sw.Reset();
             sw.Start();
-            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.7, 0.7, 0.7, 40);
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10.0), minPrecursorCharge, maxPrecursorCharge, 3000, 50000, 0.7, 0.7, 0.7, 40);
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
@@ -158,7 +158,7 @@ namespace InformedProteomics.Test
             //    0, 0,
             //    600.0, 1800.0, new Tolerance(tolerancePpm), null);
             //ms1BasedFilter.CachePrecursorMatchesBinCentric();
-            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 10, 3000, 50000, 0.5, 0.5, 0.5, 40);
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10.0), minPrecursorCharge, maxPrecursorCharge, 3000, 50000, 0.5, 0.5, 0.5, 40);
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
@@ -292,53 +292,6 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestDeconvolutionMs2()
-        {
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var numSpecs = 0;
-            var numPeaks = 0;
-            //foreach (var ms2ScanNum in run.GetScanNumbers(2))
-            var ms2ScanNum = 1575;
-            {
-                var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                //if (spec == null) continue;
-                var deconvolutedSpec = ProductScorerBasedOnDeconvolutedSpectra.GetDeconvolutedSpectrum(spec, 2, 10, new Tolerance(10), 0.7) as ProductSpectrum;
-                if (deconvolutedSpec != null)
-                {
-                    deconvolutedSpec.Display();
-                    var nPeaks = deconvolutedSpec.Peaks.Length;
-                    //Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
-                    ++numSpecs;
-                    numPeaks += nPeaks;
-                    var hist = new Dictionary<double, int>();
-                    for (var i = 0; i < nPeaks - 1; i++)
-                    {
-                        for (var j = i + 1; j < nPeaks; j++)
-                        {
-                            var sum = deconvolutedSpec.Peaks[i].Mz + deconvolutedSpec.Peaks[j].Mz;
-                            var rounded = BitConverter.Int64BitsToDouble((BitConverter.DoubleToInt64Bits(sum) >> 37) << 37);
-                            int num;
-                            if (hist.TryGetValue(rounded, out num)) hist[rounded] = num + 1;
-                            else hist[rounded] = 1;
-                        }
-                    }
-                    Console.WriteLine("{0}\t{1}", ms2ScanNum, nPeaks);
-                    foreach (var entry in hist.OrderByDescending(e => e.Value))
-                    {
-                        var mass = entry.Key;
-                        var charge = (int)Math.Round(mass / spec.IsolationWindow.IsolationWindowTargetMz);
-                        if (spec.IsolationWindow.Contains(Ion.GetIsotopeMz(mass, charge, Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex)))
-                        {
-                            Console.WriteLine("{0}\t{1}\t{2}", entry.Key, entry.Value, charge);
-                        }
-                    }
-                }
-            }
-            Console.WriteLine("NumPeaks: {0:f2} {1}/{2}", numPeaks / (double)numSpecs, numPeaks, numSpecs);
-        }
-
-        [Test]
         public void TestPossibleSequenceMasses()
         {
             //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
@@ -349,7 +302,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, 3, 30, 15, 0.7, 1000);
-            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run);
+            var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10));
             
             //var masses = ms1BasedFilter.GetPossibleSequenceMasses(1113);
 
@@ -453,43 +406,6 @@ namespace InformedProteomics.Test
             //{
             //    Console.WriteLine("{0:f1}\t{1}", i / 10.0, hist[i]);
             //}
-        }
-
-        [Test]
-        public void TestMs1Caching()
-        {
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            var ms1BasedFilter = new Ms1IsotopeCorrFilter(run);
-            var testComposition = Composition.Parse("C(331) H(508) N(88) O(100) S(0)");
-            Console.WriteLine("Mass: {0}", testComposition.Mass);
-            foreach (var ms2ScanNum in ms1BasedFilter.GetMatchingMs2ScanNums(testComposition.Mass))
-            {
-                Console.WriteLine(ms2ScanNum);
-            }
-            sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-        }
-
-        [Test]
-        public void TestDeconvolution()
-        {
-            const int minProductIonCharge = 1; 
-            const int maxProductIonCharge = 10;
-            var productIonTolerance = new Tolerance(10);
-
-            const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            //var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 0, 0);
-
-            var spec = run.GetSpectrum(2313);
-
-            var deconvolutedSpectrum = ProductScorerBasedOnDeconvolutedSpectra.GetDeconvolutedSpectrum(spec, minProductIonCharge, maxProductIonCharge, productIonTolerance, 0.2);
-            deconvolutedSpectrum.Display();
         }
 
         [Test]

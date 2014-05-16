@@ -15,11 +15,11 @@ namespace InformedProteomics.TopDown.Execution
             , int minProductIonCharge = 1, int maxProductIonCharge = 10)
         {
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            _scorer = new InformedScorer(run, new AminoAcidSet(), minProductIonCharge, maxProductIonCharge, tolerance, ms2CorrThreshold);
+            _topDownScorer = new InformedTopDownScorer(run, new AminoAcidSet(), minProductIonCharge, maxProductIonCharge, tolerance, ms2CorrThreshold);
             Rescore(msAlignFilePath, outputFilePath);
         }
 
-        private readonly InformedScorer _scorer;
+        private readonly InformedTopDownScorer _topDownScorer;
 
         private void Rescore(string msAlignFilePath, string outputFilePath)
         {
@@ -50,7 +50,7 @@ namespace InformedProteomics.TopDown.Execution
                     var charge = charges[i];
                     var scanNum = scanNums[i];
 
-                    var scores = _scorer.GetScores(seqStr, composition, charge, scanNum);
+                    var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
                     if (scores == null) continue;
 
                     writer.WriteLine("{0}\t{1}", row, scores);

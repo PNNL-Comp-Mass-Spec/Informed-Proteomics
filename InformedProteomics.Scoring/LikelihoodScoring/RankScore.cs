@@ -8,14 +8,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     public class RankScore
     {
-        private RankTable _trainingSet;
-        private RankTable _decoySet;
-        public RankScore(RankTable trainingSet, RankTable decoySet)
-        {
-            _trainingSet = trainingSet;
-            _decoySet = decoySet;
-        }
-
         public RankScore(string fileName, int maxCharge=2)
         {
             ReadTrainingSetFromFile(fileName, maxCharge);
@@ -27,6 +19,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             var decoyRank = _decoySet.GetRank(rankNum);
             var prob = rank.IonFrequencies[ionType];
             var decoyProb = decoyRank.IonFrequencies[ionType];
+
+            //if (prob == 0) Console.WriteLine("*** Target: {0} {1}", ionType.Name, rankNum);
+            //if (decoyProb == 0) Console.WriteLine("*** Decoy: {0} {1}", ionType.Name, rankNum);
+            if (Math.Abs(prob) < 1e-10 || Math.Abs(decoyProb) < 1e-10) return 0;
             return (Math.Log(prob) - Math.Log(decoyProb));
         }
 
@@ -35,7 +31,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             get { return _trainingSet.GetBinEdges(); }
         }
 
-        public void ReadTrainingSetFromFile(string fileName, int maxCharge)
+        private void ReadTrainingSetFromFile(string fileName, int maxCharge)
         {
             var ionTypeFactory = new IonTypeFactory(maxCharge);
             var parser = new TsvFileParser(fileName);
@@ -49,7 +45,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             var rankProbabilities = new List<RankProbability>();
             var decoyRankProbabilities = new List<RankProbability>();
-            for (int i = 0; i < totalRanks; i++)
+            for (var i = 0; i < totalRanks; i++)
             {
                 var rankProb = new RankProbability(ionTypes);
                 var decoyRankProb = new RankProbability(ionTypes);
@@ -77,5 +73,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _trainingSet = rankTable;
             _decoySet = decoyRankTable;
         }
+
+        private RankTable _trainingSet;
+        private RankTable _decoySet;
     }
 }

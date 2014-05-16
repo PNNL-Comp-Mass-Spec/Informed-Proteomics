@@ -64,11 +64,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
     /// </summary>
-    public class MzComparerWithPpmTolerance : IComparer<Peak>, IEqualityComparer<Peak>
+    public class MzComparerWithTolerance : IComparer<Peak>, IEqualityComparer<Peak>
     {
-        public MzComparerWithPpmTolerance(double ppmTolerance)
+        public MzComparerWithTolerance(Tolerance tolerance)
         {
-            _ppmTolerance = ppmTolerance;
+            if (tolerance.GetUnit() == ToleranceUnit.Ppm)
+            {
+                _equalityComparer = new MzComparerWithPpmTolerance(tolerance.GetValue());
+            }
+            else if (tolerance.GetUnit() == ToleranceUnit.Th)
+            {
+                _equalityComparer = new MzComparerWithToleranceMz(tolerance.GetValue());
+            }
+            else throw new NotSupportedException("The tolerance unite must be ppm or Th.");
+        }
+
+        public MzComparerWithTolerance(double ppmTolerance): this(new Tolerance(ppmTolerance))
+        {
         }
 
         public int Compare(Peak x, Peak y)
@@ -79,7 +91,30 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public bool Equals(Peak x, Peak y)
         {
-            return Math.Abs((x.Mz - y.Mz)/x.Mz*1E6) <= _ppmTolerance;
+            return _equalityComparer.Equals(x, y);
+        }
+
+        public int GetHashCode(Peak p)
+        {
+            return p.Mz.GetHashCode();
+        }
+
+        private readonly IEqualityComparer<Peak> _equalityComparer;
+    }
+
+    /// <summary>
+    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
+    /// </summary>
+    public class MzComparerWithPpmTolerance : IEqualityComparer<Peak>
+    {
+        public MzComparerWithPpmTolerance(double ppmTolerance)
+        {
+            _ppmTolerance = ppmTolerance;
+        }
+
+        public bool Equals(Peak x, Peak y)
+        {
+            return Math.Abs((x.Mz - y.Mz) / x.Mz * 1E6) <= _ppmTolerance;
         }
 
         public int GetHashCode(Peak p)
@@ -90,4 +125,26 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double _ppmTolerance;
     }
 
+    /// <summary>
+    /// Compare by m/z. Two peaks within toleranceTh Th are considered to be equal.
+    /// </summary>
+    public class MzComparerWithToleranceMz : IEqualityComparer<Peak>
+    {
+        public MzComparerWithToleranceMz(double toleranceTh)
+        {
+            _toleranceTh = toleranceTh;
+        }
+
+        public bool Equals(Peak x, Peak y)
+        {
+            return Math.Abs((x.Mz - y.Mz)) <= _toleranceTh;
+        }
+
+        public int GetHashCode(Peak p)
+        {
+            return p.Mz.GetHashCode();
+        }
+
+        private readonly double _toleranceTh;
+    }
 }

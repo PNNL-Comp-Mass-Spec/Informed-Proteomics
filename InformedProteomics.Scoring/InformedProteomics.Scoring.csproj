@@ -64,7 +64,7 @@
   <ItemGroup>
     <Compile Include="BottomUp\Partition.cs" />
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
-    <Compile Include="BottomUp\RankScorer.cs" />
+    <Compile Include="BottomUp\ScoredSpectrum.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
     <Compile Include="LikelihoodScoring\I1DProbabilityTable.cs" />
     <Compile Include="LikelihoodScoring\I2DProbabilityTable.cs" />

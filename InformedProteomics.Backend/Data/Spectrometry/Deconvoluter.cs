@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var windowSpectrum = new Spectrum(window, spec.ScanNum);
                 var peakMz = peak.Mz;
 
-                var hasToSkip = new bool[maxCharge - minCharge + 1, isotopeOffsetTolerance * 2 + 1];
+                //var hasToSkip = new bool[maxCharge - minCharge + 1, isotopeOffsetTolerance * 2 + 1];
                 for (var charge = maxCharge; charge >= minCharge; charge--)
                 {
                     var mass = peak.Mz * charge;
@@ -72,10 +72,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                     for (var isotopeIndex = mostAbundantIsotopeIndex - isotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex + isotopeOffsetTolerance; isotopeIndex++)
                     {
-                        if (
-                            hasToSkip[
-                                charge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance])
-                            continue;
+                        //if (
+                        //    hasToSkip[
+                        //        charge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance])
+                        //    continue;
 
                         var monoIsotopeMass = (peakMz - Constants.Proton) * charge -
                                         isotopeIndex * Constants.C13MinusC12;
@@ -98,11 +98,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                         // monoIsotopeMass is valid
                         monoIsotopePeakList.Add(new DeconvolutedPeak(monoIsotopeMass, peak.Intensity, charge));
-                        foreach (var factorCharge in SimpleMath.GetFactors(charge))
-                        {
-                            if (factorCharge < minCharge) continue;
-                            hasToSkip[factorCharge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance] = true;
-                        }
+                        //foreach (var factorCharge in SimpleMath.GetFactors(charge))
+                        //{
+                        //    if (factorCharge < minCharge) continue;
+                        //    hasToSkip[factorCharge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance] = true;
+                        //}
                     }
                 }
             }

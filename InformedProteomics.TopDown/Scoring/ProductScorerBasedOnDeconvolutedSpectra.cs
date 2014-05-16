@@ -13,21 +13,31 @@ namespace InformedProteomics.TopDown.Scoring
         public ProductScorerBasedOnDeconvolutedSpectra(
             LcMsRun run, 
             int minProductCharge = 1, int maxProductCharge = 10,
-            double productTolerancePpm = 10)
-            : this(run, minProductCharge, maxProductCharge, new Tolerance(productTolerancePpm))
+            double productTolerancePpm = 10,
+            int isotopeOffsetTolerance = 2,
+            double filteringWindowSize = 1.1
+            )
+            : this(run, minProductCharge, maxProductCharge, new Tolerance(productTolerancePpm), isotopeOffsetTolerance, filteringWindowSize)
         {
         }
 
         public ProductScorerBasedOnDeconvolutedSpectra(
             LcMsRun run,
             int minProductCharge, int maxProductCharge,
-            Tolerance productTolerance)
+            Tolerance productTolerance,
+            int isotopeOffsetTolerance = 2, 
+            double filteringWindowSize = 1.1)
         {
             _run = run;
             _minProductCharge = minProductCharge;
             _maxProductCharge = maxProductCharge;
             _productTolerance = productTolerance;
+            FilteringWindowSize = filteringWindowSize;
+            IsotopeOffsetTolerance = isotopeOffsetTolerance;
         }
+
+        public double FilteringWindowSize { get; private set; }    // 1.1
+        public int IsotopeOffsetTolerance { get; private set; }   // 2
 
         public IScorer GetMs2Scorer(int scanNum)
         {
@@ -43,13 +53,13 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
                 if (spec == null) continue;
-
+                //if (spec.ScanNum != 879) continue;
                 var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
                 if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
             }
         }
 
-        public static Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
+        public Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
         {
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec, minCharge, maxCharge, IsotopeOffsetTolerance, FilteringWindowSize, tolerance, corrThreshold);
             var peakList = new List<Peak>();
@@ -156,8 +166,6 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _maxProductCharge;
         private readonly Tolerance _productTolerance;
         private const double RescalingConstantHighPrecision = Constants.RescalingConstantHighPrecision;
-        private const double FilteringWindowSize = 1.1;
-        private const int IsotopeOffsetTolerance = 2;
         private const double CorrScoreThresholdMs2 = 0.7;
     }
 }

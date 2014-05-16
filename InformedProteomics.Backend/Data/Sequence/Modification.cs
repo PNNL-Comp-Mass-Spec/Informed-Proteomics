@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -52,7 +50,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification Get(string psiMsName)
         {
-            return NameToModMap[psiMsName];
+            Modification mod;
+            if (NameToModMap.TryGetValue(psiMsName, out mod)) return mod;
+            return null;
         }
 
         public static IList<Modification> GetFromMass(string mass)
@@ -78,16 +78,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification Oxidation = new Modification(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
         public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
         public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
-
         public static readonly Modification Glutathione = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
         public static readonly Modification Cysteinyl = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
         public static readonly Modification Dehydro = new Modification(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
-
         public static readonly Modification Itraq4Plex = new Modification(214, Data.Composition.Composition.Parse("H(12) C(4) 13C(3) N 15N O"), "iTRAQ4plex");
         public static readonly Modification Tmt6Plex = new Modification(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
-
         public static readonly Modification Nethylmaleimide = new Modification(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
         public static readonly Modification Nitrosyl = new Modification(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
+
+        // For Aaron's data
+        public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
         private static readonly Dictionary<string, IList<Modification>> MassToModMap;
@@ -120,17 +120,28 @@ namespace InformedProteomics.Backend.Data.Sequence
             MassToModMap = new Dictionary<string, IList<Modification>>();
             foreach (var modification in CommonModifications)
             {
-                NameToModMap.Add(modification.Name, modification);
-                var massStr = string.Format("{0:N3}", modification.Composition.Mass);
-                //Console.WriteLine("{0} {1}", modification.Name, massStr);
-                IList<Modification> modList;
-                if (!MassToModMap.TryGetValue(massStr, out modList))
-                {
-                    modList = new List<Modification> {modification};
-                    MassToModMap[massStr] = modList;
-                }
-                modList.Add(modification);
+                Register(modification);
             }
+        }
+
+        public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
+        {
+            var mod = new Modification(-1, composition, name);
+            Register(mod);
+            return mod;
+        }
+
+        private static void Register(Modification modification)
+        {
+            NameToModMap.Add(modification.Name, modification);
+            var massStr = string.Format("{0:N3}", modification.Composition.Mass);
+            IList<Modification> modList;
+            if (!MassToModMap.TryGetValue(massStr, out modList))
+            {
+                modList = new List<Modification> { modification };
+                MassToModMap[massStr] = modList;
+            }
+            modList.Add(modification);
         }
     }
 }

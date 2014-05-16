@@ -98,6 +98,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             return compositions;
         }
 
+        /// <summary>
+        /// Gets number of possible proteoforms
+        /// </summary>
+        /// <returns>number of possible proteoforms</returns>
+        public int GetNumProteoforms()
+        {
+            return _graph[_index].Length;
+        }
+
         //public Composition.Composition[] GetSequenceCompositionsWithNTermCleavage(int numNTermCleavages)
         //{
         //    if (numNTermCleavages >= _index - 3) return new Composition.Composition[0];
@@ -127,6 +136,13 @@ namespace InformedProteomics.Backend.Data.Sequence
         public void CleaveNTerm()
         {
             _index = _index - 3;
+            for (var seqIndex = _index + 1; seqIndex < _index + 3; seqIndex++)
+            {
+                for (var modIndex = 0; modIndex < _graph[seqIndex].Length; modIndex++)
+                {
+                    _nodeComposition[seqIndex, modIndex] = null;
+                }
+            }
 
             ++NumNTermCleavages;
             SetNTerminalAminoAcid(_nTerm);
@@ -345,7 +361,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var modificationName = ModificationParams.GetModificationIndexBetween(prevModCombIndex, curModCombIndex).Name;
                 string newModSequence;
-                var modPos = _graph.Length - 3 - (seqIndex - 1);
+                var modPos = _index - seqIndex;
                 if (string.IsNullOrEmpty(bestPrevSequence)) newModSequence = modificationName + " " + modPos;
                 else newModSequence = modificationName + " " + modPos + ",";
                 

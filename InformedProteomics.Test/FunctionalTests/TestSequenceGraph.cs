@@ -87,7 +87,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGraphWithModifications()
         {
-            const string annotation = "_.GEEENPNNPMGYEDADRKDYENMNQENYQDLTDEKSVDDNSLDYEQDDQYENDNQYEYENQDDVKYRNMN._";
+            const string annotation = "_.MIALNKTPQTIVFYKPYGVLCQFTDNSAHPRPTLKDYINLPDLYPVGRLDQDSEGLLLLTSNGKLQHRLAHREFAHQRTYFAQVEGSPTDEDLEPLRRGITFADYPTRPAIAKIITEPDFPPRNPPIRYRASIPTSWLSITLTEGRNRQVRRMTAAVGFPTLRLVRVQIQVTGRSPQQGKGKSAATWCLTLEGLSPGQWRPLTPWEENFCQQLLTGNPNGPWQKKFGDRR._";
 
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
@@ -110,6 +110,17 @@ namespace InformedProteomics.Test.FunctionalTests
             var seqCompositions = seqGraph.GetSequenceCompositions();
             var modCombs = seqGraph.GetModificationCombinations();
 
+            Console.WriteLine("*** Before cleavage: {0}", seqCompositions.Length);
+            for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
+            {
+                var seqComposition = seqCompositions[modIndex];
+                Console.WriteLine("SequenceComposition: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+            }
+
+            seqGraph.CleaveNTerm();
+            seqCompositions = seqGraph.GetSequenceCompositions();
+            modCombs = seqGraph.GetModificationCombinations();
+            Console.WriteLine("*** After cleavage: {0}", seqCompositions.Length);
             for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             {
                 var seqComposition = seqCompositions[modIndex];
@@ -174,7 +185,18 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 Console.WriteLine("{0}\t{1}", composition, composition.Mass);
             }
+        }
 
+        [Test]
+        public void TestReadingModFile()
+        {
+            const string modFilePath = @"\\protoapps\UserData\Sangtae\TestData\MiscFiles\Mods.txt";
+            var modFileParser = new ModFileParser(modFilePath);
+            Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
+            foreach (var searhMod in modFileParser.SearchModifications)
+            {
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", searhMod.TargetResidue, searhMod.Location, searhMod.IsFixedModification, searhMod.Modification);
+            }
         }
     }
 }

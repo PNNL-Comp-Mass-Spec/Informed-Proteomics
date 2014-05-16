@@ -16,11 +16,11 @@ namespace InformedProteomics.TopDown.Execution
             , int minProductIonCharge = 1, int maxProductIonCharge = 10)
         {
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            _scorer = new InformedScorer(run, aaSet, minProductIonCharge, maxProductIonCharge, tolerance, ms2CorrThreshold);
+            _topDownScorer = new InformedTopDownScorer(run, aaSet, minProductIonCharge, maxProductIonCharge, tolerance, ms2CorrThreshold);
             Rescore(icResultFilePath, outputFilePath);
         }
 
-        private readonly InformedScorer _scorer;
+        private readonly InformedTopDownScorer _topDownScorer;
 
         private void Rescore(string icResultFilePath, string outputFilePath)
         {
@@ -45,7 +45,7 @@ namespace InformedProteomics.TopDown.Execution
                     var scanNum = scanNums[i];
                     var composition = compositions[i];
 
-                    var scores = _scorer.GetScores(seqStr, composition, charge, scanNum);
+                    var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
 
                     var token = row.Split('\t');
                     for (var j = 0; j < token.Length; j++)

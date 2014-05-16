@@ -18,34 +18,137 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
-        public void TestTopDownSearch()
+        public void TestForYufeng()
+        {
+            // QC_Shew
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\database\ID_002216_235ACCEA.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownYufeng\Ic\NoMod_M1";
+
+            // Configure amino acid set
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            //            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+
+            const int numMaxModsPerProtein = 0;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                oxM,
+                acetylN
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = true;   // true: target & decoy, false: target, null: decoy
+
+            const int minSequenceLength = 21; // 7
+            const int maxSequenceLength = 500; // 1000
+            const int minPrecursorIonCharge = 2; // 3
+            const int maxPrecursorIonCharge = 50; // 67
+            const int minProductIonCharge = 1; // 1
+            const int maxProductIonCharge = 20; // 15
+            const double minSequenceMass = 3000.0;
+            const double maxSequenceMass = 100000.0;
+
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet,
+                minSequenceLength, maxSequenceLength,
+                minPrecursorIonCharge, maxPrecursorIonCharge,
+                minProductIonCharge, maxProductIonCharge,
+                minSequenceMass, maxSequenceMass,
+                tda, searchMode
+                );
+        }
+
+        [Test]
+        public void TestForSbepData()
         {
             //// Salmonella
-            //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
-            //const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002166_F86E3B2F.fasta";
+            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
+            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002166_F86E3B2F.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDown\Ic\Mod_M2";
+
+            // Configure amino acid set
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                glutathioneC,
+                oxM,
+                acetylN,
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            const int searchMode = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = true;   // true: target & decoy, false: target, null: decoy
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
+        }
+
+        [Test]
+        public void TestForAaronData()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\raw\MTB_intact_1.raw";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\database\ID_003121_998584F8.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownAaron\Ic\Mode1_07";
+
+            // Configure amino acid set
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var tevFp2C = new SearchModification(Modification.TevFp2, 'S', SequenceLocation.Everywhere, false);
+
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                //glutathioneC,
+                //nitrosylC,
+                //nethylmaleimideC,
+                oxM,
+                acetylN,
+                tevFp2C
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = true;   // true: target & decoy, false: target, null: decoy
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
+        }
+
+        [Test]
+        public void TestForJiaData()
+        {
 
             // QC_Shew
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             //const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002216_235ACCEA.fasta";
             //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\Test.fasta";
 
-            // var aaSet = new AminoAcidSet();
-
             // Jia's data
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\D1_1_Mode1";
 
             // Configure amino acid set
-            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
-            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
-            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             var nitrosylC = new SearchModification(Modification.Nitrosyl, 'C', SequenceLocation.Everywhere, false);
             var nethylmaleimideC = new SearchModification(Modification.Nethylmaleimide, 'C', SequenceLocation.Everywhere, false);
+            //var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
 
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>
@@ -54,7 +157,41 @@ namespace InformedProteomics.Test
                 glutathioneC,
                 nitrosylC,
                 nethylmaleimideC,
-                oxM
+                oxM,
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = true;   // true: target & decoy, false: target, null: decoy
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
+        }
+
+
+        [Test]
+        public void TestForQcShew()
+        {
+
+            // QC_Shew
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002216_235ACCEA.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownQCShew\Ic";
+
+            // Configure amino acid set
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+//            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
+            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                oxM,
+                acetylN
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
@@ -64,18 +201,38 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int searchMode)
+        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
+            bool? tda, int searchMode)
         {
-            // Search parameters
-            const int maxNumNTermCleavages = 1; // 30
-            const int maxNumCTermCleavages = 0;
             const int minSequenceLength = 21; // 7
             const int maxSequenceLength = 300; // 1000
             const int minPrecursorIonCharge = 2; // 3
             const int maxPrecursorIonCharge = 30; // 67
             const int minProductIonCharge = 1; // 1
             const int maxProductIonCharge = 15; // 15
+            const double minSequenceMass = 3000.0;
+            const double maxSequenceMass = 50000.0;
 
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet,
+                minSequenceLength, maxSequenceLength,
+                minPrecursorIonCharge, maxPrecursorIonCharge,
+                minProductIonCharge, maxProductIonCharge,
+                minSequenceMass, maxSequenceMass, 
+                tda, searchMode
+                );
+        }
+
+        [Test]
+        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, 
+            int minSequenceLength, int maxSequenceLength,
+            int minPrecursorIonCharge, int maxPrecursorIonCharge,
+            int minProductIonCharge, int maxProductIonCharge,
+            double minSequenceMass, double maxSequenceMass,
+            bool? tda, int searchMode)
+        {
+            // Search parameters
+            const int maxNumNTermCleavages = 1; // 30
+            const int maxNumCTermCleavages = 0;
             const int precursorIonTolerancePpm = 10;
             const int productIonTolerancePpm = 10;
 
@@ -92,6 +249,8 @@ namespace InformedProteomics.Test
                     maxPrecursorIonCharge,
                     minProductIonCharge,
                     maxProductIonCharge,
+                    minSequenceMass,
+                    maxSequenceMass,
                     precursorIonTolerancePpm,
                     productIonTolerancePpm,
                     tda,
@@ -105,13 +264,19 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrSm()
         {
-            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             const string annotation =
-                "M.AAMTVQLDIVSAESSIFSGRVASLQVTGSEGELGIMHGHAPLLSYIKPGMARIVKQDGNEEVFYLSGGLLEVQPSSVSVLADVVMRAKDIDEQAALEAKRRAEAHMATAGADFNYDAAMVELAKAMAQLRVVETIKKNIAR._";
-            const int charge = 15;
-            const int ms2ScanNum = 5595;
+                "_.ERPDLVDPLPEDEPLPGENIPDTPEGDDPLDPDTQNEVEDPRR._";
+            const int charge = 4;
+            const int ms2ScanNum = 1313;
 
-            var aaSet = new AminoAcidSet();
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            const int numMaxModsPerProtein = 1;
+            var searchModifications = new List<SearchModification>
+            {
+                acetylN
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
@@ -124,9 +289,9 @@ namespace InformedProteomics.Test
             Console.WriteLine("Fast search score: " + score);
             var composition = graph.GetSinkSequenceCompositionWithH2O();
 
-            var informedScorer = new InformedScorer(run, new AminoAcidSet(), 1, 15, new Tolerance(10));
-            var refinedScore = informedScorer.GetScores(SimpleStringProcessing.GetStringBetweenDots(annotation), composition, charge, ms2ScanNum).Ms2Score;
-            Console.WriteLine("RefinedScore: {0}", refinedScore);
+            var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
+            var refinedScore = informedScorer.GetScores(AminoAcid.ProteinNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.ProteinCTerm, composition, charge, ms2ScanNum);
+            Console.WriteLine("RefinedScores: {0}", refinedScore);
         }
 
         [Test]
@@ -171,27 +336,6 @@ namespace InformedProteomics.Test
 
             var rescorer = new IcRescorer(specFilePath, icResultPath, outputPath, aaSet, tolerance, 0.7);
             Console.WriteLine("Done");
-        }
-
-        [Test]
-        public void ExtractProteinSequences()
-        {
-            const string fastaFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
-            var fastaDb = new FastaDatabase(fastaFilePath);
-            fastaDb.Read();
-
-            const string proteinFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\database\Proteins.txt";
-            var proteins = File.ReadAllLines(proteinFilePath);
-            foreach (var protein in proteins)
-            {
-                var token = protein.Split();
-                if (token.Length < 1) continue;
-                var proteinId = protein.Split()[0];
-                var proteinSequence = fastaDb.GetProteinSequence(proteinId);
-                Assert.IsTrue(proteinSequence != null);
-                Console.WriteLine(">" + protein);
-                Console.WriteLine(proteinSequence);
-            }
         }
 
         //[Test]

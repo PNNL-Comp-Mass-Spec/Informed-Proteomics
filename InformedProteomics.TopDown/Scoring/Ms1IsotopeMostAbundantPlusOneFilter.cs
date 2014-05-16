@@ -23,7 +23,7 @@ namespace InformedProteomics.TopDown.Scoring
             _maxCharge = maxCharge;
             MaxNumPeaksToConsider = maxNumPeaksToConsider;
             _tolerance = new Tolerance(ppmTolerance);
-            _comparer = new MzComparerWithPpmTolerance(ppmTolerance);
+            _comparer = new MzComparerWithTolerance(ppmTolerance);
             _lcMsMatchMap = new LcMsMatchMap();
             PrecomputePossibleSequenceMasses();
             _lcMsMatchMap.CreateSequenceMassToMs2ScansMap(_run, _tolerance, minMass, maxMass);
@@ -40,7 +40,7 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _minCharge;
         private readonly int _maxCharge;
         private readonly Tolerance _tolerance;
-        private readonly MzComparerWithPpmTolerance _comparer;
+        private readonly MzComparerWithTolerance _comparer;
         private readonly LcMsMatchMap _lcMsMatchMap;
 
         public void PrecomputePossibleSequenceMasses()

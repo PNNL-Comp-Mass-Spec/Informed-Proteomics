@@ -103,25 +103,27 @@
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
     <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
-    <Compile Include="TestEdrn.cs" />
+    <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestFitScore.cs" />
-    <Compile Include="TestIcIms.cs" />
+    <Compile Include="Obsolete\TestFitScore.cs" />
+    <Compile Include="TestBottomUpScoring.cs" />
+    <Compile Include="TestIcBottomUp.cs" />
+    <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
-    <Compile Include="TestIMSScoring.cs" />
-    <Compile Include="TestIpa.cs" />
+    <Compile Include="Obsolete\TestIMSScoring.cs" />
+    <Compile Include="Obsolete\TestIpa.cs" />
     <Compile Include="TestMisc.cs" />
     <Compile Include="TestIonFrequency.cs" />
     <Compile Include="TestMultiThreading.cs" />
     <Compile Include="TestOffsetFrequency.cs" />
-    <Compile Include="TestPeptideCentricAnalysis.cs" />
+    <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
     <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
     <Compile Include="FunctionalTests\TestSuffixArray.cs" />
     <Compile Include="TestLcMsCaching.cs" />
     <Compile Include="TestRankProbability.cs" />
     <Compile Include="TestSpectrumScore.cs" />
-    <Compile Include="TestTopDownMs1Scoring.cs" />
+    <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +133,10 @@
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.BottomUp\InformedProteomics.BottomUp.csproj">
+      <Project>{70efa57f-7566-4673-93c9-75cc85f8731d}</Project>
+      <Name>InformedProteomics.BottomUp</Name>
     </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.DIA\InformedProteomics.DIA.csproj">
       <Project>{16db0078-9a4c-41d8-9356-4205f03ae04a}</Project>
