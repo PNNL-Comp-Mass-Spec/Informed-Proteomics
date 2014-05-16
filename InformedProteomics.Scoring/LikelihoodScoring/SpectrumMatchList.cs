@@ -114,6 +114,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             int scanNum=0, charge=0;
             var peaks = new List<Peak>();
 
+            var peptideSet = new HashSet<string>();
             foreach (var line in file)
             {
                 switch (mgfState)
@@ -141,13 +142,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         {
                             if (peaks.Count == 0) throw new FormatException("Empty peak list.");
                             mgfState = MgfState.Label;
-                            if (charge > MaxCharge)
+                            if (charge > MaxCharge || peptideSet.Contains(sequence))
                             {
                                 sequence = "";
                                 scanNum = 0;
                                 charge = 0;
                                 continue;
                             }
+                            peptideSet.Add(sequence);
                             var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
                             var specMatch = new SpectrumMatch(sequence, spectrum, scanNum, charge);
                             sequence = "";

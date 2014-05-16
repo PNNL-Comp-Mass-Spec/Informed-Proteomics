@@ -5,6 +5,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -105,11 +106,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private void CreateDecoy()
         {
-            var rand = new Random();
-            var indices = Enumerable.Range(0, Sequence.Count).OrderBy(r => rand.Next()).ToArray();
-            var sfl = indices.Select(index => Sequence[index]).ToList();
-            sfl.Reverse();
-            Sequence = new Sequence(sfl);
+            const int mutations = 5;
+            var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
+            var shuffledSequence = SimpleStringProcessing.Shuffle(sequence);
+            var mutatedSequence = SimpleStringProcessing.Mutate(shuffledSequence, mutations);
+            int mid = mutatedSequence.Length/2;
+            var sequenceList = mutatedSequence.ToList();
+            sequenceList.Reverse(0, mid);
+            sequenceList.Reverse(mid, sequenceList.Count - mid);
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceList.ToString());
         }
 
         public List<Ion> GetPrefixIons(IonType ionType)
