@@ -31,7 +31,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _precursorCharge = precursorCharge;
             Decoy = decoy;
             Sequence = sequence;
-            if (decoy) Sequence = DecoySequence;
+            if (decoy) CreateDecoy();
         }
 
         public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, bool decoy=false)
@@ -43,7 +43,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Decoy = decoy;
             var sequenceReader = new SequenceReader();
             Sequence = sequenceReader.GetSequence(peptide);
-            if (decoy) Sequence = DecoySequence;
+            if (decoy) CreateDecoy();
         }
 
         public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, string formula, bool decoy=false)
@@ -55,7 +55,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Decoy = decoy;
             var sequenceReader = new SequenceReader();
             Sequence = sequenceReader.GetSequence(peptide);
-            if (decoy) Sequence = DecoySequence;
+            if (decoy) CreateDecoy();
             else
             {
                 var composition = Composition.Parse(formula);
@@ -103,19 +103,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public Sequence DecoySequence
+        private void CreateDecoy()
         {
-            get
-            {
-                var decoySequence = new List<AminoAcid>();
-                var random = new Random();
-                for (int i = 0; i < Sequence.Count; i++)
-                {
-                    int randomNumber = random.Next(0, Sequence.Count);
-                    decoySequence.Add(Sequence[randomNumber]);
-                }
-                return new Sequence(decoySequence);
-            }
+            var rand = new Random();
+            var indices = Enumerable.Range(0, Sequence.Count).OrderBy(r => rand.Next()).ToArray();
+            var sfl = indices.Select(index => Sequence[index]).ToList();
+            sfl.Reverse();
+            Sequence = new Sequence(sfl);
         }
 
         public List<Ion> GetPrefixIons(IonType ionType)

@@ -174,8 +174,8 @@ namespace InformedProteomics.Test
                         var precfilteredMatches = precursorFilter.FilterMatches(chargeMatches);
                         var dPrecFilteredMatches = precursorFilter.FilterMatches(dChargeMatches);
                         // Calculate rank probabilities
-                        rankTables[chargeIndex].AddMatches(precfilteredMatches);
                         decoyRankTables[chargeIndex].AddMatches(dPrecFilteredMatches);
+                        rankTables[chargeIndex].AddMatches(precfilteredMatches);
                     }
                 }
 
@@ -193,16 +193,15 @@ namespace InformedProteomics.Test
                 // Smooth ranks
                 for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    rankTables[chargeIndex].Smooth(2, 10, 30);
+                    rankTables[chargeIndex].Smooth(2, 0, 30);
                     rankTables[chargeIndex].Smooth(3, 30, 50);
                     rankTables[chargeIndex].Smooth(5, 50, 90);
-                    rankTables[chargeIndex].Smooth(7, 90, 120);
-                    rankTables[chargeIndex].Smooth(10, 120);
-                    decoyRankTables[chargeIndex].Smooth(5, 10, 20);
-                    decoyRankTables[chargeIndex].Smooth(3, 20, 40);
-                    decoyRankTables[chargeIndex].Smooth(7, 40, 90);
-                    decoyRankTables[chargeIndex].Smooth(10, 90, 120);
-                    decoyRankTables[chargeIndex].Smooth(15, 120);
+                    rankTables[chargeIndex].Smooth(10, 90, 120);
+                    rankTables[chargeIndex].Smooth(20, 120);
+                    decoyRankTables[chargeIndex].Smooth(3,0,10);
+                    decoyRankTables[chargeIndex].Smooth(10, 10, 90);
+                    decoyRankTables[chargeIndex].Smooth(15, 90, 120);
+                    decoyRankTables[chargeIndex].Smooth(20, 120);
                 }
 
                 // Write ion probability output files

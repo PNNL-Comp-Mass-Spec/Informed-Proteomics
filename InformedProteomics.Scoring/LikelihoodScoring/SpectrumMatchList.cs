@@ -110,7 +110,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             var file = File.ReadLines(fileName);
             var mgfState = MgfState.Label;
 
-            string title="", sequence="";
+            var sequence="";
             int scanNum=0, charge=0;
             var peaks = new List<Peak>();
 
@@ -125,15 +125,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     case MgfState.Parameter:
                         var parameter = line.Split('=');
                         if (parameter.Length < 2) throw new FormatException("Invalid line in MGF file: "+line);
-                        if (parameter[0] == "TITLE") title = parameter[1];
-                        else if (parameter[0] == "SEQ") sequence = parameter[1];
+                        if (parameter[0] == "SEQ") sequence = parameter[1];
                         else if (parameter[0] == "SCANS") scanNum = Convert.ToInt32(parameter[1]);
                         else if (parameter[0] == "CHARGE")
                         {
                             var chargeStr = parameter[1].Substring(0, parameter[1].Length - 1);
                             charge = Convert.ToInt32(chargeStr);
                             mgfState = MgfState.Peak;
-                            if (title == "" || sequence == "" || scanNum == 0 || charge == 0)
+                            if (sequence == "" || scanNum == 0 || charge == 0)
                                 throw new FormatException("Incomplete spectrum entry.");
                         }
                         break;
@@ -142,9 +141,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         {
                             if (peaks.Count == 0) throw new FormatException("Empty peak list.");
                             mgfState = MgfState.Label;
-                            if (sequence.Contains('(') || charge > MaxCharge)
+                            if (charge > MaxCharge)
                             {
-                                title = "";
                                 sequence = "";
                                 scanNum = 0;
                                 charge = 0;
@@ -152,7 +150,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                             }
                             var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
                             var specMatch = new SpectrumMatch(sequence, spectrum, scanNum, charge);
-                            title = "";
                             sequence = "";
                             scanNum = 0;
                             charge = 0;
