@@ -106,15 +106,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private void CreateDecoy()
         {
-            const int mutations = 5;
             var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
+            int mid = sequence.Length / 2;
             var shuffledSequence = SimpleStringProcessing.Shuffle(sequence);
-            var mutatedSequence = SimpleStringProcessing.Mutate(shuffledSequence, mutations);
-            int mid = mutatedSequence.Length/2;
-            var sequenceList = mutatedSequence.ToList();
-            sequenceList.Reverse(0, mid);
-            sequenceList.Reverse(mid, sequenceList.Count - mid);
-            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceList.ToString());
+            var mutatedSequence = SimpleStringProcessing.Mutate(shuffledSequence, mid);
+            Peptide = mutatedSequence;
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(mutatedSequence);
         }
 
         public List<Ion> GetPrefixIons(IonType ionType)
@@ -131,26 +128,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             var compositions = ionType.BaseIonType.IsPrefix ? Prefixes : Suffixes;
             return compositions.Select(ionType.GetIon).ToList();
-        }
-
-        public Probability<string> ContainsCleavageIons(IonType ionType, Tolerance tolerance, double relativeIntensityThreshold)
-        {
-            var ions = GetCleavageIons(ionType);
-
-            var probability = new Probability<string>(ionType.Name);
-            foreach (var ion in ions)
-            {
-                probability.Total++;
-                if (Spectrum.ContainsIon(ion, tolerance, relativeIntensityThreshold))
-                    probability.Found++;
-            }
-            return probability;
-        }
-
-        public bool ContainsPrecursorIon(IonType ionType, Tolerance tolerance, double relativeIntensityThreshold)
-        {
-            var ion = ionType.GetIon(PeptideComposition);
-            return Spectrum.ContainsIon(ion, tolerance, relativeIntensityThreshold);
         }
     }
 }

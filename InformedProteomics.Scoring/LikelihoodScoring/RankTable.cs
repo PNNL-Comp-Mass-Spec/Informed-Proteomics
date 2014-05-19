@@ -63,7 +63,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public void Smooth(int window, int startRank=0, int endRank=Int32.MaxValue)
+/*        public void Smooth(int window, int startRank=0, int endRank=Int32.MaxValue)
         {
             endRank = Math.Min(endRank, MaxRanks);
             startRank = Math.Max(startRank, 0);
@@ -84,6 +84,43 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     }
                 }
             }
+        }*/
+
+        public void Smooth(int window, int startRank = 0)
+        {
+            foreach (var ionType in _ionTypes)
+            {
+                int offset;
+                for (int currRank = startRank; currRank + window < MaxRanks; currRank+=window+offset-1)
+                {
+                    offset = 0;
+                    double average;
+                    var start = currRank;
+                    var end = Math.Min(start+window, MaxRanks)-1;
+                    do
+                    {
+                        if (end < MaxRanks)
+                        {
+                            end++;
+                            offset++;
+                        }
+                        else if (start > 0)
+                            start--;
+
+                        var total = 0.0;
+                        for (int i = start; i < end; i++)
+                        {
+                            total += _rankTable[i].IonFrequencies[ionType];
+                        }
+                        average = total/(end - start);
+                    } while (average.Equals(0) && (end < MaxRanks || start > 0));
+                    for (int i = start; i < end; i++)
+                    {
+                        _rankTable[i].IonFrequencies[ionType] = average;
+                    }
+                }
+            }
+
         }
 
         public void AddRanks(RankedPeaks rankedPeaks)
