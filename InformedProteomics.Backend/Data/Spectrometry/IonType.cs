@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
@@ -66,23 +67,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                    "," + Charge + "," + IsPrefixIon;
         }
 
-        ///// <summary>
-        ///// Returns ion name with ion index (e.g. y++4-H2O => charge 2 y4 - H2O)
-        ///// </summary>
-        ///// <param name="index"></param>
-        ///// <returns></returns>
-        //public string GetName(int index)
-        //{
-        //    String chargeStr;
-        //    if (Charge == 1) chargeStr = "";
-        //    else
-        //    {
-        //        var builder = new StringBuilder(Charge);
-        //        for (var i = 0; i < Charge; i++) builder.Append("+");
-        //        chargeStr = builder.ToString();
-        //    }
-        //    return BaseIonType.Symbol + chargeStr + index + NeutralLoss.Name;
-        //}
+		/// <summary>
+		/// Returns ion name with ion index (e.g. y++4-H2O => charge 2 y4 - H2O)
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		public string GetName(int index)
+		{
+			String chargeStr;
+			if (Charge == 1) chargeStr = "";
+			else
+			{
+				var builder = new StringBuilder(Charge);
+				for (var i = 0; i < Charge; i++) builder.Append("+");
+				chargeStr = builder.ToString();
+			}
+			return BaseIonType.Symbol + index + chargeStr + NeutralLoss.Name;
+		}
 
         [Obsolete("IonType object should be generated through IonTypeFactory")]
         public static IonType Parse(string s)
