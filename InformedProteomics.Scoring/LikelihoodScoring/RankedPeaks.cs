@@ -56,6 +56,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 var search = new RankInfo(intensity);
                 position = Ranks.BinarySearch(search, new RankComparer());
                 Ranks[position].Iontypes.Add(ionType);
+                position++;
             }
             else
             {

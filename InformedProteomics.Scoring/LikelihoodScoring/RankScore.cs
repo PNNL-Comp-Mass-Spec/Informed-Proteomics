@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
@@ -30,7 +28,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return (Math.Log(prob) - Math.Log(decoyProb));
         }
 
-        public IonType[] GetIonTypes(int charge=0)
+        public IonType[] GetIonTypes(int charge)
         {
             charge = GetCharge(charge);
             return _trainingSets[charge].Item1.GetBinEdges();
@@ -92,7 +90,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 }
                 else
                 {
-                    int index = header.IndexOf("-Decoy", System.StringComparison.Ordinal);
+                    int index = header.IndexOf("-Decoy", StringComparison.Ordinal);
                     if (index < 0)
                     {
                         try
