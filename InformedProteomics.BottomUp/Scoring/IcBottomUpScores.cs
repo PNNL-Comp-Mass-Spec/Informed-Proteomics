@@ -10,5 +10,9 @@
 
         public double Score { get; private set; }
         public string Modifications { get; private set; }
+        public override string ToString()
+        {
+            return Score+"\t"+Modifications;
+        }
     }
 }

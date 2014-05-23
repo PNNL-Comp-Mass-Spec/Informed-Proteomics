@@ -9,10 +9,11 @@ namespace InformedProteomics.Scoring.BottomUp
 {
     public class ScoredSpectrum: IScorer
     {
-        public ScoredSpectrum(Spectrum spec, RankScore scorer, Tolerance tolerance)
+        public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, Tolerance tolerance)
         {
             _rankedSpec = new RankedSpectrum(spec);
             _scorer = scorer;
+            _charge = charge;
             _tolerance = tolerance;
         }
 
@@ -25,7 +26,7 @@ namespace InformedProteomics.Scoring.BottomUp
         {
             var score = 0.0;
 
-            foreach (var ionType in _scorer.IonTypes)
+            foreach (var ionType in _scorer.GetIonTypes(_charge))
             {
                 var monoMz = ionType.IsPrefixIon
                     ? ionType.GetMz(prefixFragmentComposition)
@@ -35,13 +36,11 @@ namespace InformedProteomics.Scoring.BottomUp
                 var peak = _rankedSpec.FindPeak(monoMz, _tolerance);
                 if (peak == null)
                 {
-                    score += _scorer.GetScore(ionType, -1);  // missing
+                    score += _scorer.GetScore(ionType, -1, _charge);  // missing
                 }
                 else
                 {
-                    //TODO: to avoid division by zero
-                    if (peak.Rank > 150) score += _scorer.GetScore(ionType, -1);
-                    else score += _scorer.GetScore(ionType, peak.Rank);
+                    score += _scorer.GetScore(ionType, peak.Rank, _charge);
                 }
             }
             return score;
@@ -49,6 +48,7 @@ namespace InformedProteomics.Scoring.BottomUp
 
         private readonly RankedSpectrum _rankedSpec;
         private readonly RankScore _scorer;
+        private readonly int _charge;
         private readonly Tolerance _tolerance;
     }
 

@@ -109,7 +109,7 @@ namespace InformedProteomics.Backend.Utils
             if (targetHeaders.Where((t, i) => !t.Equals(decoyHeaders[i])).Any()) return false;
 
             var concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
-            var scoreIndex = _headers.IndexOf("Ms2Score");
+            var scoreIndex = _headers.IndexOf("IcScore");
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("Score");
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("#MatchedFragments");
             var sequenceIndex = _headers.IndexOf("Sequence");

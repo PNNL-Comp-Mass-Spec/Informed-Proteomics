@@ -5,7 +5,6 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
@@ -19,6 +18,35 @@ namespace InformedProteomics.Test
     public class TestBottomUpScoring
     {
         [Test]
+        public void TestPsm()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            const char pre = 'R';
+            const string sequence = "LENWPPASLADDL";
+            const char post = 'A';
+            const string annotation = "R.LENWPPASLADDL._";
+            const int charge = 2;
+            const int ms2ScanNum = 25534;
+
+            var aaSet = new AminoAcidSet();
+
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 2, 10, 0, 1.1);
+            ms2Scorer.DeconvoluteProductSpectra();
+            var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
+
+            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
+            graph.SetSink(0);
+            var score = graph.GetScore(charge, scorer);
+            Console.WriteLine("Fast search score: " + score);
+            var composition = graph.GetSinkSequenceCompositionWithH2O();
+
+            var informedScorer = new InformedBottomUpScorer(run, aaSet, 1, 15, new Tolerance(10));
+            var refinedScore = informedScorer.GetScores(pre, sequence, post, composition, charge, ms2ScanNum);
+            Console.WriteLine("RefinedScores: {0}", refinedScore);
+        }
+
+        [Test]
         public void TestLogLikelihoodScoring()
         {
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -31,10 +59,9 @@ namespace InformedProteomics.Test
 
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
             var scorer = new InformedBottomUpScorer(run, aaSet, 1, 2, new Tolerance(10));
-            var refinedScore = scorer.GetScores(AminoAcid.PeptideNTerm, seqStr, AminoAcid.PeptideCTerm, composition,
-                charge, ms2ScanNum);
-
-            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);            
+            //var refinedScore = scorer.GetScores(AminoAcid.PeptideNTerm, seqStr, AminoAcid.PeptideCTerm, composition,
+            //    charge, ms2ScanNum);
+//            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);            
         }
 
         [Test]
@@ -97,59 +124,36 @@ namespace InformedProteomics.Test
             Console.WriteLine("SuccessRage: {0}, {1}/{2}", numSurvived/(float)numPsms, numSurvived, numPsms);
         }
 
-        [Test]
-        public void TestPsm()
-        {
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            const string annotation = "K.AGGYDNHHPR.S";
-            const int charge = 3;
-            const int ms2ScanNum = 879;
 
-            var aaSet = new AminoAcidSet();
-
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
-            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 2, 10, 0, 1.1);
-            ms2Scorer.DeconvoluteProductSpectra();
-            var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
-
-            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
-            graph.SetSink(0);
-            var score = graph.GetScore(charge, scorer);
-            Console.WriteLine("Fast search score: " + score);
-            var composition = graph.GetSinkSequenceCompositionWithH2O();
-
-            var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
-            var refinedScore = informedScorer.GetScores(AminoAcid.PeptideNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.PeptideCTerm
-                , composition, charge, ms2ScanNum);
-            Console.WriteLine("RefinedScores: {0}", refinedScore);
-        }
 
         [Test]
         public void TestPeptideLevelStats()
         {
-            const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_03";
+            const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_Rescoring";
             var targetData = new List<string>();
-            foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*775to900*IcTarget.tsv"))
+            const string mzRange = "";
+            foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcTarget.tsv"))
             {
                 targetData.AddRange(File.ReadAllLines(specFilePath).Skip(1));
             }
 
             var decoyData = new List<string>();
-            foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*775to900*IcDecoy.tsv"))
+            foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcDecoy.tsv"))
             {
                 decoyData.AddRange(File.ReadAllLines(specFilePath).Skip(1));
             }
 
             const string headerStr =
-                "Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName" +
-                "\tProteinDesc\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz" +
-                "\tMass\tScore\tIsotopeCorrPrevMs1\tIsotopeCorrNextMs1\tCorrMostAbundantPlusOneIsotope";
+                "Scan\tPre\tSequence\tPost\tModifications\t" +
+                "Composition\tProteinName\tProteinDesc\tProteinLength\t" +
+                "Start\tEnd\tCharge\tMostAbundantIsotopeMz\t" +
+                "Mass\t#MatchedFragments\tIcScore";
             var header = headerStr.Split('\t').ToList();
             if (targetData.Count <= 1 || decoyData.Count <= 1) return;
 
-            var scoreIndex = header.IndexOf("Ms2Score");
-            if (scoreIndex < 0) scoreIndex = header.IndexOf("Score");
-            if (scoreIndex < 0) scoreIndex = header.IndexOf("#MatchedFragments");
+            var scoreIndex = header.IndexOf("IcScore");
+//            if (scoreIndex < 0) scoreIndex = header.IndexOf("Score");
+//            if (scoreIndex < 0) scoreIndex = header.IndexOf("#MatchedFragments");
             var sequenceIndex = header.IndexOf("Sequence");
             var preIndex = header.IndexOf("Pre");
             var postIndex = header.IndexOf("Post");

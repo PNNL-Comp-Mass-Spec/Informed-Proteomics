@@ -101,7 +101,7 @@ namespace InformedProteomics.BottomUp.Execution
 
             Console.Write("Reading raw file...");
             sw.Start();
-            _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
             _bottomUpScorer = new InformedBottomUpScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -332,7 +332,7 @@ namespace InformedProteomics.BottomUp.Execution
                         var protLength = database.GetProteinLength(proteinName);
                         var ion = match.Ion;
 
-                        var scores = _bottomUpScorer.GetScores(match.NTerm, sequence, match.CTerm, ion.Composition, ion.Charge, scanNum);
+                        var scores = _bottomUpScorer.GetScores(match, ion.Composition, ion.Charge, scanNum);
 
                         writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                             scanNum,

@@ -14,7 +14,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             ReadTrainingSetFromFile(fileName, maxCharge);
         }
 
-        public double GetScore(IonType ionType, int rankNum, int charge=0)
+        public double GetScore(IonType ionType, int rankNum, int charge)
         {
             charge = GetCharge(charge);
             var rank = _trainingSets[charge].Item1.GetRank(rankNum);
@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return _trainingSets[charge].Item1.GetBinEdges();
         }
 
-        public IonType[] IonTypes { get { return _trainingSets[GetCharge(0)].Item1.GetBinEdges();  }}
+        //public IonType[] IonTypes { get { return _trainingSets[GetCharge(0)].Item1.GetBinEdges();  }}
 
         private int GetCharge(int charge)
         {

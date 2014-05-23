@@ -51,15 +51,15 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
-            //const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
-            var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
+            //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
             //var numPeptides = indexedDb
             //        .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
             //            21, 300, 1, 0).LongCount();
-            //var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(21, 300).LongCount();
+            var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 150).LongCount();
             //var numPeptides = indexedDb.AnnotationsAndOffsets(6, 40, 2, 2, Enzyme.Trypsin).LongCount();
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(30, 250, 0)
             //    .Select(annotationAndSequence => annotationAndSequence.Annotation.Length - 4)

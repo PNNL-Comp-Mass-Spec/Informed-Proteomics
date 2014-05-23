@@ -91,6 +91,29 @@ namespace InformedProteomics.Backend.Data.Sequence
                 }
             }
 
+            //foreach (var searchModification in modifications)
+            //{
+            //    if (!searchModification.IsFixedModification) continue;
+                
+            //    var location = searchModification.Location;
+            //    var targetResidue = searchModification.TargetResidue;
+
+            //    foreach (var loc in AffectedLocations[location])
+            //    {
+            //        var residueModMap = locationSpecificResidueModMap[loc];
+            //        var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
+            //        List<Modification> modList;
+            //        if (residueModMap.TryGetValue(appliedResidue, out modList))
+            //        {
+            //            modList.Add(searchModification.Modification);
+            //        }
+            //        else
+            //        {
+            //            residueModMap.Add(appliedResidue, new List<Modification> { searchModification.Modification });
+            //        }
+            //    }
+            //}
+
             if (maxNumModsPerSequence <= 0) return;
 
             // apply dynamic modifications

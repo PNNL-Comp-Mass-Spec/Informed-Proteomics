@@ -264,17 +264,20 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrSm()
         {
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            const string specFilePath = @"D:\Research\Data\Jon\AH_SF_mouseliver_3-1_Intact_2_6Feb14_Bane_PL011402.raw";
             const string annotation =
-                "_.ERPDLVDPLPEDEPLPGENIPDTPEGDDPLDPDTQNEVEDPRR._";
-            const int charge = 4;
-            const int ms2ScanNum = 1313;
+                "_.SKVSFKITLTSDPRLPYKVLSVPESTPFTAVLKFAAEEFKVPAATSAIITNDGIGINPAQTAGNVFLKHGSELRIIPRDRVGSCV._";
+            const int charge = 7;
+            const int ms2ScanNum = 19011;
 
-            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, true);
+            var modVal = Modification.RegisterAndGetModification("Val", new Composition(5, 9, 1, 1, 0));
+            var modValAny = new SearchModification(modVal, '*', SequenceLocation.Everywhere, false);
             const int numMaxModsPerProtein = 1;
             var searchModifications = new List<SearchModification>
             {
-                acetylN
+                acetylN,
+                modValAny
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
@@ -282,16 +285,25 @@ namespace InformedProteomics.Test
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
             ms2Scorer.DeconvoluteProductSpectra();
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
+            if (scorer == null)
+            {
+                Console.WriteLine("Scorer is null!");
+                return;
+            }
 
             var graph = SequenceGraph.CreateGraph(aaSet, annotation);
-            graph.SetSink(0);
-            var score = graph.GetScore(charge, scorer);
-            Console.WriteLine("Fast search score: " + score);
-            var composition = graph.GetSinkSequenceCompositionWithH2O();
+            for (var i = 0; i < graph.GetNumProteoforms(); i++)
+            {
+                graph.SetSink(i);
+                Console.WriteLine("ModComb: " + graph.GetModificationCombinations()[i]);
+                var score = graph.GetScore(charge, scorer);
+                Console.WriteLine("Fast search score: " + score);
+                var composition = graph.GetSinkSequenceCompositionWithH2O();
 
-            var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
-            var refinedScore = informedScorer.GetScores(AminoAcid.ProteinNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.ProteinCTerm, composition, charge, ms2ScanNum);
-            Console.WriteLine("RefinedScores: {0}", refinedScore);
+                var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
+                var refinedScore = informedScorer.GetScores(AminoAcid.ProteinNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.ProteinCTerm, composition, charge, ms2ScanNum);
+                Console.WriteLine("RefinedScores: {0}", refinedScore);
+            }
         }
 
         [Test]
