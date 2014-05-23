@@ -52,8 +52,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private SpectrumMatch Filter(SpectrumMatch specMatch)
         {
             var charge = specMatch.PrecursorCharge;
-            var peaks = specMatch.Spectrum.Peaks.ToList();
+            var peaks = specMatch.Spectrum.Peaks;
             var offsetLists = _offsets[charge];
+            var indexes = new List<int>();
 
             for (int i = 0; i < offsetLists.Charge; i++)
             {
@@ -61,20 +62,26 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 var mz = ion.GetMonoIsotopicMz();
 
                 var offsets = offsetLists.GetChargeOffsets(i + 1);
-
+/*                for (int j=0; j < peaks.Length; j++)
+                {
+                    var peak = peaks[j];
+                    if (peak.Mz >= (mz - 100/(i+1)) && peak.Mz <= (mz + 100/(i+1)))
+                    {
+                        indexes.Add(j);
+                    }
+                } */
+                
                 foreach (var offset in offsets)
                 {
                     var offsetMz = mz + offset;
-                    var peak = specMatch.Spectrum.FindPeak(offsetMz, _tolerance);
-                    
-                    if (peak != null)
-                    {
-                        peaks.Remove(peak);
-                    }
+                    var peakIndex = specMatch.Spectrum.FindPeakIndex(offsetMz, _tolerance);
+                    if (peakIndex > 0) indexes.Add(peakIndex);
                 }
             }
+            indexes = indexes.Distinct().ToList();
+            var filteredPeaks = peaks.Where((t, i) => !indexes.Contains(i)).ToList();
 
-            var spectrum = new Spectrum(peaks, specMatch.ScanNum);
+            var spectrum = new Spectrum(filteredPeaks, specMatch.ScanNum);
             var filteredSpecMatch = new SpectrumMatch(specMatch.Peptide, spectrum, specMatch.ScanNum, charge, specMatch.Sequence);
             return filteredSpecMatch;
         }
@@ -87,7 +94,5 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
             return matches;
         }
-
-
     }
 }

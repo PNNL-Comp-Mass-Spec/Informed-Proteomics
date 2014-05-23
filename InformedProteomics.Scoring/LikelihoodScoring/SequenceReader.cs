@@ -1,14 +1,18 @@
-﻿using System.Linq;
-using InformedProteomics.Backend.Data.Sequence;
+﻿using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring
 {
     class SequenceReader: ISequenceReader
     {
+        private readonly string _format;
+        public SequenceReader(string format)
+        {
+            _format = format;
+        }
         public Sequence GetSequence(string sequence)
         {
             Sequence seq;
-            if (sequence.Contains('('))
+            if (_format == "mgf")
             {
                 var sequenceReader = new MgfSequenceReader();
                 seq = sequenceReader.GetSequence(sequence);

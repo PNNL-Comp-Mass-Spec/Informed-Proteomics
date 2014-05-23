@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
@@ -10,13 +12,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     {
         public RankScore(string fileName, int maxCharge=2)
         {
+            _trainingSets = new Dictionary<int, Tuple<RankTable, RankTable>>();
             ReadTrainingSetFromFile(fileName, maxCharge);
         }
 
-        public double GetScore(IonType ionType, int rankNum)
+        public double GetScore(IonType ionType, int rankNum, int charge=0)
         {
-            var rank = _trainingSet.GetRank(rankNum);
-            var decoyRank = _decoySet.GetRank(rankNum);
+            charge = GetCharge(charge);
+            var rank = _trainingSets[charge].Item1.GetRank(rankNum);
+            var decoyRank = _trainingSets[charge].Item2.GetRank(rankNum);
             var prob = rank.IonFrequencies[ionType];
             var decoyProb = decoyRank.IonFrequencies[ionType];
 
@@ -26,12 +30,108 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return (Math.Log(prob) - Math.Log(decoyProb));
         }
 
-        public IonType[] IonTypes
+        public IonType[] GetIonTypes(int charge=0)
         {
-            get { return _trainingSet.GetBinEdges(); }
+            charge = GetCharge(charge);
+            return _trainingSets[charge].Item1.GetBinEdges();
+        }
+
+        public IonType[] IonTypes { get { return _trainingSets[GetCharge(0)].Item1.GetBinEdges();  }}
+
+        private int GetCharge(int charge)
+        {
+            var keys = _trainingSets.Keys;
+            if (keys.Count == 0) throw new Exception("Empty training set.");
+            int key = charge;
+            int maxCharge = keys.Max();
+            while (!_trainingSets.ContainsKey(key)) key = (key + 1) % maxCharge;
+            return key;
         }
 
         private void ReadTrainingSetFromFile(string fileName, int maxCharge)
+        {
+            var ionTypeFactory = new IonTypeFactory(maxCharge);
+            int currCharge = 0;
+            int ranks = 0;
+            var targetProb = new List<RankProbability>();
+            var decoyProb = new List<RankProbability>();
+            var file = File.ReadAllLines(fileName).ToList();
+            file.Add("Charge\t0");
+            var ionTypes = new List<IonType>();
+            foreach (var line in file)
+            {
+                var parts = line.Split('\t').ToList();
+                if (parts.Count < 2) throw new FormatException("Invalid line in training file: "+line);
+                var header = parts[0];
+                parts.RemoveAt(0); 
+                if (header == "Charge")
+                {
+                    if (currCharge != 0)
+                    {
+                        var unfoundProb = targetProb[ranks];
+                        var decoyunfoundProb = decoyProb[ranks];
+                        targetProb.RemoveAt(ranks);
+                        decoyProb.RemoveAt(ranks);
+                        var tarTable = new RankTable(targetProb, ionTypes.ToArray(), null, ranks) { NotFound = unfoundProb };
+                        var decTable = new RankTable(decoyProb, ionTypes.ToArray(), null, ranks) { NotFound = decoyunfoundProb };
+                        _trainingSets.Add(currCharge, new Tuple<RankTable, RankTable>(tarTable, decTable));
+                        ionTypes = new List<IonType>();
+                    }
+                    currCharge = Convert.ToInt32(parts[0]);
+                }
+                else if (header == "Ranks")
+                {
+                    ranks = Convert.ToInt32(parts[0]);
+                    targetProb = new List<RankProbability> { Capacity = ranks+1 };
+                    decoyProb = new List<RankProbability> { Capacity = ranks+1 };
+                    for (int i = 0; i < ranks+1; i++)
+                    {
+                        targetProb.Add(new RankProbability());
+                        decoyProb.Add(new RankProbability());
+                    }
+                }
+                else
+                {
+                    int index = header.IndexOf("-Decoy", System.StringComparison.Ordinal);
+                    if (index < 0)
+                    {
+                        try
+                        {
+                            var ion = ionTypeFactory.GetIonType(header);
+                            ionTypes.Add(ion);
+                            for (int i = 0; i < ranks + 1; i++)
+                                targetProb[i].AddIon(ion, Convert.ToDouble(parts[i]));
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            if (header == "Total")
+                            {
+                                for (int i = 0; i < ranks + 1; i++)
+                                {
+                                    targetProb[i].RankCount = Convert.ToInt32(parts[i]);
+                                    decoyProb[i].RankCount = Convert.ToInt32(parts[i]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var ionName = header.Substring(0, index);
+                        try
+                        {
+                            var ion = ionTypeFactory.GetIonType(ionName);
+                            for (int i = 0; i < ranks + 1; i++) decoyProb[i].AddIon(ion, Convert.ToDouble(parts[i]));
+                        }
+                        catch (KeyNotFoundException) {}
+                    }
+                }
+
+            }
+        }
+
+        private readonly Dictionary<int, Tuple<RankTable, RankTable>> _trainingSets;
+
+/*        private void ReadTrainingSetFromFile(string fileName, int maxCharge)
         {
             var ionTypeFactory = new IonTypeFactory(maxCharge);
             var parser = new TsvFileParser(fileName);
@@ -47,8 +147,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             var decoyRankProbabilities = new List<RankProbability>();
             for (var i = 0; i < totalRanks; i++)
             {
-                var rankProb = new RankProbability(ionTypes);
-                var decoyRankProb = new RankProbability(ionTypes);
+                var rankProb = new RankProbability();
+                var decoyRankProb = new RankProbability();
                 foreach (var ionType in ionTypes)
                 {
                     var target = Convert.ToDouble(data[ionType.Name][i]);
@@ -75,6 +175,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         }
 
         private RankTable _trainingSet;
-        private RankTable _decoySet;
+        private RankTable _decoySet;*/
     }
 }

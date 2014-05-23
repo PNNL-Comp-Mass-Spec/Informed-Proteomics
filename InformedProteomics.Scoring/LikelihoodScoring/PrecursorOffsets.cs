@@ -41,23 +41,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        public PrecursorOffsets(IEnumerable<Probability<double>>[] offsets, int charge,
-            double probabilityThreshold = 0.0)
-        {
-            Charge = charge;
-            _offsets = new Dictionary<int, List<double>>();
-            _probabilityThreshold = probabilityThreshold;
-            for (int i = 1; i <= charge; i++)
-            {
-                _offsets.Add(i, new List<double>());
-            }
-
-            for (int i = 0; i < offsets.Length; i++)
-            {
-                AddOffsets(i+1, offsets[i]);
-            }
-        }
-
         public void AddOffsets(int charge, IEnumerable<Probability<double>> offsetProbabilities)
         {
             if (charge > Charge)
@@ -67,7 +50,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             var offsets = (from offsetProb in offsetProbabilities
                            where offsetProb.Prob >= _probabilityThreshold
-                           select offsetProb.Prob).ToList();
+                           select offsetProb.DataLabel).ToList();
 
             if (_offsets.ContainsKey(charge))
                 _offsets[charge] = offsets;

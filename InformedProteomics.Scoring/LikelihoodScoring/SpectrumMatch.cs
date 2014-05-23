@@ -24,7 +24,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public class MismatchException : Exception {}
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, Sequence sequence, bool decoy=false)
+        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, 
+                            int precursorCharge, Sequence sequence, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
@@ -35,26 +36,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             if (decoy) CreateDecoy();
         }
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, bool decoy=false)
+        public SpectrumMatch(string peptide, string sequenceFormat,
+                             Spectrum spectrum, int scanNum, 
+                             int precursorCharge, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             Decoy = decoy;
-            var sequenceReader = new SequenceReader();
+            var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
             if (decoy) CreateDecoy();
         }
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, int precursorCharge, string formula, bool decoy=false)
+        public SpectrumMatch(string peptide, string sequenceFormat,
+                             Spectrum spectrum, int scanNum,
+                             int precursorCharge, string formula, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
             ScanNum = scanNum;
             _precursorCharge = precursorCharge;
             Decoy = decoy;
-            var sequenceReader = new SequenceReader();
+            var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
             if (decoy) CreateDecoy();
             else
@@ -106,12 +111,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private void CreateDecoy()
         {
+            Sequence.Reverse();
             var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
-            int mid = sequence.Length / 2;
-            var shuffledSequence = SimpleStringProcessing.Shuffle(sequence);
-            var mutatedSequence = SimpleStringProcessing.Mutate(shuffledSequence, mid);
-            Peptide = mutatedSequence;
-            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(mutatedSequence);
+            sequence = SimpleStringProcessing.Mutate(sequence, sequence.Length/2);
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
         }
 
         public List<Ion> GetPrefixIons(IonType ionType)

@@ -13,7 +13,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private readonly static AminoAcidSet StandardAminoAcidSet;
         static MgfSequenceReader()
         {
-            StandardAminoAcidSet = new AminoAcidSet();
+            StandardAminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
             Modifications = new Dictionary<string, Tuple<AminoAcid, List<Modification>>>();
             Modifications.Add("99.032",
                 new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('G'),

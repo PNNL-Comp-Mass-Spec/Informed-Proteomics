@@ -29,7 +29,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
             // Calculate rank score
             var rank = _rankedPeaks.RankMz(mz, _tolerance);
-            var rankScore = _rankScorer.GetScore(ionType, rank);
+            var rankScore = _rankScorer.GetScore(ionType, rank, 0);
 
             // Calculate mass error score
             var peak = _spectrum.FindPeak(mz, _tolerance);
@@ -55,7 +55,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             {
                 suffixes.Add(sequence.GetComposition(i, sequence.Count));
             }
-            var ionTypes = _rankScorer.IonTypes;
+            var ionTypes = _rankScorer.GetIonTypes(0);
             var totalScore = 0.0;
             foreach (var ionType in ionTypes)
             {

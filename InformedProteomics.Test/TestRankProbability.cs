@@ -48,11 +48,15 @@ namespace InformedProteomics.Test
 
         private int _retentionCount;
         private double _windowWidth;
+        private double _precursorOffsetWidth;
         private double _precursorOffsetThreshold;
 
         private const double MassErrorBinWidth = 0.01;
         private const double MassErrorWidth = 0.5;
         private const double MassErrorStartPoint = 0.005;
+
+        private int[] _smoothingRanks;
+        private int[] _smoothingWindowSize;
 
         [Test]
         public void RankProbability()
@@ -61,10 +65,12 @@ namespace InformedProteomics.Test
 
             foreach (var dataSet in _dataSets)
             {
+                #region Initialization
                 var tsvName = _preTsv.Replace("@", dataSet);
                 var rawName = _preData.Replace("@", dataSet);
                 var txtFiles = new List<string>();
                 var dataFiles = new List<string>();
+                var observedCharges = new List<int>();
 
                 if (_dataFormat == "raw")
                 {
@@ -81,6 +87,7 @@ namespace InformedProteomics.Test
                     dataFiles.Add(_preData+dataSet+"."+_dataFormat);
                 }
 
+                
                 // Initialize ion lists
                 var selectedIons = new List<IonType>[_precursorCharge];
                 var unselectedIons = new List<IonType>[_precursorCharge];
@@ -106,7 +113,7 @@ namespace InformedProteomics.Test
                     offsetFrequencyTables[chargeIndex] = new List<PrecursorOffsetFrequencyTable>();
                     for (int j = 1; j <= (chargeIndex + 1); j++)
                     {
-                        offsetFrequencyTables[chargeIndex].Add(new PrecursorOffsetFrequencyTable(_windowWidth/j, j, BinWidth/j));
+                        offsetFrequencyTables[chargeIndex].Add(new PrecursorOffsetFrequencyTable(_precursorOffsetWidth/(2*j), j, BinWidth/j));
                     }
                     for (int j = 0; j < _ionTypes.Count; j++)
                     {
@@ -116,12 +123,16 @@ namespace InformedProteomics.Test
                                                         MassErrorWidth, MassErrorBinWidth, MassErrorStartPoint);
                     }
                 }
+                #endregion
 
-                // Read files
+
+
+                #region Calculations
+                // Read data files, calculate ion probabilities, rank probabilities, mass errors
                 for (int i = 0; i < dataFiles.Count; i++)
                 {
-                    var matchList = new SpectrumMatchList(_act, false, _precursorCharge);
-                    var decoyList = new SpectrumMatchList(_act, true, _precursorCharge);
+                    var matchList = new SpectrumMatchList(_act, false, _precursorCharge, _dataFormat);
+                    var decoyList = new SpectrumMatchList(_act, true, _precursorCharge, _dataFormat);
 
                     if (_dataFormat == "raw")
                     {
@@ -144,8 +155,12 @@ namespace InformedProteomics.Test
                         var chargeMatches = matchList.GetCharge(chargeIndex + 1);
                         var dChargeMatches = decoyList.GetCharge(chargeIndex + 1);
 
+                        if (chargeMatches.Count == 0) continue;
+
+                        observedCharges.Add(chargeIndex+1);
+
                         // Filter spectra
-                        var filteredSpectra = new SpectrumMatchList(_act, false, _precursorCharge);
+                        var filteredSpectra = new SpectrumMatchList(_act, false, _precursorCharge, _dataFormat);
                         filteredSpectra.AddRange(chargeMatches);
                         filteredSpectra.FilterSpectra(_windowWidth, _retentionCount);
                         // Calculate ion probabilities
@@ -165,7 +180,7 @@ namespace InformedProteomics.Test
                         }
 
                         // Initialize precursor filter
-                        var precursorFilter = new PrecursorFilter(_precursorCharge, _tolerance);
+                        var precursorFilter = new PrecursorFilter(_precursorCharge, _defaultToleranceTh);
                         precursorFilter.SetChargeOffsets(new PrecursorOffsets(offsetFrequencyTables[chargeIndex],
                             chargeIndex + 1,
                             _precursorOffsetThreshold));
@@ -174,8 +189,8 @@ namespace InformedProteomics.Test
                         var precfilteredMatches = precursorFilter.FilterMatches(chargeMatches);
                         var dPrecFilteredMatches = precursorFilter.FilterMatches(dChargeMatches);
                         // Calculate rank probabilities
-                        decoyRankTables[chargeIndex].AddMatches(dPrecFilteredMatches);
                         rankTables[chargeIndex].AddMatches(precfilteredMatches);
+                        decoyRankTables[chargeIndex].AddMatches(dPrecFilteredMatches);
                     }
                 }
 
@@ -193,11 +208,13 @@ namespace InformedProteomics.Test
                 // Smooth ranks
                 for (int chargeIndex = 0; chargeIndex < _precursorCharge; chargeIndex++)
                 {
-                    rankTables[chargeIndex].Smooth(3);
-                    decoyRankTables[chargeIndex].Smooth(5);
+                    rankTables[chargeIndex].Smooth(_smoothingRanks, _smoothingWindowSize);
+                    decoyRankTables[chargeIndex].Smooth(_smoothingRanks, _smoothingWindowSize);
                 }
+                #endregion
 
-                // Write ion probability output files
+
+                #region Write output files
                 if (_writeIonProbabilities)
                 {
                     var outFile = _ionProbabilityOutFileName.Replace("@", dataSet);
@@ -222,16 +239,21 @@ namespace InformedProteomics.Test
                 if (_writeRankProbabilities)
                 {
                     var outFileName = _rankProbabilityOutFileName.Replace("@", dataSet);
+                    using (var fileWriter = new StreamWriter(outFileName))
+                    {
+                        fileWriter.WriteLine("Charges\t" + string.Join("\t", observedCharges));
+                    }
                     for (int charge = 0; charge < _precursorCharge; charge++)
                     {
-                        var chargeOutFileName = outFileName.Replace("*",
-                            (charge + 1).ToString(CultureInfo.InvariantCulture));
-                        var file = new FileInfo(chargeOutFileName);
+                        if (!observedCharges.Contains(charge + 1)) continue;
+//                        var chargeOutFileName = outFileName.Replace("*",
+//                            (charge + 1).ToString(CultureInfo.InvariantCulture));
+                        var file = new FileInfo(outFileName);
                         file.Directory.Create();
-                        WriteRankProbabilities(rankTables[charge], decoyRankTables[charge],
+                        WriteHorizontalRankProbabilities(rankTables[charge], decoyRankTables[charge],
                                                 selectedIons,
                                                 charge, rankTables[charge].TotalRanks,
-                                                chargeOutFileName);
+                                                outFileName);
                     }
                 }
 
@@ -328,6 +350,84 @@ namespace InformedProteomics.Test
                         }
                     }
                 }
+                #endregion
+            }
+        }
+
+        private void WriteHorizontalRankProbabilities(RankTable targetRanks, RankTable decoyRanks,
+            List<IonType>[] selectedIons, int charge, int totalRanks,
+            string outFileName)
+        {
+            var targetProb = targetRanks.GetProbabilities();
+            var decoyProb = decoyRanks.GetProbabilities();
+
+            using (var outFile = File.AppendText(outFileName))
+            {
+                outFile.WriteLine("Charge\t{0}", charge+1);
+                outFile.WriteLine("Ranks\t{0}", totalRanks);
+                var totalUnselected = new double[_maxRanks+1];
+                var decoyTotalUnselected = new double[_maxRanks+1];
+                for (int i = 0; i < _maxRanks+1; i++)
+                {
+                    totalUnselected[i] = 0.0;
+                    decoyTotalUnselected[i] = 0.0;
+                }
+                for (int j = 0; j < _ionTypes.Count; j++)
+                {
+                    var selected = selectedIons[charge].Contains(_ionTypes[j]);
+                    for (int i = 0; i < _maxRanks+1; i++)
+                    {
+                        var currProb = targetProb[i, j];
+                        if (selected)
+                        {
+                            if (i == 0) outFile.Write(_ionTypes[j].Name + "\t");
+                            var currProbFound = Math.Round(currProb.Found, 2);
+                            outFile.Write(currProbFound);
+                            if (i != _maxRanks) outFile.Write("\t");
+                        }
+                        else
+                        {
+                            totalUnselected[i] += currProb.Found;
+                        }
+                    }
+                    if (selected) outFile.WriteLine();
+                }
+                for (int j = 0; j < _ionTypes.Count; j++)
+                {
+                    var selected = selectedIons[charge].Contains(_ionTypes[j]);
+                    for (int i = 0; i < _maxRanks+1; i++)
+                    {
+                        var currDecoyProb = decoyProb[i, j];
+                        if (selected)
+                        {
+                            if (i == 0) outFile.Write(_ionTypes[j].Name+"-Decoy\t");
+                            var currDecoyProbFound = Math.Round(currDecoyProb.Found, 2);
+                            outFile.Write(currDecoyProbFound);
+                            if (i != _maxRanks) outFile.Write("\t");
+                        }
+                        else
+                        {
+                            decoyTotalUnselected[i] += currDecoyProb.Found;
+                        }
+                    }
+                    if (selected) outFile.WriteLine();
+                }
+                var unexplainedProb = new double[_maxRanks + 1];
+                var dUnexplainedProb = new double[_maxRanks + 1];
+                for (int i = 0; i < _maxRanks + 1; i++)
+                {
+                    unexplainedProb[i] = Math.Round(totalUnselected[i] / (_ionTypes.Count - selectedIons.Length), 2);
+                    dUnexplainedProb[i] = Math.Round(decoyTotalUnselected[i] / (_ionTypes.Count - selectedIons.Length), 2);
+                }
+                outFile.WriteLine("Unexplained\t" + string.Join("\t", unexplainedProb));
+                outFile.WriteLine("Unexplained-Decoy\t" + string.Join("\t", dUnexplainedProb));
+                outFile.Write("Total\t");
+                for (int i = 0; i < _maxRanks + 1; i++)
+                {
+                    outFile.Write(targetProb[i, 0].Total);
+                    if (i != _maxRanks) outFile.Write("\t");
+                }
+                outFile.WriteLine();
             }
         }
 
@@ -392,7 +492,6 @@ namespace InformedProteomics.Test
             }
         }
 
-
         // Read Configuration file
         private void InitTest(ConfigFileReader reader)
         {
@@ -401,6 +500,7 @@ namespace InformedProteomics.Test
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
             _precursorOffsetThreshold = Convert.ToDouble(config.Contents["precursoroffsetthreshold"]);
             _windowWidth = Convert.ToInt32(config.Contents["searchwidth"]);
+            _precursorOffsetWidth = Convert.ToInt32(config.Contents["precursoroffsetwidth"]);
             _retentionCount = Convert.ToInt32(config.Contents["retentioncount"]);
             _relativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
             _selectedIonThreshold = Convert.ToDouble(config.Contents["selectedionthreshold"]);
@@ -422,6 +522,19 @@ namespace InformedProteomics.Test
             }
 
             _maxRanks = Convert.ToInt32(config.Contents["maxranks"]);
+
+            var smoothingRanksStr = config.Contents["smoothingranks"].Split(',');
+            _smoothingRanks = new int[smoothingRanksStr.Length];
+            var smoothingWindowSizeStr = config.Contents["smoothingwindowsize"].Split(',');
+            _smoothingWindowSize = new int[smoothingWindowSizeStr.Length];
+            if (_smoothingRanks.Length != _smoothingWindowSize.Length)
+                throw new ArgumentException("SmoothingRanks and SmoothingWindowSize unequal lengths.");
+            for (int i = 0; i < _smoothingRanks.Length; i++)
+            {
+                if (smoothingRanksStr[i] == "Max") _smoothingRanks[i] = Int32.MaxValue;
+                else _smoothingRanks[i] = Convert.ToInt32(smoothingRanksStr[i]);
+                _smoothingWindowSize[i] = Convert.ToInt32(smoothingWindowSizeStr[i]);
+            }
 
             // Read ion data
             var ionInfo = reader.GetNodes("ion").First();

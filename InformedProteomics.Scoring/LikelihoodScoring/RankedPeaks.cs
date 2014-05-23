@@ -16,11 +16,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
     public class RankInfo
     {
         public double Intensity { get; private set; }
-        public IonType Iontype { get; set; }
-        public RankInfo(double intensity, IonType ionType)
+        public List<IonType> Iontypes { get; private set; }
+        public RankInfo(double intensity)
         {
             Intensity = intensity;
-            Iontype = ionType;
+            Iontypes = new List<IonType>();
         }
     }
 
@@ -38,9 +38,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Ranks = new List<RankInfo>();
             foreach (var peak in peaks)
             {
-                Ranks.Add(new RankInfo(peak.Intensity, null));
+                Ranks.Add(new RankInfo(peak.Intensity));
             }
-            Ranks.Add(new RankInfo(0, null));
+            Ranks.Add(new RankInfo(0));
             Ranks.Sort(new RankComparer());
             NotFound = new Dictionary<IonType, double>();
             NotFoundTotal = 0;
@@ -49,13 +49,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public int RankIon(IonType ionType, Ion ion, Tolerance tolerance)
         {
             var peak = _spectrum.FindPeak(ion.GetMonoIsotopicMz(), tolerance);
-            var position = 0;
+            int position;
             if (peak != null)
             {
                 var intensity = peak.Intensity;
-                var search = new RankInfo(intensity, null);
+                var search = new RankInfo(intensity);
                 position = Ranks.BinarySearch(search, new RankComparer());
-                Ranks[position].Iontype = ionType;
+                Ranks[position].Iontypes.Add(ionType);
             }
             else
             {
@@ -74,7 +74,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             if (peak == null) return -1;
 
             var intensity = peak.Intensity;
-            var search = new RankInfo(intensity, null);
+            var search = new RankInfo(intensity);
             var position = Ranks.BinarySearch(search, new RankComparer());
             return position;
         }

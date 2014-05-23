@@ -28,20 +28,25 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public int MaxCharge { get; private set; }
         public bool Decoy { get; private set; }
         public ActivationMethod Act { get; private set; }
+        public string SequenceFormat { get; private set; }
 
-        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile, ActivationMethod act, bool useDecoy=false, int maxCharge=0)
+        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile,
+                                 ActivationMethod act, bool useDecoy=false, int maxCharge=0,
+                                 string sequenceFormat="raw")
         {
             Decoy = useDecoy;
             Act = act;
             MaxCharge = maxCharge;
+            SequenceFormat = sequenceFormat;
             AddMatchesFromTsvFile(lcms, tsvFile);
         }
 
-        public SpectrumMatchList(ActivationMethod act, bool useDecoy=false, int maxCharge=0)
+        public SpectrumMatchList(ActivationMethod act, bool useDecoy = false, int maxCharge = 0, string sequenceFormat = "raw")
         {
             Decoy = useDecoy;
             MaxCharge = maxCharge;
             Act = act;
+            SequenceFormat = sequenceFormat;
         }
 
         public void AddMatchesFromTsvFile(LcMsRun lcms, TsvFileParser tsvFile)
@@ -98,8 +103,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
                     Add((formulas != null && formulas[i] != null)
-                        ? new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, formulas[i], Decoy)
-                        : new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, Decoy));
+                        ? new SpectrumMatch(peptides[i], SequenceFormat, spectrum, scanNum, precursorCharge, formulas[i], Decoy)
+                        : new SpectrumMatch(peptides[i], SequenceFormat, spectrum, scanNum, precursorCharge, Decoy));
                 }
             }
         }
@@ -147,11 +152,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                                 sequence = "";
                                 scanNum = 0;
                                 charge = 0;
+                                peaks.Clear();
                                 continue;
                             }
                             peptideSet.Add(sequence);
                             var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
-                            var specMatch = new SpectrumMatch(sequence, spectrum, scanNum, charge);
+                            var specMatch = new SpectrumMatch(sequence, SequenceFormat, spectrum, scanNum, charge);
                             sequence = "";
                             scanNum = 0;
                             charge = 0;
@@ -173,7 +179,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public void AddMatch(SpectrumMatch match)
         {
-            var newMatch = new SpectrumMatch(match.Peptide, match.Spectrum, match.ScanNum,
+            var newMatch = new SpectrumMatch(match.Peptide, SequenceFormat, match.Spectrum, match.ScanNum,
                                  match.PrecursorCharge, Decoy);
             Add(newMatch);
         }
@@ -192,7 +198,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             foreach (var match in this)
             {
                 var spectrum = SpectrumFilter.GetFilteredSpectrum(match.Spectrum, windowWidth, retentionCount);
-                filteredList.Add(new SpectrumMatch(match.Peptide, spectrum, match.ScanNum, match.PrecursorCharge));
+                filteredList.Add(new SpectrumMatch(match.Peptide, SequenceFormat, spectrum, match.ScanNum, match.PrecursorCharge));
             }
             Clear();
             AddRange(filteredList);

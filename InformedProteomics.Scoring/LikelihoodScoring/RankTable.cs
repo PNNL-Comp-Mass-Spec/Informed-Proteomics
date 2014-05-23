@@ -25,7 +25,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             {
                 _rankTable.Add(new RankProbability(_ionTypes));
             }
-            NotFound = new RankProbability(ionTypes);
+            NotFound = new RankProbability(_ionTypes);
         }
 
         public RankTable(List<RankProbability> rankTable, IonType[] ionTypes, Tolerance tolerance, int maxRanks)
@@ -63,64 +63,51 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-/*        public void Smooth(int window, int startRank=0, int endRank=Int32.MaxValue)
+        public void Smooth(int[] smoothingRanks, int[] smoothingWindowSize)
         {
-            endRank = Math.Min(endRank, MaxRanks);
-            startRank = Math.Max(startRank, 0);
-            for (int currRank = startRank; currRank < endRank; currRank+=window)
+            if (smoothingRanks.Length != smoothingWindowSize.Length)
             {
-                foreach (var ionType in _ionTypes)
-                {
-                    var total = 0.0;
-                    for (int i = currRank; i < endRank && i < (currRank + window); i++)
-                    {
-                        total += _rankTable[i].IonFrequencies[ionType];
-                    }
-                    var average = total/window;
-                    if (average.Equals(0.0)) average = 0.01;
-                    for (int i = currRank; i < endRank && i < (currRank + window); i++)
-                    {
-                        _rankTable[i].IonFrequencies[ionType] = average;
-                    }
-                }
+                throw new ArgumentException("Unequal length smoothingRanks and smoothingWindowSize.");
             }
-        }*/
 
-        public void Smooth(int window, int startRank = 0)
-        {
             foreach (var ionType in _ionTypes)
             {
-                int offset;
-                for (int currRank = startRank; currRank + window < MaxRanks; currRank+=window+offset-1)
-                {
-                    offset = 0;
-                    double average;
-                    var start = currRank;
-                    var end = Math.Min(start+window, MaxRanks)-1;
-                    do
-                    {
-                        if (end < MaxRanks)
-                        {
-                            end++;
-                            offset++;
-                        }
-                        else if (start > 0)
-                            start--;
+                int index = 0;
+                int startRank = 0;
+                int window = smoothingWindowSize[index];
+                var total = 0.0;
+                var count = 0;
 
-                        var total = 0.0;
-                        for (int i = start; i < end; i++)
-                        {
-                            total += _rankTable[i].IonFrequencies[ionType];
-                        }
-                        average = total/(end - start);
-                    } while (average.Equals(0) && (end < MaxRanks || start > 0));
-                    for (int i = start; i < end; i++)
+                for (int currRank = startRank; currRank < MaxRanks; currRank += window+1)
+                {
+                    var endRank = Math.Min(currRank + window + 1, MaxRanks);
+                    for (int i = currRank; i < endRank; i++)
                     {
-                        _rankTable[i].IonFrequencies[ionType] = average;
+                        total += _rankTable[i].IonFrequencies[ionType];
+                        count++;
+                    }
+                    var average = total/count;
+                    if (!average.Equals(0))
+                    {
+                        for (int i = startRank; i < endRank; i++)
+                        {
+                            _rankTable[i].IonFrequencies[ionType] = average;
+                        }
+                        count = 0;
+                        total = 0;
+                        startRank = currRank;
+                    }
+                    if (currRank >= smoothingRanks[index])
+                    {
+                        index++;
+                        window = smoothingWindowSize[index];
+                    }
+                    if ((currRank + 2 * window) > MaxRanks)
+                    {
+                        window *= 2;
                     }
                 }
             }
-
         }
 
         public void AddRanks(RankedPeaks rankedPeaks)
@@ -130,16 +117,26 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             for (int i = 0; (i < ranks.Count && i < MaxRanks-1); i++)
             {
                 _rankTable[i].RankCount++;
-                if (ranks[i].Iontype != null)
-                    _rankTable[i].IonFrequencies[ranks[i].Iontype]++;
+                if (ranks[i].Iontypes.Count > 0)
+                {
+                    foreach (var ionType in ranks[i].Iontypes)
+                    {
+                        _rankTable[i].IonFrequencies[ionType]++;
+                    }
+                }
             }
             if (ranks.Count > MaxRanks - 1)
             {
                 for (int i = MaxRanks - 1; i < ranks.Count; i++)
                 {
                     _rankTable[MaxRanks - 1].RankCount++;
-                    if (ranks[i].Iontype != null)
-                        _rankTable[MaxRanks - 1].IonFrequencies[ranks[i].Iontype]++;
+                    if (ranks[i].Iontypes.Count > 0)
+                    {
+                        foreach (var ionType in ranks[i].Iontypes)
+                        {
+                            _rankTable[MaxRanks - 1].IonFrequencies[ionType]++;
+                        }
+                    }
                 }
             }
             NotFound.AddIons(rankedPeaks.NotFound);
@@ -150,7 +147,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             if (rankNum >= MaxRanks)
                 rankNum = MaxRanks - 1;
-            return (rankNum > 0 ? _rankTable[rankNum] : NotFound);
+            return (rankNum > 0 ? _rankTable[rankNum-1] : NotFound);
         }
 
         public Probability<IonType>[,] GetProbabilities()

@@ -66,11 +66,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             Bins = new List<List<T1>> {new List<T1>()};
         }
 
-        public List<Probability<int>> Frequencies
+        public Probability<T1>[] Frequencies
         {
             get
             {
-                return Bins.Select(bin => new Probability<int>(0, bin.Count, Total)).ToList();
+                return BinEdges.Select((t, i) => new Probability<T1>(t, Bins[i].Count, Total)).ToArray();
             }
         }
 

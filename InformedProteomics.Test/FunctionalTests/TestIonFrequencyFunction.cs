@@ -22,7 +22,6 @@ namespace InformedProteomics.Test.FunctionalTests
             var spectrum = spectrumMatch.Spectrum;
             var prefixes = spectrumMatch.Prefixes;
             var suffixes = spectrumMatch.Suffixes;
-            suffixes.Reverse();
 
             var prefixIonTypes = _ionTypes.Where(ionType => ionType.IsPrefixIon).ToList();
             var suffixIonTypes = _ionTypes.Where(ionType => !ionType.IsPrefixIon).ToList();
@@ -177,29 +176,34 @@ namespace InformedProteomics.Test.FunctionalTests
 
         private readonly BaseIonType[] _baseIons =
         {
-            BaseIonType.B
+            BaseIonType.B, BaseIonType.Y
         };
-        private readonly NeutralLoss[] _neutralLosses = { NeutralLoss.H2O };
+        private readonly NeutralLoss[] _neutralLosses = { NeutralLoss.NoLoss, NeutralLoss.H2O };
         private List<IonType> _ionTypes;
         private readonly Tolerance _tolerance = new Tolerance(0.5, ToleranceUnit.Th);
 
         private const string TsvFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
-        private const string RawFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-        private const string DebugFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\debug_HCD_QCShew.txt";
-        private const string OutputFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\results_HCD_QCShew.txt";
+        private const string RawFile = @"\\protoapps\UserData\Wilkins\MSGFPlusTrainingData\CID_LowRes_Tryp.mgf";
+        private const string DebugFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\debug_CID_LowRes_Tryp.txt";
+        private const string OutputFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\results_CID_LowRes_Tryp.txt";
 
         private const string IonProbabilityFileName =
-            @"C:\Users\wilk011\Documents\DataFiles\TestFolder\IonProbabilities_HCD_QCShew";
+            @"C:\Users\wilk011\Documents\DataFiles\TestFolder\IonProbabilities_CID_LowRes_Tryp";
         private IEnumerable<SpectrumMatch> InitTest()
         {
             var ionTypeFactory = new IonTypeFactory(_baseIons, _neutralLosses, MaxCharge);
+            _ionTypes = new List<IonType> {ionTypeFactory.GetIonType("b"), ionTypeFactory.GetIonType("y-H2O")};
 
-            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
+//            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
+            
 
-            var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
+//            var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 
-            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
+//            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
 
+            var spectrumMatches = new SpectrumMatchList(Act, false, MaxPrecCharge);
+            spectrumMatches.AddMatchesFromMgfFile(RawFile);
+//            spectrumMatches.FilterSpectra();
             return spectrumMatches;
         }
     }

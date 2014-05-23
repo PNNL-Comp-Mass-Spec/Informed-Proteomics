@@ -10,26 +10,22 @@ namespace InformedProteomics.Test
     public class TestSpectrumScore
     {
         [Test]
-        public void SpectrumScore()
+        public void RankScore()
         {
-            const int scanNum = 22383;
-            const string trainingPath = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QE_TMT10_Charles\";
-            const string path = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QE_TMT10_Charles\";
-            const string rawFile = path + @"raw\Leishmania_TMT_NiNTA_FT_01_R2_20Jan14_Samwise_13-07-28.raw";
-            const string trainingSet = trainingPath + "HCD_QE_TMT10_Charles_RankProbabilities_Charge3.txt";
-            const string massErrorSet = trainingPath + "HCD_QE_TMT10_Charles_MassErrorProbabilities_Charge3.txt";
-            const string peptide = "+229.163SAEALQQLNDASFNASATSAAQAAADVYK+229.163";
-            const string decoy = "+229.163AC+57.021C+57.021GGDGYAVGVEPAAVEK+229.163";
-            var tolerance = new Tolerance(0.5, ToleranceUnit.Th);
-
-            var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
-
-            var spectrum = lcms.GetSpectrum(scanNum);
-
-            var spectrumScorer = new SpectrumScore(spectrum, tolerance, trainingSet, massErrorSet);
-
-            Console.WriteLine("Target score: " + spectrumScorer.GetPeptideScore(peptide));
-            Console.WriteLine("Decoy score: " + spectrumScorer.GetPeptideScore(decoy));
+            var ranks = 151;
+            var rankScorer = new RankScore(@"\\protoapps\UserData\Wilkins\MSGFPlusTrainingData\HCD_QExactive_Tryp\HCD_QExactive_Tryp_RankProbabilities.txt");
+            for (int charge = 1; charge < 4; charge++)
+            {
+                var ionTypes = rankScorer.GetIonTypes(charge);
+                foreach (var ionType in ionTypes)
+                {
+                    for (int r = 1; r < ranks; r++)
+                    {
+                        Console.WriteLine("Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3}",
+                            charge, ionType.Name, r+1, rankScorer.GetScore(ionType, r, charge));
+                    }
+                }
+            }
         }
     }
 }
