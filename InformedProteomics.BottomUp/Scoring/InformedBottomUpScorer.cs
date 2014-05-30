@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Scoring.BottomUp;
 using InformedProteomics.Scoring.LikelihoodScoring;
+using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 using InformedProteomics.TopDown.Execution;
 
 namespace InformedProteomics.BottomUp.Scoring

@@ -6,6 +6,9 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 using InformedProteomics.Scoring.LikelihoodScoring;
 
@@ -101,7 +104,7 @@ namespace InformedProteomics.Test
                         finalOutputFile.WriteLine();
                         for (int j=0;j<ionFrequencies.Length;j++)
                         {
-                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].DataLabel.Name, ionFrequencies[j].Prob);
+                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].Label.Name, ionFrequencies[j].Prob);
                             if (_useDecoy)
                             {
                                 finalOutputFile.Write("\t{0}", decoyionFrequencies[j]);

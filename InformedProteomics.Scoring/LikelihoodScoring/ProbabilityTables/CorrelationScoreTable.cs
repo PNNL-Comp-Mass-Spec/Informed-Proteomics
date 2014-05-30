@@ -1,41 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
     public enum ScoreMethod { Cosine, FitScore, Pearson }
-    public class ScoreTable
+    public class CorrelationScoreTable
     {
-        private readonly double[] _binEdges;
-        private readonly ScoreMethod _method;
-        private readonly Histogram<FitScore> _intensityHistogram;
-        private readonly int _intensityBinCount;
         public double[] IntensityBins { get; private set; }
         public Probability<int> WorstScore { get; private set; }
 
-        public List<Histogram<FitScore>> Histograms
-        {
-            get
-            {
-                if (IntensityBins == null)
-                {
-                    _intensityHistogram.Equalize(_intensityBinCount, new FitScore(0,0));
-                    var edgeList = new FitScoreList(_intensityHistogram.BinEdges);
-                    IntensityBins = edgeList.Intensities;
-                }
-                else
-                {
-                    _intensityHistogram.BinEdges = new FitScoreList(IntensityBins, null).ToArray();
-                }
-                var bins = _intensityHistogram.Bins;
-                return bins.Select(bin => new Histogram<FitScore>(bin, (new FitScoreList(null, _binEdges)).ToArray(), new CompareFitScoreByScore())).ToList();
-            }
-        }
-
-        public ScoreTable(ScoreMethod method, int intensityBins, double[] binEdges)
+        public CorrelationScoreTable(ScoreMethod method, int intensityBins, double[] binEdges)
         {
             _method = method;
             _binEdges = binEdges;
@@ -46,7 +25,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _intensityHistogram = new Histogram<FitScore>(new CompareFitScoreByIntensity());
         }
 
-        public ScoreTable(ScoreMethod method, double[] intensityBins, double[] binEdges)
+        public CorrelationScoreTable(ScoreMethod method, double[] intensityBins, double[] binEdges)
         {
             _method = method;
             _binEdges = binEdges;
@@ -58,60 +37,23 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         }
 
-        private static string ReducedChargeName(IonType ionType)
+        public List<Histogram<FitScore>> Histograms
         {
-            string name = ionType.Name;
-            if (ionType.Charge > 1 && ionType.Charge < 10)
-                name = name.Remove(1, 1);
-            if (ionType.Charge >= 10)
-                name = name.Remove(1, 2);
-            return name;
-        }
-
-        private List<FitScore> SelectBestScores(Dictionary<string, FitScoreList> ionTypeScores)
-        {
-            return ionTypeScores.Values.Select(scoreList => scoreList.MaxScore(_method)).ToList();
-        }
-
-        private double GetScore(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntenistyThreshold)
-        {
-            double score;
-            switch (_method)
+            get
             {
-                case ScoreMethod.Cosine:
-                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
-                    break;
-                case ScoreMethod.FitScore:
-                    score = spectrum.GetFitScore(ion, tolerance, relativeIntenistyThreshold);
-                    break;
-                case ScoreMethod.Pearson:
-                    score = spectrum.GetCorrScore(ion, tolerance, relativeIntenistyThreshold);
-                    break;
-                default:
-                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
-                    break;
-            }
-            return score;
-        }
-
-        private Peak GetHighestPeak(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntensityThreshold)
-        {
-            var peaks = spectrum.GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
-
-            Peak highestPeak = null;
-            double highestIntensity = 0.0;
-
-            if (peaks == null) return null;
-
-            foreach (var peak in peaks)
-            {
-                if (peak != null && peak.Intensity >= highestIntensity)
+                if (IntensityBins == null)
                 {
-                    highestPeak = peak;
-                    highestIntensity = peak.Intensity;
+                    _intensityHistogram.Equalize(_intensityBinCount, new FitScore(0, 0));
+                    var edgeList = new FitScoreList(_intensityHistogram.BinEdges);
+                    IntensityBins = edgeList.Intensities;
                 }
+                else
+                {
+                    _intensityHistogram.BinEdges = new FitScoreList(IntensityBins, null).ToArray();
+                }
+                var bins = _intensityHistogram.Bins;
+                return bins.Select(bin => new Histogram<FitScore>(bin, (new FitScoreList(null, _binEdges)).ToArray(), new CompareFitScoreByScore())).ToList();
             }
-            return highestPeak;
         }
 
         public void AddMatches(List<SpectrumMatch> matches, IonType[] ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool reduceCharges=true)
@@ -168,5 +110,65 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 debugFile.Close();
             }
         }
+
+        private Peak GetHighestPeak(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntensityThreshold)
+        {
+            var peaks = spectrum.GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
+            Peak highestPeak = null;
+            double highestIntensity = 0.0;
+
+            if (peaks == null) return null;
+
+            foreach (var peak in peaks)
+            {
+                if (peak != null && peak.Intensity >= highestIntensity)
+                {
+                    highestPeak = peak;
+                    highestIntensity = peak.Intensity;
+                }
+            }
+            return highestPeak;
+        }
+
+        private static string ReducedChargeName(IonType ionType)
+        {
+            string name = ionType.Name;
+            if (ionType.Charge > 1 && ionType.Charge < 10)
+                name = name.Remove(1, 1);
+            if (ionType.Charge >= 10)
+                name = name.Remove(1, 2);
+            return name;
+        }
+
+        private List<FitScore> SelectBestScores(Dictionary<string, FitScoreList> ionTypeScores)
+        {
+            return ionTypeScores.Values.Select(scoreList => scoreList.MaxScore(_method)).ToList();
+        }
+
+        private double GetScore(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntenistyThreshold)
+        {
+            double score;
+            switch (_method)
+            {
+                case ScoreMethod.Cosine:
+                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
+                    break;
+                case ScoreMethod.FitScore:
+                    score = spectrum.GetFitScore(ion, tolerance, relativeIntenistyThreshold);
+                    break;
+                case ScoreMethod.Pearson:
+                    score = spectrum.GetCorrScore(ion, tolerance, relativeIntenistyThreshold);
+                    break;
+                default:
+                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
+                    break;
+            }
+            return score;
+        }
+
+        private readonly double[] _binEdges;
+        private readonly ScoreMethod _method;
+        private readonly Histogram<FitScore> _intensityHistogram;
+        private readonly int _intensityBinCount;
     }
 }

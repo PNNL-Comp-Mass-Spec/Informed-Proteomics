@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
     public class RankProbability
     {

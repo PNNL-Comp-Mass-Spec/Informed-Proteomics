@@ -6,58 +6,48 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class SpectrumMatch
     {
-        private List<Composition> _prefixes;
-        private List<Composition> _suffixes; 
-        private readonly int _precursorCharge;
-
         public Sequence Sequence { get; private set; }
         public string Peptide { get; private set; }
         public Spectrum Spectrum { get; private set; }
-        public int ScanNum { get; private set; }
-        public int PrecursorCharge { get { return _precursorCharge;  } }
+        public int PrecursorCharge { get; private set; }
+        public Composition PrecursorComposition { get { return Sequence.Composition + Composition.H2O; }}
         public bool Decoy { get; private set; }
-
         public class MismatchException : Exception {}
 
-        public SpectrumMatch(string peptide, Spectrum spectrum, int scanNum, 
-                            int precursorCharge, Sequence sequence, bool decoy=false)
+        public SpectrumMatch(Sequence sequence, Spectrum spectrum, int precursorCharge=1, bool decoy=false)
         {
-            Peptide = peptide;
+            foreach (var aa in sequence) Peptide += aa.Residue;
             Spectrum = spectrum;
-            ScanNum = scanNum;
-            _precursorCharge = precursorCharge;
+            PrecursorCharge = precursorCharge;
             Decoy = decoy;
             Sequence = sequence;
             if (decoy) CreateDecoy();
         }
 
-        public SpectrumMatch(string peptide, string sequenceFormat,
-                             Spectrum spectrum, int scanNum, 
-                             int precursorCharge, bool decoy=false)
+        public SpectrumMatch(string peptide, DataFileFormat sequenceFormat,
+                             Spectrum spectrum, int precursorCharge=1, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
-            ScanNum = scanNum;
-            _precursorCharge = precursorCharge;
+            PrecursorCharge = precursorCharge;
             Decoy = decoy;
             var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
             if (decoy) CreateDecoy();
         }
 
-        public SpectrumMatch(string peptide, string sequenceFormat,
-                             Spectrum spectrum, int scanNum,
-                             int precursorCharge, string formula, bool decoy=false)
+        public SpectrumMatch(string peptide, DataFileFormat sequenceFormat,
+                             Spectrum spectrum, string formula, int precursorCharge=1, bool decoy=false)
         {
             Peptide = peptide;
             Spectrum = spectrum;
-            ScanNum = scanNum;
-            _precursorCharge = precursorCharge;
+            PrecursorCharge = precursorCharge;
             Decoy = decoy;
             var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
@@ -109,28 +99,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        private void CreateDecoy()
-        {
-            Sequence.Reverse();
-            var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
-            sequence = SimpleStringProcessing.Mutate(sequence, sequence.Length/2);
-            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
-        }
-
-        public List<Ion> GetPrefixIons(IonType ionType)
-        {
-            return Prefixes.Select(ionType.GetIon).ToList();
-        }
-
-        public List<Ion> GetSuffixIons(IonType ionType)
-        {
-            return Suffixes.Select(ionType.GetIon).ToList();
-        }
-
         public List<Ion> GetCleavageIons(IonType ionType)
         {
             var compositions = ionType.BaseIonType.IsPrefix ? Prefixes : Suffixes;
             return compositions.Select(ionType.GetIon).ToList();
         }
+
+        private void CreateDecoy()
+        {
+            Sequence.Reverse();
+            var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
+            sequence = SimpleStringProcessing.Mutate(sequence, sequence.Length / 2);
+            Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
+        }
+
+        private List<Composition> _prefixes;
+        private List<Composition> _suffixes; 
     }
 }

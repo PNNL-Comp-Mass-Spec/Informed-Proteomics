@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class FitScore
     {

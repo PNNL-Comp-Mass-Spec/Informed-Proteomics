@@ -6,6 +6,9 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.Obsolete
@@ -48,8 +51,8 @@ namespace InformedProteomics.Test.Obsolete
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                var prefixTable = new ScoreTable(_method, _intensityBins, _scoreBins);
-                var suffixTable = new ScoreTable(_method, _intensityBins, _scoreBins);
+                var prefixTable = new CorrelationScoreTable(_method, _intensityBins, _scoreBins);
+                var suffixTable = new CorrelationScoreTable(_method, _intensityBins, _scoreBins);
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {
@@ -69,8 +72,8 @@ namespace InformedProteomics.Test.Obsolete
                 var suffixhistograms = suffixTable.Histograms;
                 var prefixEdges = prefixTable.IntensityBins;
                 var suffixEdges = suffixTable.IntensityBins;
-                var decoyprefixTable = new ScoreTable(_method, prefixEdges, _scoreBins);
-                var decoysuffixTable = new ScoreTable(_method, suffixEdges, _scoreBins);
+                var decoyprefixTable = new CorrelationScoreTable(_method, prefixEdges, _scoreBins);
+                var decoysuffixTable = new CorrelationScoreTable(_method, suffixEdges, _scoreBins);
 
                 for (int i = 0; i < txtFiles.Count; i++)
                 {

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class Probability <T1>
     {
-        public T1 DataLabel { get; private set; }
+        public T1 Label { get; private set; }
         public double Found { get; set; }
         public double Total { get; set; }
 
@@ -13,9 +12,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             get { return (Found / Total); }
         }
-        public Probability(T1 dataLabel, double found=0, double total=0)
+        public Probability(T1 label, double found=0, double total=0)
         {
-            DataLabel = dataLabel;
+            Label = label;
             Found = found;
             Total = total;
         }
@@ -23,7 +22,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public static Probability<T1> operator +(Probability<T1> l, Probability<T1> r)
         {
-            var added = new Probability<T1>(l.DataLabel, l.Found + r.Found, l.Total + r.Total);
+            var added = new Probability<T1>(l.Label, l.Found + r.Found, l.Total + r.Total);
             return added;
         }
     }

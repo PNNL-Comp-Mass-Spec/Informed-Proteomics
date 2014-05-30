@@ -7,6 +7,9 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -85,7 +88,7 @@ namespace InformedProteomics.Test
                         foreach (var offsetFrequency in offsetFrequencies[i])
                         {
 //                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
-                            outFile.WriteLine("{0}\t{1}", offsetFrequency.DataLabel, offsetFrequency.Prob);
+                            outFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Prob);
                         }
                     }
                 }
@@ -155,7 +158,7 @@ namespace InformedProteomics.Test
                         outFile.WriteLine();
                         for (int j = 0; j < offsetFrequencyList.First().Count; j++)
                         {
-                            var offset = offsetFrequencyList.First()[j].DataLabel;
+                            var offset = offsetFrequencyList.First()[j].Label;
                             var integerOffset = Math.Round(offset*(1/_binWidth), 2);
                             outFile.Write(integerOffset+"\t");
                             for (int k = 0; k < offsetFrequencyList.Count; k++)

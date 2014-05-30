@@ -4,7 +4,8 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.Scoring.LikelihoodScoring;
+using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests
@@ -34,12 +35,12 @@ namespace InformedProteomics.Test.FunctionalTests
 
                     debugFile.WriteLine("ScanNum\tM/Z\tPrecursor Charge\tIon Type\tPeptide");
                     debugFile.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
-                        spectrumMatch.ScanNum, mz, spectrumMatch.PrecursorCharge, ionType.Name, spectrumMatch.Peptide);
+                        spectrumMatch.Spectrum.ScanNum, mz, spectrumMatch.PrecursorCharge, ionType.Name, spectrumMatch.Peptide);
                     debugFile.WriteLine("Offset\tM/Z");
                     foreach (var offsetFrequency in offsetFrequencies)
                     {
                         if (offsetFrequency.Found > 0)
-                            debugFile.WriteLine("{0}\t{1}", offsetFrequency.DataLabel, offsetFrequency.DataLabel+mz);
+                            debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label+mz);
                     }
                 }
             }

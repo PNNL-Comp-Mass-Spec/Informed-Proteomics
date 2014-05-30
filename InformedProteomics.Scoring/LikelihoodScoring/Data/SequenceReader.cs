@@ -1,18 +1,19 @@
 ﻿using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     class SequenceReader: ISequenceReader
     {
-        private readonly string _format;
-        public SequenceReader(string format)
+        private readonly DataFileFormat _format;
+        public SequenceReader(DataFileFormat format)
         {
             _format = format;
         }
         public Sequence GetSequence(string sequence)
         {
             Sequence seq;
-            if (_format == "mgf")
+            if (_format == DataFileFormat.Mgf)
             {
                 var sequenceReader = new MgfSequenceReader();
                 seq = sequenceReader.GetSequence(sequence);

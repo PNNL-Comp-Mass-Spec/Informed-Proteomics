@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class SpectrumFilter
     {
@@ -38,6 +39,31 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
             var filteredSpectrum = new Spectrum(filteredPeaks.ToArray(), spectrum.ScanNum);
             return filteredSpectrum;
+        }
+
+        /// <summary>
+        /// Filter out all peaks in a spectrum that are not explained by certain ion types.
+        /// </summary>
+        /// <param name="sequence">Sequence to calculate ions from.</param>
+        /// <param name="spectrum">Spectrum to filter.</param>
+        /// <param name="ionTypes">Ion types to find peaks for.</param>
+        /// <param name="tolerance"></param>
+        /// <returns>Filtered Peptide Spectrum Match</returns>
+        public static Spectrum FilterIonPeaks(Sequence sequence, Spectrum spectrum, IonType[] ionTypes, Tolerance tolerance)
+        {
+            var filteredPeaks = new List<Peak>();
+            var specMatch = new SpectrumMatch(sequence, spectrum);
+            foreach (var ionType in ionTypes)
+            {
+                var ions = specMatch.GetCleavageIons(ionType);
+                foreach (var ion in ions)
+                {
+                    var peak = spectrum.FindPeak(ion.GetMonoIsotopicMz(), tolerance);
+                    if (peak != null) filteredPeaks.Add(peak);
+                }
+            }
+            filteredPeaks.Sort();
+            return new Spectrum(filteredPeaks, spectrum.ScanNum) {MsLevel = 2};
         }
     }
 }

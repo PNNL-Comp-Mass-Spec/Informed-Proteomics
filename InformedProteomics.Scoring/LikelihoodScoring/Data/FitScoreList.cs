@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class FitScoreList: List<FitScore>
     {
-        public FitScoreList(double[] intensities, double[] scores)
+        public FitScoreList(IList<double> intensities, IList<double> scores)
         {
             int counter = 0;
-            if (intensities != null && intensities.Length > 0)
-                counter = intensities.Length;
-            else if (scores != null && scores.Length > 0)
-                counter = scores.Length;
+            if (intensities != null && intensities.Count > 0)
+                counter = intensities.Count;
+            else if (scores != null && scores.Count > 0)
+                counter = scores.Count;
 
             for (int i = 0; i < counter; i++)
             {

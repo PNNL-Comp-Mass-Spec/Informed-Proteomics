@@ -6,33 +6,20 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.LikelihoodScoring.Config;
 
-namespace InformedProteomics.Scoring.LikelihoodScoring
+namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class SpectrumMatchList: List<SpectrumMatch>
     {
-        private const string QValueHeader = "Qvalue";
-        private const string EvalueHeader = "E-value";
-        private const string TopDownPeptideHeader = "Annotation";
-        private const double QValueThreshold = 0.01;
-        private const double EValueThreshold = 0.1;
-
-        private const string BottomUpPeptideHeader = "Peptide";
-        private const string PepQValueHeader = "PepQValue";
-        private const string FormulaHeader = "Formula";
-        private const double PepQValueThreshold = 0.01;
-
-        private const string ScanHeader = "ScanNum";
-        private const string PrecursorChargeHeader = "Charge";
-
         public int MaxCharge { get; private set; }
         public bool Decoy { get; private set; }
         public ActivationMethod Act { get; private set; }
-        public string SequenceFormat { get; private set; }
+        public DataFileFormat SequenceFormat { get; private set; }
 
         public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile,
                                  ActivationMethod act, bool useDecoy=false, int maxCharge=0,
-                                 string sequenceFormat="raw")
+                                 DataFileFormat sequenceFormat=DataFileFormat.Msgf)
         {
             Decoy = useDecoy;
             Act = act;
@@ -41,7 +28,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             AddMatchesFromTsvFile(lcms, tsvFile);
         }
 
-        public SpectrumMatchList(ActivationMethod act, bool useDecoy = false, int maxCharge = 0, string sequenceFormat = "raw")
+        public SpectrumMatchList(ActivationMethod act, bool useDecoy = false, int maxCharge = 0,
+                                 DataFileFormat sequenceFormat = DataFileFormat.Msgf)
         {
             Decoy = useDecoy;
             MaxCharge = maxCharge;
@@ -78,7 +66,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     if (spec == null || spec.ActivationMethod != Act) continue;
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
-                    Add(new SpectrumMatch(peptides[i], spectrum, scanNum, precursorCharge, new Sequence(peptides[i], aset), Decoy));
+                    Add(new SpectrumMatch(new Sequence(peptides[i], aset), spectrum, precursorCharge, Decoy));
                 }
             }
             else
@@ -103,8 +91,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
                     Add((formulas != null && formulas[i] != null)
-                        ? new SpectrumMatch(peptides[i], SequenceFormat, spectrum, scanNum, precursorCharge, formulas[i], Decoy)
-                        : new SpectrumMatch(peptides[i], SequenceFormat, spectrum, scanNum, precursorCharge, Decoy));
+                        ? new SpectrumMatch(peptides[i], SequenceFormat, spectrum, formulas[i], precursorCharge, Decoy)
+                        : new SpectrumMatch(peptides[i], SequenceFormat, spectrum, precursorCharge, Decoy));
                 }
             }
         }
@@ -157,7 +145,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                             }
                             peptideSet.Add(sequence);
                             var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
-                            var specMatch = new SpectrumMatch(sequence, SequenceFormat, spectrum, scanNum, charge);
+                            var specMatch = new SpectrumMatch(sequence, SequenceFormat, spectrum, charge);
                             sequence = "";
                             scanNum = 0;
                             charge = 0;
@@ -179,8 +167,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         public void AddMatch(SpectrumMatch match)
         {
-            var newMatch = new SpectrumMatch(match.Peptide, SequenceFormat, match.Spectrum, match.ScanNum,
-                                 match.PrecursorCharge, Decoy);
+            var newMatch = new SpectrumMatch(match.Peptide, SequenceFormat, match.Spectrum, match.PrecursorCharge, Decoy);
             Add(newMatch);
         }
 
@@ -198,7 +185,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             foreach (var match in this)
             {
                 var spectrum = SpectrumFilter.GetFilteredSpectrum(match.Spectrum, windowWidth, retentionCount);
-                filteredList.Add(new SpectrumMatch(match.Peptide, SequenceFormat, spectrum, match.ScanNum, match.PrecursorCharge));
+                filteredList.Add(new SpectrumMatch(match.Peptide, SequenceFormat, spectrum, match.PrecursorCharge));
             }
             Clear();
             AddRange(filteredList);
@@ -207,7 +194,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public SpectrumMatch GetScan(int scanNum)
         {
             return (from i in this
-                    where i.ScanNum == scanNum
+                    where i.Spectrum.ScanNum == scanNum
                     select i).FirstOrDefault();
         }
 
@@ -219,5 +206,19 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     select i);
             return chargeMatchList;
         }
+
+        private const string QValueHeader = "Qvalue";
+        private const string EvalueHeader = "E-value";
+        private const string TopDownPeptideHeader = "Annotation";
+        private const double QValueThreshold = 0.01;
+        private const double EValueThreshold = 0.1;
+
+        private const string BottomUpPeptideHeader = "Peptide";
+        private const string PepQValueHeader = "PepQValue";
+        private const string FormulaHeader = "Formula";
+        private const double PepQValueThreshold = 0.01;
+
+        private const string ScanHeader = "ScanNum";
+        private const string PrecursorChargeHeader = "Charge";
     }
 }
