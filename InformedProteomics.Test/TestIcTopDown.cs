@@ -23,7 +23,7 @@ namespace InformedProteomics.Test
             // QC_Shew
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\database\ID_002216_235ACCEA.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownYufeng\Ic\NoMod_M1";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownYufeng\Ic\NoMod_M2_0";
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -44,7 +44,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            const int searchMode = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
             bool? tda = true;   // true: target & decoy, false: target, null: decoy
 
             const int minSequenceLength = 21; // 7
@@ -264,26 +264,33 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrSm()
         {
-            const string specFilePath = @"D:\Research\Data\Jon\AH_SF_mouseliver_3-1_Intact_2_6Feb14_Bane_PL011402.raw";
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
             const string annotation =
-                "_.SKVSFKITLTSDPRLPYKVLSVPESTPFTAVLKFAAEEFKVPAATSAIITNDGIGINPAQTAGNVFLKHGSELRIIPRDRVGSCV._";
-            const int charge = 7;
-            const int ms2ScanNum = 19011;
+                "_.MKTKLSVLSAAMLAATLTMMPAVSQAAIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVG" +
+                "LHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTV" +
+                "TSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVG" +
+                "IGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGS" +
+                "AAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEA" +
+                "NQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDL" +
+                "KSLKELLKDQEGAVALKIVRGKSMLYLVLR._";
+            const int charge = 60;
+            const int ms2ScanNum = 46661;
 
-            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, true);
-            var modVal = Modification.RegisterAndGetModification("Val", new Composition(5, 9, 1, 1, 0));
-            var modValAny = new SearchModification(modVal, '*', SequenceLocation.Everywhere, false);
-            const int numMaxModsPerProtein = 1;
-            var searchModifications = new List<SearchModification>
-            {
-                acetylN,
-                modValAny
-            };
-            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            //var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, true);
+            //var modVal = Modification.RegisterAndGetModification("Val", new Composition(5, 9, 1, 1, 0));
+            //var modValAny = new SearchModification(modVal, '*', SequenceLocation.Everywhere, false);
+            //const int numMaxModsPerProtein = 0;
+            //var searchModifications = new List<SearchModification>
+            //{
+            //    acetylN,
+            //    modValAny
+            //};
+            //var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            var aaSet = new AminoAcidSet();
 
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
-            ms2Scorer.DeconvoluteProductSpectra();
+            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 30);
+            ms2Scorer.DeconvoluteProductSpectra(ms2ScanNum);
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
             if (scorer == null)
             {
@@ -300,7 +307,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine("Fast search score: " + score);
                 var composition = graph.GetSinkSequenceCompositionWithH2O();
 
-                var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
+                var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 30, new Tolerance(10));
                 var refinedScore = informedScorer.GetScores(AminoAcid.ProteinNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.ProteinCTerm, composition, charge, ms2ScanNum);
                 Console.WriteLine("RefinedScores: {0}", refinedScore);
             }

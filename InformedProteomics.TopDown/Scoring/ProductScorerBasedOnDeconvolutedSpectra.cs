@@ -59,6 +59,17 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
+        public void DeconvoluteProductSpectra(int scanNum)
+        {
+            _ms2Scorer = new Dictionary<int, IScorer>();
+            var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
+            if (spec == null) return;
+            //if (spec.ScanNum != 879) continue;
+            var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
+            if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
+        }
+
+
         public Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
         {
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec, minCharge, maxCharge, IsotopeOffsetTolerance, FilteringWindowSize, tolerance, corrThreshold);

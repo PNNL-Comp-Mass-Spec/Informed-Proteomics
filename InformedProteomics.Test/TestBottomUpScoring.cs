@@ -47,6 +47,23 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestVennDiagram()
+        {
+            const string result1Path = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod_NTT1.tsv";
+            const string result2Path = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT1_Test\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTda.tsv";
+            const double pepQValueThreshold = 0.01;
+            var result1 = new TsvFileParser(result1Path);
+            var result2 = new TsvFileParser(result2Path);
+
+            var vennDiagram = new VennDiagram<string>(result1.GetPeptides(pepQValueThreshold),
+                                                      result2.GetPeptides(pepQValueThreshold));
+
+            var intersectionPeptides = vennDiagram.Intersection;
+            Console.WriteLine(vennDiagram.Set1 + " " + vennDiagram.Set2);
+            Console.WriteLine(vennDiagram.Set1 + " " + vennDiagram.Intersection + " " + vennDiagram.Set2Only);
+        }
+
+        [Test]
         public void TestLogLikelihoodScoring()
         {
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -129,9 +146,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptideLevelStats()
         {
-            const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_Rescoring";
+            const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
             var targetData = new List<string>();
-            const string mzRange = "";
+            const string mzRange = "775to900";
             foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcTarget.tsv"))
             {
                 targetData.AddRange(File.ReadAllLines(specFilePath).Skip(1));

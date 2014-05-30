@@ -113,12 +113,15 @@ namespace InformedProteomics.Backend.Utils
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("Score");
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("#MatchedFragments");
             var sequenceIndex = _headers.IndexOf("Sequence");
+            var scanNumIndex = _headers.IndexOf("Scan");
             var preIndex = _headers.IndexOf("Pre");
             var postIndex = _headers.IndexOf("Post");
             var proteinIndex = _headers.IndexOf("ProteinName");
             if (scoreIndex < 0 || sequenceIndex < 0 || preIndex < 0 || postIndex < 0 || proteinIndex < 0) return false;
 
             var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                .Select(grp => grp.First())
                 .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
                 .Select(grp => grp.First())
                 .ToArray();

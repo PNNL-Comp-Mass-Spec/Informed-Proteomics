@@ -50,8 +50,8 @@ namespace InformedProteomics.Backend.Utils
 
             for (var i = 0; i < _header.Length; i++)
             {
-                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide")) peptideColumnIndex = i;
-                if (_header[i].Equals("Protein")) proteinColumnIndex = i;
+                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence")) peptideColumnIndex = i;
+                if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName")) proteinColumnIndex = i;
                 if (_header[i].Equals("PepQValue")) pepQValueColumnIndex = i;
             }
 

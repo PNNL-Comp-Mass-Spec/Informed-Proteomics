@@ -89,12 +89,20 @@ namespace InformedProteomics.BottomUp.Scoring
             var ms2Score = scoreAndModifications.Item1;
 
             // TODO: This assumes enzyme is trypsin
-            if (pre == 'K' || pre == 'R' || pre == FastaDatabase.Delimiter || pre == '-') ms2Score += 2.21;
-            else ms2Score += -0.14;
+            const double probN = 0.99999;
+            const double probC = 0.99999;
+            const double sumAAProbabilities = 0.1;
+            var creditN = Math.Log(probN / sumAAProbabilities);
+            var penaltyN = Math.Log((1.0 - probN) / (1.0 - sumAAProbabilities));
+            var creditC = Math.Log(probC / sumAAProbabilities);
+            var penaltyC = Math.Log((1.0 - probC) / (1.0 - sumAAProbabilities));
+
+            if (pre == 'K' || pre == 'R' || pre == FastaDatabase.Delimiter || pre == '-') ms2Score += creditN;
+            else ms2Score += penaltyN;
 
             var lastResidue = sequence[sequence.Length - 1];
-            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabase.Delimiter || post == '-') ms2Score += 2.29;
-            else ms2Score += -2.41;
+            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabase.Delimiter || post == '-') ms2Score += creditC;
+            else ms2Score += penaltyC;
 
             var modifications = scoreAndModifications.Item2;
 
