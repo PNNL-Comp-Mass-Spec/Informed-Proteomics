@@ -44,7 +44,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public double PrecursorOffsetThreshold { get; private set; }
         
         public const double BinWidth = 1.005;
-        public int MassBins { get; private set; }
+        public int MassBinSize { get; private set; }
         public const double MassErrorBinWidth = 0.01;
         public const double MassErrorWidth = 0.5;
         public const double MassErrorStartPoint = 0.005;
@@ -69,7 +69,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             RetentionCount = Convert.ToInt32(config.Contents["retentioncount"]);
             RelativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
             SelectedIonThreshold = Convert.ToDouble(config.Contents["selectedionthreshold"]);
-            MassBins = Convert.ToInt32(config.Contents["massbins"]);
+            MassBinSize = Convert.ToInt32(config.Contents["massbinsize"]);
             var actStr = config.Contents["activationmethod"].ToLower();
             switch (actStr)
             {

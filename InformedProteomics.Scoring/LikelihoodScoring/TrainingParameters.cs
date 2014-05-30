@@ -21,6 +21,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public TrainingParameters(TrainerConfiguration config)
         {
             Config = config;
+            _massBins = new Dictionary<int, int>();
             _charges = new HashSet<int>();
             _massSorter = new Dictionary<int, Histogram<double>>();
             _rankTables = new Dictionary<int, List<RankTable>>();
@@ -117,17 +118,17 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     file.WriteLine("Charge\t"+charge);
                     file.Write("BinSize\t");
                     var massBins = _massSorter[charge].Bins;
-                    for (int i = 0; i < Config.MassBins; i++)
+                    for (int i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write(massBins[i].Count);
-                        if (i < Config.MassBins-1) file.Write("\t");
+                        if (i < _massBins[charge]-1) file.Write("\t");
                     }
                     file.WriteLine();
-                    for (int i = 0; i < Config.MassBins; i++)
+                    for (int i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
                         var max = Double.PositiveInfinity;
-                        if (i < Config.MassBins-1) max = _massSorter[charge].BinEdges[i+1];
+                        if (i < _massBins[charge]-1) max = _massSorter[charge].BinEdges[i+1];
                         file.Write("\t"+max);
                         file.WriteLine();
                         var ionTypes = _ionProbabilities[charge][i].SelectIonTypess(Config.SelectedIonThreshold);
@@ -231,12 +232,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private void Initialize(int charge, SpectrumMatchList matches)
         {
             var chargeMatches = matches.GetCharge(charge);
+            if (chargeMatches.Count < Config.MassBinSize)
+                throw new Exception("Fewer than " + Config.MassBinSize + " spectra in charge "+charge+" data set.");
+            _massBins.Add(charge, chargeMatches.Count / Config.MassBinSize);
             _massSorter.Add(charge, new Histogram<double>());
             foreach (var match in chargeMatches)
             {
                 _massSorter[charge].AddDatum(match.PrecursorComposition.Mass);
             }
-            _massSorter[charge].Equalize(Config.MassBins, 0);
+            _massSorter[charge].Equalize(_massBins[charge], 0);
 
             _rankTables.Add(charge, new List<RankTable>());
             _drankTables.Add(charge, new List<RankTable>());
@@ -262,6 +266,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return key;
         }
 
+        private readonly Dictionary<int, int> _massBins;
         private readonly HashSet<int> _charges;
         private readonly Dictionary<int, List<RankTable>> _rankTables;
         private readonly Dictionary<int, List<RankTable>> _drankTables;
