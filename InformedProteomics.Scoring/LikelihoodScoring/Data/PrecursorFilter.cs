@@ -46,7 +46,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             var filteredPeaks = peaks.Where((t, i) => !indexes.Contains(i)).ToList();
 
             var spectrum = new Spectrum(filteredPeaks, specMatch.Spectrum.ScanNum);
-            var filteredSpecMatch = new SpectrumMatch(specMatch.Sequence, spectrum, charge, specMatch.Decoy);
+            var filteredSpecMatch = new SpectrumMatch(specMatch.Sequence, spectrum, specMatch.ScanNum, charge, specMatch.Decoy);
             return filteredSpecMatch;
         }
 

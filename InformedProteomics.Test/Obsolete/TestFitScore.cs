@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 
@@ -59,8 +58,8 @@ namespace InformedProteomics.Test.Obsolete
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
-                    var matchList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act));
+                    var lcms = new LazyLcMsRun(rawFile, _noiseFiltration, _noiseFiltration);
+                    var matchList = (new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcTopDown));
                     prefixTable.AddMatches(matchList, _prefixionTypes.ToArray(), _defaultTolerance, _relativeIntensityThreshold);
                     suffixTable.AddMatches(matchList, _suffixionTypes.ToArray(), _defaultTolerance, _relativeIntensityThreshold);
                 }
@@ -80,8 +79,8 @@ namespace InformedProteomics.Test.Obsolete
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, _noiseFiltration, _noiseFiltration);
-                    var decoyList = (new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act, true));
+                    var lcms = new LazyLcMsRun(rawFile, _noiseFiltration, _noiseFiltration);
+                    var decoyList = (new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcTopDown, 0, true));
                     decoyprefixTable.AddMatches(decoyList, _prefixionTypes.ToArray(), _defaultTolerance,
                         _relativeIntensityThreshold);
                     decoysuffixTable.AddMatches(decoyList, _suffixionTypes.ToArray(), _defaultTolerance,

@@ -97,39 +97,43 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             foreach (var ionType in IonTypes)
             {
                 int index = 0;
-                int startRank = 0;
                 int window = smoothingWindowSize[index];
                 var total = 0.0;
                 var count = 0;
+                var endRank = 0;
 
-                for (int currRank = startRank; currRank < MaxRanks+1; currRank += window + 1)
+                for (int startRank = 0; startRank < MaxRanks;)
                 {
-                    var endRank = Math.Min(currRank + window + 1, MaxRanks);
-                    for (int i = currRank; i < endRank; i++)
+                    if (startRank >= smoothingRanks[index])
+                    {
+                        index++;
+                        window = smoothingWindowSize[index];
+                    }
+                    endRank = Math.Min(endRank + window + 1, MaxRanks);
+                    for (int i = startRank; i < endRank; i++)
                     {
                         total += _rankTable[ionType][i];
                         count++;
                     }
                     var average = total / count;
-                    if (!average.Equals(0))
+                    if (average > 0.0)
                     {
                         for (int i = startRank; i < endRank; i++)
                         {
                             _rankTable[ionType][i] = average;
                         }
+                        total = 0.0;
                         count = 0;
-                        total = 0;
-                        startRank = currRank;
+                        startRank += window + 1;
                     }
-                    if (currRank >= smoothingRanks[index])
+                    else if (endRank == MaxRanks && startRank > 0)
                     {
-                        index++;
-                        window = smoothingWindowSize[index];
+                        startRank--;
+                        total = 0.0;
+                        count = 0;
+                        continue;
                     }
-                    if ((currRank + 2 * window) > MaxRanks)
-                    {
-                        window *= 2;
-                    }
+                    if (endRank == MaxRanks) break;
                 }
             }
         }

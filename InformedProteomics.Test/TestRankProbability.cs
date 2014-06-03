@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -29,7 +28,11 @@ namespace InformedProteomics.Test
                 var txtFiles = new List<string>();
                 var dataFiles = new List<string>();
 
-                if (config.DataFormat == DataFileFormat.Msgf)
+                if (config.DataFormat == DataFileFormat.Mgf)
+                {
+                    dataFiles.Add(config.DataPath + dataSet + "." + config.DataFormat);
+                }
+                else
                 {
                     // Read directory
                     var txtFilesTemp = Directory.GetFiles(tsvName).ToList();
@@ -39,37 +42,28 @@ namespace InformedProteomics.Test
                         dataFilesTemp.Where(dataFile => Path.GetExtension(dataFile) == ".raw").ToList();
                     Assert.True(dataFiles.Count == txtFiles.Count);
                 }
-                else
-                {
-                    dataFiles.Add(config.DataPath + dataSet + "." + config.DataFormat);
-                }
 
                 // Read Data files
                 for (int i = 0; i < dataFiles.Count; i++)
                 {
-                    var targets = new SpectrumMatchList(config.ActivationMethod, false, config.PrecursorCharge,
-                        config.DataFormat);
-                    var decoys = new SpectrumMatchList(config.ActivationMethod, true, config.PrecursorCharge,
-                        config.DataFormat);
+                    SpectrumMatchList targets;
 
-                    if (config.DataFormat == DataFileFormat.Msgf)
+                    if (config.DataFormat == DataFileFormat.Mgf)
+                    {
+                        Console.WriteLine(dataSet + ".mgf");
+                        targets = new SpectrumMatchList(dataFiles[i], config.PrecursorCharge);
+                    }
+                    else
                     {
                         string textFile = txtFiles[i];
                         string rawFile = dataFiles[i];
                         Console.WriteLine("{0}\t{1}", textFile, rawFile);
-                        var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
-                        targets.AddMatchesFromTsvFile(lcms, new TsvFileParser(txtFiles[i]));
+                        var lcms = new LazyLcMsRun(rawFile, 0, 0);
+                        targets = new SpectrumMatchList(lcms, txtFiles[i], config.DataFormat, config.PrecursorCharge);
                     }
-                    else
-                    {
-                        Console.WriteLine(dataSet + ".mgf");
-                        targets.AddMatchesFromMgfFile(dataFiles[i]);
-                    }
-
-                    decoys.AddMatches(targets);
 
                     // Add PSMs
-                    trainingParameters.AddMatches(targets, decoys);
+                    trainingParameters.AddMatches(targets);
                 }
 
                 // Write output file

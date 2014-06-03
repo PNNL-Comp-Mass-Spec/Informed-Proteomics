@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
-using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
@@ -203,8 +200,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
 //            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
 
-            var spectrumMatches = new SpectrumMatchList(Act, false, MaxPrecCharge);
-            spectrumMatches.AddMatchesFromMgfFile(RawFile);
+            var spectrumMatches = new SpectrumMatchList(RawFile, MaxPrecCharge);
 //            spectrumMatches.FilterSpectra();
             return spectrumMatches;
         }

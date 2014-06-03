@@ -4,13 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
-using InformedProteomics.Scoring.LikelihoodScoring;
 
 namespace InformedProteomics.Test
 {
@@ -68,11 +67,11 @@ namespace InformedProteomics.Test
                     string textFile = txtFiles[i];
                     string rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
-                    var lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
-                    var matchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act);
+                    var lcms = new LazyLcMsRun(rawFile, NoiseFiltration, NoiseFiltration);
+                    var matchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp);
                     SpectrumMatchList decoyMatchList = null;
                     if (_useDecoy)
-                        decoyMatchList = new SpectrumMatchList(lcms, new TsvFileParser(txtFiles[i]), _act, true);
+                        decoyMatchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp, 0, true);
 
                     for (int j = 0; j < tableCount; j++)
                     {

@@ -21,6 +21,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public TrainingParameters(TrainerConfiguration config)
         {
             Config = config;
+            _dataSet = new Queue<SpectrumMatch>();
             _massBins = new Dictionary<int, int>();
             _charges = new HashSet<int>();
             _massSorter = new Dictionary<int, Histogram<double>>();
@@ -29,6 +30,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _ionProbabilities = new Dictionary<int, List<ProductIonFrequencyTable>>();
             _massErrors = new Dictionary<int, List<MassErrorTable>>();
             _precursorOffsets = new Dictionary<int, List<PrecursorOffsets>>();
+            _computed = false;
         }
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _precursorOffsets = new Dictionary<int, List<PrecursorOffsets>>();
             Config = config;
             ReadFromFile(fileName);
+            _computed = true;
         }
         #endregion
 
@@ -87,30 +90,30 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         /// and MassErrorTables. Partitions them by mass and precursor charge.
         /// </summary>
         /// <param name="targets">Target Peptide-Spectrum matches.</param>
-        /// <param name="decoys">Decoy Peptide-Spectrum matches ordered the same as the target list.
-        /// </param>
-        public void AddMatches(SpectrumMatchList targets, SpectrumMatchList decoys)
+        public void AddMatches(SpectrumMatchList targets)
         {
-            if (targets.Count != decoys.Count) throw new ArgumentException("Unequal length target and decoy lists.");
-            for (int i = 0; i < targets.Count; i++)
+            _computed = false;
+            foreach (var match in targets)
             {
-                var target = targets[i];
-                var decoy = decoys[i];
-                var charge = target.PrecursorCharge;
-                if (!_massSorter.ContainsKey(charge))
+                var charge = match.PrecursorCharge;
+                if (!_charges.Contains(match.PrecursorCharge))
                 {
-                    Initialize(charge, targets);
                     _charges.Add(charge);
+                    _rankTables.Add(charge, new List<RankTable>());
+                    _drankTables.Add(charge, new List<RankTable>());
+                    _ionProbabilities.Add(charge, new List<ProductIonFrequencyTable>());
+                    _massErrors.Add(charge, new List<MassErrorTable>());
+                    _massSorter.Add(charge, new Histogram<double>());
+                    _precursorOffsets.Add(charge, new List<PrecursorOffsets>());
                 }
-                var mass = target.PrecursorComposition.Mass;
-                var index = _massSorter[charge].GetBinIndex(mass);
-                AddMatch(target, charge, index, false);
-                AddMatch(decoy, charge, index, true);
+                _massSorter[charge].AddDatum(match.PrecursorComposition.Mass);
+                _dataSet.Enqueue(match);
             }
         }
 
         public void WriteToFile(string fileName)
         {
+            Compute();
             using (var file = new StreamWriter(fileName))
             {
                 foreach (var charge in _charges)
@@ -146,7 +149,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         #endregion
 
         #region Private Methods
-
         private void ReadFromFile(string fileName)
         {
             var ionTypeFactory = new IonTypeFactory(2);
@@ -196,8 +198,28 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             }
         }
 
-        private void AddMatch(SpectrumMatch match, int charge, int massIndex, bool isDecoy)
+        private void Compute()
         {
+            if (_computed) return;
+            Initialize();
+            var total = _dataSet.Count;
+            for (int i = 0; i < total; i++)
+            {
+                var target = _dataSet.Dequeue();
+                var charge = target.PrecursorCharge;
+                if (!_charges.Contains(charge)) continue;
+                var decoy = new SpectrumMatch(target, true);
+                var mass = target.PrecursorComposition.Mass;
+                var index = _massSorter[charge].GetBinIndex(mass);
+                ComputeMatch(target, charge, index);
+                ComputeMatch(decoy, charge, index);
+            }
+            _computed = true;
+        }
+
+        private void ComputeMatch(SpectrumMatch match, int charge, int massIndex)
+        {
+            var isDecoy = match.Decoy;
             var massErrors = _massErrors[charge][massIndex];
             var rankTable = (isDecoy ? _drankTables[charge][massIndex] : _rankTables[charge][massIndex]);
             var ionFrequencies = _ionProbabilities[charge][massIndex];
@@ -208,7 +230,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 // filter out all peaks except ion peaks
                 var ionPeakSpectrum = SpectrumFilter.FilterIonPeaks(match.Sequence, match.Spectrum,
                                                                     Config.IonTypes, Config.Tolerance);
-                acMatch = new SpectrumMatch(acMatch.Sequence, ionPeakSpectrum, acMatch.PrecursorCharge, acMatch.Decoy);
+                acMatch = new SpectrumMatch(acMatch.Sequence, ionPeakSpectrum, acMatch.ScanNum, acMatch.PrecursorCharge, acMatch.Decoy);
             }
             else
             {
@@ -229,32 +251,32 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             ionFrequencies.AddMatch(filteredMatch);
         }
 
-        private void Initialize(int charge, SpectrumMatchList matches)
+        private void Initialize()
         {
-            var chargeMatches = matches.GetCharge(charge);
-            if (chargeMatches.Count < Config.MassBinSize)
-                throw new Exception("Fewer than " + Config.MassBinSize + " spectra in charge "+charge+" data set.");
-            _massBins.Add(charge, chargeMatches.Count / Config.MassBinSize);
-            _massSorter.Add(charge, new Histogram<double>());
-            foreach (var match in chargeMatches)
+            var validCharges = new HashSet<int>();
+            // partition by mass
+            foreach (var charge in _charges)
             {
-                _massSorter[charge].AddDatum(match.PrecursorComposition.Mass);
+                var chargeTableSize = _massSorter[charge].Total;
+                if (chargeTableSize < Config.MassBinSize)
+                {
+                    continue;
+//                    throw new Exception("Fewer than "+Config.MassBinSize+" items in charge "+charge+" data set.");
+                }
+                validCharges.Add(charge);
+                _massBins.Add(charge, chargeTableSize/Config.MassBinSize);
+                _massSorter[charge].Equalize(_massBins[charge], 0);
+                var binCount = _massSorter[charge].BinEdges.Length;
+                for (int i = 0; i < binCount; i++)
+                {
+                    _rankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
+                    _drankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
+                    _ionProbabilities[charge].Add(new ProductIonFrequencyTable(Config.IonTypes, Config.Tolerance, Config.RelativeIntensityThreshold));
+                    _massErrors[charge].Add(new MassErrorTable(Config.IonTypes, Config.Tolerance));
+                    _precursorOffsets[charge].Add(new PrecursorOffsets(charge, Config.PrecursorOffsetWidth, Config.PrecursorOffsetThreshold));
+                }
             }
-            _massSorter[charge].Equalize(_massBins[charge], 0);
-
-            _rankTables.Add(charge, new List<RankTable>());
-            _drankTables.Add(charge, new List<RankTable>());
-            _ionProbabilities.Add(charge, new List<ProductIonFrequencyTable>());
-            _massErrors.Add(charge, new List<MassErrorTable>());
-            _precursorOffsets.Add(charge, new List<PrecursorOffsets>());
-            for (int i = 0; i < _massSorter[charge].BinEdges.Length; i++)
-            {
-                _rankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
-                _drankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
-                _ionProbabilities[charge].Add(new ProductIonFrequencyTable(Config.IonTypes, Config.Tolerance, Config.RelativeIntensityThreshold));
-                _massErrors[charge].Add(new MassErrorTable(Config.IonTypes, Config.Tolerance));
-                _precursorOffsets[charge].Add(new PrecursorOffsets(charge, Config.PrecursorOffsetWidth, Config.PrecursorOffsetThreshold));
-            }
+            _charges = validCharges;
         }
 
         private int GetCharge(int charge)
@@ -266,14 +288,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return key;
         }
 
+        private readonly Queue<SpectrumMatch> _dataSet; 
         private readonly Dictionary<int, int> _massBins;
-        private readonly HashSet<int> _charges;
+        private HashSet<int> _charges;
         private readonly Dictionary<int, List<RankTable>> _rankTables;
         private readonly Dictionary<int, List<RankTable>> _drankTables;
         private readonly Dictionary<int, List<ProductIonFrequencyTable>> _ionProbabilities;
         private readonly Dictionary<int, List<MassErrorTable>> _massErrors;
         private readonly Dictionary<int, List<PrecursorOffsets>> _precursorOffsets; 
         private readonly Dictionary<int, Histogram<double>> _massSorter;
+        private bool _computed;
 
         #endregion
     }

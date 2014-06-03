@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 {
@@ -11,11 +12,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         Dda
     };
 
-    public enum DataFileFormat
-    {
-        Mgf,
-        Msgf
-    };
     public class TrainerConfiguration
     {
         public string[] DataSets { get; private set; }
@@ -184,8 +180,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                 case "mgf":
                     DataFormat = DataFileFormat.Mgf;
                     break;
-                case "msgf":
-                    DataFormat = DataFileFormat.Msgf;
+                case "ictopdown":
+                    DataFormat = DataFileFormat.IcTopDown;
+                    break;
+                case "icbottomup":
+                    DataFormat = DataFileFormat.IcBottomUp;
+                    break;
+                case "dia":
+                    DataFormat = DataFileFormat.Dia;
                     break;
                 default:
                     throw new FormatException("Invalid Acquisition Method.");

@@ -66,7 +66,14 @@
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\ScoredSpectrum.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
+    <Compile Include="LikelihoodScoring\Data\LazyLcMsRun.cs" />
     <Compile Include="LikelihoodScoring\Data\RankedPeaks.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\DiaTsvReader.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\IcBottomUpTsvReader.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\IcTopDownTsvReader.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\IDataFileReader.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\MgfReader.cs" />
+    <Compile Include="LikelihoodScoring\FileReaders\DataFileReaderFactory.cs" />
     <Compile Include="LikelihoodScoring\ProbabilityTables\RankTable.cs" />
     <Compile Include="LikelihoodScoring\Scoring\DiaRankScore.cs" />
     <Compile Include="LikelihoodScoring\Data\ISequenceReader.cs" />

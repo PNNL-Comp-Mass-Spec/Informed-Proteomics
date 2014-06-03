@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
-using InformedProteomics.Scoring.LikelihoodScoring.Config;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
@@ -14,160 +8,44 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public int MaxCharge { get; private set; }
         public bool Decoy { get; private set; }
-        public ActivationMethod Act { get; private set; }
+//        public ActivationMethod Act { get; private set; }
         public DataFileFormat SequenceFormat { get; private set; }
 
-        public SpectrumMatchList(LcMsRun lcms, TsvFileParser tsvFile,
-                                 ActivationMethod act, bool useDecoy=false, int maxCharge=0,
-                                 DataFileFormat sequenceFormat=DataFileFormat.Msgf)
-        {
-            Decoy = useDecoy;
-            Act = act;
-            MaxCharge = maxCharge;
-            SequenceFormat = sequenceFormat;
-            AddMatchesFromTsvFile(lcms, tsvFile);
-        }
-
-        public SpectrumMatchList(ActivationMethod act, bool useDecoy = false, int maxCharge = 0,
-                                 DataFileFormat sequenceFormat = DataFileFormat.Msgf)
+        public SpectrumMatchList(LazyLcMsRun lcms, string tsvFile, DataFileFormat sequenceFormat,
+                                 int maxCharge=0, bool useDecoy=false)
         {
             Decoy = useDecoy;
             MaxCharge = maxCharge;
-            Act = act;
             SequenceFormat = sequenceFormat;
+            var fileReader = DataFileReaderFactory.Create(SequenceFormat, tsvFile, useDecoy, lcms);
+            var specMatches = fileReader.Read();
+            AddRange(from i in specMatches
+                     where i.PrecursorCharge <= maxCharge
+                     select i);
         }
 
-        public void AddMatchesFromTsvFile(LcMsRun lcms, TsvFileParser tsvFile)
+        public SpectrumMatchList(string fileName, int maxCharge = 0, bool useDecoy = false)
         {
-            var precursorCharges = tsvFile.GetData(PrecursorChargeHeader);
-            var scans = tsvFile.GetData(ScanHeader);
-
-            var peptides = tsvFile.GetData(TopDownPeptideHeader);
-            if (peptides != null)
-            {
-                var peptideSet = new HashSet<string>();
-                var filterThreshold = QValueThreshold;
-                var filterValues = tsvFile.GetData(QValueHeader);
-                if (filterValues == null)
-                {
-                    filterValues = tsvFile.GetData(EvalueHeader);
-                    filterThreshold = EValueThreshold;
-                }
-
-                var aset = new AminoAcidSet();
-
-                for (int i = 0; i < peptides.Count; i++)
-                {
-                    if (Convert.ToDouble(filterValues[i]) > filterThreshold || peptideSet.Contains(peptides[i])) continue;
-                    peptideSet.Add(peptides[i]);
-                    var scanNum = Convert.ToInt32(scans[i]);
-                    var spectrum = lcms.GetSpectrum(scanNum);
-                    var spec = spectrum as ProductSpectrum;
-                    if (spec == null || spec.ActivationMethod != Act) continue;
-                    int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
-                    Add(new SpectrumMatch(new Sequence(peptides[i], aset), spectrum, precursorCharge, Decoy));
-                }
-            }
-            else
-            {
-                peptides = tsvFile.GetData(BottomUpPeptideHeader);
-                if (scans == null)
-                    throw new FormatException();
-
-                var pepQValues = tsvFile.GetData(PepQValueHeader);
-                var formulas = tsvFile.GetData(FormulaHeader);
-
-                var peptideSet = new HashSet<string>();
-
-                for (int i = 0; i < peptides.Count; i++)
-                {
-                    if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold || peptideSet.Contains(peptides[i])) continue;
-                    peptideSet.Add(peptides[i]);
-                    var scanNum = Convert.ToInt32(scans[i]);
-                    var spectrum = lcms.GetSpectrum(scanNum);
-                    var spec = spectrum as ProductSpectrum;
-                    if (spec == null || spec.ActivationMethod != Act) continue;
-                    int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    if (MaxCharge > 0 && precursorCharge > MaxCharge) continue;
-                    Add((formulas != null && formulas[i] != null)
-                        ? new SpectrumMatch(peptides[i], SequenceFormat, spectrum, formulas[i], precursorCharge, Decoy)
-                        : new SpectrumMatch(peptides[i], SequenceFormat, spectrum, precursorCharge, Decoy));
-                }
-            }
+            Decoy = useDecoy;
+            MaxCharge = maxCharge;
+            SequenceFormat = DataFileFormat.Mgf;
+            var fileReader = DataFileReaderFactory.Create(SequenceFormat, fileName, useDecoy);
+            var specMatches = fileReader.Read();
+            AddRange(from i in specMatches
+                     where i.PrecursorCharge <= maxCharge
+                     select i);
         }
 
-        private enum MgfState { Label, Parameter, Peak };
-        public void AddMatchesFromMgfFile(string fileName)
+        public SpectrumMatchList(int maxCharge = 0, bool useDecoy = false)
         {
-            var file = File.ReadLines(fileName);
-            var mgfState = MgfState.Label;
-
-            var sequence="";
-            int scanNum=0, charge=0;
-            var peaks = new List<Peak>();
-
-            var peptideSet = new HashSet<string>();
-            foreach (var line in file)
-            {
-                switch (mgfState)
-                {
-                    case MgfState.Label:
-                        if (line == "BEGIN IONS") mgfState = MgfState.Parameter;
-                        else throw new FormatException("Invalid MGF file.");
-                        break;
-                    case MgfState.Parameter:
-                        var parameter = line.Split('=');
-                        if (parameter.Length < 2) throw new FormatException("Invalid line in MGF file: "+line);
-                        if (parameter[0] == "SEQ") sequence = parameter[1];
-                        else if (parameter[0] == "SCANS") scanNum = Convert.ToInt32(parameter[1]);
-                        else if (parameter[0] == "CHARGE")
-                        {
-                            var chargeStr = parameter[1].Substring(0, parameter[1].Length - 1);
-                            charge = Convert.ToInt32(chargeStr);
-                            mgfState = MgfState.Peak;
-                            if (sequence == "" || scanNum == 0 || charge == 0)
-                                throw new FormatException("Incomplete spectrum entry.");
-                        }
-                        break;
-                    case MgfState.Peak:
-                        if (line == "END IONS")
-                        {
-                            if (peaks.Count == 0) throw new FormatException("Empty peak list.");
-                            mgfState = MgfState.Label;
-                            if (charge > MaxCharge || peptideSet.Contains(sequence))
-                            {
-                                sequence = "";
-                                scanNum = 0;
-                                charge = 0;
-                                peaks.Clear();
-                                continue;
-                            }
-                            peptideSet.Add(sequence);
-                            var spectrum = new ProductSpectrum(peaks, scanNum) {ActivationMethod = Act, MsLevel = 2};
-                            var specMatch = new SpectrumMatch(sequence, SequenceFormat, spectrum, charge);
-                            sequence = "";
-                            scanNum = 0;
-                            charge = 0;
-                            Add(specMatch);
-                            peaks.Clear();
-                        }
-                        else
-                        {
-                            var parts = line.Split('\t');
-                            if (parts.Length < 2) throw new FormatException("Invalid line in MGF file: " + line);
-                            var mz = Convert.ToDouble(parts[0]);
-                            var intensity = Convert.ToDouble(parts[1]);
-                            peaks.Add(new Peak(mz, intensity));
-                        }
-                        break;
-                }
-            }
+            Decoy = useDecoy;
+            MaxCharge = maxCharge;
+            SequenceFormat = DataFileFormat.IcBottomUp;
         }
 
         public void AddMatch(SpectrumMatch match)
         {
-            var newMatch = new SpectrumMatch(match.Peptide, SequenceFormat, match.Spectrum, match.PrecursorCharge, Decoy);
+            var newMatch = new SpectrumMatch(match, Decoy);
             Add(newMatch);
         }
 
@@ -181,44 +59,23 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public void FilterSpectra(double windowWidth=100, int retentionCount=6)
         {
-            var filteredList = new SpectrumMatchList(Act);
+            var filteredList = new SpectrumMatchList();
             foreach (var match in this)
             {
                 var spectrum = SpectrumFilter.GetFilteredSpectrum(match.Spectrum, windowWidth, retentionCount);
-                filteredList.Add(new SpectrumMatch(match.Peptide, SequenceFormat, spectrum, match.PrecursorCharge));
+                filteredList.Add(new SpectrumMatch(match.Peptide, SequenceFormat, spectrum, match.ScanNum, match.PrecursorCharge, match.Decoy));
             }
             Clear();
             AddRange(filteredList);
         }
 
-        public SpectrumMatch GetScan(int scanNum)
-        {
-            return (from i in this
-                    where i.Spectrum.ScanNum == scanNum
-                    select i).FirstOrDefault();
-        }
-
         public SpectrumMatchList GetCharge(int charge)
         {
-            var chargeMatchList = new SpectrumMatchList(Act);
+            var chargeMatchList = new SpectrumMatchList();
             chargeMatchList.AddRange(from i in this
                     where i.PrecursorCharge == charge
                     select i);
             return chargeMatchList;
         }
-
-        private const string QValueHeader = "Qvalue";
-        private const string EvalueHeader = "E-value";
-        private const string TopDownPeptideHeader = "Annotation";
-        private const double QValueThreshold = 0.01;
-        private const double EValueThreshold = 0.1;
-
-        private const string BottomUpPeptideHeader = "Peptide";
-        private const string PepQValueHeader = "PepQValue";
-        private const string FormulaHeader = "Formula";
-        private const double PepQValueThreshold = 0.01;
-
-        private const string ScanHeader = "ScanNum";
-        private const string PrecursorChargeHeader = "Charge";
     }
 }

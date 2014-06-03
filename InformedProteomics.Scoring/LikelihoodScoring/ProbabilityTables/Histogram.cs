@@ -200,10 +200,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             Bins = new List<List<T1>>();
             BinEdges = new T1[bins];
-            for (int i = 0; i < bins; i++)
-            {
-                Bins.Add(new List<T1>());
-            }
             int binSize = datacollection.Count / bins;
             for (int j = 0; j < bins; j++)
             {

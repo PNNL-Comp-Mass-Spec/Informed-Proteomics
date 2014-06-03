@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
+using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 using NUnit.Framework;
 
@@ -65,9 +65,9 @@ namespace InformedProteomics.Test.FunctionalTests
 
             _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
 
-            var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
+            var lcms = new LazyLcMsRun(RawFile, NoiseFiltration, NoiseFiltration);
 
-            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act));
+            var spectrumMatches = (new SpectrumMatchList(lcms, TsvFile, DataFileFormat.IcBottomUp));
 
             return spectrumMatches;
         }
