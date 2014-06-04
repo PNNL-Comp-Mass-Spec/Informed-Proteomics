@@ -78,15 +78,13 @@
     <Compile Include="LikelihoodScoring\Scoring\DiaRankScore.cs" />
     <Compile Include="LikelihoodScoring\Data\ISequenceReader.cs" />
     <Compile Include="LikelihoodScoring\Data\MgfSequenceReader.cs" />
-    <Compile Include="LikelihoodScoring\ProbabilityTables\ProductIonFrequencyTable.cs" />
+    <Compile Include="LikelihoodScoring\ProbabilityTables\IonFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\Config\ConfigFileReader.cs" />
     <Compile Include="LikelihoodScoring\Data\FitScore.cs" />
     <Compile Include="LikelihoodScoring\Data\FitScoreList.cs" />
     <Compile Include="LikelihoodScoring\ProbabilityTables\Histogram.cs" />
     <Compile Include="GeneratingFunction\IScoringGraph.cs" />
-    <Compile Include="LikelihoodScoring\ProbabilityTables\IonFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\ProbabilityTables\MassErrorTable.cs" />
-    <Compile Include="LikelihoodScoring\ProbabilityTables\OffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\Data\PrecursorFilter.cs" />
     <Compile Include="LikelihoodScoring\ProbabilityTables\PrecursorOffsetFrequencyTable.cs" />
     <Compile Include="LikelihoodScoring\ProbabilityTables\PrecursorOffsets.cs" />

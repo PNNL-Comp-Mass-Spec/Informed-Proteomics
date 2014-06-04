@@ -27,7 +27,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _massSorter = new Dictionary<int, Histogram<double>>();
             _rankTables = new Dictionary<int, List<RankTable>>();
             _drankTables = new Dictionary<int, List<RankTable>>();
-            _ionProbabilities = new Dictionary<int, List<ProductIonFrequencyTable>>();
+            _ionProbabilities = new Dictionary<int, List<IonFrequencyTable>>();
             _massErrors = new Dictionary<int, List<MassErrorTable>>();
             _precursorOffsets = new Dictionary<int, List<PrecursorOffsets>>();
             _computed = false;
@@ -45,7 +45,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             _massSorter = new Dictionary<int, Histogram<double>>();
             _rankTables = new Dictionary<int, List<RankTable>>();
             _drankTables = new Dictionary<int, List<RankTable>>();
-            _ionProbabilities = new Dictionary<int, List<ProductIonFrequencyTable>>();
+            _ionProbabilities = new Dictionary<int, List<IonFrequencyTable>>();
             _massErrors = new Dictionary<int, List<MassErrorTable>>();
             _precursorOffsets = new Dictionary<int, List<PrecursorOffsets>>();
             Config = config;
@@ -69,7 +69,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return (isDecoy ? _drankTables[charge][index] : _rankTables[charge][index]);
         }
 
-        public ProductIonFrequencyTable GetIonProbabilityTable(int charge, double mass)
+        public IonFrequencyTable GetIonProbabilityTable(int charge, double mass)
         {
             charge = GetCharge(charge);
             var index = _massSorter[charge].GetBinIndex(mass);
@@ -101,7 +101,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     _charges.Add(charge);
                     _rankTables.Add(charge, new List<RankTable>());
                     _drankTables.Add(charge, new List<RankTable>());
-                    _ionProbabilities.Add(charge, new List<ProductIonFrequencyTable>());
+                    _ionProbabilities.Add(charge, new List<IonFrequencyTable>());
                     _massErrors.Add(charge, new List<MassErrorTable>());
                     _massSorter.Add(charge, new Histogram<double>());
                     _precursorOffsets.Add(charge, new List<PrecursorOffsets>());
@@ -134,7 +134,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                         if (i < _massBins[charge]-1) max = _massSorter[charge].BinEdges[i+1];
                         file.Write("\t"+max);
                         file.WriteLine();
-                        var ionTypes = _ionProbabilities[charge][i].SelectIonTypess(Config.SelectedIonThreshold);
+                        var ionTypes = _ionProbabilities[charge][i].SelectIonTypes(Config.SelectedIonThreshold);
                         file.WriteLine("RankProbabilities");
                         _rankTables[charge][i].Smooth(Config.SmoothingRanks, Config.SmoothingWindowSize);
                         _rankTables[charge][i].WriteToFile(file, ionTypes);
@@ -182,7 +182,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                             _massSorter.Add(charge, new Histogram<double>());
                             _rankTables.Add(charge, new List<RankTable>());
                             _drankTables.Add(charge, new List<RankTable>());
-                            _ionProbabilities.Add(charge, new List<ProductIonFrequencyTable>());
+                            _ionProbabilities.Add(charge, new List<IonFrequencyTable>());
                             _massErrors.Add(charge, new List<MassErrorTable>());
                         }
                     }
@@ -271,7 +271,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 {
                     _rankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
                     _drankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
-                    _ionProbabilities[charge].Add(new ProductIonFrequencyTable(Config.IonTypes, Config.Tolerance, Config.RelativeIntensityThreshold));
+                    _ionProbabilities[charge].Add(new IonFrequencyTable(Config.IonTypes, Config.Tolerance, Config.RelativeIntensityThreshold));
                     _massErrors[charge].Add(new MassErrorTable(Config.IonTypes, Config.Tolerance));
                     _precursorOffsets[charge].Add(new PrecursorOffsets(charge, Config.PrecursorOffsetWidth, Config.PrecursorOffsetThreshold));
                 }
@@ -293,7 +293,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private HashSet<int> _charges;
         private readonly Dictionary<int, List<RankTable>> _rankTables;
         private readonly Dictionary<int, List<RankTable>> _drankTables;
-        private readonly Dictionary<int, List<ProductIonFrequencyTable>> _ionProbabilities;
+        private readonly Dictionary<int, List<IonFrequencyTable>> _ionProbabilities;
         private readonly Dictionary<int, List<MassErrorTable>> _massErrors;
         private readonly Dictionary<int, List<PrecursorOffsets>> _precursorOffsets; 
         private readonly Dictionary<int, Histogram<double>> _massSorter;

@@ -56,9 +56,9 @@ namespace InformedProteomics.Test
                 var decoyionFrequencyFunctions = new IonFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
-                    ionFrequencyFunctions[i] = new ProductIonFrequencyTable(_ionTypes,
+                    ionFrequencyFunctions[i] = new IonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
-                    decoyionFrequencyFunctions[i] = new ProductIonFrequencyTable(_ionTypes,
+                    decoyionFrequencyFunctions[i] = new IonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
                 }
 

@@ -93,7 +93,7 @@ namespace InformedProteomics.Test.FunctionalTests
             foreach (var spectrumMatch in spectrumMatchList)
             {
                 var charge = spectrumMatch.PrecursorCharge - 1;
-                var offsetFrequencies = new ProductIonFrequencyTable(_ionTypes, _tolerance, RelativeIntensityThreshold);
+                var offsetFrequencies = new IonFrequencyTable(_ionTypes, _tolerance, RelativeIntensityThreshold);
                 offsetFrequencies.AddMatches(new List<SpectrumMatch>{spectrumMatch});
                 var probabilities = offsetFrequencies.GetProbabilities();
 
