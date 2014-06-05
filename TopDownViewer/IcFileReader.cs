@@ -24,11 +24,11 @@ namespace InformedProteomics.TopDownViewer
             {
                 lineCount++;
                 if (lineCount == 1) continue; // first line
-                var chargeStateData = new ChargeStateData(line, _lcms);
-                var sequence = chargeStateData.Sequence;
+                var idData = new IdData(line, _lcms);
+                var sequence = idData.Sequence;
                 if (!prsms.ContainsKey(sequence))
                     prsms.Add(sequence, new PrSm(sequence));
-                prsms[sequence].AddCharge(chargeStateData);
+                prsms[sequence].AddId(idData);
             }
             return prsms.Values.ToList();
         }

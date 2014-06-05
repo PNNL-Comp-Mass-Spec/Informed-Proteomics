@@ -9,7 +9,7 @@ namespace InformedProteomics.TopDownViewer
         public PrSm(string sequence)
         {
             Sequence = sequence;
-            _chargeStates = new Dictionary<int, ChargeStateData>();
+            _chargeStates = new Dictionary<int, Dictionary<int, IdData>>();
         }
 
         public List<int> Charges
@@ -17,16 +17,32 @@ namespace InformedProteomics.TopDownViewer
             get { return _chargeStates.Keys.ToList(); }
         }
 
-        public ChargeStateData GetCharge(int charge)
+        public List<int> GetScanNums(int charge)
         {
-            return _chargeStates[charge];
+            return _chargeStates[charge].Keys.ToList();
         }
 
-        public void AddCharge(ChargeStateData data)
+        public IdData GetData(int charge, int scanNum)
         {
-            if (!_chargeStates.ContainsKey(data.Charge))    _chargeStates.Add(data.Charge, data);
+            return _chargeStates[charge][scanNum];
         }
 
-        private readonly Dictionary<int, ChargeStateData> _chargeStates;
+        public void AddId(IdData data)
+        {
+
+            var charge = data.Charge;
+            var scanNum = data.Scan;
+            if (!_chargeStates.ContainsKey(charge))
+                _chargeStates.Add(charge, new Dictionary<int, IdData>());
+
+            _chargeStates[charge].Add(scanNum, data);
+        }
+
+        public override string ToString()
+        {
+            return Sequence;
+        }
+
+        private readonly Dictionary<int, Dictionary<int, IdData>> _chargeStates;
     }
 }

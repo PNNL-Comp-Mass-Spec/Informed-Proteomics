@@ -6,7 +6,7 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDownViewer
 {
-    public class ChargeStateData
+    public class IdData
     {
         public int Scan { get; private set; }
         public ProductSpectrum Ms2Spectrum { get; private set; }
@@ -32,8 +32,9 @@ namespace InformedProteomics.TopDownViewer
         public double QValue { get; private set; }
         public double PepQValue { get; private set; }
 
-        public ChargeStateData(string line, LcMsRun lcms)
+        public IdData(string line, LcMsRun lcms)
         {
+            _ions = new Dictionary<IonType, List<Peak>>();
             var parts = line.Split('\t');
             Scan = Convert.ToInt32(parts[0]);
             Ms2Spectrum = lcms.GetSpectrum(Scan) as ProductSpectrum;
@@ -59,5 +60,31 @@ namespace InformedProteomics.TopDownViewer
             QValue = Convert.ToDouble(parts[20]);
             PepQValue = Convert.ToDouble(parts[21]);
         }
+
+        public List<Peak> GetIons(IonType ionType)
+        {
+            if (_ions.ContainsKey(ionType)) return _ions[ionType];
+
+            var sequence = Backend.Data.Sequence.Sequence.GetSequenceFromMsGfPlusPeptideStr(Sequence);
+            var compositions = new List<Composition>();
+            for (int i = 1; i < sequence.Count; i++)
+            {
+                compositions.Add(ionType.BaseIonType.IsPrefix
+                    ? sequence.GetComposition(0, i)
+                    : sequence.GetComposition(i, sequence.Count));
+            }
+            var peaks = new List<Peak>();
+            var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
+            foreach (var composition in compositions)
+            {
+                var ion = ionType.GetIon(composition);
+                var peak = Ms2Spectrum.FindPeak(ion.GetMonoIsotopicMz(), tolerance);
+                if (peak != null)   peaks.Add(peak);
+            }
+            _ions.Add(ionType, peaks);
+            return peaks;
+        }
+
+        private readonly Dictionary<IonType, List<Peak>> _ions;
     }
 }
