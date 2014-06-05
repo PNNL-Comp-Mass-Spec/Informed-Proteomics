@@ -15,8 +15,8 @@ namespace InformedProteomics.Test
         [Test]
         public void RankScore()
         {
-            const int ranks = 151;
-            var rankScorer = new RankScore(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\CID_LowRes_Tryp_TrainingData_rw.txt");
+            const int ranks = 20;
+            var rankScorer = new RankScore(@"\\protoapps\UserData\Wilkins\DIA\DIA.txt");
             for (int charge = 1; charge < 4; charge++)
             {
                 var ionTypes = rankScorer.GetIonTypes(charge);

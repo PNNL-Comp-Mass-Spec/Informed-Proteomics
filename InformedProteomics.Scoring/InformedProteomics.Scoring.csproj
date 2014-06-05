@@ -70,7 +70,6 @@
     <Compile Include="LikelihoodScoring\Data\RankedPeaks.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\DiaTsvReader.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\IcBottomUpTsvReader.cs" />
-    <Compile Include="LikelihoodScoring\FileReaders\IcTopDownTsvReader.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\IDataFileReader.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\MgfReader.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\DataFileReaderFactory.cs" />

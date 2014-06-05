@@ -5,7 +5,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
     public enum DataFileFormat
     {
         Mgf,
-        IcTopDown,
         IcBottomUp,
         Dia
     };
@@ -18,9 +17,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
             {
                 case DataFileFormat.Mgf:
                     reader = new MgfReader(annotations, decoy);
-                    break;
-                case DataFileFormat.IcTopDown:
-                    reader = new IcTopDownTsvReader(annotations, lcms, decoy);
                     break;
                 case DataFileFormat.IcBottomUp:
                     reader = new IcBottomUpTsvReader(annotations, lcms, decoy);

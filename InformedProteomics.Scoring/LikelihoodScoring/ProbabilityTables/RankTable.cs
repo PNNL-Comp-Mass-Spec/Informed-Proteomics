@@ -225,8 +225,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 else if (header == "Total")
                 {
                     if (MaxRanks < 0) throw new FormatException("Badly formatted rank data.");
-                    _rankTotals = new double[MaxRanks];
-                    for (int i = 0; i < MaxRanks; i++)
+                    _rankTotals = new double[MaxRanks+1];
+                    for (int i = 0; i < MaxRanks+1; i++)
                     {
                         _rankTotals[i] = Convert.ToInt32(parts[i]);
                     }
@@ -240,7 +240,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     try
                     {
                         var ionType = ionTypeFactory.GetIonType(header);
-                        _rankTable.Add(ionType, new double[MaxRanks]);
+                        _rankTable.Add(ionType, new double[MaxRanks+1]);
                         for (int i = 0; i < MaxRanks+1; i++)
                         {
                             _rankTable[ionType][i] = Convert.ToDouble(parts[i]);
@@ -257,7 +257,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private int GetRankIndex(int rankNum)
         {
-            if (rankNum < 0) rankNum = MaxRanks + 1;
+            if (rankNum < 1) rankNum = MaxRanks + 1;
             else if (rankNum > MaxRanks) rankNum = MaxRanks;
             return rankNum-1;
         }

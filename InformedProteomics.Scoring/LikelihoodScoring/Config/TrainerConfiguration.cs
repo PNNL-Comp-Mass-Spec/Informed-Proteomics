@@ -180,9 +180,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                 case "mgf":
                     DataFormat = DataFileFormat.Mgf;
                     break;
-                case "ictopdown":
-                    DataFormat = DataFileFormat.IcTopDown;
-                    break;
                 case "icbottomup":
                     DataFormat = DataFileFormat.IcBottomUp;
                     break;
