@@ -149,7 +149,7 @@ namespace InformedProteomics.Test
         public void TestMaccoss(string specFilePath)
         {
             const string dbFilePath = @"D:\Research\Data\UW\QExactive\M_musculus_Uniprot_withContam.fasta";
-            const string outputDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
+            const string outputDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Mass";
 
             // Configure amino acid set
             var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
@@ -179,7 +179,7 @@ namespace InformedProteomics.Test
             // QC_Shew QE
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\ID_003456_9B916A8B.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT1_Test";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT2_Mass";
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -198,7 +198,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const int ntt = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            const int ntt = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
             bool? tda = true;   // true: target & decoy, false: target, null: decoy
             TestBottomUpSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, ntt);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -17,6 +18,48 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestIcTopDown
     {
+        [Test]
+        public void TestForVlad()
+        {
+            const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
+            const string dbFilePath = @"D:\Research\Data\Vlad\database\ID_004221_1C042A1F.fasta";
+            //const string dbFilePath = @"D:\Research\Data\Vlad\database\HBA_MOUSE.fasta";
+            const string outputDir = @"D:\Research\Data\Vlad\Ic\MoreMod_M2";
+
+            // Configure amino acid set
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+            var thrToAla = new SearchModification(Modification.ThrToAla, 'T', SequenceLocation.Everywhere, false);
+            var dethiomethylM = new SearchModification(Modification.Dethiomethyl, 'M', SequenceLocation.Everywhere, false);
+            var deamidatedN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            var deamidatedQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+            var serToAsn = new SearchModification(Modification.SerToAsn, 'S', SequenceLocation.Everywhere, false);
+            var pyroCarbamidomethylC = new SearchModification(Modification.PyroCarbamidomethyl, 'C',
+                SequenceLocation.ProteinNTerm, false);
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                glutathioneC,
+                oxM,
+                dethiomethylM,
+                acetylN,
+                thrToAla,
+                serToAsn,
+                deamidatedN,
+                deamidatedQ,
+                pyroCarbamidomethylC
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            const int searchMode = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = false;   // true: target & decoy, false: target, null: decoy
+            TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
+
+        }
+
         [Test]
         public void TestForYufeng()
         {
@@ -264,32 +307,37 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrSm()
         {
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
-            const string annotation =
-                "_.MKTKLSVLSAAMLAATLTMMPAVSQAAIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVG" +
-                "LHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTV" +
-                "TSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVG" +
-                "IGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGS" +
-                "AAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEA" +
-                "NQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDL" +
-                "KSLKELLKDQEGAVALKIVRGKSMLYLVLR._";
-            const int charge = 60;
-            const int ms2ScanNum = 46661;
+            //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
+            //const string annotation =
+            //    "_.MKTKLSVLSAAMLAATLTMMPAVSQAAIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVG" +
+            //    "LHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTV" +
+            //    "TSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVG" +
+            //    "IGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGS" +
+            //    "AAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEA" +
+            //    "NQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDL" +
+            //    "KSLKELLKDQEGAVALKIVRGKSMLYLVLR._";
+            //var aaSet = new AminoAcidSet();
 
-            //var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, true);
-            //var modVal = Modification.RegisterAndGetModification("Val", new Composition(5, 9, 1, 1, 0));
-            //var modValAny = new SearchModification(modVal, '*', SequenceLocation.Everywhere, false);
-            //const int numMaxModsPerProtein = 0;
-            //var searchModifications = new List<SearchModification>
-            //{
-            //    acetylN,
-            //    modValAny
-            //};
-            //var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
-            var aaSet = new AminoAcidSet();
+            //const int charge = 60;
+            //const int ms2ScanNum = 46661;
+
+            const string specFilePath = @"D:\Research\Data\Jon\AH_SF_mouseliver_3-1_Intact_2_6Feb14_Bane_PL011402.raw";
+            const int ms2ScanNum = 19011;
+            const int charge = 7;
+            const string annotation = "_.SKVSFKITLTSDPRLPYKVLSVPESTPFTAVLKFAAEEFKVPAATSAIITNDGIGINPAQTAGNVFLKHGSELRIIPRDRVGSC._";
+
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, true);
+            var modVal = Modification.RegisterAndGetModification("AddVal", new Composition(5, 9, 1, 1, 0));
+            var searchMods = AminoAcid.StandardAminoAcidCharacters.Select(residue => new SearchModification(modVal, residue, SequenceLocation.Everywhere, false)).ToList();
+            searchMods.Add(acetylN);
+            const int numMaxModsPerProtein = 1;
+            var aaSet = new AminoAcidSet(searchMods, numMaxModsPerProtein);
+
+            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
+            Console.WriteLine("NumProteoforms: " + graph.GetNumProteoforms());
 
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 30);
+            var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
             ms2Scorer.DeconvoluteProductSpectra(ms2ScanNum);
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
             if (scorer == null)
@@ -298,7 +346,6 @@ namespace InformedProteomics.Test
                 return;
             }
 
-            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
             for (var i = 0; i < graph.GetNumProteoforms(); i++)
             {
                 graph.SetSink(i);
@@ -309,6 +356,8 @@ namespace InformedProteomics.Test
 
                 var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 30, new Tolerance(10));
                 var refinedScore = informedScorer.GetScores(AminoAcid.ProteinNTerm, SimpleStringProcessing.GetStringBetweenDots(annotation), AminoAcid.ProteinCTerm, composition, charge, ms2ScanNum);
+                Console.WriteLine("Modifications: {0}", refinedScore.Modifications);
+                Console.WriteLine("Composition: {0}", composition);
                 Console.WriteLine("RefinedScores: {0}", refinedScore);
             }
         }

@@ -85,6 +85,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification Tmt6Plex = new Modification(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
         public static readonly Modification Nethylmaleimide = new Modification(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
         public static readonly Modification Nitrosyl = new Modification(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
+        public static readonly Modification ThrToAla = new Modification(659, Data.Composition.Composition.Parse("H(-2) C(-1) O(-1)"), "Thr->Ala");
+        public static readonly Modification Dethiomethyl = new Modification(526, Data.Composition.Composition.Parse("H(-4) C(-1) S(-1)"), "Dethiomethyl");
+        public static readonly Modification DelC2H2 = new Modification(254, Data.Composition.Composition.Parse("H(2) C(2)"), "Delta:H(2)C(2)");
+        public static readonly Modification SerToXle = new Modification(656, Data.Composition.Composition.Parse("H(6) C(3) O(-1)"), "Ser->Xle");
+        public static readonly Modification SerToAsn = new Modification(651, Data.Composition.Composition.Parse("H C N"), "Ser->Asn");
+        public static readonly Modification SerToAsp = new Modification(1196, Data.Composition.Composition.Parse("C O"), "Ser->Asp");
 
         // For Aaron's data
         public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");

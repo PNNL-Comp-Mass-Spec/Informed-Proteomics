@@ -53,7 +53,14 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAaSet()
         {
+            var oxEverywhere = new SearchModification(Modification.Oxidation, '*', SequenceLocation.Everywhere, true);
+            var acetylNTerm = new SearchModification(Modification.Acetylation, '*', SequenceLocation.PeptideNTerm,
+                false);
+            var iTraqCTerm = new SearchModification(Modification.Itraq4Plex, '*', SequenceLocation.PeptideCTerm, true);
+            var iTraqK = new SearchModification(Modification.Itraq4Plex, 'K', SequenceLocation.PeptideCTerm, true);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C',
+                SequenceLocation.Everywhere, true);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             var nitrosylC = new SearchModification(Modification.Nitrosyl, 'C', SequenceLocation.Everywhere, false);
@@ -61,13 +68,19 @@ namespace InformedProteomics.Test
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>
             {
-                dehydroC,
-                glutathioneC,
-                nitrosylC,
-                nethylmaleimideC,
-                oxM
+                oxEverywhere
+                //iTraqK,
+                //iTraqCTerm
+                //acetylNTerm
+                //carbamidomethylC,
+                //dehydroC,
+                //glutathioneC,
+                //nitrosylC,
+                //nethylmaleimideC,
+                //oxM
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            aaSet.Display();
         }
 
         [Test]
@@ -98,6 +111,18 @@ namespace InformedProteomics.Test
             var ion = new Ion(composition + Composition.H2O, 13);
             foreach (var p in ion.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", ion.GetIsotopeMz(p.Index), p.Ratio);
             Console.WriteLine();
+        }
+
+        [Test]
+        public void TestIsoProfile()
+        {
+            var composition = Composition.Parse("C(413) H(667) N(109) O(121) S(1)");
+            const int charge = 7;
+            var ion = new Ion(composition, charge);
+            foreach (var isotope in ion.GetIsotopes(0.1))
+            {
+                Console.WriteLine("{0}\t{1}\t{2}", isotope.Index, ion.GetIsotopeMz(isotope.Index), isotope.Ratio);
+            }
         }
 
         [Test]

@@ -78,10 +78,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="alglibnet2, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\alglibnet2.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics, Version=2.3.0.25, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
@@ -170,7 +166,6 @@
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
-    <Compile Include="Utils\CommandLineParser.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\ListUtil.cs" />

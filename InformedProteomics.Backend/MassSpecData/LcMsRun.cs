@@ -363,6 +363,47 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
+        /// </summary>
+        /// <param name="mz">target m/z</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
+        /// <param name="minScanNum">minimum scan number (inclusive)</param>
+        /// <param name="maxScanNum">maximum scan number (inclusive)</param>
+        /// <returns>XIC as an Xic object</returns>
+        public Xic GetExtractedFragmentIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz, int minScanNum, int maxScanNum)
+        {
+            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var minMz = mz - tolTh;
+            var maxMz = mz + tolTh;
+            return GetExtractedFragmentIonChromatogram(minMz, maxMz, precursorIonMz, minScanNum, maxScanNum);
+        }
+
+        /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
+        /// </summary>
+        /// <param name="minMz">min m/z</param>
+        /// <param name="maxMz">max m/z</param>
+        /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
+        /// <param name="minScanNum">minimum scan number (inclusive)</param>
+        /// <param name="maxScanNum">maximum scan number (inclusive)</param>
+        /// <returns>XIC as an Xic object</returns>
+        public Xic GetExtractedFragmentIonChromatogram(double minMz, double maxMz, double precursorIonMz, int minScanNum, int maxScanNum)
+        {
+            var xic = new Xic();
+            for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+            {
+                var spec = GetSpectrum(scanNum) as ProductSpectrum;
+                if (spec == null || spec.MsLevel != 2) continue;
+                if (!spec.IsolationWindow.Contains(precursorIonMz)) continue;
+
+                var peak = spec.FindPeak(minMz, maxMz);
+                if(peak != null) xic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+            }
+            return xic;
+        }
+
+        /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)
         /// XicPoint is created for every MS1 scan.
         /// </summary>

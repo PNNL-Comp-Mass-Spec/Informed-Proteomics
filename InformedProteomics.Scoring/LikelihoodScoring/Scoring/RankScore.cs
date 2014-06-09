@@ -10,7 +10,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
             _trainingParameters = new TrainingParameters(fileName);
         }
 
-        public double GetScore(IonType ionType, int rankNum, int charge, double mass=0.0)
+        public double GetScore(IonType ionType, int rankNum, int charge, double mass)
         {
             var targetRankTable = _trainingParameters.GetRankTable(charge, mass, false);
             var decoyRankTable = _trainingParameters.GetRankTable(charge, mass, true);
@@ -23,7 +23,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
             return (Math.Log(prob) - Math.Log(decoyProb));
         }
 
-        public IonType[] GetIonTypes(int charge, double mass=0.0)
+        public IonType[] GetIonTypes(int charge, double mass)
         {
             return _trainingParameters.GetIonTypes(charge, mass);
         }

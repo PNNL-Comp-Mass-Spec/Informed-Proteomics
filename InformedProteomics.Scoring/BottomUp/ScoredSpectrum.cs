@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -10,11 +11,12 @@ namespace InformedProteomics.Scoring.BottomUp
 {
     public class ScoredSpectrum: IScorer
     {
-        public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, Tolerance tolerance)
+        public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, double massWithH2O, Tolerance tolerance)
         {
             _rankedSpec = new RankedSpectrum(spec);
             _scorer = scorer;
             _charge = charge;
+            _sequenceMass = massWithH2O;
             _tolerance = tolerance;
         }
 
@@ -27,7 +29,7 @@ namespace InformedProteomics.Scoring.BottomUp
         {
             var score = 0.0;
 
-            foreach (var ionType in _scorer.GetIonTypes(_charge))
+            foreach (var ionType in _scorer.GetIonTypes(_charge, _sequenceMass))
             {
                 var monoMz = ionType.IsPrefixIon
                     ? ionType.GetMz(prefixFragmentComposition)
@@ -37,11 +39,11 @@ namespace InformedProteomics.Scoring.BottomUp
                 var peak = _rankedSpec.FindPeak(monoMz, _tolerance);
                 if (peak == null)
                 {
-                    score += _scorer.GetScore(ionType, -1, _charge);  // missing
+                    score += _scorer.GetScore(ionType, -1, _charge, _sequenceMass);  // missing
                 }
                 else
                 {
-                    score += _scorer.GetScore(ionType, peak.Rank, _charge);
+                    score += _scorer.GetScore(ionType, peak.Rank, _charge, _sequenceMass);
                 }
             }
             return score;
@@ -50,6 +52,7 @@ namespace InformedProteomics.Scoring.BottomUp
         private readonly RankedSpectrum _rankedSpec;
         private readonly RankScore _scorer;
         private readonly int _charge;
+        private readonly double _sequenceMass;
         private readonly Tolerance _tolerance;
     }
 

@@ -197,6 +197,8 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}", searhMod.TargetResidue, searhMod.Location, searhMod.IsFixedModification, searhMod.Modification);
             }
+            var aaSet = new AminoAcidSet(modFilePath);
+            aaSet.Display();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
@@ -146,18 +147,18 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptideLevelStats()
         {
+            const int topK = 10;
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
-            var targetData = new List<string>();
-            const string mzRange = "775to900";
+            var concatenated = new List<string>();
+            const string mzRange = "650to775";
             foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcTarget.tsv"))
             {
-                targetData.AddRange(File.ReadAllLines(specFilePath).Skip(1));
+                concatenated.AddRange(File.ReadAllLines(specFilePath).Skip(1));
             }
 
-            var decoyData = new List<string>();
             foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcDecoy.tsv"))
             {
-                decoyData.AddRange(File.ReadAllLines(specFilePath).Skip(1));
+                concatenated.AddRange(File.ReadAllLines(specFilePath).Skip(1));
             }
 
             const string headerStr =
@@ -166,98 +167,57 @@ namespace InformedProteomics.Test
                 "Start\tEnd\tCharge\tMostAbundantIsotopeMz\t" +
                 "Mass\t#MatchedFragments\tIcScore";
             var header = headerStr.Split('\t').ToList();
-            if (targetData.Count <= 1 || decoyData.Count <= 1) return;
+            if (concatenated.Count <= 1) return;
 
             var scoreIndex = header.IndexOf("IcScore");
-//            if (scoreIndex < 0) scoreIndex = header.IndexOf("Score");
-//            if (scoreIndex < 0) scoreIndex = header.IndexOf("#MatchedFragments");
             var sequenceIndex = header.IndexOf("Sequence");
             var preIndex = header.IndexOf("Pre");
             var postIndex = header.IndexOf("Post");
             var proteinIndex = header.IndexOf("ProteinName");
+            var scanIndex = header.IndexOf("Scan");
             if (scoreIndex < 0 || sequenceIndex < 0 || preIndex < 0 || postIndex < 0 || proteinIndex < 0) return;
 
-            var target = new Dictionary<string, double>();
-            foreach (var r in targetData)
-            {
-                var columns = r.Split('\t');
-                var peptide = 0 + columns[sequenceIndex];
-                var curScore = Convert.ToDouble(columns[scoreIndex]);
-                double score;
-                if (target.TryGetValue(peptide, out score)) target[peptide] = Math.Max(score, curScore);
-                else target.Add(peptide, curScore);
-            }
+            //var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+            //    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanIndex]))
+            //    .Select(grp => grp.First())
+            //    .ToArray();
 
-            var decoy = new Dictionary<string, double>();
-            foreach (var r in decoyData)
-            {
-                var columns = r.Split('\t');
-                var peptide = 1 + columns[sequenceIndex];
-                var curScore = Convert.ToDouble(columns[scoreIndex]);
-                double score;
-                if (decoy.TryGetValue(peptide, out score)) decoy[peptide] = Math.Max(score, curScore);
-                else decoy.Add(peptide, curScore);
-            }
-
-            var distinctSortedDecoyFirst = decoy.Concat(target).OrderByDescending(keyValuePair => keyValuePair.Value).ToArray();
+            var distinctSorted = concatenated
+                .GroupBy(r => Convert.ToInt32(r.Split('\t')[scanIndex]))
+                .Select(g => new
+                {
+                    FirstTwo = g.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex])).Take(topK)
+                })
+                .SelectMany(g => g.FirstTwo)
+                .OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                .Select(grp => grp.First())
+                .ToArray();
 
             // Calculate q values
             var numDecoy = 0;
             var numTarget = 0;
-            var fdr = new double[distinctSortedDecoyFirst.Length];
-            for (var i = 0; i < distinctSortedDecoyFirst.Length; i++)
+            var fdr = new double[distinctSorted.Length];
+            for (var i = 0; i < distinctSorted.Length; i++)
             {
-                var r = distinctSortedDecoyFirst[i].Key;  // peptide
-                if (r.StartsWith("0")) numTarget++;
-                else numDecoy++;
+                var row = distinctSorted[i];
+                var columns = row.Split('\t');
+                var protein = columns[proteinIndex];
+                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) numDecoy++;
+                else numTarget++;
                 fdr[i] = numDecoy / (double)numTarget;
             }
 
-            var pepQValue = new double[fdr.Length];
-            pepQValue[fdr.Length - 1] = fdr[fdr.Length - 1];
+            var numPeptides = 0;
+            var qValue = new double[fdr.Length];
+            qValue[fdr.Length - 1] = fdr[fdr.Length - 1];
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
-                pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
+                qValue[i] = Math.Min(qValue[i + 1], fdr[i]);
+                if (qValue[i] < 0.01) numPeptides++;
             }
 
-            var numIdentifiedPeptidesDecoyFirst = 0;
-            for (var i = 0; i < distinctSortedDecoyFirst.Length; i++)
-            {
-                if(pepQValue[i] < 0.01) ++numIdentifiedPeptidesDecoyFirst;
-            }
-
-            var distinctSortedTargetFirst = target.Concat(decoy).OrderByDescending(keyValuePair => keyValuePair.Value).ToArray();
-
-            // Calculate q values
-            numDecoy = 0;
-            numTarget = 0;
-            fdr = new double[distinctSortedTargetFirst.Length];
-            for (var i = 0; i < distinctSortedTargetFirst.Length; i++)
-            {
-                var r = distinctSortedTargetFirst[i].Key;  // peptide
-                if (r.StartsWith("0")) numTarget++;
-                else numDecoy++;
-                fdr[i] = numDecoy / (double)numTarget;
-            }
-
-            pepQValue = new double[fdr.Length];
-            pepQValue[fdr.Length - 1] = fdr[fdr.Length - 1];
-            for (var i = fdr.Length - 2; i >= 0; i--)
-            {
-                pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
-            }
-
-            var numIdentifiedPeptidesTargetFirst = 0;
-            for (var i = 0; i < distinctSortedTargetFirst.Length; i++)
-            {
-                if (pepQValue[i] < 0.01) ++numIdentifiedPeptidesTargetFirst;
-            }
-
-            Console.WriteLine("NumPeptides: {0}, {1}, {2}", 
-                numIdentifiedPeptidesDecoyFirst, 
-                numIdentifiedPeptidesTargetFirst,
-                0.5*(numIdentifiedPeptidesDecoyFirst + numIdentifiedPeptidesTargetFirst)
-                );
+            Console.WriteLine("NumPeptides: {0}", numPeptides);
         }
 
         [Test]

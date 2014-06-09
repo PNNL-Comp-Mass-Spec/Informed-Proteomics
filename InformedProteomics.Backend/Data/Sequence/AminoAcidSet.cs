@@ -77,74 +77,51 @@ namespace InformedProteomics.Backend.Data.Sequence
             var modifications = searchModifications as SearchModification[] ?? searchModifications.ToArray();
 
             // apply fixed modifications
-            foreach (var loc in AllSequenceLocations)
+            foreach (var searchModification in modifications)
             {
-                var residueMap = _locationSpecificResidueMap[loc];
-                foreach (var searchModification in modifications)
+                if (!searchModification.IsFixedModification) continue;
+
+                var location = searchModification.Location;
+                var targetResidue = searchModification.TargetResidue;
+
+                foreach (var loc in AffectedLocations[location])
                 {
-                    if (searchModification.IsFixedModification)
-                    {
-                        var targetResidue = searchModification.TargetResidue;
-                        if (targetResidue == '*') targetResidue = SequenceLocationToLocationResidue[loc];
-                        residueMap[targetResidue] = new ModifiedAminoAcid(residueMap[targetResidue], searchModification.Modification);
-                    }
+                    var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
+                    var residueMap = _locationSpecificResidueMap[loc];
+                    residueMap[appliedResidue] = new ModifiedAminoAcid(residueMap[appliedResidue], searchModification.Modification);
                 }
             }
-
-            //foreach (var searchModification in modifications)
-            //{
-            //    if (!searchModification.IsFixedModification) continue;
-                
-            //    var location = searchModification.Location;
-            //    var targetResidue = searchModification.TargetResidue;
-
-            //    foreach (var loc in AffectedLocations[location])
-            //    {
-            //        var residueModMap = locationSpecificResidueModMap[loc];
-            //        var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
-            //        List<Modification> modList;
-            //        if (residueModMap.TryGetValue(appliedResidue, out modList))
-            //        {
-            //            modList.Add(searchModification.Modification);
-            //        }
-            //        else
-            //        {
-            //            residueModMap.Add(appliedResidue, new List<Modification> { searchModification.Modification });
-            //        }
-            //    }
-            //}
 
             if (maxNumModsPerSequence <= 0) return;
 
             // apply dynamic modifications
             var dynamicModifications = new HashSet<Modification>();
-            var locationSpecificResidueModMap = new Dictionary<SequenceLocation,Dictionary<char, List<Modification>>>();
-            foreach (SequenceLocation loc in AllSequenceLocations)
+            var locationSpecificResidueVariableModMap = new Dictionary<SequenceLocation,Dictionary<char, List<Modification>>>();
+            foreach (var loc in AllSequenceLocations)
             {
-                locationSpecificResidueModMap[loc] = new Dictionary<char, List<Modification>>();
+                locationSpecificResidueVariableModMap[loc] = new Dictionary<char, List<Modification>>();
             }
 
             foreach (var searchModification in modifications)
             {
-                if (!searchModification.IsFixedModification)
-                {
-                    dynamicModifications.Add(searchModification.Modification);
-                    var location = searchModification.Location;
-                    var targetResidue = searchModification.TargetResidue;
+                if (searchModification.IsFixedModification) continue;
 
-                    foreach (var loc in AffectedLocations[location])
+                dynamicModifications.Add(searchModification.Modification);
+                var location = searchModification.Location;
+                var targetResidue = searchModification.TargetResidue;
+
+                foreach (var loc in AffectedLocations[location])
+                {
+                    var residueModMap = locationSpecificResidueVariableModMap[loc];
+                    var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
+                    List<Modification> modList;
+                    if (residueModMap.TryGetValue(appliedResidue, out modList))
                     {
-                        var residueModMap = locationSpecificResidueModMap[loc];
-                        var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
-                        List<Modification> modList;
-                        if (residueModMap.TryGetValue(appliedResidue, out modList))
-                        {
-                            modList.Add(searchModification.Modification);
-                        }
-                        else
-                        {
-                            residueModMap.Add(appliedResidue, new List<Modification> { searchModification.Modification });
-                        }
+                        modList.Add(searchModification.Modification);
+                    }
+                    else
+                    {
+                        residueModMap.Add(appliedResidue, new List<Modification> { searchModification.Modification });
                     }
                 }
             }
@@ -154,7 +131,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             foreach (SequenceLocation loc in AllSequenceLocations)
             {
-                var residueModMap = locationSpecificResidueModMap[loc];
+                var residueModMap = locationSpecificResidueVariableModMap[loc];
                 foreach (var entry in residueModMap)
                 {
                     var residue = entry.Key;

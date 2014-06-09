@@ -121,6 +121,14 @@ namespace InformedProteomics.Backend.Data.Sequence
                         return null;
                     }
 
+                    // Check if it's valid
+			        if (residueStr.Equals("*") && location == SequenceLocation.Everywhere)
+			        {
+                        Console.WriteLine("{0}: Invalid modification: * should not be applied to \"any\"");
+                        maxNumDynModsPerPeptide = -1;
+                        return null;
+			        }
+
 				    var name = token[4].Split()[0].Trim();
 
 			        var mod = Modification.Get(name) ?? Modification.RegisterAndGetModification(name, composition);

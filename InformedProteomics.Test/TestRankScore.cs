@@ -19,13 +19,13 @@ namespace InformedProteomics.Test
             var rankScorer = new RankScore(@"\\protoapps\UserData\Wilkins\DIA\DIA.txt");
             for (int charge = 1; charge < 4; charge++)
             {
-                var ionTypes = rankScorer.GetIonTypes(charge);
+                var ionTypes = rankScorer.GetIonTypes(charge, 0);
                 foreach (var ionType in ionTypes)
                 {
                     for (int r = 0; r <= ranks; r++)
                     {
                         Console.WriteLine("Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3}",
-                            charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge));
+                            charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
                     }
                 }
             }

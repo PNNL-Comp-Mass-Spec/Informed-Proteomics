@@ -13,7 +13,7 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestIcTopDownResults
     {
         [Test]
-        public void TestIcResultsWithModifications()
+        public void ValidateIcResultsWithModifications()
         {
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.tsv";
             var parser = new TsvFileParser(resultFilePath);

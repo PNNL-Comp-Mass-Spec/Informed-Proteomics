@@ -6,7 +6,6 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Scoring.BottomUp;
-using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 using InformedProteomics.TopDown.Execution;
 
@@ -21,7 +20,7 @@ namespace InformedProteomics.BottomUp.Scoring
             MinProductCharge = minProductCharge;
             MaxProductCharge = maxProductCharge;
             Tolerance = tolerance;
-            const string scoringParamPath = @"\\protoapps\UserData\Sangtae\ScoringParams\HCD_QExactive_Tryp_RankProbabilities.txt";
+            const string scoringParamPath = @"\\protoapps\UserData\Wilkins\MSGFPlusTrainingData\HCD_QExactive_Tryp\HCD_QExactive_Tryp.txt";
             _rankScorer = new RankScore(scoringParamPath);
             _scoredSpectra = new Dictionary<int, ScoredSpectrum>();
         }
@@ -57,7 +56,7 @@ namespace InformedProteomics.BottomUp.Scoring
             {
                 var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                 if (spec == null) return null;
-                scoredSpectrum = new ScoredSpectrum(spec, _rankScorer, charge, Tolerance);
+                scoredSpectrum = new ScoredSpectrum(spec, _rankScorer, charge, composition.Mass, Tolerance);
                 _scoredSpectra.Add(index, scoredSpectrum);
             }
 
