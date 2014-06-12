@@ -24,7 +24,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
             const string dbFilePath = @"D:\Research\Data\Vlad\database\ID_004221_1C042A1F.fasta";
             //const string dbFilePath = @"D:\Research\Data\Vlad\database\HBA_MOUSE.fasta";
-            const string outputDir = @"D:\Research\Data\Vlad\Ic\MoreMod_M2";
+            const string outputDir = @"D:\Research\Data\Vlad\Ic\POPSICLETest_M1";
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -38,26 +38,32 @@ namespace InformedProteomics.Test
             var serToAsn = new SearchModification(Modification.SerToAsn, 'S', SequenceLocation.Everywhere, false);
             var pyroCarbamidomethylC = new SearchModification(Modification.PyroCarbamidomethyl, 'C',
                 SequenceLocation.ProteinNTerm, false);
+            var phosphoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
+            var phosphoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
+            var phosphoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
+
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>
             {
                 dehydroC,
-                glutathioneC,
+//                glutathioneC,
                 oxM,
-                dethiomethylM,
+//                dethiomethylM,
                 acetylN,
-                thrToAla,
-                serToAsn,
-                deamidatedN,
-                deamidatedQ,
-                pyroCarbamidomethylC
+                phosphoS,
+                phosphoT,
+                phosphoY
+//                thrToAla,
+//                serToAsn,
+//                deamidatedN,
+//                deamidatedQ,
+//                pyroCarbamidomethylC
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const int searchMode = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
             bool? tda = false;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
-
         }
 
         [Test]

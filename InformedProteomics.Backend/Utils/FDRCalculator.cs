@@ -81,7 +81,7 @@ namespace InformedProteomics.Backend.Utils
                 var protein = columns[proteinIndex];
                 if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) numDecoy++;
                 else numTarget++;
-                fdr[i] = numDecoy/(double)numTarget;
+                fdr[i] = Math.Max(numDecoy/(double)numTarget, 1.0);
             }
             var qValue = new double[fdr.Length];
             qValue[fdr.Length - 1] = fdr[fdr.Length - 1];
@@ -140,7 +140,7 @@ namespace InformedProteomics.Backend.Utils
                 var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
                 if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) numDecoy++;
                 else numTarget++;
-                fdr[i] = numDecoy / (double)numTarget;
+                fdr[i] = Math.Max(numDecoy / (double)numTarget, 1.0);
                 peptide[i] = annotation;
             }
 

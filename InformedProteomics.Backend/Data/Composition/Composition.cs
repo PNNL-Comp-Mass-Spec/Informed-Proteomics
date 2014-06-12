@@ -327,11 +327,11 @@ namespace InformedProteomics.Backend.Data.Composition
         // Parses plain string (e.g. C2H3N1O1S)
         public static Composition ParseFromPlainString(string plaincompositionStr)
         {
-            if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?\d*)+$")) return null;
+            if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
 
             var unimodString = new StringBuilder();
 
-            var matches = Regex.Matches(plaincompositionStr, @"[A-Z][a-z]?\d*");
+            var matches = Regex.Matches(plaincompositionStr, @"[A-Z][a-z]?-?\d*");
             foreach (Match match in matches)
             {
                 var element = match.Value;

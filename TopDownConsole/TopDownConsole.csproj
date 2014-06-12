@@ -64,9 +64,20 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopDownInputParameters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
+      <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
+      <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
+      <Project>{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}</Project>
+      <Name>InformedProteomics.TopDown</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

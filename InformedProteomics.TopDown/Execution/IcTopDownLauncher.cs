@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -234,21 +236,22 @@ namespace InformedProteomics.TopDown.Execution
 
             var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
 
-            foreach (var annotationAndOffset in annotationsAndOffsets)
+            foreach (var annotationAndOffset in annotationsAndOffsets.AsParallel())
             {
-                ++numProteins;
+                //++numProteins;
+                Interlocked.Increment(ref numProteins);
 
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;
 
-                if (numProteins % 100000 == 0)
+                if (numProteins%100000 == 0)
                 {
                     Console.Write("Processing {0}{1} proteins...", numProteins,
                         numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
                     if (numProteins != 0)
                     {
                         sw.Stop();
-                        var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+                        var sec = sw.ElapsedTicks/(double) Stopwatch.Frequency;
                         Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
@@ -257,12 +260,13 @@ namespace InformedProteomics.TopDown.Execution
 
                 var protSequence = annotation.Substring(2, annotation.Length - 4);
 
-                var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
+                var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
+                    AminoAcid.ProteinCTerm);
                 if (seqGraph == null) continue;
 
                 for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
                 {
-                    if(numNTermCleavages > 0) seqGraph.CleaveNTerm();
+                    if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
                     var numProteoforms = seqGraph.GetNumProteoforms();
                     var modCombs = seqGraph.GetModificationCombinations();
                     for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
@@ -277,7 +281,9 @@ namespace InformedProteomics.TopDown.Execution
                             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                             if (spec == null) continue;
                             var charge =
-                                (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
+                                (int)
+                                    Math.Round(sequenceMass/
+                                               (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                             var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
                             var score = seqGraph.GetScore(charge, scorer);
                             if (score <= 3) continue;
@@ -287,12 +293,13 @@ namespace InformedProteomics.TopDown.Execution
                             var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
                             var post = annotation[annotation.Length - 1];
 
-                            var prsm = new SequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, numNTermCleavages, 
+                            var prsm = new SequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
+                                numNTermCleavages,
                                 modCombinations, precursorIon, score);
-                            
+
                             if (matches[ms2ScanNum] == null)
                             {
-                                matches[ms2ScanNum] = new SortedSet<SequenceSpectrumMatch> { prsm };
+                                matches[ms2ScanNum] = new SortedSet<SequenceSpectrumMatch> {prsm};
                             }
                             else // already exists
                             {
@@ -312,7 +319,6 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
             }
-
             return matches;
         }
 

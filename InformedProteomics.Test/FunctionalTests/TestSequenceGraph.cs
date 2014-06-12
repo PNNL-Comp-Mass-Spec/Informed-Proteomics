@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using NUnit.Framework;
@@ -190,7 +191,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingModFile()
         {
-            const string modFilePath = @"\\protoapps\UserData\Sangtae\TestData\MiscFiles\Mods.txt";
+            const string modFilePath = @"D:\Research\Data\Vlad\Popsicle\Mods.txt";
             var modFileParser = new ModFileParser(modFilePath);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)
@@ -199,6 +200,14 @@ namespace InformedProteomics.Test.FunctionalTests
             }
             var aaSet = new AminoAcidSet(modFilePath);
             aaSet.Display();
+        }
+
+        [Test]
+        public void TestParsingCompositions()
+        {
+            const string compStr = "CH-1N-3O23S";
+            var composition = Composition.ParseFromPlainString(compStr);
+            Console.WriteLine(composition);
         }
     }
 }
