@@ -399,6 +399,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 var peak = spec.FindPeak(minMz, maxMz);
                 if(peak != null) xic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+                else xic.Add(new XicPoint(scanNum, 0, 0));
             }
             return xic;
         }

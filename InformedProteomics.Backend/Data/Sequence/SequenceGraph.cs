@@ -287,7 +287,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Tuple<double, string>(fragmentScore.Item1 + precursorIonScore, fragmentScore.Item2);
         }
 
-        private SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
+        protected SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
         {
             _aminoAcidSet = aminoAcidSet;
             _sequence = sequence;
@@ -373,7 +373,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 ((double)curNodeScore + bestPrevNodeScore, bestPrevSequence);
         }
 
-        private Composition.Composition GetComposition(int seqIndex, int modIndex)
+        protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
             if (_nodeComposition[seqIndex, modIndex] == null)
             {
@@ -385,7 +385,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _nodeComposition[seqIndex, modIndex];
         }
 
-        private Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
+        protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
             if (_compNodeComposition[seqIndex, modIndex] == null)
             {
@@ -395,7 +395,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _compNodeComposition[seqIndex, modIndex];
         }
 
-        private double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
+        protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
             if (score != null) return (double)score;
@@ -417,18 +417,18 @@ namespace InformedProteomics.Backend.Data.Sequence
             // ReSharper restore PossibleInvalidOperationException
         }
 
-        private readonly int _maxSeqIndex;
-        private readonly AminoAcidSet _aminoAcidSet;
-        private readonly ModificationParams _modificationParams;
+        protected readonly int _maxSeqIndex;
+        protected readonly AminoAcidSet _aminoAcidSet;
+        protected readonly ModificationParams _modificationParams;
 
-        private int _index;
-        private readonly Node[][] _graph;
-        private readonly string _sequence;
-        private readonly AminoAcid _nTerm;
-        private readonly AminoAcid[] _aminoAcidSequence;
-        private readonly Composition.Composition[,] _nodeComposition;
+        protected int _index;
+        protected readonly Node[][] _graph;
+        protected readonly string _sequence;
+        protected readonly AminoAcid _nTerm;
+        protected readonly AminoAcid[] _aminoAcidSequence;
+        protected readonly Composition.Composition[,] _nodeComposition;
 
-        private readonly Composition.Composition[] _suffixComposition;
+        protected readonly Composition.Composition[] _suffixComposition;
 
         private void SetNTerminalAminoAcid(AminoAcid nTerm)
         {
@@ -542,7 +542,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
     }
 
-    internal class Node
+    public class Node
     {
         internal Node(int modificationCombinationIndex)
         {
