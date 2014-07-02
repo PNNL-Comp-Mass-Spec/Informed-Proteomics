@@ -50,6 +50,28 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GraphX.Common">
+      <HintPath>..\packages\GraphX.2.0.2\lib\net40\GraphX.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphX.Controls">
+      <HintPath>..\packages\GraphX.2.0.2\lib\net40\GraphX.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphX.Logic">
+      <HintPath>..\packages\GraphX.2.0.2\lib\net40\GraphX.Logic.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="QuickGraph.Data">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -57,18 +79,30 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="YAXLib">
+      <HintPath>..\packages\YAXLib.2.13\lib\YAXLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IdData.cs" />
+    <Compile Include="Models\ChargeStateId.cs" />
+    <Compile Include="IcParameters.cs" />
+    <Compile Include="Models\DataGraph.cs" />
+    <Compile Include="Models\IIdData.cs" />
+    <Compile Include="Models\ProteoformId.cs" />
+    <Compile Include="Models\PrSm.cs" />
     <Compile Include="IcFileReader.cs" />
+    <Compile Include="Models\GraphXSequenceGraph.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PrSm.cs" />
+    <Compile Include="Models\ProteinId.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

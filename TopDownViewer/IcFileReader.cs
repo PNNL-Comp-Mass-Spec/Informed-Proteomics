@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.TopDownViewer.Models;
 
 namespace InformedProteomics.TopDownViewer
 {
     public class IcFileReader
     {
-        public IcFileReader(string tsvFile, string rawFile)
+        public IcParameters Config { get; private set; }
+
+        public IcFileReader(string tsvFile, string paramFile)
         {
-            _lcms = LcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0);
+            Config = new IcParameters(paramFile);
             _tsvFile = tsvFile;
         }
 
-        public List<PrSm> Read()
+        public List<ProteinId> Read()
         {
-            var prsms = new Dictionary<string, PrSm>();
+            var proteins = new Dictionary<string, ProteinId>();
             var file = File.ReadLines(_tsvFile);
 
             var lineCount = 0;
@@ -24,16 +25,18 @@ namespace InformedProteomics.TopDownViewer
             {
                 lineCount++;
                 if (lineCount == 1) continue; // first line
-                var idData = new IdData(line, _lcms);
-                var sequence = idData.Sequence;
-                if (!prsms.ContainsKey(sequence))
-                    prsms.Add(sequence, new PrSm(sequence));
-                prsms[sequence].AddId(idData);
+                var idData = new PrSm(line, Config);
+                if (idData.QValue > QValueThreshold) continue;
+                var sequence = idData.Protein;
+                if (!proteins.ContainsKey(sequence))
+                    proteins.Add(sequence, new ProteinId(idData));
+                else proteins[sequence].Add(idData);
             }
-            return prsms.Values.ToList();
+
+            return proteins.Values.ToList();
         }
 
-        private readonly LcMsRun _lcms;
         private readonly string _tsvFile;
+        private const double QValueThreshold = 0.01;
     }
 }
