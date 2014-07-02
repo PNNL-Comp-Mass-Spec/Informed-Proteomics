@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -20,8 +21,7 @@ namespace InformedProteomics.BottomUp.Scoring
             MinProductCharge = minProductCharge;
             MaxProductCharge = maxProductCharge;
             Tolerance = tolerance;
-            const string scoringParamPath = @"\\protoapps\UserData\Wilkins\MSGFPlusTrainingData\HCD_QExactive_Tryp\HCD_QExactive_Tryp.txt";
-            _rankScorer = new RankScore(scoringParamPath);
+            _rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Orbitrap, Enzyme.Trypsin, Protocol.Standard);
             _scoredSpectra = new Dictionary<int, ScoredSpectrum>();
         }
 

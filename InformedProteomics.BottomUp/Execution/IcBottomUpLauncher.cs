@@ -241,7 +241,7 @@ namespace InformedProteomics.BottomUp.Execution
 
                 if (numProteins % 100000 == 0)
                 {
-                    Console.Write("Processing {0}{1} proteins...", numProteins,
+                    Console.Write("Processing {0}{1} peptides...", numProteins,
                         numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
                     if (numProteins != 0)
                     {
