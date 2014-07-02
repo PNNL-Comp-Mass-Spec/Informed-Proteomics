@@ -52,6 +52,25 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             ReadFromFile(fileName);
             _computed = true;
         }
+
+        /// <summary>
+        /// Constructor for creating TrainingParamters from resource file stream parameter file.
+        /// </summary>
+        /// <param name="resourceStream"></param>
+        /// <param name="config"></param>
+        public TrainingParameters(Stream resourceStream, TrainerConfiguration config = null)
+        {
+            _charges = new HashSet<int>();
+            _massSorter = new Dictionary<int, Histogram<double>>();
+            _rankTables = new Dictionary<int, List<RankTable>>();
+            _drankTables = new Dictionary<int, List<RankTable>>();
+            _ionProbabilities = new Dictionary<int, List<IonFrequencyTable>>();
+            _massErrors = new Dictionary<int, List<MassErrorTable>>();
+            _precursorOffsets = new Dictionary<int, List<PrecursorOffsets>>();
+            Config = config;
+            ReadFromResourceFile(resourceStream);
+            _computed = true;
+        }
         #endregion
 
         #region Getters
@@ -149,52 +168,65 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         #endregion
 
         #region Private Methods
-        private void ReadFromFile(string fileName)
+        private void Read(StreamReader file)
         {
             var ionTypeFactory = new IonTypeFactory(2);
-            using (var file = new StreamReader(fileName))
+            var massBins = new List<double>();
+            var binEdges = new List<double>();
+            var charge = 0;
+            var line = file.ReadLine();
+            while (line != null)
             {
-                var massBins = new List<double>();
-                var binEdges = new List<double>();
-                var charge = 0;
-                var line = file.ReadLine();
-                while (line != null)
+                var parts = line.Split('\t').ToList();
+                var header = parts[0];
+                parts.RemoveAt(0);
+                if (header == "BinSize") massBins.AddRange(parts.Select(Convert.ToDouble));
+                else if (header == "BinEdges")
                 {
-                    var parts = line.Split('\t').ToList();
-                    var header = parts[0];
-                    parts.RemoveAt(0);
-                    if (header == "BinSize") massBins.AddRange(parts.Select(Convert.ToDouble));
-                    else if (header == "BinEdges")
-                    {
-                        binEdges.Add(Convert.ToDouble(parts[0]));
-                    }
-                    else if (header == "Charge")
-                    {
-                        if (binEdges.Count > 0)
-                        {
-                            _massSorter[charge].BinEdges = binEdges.ToArray();
-                            binEdges.Clear();
-                        }
-                        charge = Convert.ToInt32(parts[0]);
-                        if (!_charges.Contains(charge))
-                        {
-                            _charges.Add(charge);
-                            _massSorter.Add(charge, new Histogram<double>());
-                            _rankTables.Add(charge, new List<RankTable>());
-                            _drankTables.Add(charge, new List<RankTable>());
-                            _ionProbabilities.Add(charge, new List<IonFrequencyTable>());
-                            _massErrors.Add(charge, new List<MassErrorTable>());
-                        }
-                    }
-                    else if (header == "RankProbabilities")
-                    {
-                        if (massBins.Count == 0 || charge == 0) throw new FormatException("Badly formatted training file.");
-                        _rankTables[charge].Add(new RankTable(file, ionTypeFactory));
-                        _drankTables[charge].Add(new RankTable(file, ionTypeFactory));
-                    }
-                    line = file.ReadLine();
+                    binEdges.Add(Convert.ToDouble(parts[0]));
                 }
-                _massSorter[charge].BinEdges = binEdges.ToArray();
+                else if (header == "Charge")
+                {
+                    if (binEdges.Count > 0)
+                    {
+                        _massSorter[charge].BinEdges = binEdges.ToArray();
+                        binEdges.Clear();
+                    }
+                    charge = Convert.ToInt32(parts[0]);
+                    if (!_charges.Contains(charge))
+                    {
+                        _charges.Add(charge);
+                        _massSorter.Add(charge, new Histogram<double>());
+                        _rankTables.Add(charge, new List<RankTable>());
+                        _drankTables.Add(charge, new List<RankTable>());
+                        _ionProbabilities.Add(charge, new List<IonFrequencyTable>());
+                        _massErrors.Add(charge, new List<MassErrorTable>());
+                    }
+                }
+                else if (header == "RankProbabilities")
+                {
+                    if (massBins.Count == 0 || charge == 0) throw new FormatException("Badly formatted training file.");
+                    _rankTables[charge].Add(new RankTable(file, ionTypeFactory));
+                    _drankTables[charge].Add(new RankTable(file, ionTypeFactory));
+                }
+                line = file.ReadLine();
+            }
+            _massSorter[charge].BinEdges = binEdges.ToArray();
+        }
+
+        private void ReadFromResourceFile(Stream resourceFile)
+        {
+            using (var fileStreamReader = new StreamReader(resourceFile))
+            {
+                Read(fileStreamReader);
+            }
+        }
+
+        private void ReadFromFile(string fileName)
+        {
+            using (var fileStreamReader = new StreamReader(fileName))
+            {
+                Read(fileStreamReader);
             }
         }
 

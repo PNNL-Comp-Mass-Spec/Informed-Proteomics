@@ -1,10 +1,30 @@
 ﻿using System;
+using System.IO;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
 {
     public class RankScore
     {
+        public RankScore(ActivationMethod activationMethod, Ms2DetectorType ms2DetectorType, Enzyme enzyme, Protocol protocol)
+        {
+            if (activationMethod == ActivationMethod.HCD && enzyme == Enzyme.Trypsin)
+            {
+                var paramFile = Properties.Resources.HCD_Trypsin;
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                writer.Write(paramFile);
+                writer.Flush();
+                stream.Position = 0;
+                _trainingParameters = new TrainingParameters(stream);
+            }
+            else
+            {
+                throw new ArgumentException("No parameter file available for selected arguments.");
+            }
+        }
+
         public RankScore(string fileName)
         {
             _trainingParameters = new TrainingParameters(fileName);

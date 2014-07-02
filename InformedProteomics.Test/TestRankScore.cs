@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
@@ -12,6 +14,26 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestRankScore
     {
+        [Test]
+        public void RankScoreParamResources()
+        {
+            const int ranks = 20;
+            var rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Iontrap, Enzyme.Trypsin,
+                                           Protocol.Standard);
+            for (int charge = 1; charge < 4; charge++)
+            {
+                var ionTypes = rankScorer.GetIonTypes(charge, 0);
+                foreach (var ionType in ionTypes)
+                {
+                    for (int r = 0; r <= ranks; r++)
+                    {
+                        Console.WriteLine(@"Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3}",
+                            charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
+                    }
+                }
+            }
+        }
+
         [Test]
         public void RankScore()
         {

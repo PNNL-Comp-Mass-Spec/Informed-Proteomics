@@ -34,15 +34,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             var max = GetMaxMz(monoIsotopicMz);
 
             var peaks = match.Spectrum.Peaks;
-            var offsetMzCollection = new List<double>();
-
-            foreach (var peak in peaks)
-            {
-                if (peak.Mz >= min && peak.Mz <= max)
-                {
-                    offsetMzCollection.Add(peak.Mz - monoIsotopicMz);
-                }
-            }
+            var offsetMzCollection = (from peak in peaks
+                                      where peak.Mz >= min && peak.Mz <= max
+                                      select peak.Mz - monoIsotopicMz).ToList();
             AddOffsets(offsetMzCollection);
         }
 

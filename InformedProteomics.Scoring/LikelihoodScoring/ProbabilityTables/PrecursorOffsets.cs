@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
@@ -35,11 +34,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public void AddMatches(IEnumerable<SpectrumMatch> matches)
         {
             foreach (var match in matches)  AddMatch(match);
-        }
-
-        public void WriteToFile(StreamWriter file)
-        {
-
         }
 
         public List<double> GetChargeOffsets(int charge)

@@ -107,7 +107,6 @@
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestIcBottomUp.cs" />
     <Compile Include="Obsolete\TestIcIms.cs" />
-    <Compile Include="TestIcFileReader.cs" />
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="Obsolete\TestIMSScoring.cs" />
     <Compile Include="Obsolete\TestIpa.cs" />
@@ -152,10 +151,6 @@
     <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
       <Name>InformedProteomics.TopDown</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TopDownViewer\TopDownViewer.csproj">
-      <Project>{d606d8fb-b980-4665-9c2b-86c389853476}</Project>
-      <Name>TopDownViewer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
