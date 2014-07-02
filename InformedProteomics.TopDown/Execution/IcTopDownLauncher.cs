@@ -44,25 +44,6 @@ namespace InformedProteomics.TopDown.Execution
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
-
-            if (outputDir == null)
-            {
-                OutputDir = Path.GetDirectoryName(SpecFilePath);
-            }
-            else
-            {
-                if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
-                if (!Directory.Exists(outputDir))
-                {
-                    if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
-                    {
-                        throw new Exception(outputDir + " is not a directory!");
-                    }
-                    Directory.CreateDirectory(outputDir);
-                }
-                OutputDir = outputDir;
-            }
-
             OutputDir = outputDir;
             MinSequenceLength = minSequenceLength;
             MaxSequenceLength = maxSequenceLength;
@@ -343,6 +324,7 @@ namespace InformedProteomics.TopDown.Execution
                         var protLength = database.GetProteinLength(proteinName);
                         var ion = match.Ion;
 
+                        // Re-scoring
                         var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, ion.Composition, ion.Charge, scanNum);
 
                         writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}\t{18}\t{19}",

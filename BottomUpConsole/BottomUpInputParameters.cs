@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 
-namespace TopDownConsole
+namespace BottomUpConsole
 {
-    public class TopDownInputParameters
+    public class BottomUpInputParameters
     {
         public const string ParameterFileExtension = ".param";
 
@@ -15,7 +14,8 @@ namespace TopDownConsole
         public string DatabaseFilePath { get; set; }
         public string OutputDir { get; set; }
         public AminoAcidSet AminoAcidSet { get; set; }
-        public int SearchMode { get; set; }
+        public Enzyme Enzyme { get; set; }
+        public int NumTolerableTermini { get; set; }
         public bool Tda { get; set; }
         public double PrecursorIonTolerancePpm { get; set; }
         public double ProductIonTolerancePpm { get; set; }
@@ -25,8 +25,6 @@ namespace TopDownConsole
         public int MaxPrecursorIonCharge { get; set; }
         public int MinProductIonCharge { get; set; }
         public int MaxProductIonCharge { get; set; }
-        public double MinSequenceMass { get; set; }
-        public double MaxSequenceMass { get; set; }
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
@@ -36,7 +34,8 @@ namespace TopDownConsole
             Console.WriteLine("SpecFilePath: " + SpecFilePath);
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("OutputDir: " + OutputDir);
-            Console.WriteLine("SearchMode: " + SearchMode);
+            Console.WriteLine("Enzyme: " + Enzyme.Name);
+            Console.WriteLine("NumTolerableTermini: " + NumTolerableTermini);
             Console.WriteLine("Tda: " + Tda);
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
@@ -46,8 +45,6 @@ namespace TopDownConsole
             Console.WriteLine("MaxPrecursorIonCharge: " + MaxPrecursorIonCharge);
             Console.WriteLine("MinProductIonCharge: " + MinProductIonCharge);
             Console.WriteLine("MaxProductIonCharge: " + MaxProductIonCharge);
-            Console.WriteLine("MinSequenceMass: " + MinSequenceMass);
-            Console.WriteLine("MaxSequenceMass: " + MaxSequenceMass);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + _maxNumDynModsPerSequence);
             Console.WriteLine("Modifications: ");
             foreach (var searchMod in _searchModifications)
@@ -65,7 +62,8 @@ namespace TopDownConsole
             {
                 writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
                 writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                writer.WriteLine("SearchMode\t" + SearchMode);
+                writer.WriteLine("Enzyme\t" + Enzyme.Name);
+                writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
                 writer.WriteLine("Tda\t" + Tda);
                 writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                 writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
@@ -75,12 +73,10 @@ namespace TopDownConsole
                 writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
                 writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
                 writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
-                writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
-                writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
                 writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
                 foreach (var searchMod in _searchModifications)
                 {
-                    writer.WriteLine("Modification\t"+searchMod);
+                    writer.WriteLine("Modification\t" + searchMod);
                 }
             }
         }
@@ -122,10 +118,49 @@ namespace TopDownConsole
                 _searchModifications = new SearchModification[0];
             }
 
-            SearchMode = Convert.ToInt32(parameters["-m"]);
-            if (SearchMode < 0 || SearchMode > 2)
+            var enzymeId = Convert.ToInt32(parameters["-e"]);
+            Enzyme enzyme;
+            switch (enzymeId)
             {
-                return "Invalid value (" + SearchMode + ") for parameter -m";
+                case 0:
+                    enzyme = Enzyme.UnspecificCleavage;
+                    break;
+                case 1:
+                    enzyme = Enzyme.Trypsin;
+                    break;
+                case 2:
+                    enzyme = Enzyme.Chymotrypsin;
+                    break;
+                case 3:
+                    enzyme = Enzyme.LysC;
+                    break;
+                case 4:
+                    enzyme = Enzyme.LysN;
+                    break;
+                case 5:
+                    enzyme = Enzyme.GluC;
+                    break;
+                case 6:
+                    enzyme = Enzyme.ArgC;
+                    break;
+                case 7:
+                    enzyme = Enzyme.AspN;
+                    break;
+                case 8:
+                    enzyme = Enzyme.Alp;
+                    break;
+                case 9:
+                    enzyme = Enzyme.NoCleavage;
+                    break;
+                default:
+                    return "Invalid enzyme ID (" + enzymeId + ") for parameter -e";
+            }
+            Enzyme = enzyme;
+
+            NumTolerableTermini = Convert.ToInt32(parameters["-ntt"]);
+            if (NumTolerableTermini < 0 || NumTolerableTermini > 2)
+            {
+                return "Invalid value (" + NumTolerableTermini + ") for parameter -m";
             }
 
             PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
@@ -159,13 +194,6 @@ namespace TopDownConsole
                 return "MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!";
             }
 
-            MinSequenceMass = Convert.ToDouble(parameters["-minMass"]);
-            MaxSequenceMass = Convert.ToDouble(parameters["-maxMass"]);
-            if (MinSequenceMass > MaxSequenceMass)
-            {
-                return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
-            }
-
             return null;
         }
 
@@ -196,7 +224,7 @@ namespace TopDownConsole
                         return "Invalid extension for the parameter " + key + " (" + extension + ")!";
                     }
                 }
-                else if(key.Equals("-d"))
+                else if (key.Equals("-d"))
                 {
                     if (value == null)
                     {
@@ -214,7 +242,7 @@ namespace TopDownConsole
                 }
                 else if (key.Equals("-o"))
                 {
-                    
+
                 }
                 else if (key.Equals("-mod"))
                 {

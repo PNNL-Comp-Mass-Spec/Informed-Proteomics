@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using InformedProteomics.TopDown.Execution;
+using InformedProteomics.BottomUp.Execution;
 
-namespace TopDownConsole
+namespace BottomUpConsole
 {
     internal class Program
     {
-        public const string Version = "0.11 (June 14, 2014)";
+        public const string Version = "0.1 (June 30, 2014)";
         public const double CorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -20,7 +20,7 @@ namespace TopDownConsole
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
 
-            if (args.Length%2 != 0)
+            if (args.Length % 2 != 0)
             {
                 PrintUsageInfo("The number of arguments must be even.");
                 return;
@@ -32,25 +32,24 @@ namespace TopDownConsole
                 {"-s", null},
                 {"-d", null},
                 {"-o", null},
-                {"-m", "1"},
+                {"-e", "1"},
+                {"-ntt", "2"},
                 {"-mod", null},
                 {"-t", "10"},
                 {"-f", "10"},
                 {"-tda", "0"},
-                {"-minLength", "21"},
-                {"-maxLength", "300"},
-                {"-minCharge", "2"},
-                {"-maxCharge", "30"},
+                {"-minLength", "6"},
+                {"-maxLength", "40"},
+                {"-minCharge", "1"},
+                {"-maxCharge", "4"},
                 {"-minFragCharge", "1"},
-                {"-maxFragCharge", "15"},
-                {"-minMass", "3000.0"},
-                {"-maxMass", "50000.0"}
+                {"-maxFragCharge", "3"}
             };
 
-            for (var i = 0; i < args.Length/2; i++)
+            for (var i = 0; i < args.Length / 2; i++)
             {
-                var key = args[2*i];
-                var value = args[2*i + 1];
+                var key = args[2 * i];
+                var value = args[2 * i + 1];
                 if (!paramDic.ContainsKey(key))
                 {
                     PrintUsageInfo("Invalid parameter: " + key);
@@ -59,7 +58,7 @@ namespace TopDownConsole
                 paramDic[key] = value;
             }
 
-            var parameters = new TopDownInputParameters();
+            var parameters = new BottomUpInputParameters();
             var message = parameters.Parse(paramDic);
             if (message != null)
             {
@@ -67,32 +66,28 @@ namespace TopDownConsole
                 return;
             }
 
-            Console.WriteLine("POPSICLE " + Version);
+            Console.WriteLine("POPSICLE (Bottom-Up) " + Version);
             parameters.Display();
             parameters.Write();
 
-            var topDownLauncher = new IcTopDownLauncher(
+            var bottomUpLauncher = new IcBottomUpLauncher(
                 parameters.SpecFilePath,
                 parameters.DatabaseFilePath,
                 parameters.OutputDir,
                 parameters.AminoAcidSet,
+                parameters.Enzyme,
                 parameters.MinSequenceLength,
                 parameters.MaxSequenceLength,
-                1,  // max number of N-term cleavages
-                0,  // max number of C-term cleavages
                 parameters.MinPrecursorIonCharge,
                 parameters.MaxPrecursorIonCharge,
                 parameters.MinProductIonCharge,
                 parameters.MaxProductIonCharge,
-                parameters.MinSequenceMass,
-                parameters.MaxSequenceMass,
                 parameters.PrecursorIonTolerancePpm,
                 parameters.ProductIonTolerancePpm,
-                parameters.Tda,
-                parameters.SearchMode
+                parameters.Tda
                 );
 
-            topDownLauncher.RunSearch(CorrThreshold);
+            bottomUpLauncher.RunSearch(CorrThreshold);
         }
 
 
@@ -100,12 +95,13 @@ namespace TopDownConsole
         {
             if (message != null) Console.WriteLine("Error: " + message);
             Console.WriteLine(
-                "POPSICLE " + Version + "\n" +
+                "POPSICLE (Bottom-Up) " + Version + "\n" +
                 "Usage: POPSICLE.exe\n" +
                 "\t-s SpectrumFile (*.raw)\n" +
                 "\t-d DatabaseFile (*.fasta or *.fa)\n" +
                 "\t[-o OutputFolder]\n" +
-                "\t[-m SearchMode] (0: multiple internal cleavages, 1: single internal cleavage (default), 2: no internal cleavage)\n" +
+                "\t[-e EnzymeId] (0: Unspecific cleavage, 1: Trypsin (Default), 2: Chymotrypsin, 3: Lys-C, 4: Lys-N, 5: Glu-C, 6: Arg-C, 7: Asp-N, 8: AlphaLP, 9: No cleavage)\n" +
+                "\t[-ntt NumTolerableTermini] (0, 1, or 2, Default: 2)\n" +
                 "\t[-mod ModificationFileName] (modification file, default: no modification)\n" +
                 "\t[-t PrecursorToleranceInPpm] (e.g. 10, Default: 10)\n" +
                 "\t[-f FragmentIonToleranceInPpm] (e.g. 10, Default: 10)\n" +
@@ -115,9 +111,7 @@ namespace TopDownConsole
                 "\t[-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 2)\n" +
                 "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 30)\n" +
                 "\t[-minFragCharge MinPrecursorCharge] (minimum fragment ion charge, default: 1)\n" +
-                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n" +
-                "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
-                "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n"
+                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n"
                 );
         }
 

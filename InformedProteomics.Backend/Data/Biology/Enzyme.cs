@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Data.Biology
         public static readonly Enzyme Chymotrypsin = new Enzyme("Chymotrypsin", "FYWL", false, "Chymotrypsin", "MS:1001306");
         public static readonly Enzyme LysC = new Enzyme("LysC", "K", false, "Lys-C", "MS:1001309");
         public static readonly Enzyme LysN = new Enzyme("LysN", "K", true, "Lys-N", null);
-        public static readonly Enzyme GluC = new Enzyme("GluC","E",false, "glutamyl endopeptidase", "MS:1001917");
+        public static readonly Enzyme GluC = new Enzyme("GluC","E",false, "Glu-C", "MS:1001917");
         public static readonly Enzyme ArgC = new Enzyme("ArgC","R",false, "Arg-C", "MS:1001303");
         public static readonly Enzyme AspN = new Enzyme("AspN","D",true, "Asp-N", "MS:1001304");
         public static readonly Enzyme Alp = new Enzyme("aLP", "", false, "alphaLP", null);
