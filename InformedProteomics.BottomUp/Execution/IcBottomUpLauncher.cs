@@ -225,7 +225,7 @@ namespace InformedProteomics.BottomUp.Execution
         private SortedSet<SequenceSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets, ISequenceFilter ms1Filter)
         {
             var sw = new Stopwatch();
-            var numProteins = 0;
+            var numPeptides = 0;
             sw.Reset();
             sw.Start();
 
@@ -234,16 +234,16 @@ namespace InformedProteomics.BottomUp.Execution
             // TODO: N-term Met cleavage
             foreach (var annotationAndOffset in annotationsAndOffsets)
             {
-                ++numProteins;
+                ++numPeptides;
 
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;
 
-                if (numProteins % 100000 == 0)
+                if (numPeptides % 100000 == 0)
                 {
-                    Console.Write("Processing {0}{1} peptides...", numProteins,
-                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
-                    if (numProteins != 0)
+                    Console.Write("Processing {0}{1} peptides...", numPeptides,
+                        numPeptides == 1 ? "st" : numPeptides == 2 ? "nd" : numPeptides == 3 ? "rd" : "th");
+                    if (numPeptides != 0)
                     {
                         sw.Stop();
                         var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;

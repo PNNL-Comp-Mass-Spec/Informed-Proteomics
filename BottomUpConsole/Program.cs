@@ -84,7 +84,8 @@ namespace BottomUpConsole
                 parameters.MaxProductIonCharge,
                 parameters.PrecursorIonTolerancePpm,
                 parameters.ProductIonTolerancePpm,
-                parameters.Tda
+                parameters.Tda,
+                parameters.NumTolerableTermini
                 );
 
             bottomUpLauncher.RunSearch(CorrThreshold);
@@ -106,12 +107,12 @@ namespace BottomUpConsole
                 "\t[-t PrecursorToleranceInPpm] (e.g. 10, Default: 10)\n" +
                 "\t[-f FragmentIonToleranceInPpm] (e.g. 10, Default: 10)\n" +
                 "\t[-tda 0/1] (0: don't search decoy database (default), 1: search shuffled decoy database)\n" +
-                "\t[-minLength MinSequenceLength] (minimum sequence length, default: 21)\n" +
-                "\t[-maxLength MaxSequenceLength] (maximum sequence length, default: 300)\n" +
-                "\t[-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 2)\n" +
-                "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 30)\n" +
+                "\t[-minLength MinSequenceLength] (minimum sequence length, default: 6)\n" +
+                "\t[-maxLength MaxSequenceLength] (maximum sequence length, default: 40)\n" +
+                "\t[-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 1)\n" +
+                "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 4)\n" +
                 "\t[-minFragCharge MinPrecursorCharge] (minimum fragment ion charge, default: 1)\n" +
-                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n"
+                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 3)\n"
                 );
         }
 
