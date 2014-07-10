@@ -398,8 +398,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (!spec.IsolationWindow.Contains(precursorIonMz)) continue;
 
                 var peak = spec.FindPeak(minMz, maxMz);
-                if(peak != null) xic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
-                else xic.Add(new XicPoint(scanNum, 0, 0));
+                if (peak != null) xic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+//                else xic.Add(new XicPoint(scanNum, 0, 0));
             }
             return xic;
         }
