@@ -129,7 +129,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var dynModArray = dynamicModifications.ToArray();
             _modificationParams = new ModificationParams(dynModArray, maxNumModsPerSequence);
 
-            foreach (SequenceLocation loc in AllSequenceLocations)
+            foreach (var loc in AllSequenceLocations)
             {
                 var residueModMap = locationSpecificResidueVariableModMap[loc];
                 foreach (var entry in residueModMap)
@@ -294,7 +294,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         public ModifiedAminoAcid(AminoAcid aa, Modification modification) 
             : base(aa.Residue, aa.Name+"+"+modification.Name, aa.Composition+modification.Composition)
         {
-            _modification = modification;
+            var modAa = aa as ModifiedAminoAcid;
+            if(modAa == null) _modification = modification; // aa is not modified
+            else    // aa is already modified
+            {
+                _modification = Modification.RegisterAndGetModification(modAa.Modification.Name+"+"+modification.Name, Composition);
+            }
         }
 
         private readonly Modification _modification;

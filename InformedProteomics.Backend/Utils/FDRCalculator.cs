@@ -10,9 +10,14 @@ namespace InformedProteomics.Backend.Utils
     {
         private IList<string> _headers;
         private string[] _results;
+        private readonly bool _multiplePeptidesPerScan;
 
-        public FdrCalculator(string targetResultFilePath, string decoyResultFilePath)
+        public int NumPsms { get; private set; }
+        public int NumPeptides { get; private set; }
+
+        public FdrCalculator(string targetResultFilePath, string decoyResultFilePath, bool multiplePeptidesPerScan = false)
         {
+            _multiplePeptidesPerScan = multiplePeptidesPerScan;
             if (!CalculateQValues(targetResultFilePath, decoyResultFilePath))
             {
                 throw new Exception("Illegal file format at FdrCalculator");
@@ -69,6 +74,7 @@ namespace InformedProteomics.Backend.Utils
                 .Select(grp => grp.First())
                 .ToArray();
 
+            NumPsms = 0;
             // Calculate q values
             _headers = _headers.Concat(new[] {"QValue"}).ToArray();
             var numDecoy = 0;
@@ -88,6 +94,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
                 qValue[i] = Math.Min(qValue[i + 1], fdr[i]);
+                if (qValue[i] <= 0.01) ++NumPsms;
             }
 
             _results = distinctSorted.Select((r, i) => r + "\t" + qValue[i]).ToArray();
@@ -119,12 +126,17 @@ namespace InformedProteomics.Backend.Utils
             var proteinIndex = _headers.IndexOf("ProteinName");
             if (scoreIndex < 0 || sequenceIndex < 0 || preIndex < 0 || postIndex < 0 || proteinIndex < 0) return false;
 
-            var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                .Select(grp => grp.First())
-                .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                .Select(grp => grp.First())
-                .ToArray();
+            var distinctSorted = !_multiplePeptidesPerScan ?
+                concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                    .Select(grp => grp.First())
+                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                    .Select(grp => grp.First())
+                    .ToArray() :
+                concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                    .Select(grp => grp.First())
+                    .ToArray();
 
             // Calculate q values
             _headers = _headers.Concat(new[] { "PepQValue" }).ToArray();
@@ -149,6 +161,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
                 pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
+                if (pepQValue[i] <= 0.01) ++NumPeptides;
             }
 
             var annotationToPepQValue = new Dictionary<string, double>();

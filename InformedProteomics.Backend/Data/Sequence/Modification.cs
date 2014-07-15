@@ -132,7 +132,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
         {
-            var mod = new Modification(-1, composition, name);
+            var mod = Get(name);
+            if (mod != null) return mod;
+
+            mod = new Modification(-1, composition, name);
             Register(mod);
             return mod;
         }

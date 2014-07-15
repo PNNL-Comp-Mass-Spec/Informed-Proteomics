@@ -32,12 +32,12 @@ namespace InformedProteomics.TopDown.Execution
 
         public AminoAcid NTerm
         {
-            get { return Pre == FastaDatabase.Delimiter ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm; }
+            get { return Pre == '-' ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm; }
         }
 
         public AminoAcid CTerm
         {
-            get { return Post == FastaDatabase.Delimiter ? AminoAcid.ProteinCTerm : AminoAcid.PeptideCTerm; }
+            get { return Post == '-' ? AminoAcid.ProteinCTerm : AminoAcid.PeptideCTerm; }
         }
 
         public int CompareTo(SequenceSpectrumMatch other)

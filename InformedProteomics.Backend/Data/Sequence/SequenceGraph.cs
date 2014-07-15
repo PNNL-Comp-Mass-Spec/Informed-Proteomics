@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
@@ -186,7 +187,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public IEnumerable<Composition.Composition> GetAllFragmentNodeCompositions()
         {
-            for (var seqIndex = 2; seqIndex < _maxSeqIndex - 2; seqIndex++)
+            for (var seqIndex = 2; seqIndex < MaxSeqIndex - 2; seqIndex++)
             {
                 for (var modIndex = 0; modIndex < _graph[seqIndex].Length; modIndex++)
                 {
@@ -226,7 +227,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _sinkSequenceComposition = GetComposition(_index, modIndex);
             _sinkSequenceCompositionWithH2O = _sinkSequenceComposition + Composition.Composition.H2O;
             _sinkSequenceCompositionWithH2O.ComputeApproximateIsotopomerEnvelop();
-            _compNodeComposition = new Composition.Composition[_maxSeqIndex, _modificationParams.NumModificationCombinations];
+            _compNodeComposition = new Composition.Composition[MaxSeqIndex, _modificationParams.NumModificationCombinations];
         }
 
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
@@ -247,9 +248,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             // Get 
             var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
 
-            var nodeScore = new double?[_maxSeqIndex][];
-            var maxScore = new double?[_maxSeqIndex][];
-            for (var si = 0; si < _maxSeqIndex; si++)
+            var nodeScore = new double?[MaxSeqIndex][];
+            var maxScore = new double?[MaxSeqIndex][];
+            for (var si = 0; si < MaxSeqIndex; si++)
             {
                 nodeScore[si] = new double?[_graph[si].Length];
                 maxScore[si] = new double?[_graph[si].Length];
@@ -271,9 +272,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             // Get 
             var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
 
-            var nodeScore = new double?[_maxSeqIndex][];
-            var maxScore = new Tuple<double, string>[_maxSeqIndex][];
-            for (var si = 0; si < _maxSeqIndex; si++)
+            var nodeScore = new double?[MaxSeqIndex][];
+            var maxScore = new Tuple<double, string>[MaxSeqIndex][];
+            for (var si = 0; si < MaxSeqIndex; si++)
             {
                 nodeScore[si] = new double?[_graph[si].Length];
                 maxScore[si] = new Tuple<double, string>[_graph[si].Length];
@@ -295,20 +296,20 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             _modificationParams = aminoAcidSet.GetModificationParams();
 
-            _maxSeqIndex = sequence.Length + 3;  // init + C-term + sequence length + N-term
+            MaxSeqIndex = sequence.Length + 3;  // init + C-term + sequence length + N-term
 
             _index = 0;
 
-            _aminoAcidSequence = new AminoAcid[_maxSeqIndex];
+            _aminoAcidSequence = new AminoAcid[MaxSeqIndex];
             _aminoAcidSequence[0] = AminoAcid.Empty;
 
-            _suffixComposition = new Composition.Composition[_maxSeqIndex];
+            _suffixComposition = new Composition.Composition[MaxSeqIndex];
             _suffixComposition[0] = Composition.Composition.Zero;
 
-            _graph = new Node[_maxSeqIndex][];
+            _graph = new Node[MaxSeqIndex][];
             _graph[0] = new[] { new Node(0) };
 
-            _nodeComposition = new Composition.Composition[_maxSeqIndex, _modificationParams.NumModificationCombinations];
+            _nodeComposition = new Composition.Composition[MaxSeqIndex, _modificationParams.NumModificationCombinations];
 
             NumNTermCleavages = 0;
             IsValid = true;
@@ -355,16 +356,36 @@ namespace InformedProteomics.Backend.Data.Sequence
                 return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>((double)curNodeScore, "");
             }
 
+            var modPos = _index - seqIndex;
+            var aminoAcid = _aminoAcidSequence[seqIndex];
+            var modAa = aminoAcid as ModifiedAminoAcid;
+            if (modAa != null)
+            {
+                var modificationName = modAa.Modification.Name;
+                if (string.IsNullOrEmpty(bestPrevSequence))
+                {
+                    bestPrevSequence = modificationName + " " + modPos;
+                }
+                else
+                {
+                    bestPrevSequence = modificationName + " " + modPos + "," + bestPrevSequence;
+                }
+            }
+
             var prevModCombIndex = _graph[seqIndex - 1][bestPrevNodeIndex].ModificationCombinationIndex;
             var curModCombIndex = node.ModificationCombinationIndex;
             if (prevModCombIndex != curModCombIndex) // modified
             {
                 var modificationName = ModificationParams.GetModificationIndexBetween(prevModCombIndex, curModCombIndex).Name;
                 string newModSequence;
-                var modPos = _index - seqIndex;
-                if (string.IsNullOrEmpty(bestPrevSequence)) newModSequence = modificationName + " " + modPos;
-                else newModSequence = modificationName + " " + modPos + ",";
-                
+                if (string.IsNullOrEmpty(bestPrevSequence))
+                {
+                    newModSequence = modificationName + " " + modPos;
+                }
+                else
+                {
+                    newModSequence = modificationName + " " + modPos + ",";
+                }
                 return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
                     ((double)curNodeScore + bestPrevNodeScore, newModSequence+bestPrevSequence);
             }
@@ -417,7 +438,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             // ReSharper restore PossibleInvalidOperationException
         }
 
-        protected readonly int _maxSeqIndex;
+        protected readonly int MaxSeqIndex;
         protected readonly AminoAcidSet _aminoAcidSet;
         protected readonly ModificationParams _modificationParams;
 

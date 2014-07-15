@@ -204,6 +204,36 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestDdaPlus()
+        {
+            // QC_Shew QE
+            const string specFilePath = @"H:\Research\DDAPlus\raw\20140701_yeast_DDA_01.raw";
+            const string dbFilePath = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
+            const string outputDir = @"H:\Research\DDAPlus\Test";
+
+            // Configure amino acid set
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
+            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
+
+            const int numMaxModsPerPeptide = 2;
+            var searchModifications = new List<SearchModification>
+            {
+                //carbamidomethylC,
+                acetylN,
+                oxM
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerPeptide);
+
+            const int ntt = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            bool? tda = true;   // true: target & decoy, false: target, null: decoy
+            TestBottomUpSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, ntt);
+        }
+
+        [Test]
         public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int searchMode, double corrThreshold = 0.3)
         {
             // Search parameters

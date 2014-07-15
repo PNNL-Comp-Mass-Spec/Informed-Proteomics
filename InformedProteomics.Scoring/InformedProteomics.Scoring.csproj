@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BottomUp\DummyScorer.cs" />
     <Compile Include="BottomUp\Partition.cs" />
     <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\ScoredSpectrum.cs" />

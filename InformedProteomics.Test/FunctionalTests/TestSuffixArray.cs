@@ -52,7 +52,7 @@ namespace InformedProteomics.Test.FunctionalTests
             sw.Start();
 
             //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string dbFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
 //            const string dbFile = @"H:\Research\CPTAC_Phospho\database\ID_004208_295531A4.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);

@@ -8,7 +8,8 @@ namespace TopDownConsole
 {
     internal class Program
     {
-        public const string Version = "0.11 (June 14, 2014)";
+        public const string Name = "PoPMiner";
+        public const string Version = "Top-Down 0.11 (June 14, 2014)";
         public const double CorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -67,7 +68,7 @@ namespace TopDownConsole
                 return;
             }
 
-            Console.WriteLine("POPSICLE " + Version);
+            Console.WriteLine(Name + " " + Version);
             parameters.Display();
             parameters.Write();
 
@@ -100,8 +101,8 @@ namespace TopDownConsole
         {
             if (message != null) Console.WriteLine("Error: " + message);
             Console.WriteLine(
-                "POPSICLE " + Version + "\n" +
-                "Usage: POPSICLE.exe\n" +
+                Name + " " + Version + "\n" +
+                "Usage: " + Name + ".exe\n" +
                 "\t-s SpectrumFile (*.raw)\n" +
                 "\t-d DatabaseFile (*.fasta or *.fa)\n" +
                 "\t[-o OutputFolder]\n" +

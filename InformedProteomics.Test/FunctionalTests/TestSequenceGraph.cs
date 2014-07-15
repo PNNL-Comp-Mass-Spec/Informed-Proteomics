@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Scoring.BottomUp;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests
@@ -209,5 +211,48 @@ namespace InformedProteomics.Test.FunctionalTests
             var composition = Composition.ParseFromPlainString(compStr);
             Console.WriteLine(composition);
         }
+
+        [Test]
+        public void TestGettingSequence()
+        {
+            const string annotation = "_.AECMC._";
+
+            // Configure amino acid set
+            var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
+            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
+            var methylC = new SearchModification(Modification.Methylation, 'C', SequenceLocation.Everywhere, true);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.PeptideNTerm, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                carbamidomethylC,
+                methylC
+                //methylK,
+                //pyroGluQ,
+                //oxM,
+                //acetylN
+            };
+
+            const int numMaxModsPerProtein = 2;
+
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
+
+            var protCompositions = seqGraph.GetSequenceCompositions();
+            for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+            {
+                seqGraph.SetSink(modIndex);
+
+                var composition = protCompositions[modIndex];
+                Console.WriteLine("{0}\t{1}", composition, composition.Mass);
+                var curScoreAndModifications = seqGraph.GetScoreAndModifications(0, new DummyScorer());
+                if (curScoreAndModifications != null) Console.WriteLine("Score: {0}, Modifications: {1}", curScoreAndModifications.Item1, curScoreAndModifications.Item2);
+            }
+        }
     }
+
+
 }
