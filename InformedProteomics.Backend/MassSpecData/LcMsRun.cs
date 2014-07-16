@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
@@ -247,6 +248,16 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             
             return new Spectrum(summedPeakList, scanNum);
+        }
+
+        public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)
+        {
+            return
+                from ms2ScanNum in GetScanNumbers(2) 
+                let productSpec = GetSpectrum(ms2ScanNum) as ProductSpectrum 
+                where productSpec != null 
+                where productSpec.IsolationWindow.Contains(precursorMz) 
+                select ms2ScanNum;
         }
 
         /// <summary>
