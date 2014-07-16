@@ -193,7 +193,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingModFile()
         {
-            const string modFilePath = @"D:\Research\Data\Vlad\Popsicle\Mods.txt";
+            const string modFilePath = @"..\..\..\TestFiles\Mods.txt";
             var modFileParser = new ModFileParser(modFilePath);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)

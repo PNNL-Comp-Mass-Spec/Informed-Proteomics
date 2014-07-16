@@ -99,7 +99,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 					
 				    // Location
 				    SequenceLocation location;
-				    var locStr = token[3].Split()[0].Trim();
+				    var locStr = token[3].Trim().Split()[0];
 			        if (locStr.Equals("any", StringComparison.InvariantCultureIgnoreCase))
 			            location = SequenceLocation.Everywhere;
                     else if (locStr.Equals("N-Term", StringComparison.InvariantCultureIgnoreCase) ||
