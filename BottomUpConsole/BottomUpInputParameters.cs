@@ -4,13 +4,13 @@ using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 
-namespace BottomUpConsole
+namespace MSPathFinder
 {
     public class BottomUpInputParameters
     {
         public const string ParameterFileExtension = ".param";
 
-        public string SpecFilePath { get; set; }
+        public IEnumerable<string> SpecFilePaths { get; set; }
         public string DatabaseFilePath { get; set; }
         public string OutputDir { get; set; }
         public AminoAcidSet AminoAcidSet { get; set; }
@@ -31,7 +31,8 @@ namespace BottomUpConsole
 
         public void Display()
         {
-            Console.WriteLine("SpecFilePath: " + SpecFilePath);
+            Console.WriteLine("SpecFilePath: ");
+            foreach(var specFilePath in SpecFilePaths) Console.WriteLine("\t{0}", specFilePath);
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("Enzyme: " + Enzyme.Name);
@@ -55,29 +56,32 @@ namespace BottomUpConsole
 
         public void Write()
         {
-            var outputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + ParameterFileExtension;
-
-            using (var writer = new StreamWriter(outputFilePath))
+            foreach (var specFilePath in SpecFilePaths)
             {
-                writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
-                writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                writer.WriteLine("Enzyme\t" + Enzyme.Name);
-                writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
-                writer.WriteLine("Tda\t" + Tda);
-                writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
-                writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
-                writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
-                writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
-                writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
-                writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
-                writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
-                writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
-                writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
-                foreach (var searchMod in _searchModifications)
+                var outputFilePath = OutputDir + Path.DirectorySeparatorChar +
+                                           Path.GetFileNameWithoutExtension(specFilePath) + ParameterFileExtension;
+
+                using (var writer = new StreamWriter(outputFilePath))
                 {
-                    writer.WriteLine("Modification\t" + searchMod);
-                }
+                    writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
+                    writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+                    writer.WriteLine("Enzyme\t" + Enzyme.Name);
+                    writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
+                    writer.WriteLine("Tda\t" + Tda);
+                    writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
+                    writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
+                    writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
+                    writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
+                    writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
+                    writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
+                    writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
+                    writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
+                    writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
+                    foreach (var searchMod in _searchModifications)
+                    {
+                        writer.WriteLine("Modification\t" + searchMod);
+                    }
+                }                
             }
         }
 
@@ -86,7 +90,16 @@ namespace BottomUpConsole
             var message = CheckIsValid(parameters);
             if (message != null) return message;
 
-            SpecFilePath = parameters["-s"];
+            var specFilePath = parameters["-s"];
+            if (Directory.Exists(specFilePath)) // Directory
+            {
+                SpecFilePaths = Directory.GetFiles(specFilePath, "*.raw");
+            }
+            else
+            {
+                SpecFilePaths = new[] {specFilePath};
+            }
+
             DatabaseFilePath = parameters["-d"];
 
             var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
@@ -214,10 +227,11 @@ namespace BottomUpConsole
                     {
                         return "Missing parameter " + key + "!";
                     }
-                    if (!File.Exists(value))
+                    if (!File.Exists(value) && !Directory.Exists(value))
                     {
                         return "File not found: " + value + "!";
                     }
+                    if (Directory.Exists(value)) continue;
                     var extension = Path.GetExtension(value);
                     if (!Path.GetExtension(value).ToLower().Equals(".raw"))
                     {
@@ -232,7 +246,7 @@ namespace BottomUpConsole
                     }
                     if (!File.Exists(value))
                     {
-                        return "File not found." + value + "!"; ;
+                        return "File not found." + value + "!"; 
                     }
                     var extension = Path.GetExtension(value).ToLower();
                     if (!extension.Equals(".fa") && !extension.Equals(".fasta"))

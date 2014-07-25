@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using InformedProteomics.BottomUp.Execution;
 
-namespace BottomUpConsole
+namespace MSPathFinder
 {
     internal class Program
     {
-        public const string Name = "PoPMiner";
-        public const string Version = "Bottom-Up 0.12 (July 9, 2014)";
+        public const string Name = "MSPathFinder";
+        public const string Version = "0.14 (July 18, 2014)";
         public const double CorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -71,25 +71,28 @@ namespace BottomUpConsole
             parameters.Display();
             parameters.Write();
 
-            var bottomUpLauncher = new IcBottomUpLauncher(
-                parameters.SpecFilePath,
-                parameters.DatabaseFilePath,
-                parameters.OutputDir,
-                parameters.AminoAcidSet,
-                parameters.Enzyme,
-                parameters.MinSequenceLength,
-                parameters.MaxSequenceLength,
-                parameters.MinPrecursorIonCharge,
-                parameters.MaxPrecursorIonCharge,
-                parameters.MinProductIonCharge,
-                parameters.MaxProductIonCharge,
-                parameters.PrecursorIonTolerancePpm,
-                parameters.ProductIonTolerancePpm,
-                parameters.Tda,
-                parameters.NumTolerableTermini
-                );
+            foreach (string specFilePath in parameters.SpecFilePaths)
+            {
+                var bottomUpLauncher = new IcBottomUpLauncher(
+                    specFilePath,
+                    parameters.DatabaseFilePath,
+                    parameters.OutputDir,
+                    parameters.AminoAcidSet,
+                    parameters.Enzyme,
+                    parameters.MinSequenceLength,
+                    parameters.MaxSequenceLength,
+                    parameters.MinPrecursorIonCharge,
+                    parameters.MaxPrecursorIonCharge,
+                    parameters.MinProductIonCharge,
+                    parameters.MaxProductIonCharge,
+                    parameters.PrecursorIonTolerancePpm,
+                    parameters.ProductIonTolerancePpm,
+                    parameters.Tda,
+                    parameters.NumTolerableTermini
+                    );
 
-            bottomUpLauncher.RunSearch(CorrThreshold);
+                bottomUpLauncher.RunSearch(CorrThreshold);
+            }
         }
 
 
@@ -99,7 +102,7 @@ namespace BottomUpConsole
             Console.WriteLine(
                 Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
-                "\t-s SpectrumFile (*.raw)\n" +
+                "\t-s SpectrumFile or Folder (*.raw)\n" +
                 "\t-d DatabaseFile (*.fasta or *.fa)\n" +
                 "\t[-o OutputFolder]\n" +
                 "\t[-e EnzymeId] (0: Unspecific cleavage, 1: Trypsin (Default), 2: Chymotrypsin, 3: Lys-C, 4: Lys-N, 5: Glu-C, 6: Arg-C, 7: Asp-N, 8: AlphaLP, 9: No cleavage)\n" +
@@ -116,6 +119,5 @@ namespace BottomUpConsole
                 "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 3)\n"
                 );
         }
-
     }
 }

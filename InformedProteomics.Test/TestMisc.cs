@@ -22,7 +22,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void ProcessIprg2015()
+        public void ProcessIprg2015PreStudy()
         {
             const string dir = @"H:\Research\IPRG2015";
 
@@ -140,7 +140,7 @@ namespace InformedProteomics.Test
             //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
-            const string resultDir = dir + @"\mzid";
+            const string resultDir = dir + @"\NTT1";
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
 
             var specCount = new Dictionary<string, int[]>();  // protein name => array of counts
@@ -180,7 +180,7 @@ namespace InformedProteomics.Test
             }
 
             // Writing
-            const string databaseFilePath = dir + @"\yeast6mix.fasta";
+            const string databaseFilePath = dir + @"\database\iPRG2015.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
@@ -189,7 +189,8 @@ namespace InformedProteomics.Test
             const string outputFilePath = dir + @"\SpecCountAllProteins.tsv";
             using (var writer = new StreamWriter(outputFilePath))
             {
-                var fileIds = msgfResultFiles.Select(f => f.Substring(f.LastIndexOf('_') + 1, f.LastIndexOf('.') - f.LastIndexOf('_') - 1));
+                var fileIds = msgfResultFiles.Select(f => f.Substring(f.IndexOf("_sample", StringComparison.Ordinal) + 1, 
+                    f.LastIndexOf('.') - f.IndexOf("_sample", StringComparison.Ordinal) - 1));
                 writer.WriteLine("Protein\tLength\t" + string.Join("\t", fileIds) + "\tSpikeIn");
                 foreach (var entry in specCount)
                 {
@@ -200,7 +201,7 @@ namespace InformedProteomics.Test
                     Assert.True(counts.Length == msgfResultFiles.Length);
                     var spikeIn = 0;
                     //if (spikeInAccessions.Any(spikeInAccession => proteinId.StartsWith("sp|" + spikeInAccession)))
-                    if(proteinId.StartsWith("STANDARD"))
+                    if(proteinId.StartsWith("sp|"))
                     {
                         spikeIn = 1;
                     }

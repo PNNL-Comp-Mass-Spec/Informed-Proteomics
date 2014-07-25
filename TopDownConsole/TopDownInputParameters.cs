@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Sequence;
 
-namespace TopDownConsole
+namespace MSPathFinderT
 {
     public class TopDownInputParameters
     {
@@ -190,8 +190,8 @@ namespace TopDownConsole
                     {
                         return "File not found: " + value + "!";
                     }
-                    var extension = Path.GetExtension(value);
-                    if (!Path.GetExtension(value).ToLower().Equals(".raw"))
+                    var extension = Path.GetExtension(value).ToLower();
+                    if (!extension.Equals(".raw") && !extension.Equals(".pbf"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")!";
                     }

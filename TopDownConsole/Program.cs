@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using InformedProteomics.TopDown.Execution;
 
-namespace TopDownConsole
+namespace MSPathFinderT
 {
     internal class Program
     {
-        public const string Name = "PoPMiner";
-        public const string Version = "Top-Down 0.11 (June 14, 2014)";
+        public const string Name = "MSPathFinderT";
+        public const string Version = "0.12 (June 17, 2014)";
         public const double CorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);

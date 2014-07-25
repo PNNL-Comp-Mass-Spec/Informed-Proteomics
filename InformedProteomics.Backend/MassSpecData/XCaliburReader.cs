@@ -223,6 +223,11 @@ namespace InformedProteomics.Backend.MassSpecData
             object objValues = null;
             var intArrayCount = 0;
 
+            //if (scanNum == 18099)
+            //{
+            //    Console.WriteLine("***ScanNum: {0}", scanNum);
+            //}
+
             _msfileReader.GetTrailerExtraForScanNum(scanNum, ref objLabels, ref objValues, ref intArrayCount);
 
             var labels = objLabels as string[];

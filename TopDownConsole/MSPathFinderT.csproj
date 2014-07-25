@@ -7,8 +7,8 @@
     <ProjectGuid>{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TopDownConsole</RootNamespace>
-    <AssemblyName>TopDownConsole</AssemblyName>
+    <RootNamespace>MSPathFinderT</RootNamespace>
+    <AssemblyName>MSPathFinderT</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

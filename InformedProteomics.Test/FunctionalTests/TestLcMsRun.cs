@@ -125,5 +125,15 @@ namespace InformedProteomics.Test.FunctionalTests
                 Console.WriteLine("PrecursorCharge: {0}", isolationWindow.Charge);
             }
         }
+
+        [Test]
+        public void TestReadingDiaRawFile()
+        {
+            const string rawFilePath = @"H:\Research\Jarret\20mz\raw\Q_2014_0523_28_100_amol_uL_20mz.raw";
+            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var spec = run.GetSpectrum(100);
+            spec.Display();
+
+        }
     }
 }
