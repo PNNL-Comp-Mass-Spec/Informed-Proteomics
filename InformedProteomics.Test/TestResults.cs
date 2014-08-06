@@ -15,8 +15,9 @@ namespace InformedProteomics.Test
         {
             //const string targetResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcTarget.tsv";
             //const string decoyResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcDecoy.tsv";
-            //const string path = @"H:\Research\Jarret\Test\30fmol_10mz\NoMod_NTT2\Q_2014_0523_53_30_fmol_uL_10mz";
-            const string path = @"H:\Research\Jarret\DDA\NoMod_NTT2\Q_2014_0523_1_0_amol_uL_DDA";
+            //const string path = @"H:\Research\Jarret\10mz\0amol\Q_2014_0523_10_0_amol_uL_10mz";
+            const string path = @"H:\Research\Jarret\20mz\NTT2\Q_2014_0523_12_0_amol_uL_20mz";
+            //const string path = @"H:\Research\Jarret\DDA\NoMod_NTT2\Q_2014_0523_1_0_amol_uL_DDA";
             const string targetResultPath = path + "_IcTarget.tsv";
             const string decoyResultPath = path + "_IcDecoy.tsv";
 

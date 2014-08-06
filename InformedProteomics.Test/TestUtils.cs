@@ -116,13 +116,14 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsoProfile()
         {
-            var composition = Composition.Parse("C(413) H(667) N(109) O(121) S(1)");
-            const int charge = 7;
+            var composition = Composition.Parse("C(82) H(149) N(23) O(24) S(3)");
+            const int charge = 3;
             var ion = new Ion(composition, charge);
             foreach (var isotope in ion.GetIsotopes(0.1))
             {
                 Console.WriteLine("{0}\t{1}\t{2}", isotope.Index, ion.GetIsotopeMz(isotope.Index), isotope.Ratio);
             }
+            Console.WriteLine(composition.Mass);
         }
 
         [Test]
