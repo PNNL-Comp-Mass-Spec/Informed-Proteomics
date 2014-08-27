@@ -92,6 +92,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FunctionalTests\TestMzMLReader.cs" />
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
     <Compile Include="FunctionalTests\TestIcTopDownResults.cs" />

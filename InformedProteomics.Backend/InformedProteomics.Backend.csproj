@@ -142,6 +142,7 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
+    <Compile Include="MassSpecData\MzMLReader.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\IMassSpecDataReader.cs" />
     <Compile Include="MassSpecData\MassSpecDataType.cs" />
