@@ -189,6 +189,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 nextMsLevel = msLevel;
             }
+
+            IsDia = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia;
         }
 
         public int MinLcScan { get; private set; }
@@ -196,6 +198,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public int MinMsLevel { get; private set; }
         public int MaxMsLevel { get; private set; }
+
+        public bool IsDia { get; private set; }
 
         public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
 
@@ -224,10 +228,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return minWidth;
         }
 
-        public bool IsDia()
-        {
-            return GetNumUniqueIsoWindows() <= NumUniqueIsolationWindowThresholdForDia;
-        }
+        //public bool IsDia()
+        //{
+        //    return GetNumUniqueIsoWindows() <= NumUniqueIsolationWindowThresholdForDia;
+        //}
 
         /// <summary>
         /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified

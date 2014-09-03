@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         int MinLcScan { get; }
         int MaxLcScan { get; }
-
+        bool IsDia { get; }
         double GetElutionTime(int scanNum);
         int GetMsLevel(int scanNum);
         int GetPrevScanNum(int scanNum, int msLevel);

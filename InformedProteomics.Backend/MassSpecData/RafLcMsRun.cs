@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.MassSpecData
     public class RafLcMsRun: ILcMsRun, IMassSpecDataReader
     {
         public const int FileFormatId = 150603;
-
+        
         public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
@@ -49,6 +49,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public int MinLcScan { get; private set; }
         public int MaxLcScan { get; private set; }
+        public bool IsDia { get; private set; }
 
         public Spectrum GetSpectrum(int scanNum)
         {
@@ -154,116 +155,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return newXic;
         }
 
-        /// <summary>
-        /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
-        /// </summary>
-        /// <param name="mostAbundantIsotopeMz"></param>
-        /// <returns>scan numbers of fragmentation spectra</returns>
-        public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
-        {
-            var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * LcMsRun.IsolationWindowBinningFactor);
-            int[] scanNums;
-            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
-        }
-
-        private readonly BinaryReader _reader;
-        private readonly double _precursorSignalToNoiseRatioThreshold;
-        private readonly double _productSignalToNoiseRatioThreshold;
-
-        private long _offsetChromatogramStart;
-        private long _offsetProductChromatogramBebin;
-        private long _offsetProductChromatogramEnd;
-        private long _offsetChromatogramEnd;
-        //private long _offsetMetaInfo;
-
-        private Dictionary<int, int> _scanNumToMsLevel;
-        private Dictionary<int, double> _scanNumElutionTimeMap;
-        private Dictionary<int, int[]> _isolationMzBinToScanNums;
-        private Dictionary<int, long> _scanNumToSpecOffset;
-        private int _minMzIndex;
-        private int _maxMzIndex;
-
-        private long[] _chromMzIndexToOffset;
-        private const double MzBinSize = 1;
-        private const int NumBytePeak = 16;
-
-        public bool ReadMetaInfo()
-        {
-            _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
-            var fileFormatId = _reader.ReadInt32();
-            if (fileFormatId != FileFormatId) return false;
-
-            _reader.BaseStream.Seek(-3*sizeof (long) - 1*sizeof (int), SeekOrigin.End);
-
-            _offsetChromatogramStart = _reader.ReadInt64();
-            _offsetChromatogramEnd = _offsetProductChromatogramBebin = _reader.ReadInt64();
-            _offsetProductChromatogramEnd = _reader.ReadInt64();
-            // Read meta information
-            var offsetMetaInfo = _offsetProductChromatogramEnd;
-
-            _reader.BaseStream.Seek(offsetMetaInfo, SeekOrigin.Begin);
-            MinLcScan = _reader.ReadInt32();
-            MaxLcScan = _reader.ReadInt32();
-
-            _scanNumToMsLevel = new Dictionary<int, int>();
-            _scanNumElutionTimeMap = new Dictionary<int, double>();
-            _scanNumToSpecOffset = new Dictionary<int, long>();
-            //_scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>();
-            //_isolationMzBinToScanNums = new Dictionary<int, List<int>>();
-            var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
-            {
-                var msLevel = _reader.ReadInt32();
-                _scanNumToMsLevel[scanNum] = msLevel;
-                _scanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
-                if (msLevel == 2)
-                {
-                    var minMz = _reader.ReadSingle();
-                    var maxMz = _reader.ReadSingle();
-                    var minBinNum = (int)Math.Round(minMz * LcMsRun.IsolationWindowBinningFactor);
-                    var maxBinNum = (int)Math.Round(maxMz * LcMsRun.IsolationWindowBinningFactor);
-                    for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
-                    {
-                        List<int> scanNumList;
-                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
-                        {
-                            scanNumList = new List<int>();
-                            isolationMzBinToScanNums[binNum] = scanNumList;
-                        }
-                        scanNumList.Add(scanNum);
-                    }
-                }
-                _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
-            }
-
-            _isolationMzBinToScanNums = new Dictionary<int, int[]>();
-            foreach (var entry in isolationMzBinToScanNums)
-            {
-                var binNum = entry.Key;
-                entry.Value.Sort();
-                var scanNumList = entry.Value.ToArray();
-                _isolationMzBinToScanNums[binNum] = scanNumList;
-            }
-
-            var minIndex = _reader.ReadInt32();
-            var maxIndex = _reader.ReadInt32();
-            _chromMzIndexToOffset = new long[maxIndex - minIndex + 1];
-
-            for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
-            {
-                _chromMzIndexToOffset[i] = _reader.ReadInt64();
-            }
-            _minMzIndex = minIndex;
-            _maxMzIndex = maxIndex;
-
-            return true;
-        }
-
-        public static int GetMzBinIndex(double mz)
-        {
-            return (int) (mz / MzBinSize);
-        }
-
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
@@ -282,7 +173,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if(offset < _offsetChromatogramStart) return new Xic();
+                if (offset < _offsetChromatogramStart) return new Xic();
 
                 // binary search
                 var beginOffset = offset;
@@ -291,11 +182,11 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                if(maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
+                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
                 targetOffset = maxBinIndex > _maxMzIndex ? _offsetChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if(targetOffset < _offsetChromatogramStart) return new Xic();
+            if (targetOffset < _offsetChromatogramStart) return new Xic();
             var xic = GetXic(minMz, maxMz, _offsetChromatogramStart, _offsetChromatogramEnd, targetOffset);
             if (!xic.Any()) return xic;
             xic.Sort();
@@ -325,15 +216,139 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader.Close();
         }
 
+        /// <summary>
+        /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
+        /// </summary>
+        /// <param name="mostAbundantIsotopeMz"></param>
+        /// <returns>scan numbers of fragmentation spectra</returns>
+        public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
+        {
+            var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * LcMsRun.IsolationWindowBinningFactor);
+            int[] scanNums;
+            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+        }
+
+        private readonly BinaryReader _reader;
+        private readonly double _precursorSignalToNoiseRatioThreshold;
+        private readonly double _productSignalToNoiseRatioThreshold;
+
+        private readonly Object _lock = new Object();
+        private long _offsetChromatogramStart;
+        private long _offsetProductChromatogramBebin;
+        private long _offsetProductChromatogramEnd;
+        private long _offsetChromatogramEnd;
+        //private long _offsetMetaInfo;
+
+        private Dictionary<int, int> _scanNumToMsLevel;
+        private Dictionary<int, double> _scanNumElutionTimeMap;
+        private Dictionary<int, int[]> _isolationMzBinToScanNums;
+        private Dictionary<int, long> _scanNumToSpecOffset;
+        private int _minMzIndex;
+        private int _maxMzIndex;
+
+        private long[] _chromMzIndexToOffset;
+        private const double MzBinSize = 1;
+        private const int NumBytePeak = 16;
+
+        private bool ReadMetaInfo()
+        {
+            _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
+            var fileFormatId = _reader.ReadInt32();
+            if (fileFormatId != FileFormatId) return false;
+
+            _reader.BaseStream.Seek(-3*sizeof (long) - 1*sizeof (int), SeekOrigin.End);
+
+            _offsetChromatogramStart = _reader.ReadInt64();
+            _offsetChromatogramEnd = _offsetProductChromatogramBebin = _reader.ReadInt64();
+            _offsetProductChromatogramEnd = _reader.ReadInt64();
+            // Read meta information
+            var offsetMetaInfo = _offsetProductChromatogramEnd;
+
+            _reader.BaseStream.Seek(offsetMetaInfo, SeekOrigin.Begin);
+            MinLcScan = _reader.ReadInt32();
+            MaxLcScan = _reader.ReadInt32();
+
+            _scanNumToMsLevel = new Dictionary<int, int>();
+            _scanNumElutionTimeMap = new Dictionary<int, double>();
+            _scanNumToSpecOffset = new Dictionary<int, long>();
+            //_scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>();
+            //_isolationMzBinToScanNums = new Dictionary<int, List<int>>();
+            var isoWindowSet = new HashSet<IsolationWindow>();
+            var isDda = false;
+            var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                var msLevel = _reader.ReadInt32();
+                _scanNumToMsLevel[scanNum] = msLevel;
+                _scanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
+                if (msLevel == 2)
+                {
+                    var minMz = _reader.ReadSingle();
+                    var maxMz = _reader.ReadSingle();
+                    if (!isDda)
+                    {
+                        var isoWindow = new IsolationWindow((minMz + maxMz) / 2, (maxMz - minMz) / 2, (maxMz - minMz) / 2);
+                        isoWindowSet.Add(isoWindow);
+                        if (isoWindowSet.Count >= LcMsRun.NumUniqueIsolationWindowThresholdForDia) isDda = true;
+                    }
+                    var minBinNum = (int)Math.Round(minMz * LcMsRun.IsolationWindowBinningFactor);
+                    var maxBinNum = (int)Math.Round(maxMz * LcMsRun.IsolationWindowBinningFactor);
+                    for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+                    {
+                        List<int> scanNumList;
+                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                        {
+                            scanNumList = new List<int>();
+                            isolationMzBinToScanNums[binNum] = scanNumList;
+                        }
+                        scanNumList.Add(scanNum);
+                    }
+                }
+                _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
+            }
+
+            IsDia = !isDda;
+
+            _isolationMzBinToScanNums = new Dictionary<int, int[]>();
+            foreach (var entry in isolationMzBinToScanNums)
+            {
+                var binNum = entry.Key;
+                entry.Value.Sort();
+                var scanNumList = entry.Value.ToArray();
+                _isolationMzBinToScanNums[binNum] = scanNumList;
+            }
+
+            var minIndex = _reader.ReadInt32();
+            var maxIndex = _reader.ReadInt32();
+            _chromMzIndexToOffset = new long[maxIndex - minIndex + 1];
+
+            for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
+            {
+                _chromMzIndexToOffset[i] = _reader.ReadInt64();
+            }
+            _minMzIndex = minIndex;
+            _maxMzIndex = maxIndex;
+
+            return true;
+        }
+
+        public static int GetMzBinIndex(double mz)
+        {
+            return (int) (mz / MzBinSize);
+        }
+
         private Spectrum ReadSpectrum(long offset)
         {
-            _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-            while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+            lock (_lock)
             {
-                var spec = ReadSpectrum(_reader);
-                return spec;
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var spec = ReadSpectrum(_reader);
+                    return spec;
+                }
+                return null;
             }
-            return null;
         }
 
         private static Spectrum ReadSpectrum(BinaryReader reader)
@@ -395,16 +410,20 @@ namespace InformedProteomics.Backend.MassSpecData
             var minOffset = beginOffset;
             var maxOffset = endOffset;
             var curOffset = -1L;
-            while (minOffset <= maxOffset)
+            // binary search
+            lock (_lock)
             {
-                curOffset = minOffset + (maxOffset - minOffset) / NumBytePeak / 2 * NumBytePeak;
-                _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
-                var curMz = _reader.ReadDouble();
-                if (curMz < minMz) minOffset = curOffset + NumBytePeak;
-                else if (curMz > maxMz) maxOffset = curOffset - NumBytePeak;
-                else
+                while (minOffset <= maxOffset)
                 {
-                    return curOffset;
+                    curOffset = minOffset + (maxOffset - minOffset) / NumBytePeak / 2 * NumBytePeak;
+                    _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
+                    var curMz = _reader.ReadDouble();
+                    if (curMz < minMz) minOffset = curOffset + NumBytePeak;
+                    else if (curMz > maxMz) maxOffset = curOffset - NumBytePeak;
+                    else
+                    {
+                        return curOffset;
+                    }
                 }
             }
             return curOffset;
@@ -425,30 +444,33 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var xic = new Xic();
             var curOffset = targetOffset - NumBytePeak;
-            // go down
-            while (curOffset >= beginOffset)
+            lock (_lock)
             {
-                _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
-                var mz = _reader.ReadDouble();
-                var intensity = _reader.ReadSingle();
-                var scanNum = _reader.ReadInt32();
-                if (mz < minMz) break;
-                xic.Add(new XicPoint(scanNum, mz, intensity));
-                curOffset -= NumBytePeak;
-            }
+                // go down
+                while (curOffset >= beginOffset)
+                {
+                    _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
+                    var mz = _reader.ReadDouble();
+                    var intensity = _reader.ReadSingle();
+                    var scanNum = _reader.ReadInt32();
+                    if (mz < minMz) break;
+                    xic.Add(new XicPoint(scanNum, mz, intensity));
+                    curOffset -= NumBytePeak;
+                }
 
-            // go up
-            curOffset = targetOffset;
-            while (curOffset < endOffset)
-            {
-                _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
-                var mz = _reader.ReadDouble();
-                var intensity = _reader.ReadSingle();
-                var scanNum = _reader.ReadInt32();
-                if (mz > maxMz) break;
-                xic.Add(new XicPoint(scanNum, mz, intensity));
-                _reader.BaseStream.Seek(NumBytePeak, SeekOrigin.Current);
-                curOffset += NumBytePeak;
+                // go up
+                curOffset = targetOffset;
+                while (curOffset < endOffset)
+                {
+                    _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
+                    var mz = _reader.ReadDouble();
+                    var intensity = _reader.ReadSingle();
+                    var scanNum = _reader.ReadInt32();
+                    if (mz > maxMz) break;
+                    xic.Add(new XicPoint(scanNum, mz, intensity));
+                    _reader.BaseStream.Seek(NumBytePeak, SeekOrigin.Current);
+                    curOffset += NumBytePeak;
+                }                
             }
 
             return xic;
