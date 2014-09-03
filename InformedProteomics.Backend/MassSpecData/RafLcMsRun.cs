@@ -29,8 +29,19 @@ namespace InformedProteomics.Backend.MassSpecData
                         0, 0);
                 }
                 else run = null;
-                if (run != null) run.WriteAsRaf(rafFilePath);
-                else throw new Exception("Unsupported raw file format!");
+                if (run == null) throw new Exception("Unsupported raw file format!");
+                try
+                {
+                    run.WriteAsRaf(rafFilePath);
+                }
+                catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
+                {
+                    var fileName = Path.GetFileName(rafFilePath);
+                    if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
+                    var tempPath = Path.Combine(Path.GetTempPath(), fileName);
+                    if (!File.Exists(tempPath) || !CheckFileFormatVersion(tempPath)) run.WriteAsRaf(tempPath);
+                    rafFilePath = tempPath;
+                }
             }
 
             return new RafLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);

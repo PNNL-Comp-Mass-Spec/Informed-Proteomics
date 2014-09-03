@@ -31,8 +31,19 @@ namespace InformedProteomics.Backend.MassSpecData
                         0, 0);
                 }
                 else run = null;
-                if (run != null) run.WriteTo(pbfFilePath);
-                else throw new Exception("Unsupported raw file format!");
+                if (run == null) throw new Exception("Unsupported raw file format!");
+                try
+                {
+                    run.WriteTo(pbfFilePath);
+                }
+                catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
+                {
+                    var fileName = Path.GetFileName(pbfFilePath);
+                    if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
+                    var tempPath = Path.Combine(Path.GetTempPath(), fileName);
+                    if (!File.Exists(tempPath) || !PbfReader.CheckFileFormatVersion(tempPath)) run.WriteTo(tempPath);
+                    pbfFilePath = tempPath;
+                }
             }
 
             return new LcMsRun(new PbfReader(pbfFilePath),
