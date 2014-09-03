@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    interface IChromatogramExtractor
+    public interface IChromatogramExtractor
     {
         // MS
         Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance);
