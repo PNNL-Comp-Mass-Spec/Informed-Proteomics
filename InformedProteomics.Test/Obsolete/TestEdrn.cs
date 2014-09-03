@@ -200,7 +200,7 @@ namespace InformedProteomics.Test.Obsolete
                     {
                         var ion = new Ion(match.Formula, match.Charge);
                         var mostAbundantIonMz = ion.GetMostAbundantIsotopeMz();
-                        var xic = run.GetExtractedIonChromatogram(mostAbundantIonMz, tolerance, match.ScanNum);
+                        var xic = run.GetPrecursorExtractedIonChromatogram(mostAbundantIonMz, tolerance, match.ScanNum);
                         if (xic.Count == 0) continue;
                         var minScan = xic.Min().ScanNum;
                         var maxScan = xic.Max().ScanNum;

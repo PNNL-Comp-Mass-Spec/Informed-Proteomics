@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Sequence;
 
 namespace MSPathFinderT
@@ -11,7 +9,7 @@ namespace MSPathFinderT
     {
         public const string ParameterFileExtension = ".param";
 
-        public string SpecFilePath { get; set; }
+        public IEnumerable<string> SpecFilePaths { get; set; }
         public string DatabaseFilePath { get; set; }
         public string OutputDir { get; set; }
         public AminoAcidSet AminoAcidSet { get; set; }
@@ -27,13 +25,14 @@ namespace MSPathFinderT
         public int MaxProductIonCharge { get; set; }
         public double MinSequenceMass { get; set; }
         public double MaxSequenceMass { get; set; }
+        public double CorrThreshold { get; set; }
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
 
         public void Display()
         {
-            Console.WriteLine("SpecFilePath: " + SpecFilePath);
+            foreach (var specFilePath in SpecFilePaths) Console.WriteLine("\t{0}", specFilePath);
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchMode);
@@ -58,31 +57,35 @@ namespace MSPathFinderT
 
         public void Write()
         {
-            var outputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + ParameterFileExtension;
-
-            using (var writer = new StreamWriter(outputFilePath))
+            foreach (var specFilePath in SpecFilePaths)
             {
-                writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
-                writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                writer.WriteLine("SearchMode\t" + SearchMode);
-                writer.WriteLine("Tda\t" + Tda);
-                writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
-                writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
-                writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
-                writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
-                writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
-                writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
-                writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
-                writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
-                writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
-                writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
-                writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
-                foreach (var searchMod in _searchModifications)
+                var outputFilePath = OutputDir + Path.DirectorySeparatorChar +
+                                           Path.GetFileNameWithoutExtension(specFilePath) + ParameterFileExtension;
+
+                using (var writer = new StreamWriter(outputFilePath))
                 {
-                    writer.WriteLine("Modification\t"+searchMod);
+                    writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
+                    writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+                    writer.WriteLine("SearchMode\t" + SearchMode);
+                    writer.WriteLine("Tda\t" + Tda);
+                    writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
+                    writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
+                    writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
+                    writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
+                    writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
+                    writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
+                    writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
+                    writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
+                    writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
+                    writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
+                    writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
+                    foreach (var searchMod in _searchModifications)
+                    {
+                        writer.WriteLine("Modification\t" + searchMod);
+                    }
                 }
             }
+
         }
 
         public string Parse(Dictionary<string, string> parameters)
@@ -90,7 +93,15 @@ namespace MSPathFinderT
             var message = CheckIsValid(parameters);
             if (message != null) return message;
 
-            SpecFilePath = parameters["-s"];
+            var specFilePath = parameters["-s"];
+            if (Directory.Exists(specFilePath)) // Directory
+            {
+                SpecFilePaths = Directory.GetFiles(specFilePath, "*.raw");
+            }
+            else
+            {
+                SpecFilePaths = new[] { specFilePath };
+            }
             DatabaseFilePath = parameters["-d"];
 
             var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
@@ -166,6 +177,7 @@ namespace MSPathFinderT
                 return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
             }
 
+            CorrThreshold = Convert.ToDouble(parameters["-corr"]);
             return null;
         }
 
@@ -186,12 +198,13 @@ namespace MSPathFinderT
                     {
                         return "Missing parameter " + key + "!";
                     }
-                    if (!File.Exists(value))
+                    if (!File.Exists(value) && !Directory.Exists(value))
                     {
                         return "File not found: " + value + "!";
                     }
-                    var extension = Path.GetExtension(value).ToLower();
-                    if (!extension.Equals(".raw") && !extension.Equals(".pbf"))
+                    if (Directory.Exists(value)) continue;
+                    var extension = Path.GetExtension(value);
+                    if (!Path.GetExtension(value).ToLower().Equals(".raw"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")!";
                     }

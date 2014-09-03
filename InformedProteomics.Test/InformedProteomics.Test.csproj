@@ -99,6 +99,7 @@
     <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
     <Compile Include="FunctionalTests\TestLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />
+    <Compile Include="FunctionalTests\TestRafLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
     <Compile Include="FunctionalTests\TestSimpleUtils.cs" />

@@ -8,8 +8,10 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class LcMsRun
+    public class LcMsRun: ILcMsRun
     {
+        public const int NumUniqueIsolationWindowThresholdForDia = 1000;
+
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
@@ -43,6 +45,8 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
+            _ms2PeakList = new List<LcMsPeak>();
+            _scanNumElutionTimeMap = new Dictionary<int, double>();
             var msLevelMap = new Dictionary<int, int>();
 
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
@@ -57,6 +61,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 //Console.WriteLine("Reading Scan {0}", spec.ScanNum);
                 msLevelMap[spec.ScanNum] = spec.MsLevel;
+                _scanNumElutionTimeMap[spec.ScanNum] = spec.ElutionTime;
                 if (spec.MsLevel == 1)
                 {
                     if (precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(precursorSignalToNoiseRatioThreshold);
@@ -73,9 +78,15 @@ namespace InformedProteomics.Backend.MassSpecData
                     if (productSpec != null)
                     {
                         if (productSignalToNoiseRatioThreshold > 0.0) productSpec.FilterNoise(productSignalToNoiseRatioThreshold);
-                        var isolationInfo = productSpec.IsolationWindow;
-                        var minBinNum = (int)(isolationInfo.MinMz*IsolationWindowBinningFactor);
-                        var maxBinNum = (int)((isolationInfo.MaxMz+0.49999999)*IsolationWindowBinningFactor);
+
+                        foreach (var peak in spec.Peaks)
+                        {
+                            _ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
+                        }
+
+                        var isolationWindow = productSpec.IsolationWindow;
+                        var minBinNum = (int)Math.Round(isolationWindow.MinMz*IsolationWindowBinningFactor);
+                        var maxBinNum = (int)Math.Round(isolationWindow.MaxMz*IsolationWindowBinningFactor);
                         for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                         {
                             List<int> scanNumList;
@@ -108,6 +119,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
            _ms1PeakList.Sort();
+           _ms2PeakList.Sort();
 
             // Read MS levels and precursor information
 
@@ -185,6 +197,38 @@ namespace InformedProteomics.Backend.MassSpecData
         public int MinMsLevel { get; private set; }
         public int MaxMsLevel { get; private set; }
 
+        public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
+
+        public int GetNumUniqueIsoWindows()
+        {
+            var isoWindowSet = new HashSet<IsolationWindow>();
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
+                if (productSpec == null) continue;
+                isoWindowSet.Add(productSpec.IsolationWindow);
+            }
+            return isoWindowSet.Count;
+        }
+
+        public double GetMinIsolationWindowWidth()
+        {
+            var minWidth = Double.MaxValue;
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
+                if (productSpec == null) continue;
+                if (productSpec.IsolationWindow.Width < minWidth) minWidth = productSpec.IsolationWindow.Width;
+
+            }
+            return minWidth;
+        }
+
+        public bool IsDia()
+        {
+            return GetNumUniqueIsoWindows() <= NumUniqueIsolationWindowThresholdForDia;
+        }
+
         /// <summary>
         /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
         /// </summary>
@@ -217,6 +261,12 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             Spectrum spec;
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
+        }
+
+        public double GetElutionTime(int scanNum)
+        {
+            double elutionTime;
+            return _scanNumElutionTimeMap.TryGetValue(scanNum, out elutionTime) ? elutionTime : 0.0;
         }
 
         private static readonly MzComparerWithTolerance MzComparer = new MzComparerWithTolerance(5);
@@ -266,12 +316,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetExtractedIonChromatogram(double mz, Tolerance tolerance)
+        public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
-            return GetExtractedIonChromatogram(minMz, maxMz);
+            return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
         }
 
         /// <summary>
@@ -283,13 +333,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="targetScanNum">target scan number to generate xic</param>
         /// <param name="maxNumConsecutiveScansWithoutPeak">maximum number of consecutive scans with a peak</param>
         /// <returns>XIC around targetScanNum</returns>
-        public Xic GetExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum, int maxNumConsecutiveScansWithoutPeak = 3)
+        public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum, int maxNumConsecutiveScansWithoutPeak = 3)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
-            if (targetScanNum < 0) return GetExtractedIonChromatogram(minMz, maxMz);
-            return GetExtractedIonChromatogram(minMz, maxMz, targetScanNum);
+            if (targetScanNum < 0) return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
+            return GetPrecursorExtractedIonChromatogram(minMz, maxMz, targetScanNum);
         }
 
         ///// <summary>
@@ -317,60 +367,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetExtractedIonChromatogram(double minMz, double maxMz)
+        public Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
-            var xic = new Xic();
-
-            var index = _ms1PeakList.BinarySearch(new LcMsPeak((minMz + maxMz) / 2, 0, 0));
-            if (index < 0) index = ~index;
-
-            // go down
-            var i = index - 1;
-            while (i >= 0 && i < _ms1PeakList.Count)
-            {
-                var peak = _ms1PeakList[i];
-                if (peak.Mz <= minMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
-                --i;
-            }
-
-            // go up
-            i = index;
-            while (i >= 0 && i < _ms1PeakList.Count)
-            {
-                var peak = _ms1PeakList[i];
-                if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
-                ++i;
-            }
-
-            if (xic.Count == 0) return xic;
-
-            xic.Sort();
-            // select one best peak for each scan
-            var newXic = new Xic();
-
-            var prevScanNum = xic[0].ScanNum;
-            var bestPeak = xic[0];
-            for (i = 1; i < xic.Count; i++)
-            {
-                var xicPeak = xic[i];
-                if (xicPeak.ScanNum > prevScanNum)
-                {
-                    newXic.Add(bestPeak);
-                    bestPeak = xicPeak;
-                }
-                else
-                {
-                    if (xicPeak.Intensity > bestPeak.Intensity)
-                    {
-                        bestPeak = xicPeak;
-                    }
-                }
-                prevScanNum = xicPeak.ScanNum;
-            }
-            newXic.Add(bestPeak);
-            return newXic;
+            return GetExtractedIonChromatogram(minMz, maxMz, Ms1PeakList);
         }
 
         /// <summary>
@@ -382,12 +381,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minScanNum">minimum scan number (inclusive)</param>
         /// <param name="maxScanNum">maximum scan number (inclusive)</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFragmentExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz, int minScanNum, int maxScanNum)
+        public Xic GetProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz, int minScanNum, int maxScanNum)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
-            return GetFragmentExtractedIonChromatogram(minMz, maxMz, precursorIonMz, minScanNum, maxScanNum);
+            return GetProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz, minScanNum, maxScanNum);
         }
 
         /// <summary>
@@ -399,14 +398,15 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minScanNum">minimum scan number (inclusive)</param>
         /// <param name="maxScanNum">maximum scan number (inclusive)</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFragmentExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz, int minScanNum, int maxScanNum)
+        public Xic GetProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz, int minScanNum, int maxScanNum)
         {
             var xic = new Xic();
-            for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+            //for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+            foreach(var scanNum in GetFragmentationSpectraScanNums(precursorIonMz))
             {
+                if (scanNum < minScanNum || scanNum > maxScanNum) continue;
                 var spec = GetSpectrum(scanNum) as ProductSpectrum;
-                if (spec == null || spec.MsLevel != 2) continue;
-                if (!spec.IsolationWindow.Contains(precursorIonMz)) continue;
+                if (spec == null) continue;
 
                 var peak = spec.FindPeak(minMz, maxMz);
                 xic.Add(peak != null ? new XicPoint(scanNum, peak.Mz, peak.Intensity) : new XicPoint(scanNum, 0, 0));
@@ -421,21 +421,32 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="tolerance">tolerance</param>
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFullFragmentExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
+        public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
         {
-            return GetFragmentExtractedIonChromatogram(mz, tolerance, precursorIonMz, MinLcScan, MaxLcScan);
+            return GetProductExtractedIonChromatogram(mz, tolerance, precursorIonMz, MinLcScan, MaxLcScan);
         }
 
-            /// <summary>
+        public Xic GetFullProductExtractedIonChromatogram2(double minMz, double maxMz, double precursorMz)
+        {
+            var xic = GetExtractedIonChromatogram(minMz, maxMz, _ms2PeakList);
+            var scanToXicPoint = new XicPoint[MaxLcScan - MinLcScan + 1];
+            foreach (var xicPoint in xic) scanToXicPoint[xicPoint.ScanNum - MinLcScan] = xicPoint;
+
+            var newXic = new Xic();
+            newXic.AddRange(GetFragmentationSpectraScanNums(precursorMz).Select(scanNum => scanToXicPoint[scanNum - MinLcScan] ?? new XicPoint(scanNum, 0, 0)));
+            return newXic;
+        }
+
+        /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFullExtractedFragmentIonChromatogram(double minMz, double maxMz, double precursorIonMz)
+        public Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz)
         {
-            return GetFragmentExtractedIonChromatogram(minMz, maxMz, precursorIonMz, MinLcScan, MaxLcScan);
+            return GetProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz, MinLcScan, MaxLcScan);
         }
 
         /// <summary>
@@ -445,12 +456,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFullExtractedIonChromatogram(double mz, Tolerance tolerance)
+        public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
-            return GetFullExtractedIonChromatogram(minMz, maxMz);
+            return GetFullPrecursorIonExtractedIonChromatogram(minMz, maxMz);
         }
 
 
@@ -461,9 +472,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
         /// <returns>XIC as an Xic object</returns>
-        public Xic GetFullExtractedIonChromatogram(double minMz, double maxMz)
+        public Xic GetFullPrecursorIonExtractedIonChromatogram(double minMz, double maxMz)
         {
-            var xic = GetExtractedIonChromatogram(minMz, maxMz);
+            var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
 
             var hasXicPoint = new bool[MaxLcScan - MinLcScan + 1];
             foreach (var xicPoint in xic) hasXicPoint[xicPoint.ScanNum - MinLcScan] = true;
@@ -485,11 +496,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="targetScanNum">target scan number to generate xic</param>
         /// <param name="tolerance">max number of consecutive scans without a peak</param>
         /// <returns>XIC around targetScanNum</returns>
-        public Xic GetExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum, int tolerance = 3)
+        public Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum, int tolerance = 3)
         {
             if (GetMsLevel(targetScanNum) > 1)
                 targetScanNum = GetPrecursorScanNum(targetScanNum);
-            var xic = GetExtractedIonChromatogram(minMz, maxMz);
+            var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
             return GetTrimmedXic(xic, targetScanNum);
         }
 
@@ -560,7 +571,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return xicSegment;
         }
 
-        public Xic GetProductIonChromatogram(double productIonMz, double precursorIonMz, Tolerance tolerance, int minScanNum, int maxScanNum)
+        public Xic GetProductExtractedIonChromatogram(double productIonMz, double precursorIonMz, Tolerance tolerance, int minScanNum, int maxScanNum)
         {
             var productXic = new Xic();
 
@@ -741,6 +752,96 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        public void WriteAsRaf(string outputFilePath)
+        {
+            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
+            {
+                WriteAsRaf(writer);
+            }
+        }
+
+        protected void WriteAsRaf(BinaryWriter writer)
+        {
+            var scanNumToSpecOffset = new long[MaxLcScan - MinLcScan + 1];
+            var scanNumToIsolationWindow = new IsolationWindow[MaxLcScan - MinLcScan + 1];
+            // Spectra
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                scanNumToSpecOffset[scanNum - MinLcScan] = writer.BaseStream.Position;
+                var spec = GetSpectrum(scanNum);
+                var productSpec = spec as ProductSpectrum;
+                scanNumToIsolationWindow[scanNum - MinLcScan] = productSpec == null ? null : productSpec.IsolationWindow;
+                PbfReader.WriteSpectrumAsPbf(spec, writer);
+            }
+
+            // Precursor ion chromatograms
+            var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
+            var minMzIndex = RafLcMsRun.GetMzBinIndex(Ms1PeakList[0].Mz);
+            var maxMzIndex = RafLcMsRun.GetMzBinIndex(Ms1PeakList[Ms1PeakList.Count - 1].Mz);
+
+            var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
+            var prevMzIndex = -1;
+            foreach (var peak in Ms1PeakList)
+            {
+                var mz = peak.Mz;
+                var mzIndex = RafLcMsRun.GetMzBinIndex(mz);
+                if (mzIndex > prevMzIndex)
+                {
+                    chromMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
+                    prevMzIndex = mzIndex;
+                }
+                writer.Write(peak.Mz);
+                writer.Write((float)peak.Intensity);
+                writer.Write(peak.ScanNum);
+            }
+
+            // Product ion chromatograms
+            var offsetBeginProductChromatogram = writer.BaseStream.Position;
+            foreach (var peak in _ms2PeakList)
+            {
+                writer.Write(peak.Mz);
+                writer.Write((float)peak.Intensity);
+                writer.Write(peak.ScanNum);
+            }
+
+            // Meta information
+            var offsetBeginMetaInformation = writer.BaseStream.Position;
+            writer.Write(MinLcScan);
+            writer.Write(MaxLcScan);
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                var msLevel = GetMsLevel(scanNum);
+                writer.Write(GetMsLevel(scanNum));
+                writer.Write(GetElutionTime(scanNum));
+                if (msLevel == 2)
+                {
+                    writer.Write((float)scanNumToIsolationWindow[scanNum - MinLcScan].MinMz);
+                    writer.Write((float)scanNumToIsolationWindow[scanNum - MinLcScan].MaxMz);
+                }
+                writer.Write(scanNumToSpecOffset[scanNum - MinLcScan]);
+            }
+            // Precursor chromatogram index
+            writer.Write(minMzIndex);   // min index
+            writer.Write(maxMzIndex);
+
+            var prevOffset = offsetBeginMetaInformation;
+            for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
+            {
+                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram) chromMzIndexToOffset[i] = prevOffset;
+                else prevOffset = chromMzIndexToOffset[i];
+            }
+
+            foreach (var offset in chromMzIndexToOffset)
+            {
+                writer.Write(offset);
+            }
+
+            writer.Write(offsetBeginPrecursorChromatogram); // 8
+            writer.Write(offsetBeginProductChromatogram); // 8
+            writer.Write(offsetBeginMetaInformation); // 8
+            writer.Write(RafLcMsRun.FileFormatId); // 4            
+        }
+
         public void ComputeMs1Features(int minCharge, int maxCharge, Tolerance tolerance)
         {
             _ms1Features = new Dictionary<int, List<double>[]>();
@@ -766,19 +867,60 @@ namespace InformedProteomics.Backend.MassSpecData
             _ms1FeatureMinCharge = minCharge;
         }
 
+        protected static Xic GetXicPointsWithin(double minMz, double maxMz, List<LcMsPeak> peakList)
+        {
+            var xic = new Xic();
+
+            var index = peakList.BinarySearch(new LcMsPeak((minMz + maxMz) / 2, 0, 0));
+            if (index < 0) index = ~index;
+
+            // go down
+            var i = index - 1;
+            while (i >= 0 && i < peakList.Count)
+            {
+                var peak = peakList[i];
+                if (peak.Mz <= minMz) break;
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                --i;
+            }
+
+            // go up
+            i = index;
+            while (i >= 0 && i < peakList.Count)
+            {
+                var peak = peakList[i];
+                if (peak.Mz >= maxMz) break;
+                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                ++i;
+            }
+
+            return xic;
+        }
+
+        protected static Xic GetExtractedIonChromatogram(double minMz, double maxMz, List<LcMsPeak> peakList)
+        {
+            var xic = GetXicPointsWithin(minMz, maxMz, peakList);
+            xic.Sort();
+            return Xic.GetSelectedXic(xic);
+        }
+
         //private readonly Dictionary<int, int> _msLevel;
         private readonly int[] _msLevel;
         private readonly int[] _precursorScan;
         private readonly int[] _nextScan;
 
         private readonly List<LcMsPeak> _ms1PeakList;
+        private readonly List<LcMsPeak> _ms2PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         private readonly Dictionary<int, int[]> _isolationMzBinToScanNums;
+
         private Dictionary<int, List<double>[]> _ms1Features;
         private int _ms1FeatureMinCharge;
+
+        private readonly Dictionary<int, double> _scanNumElutionTimeMap;
     }
 
-    class LcMsPeak: Peak
+    public class LcMsPeak: Peak
     {
         public LcMsPeak(double mz, double intensity, int scanNum) : base(mz, intensity)
         {

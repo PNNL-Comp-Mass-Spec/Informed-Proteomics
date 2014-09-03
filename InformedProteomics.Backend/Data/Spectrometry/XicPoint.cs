@@ -24,10 +24,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
-			return other.ScanNum == ScanNum;
+			return other.ScanNum == ScanNum && Math.Abs(other.Mz - Mz) < 0.001 && Math.Abs(other.Intensity - Intensity) < 0.001;
 		}
 
-		public override bool Equals(object obj)
+        public override string ToString()
+        {
+            return ScanNum + "," + Mz + "," + Intensity;
+        }
+
+        public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;

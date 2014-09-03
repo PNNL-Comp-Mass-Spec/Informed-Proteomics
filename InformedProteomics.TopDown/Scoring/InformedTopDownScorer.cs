@@ -74,7 +74,7 @@ namespace InformedProteomics.TopDown.Scoring
             var isotopeCorrNextMs1 = nextMs1Spec == null ? 0.0 : nextMs1Spec.GetCorrScore(ion, Tolerance);
 
             var mostAbundantIsotopeMz = ion.GetMostAbundantIsotopeMz();
-            var xicThisPeak = Run.GetExtractedIonChromatogram(mostAbundantIsotopeMz, Tolerance, ms2ScanNum);
+            var xicThisPeak = Run.GetPrecursorExtractedIonChromatogram(mostAbundantIsotopeMz, Tolerance, ms2ScanNum);
             if (xicThisPeak.Count < 2)
             {
                 return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, 0.0, 0.0, 0.0, modifications);
@@ -82,15 +82,15 @@ namespace InformedProteomics.TopDown.Scoring
 
             // check whether next isotope peak exists
             var nextIsotopeMz = mostAbundantIsotopeMz + Constants.C13MinusC12 / charge;
-            var xicNextIsotope = Run.GetExtractedIonChromatogram(nextIsotopeMz, Tolerance, ms2ScanNum);
+            var xicNextIsotope = Run.GetPrecursorExtractedIonChromatogram(nextIsotopeMz, Tolerance, ms2ScanNum);
             var corrMostAbundantPlusOneIsotope = xicThisPeak.GetCorrelation(xicNextIsotope);
 
             var mzChargeMinusOne = new Ion(composition, charge - 1).GetMostAbundantIsotopeMz();
-            var xicMinusOneCharge = Run.GetExtractedIonChromatogram(mzChargeMinusOne, Tolerance, ms2ScanNum);
+            var xicMinusOneCharge = Run.GetPrecursorExtractedIonChromatogram(mzChargeMinusOne, Tolerance, ms2ScanNum);
             var corrMinusOneCharge = xicMinusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicMinusOneCharge) : 0;
 
             var mzChargePlusOne = new Ion(composition, charge + 1).GetMostAbundantIsotopeMz();
-            var xicPlusOneCharge = Run.GetExtractedIonChromatogram(mzChargePlusOne, Tolerance, ms2ScanNum);
+            var xicPlusOneCharge = Run.GetPrecursorExtractedIonChromatogram(mzChargePlusOne, Tolerance, ms2ScanNum);
             var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
 
             return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, corrMostAbundantPlusOneIsotope, corrMinusOneCharge, corrPlusOneCharge, modifications);

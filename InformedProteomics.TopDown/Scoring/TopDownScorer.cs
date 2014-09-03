@@ -375,7 +375,7 @@ namespace InformedProteomics.TopDown.Scoring
                 for (var k = 0; k < xicArrayForThisCharge.Length; k++)
                 {
                     var mz = precursorIon.GetIsotopeMz(k + _minIsotopeIndex);
-                    var xic = _run.GetExtractedIonChromatogram(mz, _tolerance);
+                    var xic = _run.GetPrecursorExtractedIonChromatogram(mz, _tolerance);
 
                     //Console.WriteLine("Mz" + mz);
 

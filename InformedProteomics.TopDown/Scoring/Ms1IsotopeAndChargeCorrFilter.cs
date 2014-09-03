@@ -128,14 +128,14 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void SetLcMsMatches(double peakMz, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow)
         {
-            var xicThisPeak = _run.GetExtractedIonChromatogram(peakMz, _tolerance, scanNum);
+            var xicThisPeak = _run.GetPrecursorExtractedIonChromatogram(peakMz, _tolerance, scanNum);
             if (xicThisPeak.Count < 2) return;
 
             for (var charge = _maxCharge; charge >= _minCharge; charge--)
             {
                 // check whether next isotope peak exists
                 var nextIsotopeMz = peakMz + Constants.C13MinusC12 / charge;
-                var xicNextIsotope = _run.GetExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
+                var xicNextIsotope = _run.GetPrecursorExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
                 if (!xicNextIsotope.Any()) continue;
                 if (xicThisPeak.GetCorrelation(xicNextIsotope) < _mostAbundantPlusOneIsotopeCorrThreshold) continue;
 
@@ -154,14 +154,14 @@ namespace InformedProteomics.TopDown.Scoring
                 if (_chargeCorrThresholdThreshold > 0.0)
                 {
                     var mzChargePlusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge + 1, approxMostAbundantIsotopeIndex);
-                    var xicPlusOneCharge = _run.GetExtractedIonChromatogram(mzChargePlusOne, _tolerance, scanNum);
+                    var xicPlusOneCharge = _run.GetPrecursorExtractedIonChromatogram(mzChargePlusOne, _tolerance, scanNum);
                     var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
 
                     double corrMinusOneCharge;
                     if (charge > 1)
                     {
                         var mzChargeMinusOne = Ion.GetIsotopeMz(monoIsotopicMass, charge - 1, approxMostAbundantIsotopeIndex);
-                        var xicMinusOneCharge = _run.GetExtractedIonChromatogram(mzChargeMinusOne, _tolerance, scanNum);
+                        var xicMinusOneCharge = _run.GetPrecursorExtractedIonChromatogram(mzChargeMinusOne, _tolerance, scanNum);
                         corrMinusOneCharge = xicMinusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicMinusOneCharge) : 0;
                     }
                     else

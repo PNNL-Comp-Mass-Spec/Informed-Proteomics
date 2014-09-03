@@ -11,6 +11,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
@@ -86,7 +87,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
-            const string sequence = "NCVISFPQTKFLPLSLEFNACLAEYLTPDNSPILFGCRTGLCGTCLVKVVGEILSPEAEEREILAILAPDDVQARLACQIKLTGDIAIRAYQSDEI";
+            //const string sequence = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
+            const string sequence = "IRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
             //const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             //const string sequence = "MNKTQLIDVIAEKAELSKTQAKAALESTLAAITESLKEGDAVQLVGFGTFKVNHRAERTGRNPQTGKEIKIAAANVPAFVSGKALKDAVK";
             //const string sequence =
@@ -443,5 +445,15 @@ namespace InformedProteomics.Test
             Console.WriteLine(comp.ToPlainString());
             Console.WriteLine(comp.ToString());
         }
+
+        [Test]
+        public void TestNumIsoWindows()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            Console.WriteLine("NumIsoWindows: " + run.GetNumUniqueIsoWindows());
+            Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
+        }
+
     }
 }

@@ -101,7 +101,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 Console.WriteLine("MsLevel: {0}", run.GetMsLevel(scanNum));
             }
 
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Done. {0:f4} sec", sec);
         }
 
@@ -133,7 +133,86 @@ namespace InformedProteomics.Test.FunctionalTests
             var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(100);
             spec.Display();
-
         }
+
+        [Test]
+        public void TestGeneratingProductXic()
+        {
+            const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+            var run1 = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run2 = new DiaLcMsRun(new PbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
+
+            var mz = 1401.643;
+            var tolerance = new Tolerance(10);
+            var xic1 = run1.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
+            xic1.Display();
+            var xic2 = run2.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
+            //xic2.Display();
+            Assert.True(xic1.Count == xic2.Count);
+            for (var i = 0; i < xic1.Count; i++)
+            {
+                if (!xic1[i].Equals(xic2[i]))
+                {
+                    Console.WriteLine("{0} {1} {2}", i, xic1[i], xic2[i]);
+                }
+                Assert.True(xic1[i].Equals(xic2[i]));
+            }
+            Console.WriteLine("Done");
+        }
+
+        [Test]
+        public void TestGeneratingProductManyXics()
+        {
+            const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            //var run2 = new DiaLcMsRun(new PbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
+
+            var tolerance = new Tolerance(10);
+
+            var mzArr = new double[100000];
+            var precursorMzArr = new double[mzArr.Length];
+            var rnd = new Random();
+            for (var i = 0; i < mzArr.Length; i++)
+            {
+                mzArr[i] = rnd.NextDouble()*1450.0 + 50.0;
+                precursorMzArr[i] = rnd.NextDouble()*(810.0-390.0) + 390.0;
+            }
+
+            var sw = new System.Diagnostics.Stopwatch();
+            double sec;
+
+            // method 1
+            sw.Start();
+            for (var i = 0; i < mzArr.Length; i++)
+            {
+                var mz = mzArr[i];
+                var tolTh = tolerance.GetToleranceAsTh(mz);
+                var minMz = mz - tolTh;
+                var maxMz = mz + tolTh;
+                var xic1 = run.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
+                //var xic2 = run.GetFullProductExtractedIonChromatogram2(minMz, maxMz, precursorMzArr[i]);
+                //Assert.True(xic1.Equals(xic2));
+            }
+            sw.Stop();
+            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Method 1: {0:f4} sec", sec);
+
+            sw.Reset();
+            sw.Start();
+            for (var i = 0; i < mzArr.Length; i++)
+            {
+                var mz = mzArr[i];
+                var tolTh = tolerance.GetToleranceAsTh(mz);
+                var minMz = mz - tolTh;
+                var maxMz = mz + tolTh;
+                run.GetFullProductExtractedIonChromatogram2(minMz, maxMz, precursorMzArr[i]);
+            }
+            sw.Stop();
+            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Method 2: {0:f4} sec", sec);
+
+            Console.WriteLine("Done");
+        }
+
     }
 }

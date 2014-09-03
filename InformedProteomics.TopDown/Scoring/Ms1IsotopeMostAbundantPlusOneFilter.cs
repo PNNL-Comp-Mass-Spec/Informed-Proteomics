@@ -113,14 +113,14 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void SetLcMsMatches(double peakMz, int scanNum)
         {
-            var xicThisPeak = _run.GetExtractedIonChromatogram(peakMz, _tolerance, scanNum);
+            var xicThisPeak = _run.GetPrecursorExtractedIonChromatogram(peakMz, _tolerance, scanNum);
             if (xicThisPeak.Count < 2) return;
 
             for (var charge = _maxCharge; charge >= _minCharge; charge--)
             {
                 // check whether next isotope peak exists
                 var nextIsotopeMz = peakMz + Constants.C13MinusC12 / charge;
-                var xicNextIsotope = _run.GetExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
+                var xicNextIsotope = _run.GetPrecursorExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
                 if (!xicNextIsotope.Any()) continue;
 
                 var mostAbundantIsotopeMass = (peakMz - Constants.Proton) * charge;

@@ -9,8 +9,8 @@ namespace MSPathFinderT
     internal class Program
     {
         public const string Name = "MSPathFinderT";
-        public const string Version = "0.12 (June 17, 2014)";
-        public const double CorrThreshold = 0.7;
+        public const string Version = "0.13 (Sept 02, 2014)";
+        public const double DefaultCorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
@@ -45,7 +45,8 @@ namespace MSPathFinderT
                 {"-minFragCharge", "1"},
                 {"-maxFragCharge", "15"},
                 {"-minMass", "3000.0"},
-                {"-maxMass", "50000.0"}
+                {"-maxMass", "50000.0"},
+                {"-corr", "0.7"}
             };
 
             for (var i = 0; i < args.Length/2; i++)
@@ -72,28 +73,30 @@ namespace MSPathFinderT
             parameters.Display();
             parameters.Write();
 
-            var topDownLauncher = new IcTopDownLauncher(
-                parameters.SpecFilePath,
-                parameters.DatabaseFilePath,
-                parameters.OutputDir,
-                parameters.AminoAcidSet,
-                parameters.MinSequenceLength,
-                parameters.MaxSequenceLength,
-                1,  // max number of N-term cleavages
-                0,  // max number of C-term cleavages
-                parameters.MinPrecursorIonCharge,
-                parameters.MaxPrecursorIonCharge,
-                parameters.MinProductIonCharge,
-                parameters.MaxProductIonCharge,
-                parameters.MinSequenceMass,
-                parameters.MaxSequenceMass,
-                parameters.PrecursorIonTolerancePpm,
-                parameters.ProductIonTolerancePpm,
-                parameters.Tda,
-                parameters.SearchMode
-                );
-
-            topDownLauncher.RunSearch(CorrThreshold);
+            foreach (string specFilePath in parameters.SpecFilePaths)
+            {
+                var topDownLauncher = new IcTopDownLauncher(
+                    specFilePath,
+                    parameters.DatabaseFilePath,
+                    parameters.OutputDir,
+                    parameters.AminoAcidSet,
+                    parameters.MinSequenceLength,
+                    parameters.MaxSequenceLength,
+                    1, // max number of N-term cleavages
+                    0, // max number of C-term cleavages
+                    parameters.MinPrecursorIonCharge,
+                    parameters.MaxPrecursorIonCharge,
+                    parameters.MinProductIonCharge,
+                    parameters.MaxProductIonCharge,
+                    parameters.MinSequenceMass,
+                    parameters.MaxSequenceMass,
+                    parameters.PrecursorIonTolerancePpm,
+                    parameters.ProductIonTolerancePpm,
+                    parameters.Tda,
+                    parameters.SearchMode
+                    );
+                topDownLauncher.RunSearch(parameters.CorrThreshold);
+            }
         }
 
 
@@ -118,7 +121,8 @@ namespace MSPathFinderT
                 "\t[-minFragCharge MinPrecursorCharge] (minimum fragment ion charge, default: 1)\n" +
                 "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n" +
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
-                "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n"
+                "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
+                "\t[-corr CorrThreshold] (correlation threshold, default: 0.7)\n"
                 );
         }
 

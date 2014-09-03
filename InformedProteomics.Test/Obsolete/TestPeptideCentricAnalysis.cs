@@ -444,7 +444,7 @@ namespace InformedProteomics.Test.Obsolete
             var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             for (var i = -1; i < 3; i++)
             {
-                xicArr[i] = run.GetExtractedIonChromatogram(precursorIon.GetIsotopeMz(i), tolerance, targetScanNum);
+                xicArr[i] = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetIsotopeMz(i), tolerance, targetScanNum);
             }
 
             for (var i = -1; i < 3; i++)
@@ -501,7 +501,7 @@ namespace InformedProteomics.Test.Obsolete
 
                 var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
                 var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
+                var baseXic = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var baseIntensity = baseXic.GetSumIntensities();
 
                 var isValid = true;
@@ -509,7 +509,7 @@ namespace InformedProteomics.Test.Obsolete
                 {
                     if (isotope.Index == basePeakIndex) continue;
                     var isotopeMz = precursorIon.GetIsotopeMz(isotope.Index);
-                    var xic = run.GetExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
+                    var xic = run.GetPrecursorExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
 
                     if (xic.Count == 0)
                     {
@@ -598,7 +598,7 @@ namespace InformedProteomics.Test.Obsolete
                 var isDecoy = protein.StartsWith("XXX_");
 
                 var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
-                var baseXic = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
+                var baseXic = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var baseIntensity = baseXic.GetSumIntensities();
 
                 Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", (isDecoy ? 1 : 0), peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMonoIsotopicMz());
@@ -615,7 +615,7 @@ namespace InformedProteomics.Test.Obsolete
                 foreach (var isotopeIndex in isotopeIndices)
                 {
                     var isotopeMz = precursorIon.GetIsotopeMz(isotopeIndex);
-                    var xic = run.GetExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
+                    var xic = run.GetPrecursorExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
                     var relativeIntensity = xic.GetSumIntensities() / baseIntensity;
                     var correlation = xic.GetCorrelation(baseXic);
                     Console.Write("\t{0}\t{1}", relativeIntensity, correlation);

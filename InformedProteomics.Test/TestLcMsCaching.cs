@@ -262,7 +262,7 @@ namespace InformedProteomics.Test
                 }
                 allSeqSet.Add(sequences[i]);
 
-                //var xic = run.GetFullExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance);
+                //var xic = run.GetFullPrecursorIonExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance);
                 ////xic.Display();
                 //var apexScanNum = xic.GetNearestApexScanNum(run.GetPrecursorScanNum(scanNum), false);
                 //var apexSpec = run.GetSpectrum(apexScanNum);
@@ -376,7 +376,7 @@ namespace InformedProteomics.Test
                 var nextSpec = run.GetSpectrum(nextScanNum);
                 var nextIsotopeCorr = nextSpec.GetCorrScore(precursorIon, tolerance, 0.1);
 
-                var xicMostAbundant = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
+                var xicMostAbundant = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
 
                 var apexScanNum = xicMostAbundant.GetApexScanNum();
                 if (apexScanNum < run.MinLcScan) apexScanNum = scanNum;
@@ -384,16 +384,16 @@ namespace InformedProteomics.Test
                 var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
 //                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
 
-                var xicNextIsotope = run.GetExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12/charge, tolerance, scanNum);
+                var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12/charge, tolerance, scanNum);
 
                 var plusOneIsotopeCorr = xicMostAbundant.GetCorrelation(xicNextIsotope);
 
                 var precursorIonChargeMinusOne = new Ion(composition, charge - 1);
-                var xicChargeMinusOne = run.GetExtractedIonChromatogram(precursorIonChargeMinusOne.GetMostAbundantIsotopeMz(), tolerance, scanNum);
+                var xicChargeMinusOne = run.GetPrecursorExtractedIonChromatogram(precursorIonChargeMinusOne.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var chargeMinusOneCorr = xicMostAbundant.GetCorrelation(xicChargeMinusOne);
 
                 var precursorIonChargePlusOne = new Ion(composition, charge + 1);
-                var xicChargePlusOne = run.GetExtractedIonChromatogram(precursorIonChargePlusOne.GetMostAbundantIsotopeMz(), tolerance, scanNum);
+                var xicChargePlusOne = run.GetPrecursorExtractedIonChromatogram(precursorIonChargePlusOne.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var chargePlusOneCorr = xicMostAbundant.GetCorrelation(xicChargePlusOne);
 
                 var max = new[] {preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr}.Max();

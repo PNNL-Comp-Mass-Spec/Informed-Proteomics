@@ -1,8 +1,9 @@
-﻿using InformedProteomics.Backend.Data.Biology;
+﻿using System;
+using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class IsolationWindow
+    public class IsolationWindow: IComparable<IsolationWindow>
     {
         public IsolationWindow(
             double isolationWindowTargetMz,
@@ -41,6 +42,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        public double Width
+        {
+            get { return IsolationWindowUpperOffset + IsolationWindowLowerOffset; }
+        }
+
         public double? MonoisotopicMass
         {
             get
@@ -53,6 +59,36 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public bool Contains(double mz)
         {
             return mz >= MinMz && mz < MaxMz;
+        }
+
+        protected bool Equals(IsolationWindow other)
+        {
+            if (Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01) return true;
+            return false;
+        }
+
+        public int CompareTo(IsolationWindow other)
+        {
+            return IsolationWindowTargetMz.CompareTo(other.IsolationWindowTargetMz);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((IsolationWindow)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = IsolationWindowTargetMz.GetHashCode();
+                hashCode = (hashCode * 397) ^ IsolationWindowLowerOffset.GetHashCode();
+                hashCode = (hashCode * 397) ^ IsolationWindowUpperOffset.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

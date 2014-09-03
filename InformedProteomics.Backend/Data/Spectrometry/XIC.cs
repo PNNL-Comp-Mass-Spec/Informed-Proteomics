@@ -173,5 +173,50 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 Console.WriteLine(p.ScanNum+"\t"+p.Intensity);
             }
         }
+
+        // sort XicPoints and select one peak per scan
+        public static Xic GetSelectedXic(Xic xic)
+        {
+            if (xic.Count == 0) return xic;
+
+            // select one best peak for each scan
+            var newXic = new Xic();
+
+            var prevScanNum = xic[0].ScanNum;
+            var bestPeak = xic[0];
+            for (var i = 1; i < xic.Count; i++)
+            {
+                var xicPeak = xic[i];
+                if (xicPeak.ScanNum > prevScanNum)
+                {
+                    newXic.Add(bestPeak);
+                    bestPeak = xicPeak;
+                }
+                else
+                {
+                    if (xicPeak.Intensity > bestPeak.Intensity)
+                    {
+                        bestPeak = xicPeak;
+                    }
+                }
+                prevScanNum = xicPeak.ScanNum;
+            }
+            newXic.Add(bestPeak);
+            return newXic;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj as Xic != null && Equals((Xic) obj);
+        }
+
+        protected bool Equals(Xic other)
+        {
+            for (var i = 0; i < Count; i++)
+            {
+                if (!this[i].Equals(other[i])) return false;
+            }
+            return true;
+        }
     }
 }
