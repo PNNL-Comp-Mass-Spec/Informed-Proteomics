@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.MassSpecData
+﻿using System.Collections.Generic;
+
+namespace InformedProteomics.Backend.MassSpecData
 {
     public interface ILcMsRun: IChromatogramExtractor, ISpectrumExtractor
     {
@@ -9,5 +11,6 @@
         int GetMsLevel(int scanNum);
         int GetPrevScanNum(int scanNum, int msLevel);
         int GetNextScanNum(int scanNum, int msLevel);
+        IList<int> GetScanNumbers(int msLevel);
     }
 }

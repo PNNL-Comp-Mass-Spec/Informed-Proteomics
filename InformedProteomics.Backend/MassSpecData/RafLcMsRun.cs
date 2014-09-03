@@ -93,6 +93,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return MaxLcScan + 1;
         }
 
+        public IList<int> GetScanNumbers(int msLevel)
+        {
+            var scanNumbers = new List<int>();
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            {
+                if (GetMsLevel(scanNum) == msLevel) scanNumbers.Add(scanNum);
+            }
+            return scanNumbers;
+        }
+
         public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsTh(mz);

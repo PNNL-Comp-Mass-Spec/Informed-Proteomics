@@ -217,5 +217,15 @@ namespace InformedProteomics.Test.FunctionalTests
 
             Console.WriteLine("Done");
         }
+
+        [Test]
+        public void TestSpectrumNavigation()
+        {
+            const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
+            var rafRun = new RafLcMsRun(rafFilePath);
+           // var spec = rafRun.GetSpectrum(54531);
+            var scanNum = rafRun.GetNextScanNum(54530, 1);
+            Console.WriteLine(scanNum);
+        }
     }
 }
