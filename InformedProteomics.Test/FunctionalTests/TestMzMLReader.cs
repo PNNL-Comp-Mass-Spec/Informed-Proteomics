@@ -16,7 +16,8 @@ namespace InformedProteomics.Test.FunctionalTests
         [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\CTRL_Dam_17022011_1.mzML", 18696)] // Centroid, Waters/MassLynx, mzML 1.0.0, requires the referenceable Param Group
         [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\napedro_L120224_005_SW-400AQUA no background 2ul dilution 6.mzML", 78012)] // Centroid, ABI SCIex WIFF files
         [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\VA139IMSMS.mzML", 3145)] // Centroid, Agilent QTOF
-        [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\VA139IMSMS_compressed.mzML", 3145)] // Centroid, Agilent QTOF, compressed
+        [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\VA139IMSMS.mzML.gz", 3145)] // Centroid, Agilent QTOF, gzipped
+        [TestCase(@"\\protoapps\UserData\Sangtae\TestData\SpecFiles\VA139IMSMS_compressed.mzML", 3145)] // Centroid, Agilent QTOF, compressed binary data
         public void TestReadMzML(string filePath, int expectedSpectra)
         {
             Stopwatch timer = new Stopwatch();

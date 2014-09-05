@@ -12,20 +12,26 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         private XmlReader _reader;
 
+        /// <summary>
+        /// Enumeration of common mzML versions
+        /// </summary>
         private enum MzML_Version
         {
             mzML1_0_0,
             mzML1_1_0
         }
 
+        /// <summary>
+        /// Store the mzML version, so that we can use it to adjust how some things are processed.
+        /// </summary>
         private MzML_Version _version;
 
-        private struct ScanData
+        private class ScanData
         {
             public double MonoisotopicMz;
             public double StartTime;
 
-            public void Initialize()
+            public ScanData()
             {
                 MonoisotopicMz = 0.0;
                 StartTime = 0.0;
@@ -38,7 +44,7 @@ namespace InformedProteomics.Backend.MassSpecData
             userParam
         }
 
-        private class Param
+        private abstract class Param
         {
             public ParamType ParamType { get; protected set; }
             public string Name;          // Required
@@ -115,21 +121,21 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private Dictionary<string, List<Param>> _referenceableParamGroups;
+        private readonly Dictionary<string, List<Param>> _referenceableParamGroups = new Dictionary<string, List<Param>>();
 
-        private struct SelectedIon
+        private class SelectedIon
         {
             public double SelectedIonMz;
             public int Charge;
 
-            public void Initialize()
+            public SelectedIon()
             {
                 SelectedIonMz = 0.0;
                 Charge = 0;
             }
         }
 
-        private struct Precursor
+        private class Precursor
         {
             public List<SelectedIon> Ions;
             public double IsolationWindowTargetMz;
@@ -137,7 +143,7 @@ namespace InformedProteomics.Backend.MassSpecData
             public double IsolationWindowUpperOffset;
             public ActivationMethod Activation;
 
-            public void Initialize()
+            public Precursor()
             {
                 Ions = new List<SelectedIon>();
                 IsolationWindowTargetMz = 0.0;
@@ -178,14 +184,14 @@ namespace InformedProteomics.Backend.MassSpecData
         private Instrument _instrument;
         private int _artificialScanNum;
 
-        private struct BinaryDataArray
+        private class BinaryDataArray
         {
             public int ArrayLength;
             public Precision Precision;
             public ArrayType ArrayType;
             public double[] Data;
 
-            public void Initialize()
+            public BinaryDataArray()
             {
                 Data = null;
                 Precision = Precision.Precision32;
@@ -204,21 +210,18 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _instrument = Instrument.Unknown;
             _artificialScanNum = 1;
-            _referenceableParamGroups = new Dictionary<string, List<Param>>();
             _version = MzML_Version.mzML1_1_0;
 
-            var xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
+            // Set a very large read buffer, it does decrease the read times for uncompressed files.
+            Stream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
 
             if (filePath.EndsWith(".mzML.gz"))
             {
-                var gstream = new GZipStream(new FileStream(filePath, FileMode.Open), CompressionMode.Decompress);
-                _reader = XmlReader.Create(gstream, xSettings);
+                file = new GZipStream(file, CompressionMode.Decompress);
             }
-            else
-            {
-                var sr = new StreamReader(filePath);
-                _reader = XmlReader.Create(sr, xSettings);
-            }
+
+            var xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
+            _reader = XmlReader.Create(new StreamReader(file, System.Text.Encoding.UTF8, true, 65536), xSettings);
         }
 
         public IEnumerable<Spectrum> ReadAllSpectra()
@@ -765,7 +768,12 @@ namespace InformedProteomics.Backend.MassSpecData
             string index = reader.GetAttribute("index");
             //Console.WriteLine("Reading spectrum indexed by " + index);
             // This is correct for Thermo files converted by msConvert, but need to implement for others as well
-            //string spectrumId = reader.GetAttribute("id"); // id="controllerType=0 controllerNumber=1 scan=3973"
+            string spectrumId = reader.GetAttribute("id"); // Native ID in mzML_1.1.0; unique identifier in mzML_1.0.0, often same as nativeID
+            string nativeId = spectrumId;
+            if (_version == MzML_Version.mzML1_0_0)
+            {
+                nativeId = reader.GetAttribute("nativeID"); // Native ID in mzML_1.0.0
+            }
             //int scanNum = Convert.ToInt32(spectrumId.Substring(spectrumId.LastIndexOf("scan=") + 5));
             // TODO: Get rid of this hack, use something with nativeID. May involve special checks for mzML version
             int scanNum = _artificialScanNum++;
@@ -966,6 +974,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             spectrum.MsLevel = msLevel;
             spectrum.ElutionTime = scan.StartTime;
+            spectrum.NativeId = nativeId;
             _spectra.Add(spectrum);
         }
 
