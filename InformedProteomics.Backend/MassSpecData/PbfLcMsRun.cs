@@ -6,9 +6,10 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class RafLcMsRun: ILcMsRun, IMassSpecDataReader
+    public class PbfLcMsRun: ILcMsRun, IMassSpecDataReader
     {
-        public const int FileFormatId = 150603;
+        public const int FileFormatId = 150604;
+        public const string FileExtension = ".pbf";
         
         public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
@@ -18,7 +19,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
-            var rafFilePath = Path.ChangeExtension(specFilePath, ".raf");
+            var rafFilePath = Path.ChangeExtension(specFilePath, FileExtension);
 
             if (!File.Exists(rafFilePath) || !CheckFileFormatVersion(rafFilePath))
             {
@@ -32,22 +33,22 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (run == null) throw new Exception("Unsupported raw file format!");
                 try
                 {
-                    run.WriteAsRaf(rafFilePath);
+                    run.WriteAsPbf(rafFilePath);
                 }
                 catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
                 {
                     var fileName = Path.GetFileName(rafFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
                     var tempPath = Path.Combine(Path.GetTempPath(), fileName);
-                    if (!File.Exists(tempPath) || !CheckFileFormatVersion(tempPath)) run.WriteAsRaf(tempPath);
+                    if (!File.Exists(tempPath) || !CheckFileFormatVersion(tempPath)) run.WriteAsPbf(tempPath);
                     rafFilePath = tempPath;
                 }
             }
 
-            return new RafLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+            return new PbfLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
-        public RafLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
+        public PbfLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
         {
             _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
             if (ReadMetaInfo() == false)
@@ -225,6 +226,45 @@ namespace InformedProteomics.Backend.MassSpecData
         public void Close()
         {
             _reader.Close();
+        }
+
+        public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
+        {
+            // scan number: 4
+            writer.Write(spec.ScanNum);
+
+            // ms level: 1
+            writer.Write(Convert.ToByte(spec.MsLevel));
+
+            // elution time: 4
+            writer.Write(spec.ElutionTime);
+
+            var productSpec = spec as ProductSpectrum;
+            if (productSpec != null)    // product spectrum
+            {
+                var isolationWindow = productSpec.IsolationWindow;
+                // precursor mass: 8
+                writer.Write(isolationWindow.MonoisotopicMz ?? 0.0);
+                // precursor charge: 4
+                writer.Write(isolationWindow.Charge ?? 0);
+                // Activation method: 1
+                writer.Write((byte)productSpec.ActivationMethod);
+                // Isolation window target m/z: 8
+                writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
+                // Isolation window lower offset: 8
+                writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
+                // Isolation window uppoer offset: 8
+                writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
+            }
+            // Number of peaks: 4
+            writer.Write(spec.Peaks.Length);
+            foreach (var peak in spec.Peaks)
+            {
+                // m/z: 8
+                writer.Write(peak.Mz);
+                // intensity: 4
+                writer.Write(Convert.ToSingle(peak.Intensity));
+            }
         }
 
         /// <summary>

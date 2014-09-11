@@ -27,7 +27,7 @@ namespace InformedProteomics.Test.FunctionalTests
   //          const string outputFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
 //            const string outputFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             var outputFilePath = Path.ChangeExtension(specFilePath, ".raf");
-            run.WriteAsRaf(outputFilePath);
+            run.WriteAsPbf(outputFilePath);
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Done. {0:f4} sec", sec);
         }
@@ -36,7 +36,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestReadingRafFile()
         {
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
@@ -78,7 +78,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestGetChrom()
         {
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
 
             Console.WriteLine("Chromatogram");
             // chromatogram comparison
@@ -97,7 +97,7 @@ namespace InformedProteomics.Test.FunctionalTests
             //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
 
             var tolerance = new Tolerance(10);
 
@@ -147,7 +147,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
 
             const double precursorIonMz = 815.16;
             const double productIonMz = 902.445;
@@ -169,7 +169,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
 
             var tolerance = new Tolerance(10);
 
@@ -193,7 +193,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 var tolTh = tolerance.GetToleranceAsTh(mz);
                 var minMz = mz - tolTh;
                 var maxMz = mz + tolTh;
-                var xic1 = run.GetFullProductExtractedIonChromatogram2(minMz, maxMz, precursorMzArr[i]);
+                var xic1 = run.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
                 //var xic2 = rafRun.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
                 //Assert.True(xic1.Equals(xic2));
             }
@@ -222,10 +222,18 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestSpectrumNavigation()
         {
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
-            var rafRun = new RafLcMsRun(rafFilePath);
+            var rafRun = new PbfLcMsRun(rafFilePath);
            // var spec = rafRun.GetSpectrum(54531);
             var scanNum = rafRun.GetNextScanNum(54530, 1);
             Console.WriteLine(scanNum);
+        }
+
+        [Test]
+        public void TestRafGen()
+        {
+            const string rafFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
+            var args = new[] {"-s", rafFilePath};
+            PbfGen.Program.Main(args);
         }
     }
 }

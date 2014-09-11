@@ -20,9 +20,9 @@ namespace InformedProteomics.Backend.MassSpecData
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, 
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
-            var pbfFilePath = Path.ChangeExtension(specFilePath, ".pbf");
+            var rafFilePath = Path.ChangeExtension(specFilePath, PbfLcMsRun.FileExtension);
 
-            if (!File.Exists(pbfFilePath) || !PbfReader.CheckFileFormatVersion(pbfFilePath))
+            if (!File.Exists(rafFilePath) || !PbfLcMsRun.CheckFileFormatVersion(rafFilePath))
             {
                 LcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
@@ -34,20 +34,19 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (run == null) throw new Exception("Unsupported raw file format!");
                 try
                 {
-                    run.WriteTo(pbfFilePath);
+                    run.WriteAsPbf(rafFilePath);
                 }
                 catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
                 {
-                    var fileName = Path.GetFileName(pbfFilePath);
+                    var fileName = Path.GetFileName(rafFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
                     var tempPath = Path.Combine(Path.GetTempPath(), fileName);
-                    if (!File.Exists(tempPath) || !PbfReader.CheckFileFormatVersion(tempPath)) run.WriteTo(tempPath);
-                    pbfFilePath = tempPath;
+                    if (!File.Exists(tempPath) || !PbfLcMsRun.CheckFileFormatVersion(tempPath)) run.WriteAsPbf(tempPath);
+                    rafFilePath = tempPath;
                 }
             }
 
-            return new LcMsRun(new PbfReader(pbfFilePath),
-                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+            return new LcMsRun(new PbfLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold), 0.0, 0.0);
         }
 
         public const double IsolationWindowBinningFactor = 10;
@@ -56,7 +55,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
             _ms1PeakList = new List<LcMsPeak>();
-            _ms2PeakList = new List<LcMsPeak>();
+//            _ms2PeakList = new List<LcMsPeak>();
             _scanNumElutionTimeMap = new Dictionary<int, double>();
             var msLevelMap = new Dictionary<int, int>();
 
@@ -90,10 +89,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         if (productSignalToNoiseRatioThreshold > 0.0) productSpec.FilterNoise(productSignalToNoiseRatioThreshold);
 
-                        foreach (var peak in spec.Peaks)
-                        {
-                            _ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
-                        }
+                        //foreach (var peak in spec.Peaks)
+                        //{
+                        //    _ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
+                        //}
 
                         var isolationWindow = productSpec.IsolationWindow;
                         var minBinNum = (int)Math.Round(isolationWindow.MinMz*IsolationWindowBinningFactor);
@@ -130,7 +129,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
            _ms1PeakList.Sort();
-           _ms2PeakList.Sort();
+           //_ms2PeakList.Sort();
 
             // Read MS levels and precursor information
 
@@ -441,16 +440,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetProductExtractedIonChromatogram(mz, tolerance, precursorIonMz, MinLcScan, MaxLcScan);
         }
 
-        public Xic GetFullProductExtractedIonChromatogram2(double minMz, double maxMz, double precursorMz)
-        {
-            var xic = GetExtractedIonChromatogram(minMz, maxMz, _ms2PeakList);
-            var scanToXicPoint = new XicPoint[MaxLcScan - MinLcScan + 1];
-            foreach (var xicPoint in xic) scanToXicPoint[xicPoint.ScanNum - MinLcScan] = xicPoint;
+        //public Xic GetFullProductExtractedIonChromatogram2(double minMz, double maxMz, double precursorMz)
+        //{
+        //    var xic = GetExtractedIonChromatogram(minMz, maxMz, _ms2PeakList);
+        //    var scanToXicPoint = new XicPoint[MaxLcScan - MinLcScan + 1];
+        //    foreach (var xicPoint in xic) scanToXicPoint[xicPoint.ScanNum - MinLcScan] = xicPoint;
 
-            var newXic = new Xic();
-            newXic.AddRange(GetFragmentationSpectraScanNums(precursorMz).Select(scanNum => scanToXicPoint[scanNum - MinLcScan] ?? new XicPoint(scanNum, 0, 0)));
-            return newXic;
-        }
+        //    var newXic = new Xic();
+        //    newXic.AddRange(GetFragmentationSpectraScanNums(precursorMz).Select(scanNum => scanToXicPoint[scanNum - MinLcScan] ?? new XicPoint(scanNum, 0, 0)));
+        //    return newXic;
+        //}
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
@@ -752,30 +751,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return false;                
         }
 
-
-        // These writing/reading methods are added to speed up the testing
-        public void WriteTo(string outputFilePath)
+        public void WriteAsPbf(string outputFilePath)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
             {
-                for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++ )
-                {
-                    var spec = GetSpectrum(scanNum);
-                    PbfReader.WriteSpectrumAsPbf(spec, writer);
-                }
-                writer.Write(PbfReader.FileFormatId);
+                WriteAsPbf(writer);
             }
         }
 
-        public void WriteAsRaf(string outputFilePath)
-        {
-            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
-            {
-                WriteAsRaf(writer);
-            }
-        }
-
-        protected void WriteAsRaf(BinaryWriter writer)
+        protected void WriteAsPbf(BinaryWriter writer)
         {
             var scanNumToSpecOffset = new long[MaxLcScan - MinLcScan + 1];
             var scanNumToIsolationWindow = new IsolationWindow[MaxLcScan - MinLcScan + 1];
@@ -786,20 +770,20 @@ namespace InformedProteomics.Backend.MassSpecData
                 var spec = GetSpectrum(scanNum);
                 var productSpec = spec as ProductSpectrum;
                 scanNumToIsolationWindow[scanNum - MinLcScan] = productSpec == null ? null : productSpec.IsolationWindow;
-                PbfReader.WriteSpectrumAsPbf(spec, writer);
+                PbfLcMsRun.WriteSpectrum(spec, writer);
             }
 
             // Precursor ion chromatograms
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
-            var minMzIndex = RafLcMsRun.GetMzBinIndex(Ms1PeakList[0].Mz);
-            var maxMzIndex = RafLcMsRun.GetMzBinIndex(Ms1PeakList[Ms1PeakList.Count - 1].Mz);
+            var minMzIndex = PbfLcMsRun.GetMzBinIndex(Ms1PeakList[0].Mz);
+            var maxMzIndex = PbfLcMsRun.GetMzBinIndex(Ms1PeakList[Ms1PeakList.Count - 1].Mz);
 
             var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
             foreach (var peak in Ms1PeakList)
             {
                 var mz = peak.Mz;
-                var mzIndex = RafLcMsRun.GetMzBinIndex(mz);
+                var mzIndex = PbfLcMsRun.GetMzBinIndex(mz);
                 if (mzIndex > prevMzIndex)
                 {
                     chromMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
@@ -811,8 +795,20 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Product ion chromatograms
+            var ms2PeakList = new List<LcMsPeak>();
+            foreach (var ms2ScanNum in GetScanNumbers(2))
+            {
+                var productSpec = GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                if (productSpec == null) continue;
+                foreach (var peak in productSpec.Peaks)
+                {
+                    ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
+                }
+            }
+            ms2PeakList.Sort();
+
             var offsetBeginProductChromatogram = writer.BaseStream.Position;
-            foreach (var peak in _ms2PeakList)
+            foreach (var peak in ms2PeakList)
             {
                 writer.Write(peak.Mz);
                 writer.Write((float)peak.Intensity);
@@ -854,7 +850,7 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(offsetBeginPrecursorChromatogram); // 8
             writer.Write(offsetBeginProductChromatogram); // 8
             writer.Write(offsetBeginMetaInformation); // 8
-            writer.Write(RafLcMsRun.FileFormatId); // 4            
+            writer.Write(PbfLcMsRun.FileFormatId); // 4            
         }
 
         public void ComputeMs1Features(int minCharge, int maxCharge, Tolerance tolerance)
@@ -925,7 +921,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly int[] _nextScan;
 
         private readonly List<LcMsPeak> _ms1PeakList;
-        private readonly List<LcMsPeak> _ms2PeakList;
+//        private readonly List<LcMsPeak> _ms2PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
         private readonly Dictionary<int, int[]> _isolationMzBinToScanNums;
 

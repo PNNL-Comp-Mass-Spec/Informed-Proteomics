@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
             {
-                WriteAsRaf(writer);
+                WriteAsPbf(writer);
             }
         }
 

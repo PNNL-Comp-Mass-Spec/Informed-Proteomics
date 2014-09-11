@@ -155,6 +155,10 @@
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
       <Name>InformedProteomics.TopDown</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PbfGen\PbfGen.csproj">
+      <Project>{b31c2ac2-88c6-43c9-b809-26b7547592ff}</Project>
+      <Name>PbfGen</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="PNNLOmicsElementData.xml">

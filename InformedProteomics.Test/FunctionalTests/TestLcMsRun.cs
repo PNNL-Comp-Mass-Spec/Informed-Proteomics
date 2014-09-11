@@ -71,7 +71,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //    var sw = new System.Diagnostics.Stopwatch();
 
         //    sw.Start();
-        //    var run = new LcMsRun(new PbfReader(TestPbfFilePath));
+        //    var run = new LcMsRun(new OldPbfReader(TestPbfFilePath));
         //    Console.WriteLine(run.MaxLcScan);
         //    var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
         //    Console.WriteLine(@"Done. {0:f4} sec", sec);
@@ -135,37 +135,37 @@ namespace InformedProteomics.Test.FunctionalTests
             spec.Display();
         }
 
-        [Test]
-        public void TestGeneratingProductXic()
-        {
-            const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
-            var run1 = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
-            var run2 = new DiaLcMsRun(new PbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
+        //[Test]
+        //public void TestGeneratingProductXic()
+        //{
+        //    const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+        //    var run1 = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+        //    var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
 
-            var mz = 1401.643;
-            var tolerance = new Tolerance(10);
-            var xic1 = run1.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
-            xic1.Display();
-            var xic2 = run2.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
-            //xic2.Display();
-            Assert.True(xic1.Count == xic2.Count);
-            for (var i = 0; i < xic1.Count; i++)
-            {
-                if (!xic1[i].Equals(xic2[i]))
-                {
-                    Console.WriteLine("{0} {1} {2}", i, xic1[i], xic2[i]);
-                }
-                Assert.True(xic1[i].Equals(xic2[i]));
-            }
-            Console.WriteLine("Done");
-        }
+        //    var mz = 1401.643;
+        //    var tolerance = new Tolerance(10);
+        //    var xic1 = run1.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
+        //    xic1.Display();
+        //    var xic2 = run2.GetFullProductExtractedIonChromatogram(mz, tolerance, 791.03);
+        //    //xic2.Display();
+        //    Assert.True(xic1.Count == xic2.Count);
+        //    for (var i = 0; i < xic1.Count; i++)
+        //    {
+        //        if (!xic1[i].Equals(xic2[i]))
+        //        {
+        //            Console.WriteLine("{0} {1} {2}", i, xic1[i], xic2[i]);
+        //        }
+        //        Assert.True(xic1[i].Equals(xic2[i]));
+        //    }
+        //    Console.WriteLine("Done");
+        //}
 
         [Test]
         public void TestGeneratingProductManyXics()
         {
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
             var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
-            //var run2 = new DiaLcMsRun(new PbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
+            //var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
 
             var tolerance = new Tolerance(10);
 
@@ -205,7 +205,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 var tolTh = tolerance.GetToleranceAsTh(mz);
                 var minMz = mz - tolTh;
                 var maxMz = mz + tolTh;
-                run.GetFullProductExtractedIonChromatogram2(minMz, maxMz, precursorMzArr[i]);
+                run.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
             }
             sw.Stop();
             sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;

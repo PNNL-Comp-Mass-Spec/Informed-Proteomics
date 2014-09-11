@@ -7,7 +7,7 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace PbfGen
 {
-    class Program
+    public class Program
     {
         public const string Name = "PbfGen";
 
@@ -15,7 +15,7 @@ namespace PbfGen
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
@@ -79,14 +79,14 @@ namespace PbfGen
                 Directory.CreateDirectory(outputDir);
             }
 
-            var pbfFilePath = outputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(specFilePath) + ".pbf";
+            var rafFilePath = outputDir + Path.DirectorySeparatorChar +
+                                       Path.GetFileNameWithoutExtension(specFilePath) + PbfLcMsRun.FileExtension;
 
-            Console.WriteLine("Creating {0} from {1}", pbfFilePath, specFilePath);
+            Console.WriteLine("Creating {0} from {1}", rafFilePath, specFilePath);
             var reader = new XCaliburReader(specFilePath);
             var run = new LcMsRun(reader, 0, 0);
-            run.WriteTo(pbfFilePath);
-            Console.WriteLine("PbfFormatVersion: {0}", PbfReader.FileFormatId);
+            run.WriteAsPbf(rafFilePath);
+            Console.WriteLine("RafFormatVersion: {0}", PbfLcMsRun.FileFormatId);
         }
 
         private static void PrintUsageInfo(string message = null)
