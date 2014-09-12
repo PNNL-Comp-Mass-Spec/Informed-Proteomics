@@ -10,6 +10,7 @@ namespace PbfGen
     public class Program
     {
         public const string Name = "PbfGen";
+        public const string Version = "0.14 (Sept 11, 2014)";
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -46,22 +47,26 @@ namespace PbfGen
 
             // Parse command line parameters
             var specFilePath = paramDic["-s"];
+
             if (specFilePath == null)
             {
                 PrintUsageInfo("Missing required parameter -s!");
                 return;
             }
-            if (!File.Exists(specFilePath))
+
+            if (!File.Exists(specFilePath) && !Directory.Exists(specFilePath))
             {
                 PrintUsageInfo("File not found: " + specFilePath + ".");
                 return;
             }
-            if (Path.GetExtension(specFilePath).ToLower().Equals("raw"))
+
+            if (!Directory.Exists(specFilePath) && !Path.GetExtension(specFilePath).ToLower().Equals(".raw"))
             {
-                PrintUsageInfo("Invalid file extension: " + specFilePath + ".");
+                PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath + ".");
                 return;
             }
-            var outputDir = paramDic["-o"] ?? Path.GetDirectoryName(specFilePath);
+
+            var outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(specFilePath));
             if (outputDir == null)
             {
                 PrintUsageInfo("Invalid raw file directory: " + specFilePath + ".");
@@ -79,22 +84,35 @@ namespace PbfGen
                 Directory.CreateDirectory(outputDir);
             }
 
-            var rafFilePath = outputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(specFilePath) + PbfLcMsRun.FileExtension;
+            var specFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
 
-            Console.WriteLine("Creating {0} from {1}", rafFilePath, specFilePath);
-            var reader = new XCaliburReader(specFilePath);
-            var run = new LcMsRun(reader, 0, 0);
-            run.WriteAsPbf(rafFilePath);
-            Console.WriteLine("RafFormatVersion: {0}", PbfLcMsRun.FileFormatId);
+            foreach (var rawFilePath in specFilePaths)
+            {
+                var rafFilePath = outputDir + Path.DirectorySeparatorChar +
+                                           Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension;
+
+                if(File.Exists(rafFilePath) && PbfLcMsRun.CheckFileFormatVersion(rafFilePath))
+                {
+                    Console.WriteLine("{0} already exists.", rawFilePath);
+                }
+                else
+                {
+                    Console.WriteLine("Creating {0} from {1}", rafFilePath, rawFilePath);
+                    var reader = new XCaliburReader(rawFilePath);
+                    var run = new LcMsRun(reader, 0, 0);
+                    run.WriteAsPbf(rafFilePath);
+                }
+            }
+            Console.WriteLine("PbfFormatVersion: {0}", PbfLcMsRun.FileFormatId);
         }
 
         private static void PrintUsageInfo(string message = null)
         {
             if (message != null) Console.WriteLine("Error: " + message);
             Console.WriteLine(
+                Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
-                "\t-s RawFilePath (*.raw)\n" +
+                "\t-s RawFilePath (*.raw or directory)\n" +
                 "\t[-o OutputDir]\n"
                 );
         }

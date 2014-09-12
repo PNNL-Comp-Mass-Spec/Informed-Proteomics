@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.MassSpecData;
 
 namespace MSPathFinderT
 {
@@ -204,7 +205,7 @@ namespace MSPathFinderT
                     }
                     if (Directory.Exists(value)) continue;
                     var extension = Path.GetExtension(value);
-                    if (!Path.GetExtension(value).ToLower().Equals(".raw"))
+                    if (!Path.GetExtension(value).ToLower().Equals(".raw") && !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")!";
                     }

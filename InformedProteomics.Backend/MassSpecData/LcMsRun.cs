@@ -20,9 +20,9 @@ namespace InformedProteomics.Backend.MassSpecData
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, 
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
-            var rafFilePath = Path.ChangeExtension(specFilePath, PbfLcMsRun.FileExtension);
+            var pbfFilePath = Path.ChangeExtension(specFilePath, PbfLcMsRun.FileExtension);
 
-            if (!File.Exists(rafFilePath) || !PbfLcMsRun.CheckFileFormatVersion(rafFilePath))
+            if (!File.Exists(pbfFilePath) || !PbfLcMsRun.CheckFileFormatVersion(pbfFilePath))
             {
                 LcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
@@ -34,19 +34,19 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (run == null) throw new Exception("Unsupported raw file format!");
                 try
                 {
-                    run.WriteAsPbf(rafFilePath);
+                    run.WriteAsPbf(pbfFilePath);
                 }
                 catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
                 {
-                    var fileName = Path.GetFileName(rafFilePath);
+                    var fileName = Path.GetFileName(pbfFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
                     var tempPath = Path.Combine(Path.GetTempPath(), fileName);
                     if (!File.Exists(tempPath) || !PbfLcMsRun.CheckFileFormatVersion(tempPath)) run.WriteAsPbf(tempPath);
-                    rafFilePath = tempPath;
+                    pbfFilePath = tempPath;
                 }
             }
 
-            return new LcMsRun(new PbfLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold), 0.0, 0.0);
+            return new LcMsRun(new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold), 0.0, 0.0);
         }
 
         public const double IsolationWindowBinningFactor = 10;
