@@ -455,5 +455,38 @@ namespace InformedProteomics.Test
             Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
         }
 
+        [TestCase("EAQADAAAEIAEDAAEAEDAGKPK", @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw", 54407)]
+        [TestCase("KYETIDSLQIDDLMNRREVRQPADWQADENGSNDKGNGKGEPAVKVDEVVKSAPAEAELKDADESPVK",
+                  @"\\protoapps\UserData\Wilkins\TopDown\Anil\QC_Shew_IntactProtein_new_CID-30CE-4Sep14_Bane_C2Column_3.raw", 2755)]
+        public void TestObsTheoMatch(string seqText, string rawFilePath, int scanNum)
+        {
+            var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
+            const int maxCharge = 15;
+            const double relIntThres = 0.1;
+
+            // init
+            var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(seqText);
+            var lcms = PbfLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var spectrum = lcms.GetSpectrum(scanNum);
+
+            var ionTypeFactory = new IonTypeFactory(maxCharge);
+            var iontypes = ionTypeFactory.GetAllKnownIonTypes();
+
+            foreach (var iontype in iontypes)
+            {
+                var ion = iontype.GetIon(sequence.Composition);
+                var obsPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, relIntThres);
+                if (obsPeaks == null) continue;
+                var isotopes = ion.GetIsotopes(relIntThres).ToArray();
+                for (int i = 0; i < isotopes.Length; i++)
+                {
+                    if (obsPeaks[i] == null) continue;
+                    var obsMz = obsPeaks[i].Mz;
+                    var theoMz = ion.GetIsotopeMz(isotopes[i].Index);
+                    var ppmError = (obsMz - theoMz)/theoMz*1e6;
+                    Assert.True(ppmError <= tolerance.GetValue());
+                }
+            }
+        }
     }
 }
