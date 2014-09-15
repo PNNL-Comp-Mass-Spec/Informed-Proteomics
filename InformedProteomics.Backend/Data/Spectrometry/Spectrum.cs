@@ -5,6 +5,7 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
+using MathNet.Numerics.Interpolation;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -411,6 +412,36 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             filteredPeaks.Sort();
             Peaks = filteredPeaks.ToArray();
         }
+
+        private void FilterNoiseBySlope(double slopeThreshold = 0.33)
+        {
+            if (Peaks.Length < 2) return;
+
+            float[] mzData = new float[Peaks.Length];
+            float[] intensityData = new float[Peaks.Length];
+            int i = 0;
+
+            for (i = 0; i < Peaks.Length; i++)
+            {
+                mzData[i] = (float) Peaks[i].Mz;
+                intensityData[i] = (float) Peaks[i].Intensity;
+            }
+
+            CubicSpline spline = new CubicSpline();
+            spline.Fit(mzData, intensityData);
+
+            float[] intensitySlope = spline.EvalSlope(mzData);
+
+            var filteredPeaks = new List<Peak>();
+
+            for (i = 0; i < Peaks.Length; i++)
+            {
+                if (Math.Abs(intensitySlope[i]) > slopeThreshold)
+                    filteredPeaks.Add(Peaks[i]);
+            }
+            Peaks = filteredPeaks.ToArray();
+        }
+
 
         private int _msLevel = 1;
 

@@ -172,6 +172,7 @@
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
+    <Compile Include="Utils\CubicSpline.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\ListUtil.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
     <Compile Include="Utils\SimpleStringProcessing.cs" />
+    <Compile Include="Utils\TriDiagonalMatrix.cs" />
     <Compile Include="Utils\TsvFileParser.cs" />
     <Compile Include="Utils\VennDiagram.cs" />
   </ItemGroup>
