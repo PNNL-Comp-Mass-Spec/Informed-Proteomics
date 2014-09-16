@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public const int FileFormatId = 150604;
         public const string FileExtension = ".pbf";
         
-        public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
+        public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType = MassSpecDataType.XCaliburRun)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
         }

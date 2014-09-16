@@ -126,6 +126,7 @@
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestResults.cs" />
     <Compile Include="TestUtils.cs" />
+    <Compile Include="TestYufengData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

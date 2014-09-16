@@ -454,7 +454,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             filteredSpec.FilterNoiseBySlope(slopeThreshold);
             return filteredSpec;
         }
-        
+
         private int _msLevel = 1;
 
         public int FindPeakIndex(double mz, Tolerance tolerance)

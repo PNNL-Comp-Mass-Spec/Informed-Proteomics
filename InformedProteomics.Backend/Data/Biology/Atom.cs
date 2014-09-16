@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("18O", 17.9991603, 18, "Oxigen"),
                 new Atom("F", 18.99840322, 19, "Fluorine"),
                 new Atom("Na", 22.9897677, 23, "Sodium"),
-                new Atom("P", 30.973762, 13, "Phosphorous"),
+                new Atom("P", 30.973762, 31, "Phosphorous"),
                 new Atom("S", S, 32, "Sulfur"),
                 new Atom("Cl", 34.96885272, 35, "Chlorine"),
                 new Atom("K", 38.9637074, 39, "Potassium"),
