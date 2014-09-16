@@ -46,7 +46,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            return new LcMsRun(new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold), 0.0, 0.0);
+            return new LcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
         public const double IsolationWindowBinningFactor = 10;

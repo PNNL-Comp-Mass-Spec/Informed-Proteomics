@@ -5,7 +5,6 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
-using MathNet.Numerics.Interpolation;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -413,13 +412,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = filteredPeaks.ToArray();
         }
 
-        private void FilterNoiseBySlope(double slopeThreshold = 0.33)
+        public void FilterNoiseBySlope(double slopeThreshold = 0.33)
         {
             if (Peaks.Length < 2) return;
 
-            float[] mzData = new float[Peaks.Length];
-            float[] intensityData = new float[Peaks.Length];
-            int i = 0;
+            var mzData = new float[Peaks.Length];
+            var intensityData = new float[Peaks.Length];
+            var i = 0;
 
             for (i = 0; i < Peaks.Length; i++)
             {
@@ -427,10 +426,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 intensityData[i] = (float) Peaks[i].Intensity;
             }
 
-            CubicSpline spline = new CubicSpline();
+            var spline = new CubicSpline();
             spline.Fit(mzData, intensityData);
 
-            float[] intensitySlope = spline.EvalSlope(mzData);
+            var intensitySlope = spline.EvalSlope(mzData);
 
             var filteredPeaks = new List<Peak>();
 
@@ -442,7 +441,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = filteredPeaks.ToArray();
         }
 
+        public Spectrum GetFilteredSpectrumBySignalToNoiseRatio(double signalToNoiseRatio = 1.4826)
+        {
+            var filteredSpec = (Spectrum)MemberwiseClone();
+            filteredSpec.FilterNoise(signalToNoiseRatio);
+            return filteredSpec;
+        }
 
+        public Spectrum GetFilteredSpectrumBySlope(double slopeThreshold = 0.33)
+        {
+            var filteredSpec = (Spectrum)MemberwiseClone();
+            filteredSpec.FilterNoiseBySlope(slopeThreshold);
+            return filteredSpec;
+        }
+        
         private int _msLevel = 1;
 
         public int FindPeakIndex(double mz, Tolerance tolerance)

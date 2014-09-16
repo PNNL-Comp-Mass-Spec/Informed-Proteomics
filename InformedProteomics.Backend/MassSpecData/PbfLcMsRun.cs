@@ -53,7 +53,7 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
             if (ReadMetaInfo() == false)
             {
-                throw new FormatException("Illegal raf file format!");
+                throw new FormatException("Illegal pbf file format!");
             }
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;

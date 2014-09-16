@@ -10,10 +10,12 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestLcMsRun
     {
-        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
-        public const string TestPbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.pbf";
-        public const string TestTopDownRawFilePathEtd = @"\\protoapps\UserData\Sangtae\TestData\E_coli_iscU_60_mock.raw";
-        public const string TestTopDownRawFilePathCid = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public const string TestPbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.pbf";
+        public const string TestTopDownRawFilePathEtd = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\E_coli_iscU_60_mock.raw";
+        public const string TestTopDownRawFilePathCid = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
+        public const string TestQExactiveRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+        public const string TestQExactivePbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
 
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()
@@ -214,5 +216,16 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("Done");
         }
 
+        [Test]
+        public void TestNoiseFiltration()
+        {
+            //var run = new PbfLcMsRun(TestQExactiveRawFilePath);
+            var run = PbfLcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
+            //var run = LcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
+            var spec = run.GetSpectrum(6747);
+            var filtered = spec.GetFilteredSpectrumBySignalToNoiseRatio();
+            var productSpec = filtered as ProductSpectrum;
+            Console.WriteLine(productSpec == null);
+        }
     }
 }

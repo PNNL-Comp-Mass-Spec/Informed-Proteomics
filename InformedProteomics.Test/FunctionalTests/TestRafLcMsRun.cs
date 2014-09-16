@@ -229,7 +229,7 @@ namespace InformedProteomics.Test.FunctionalTests
         }
 
         [Test]
-        public void TestRafGen()
+        public void TestPbfGen()
         {
             const string rafFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
             var args = new[] {"-s", rafFilePath};
