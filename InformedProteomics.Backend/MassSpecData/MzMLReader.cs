@@ -1199,7 +1199,11 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             case "MS:1000016":
                                 // name="scan start time"
-                                scan.StartTime = Convert.ToDouble(reader.GetAttribute("value"));
+                                double time = Convert.ToDouble(reader.GetAttribute("value"));
+                                bool isSeconds = reader.GetAttribute("unitName") == "second";
+                                // Should only see "second" and "minute"
+                                scan.StartTime = isSeconds ? time / 60.0 : time;
+                                //scan.StartTime = Convert.ToDouble(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000512":
                                 // name="filter string"
