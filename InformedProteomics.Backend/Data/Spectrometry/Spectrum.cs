@@ -549,6 +549,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return filteredSpec;
         }
 
+        public Spectrum GetFilteredSpectrumByIntensityHistogram(int windowSize = 3, double rankingRatioThreshold = 0.5)
+        {
+            var filteredSpec = (Spectrum)MemberwiseClone();
+            filteredSpec.FilterNosieByIntensityHistogram(windowSize, rankingRatioThreshold);
+            return filteredSpec;
+        }
+        
         public Spectrum GetFilteredSpectrumBySlope(double slopeThreshold = 0.33)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();
