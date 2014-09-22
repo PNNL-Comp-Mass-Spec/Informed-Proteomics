@@ -5,6 +5,8 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
+using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -412,7 +414,106 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = filteredPeaks.ToArray();
         }
 
-        public void FilterNoiseBySlope(double slopeThreshold = 0.33)
+        public void FilterNosieByIntensityHistogram(int windowSize = 3, double rankingRatioThreshold = 0.5)
+        {
+            var intensities = new double[Peaks.Length];
+            var numberOfBins = Math.Min(Math.Max((int) (0.01*(double)Peaks.Length), 10), 100);
+            var binIndices = new int[Peaks.Length];
+
+
+            for(int i = 0; i < Peaks.Length; i++)
+            {
+                intensities[i] = Peaks[i].Intensity;
+            }
+
+            var upper = intensities.Max();
+            var lower = intensities.Min();
+            var binWidth = (upper - lower)/numberOfBins;
+
+            var intensityHisto = new int[numberOfBins];
+
+            for(int i = 0; i < intensities.Length; i++)
+            {
+                var binIndex = (int) Math.Floor((intensities[i] - lower)/binWidth);
+                binIndex = Math.Max(Math.Min(binIndex, numberOfBins - 1), 0);
+                binIndices[i] = binIndex;
+                intensityHisto[binIndex]++;
+            }
+
+            int mostAbundantBinIndex = 0;
+            for(int i = 0; i < numberOfBins; i++)
+            {
+                if (intensityHisto[i] == intensityHisto.Max())
+                {
+                    mostAbundantBinIndex = i;
+                    break;
+                }
+            }
+
+            int localWinBegin = 0;
+            int localWinEnd = 0;
+            
+
+            var rankingRatio = new double[intensities.Length];
+
+            for (int i = 0; i < Peaks.Length; i++)
+            {
+                for (int j = i; j >= 0; j--)
+                {
+                    if (Peaks[j].Mz > Peaks[i].Mz - windowSize) localWinBegin = j;
+                    else break;
+                }
+
+                for (int j = i; j < Peaks.Length; j++)
+                {
+                    if (Peaks[j].Mz < Peaks[i].Mz + windowSize) localWinEnd = j;
+                    else break;
+                }
+                
+                double rank = 1;
+                for (int j = localWinBegin; j <= localWinEnd; j++)
+                {
+                    if (j == i) continue;
+                    if (Peaks[i].Intensity < Peaks[j].Intensity) rank++;
+                }
+                
+                rankingRatio[i] = rank/(localWinEnd - localWinBegin + 1);
+
+            }
+
+            var filteredPeaks = new List<Peak>();
+            var noisePeaks = new List<Peak>();
+
+            
+            for(int i = 0; i < intensities.Length; i++)
+            {
+                if (binIndices[i] == mostAbundantBinIndex && rankingRatio[i] > rankingRatioThreshold)
+                {
+                    noisePeaks.Add(Peaks[i]);
+                    
+                }
+                else
+                {
+                    filteredPeaks.Add(Peaks[i]);
+                }
+            }
+            /*
+            Console.WriteLine("--------- Removed Spectrum -----------------\n");
+            foreach (var peak in noisePeaks)
+            {
+                    Console.WriteLine("{0:0.0}\t{1:0.0}\t", peak.Mz, peak.Intensity);    
+            }
+            Console.WriteLine("-------------------- end --------------------\n");
+            Console.WriteLine("--------- filtered Spectrum -----------------\n");
+            foreach (var peak in filteredPeaks)
+            {
+                Console.WriteLine("{0:0.0}\t{1:0.0}\t", peak.Mz, peak.Intensity);
+            }
+            Console.WriteLine("-------------------- end --------------------\n");
+            */
+        }
+
+        public void FilterNoiseBySlope(double slopeThreshold = 10000)
         {
             if (Peaks.Length < 2) return;
 
@@ -432,7 +533,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var intensitySlope = spline.EvalSlope(mzData);
 
             var filteredPeaks = new List<Peak>();
-
+            
             for (i = 0; i < Peaks.Length; i++)
             {
                 if (Math.Abs(intensitySlope[i]) > slopeThreshold)
