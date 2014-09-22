@@ -6,6 +6,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics;
+using MathNet.Numerics.NumberTheory;
 using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
@@ -388,7 +389,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public void Display()
         {
             var sb = new StringBuilder();
-            sb.Append("--------- Spectrum -----------------\n");
+            //sb.Append("--------- Spectrum -----------------\n");
             foreach (var peak in Peaks)
             {
                 sb.Append(peak.Mz);
@@ -396,7 +397,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 sb.Append(peak.Intensity);
                 sb.Append("\n");
             }
-            sb.Append("--------------------------- end ---------------------------------------\n");
+            //sb.Append("--------------------------- end ---------------------------------------\n");
 
             Console.Write(sb.ToString());
         }
@@ -414,104 +415,70 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = filteredPeaks.ToArray();
         }
 
-        public void FilterNosieByIntensityHistogram(int windowSize = 3, double rankingRatioThreshold = 0.5)
+
+        private static Bucket GetMostAbundantIntensity(ref List<Peak> peaks)
         {
-            var intensities = new double[Peaks.Length];
-            var numberOfBins = Math.Min(Math.Max((int) (0.01*(double)Peaks.Length), 10), 100);
-            var binIndices = new int[Peaks.Length];
+            //int numberOfBins = Math.Min(Math.Max((int) (0.1*(double)peaks.Count), 5), 10);
+            const int numberOfBins = 4;
 
+            var iData = peaks.Select(t => t.Intensity).ToList();
+            var histogram = new Histogram(iData, numberOfBins);
 
-            for(int i = 0; i < Peaks.Length; i++)
-            {
-                intensities[i] = Peaks[i].Intensity;
-            }
-
-            var upper = intensities.Max();
-            var lower = intensities.Min();
-            var binWidth = (upper - lower)/numberOfBins;
-
-            var intensityHisto = new int[numberOfBins];
-
-            for(int i = 0; i < intensities.Length; i++)
-            {
-                var binIndex = (int) Math.Floor((intensities[i] - lower)/binWidth);
-                binIndex = Math.Max(Math.Min(binIndex, numberOfBins - 1), 0);
-                binIndices[i] = binIndex;
-                intensityHisto[binIndex]++;
-            }
-
+            double maxCount = 0;
             int mostAbundantBinIndex = 0;
-            for(int i = 0; i < numberOfBins; i++)
+            for (var i = 0; i < histogram.BucketCount; i++)
             {
-                if (intensityHisto[i] == intensityHisto.Max())
+                if (histogram[i].Count > maxCount)
                 {
+                    maxCount = histogram[i].Count;
                     mostAbundantBinIndex = i;
-                    break;
                 }
             }
-
-            int localWinBegin = 0;
-            int localWinEnd = 0;
             
+            return histogram[mostAbundantBinIndex];
+        }
 
-            var rankingRatio = new double[intensities.Length];
-
-            for (int i = 0; i < Peaks.Length; i++)
-            {
-                for (int j = i; j >= 0; j--)
-                {
-                    if (Peaks[j].Mz > Peaks[i].Mz - windowSize) localWinBegin = j;
-                    else break;
-                }
-
-                for (int j = i; j < Peaks.Length; j++)
-                {
-                    if (Peaks[j].Mz < Peaks[i].Mz + windowSize) localWinEnd = j;
-                    else break;
-                }
-                
-                double rank = 1;
-                for (int j = localWinBegin; j <= localWinEnd; j++)
-                {
-                    if (j == i) continue;
-                    if (Peaks[i].Intensity < Peaks[j].Intensity) rank++;
-                }
-                
-                rankingRatio[i] = rank/(localWinEnd - localWinBegin + 1);
-
-            }
-
+        public void FilterNosieByIntensityHistogram(double smallWinSize = 2.5)
+        {
             var filteredPeaks = new List<Peak>();
-            //var noisePeaks = new List<Peak>();
-            
-            for(int i = 0; i < intensities.Length; i++)
-            {
-                if (binIndices[i] == mostAbundantBinIndex && rankingRatio[i] > rankingRatioThreshold)
-                {
-                    //noisePeaks.Add(Peaks[i]);
-                }
-                else
-                {
-                    filteredPeaks.Add(Peaks[i]);
-                }
-            }
+            var intensities = new double[Peaks.Length];
+            double largeWinSize = smallWinSize*5;
 
+            foreach (var peak in Peaks)
+            {
+                var localPeaks = GetPeakListWithin(peak.Mz - largeWinSize, peak.Mz + largeWinSize);
+                var abundantIntensityBucket = GetMostAbundantIntensity(ref localPeaks);
+
+                double binIntensity = 0.5*(abundantIntensityBucket.LowerBound + abundantIntensityBucket.UpperBound);
+
+                if ((abundantIntensityBucket.LowerBound < peak.Intensity && peak.Intensity < abundantIntensityBucket.UpperBound) ||
+                    Math.Abs(binIntensity-peak.Intensity) < binIntensity*0.25)
+                {
+                    var neighborPeaks = GetPeakListWithin(peak.Mz - smallWinSize, peak.Mz + smallWinSize);
+
+                    if (neighborPeaks.Count < smallWinSize*2)
+                    {
+                        filteredPeaks.Add(peak);
+                        continue;
+                    }
+
+                    double rank = 1;
+                    foreach (var neighbor in neighborPeaks.Where(neighbor => neighbor.Intensity > peak.Intensity))
+                        rank++;
+
+
+                    if (rank < 2)
+                    {
+                        filteredPeaks.Add(peak);
+                        continue;
+                    }
+                    else
+                        filteredPeaks.Add(new Peak(peak.Mz, 0)); // noise peak
+                }
+                else filteredPeaks.Add(peak);
+            }
             filteredPeaks.Sort();
             Peaks = filteredPeaks.ToArray();
-            /*
-            Console.WriteLine("--------- Removed Spectrum -----------------\n");
-            foreach (var peak in noisePeaks)
-            {
-                    Console.WriteLine("{0:0.0}\t{1:0.0}\t", peak.Mz, peak.Intensity);    
-            }
-            Console.WriteLine("-------------------- end --------------------\n");
-            Console.WriteLine("--------- filtered Spectrum -----------------\n");
-            foreach (var peak in filteredPeaks)
-            {
-                Console.WriteLine("{0:0.0}\t{1:0.0}\t", peak.Mz, peak.Intensity);
-            }
-            Console.WriteLine("-------------------- end --------------------\n");
-            */
         }
 
         public void FilterNoiseBySlope(double slopeThreshold = 10000)
@@ -550,10 +517,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return filteredSpec;
         }
 
-        public Spectrum GetFilteredSpectrumByIntensityHistogram(int windowSize = 3, double rankingRatioThreshold = 0.5)
+        public Spectrum GetFilteredSpectrumByIntensityHistogram(double windowSize = 2.5)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();
-            filteredSpec.FilterNosieByIntensityHistogram(windowSize, rankingRatioThreshold);
+            filteredSpec.FilterNosieByIntensityHistogram(windowSize);
             return filteredSpec;
         }
         
