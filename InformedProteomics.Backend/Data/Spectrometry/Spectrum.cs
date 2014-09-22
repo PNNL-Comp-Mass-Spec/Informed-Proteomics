@@ -482,21 +482,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             var filteredPeaks = new List<Peak>();
-            var noisePeaks = new List<Peak>();
-
+            //var noisePeaks = new List<Peak>();
             
             for(int i = 0; i < intensities.Length; i++)
             {
                 if (binIndices[i] == mostAbundantBinIndex && rankingRatio[i] > rankingRatioThreshold)
                 {
-                    noisePeaks.Add(Peaks[i]);
-                    
+                    //noisePeaks.Add(Peaks[i]);
                 }
                 else
                 {
                     filteredPeaks.Add(Peaks[i]);
                 }
             }
+
+            filteredPeaks.Sort();
+            Peaks = filteredPeaks.ToArray();
             /*
             Console.WriteLine("--------- Removed Spectrum -----------------\n");
             foreach (var peak in noisePeaks)
