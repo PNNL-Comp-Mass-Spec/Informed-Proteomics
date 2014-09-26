@@ -142,12 +142,12 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
-    <Compile Include="MassSpecData\DiaLcMsRun.cs" />
+    <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MzMLReader.cs" />
     <Compile Include="MassSpecData\IChromatogramExtractor.cs" />
     <Compile Include="MassSpecData\ILcMsRun.cs" />
     <Compile Include="MassSpecData\ISpectrumExtractor.cs" />
-    <Compile Include="MassSpecData\LcMsRun.cs" />
+    <Compile Include="MassSpecData\InMemoryLcMsRun.cs" />
     <Compile Include="MassSpecData\IMassSpecDataReader.cs" />
     <Compile Include="MassSpecData\MassSpecDataType.cs" />
     <Compile Include="MassSpecData\ProteoWizardReader.cs" />
@@ -175,6 +175,7 @@
     <Compile Include="Utils\CubicSpline.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
+    <Compile Include="Utils\GeneratingFunctionForSkyline.cs" />
     <Compile Include="Utils\ListUtil.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\NoiseFilter.cs" />

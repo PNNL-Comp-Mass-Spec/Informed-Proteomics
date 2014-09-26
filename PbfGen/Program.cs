@@ -99,7 +99,7 @@ namespace PbfGen
                 {
                     Console.WriteLine("Creating {0} from {1}", rafFilePath, rawFilePath);
                     var reader = new XCaliburReader(rawFilePath);
-                    var run = new LcMsRun(reader, 0, 0);
+                    var run = new InMemoryLcMsRun(reader, 0, 0);
                     run.WriteAsPbf(rafFilePath);
                 }
             }

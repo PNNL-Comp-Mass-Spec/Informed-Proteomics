@@ -196,7 +196,7 @@ namespace InformedProteomics.Test.FunctionalTests
 //            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
             
 
-//            var lcms = LcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
+//            var lcms = InMemoryLcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 
 //            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
 

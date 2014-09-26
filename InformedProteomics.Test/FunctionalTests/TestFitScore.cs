@@ -15,7 +15,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestFitScoreCalculationCid()
         {
-            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(5743);
             Assert.True(spec != null);
 
@@ -43,7 +43,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestFitScoreCalculationEtd()
         {
-            var run = LcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(810) as ProductSpectrum;
             Assert.True(spec != null);
 

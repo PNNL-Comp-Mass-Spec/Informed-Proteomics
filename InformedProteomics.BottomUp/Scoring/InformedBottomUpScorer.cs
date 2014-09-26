@@ -14,7 +14,7 @@ namespace InformedProteomics.BottomUp.Scoring
 {
     public class InformedBottomUpScorer
     {
-        public InformedBottomUpScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance)
+        public InformedBottomUpScorer(InMemoryLcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance)
         {
             Run = run;
             AminoAcidSet = aaSet;
@@ -25,7 +25,7 @@ namespace InformedProteomics.BottomUp.Scoring
             _scoredSpectra = new Dictionary<int, ScoredSpectrum>();
         }
 
-        public LcMsRun Run { get; private set; }
+        public InMemoryLcMsRun Run { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
         public int MinProductCharge { get; private set; }
         public int MaxProductCharge { get; private set; }

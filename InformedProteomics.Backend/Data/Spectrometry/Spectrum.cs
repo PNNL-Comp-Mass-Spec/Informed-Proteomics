@@ -402,16 +402,38 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.Write(sb.ToString());
         }
 
-        public void FilterNoise(double signalToNoiseRatio = 1.4826)
+        //public void FilterNoise(double signalToNoiseRatio = 1.4826)
+        //{
+        //    if (Peaks.Length < 2) return;
+        //    Array.Sort(Peaks, new IntensityComparer());
+        //    var medianIntPeak = Peaks[Peaks.Length / 2];
+        //    var noiseLevel = medianIntPeak.Intensity;
+
+        //    var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel * signalToNoiseRatio)).ToList();
+
+        //    filteredPeaks.Sort();
+        //    Peaks = filteredPeaks.ToArray();
+        //}
+
+        public void FilterNoise(double? subSpectrumMzRange = null, double signalToNoiseRatio = 1.4826)
         {
-            if (Peaks.Length < 2) return;
-            Array.Sort(Peaks, new IntensityComparer());
-            var medianIntPeak = Peaks[Peaks.Length / 2];
-            var noiseLevel = medianIntPeak.Intensity;
+            var minMz = Peaks[0].Mz;
+            var maxMz = Peaks[Peaks.Length - 1].Mz;
+            var numSubSpectra = subSpectrumMzRange == null ? 1 : (int)((maxMz - minMz) / subSpectrumMzRange);
+            var range = (maxMz - minMz) / numSubSpectra;
 
-            var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel * signalToNoiseRatio)).ToList();
+            var subSpecList =
+                from p in Peaks
+                group p by Math.Min((int)((p.Mz-minMz)/range), numSubSpectra-1)
+                into subSpectra
+                select subSpectra;
 
-            filteredPeaks.Sort();
+            var filteredPeaks = new List<Peak>();
+            foreach (var subSpec in subSpecList)
+            {
+                //Console.WriteLine(subSpec.Key);
+                PeakListUtils.FilterNoise(subSpec.ToList(), ref filteredPeaks);
+            }
             Peaks = filteredPeaks.ToArray();
         }
 

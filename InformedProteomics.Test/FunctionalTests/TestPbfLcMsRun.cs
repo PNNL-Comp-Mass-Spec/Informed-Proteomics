@@ -11,15 +11,15 @@ using NUnit.Framework;
 namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
-    public class TestRafLcMsRun
+    public class TestPbfLcMsRun
     {
         [Test]
-        public void TestWritingRafFile()
+        public void TestWritingPbfFile()
         {
 //            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             //const string specFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             Console.WriteLine("Writing...");
             var sw = new System.Diagnostics.Stopwatch();
@@ -33,19 +33,19 @@ namespace InformedProteomics.Test.FunctionalTests
         }
 
         [Test]
-        public void TestReadingRafFile()
+        public void TestReadingPbfFile()
         {
-            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
-            var rafRun = new PbfLcMsRun(rafFilePath);
+            const string pbfFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            var pbfRun = new PbfLcMsRun(pbfFilePath);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             // spectrum comparison
             for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
             {
                 var spec1 = run.GetSpectrum(scanNum);
-                var spec2 = rafRun.GetSpectrum(scanNum);
+                var spec2 = pbfRun.GetSpectrum(scanNum);
 
                 Assert.IsTrue(spec1.Peaks.Length == spec2.Peaks.Length);
                 for (var i = 0; i < spec1.Peaks.Length; i++)
@@ -61,7 +61,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
             var xic1 = run.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
-            var xic2 = rafRun.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
+            var xic2 = pbfRun.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
             Assert.True(xic1.Count == xic2.Count);
             for (var i = 0; i < xic1.Count; i++)
             {
@@ -77,14 +77,14 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGetChrom()
         {
-            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
-            var rafRun = new PbfLcMsRun(rafFilePath);
+            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            var pbfRun = new PbfLcMsRun(rafFilePath);
 
             Console.WriteLine("Chromatogram");
             // chromatogram comparison
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
-            var xic = rafRun.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
+            var xic = pbfRun.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
             xic.Display();
 
             Console.WriteLine("Done");
@@ -94,7 +94,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestRunningTimeChromGen()
         {
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            //var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            //var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -143,7 +143,7 @@ namespace InformedProteomics.Test.FunctionalTests
 //            const string rawFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
 
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
@@ -165,7 +165,7 @@ namespace InformedProteomics.Test.FunctionalTests
         {
 //            const string rawFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";

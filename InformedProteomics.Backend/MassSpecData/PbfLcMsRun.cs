@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class PbfLcMsRun: ILcMsRun, IMassSpecDataReader
+    public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
     {
         public const int FileFormatId = 150604;
         public const string FileExtension = ".pbf";
@@ -23,10 +23,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (!File.Exists(rafFilePath) || !CheckFileFormatVersion(rafFilePath))
             {
-                LcMsRun run;
+                InMemoryLcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
                 {
-                    run = new LcMsRun(new XCaliburReader(specFilePath),
+                    run = new InMemoryLcMsRun(new XCaliburReader(specFilePath),
                         0, 0);
                 }
                 else run = null;
@@ -57,13 +57,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
+            
         }
 
-        public int MinLcScan { get; private set; }
-        public int MaxLcScan { get; private set; }
-        public bool IsDia { get; private set; }
-
-        public Spectrum GetSpectrum(int scanNum)
+        public override Spectrum GetSpectrum(int scanNum)
         {
             long offset;
             if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
@@ -73,81 +70,8 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
-        public double GetElutionTime(int scanNum)
-        {
-            double elutionTime;
-            return _scanNumElutionTimeMap.TryGetValue(scanNum, out elutionTime) ? elutionTime : 0.0;
-        }
 
-        public int GetMsLevel(int scanNum)
-        {
-            int msLevel;
-            return _scanNumToMsLevel.TryGetValue(scanNum, out msLevel) ? msLevel : 0;
-        }
-
-        public int GetPrevScanNum(int scanNum, int msLevel)
-        {
-            for (var curScanNum = scanNum - 1; curScanNum >= MinLcScan; curScanNum--)
-            {
-                if (GetMsLevel(curScanNum) == msLevel) return curScanNum;
-            }
-            return MinLcScan - 1;
-        }
-
-        public int GetNextScanNum(int scanNum, int msLevel)
-        {
-            for (var curScanNum = scanNum + 1; curScanNum <= MaxLcScan; curScanNum++)
-            {
-                if (GetMsLevel(curScanNum) == msLevel)
-                {
-                    return curScanNum;
-                }
-            }
-            return MaxLcScan + 1;
-        }
-
-        public IList<int> GetScanNumbers(int msLevel)
-        {
-            var scanNumbers = new List<int>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
-            {
-                if (GetMsLevel(scanNum) == msLevel) scanNumbers.Add(scanNum);
-            }
-            return scanNumbers;
-        }
-
-        public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
-        {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
-            var minMz = mz - tolTh;
-            var maxMz = mz + tolTh;
-            return GetFullPrecursorIonExtractedIonChromatogram(minMz, maxMz);
-        }
-
-        public Xic GetFullPrecursorIonExtractedIonChromatogram(double minMz, double maxMz)
-        {
-            var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
-
-            var hasXicPoint = new bool[MaxLcScan - MinLcScan + 1];
-            foreach (var xicPoint in xic) hasXicPoint[xicPoint.ScanNum - MinLcScan] = true;
-
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
-            {
-                if (GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum - MinLcScan]) xic.Add(new XicPoint(scanNum, 0, 0));
-            }
-            xic.Sort();
-            return xic;
-        }
-
-        public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
-        {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
-            var minMz = mz - tolTh;
-            var maxMz = mz + tolTh;
-            return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
-        }
-
-        public Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
+        public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
         {
             var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBebin, _offsetProductChromatogramEnd);
             if (targetOffset < _offsetProductChromatogramBebin) return new Xic();
@@ -167,15 +91,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return newXic;
         }
 
-        public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
-        {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
-            var minMz = mz - tolTh;
-            var maxMz = mz + tolTh;
-            return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
-        }
-
-        public Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
+        public override Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
             var minBinIndex = GetMzBinIndex(minMz);
             var maxBinIndex = GetMzBinIndex(maxMz);
@@ -228,56 +144,7 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader.Close();
         }
 
-        public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
-        {
-            // scan number: 4
-            writer.Write(spec.ScanNum);
 
-            // ms level: 1
-            writer.Write(Convert.ToByte(spec.MsLevel));
-
-            // elution time: 4
-            writer.Write(spec.ElutionTime);
-
-            var productSpec = spec as ProductSpectrum;
-            if (productSpec != null)    // product spectrum
-            {
-                var isolationWindow = productSpec.IsolationWindow;
-                // precursor mass: 8
-                writer.Write(isolationWindow.MonoisotopicMz ?? 0.0);
-                // precursor charge: 4
-                writer.Write(isolationWindow.Charge ?? 0);
-                // Activation method: 1
-                writer.Write((byte)productSpec.ActivationMethod);
-                // Isolation window target m/z: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
-                // Isolation window lower offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
-                // Isolation window uppoer offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
-            }
-            // Number of peaks: 4
-            writer.Write(spec.Peaks.Length);
-            foreach (var peak in spec.Peaks)
-            {
-                // m/z: 8
-                writer.Write(peak.Mz);
-                // intensity: 4
-                writer.Write(Convert.ToSingle(peak.Intensity));
-            }
-        }
-
-        /// <summary>
-        /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
-        /// </summary>
-        /// <param name="mostAbundantIsotopeMz"></param>
-        /// <returns>scan numbers of fragmentation spectra</returns>
-        public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
-        {
-            var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * LcMsRun.IsolationWindowBinningFactor);
-            int[] scanNums;
-            return _isolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
-        }
 
         private readonly BinaryReader _reader;
         private readonly double _precursorSignalToNoiseRatioThreshold;
@@ -290,9 +157,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private long _offsetChromatogramEnd;
         //private long _offsetMetaInfo;
 
-        private Dictionary<int, int> _scanNumToMsLevel;
-        private Dictionary<int, double> _scanNumElutionTimeMap;
-        private Dictionary<int, int[]> _isolationMzBinToScanNums;
+//        private Dictionary<int, int> _scanNumToMsLevel;
+//        private Dictionary<int, double> _scanNumElutionTimeMap;
+//        private Dictionary<int, int[]> _isolationMzBinToScanNums;
+
         private Dictionary<int, long> _scanNumToSpecOffset;
         private int _minMzIndex;
         private int _maxMzIndex;
@@ -303,6 +171,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private bool ReadMetaInfo()
         {
+            ScanNumToMsLevel = new Dictionary<int, int>();
+            ScanNumElutionTimeMap = new Dictionary<int, double>();
+            IsolationMzBinToScanNums = new Dictionary<int, int[]>();
+
             _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
             var fileFormatId = _reader.ReadInt32();
             if (fileFormatId != FileFormatId) return false;
@@ -319,8 +191,6 @@ namespace InformedProteomics.Backend.MassSpecData
             MinLcScan = _reader.ReadInt32();
             MaxLcScan = _reader.ReadInt32();
 
-            _scanNumToMsLevel = new Dictionary<int, int>();
-            _scanNumElutionTimeMap = new Dictionary<int, double>();
             _scanNumToSpecOffset = new Dictionary<int, long>();
             //_scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>();
             //_isolationMzBinToScanNums = new Dictionary<int, List<int>>();
@@ -330,8 +200,8 @@ namespace InformedProteomics.Backend.MassSpecData
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
                 var msLevel = _reader.ReadInt32();
-                _scanNumToMsLevel[scanNum] = msLevel;
-                _scanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
+                ScanNumToMsLevel[scanNum] = msLevel;
+                ScanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
                 if (msLevel == 2)
                 {
                     var minMz = _reader.ReadSingle();
@@ -340,10 +210,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         var isoWindow = new IsolationWindow((minMz + maxMz) / 2, (maxMz - minMz) / 2, (maxMz - minMz) / 2);
                         isoWindowSet.Add(isoWindow);
-                        if (isoWindowSet.Count >= LcMsRun.NumUniqueIsolationWindowThresholdForDia) isDda = true;
+                        if (isoWindowSet.Count >= NumUniqueIsolationWindowThresholdForDia) isDda = true;
                     }
-                    var minBinNum = (int)Math.Round(minMz * LcMsRun.IsolationWindowBinningFactor);
-                    var maxBinNum = (int)Math.Round(maxMz * LcMsRun.IsolationWindowBinningFactor);
+                    var minBinNum = (int)Math.Round(minMz * IsolationWindowBinningFactor);
+                    var maxBinNum = (int)Math.Round(maxMz * IsolationWindowBinningFactor);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
                         List<int> scanNumList;
@@ -358,15 +228,14 @@ namespace InformedProteomics.Backend.MassSpecData
                 _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
             }
 
-            IsDia = !isDda;
+            IsDiaOrNull = !isDda;
 
-            _isolationMzBinToScanNums = new Dictionary<int, int[]>();
             foreach (var entry in isolationMzBinToScanNums)
             {
                 var binNum = entry.Key;
                 entry.Value.Sort();
                 var scanNumList = entry.Value.ToArray();
-                _isolationMzBinToScanNums[binNum] = scanNumList;
+                IsolationMzBinToScanNums[binNum] = scanNumList;
             }
 
             var minIndex = _reader.ReadInt32();

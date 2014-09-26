@@ -421,7 +421,7 @@ namespace InformedProteomics.Test.Obsolete
         public void TestXicGen()
         {
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             // Test
             var tolerance = new Tolerance(30);
@@ -468,7 +468,7 @@ namespace InformedProteomics.Test.Obsolete
             const double fdrThreshold = 0.01;
 
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -569,7 +569,7 @@ namespace InformedProteomics.Test.Obsolete
             const double precursorTolerancePpm = 20;
 
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             const double fdrThreshold = 0.01;
 
             var tolerance = new Tolerance(precursorTolerancePpm);

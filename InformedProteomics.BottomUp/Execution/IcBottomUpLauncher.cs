@@ -91,7 +91,7 @@ namespace InformedProteomics.BottomUp.Execution
 
         public int NumTolerableTermini { get; private set; }
 
-        private LcMsRun _run;
+        private InMemoryLcMsRun _run;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedBottomUpScorer _bottomUpScorer;
 
@@ -101,7 +101,7 @@ namespace InformedProteomics.BottomUp.Execution
 
             Console.Write("Reading raw file...");
             sw.Start();
-            _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
             _bottomUpScorer = new InformedBottomUpScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;

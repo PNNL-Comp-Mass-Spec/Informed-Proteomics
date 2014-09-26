@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.Execution
         // 2: 1: #NCleavges <= Max AND Cleavages <= Max
         public int SearchMode { get; private set; } 
 
-        private LcMsRun _run;
+        private InMemoryLcMsRun _run;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedTopDownScorer _topDownScorer;
 
@@ -94,7 +94,7 @@ namespace InformedProteomics.TopDown.Execution
 
             Console.Write("Reading raw file...");
             sw.Start();
-            _run = LcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;

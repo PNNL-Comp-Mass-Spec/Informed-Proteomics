@@ -31,7 +31,7 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet();
 
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 2, 10, 0, 1.1);
             ms2Scorer.DeconvoluteProductSpectra();
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
@@ -75,7 +75,7 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet();
 
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
             var scorer = new InformedBottomUpScorer(run, aaSet, 1, 2, new Tolerance(10));
             //var refinedScore = scorer.GetScores(AminoAcid.PeptideNTerm, seqStr, AminoAcid.PeptideCTerm, composition,
             //    charge, ms2ScanNum);
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
             var msgfPlusResults = new MsGfResults(msgfPlusResulPath);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
             var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10), 1, 4,
                 400, 5000, 0.3, 0, 0);
 

@@ -65,7 +65,7 @@ namespace InformedProteomics.Test
             var charges = parser.GetData("Charge");
             var scans = parser.GetData("ScanNum");
 
-            var lcms = LcMsRun.GetLcMsRun(dataFile, MassSpecDataType.XCaliburRun, 0, 0);
+            var lcms = InMemoryLcMsRun.GetLcMsRun(dataFile, MassSpecDataType.XCaliburRun, 0, 0);
             var rankScorer =
     new DiaRankScore(
         @"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");

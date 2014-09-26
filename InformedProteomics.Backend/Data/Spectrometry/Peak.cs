@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Biology;
+using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -147,4 +149,54 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly double _toleranceTh;
     }
+
+    /// <summary>
+    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
+    /// </summary>
+    public class MzComparerWithBinning : IComparer<Peak>, IEqualityComparer<Peak>
+    {
+        public MzComparerWithBinning(int numBits = 27)
+        {
+            _numShifts = sizeof(double)*8 - numBits;
+        }
+
+        public bool Equals(Peak x, Peak y)
+        {
+            return GetBinNumber(x.Mz) == GetBinNumber(y.Mz);
+        }
+
+        public int GetHashCode(Peak p)
+        {
+            return GetBinNumber(p.Mz);
+        }
+
+        public int Compare(Peak x, Peak y)
+        {
+            return GetBinNumber(x.Mz).CompareTo(GetBinNumber(y.Mz));
+        }
+
+        public double GetRoundedValue(double mz)
+        {
+            var converted = BitConverter.DoubleToInt64Bits(mz);
+            var rounded = (converted >> _numShifts) << _numShifts;
+            var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
+            return roundedDouble;
+        }
+
+        public int GetBinNumber(double mz)
+        {
+            var converted = BitConverter.DoubleToInt64Bits(mz);
+            var rounded = (converted >> _numShifts) << _numShifts;
+            return (int)(rounded >> _numShifts);
+        }
+
+        public double GetMz(int binNum)
+        {
+            var rounded = (long)binNum << _numShifts;
+            return BitConverter.Int64BitsToDouble(rounded);
+        }
+
+        private readonly int _numShifts;
+    }
+
 }

@@ -9,7 +9,7 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class InformedTopDownScorer
     {
-        public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7)
+        public InformedTopDownScorer(InMemoryLcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7)
         {
             Run = run;
             AminoAcidSet = aaSet;
@@ -19,7 +19,7 @@ namespace InformedProteomics.TopDown.Scoring
             Ms2CorrThreshold = ms2CorrThreshold;
         }
 
-        public LcMsRun Run { get; private set; }
+        public InMemoryLcMsRun Run { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
         public int MinProductCharge { get; private set; }
         public int MaxProductCharge { get; private set; }

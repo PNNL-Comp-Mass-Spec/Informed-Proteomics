@@ -13,6 +13,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -428,6 +429,13 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestLinq()
+        {
+            var intArr = new List<double> {4.0, 1.0, 2.0, 6.0};
+            Console.WriteLine(intArr.Median());
+        }
+
+        [Test]
         public void TestRegularExpressions()
         {
             const string str = "C2HBr365Ag2";
@@ -450,7 +458,7 @@ namespace InformedProteomics.Test
         public void TestNumIsoWindows()
         {
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             Console.WriteLine("NumIsoWindows: " + run.GetNumUniqueIsoWindows());
             Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
         }

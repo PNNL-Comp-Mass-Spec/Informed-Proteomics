@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
+using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
@@ -10,6 +12,55 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestResults
     {
+        [Test]
+        public void SummarizeAnilResults()
+        {
+            const string resultFolder = @"H:\Research\Anil\Sep19_ETD";
+            var actMethods = new[] { ActivationMethod.CID, ActivationMethod.ETD, ActivationMethod.HCD };
+
+            Console.WriteLine("Data\tCID\t\tETD\t\tHCD\t");
+            Console.WriteLine("\tNumId\tMaxMass\tNumId\tMaxMass\tNumId\tMaxMass");
+            foreach (var rawFile in Directory.GetFiles(resultFolder, "*.raw"))
+            {
+                var datasetName = Path.GetFileNameWithoutExtension(rawFile);
+
+                var resultFile = Path.GetDirectoryName(rawFile) + Path.DirectorySeparatorChar + datasetName + "_IcTda.tsv";
+                var numId = new Dictionary<ActivationMethod, int>();
+                var maxMass = new Dictionary<ActivationMethod, double>();
+
+                foreach (var actMethod in actMethods)
+                {
+                    numId[actMethod] = 0;
+                    maxMass[actMethod] = 0.0;
+                }
+
+                var run = PbfLcMsRun.GetLcMsRun(rawFile);
+                var tsvParser = new TsvFileParser(resultFile);
+                var qValues = tsvParser.GetData("QValue").Select(Convert.ToDouble).ToArray();
+                var scanNums = tsvParser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
+                var masses = tsvParser.GetData("Mass").Select(Convert.ToDouble).ToArray();
+
+                for (var i = 0; i < qValues.Length; i++)
+                {
+                    if (qValues[i] > 0.01) break;
+                    var scanNum = scanNums[i];
+                    var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
+                    Assert.True(spec != null);
+                    ++numId[spec.ActivationMethod];
+
+                    var mass = masses[i];
+                    if (mass > maxMass[spec.ActivationMethod]) maxMass[spec.ActivationMethod] = mass;
+                }
+                Console.Write(datasetName);
+                foreach (var actMethod in actMethods)
+                {
+                    Console.Write("\t" + numId[actMethod]);
+                    Console.Write("\t" + maxMass[actMethod]);
+                }
+                Console.WriteLine();
+            }
+        }
+
         [Test]
         public void CountIdentifiedPeptides()
         {

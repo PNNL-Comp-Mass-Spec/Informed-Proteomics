@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -128,7 +130,7 @@ namespace InformedProteomics.Backend.Utils
             var intersection = new List<Peak>();
             while (index1 < count1 && index2 < count2)
             {
-                var comp = peakList1[index1].CompareTo(peakList2[index2]);
+                var comp = comparer.Compare(peakList1[index1], peakList2[index2]);
                 if (comp < 0) ++index1;
                 else if (comp > 0) ++index2;
                 else
@@ -185,7 +187,7 @@ namespace InformedProteomics.Backend.Utils
                 var p1 = peakList1[index1];
                 var p2 = peakList2[index2];
 
-                var comp = p1.CompareTo(p2);
+                var comp = comparer.Compare(peakList1[index1], peakList2[index2]);
                 if (comp < 0)
                 {
                     sum.Add(p1);
@@ -207,6 +209,16 @@ namespace InformedProteomics.Backend.Utils
             while (index2 < count2) sum.Add(peakList2[index2++]);
 
             return sum;
+        }
+
+        // startIndex: inclusive
+        // endIndex: exclusive
+        public static void FilterNoise(IList<Peak> peakList, 
+            ref List<Peak> filteredPeakList, double signalToMedianRatio = 1.4826)
+        {
+            //var medianIntensity = peakList.OrderByDescending(p => p.Intensity).Select(p => p.Intensity).Median();
+            var medianIntensity = peakList.Select(p => p.Intensity).Median();
+            filteredPeakList.AddRange(peakList.OrderByDescending(p => p.Intensity).TakeWhile(p => !(p.Intensity < medianIntensity * signalToMedianRatio)).OrderBy(p => p.Mz));
         }
     }
 }

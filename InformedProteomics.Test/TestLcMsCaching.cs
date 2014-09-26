@@ -23,7 +23,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Reading run: {0:f4} sec", sec);
@@ -139,7 +139,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Reading run: {0:f4} sec", sec);
@@ -284,11 +284,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFloatingPointRounding()
         {
+            const int numShifts = 36;
             const double value = 7655.9568537625;
             var converted = BitConverter.DoubleToInt64Bits(value);
-            var rounded = (converted >> 37) << 37;
-            Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, (converted >> 37) << 37);
-            Console.WriteLine("{0}\t{1}", value, BitConverter.Int64BitsToDouble(rounded));
+            var rounded = (converted >> numShifts) << numShifts;
+            var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
+            var roundedInt = (int) (rounded >> 32);
+            Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, rounded);
+            Console.WriteLine("{0}\t{1}", value, roundedDouble);
+            Console.WriteLine("PPM error: {0}", (roundedDouble - value) / value * 1E6);
+            Console.WriteLine("{0,16:X8}", roundedInt);
         }
 
         [Test]
@@ -297,7 +302,7 @@ namespace InformedProteomics.Test
             //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
 
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -325,7 +330,7 @@ namespace InformedProteomics.Test
                 @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.decoy.icresult";
                 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             //const int minPrecursorCharge = 3;
             //const int maxPrecursorCharge = 30;
@@ -380,8 +385,8 @@ namespace InformedProteomics.Test
 
                 var apexScanNum = xicMostAbundant.GetApexScanNum();
                 if (apexScanNum < run.MinLcScan) apexScanNum = scanNum;
-                var sumSpec = run.GetSummedMs1Spectrum(apexScanNum);
-                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
+                //var sumSpec = run.GetSummedMs1Spectrum(apexScanNum);
+//                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
 //                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
 
                 var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12/charge, tolerance, scanNum);
@@ -396,9 +401,9 @@ namespace InformedProteomics.Test
                 var xicChargePlusOne = run.GetPrecursorExtractedIonChromatogram(precursorIonChargePlusOne.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var chargePlusOneCorr = xicMostAbundant.GetCorrelation(xicChargePlusOne);
 
-                var max = new[] {preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr}.Max();
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
-                    scanNum, score, preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr, max, xicMostAbundant.Count);
+                //var max = new[] {preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr}.Max();
+                //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+                //    scanNum, score, preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr, max, xicMostAbundant.Count);
             }
 
             //Console.WriteLine("Histogram");
@@ -412,7 +417,7 @@ namespace InformedProteomics.Test
         public void TestMs2Caching()
         {
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
 
             const int minPrecursorIonCharge = 3; // 3
             const int maxPrecursorIonCharge = 30;// 67

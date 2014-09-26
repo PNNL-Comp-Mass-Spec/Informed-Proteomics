@@ -13,7 +13,7 @@ namespace InformedProteomics.DIA.Search
     public class InformedProteomicsAnalysis
     {
         public InformedProteomicsAnalysis(
-            LcMsRun run,
+            InMemoryLcMsRun run,
             IEnumerable<string> peptideEnumerator,
             AminoAcidSet aminoAcidSet): this(run, peptideEnumerator, aminoAcidSet, 1, 3)
         {
@@ -21,7 +21,7 @@ namespace InformedProteomics.DIA.Search
         }
 
         public InformedProteomicsAnalysis(
-            LcMsRun run, 
+            InMemoryLcMsRun run, 
             IEnumerable<string> peptideEnumerator, 
             AminoAcidSet aminoAcidSet, 
             int minCharge, 
@@ -34,7 +34,7 @@ namespace InformedProteomics.DIA.Search
             MaxCharge = maxCharge;
         }
 
-        public LcMsRun Run { get; private set; }
+        public InMemoryLcMsRun Run { get; private set; }
         public IEnumerable<string> PeptideEnumerator { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
         public int MinCharge { get; private set; }

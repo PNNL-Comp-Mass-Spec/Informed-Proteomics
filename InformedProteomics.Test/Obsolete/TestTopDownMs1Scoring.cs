@@ -39,7 +39,7 @@ namespace InformedProteomics.Test.Obsolete
             sw.Start();
             Console.Write("Reading raw file...");
             const string specFilePath = @"C:\workspace\TopDown\E_coli_iscU_60_mock.raw";
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             sw.Stop();
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -146,7 +146,7 @@ namespace InformedProteomics.Test.Obsolete
                 };
             var aaSet = new AminoAcidSet(searchModifications, 0);
             var precursorTolerance = new Tolerance(10);
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             var writer = new StreamWriter(msAlignPlusResultPath+ ".txt");
             var reader = new StreamReader(msAlignPlusResultPath);
 
@@ -218,7 +218,7 @@ namespace InformedProteomics.Test.Obsolete
 
           //  TopDownScorer.MaxCharge = 60;
           //  TopDownScorer.MinCharge = 3;
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             
             foreach (var protComposition in seqGraph.GetSequenceCompositions())
             {

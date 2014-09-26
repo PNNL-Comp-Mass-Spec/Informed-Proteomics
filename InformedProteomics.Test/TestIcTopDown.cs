@@ -342,9 +342,9 @@ namespace InformedProteomics.Test
             var graph = SequenceGraph.CreateGraph(aaSet, annotation);
             Console.WriteLine("NumProteoforms: " + graph.GetNumProteoforms());
 
-            var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
-            ms2Scorer.DeconvoluteProductSpectra(ms2ScanNum);
+            ms2Scorer.DeconvoluteProductSpectrum(ms2ScanNum);
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
             if (scorer == null)
             {

@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _map = new Dictionary<int, IList<IntRange>>();
         }
 
-        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
+        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, InMemoryLcMsRun run)
         {
             var massBinNum = GetBinNumber(sequenceMass);
             IEnumerable<int> ms2ScanNums;
@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new int[0];
         }
 
-        public void CreateSequenceMassToMs2ScansMap(LcMsRun run, Tolerance tolerance, double minMass, double maxMass)
+        public void CreateSequenceMassToMs2ScansMap(InMemoryLcMsRun run, Tolerance tolerance, double minMass, double maxMass)
         {
             // Make a bin to scan numbers map without considering tolerance
             var massBinToScanNumsMapNoTolerance = new Dictionary<int, List<int>>();

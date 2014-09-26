@@ -149,7 +149,7 @@ namespace InformedProteomics.Test.Obsolete
             var rawFilePath =
                 @"D:\Research\Data\EDRN\DDA\raw\" + Path.GetFileNameWithoutExtension(resultFilePath) + ".raw";
             var reader = new XCaliburReader(rawFilePath);
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
 
             var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
 

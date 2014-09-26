@@ -11,7 +11,7 @@ namespace InformedProteomics.TopDown.Scoring
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
-            LcMsRun run, 
+            ILcMsRun run, 
             int minProductCharge = 1, int maxProductCharge = 10,
             double productTolerancePpm = 10,
             int isotopeOffsetTolerance = 2,
@@ -22,7 +22,7 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         public ProductScorerBasedOnDeconvolutedSpectra(
-            LcMsRun run,
+            ILcMsRun run,
             int minProductCharge, int maxProductCharge,
             Tolerance productTolerance,
             int isotopeOffsetTolerance = 2, 
@@ -34,6 +34,7 @@ namespace InformedProteomics.TopDown.Scoring
             _productTolerance = productTolerance;
             FilteringWindowSize = filteringWindowSize;
             IsotopeOffsetTolerance = isotopeOffsetTolerance;
+            _ms2Scorer = new Dictionary<int, IScorer>();
         }
 
         public double FilteringWindowSize { get; private set; }    // 1.1
@@ -48,7 +49,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         public void DeconvoluteProductSpectra()
         {
-            _ms2Scorer = new Dictionary<int, IScorer>();
             foreach (var scanNum in _run.GetScanNumbers(2))
             {
                 var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
@@ -59,16 +59,14 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        public void DeconvoluteProductSpectra(int scanNum)
+        public void DeconvoluteProductSpectrum(int scanNum)
         {
-            _ms2Scorer = new Dictionary<int, IScorer>();
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec == null) return;
             //if (spec.ScanNum != 879) continue;
             var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
             if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
         }
-
 
         public Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
         {
@@ -177,9 +175,9 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private Dictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
+        private readonly Dictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
 
-        private readonly LcMsRun _run;
+        private readonly ILcMsRun _run;
         private readonly int _minProductCharge;
         private readonly int _maxProductCharge;
         private readonly Tolerance _productTolerance;

@@ -11,7 +11,7 @@ namespace InformedProteomics.TopDown.Scoring
     public class Ms1IsotopeMostAbundantPlusOneFilter : ISequenceFilter
     {
         public Ms1IsotopeMostAbundantPlusOneFilter(
-            LcMsRun run,
+            InMemoryLcMsRun run,
             int minCharge = 3, int maxCharge = 30,
             double ppmTolerance = 10,
             double minMass = 3000.0,
@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public int MaxNumPeaksToConsider { get; private set; }
 
-        private readonly LcMsRun _run;
+        private readonly InMemoryLcMsRun _run;
         private readonly int _minCharge;
         private readonly int _maxCharge;
         private readonly Tolerance _tolerance;

@@ -20,7 +20,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()
         {
-            var run = LcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun);
 
             var msLevel = new Dictionary<int, int>();
 
@@ -73,7 +73,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //    var sw = new System.Diagnostics.Stopwatch();
 
         //    sw.Start();
-        //    var run = new LcMsRun(new OldPbfReader(TestPbfFilePath));
+        //    var run = new InMemoryLcMsRun(new OldPbfReader(TestPbfFilePath));
         //    Console.WriteLine(run.MaxLcScan);
         //    var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
         //    Console.WriteLine(@"Done. {0:f4} sec", sec);
@@ -86,7 +86,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             sw.Start();
 
-            var run = LcMsRun.GetLcMsRun(TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(TestTopDownRawFilePathCid, MassSpecDataType.XCaliburRun);
 
             const int scanNum = 425;
             var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
@@ -132,7 +132,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestReadingDiaRawFile()
         {
             const string rawFilePath = @"H:\Research\Jarret\20mz\raw\Q_2014_0523_28_100_amol_uL_20mz.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(100);
             spec.Display();
         }
@@ -141,7 +141,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //public void TestGeneratingProductXic()
         //{
         //    const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
-        //    var run1 = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+        //    var run1 = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
         //    var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
 
         //    var mz = 1401.643;
@@ -166,7 +166,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestGeneratingProductManyXics()
         {
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
-            var run = LcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
             //var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
 
             var tolerance = new Tolerance(10);
@@ -221,7 +221,7 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             //var run = new PbfLcMsRun(TestQExactiveRawFilePath);
             var run = PbfLcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
-            //var run = LcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
+            //var run = InMemoryLcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
             var spec = run.GetSpectrum(6747);
             var filtered = spec.GetFilteredSpectrumBySignalToNoiseRatio();
             var productSpec = filtered as ProductSpectrum;

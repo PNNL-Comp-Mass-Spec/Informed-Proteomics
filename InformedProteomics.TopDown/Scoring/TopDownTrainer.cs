@@ -12,10 +12,10 @@ namespace InformedProteomics.TopDown.Scoring
         private Dictionary<int, Dictionary<int, int>> _xicCorrScoreCounterTarget;    // charge, correlation raw score, count
         private Dictionary<int, int> _missingXicCounterDecoy; // charge, count
         private Dictionary<int, Dictionary<int, int>> _xicCorrScoreCounterDecoy;    // charge, correlation raw score, count
-        private LcMsRun _run;
+        private InMemoryLcMsRun _run;
         private Tolerance _tolerance;
 
-        public void Train(string outFileName, LcMsRun run, Tolerance tolerance, string annotationFileName)
+        public void Train(string outFileName, InMemoryLcMsRun run, Tolerance tolerance, string annotationFileName)
         {
             // charge, scan number, protein
             _run = run;
