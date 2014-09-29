@@ -117,6 +117,7 @@
     <Compile Include="Data\Composition\IsotopomerEnvelope.cs" />
     <Compile Include="Data\Sequence\Cleavage.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
+    <Compile Include="Data\Spectrometry\ChargeLcScanMatrix.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
