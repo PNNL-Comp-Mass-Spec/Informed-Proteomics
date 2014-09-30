@@ -95,6 +95,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\x64\ProteowizardWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="QuickGraph">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Data">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>
     </Reference>
@@ -171,6 +183,10 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
+    <Compile Include="SequenceTag\CandidatePathManager.cs" />
+    <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
+    <Compile Include="SequenceTag\ScoringFunction.cs" />
+    <Compile Include="SequenceTag\SequenceTagFinder.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
     <Compile Include="Utils\CubicSpline.cs" />
@@ -191,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

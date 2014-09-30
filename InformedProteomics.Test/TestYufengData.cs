@@ -14,14 +14,16 @@ using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
+using InformedProteomics.Backend.SequenceTag;
 
 namespace InformedProteomics.Test
 {
     [TestFixture]
     public class TestYufengData
     {
-        public const string TestRawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
-
+        //public const string TestRawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
+        public const string TestRawFilePath = @"D:\Vlad_TopDown\raw\yufeng_column_test2.raw";
+        
         private static readonly IEnumerable<int> Ms2ScanNums = new[] { 46454, 46475, 46484, 46506, 46562, 46661 };
         private class SimpleMs1Filter : ISequenceFilter
         {
@@ -294,7 +296,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingXicsOfAllCharges()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
             var comparer = new MzComparerWithBinning(27);
             const string protSequence =
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
@@ -322,5 +325,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
             }
         }
+    
     }
 }

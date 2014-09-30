@@ -92,6 +92,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChargeLcScanMatrix.cs" />
     <Compile Include="FunctionalTests\TestMzMLReader.cs" />
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
@@ -124,11 +125,13 @@
     <Compile Include="TestRankScore.cs" />
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestResults.cs" />
+    <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
