@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -105,6 +106,20 @@ namespace InformedProteomics.Backend.Utils
                 yield return factor;
                 if (factor * factor != x) yield return x / factor;
             }
+        }
+
+        static public double GetKLDivergence(double[] P, double[] Q)
+        {
+            var ret = P.Select((t, i) => t*(Math.Log(t) - Math.Log(Q[i]))).Sum();
+
+            if (ret > 10000)
+            {
+                int a = 0;
+
+
+            }
+
+            return ret;
         }
     }
 }
