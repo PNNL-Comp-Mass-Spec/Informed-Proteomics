@@ -16,117 +16,9 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-
-    public class ChargeLcScanCluster
-    {
-        public double Score { get; private set; }
-
-        public List<ChargeLcScanCell> Members;
-        public double[] ObservedEnvelope;
-
-        public double HighestIntensity
-        {
-            get 
-            {
-                return Members.Count < 1 ? 0.0 : Members[0].Intensity;
-            }
-        }
-        
-
-        public ChargeLcScanCluster()
-        {
-            Score = -1;
-            Members = new List<ChargeLcScanCell>();
-        }
-
-        public void Add(ChargeLcScanCell cell, double[,,] data, double[] envelopePdf, double _score = -1)
-        {
-            var nEnvelope = data.GetLength(2);
-
-            if (ObservedEnvelope == null)
-                ObservedEnvelope = new double[nEnvelope];
-
-            Members.Add(cell);
-
-            for (var k = 0; k < nEnvelope; k++)
-                ObservedEnvelope[k] += data[cell.Row, cell.Col, k];
-
-            Score = _score >= 0 ? _score : ComputeScore(envelopePdf, ObservedEnvelope);
-        }
-
-        public double GetNewScore(ChargeLcScanCell cell, double[,,] data, double[] envelopePdf)
-        {
-            var nEnvelope = data.GetLength(2);
-            var tempEnvelope = new double[nEnvelope];
-
-            for (var k = 0; k < nEnvelope; k++)
-                tempEnvelope[k] = ObservedEnvelope[k] + data[cell.Row, cell.Col, k];
-
-            var newScore = ComputeScore(envelopePdf, tempEnvelope);
-
-            return newScore;
-        }
-
-        public static double ComputeScore(double[] envelopPdf, double[] observedEnvelope)
-        {
-            const double minIntensity = 1E-6;
-            var normalizedEnv = new double[observedEnvelope.Length];
-
-            var sum = observedEnvelope.Sum();
-            bool foundZero = false;
-            for (var k = 0; k < envelopPdf.Length; k++)
-            {
-                normalizedEnv[k] = observedEnvelope[k] / sum;
-                if (normalizedEnv[k] < minIntensity)
-                {
-                    normalizedEnv[k] = minIntensity;
-                    foundZero = true;
-                }
-            }
-
-            if (!foundZero) return SimpleMath.GetKLDivergence(envelopPdf, normalizedEnv);
-
-            sum = normalizedEnv.Sum();
-            for (var k = 0; k < envelopPdf.Length; k++)
-                normalizedEnv[k] = normalizedEnv[k] / sum;
-
-            return SimpleMath.GetKLDivergence(envelopPdf, normalizedEnv);
-        }
-        
-    }
-
-    public class ChargeLcScanCell //: IComparable<ChargeLcScanCell>
-    {
-        public int Row;
-        public int Col;
-        public double Intensity;
-
-        public ChargeLcScanCell(int row, int col, double intensity)
-        {
-            Row = row;
-            Col = col;
-            Intensity = intensity;
-        }
-
-        public int ChargeIndex
-        {
-            get { return Row; }
-        }
-
-        public int ScanIndex
-        {
-            get { return Col;  }
-        }
-
-        //public int CompareTo(ChargeLcScanCell other)
-        //{
-        //    return Intensity.CompareTo(other.Intensity);
-        //}
-    }
-
     public class ChargeLcScanMatrix : ILcMsMap
     {
-        private LcMsRun _run;
+        private readonly LcMsRun _run;
         public int NumberOfScans { get; private set; }
         public int MinCharge { get; private set; }
         public int MaxCharge { get; private set; }
@@ -423,5 +315,110 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 yield  return new ChargeLcScanCluster(minC, maxC, startScanNum, endScanNum);
             }
         }*/
+    }
+
+    public class ChargeLcScanCluster
+    {
+        public double Score { get; private set; }
+
+        public List<ChargeLcScanCell> Members;
+        public double[] ObservedEnvelope;
+
+        public double HighestIntensity
+        {
+            get 
+            {
+                return Members.Count < 1 ? 0.0 : Members[0].Intensity;
+            }
+        }
+
+        public ChargeLcScanCluster()
+        {
+            Score = -1;
+            Members = new List<ChargeLcScanCell>();
+        }
+
+        public void Add(ChargeLcScanCell cell, double[,,] data, double[] envelopePdf, double _score = -1)
+        {
+            var nEnvelope = data.GetLength(2);
+
+            if (ObservedEnvelope == null)
+                ObservedEnvelope = new double[nEnvelope];
+
+            Members.Add(cell);
+
+            for (var k = 0; k < nEnvelope; k++)
+                ObservedEnvelope[k] += data[cell.Row, cell.Col, k];
+
+            Score = _score >= 0 ? _score : ComputeScore(envelopePdf, ObservedEnvelope);
+        }
+
+        public double GetNewScore(ChargeLcScanCell cell, double[,,] data, double[] envelopePdf)
+        {
+            var nEnvelope = data.GetLength(2);
+            var tempEnvelope = new double[nEnvelope];
+
+            for (var k = 0; k < nEnvelope; k++)
+                tempEnvelope[k] = ObservedEnvelope[k] + data[cell.Row, cell.Col, k];
+
+            var newScore = ComputeScore(envelopePdf, tempEnvelope);
+
+            return newScore;
+        }
+
+        public static double ComputeScore(double[] envelopPdf, double[] observedEnvelope)
+        {
+            const double minIntensity = 1E-6;
+            var normalizedEnv = new double[observedEnvelope.Length];
+
+            var sum = observedEnvelope.Sum();
+            bool foundZero = false;
+            for (var k = 0; k < envelopPdf.Length; k++)
+            {
+                normalizedEnv[k] = observedEnvelope[k] / sum;
+                if (normalizedEnv[k] < minIntensity)
+                {
+                    normalizedEnv[k] = minIntensity;
+                    foundZero = true;
+                }
+            }
+
+            if (!foundZero) return SimpleMath.GetKLDivergence(envelopPdf, normalizedEnv);
+
+            sum = normalizedEnv.Sum();
+            for (var k = 0; k < envelopPdf.Length; k++)
+                normalizedEnv[k] = normalizedEnv[k] / sum;
+
+            return SimpleMath.GetKLDivergence(envelopPdf, normalizedEnv);
+        }
+    }
+
+    public class ChargeLcScanCell //: IComparable<ChargeLcScanCell>
+    {
+        public int Row;
+        public int Col;
+        public double Intensity;
+
+        public ChargeLcScanCell(int row, int col, double intensity)
+        {
+            Row = row;
+            Col = col;
+            Intensity = intensity;
+        }
+
+        public int ChargeIndex
+        {
+            get { return Row; }
+        }
+
+        public int ScanIndex
+        {
+            get { return Col;  }
+        }
+
+        //public int CompareTo(ChargeLcScanCell other)
+        //{
+        //    return Intensity.CompareTo(other.Intensity);
+        //}
     }
 }
