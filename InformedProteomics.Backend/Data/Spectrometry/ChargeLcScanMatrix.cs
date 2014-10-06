@@ -124,7 +124,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         //}
     }
 
-    public class ChargeLcScanMatrix
+    public class ChargeLcScanMatrix : ILcMsMap
     {
         private LcMsRun _run;
         public int NumberOfScans { get; private set; }
@@ -179,8 +179,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     var abundantIsotopeMz = Ion.GetIsotopeMz(proteinMass, charge, isotopeIndex);
                     var binNum = comparer.GetBinNumber(abundantIsotopeMz);
 
-                    var mz = comparer.GetMz(binNum);
-                    var mzNext = comparer.GetMz(binNum + 1);
+                    var mz = comparer.GetMzAverage(binNum);
+                    var mzNext = comparer.GetMzAverage(binNum + 1);
 
                     var xic = _run.GetFullPrecursorIonExtractedIonChromatogram(mz, mzNext);
 
