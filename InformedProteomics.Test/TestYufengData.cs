@@ -261,7 +261,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneringAllXics()
         {
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            //var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             Assert.True(run != null);
             var comparer = new MzComparerWithBinning(27);
             const double minMz = 600.0; // 600.0
@@ -281,8 +282,9 @@ namespace InformedProteomics.Test
                 //var between = 0.4*mz + 0.6*mzNext;
                 //Console.WriteLine(comparer.GetBinNumber(mz) + " " + comparer.GetBinNumber(between) + " " + comparer.GetBinNumber(mzNext));
                 //Assert.True(binNum == comparer.GetBinNumber(mzNextMinusEpsilon));
-                //run.GetFullPrecursorIonExtractedIonChromatogram(mz, mzNext);
-                run.GetPrecursorExtractedIonChromatogram(mzStart, mzEnd);
+                //run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
+                run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
+                //run.GetPrecursorExtractedIonChromatogram(mzStart, mzEnd);
                 //if(++numBinsProcessed % 1000 == 0) Console.WriteLine(numBinsProcessed);
             }
             sw.Stop();

@@ -57,17 +57,28 @@ namespace InformedProteomics.Backend.MassSpecData
         // minScanNum, maxScanNum: inclusive
         public Spectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
         {
-            var mzComparer = new MzComparerWithBinning();
             if (minScanNum < MinLcScan) minScanNum = MinLcScan;
             if (maxScanNum > MaxLcScan) maxScanNum = MaxLcScan;
 
-            //var summedPeakList = new List<Peak>();
-            var mzDic = new Dictionary<int, List<double>>();
-            var intDic = new Dictionary<int, double>();
-
+            var scanNums = new List<int>();
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
                 if (GetMsLevel(scanNum) != 1) continue;
+                scanNums.Add(scanNum);
+            }
+
+            return GetSummedSpectrum(scanNums, minScanNum);
+        }
+
+        public Spectrum GetSummedSpectrum(IEnumerable<int> scanNums, int repScanNum = 0)
+        {
+            var mzComparer = new MzComparerWithBinning();
+
+            var mzDic = new Dictionary<int, List<double>>();
+            var intDic = new Dictionary<int, double>();
+
+            foreach (var scanNum in scanNums)
+            {
                 var spec = GetSpectrum(scanNum);
                 if (spec == null) continue;
                 foreach (var peak in spec.Peaks)
@@ -98,7 +109,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             summedPeakList.Sort();
 
-            return new Spectrum(summedPeakList, minScanNum);
+            return new Spectrum(summedPeakList, repScanNum);
         }
 
         /// <summary>
@@ -221,6 +232,23 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             xic.Sort();
             return xic;
+        }
+
+        private int[] _ms1ScanVector;
+
+        public int[] GetMs1ScanVector()
+        {
+            return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
+        }
+
+        public double[] GetFullPrecursorIonExtractedIonChromatogramVector(double minMz, double maxMz)
+        {
+            var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
+
+            var xicIntensityVector = new double[MaxLcScan - MinLcScan + 1];
+            foreach (var xicPoint in xic) xicIntensityVector[xicPoint.ScanNum - MinLcScan] = xicPoint.Intensity;
+            var intVector = GetMs1ScanVector().Select(s => xicIntensityVector[s - MinLcScan]).ToArray();
+            return intVector;
         }
 
         /// <summary>
@@ -463,7 +491,6 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private int[] _precursorScan;
         private int[] _nextScan;
-
 
         protected void CreatePrecursorNextScanMap()
         {
