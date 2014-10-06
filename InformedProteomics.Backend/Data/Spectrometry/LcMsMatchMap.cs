@@ -4,6 +4,7 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Integration.Algorithms;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
@@ -15,7 +16,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _map = new Dictionary<int, IList<IntRange>>();
         }
 
-        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, InMemoryLcMsRun run)
+        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
         {
             var massBinNum = GetBinNumber(sequenceMass);
             IEnumerable<int> ms2ScanNums;
@@ -23,7 +24,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new int[0];
         }
 
-        public void CreateSequenceMassToMs2ScansMap(InMemoryLcMsRun run, Tolerance tolerance, double minMass, double maxMass)
+        public void CreateSequenceMassToMs2ScansMap(LcMsRun run, Tolerance tolerance, double minMass, double maxMass)
         {
             // Make a bin to scan numbers map without considering tolerance
             var massBinToScanNumsMapNoTolerance = new Dictionary<int, List<int>>();
@@ -126,38 +127,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private Dictionary<int, IList<IntRange>> _map;
         private new Dictionary<int, IEnumerable<int>> _sequenceMassBinToScanNumsMap;
-
-    }
-
-    class IntRange: IComparable<IntRange>
-    {
-        public IntRange(int min, int max)
-        {
-            Min = min;
-            Max = max;
-        }
-
-        public bool Contains(int value)
-        {
-            return value >= Min && value <= Max;
-        }
-
-        public bool Overlaps(IntRange other)
-        {
-            return Contains(other.Min) || Contains(other.Max);
-        }
-
-        public static IntRange Union(IntRange range1, IntRange range2)
-        {
-            return new IntRange(Math.Min(range1.Min, range2.Min), Math.Max(range1.Max, range2.Max));
-        }
-
-        public int Min { get; private set; }
-        public int Max { get; private set; }
-
-        public int CompareTo(IntRange other)
-        {
-            return Min.CompareTo(other.Min);
-        }
     }
 }

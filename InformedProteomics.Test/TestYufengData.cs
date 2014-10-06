@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -11,7 +9,6 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 using InformedProteomics.Backend.SequenceTag;
@@ -21,9 +18,7 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestYufengData
     {
-        //public const string TestRawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
-        public const string TestRawFilePath = @"D:\Vlad_TopDown\raw\yufeng_column_test2.raw";
-        
+        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\Yufeng\raw\yufeng_column_test2.raw";
         private static readonly IEnumerable<int> Ms2ScanNums = new[] { 46454, 46475, 46484, 46506, 46562, 46661 };
         private class SimpleMs1Filter : ISequenceFilter
         {
@@ -266,7 +261,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneringAllXics()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             Assert.True(run != null);
             var comparer = new MzComparerWithBinning(27);
             const double minMz = 600.0; // 600.0
@@ -279,13 +274,15 @@ namespace InformedProteomics.Test
             var numBinsProcessed = 0;
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                var mz = comparer.GetMz(binNum);
-                var mzNext = comparer.GetMz(binNum+1);
+//                if (binNum < 33880544) continue;
+//                Console.WriteLine(binNum);
+                var mzStart = comparer.GetMzStart(binNum);
+                var mzEnd = comparer.GetMzEnd(binNum);
                 //var between = 0.4*mz + 0.6*mzNext;
                 //Console.WriteLine(comparer.GetBinNumber(mz) + " " + comparer.GetBinNumber(between) + " " + comparer.GetBinNumber(mzNext));
                 //Assert.True(binNum == comparer.GetBinNumber(mzNextMinusEpsilon));
                 //run.GetFullPrecursorIonExtractedIonChromatogram(mz, mzNext);
-                run.GetPrecursorExtractedIonChromatogram(mz, mzNext);
+                run.GetPrecursorExtractedIonChromatogram(mzStart, mzEnd);
                 //if(++numBinsProcessed % 1000 == 0) Console.WriteLine(numBinsProcessed);
             }
             sw.Stop();
@@ -297,7 +294,7 @@ namespace InformedProteomics.Test
         public void TestGeneratingXicsOfAllCharges()
         {
             //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             var comparer = new MzComparerWithBinning(27);
             const string protSequence =
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
@@ -316,15 +313,45 @@ namespace InformedProteomics.Test
             {
                 var ion = new Ion(neutral, charge);
                 var mostAbundantIsotopeMz = ion.GetIsotopeMz(isoEnv.MostAbundantIsotopeIndex);
+                //var secondMostAbundantIsotopeMz = ion.GetIsotopeMz(isoEnv.MostAbundantIsotopeIndex + 1);
                 var binNum = comparer.GetBinNumber(mostAbundantIsotopeMz);
-                var mz = comparer.GetMz(binNum);
-                var mzNext = comparer.GetMz(binNum+1);
+                var mzStart = comparer.GetMzStart(binNum);
+                var mzEnd = comparer.GetMzEnd(binNum);
 
-                var xic = run.GetFullPrecursorIonExtractedIonChromatogram(mz, mzNext);
+                var xic = run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
                 Console.Write(charge+"\t");
                 Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
             }
         }
-    
+
+        [Test]
+        public void TestAbpSumMs1Spectra()
+        {
+            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+
+            const int minScanNum = 5657;
+            const int maxScanNum = 5699;
+
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath);
+            if (run == null) return;
+            var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
+            var peakList = summedSpec.GetPeakListWithin(1180.0, 1192.0);
+            var filteredPeakList = new List<Peak>();
+            PeakListUtils.FilterNoise(peakList, ref filteredPeakList);
+            new Spectrum(filteredPeakList, 0).Display();
+        }
+
+        [Test]
+        public void TestIsoProfile()
+        {
+            const string sequence = "MWYMISAQDVENSLEKRLAARPAHLARLQELADEGRLLVAGPHPAIDSENPGDAGFSGSLVVADFDSLATAQAWADADPYFAAGVYQSVVVKPFKRVLP";
+            var aaSet = new AminoAcidSet();
+            var comp = aaSet.GetComposition(sequence) + Composition.H2O;
+            var ion = new Ion(comp, 9);
+            foreach (var i in ion.GetIsotopes(0.1))
+            {
+                Console.WriteLine(ion.GetIsotopeMz(i.Index)+"\t"+i.Ratio);
+            }
+        }
     }
 }

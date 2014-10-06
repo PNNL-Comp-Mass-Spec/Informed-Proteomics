@@ -12,6 +12,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         public const int NumUniqueIsolationWindowThresholdForDia = 1000;
         public const double IsolationWindowBinningFactor = 10;
+        //public const double DefaultSpectrumFilteringWindowSize = 100.0;
 
         public int MinLcScan { get; protected set; }
         public int MaxLcScan { get; protected set; }

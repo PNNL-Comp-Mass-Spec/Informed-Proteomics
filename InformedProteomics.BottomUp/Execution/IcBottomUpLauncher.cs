@@ -91,7 +91,7 @@ namespace InformedProteomics.BottomUp.Execution
 
         public int NumTolerableTermini { get; private set; }
 
-        private InMemoryLcMsRun _run;
+        private LcMsRun _run;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedBottomUpScorer _bottomUpScorer;
 

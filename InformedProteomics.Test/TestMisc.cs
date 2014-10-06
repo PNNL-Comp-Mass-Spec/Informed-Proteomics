@@ -133,6 +133,84 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void GenerateMagnusAbrfSpecCountAllProteins()
+        {
+            const string dir = @"H:\Research\IPRG2015\Magnus";
+            const double qValueThreshold = 0.01;
+            //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
+            //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
+
+            const string resultDir = dir + @"\beforeRefinery20ppm";
+            var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
+
+            var specCount = new Dictionary<string, int[]>();  // protein name => array of counts
+
+            for (var i = 0; i < msgfResultFiles.Length; i++)
+            {
+                var msgfResultFile = msgfResultFiles[i];
+
+                MsGfPlusHeaderInformation headerInfo = null;
+
+                var prevScanNum = -1;
+                foreach (var line in File.ReadLines(msgfResultFile))
+                {
+                    if (line.StartsWith("#"))
+                    {
+                        headerInfo = new MsGfPlusHeaderInformation(line);
+                        continue;
+                    }
+
+                    var match = new MsGfMatch(line, headerInfo);
+
+                    if (match.ScanNum == prevScanNum) continue;
+                    prevScanNum = match.ScanNum;
+
+                    if (!match.IsValid || match.Protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) continue;
+                    if (match.QValue > qValueThreshold) continue;
+
+                    var proteins = match.Protein.Split(';');
+                    foreach (var protein in proteins)
+                    {
+                        var proteinName = protein.Substring(0, protein.LastIndexOf("(pre=", StringComparison.Ordinal));
+                        int[] countArr;
+                        if (!specCount.TryGetValue(proteinName, out countArr)) specCount[proteinName] = new int[msgfResultFiles.Length];
+                        specCount[proteinName][i]++;
+                    }
+                }
+            }
+
+            // Writing
+            const string databaseFilePath = dir + @"\database\iPRG2015.fasta";
+            var database = new FastaDatabase(databaseFilePath);
+            database.Read();
+
+            //            var spikeInAccessions = new[] { "STANDARD_Alpha-Casein", "STANDARD_Beta-Lactoglobulin", "STANDARD_Carbonic-Anhydrase", "P02769"};
+
+            const string outputFilePath = dir + @"\SpecCountAllProteins.tsv";
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                var fileIds = msgfResultFiles.Select(f => f.Substring(f.IndexOf("sample", StringComparison.Ordinal) + 6,
+                    f.LastIndexOf('_') - f.IndexOf("sample", StringComparison.Ordinal) - 6));
+                writer.WriteLine("Protein\tLength\t" + string.Join("\t", fileIds) + "\tSpikeIn");
+                foreach (var entry in specCount)
+                {
+                    var proteinId = entry.Key;
+                    var length = database.GetProteinLength(proteinId);
+                    Assert.True(length > 0);
+                    var counts = entry.Value;
+                    Assert.True(counts.Length == msgfResultFiles.Length);
+                    var spikeIn = 0;
+                    //if (spikeInAccessions.Any(spikeInAccession => proteinId.StartsWith("sp|" + spikeInAccession)))
+                    if (proteinId.StartsWith("sp|P44") || proteinId.StartsWith("sp|P55"))
+                    {
+                        spikeIn = 1;
+                    }
+                    writer.WriteLine("{0}\t{1}\t{2}\t{3}", proteinId, length, string.Join("\t", counts), spikeIn);
+                }
+            }
+        }
+
+        [Test]
         public void GenerateAbrfSpecCountAllProteins()
         {
             const string dir = @"H:\Research\IPRG2015";

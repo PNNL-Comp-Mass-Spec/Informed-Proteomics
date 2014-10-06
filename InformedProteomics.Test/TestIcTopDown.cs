@@ -222,8 +222,8 @@ namespace InformedProteomics.Test
 
             // QC_Shew
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002216_235ACCEA.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownQCShew\Ic";
+            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownQCShew\Test";
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);

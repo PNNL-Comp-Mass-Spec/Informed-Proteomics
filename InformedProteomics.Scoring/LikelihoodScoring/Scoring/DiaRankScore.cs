@@ -13,7 +13,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
             _rankScore = new RankScore(fileName);
         }
 
-        public double GetScore(Sequence sequence, int charge, int scan, InMemoryLcMsRun lcmsRun)
+        public double GetScore(Sequence sequence, int charge, int scan, LcMsRun lcmsRun)
         {
             var mass = sequence.Composition.Mass + Composition.H2O.Mass;
             var spectrum = lcmsRun.GetSpectrum(scan);

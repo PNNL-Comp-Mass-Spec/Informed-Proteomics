@@ -245,6 +245,7 @@ namespace InformedProteomics.Test.Obsolete
                 // }
 
                 Console.WriteLine("\nCharge\tm/z");
+
                 for (var charge = 9; charge <= 18; charge++)
                 {
                     var precursorIon = new Ion(protComposition + Composition.H2O, charge);

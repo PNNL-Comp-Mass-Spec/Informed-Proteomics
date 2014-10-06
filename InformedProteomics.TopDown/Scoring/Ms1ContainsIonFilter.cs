@@ -6,13 +6,13 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class Ms1ContainsIonFilter
     {
-        public Ms1ContainsIonFilter(InMemoryLcMsRun run, Tolerance mzTolerance)
+        public Ms1ContainsIonFilter(LcMsRun run, Tolerance mzTolerance)
         {
             Run = run;
             MzTolerance = mzTolerance;
         }
 
-        public InMemoryLcMsRun Run { get; private set; }
+        public LcMsRun Run { get; private set; }
         public Tolerance MzTolerance { get; private set; }
 
         public const double RelativeIsotopeIntensityThreshold = 0.8;    // 0.5

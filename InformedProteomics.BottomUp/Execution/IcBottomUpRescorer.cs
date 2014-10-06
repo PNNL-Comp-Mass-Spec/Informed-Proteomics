@@ -18,7 +18,7 @@ namespace InformedProteomics.BottomUp.Execution
             Rescore(icResultFilePath, outputFilePath);
         }
 
-        private readonly InMemoryLcMsRun _run;
+        private readonly LcMsRun _run;
 
         private void Rescore(string icResultFilePath, string outputFilePath)
         {

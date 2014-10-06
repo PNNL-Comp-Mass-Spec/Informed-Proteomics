@@ -11,17 +11,17 @@ namespace InformedProteomics.Backend.MassSpecData
         public const int FileFormatId = 150604;
         public const string FileExtension = ".pbf";
         
-        public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType = MassSpecDataType.XCaliburRun)
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType = MassSpecDataType.XCaliburRun)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
         }
 
-        public static ILcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
-            var rafFilePath = Path.ChangeExtension(specFilePath, FileExtension);
+            var pbfFilePath = Path.ChangeExtension(specFilePath, FileExtension);
 
-            if (!File.Exists(rafFilePath) || !CheckFileFormatVersion(rafFilePath))
+            if (!File.Exists(pbfFilePath) || !CheckFileFormatVersion(pbfFilePath))
             {
                 InMemoryLcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
@@ -33,19 +33,19 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (run == null) throw new Exception("Unsupported raw file format!");
                 try
                 {
-                    run.WriteAsPbf(rafFilePath);
+                    run.WriteAsPbf(pbfFilePath);
                 }
                 catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
                 {
-                    var fileName = Path.GetFileName(rafFilePath);
+                    var fileName = Path.GetFileName(pbfFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
                     var tempPath = Path.Combine(Path.GetTempPath(), fileName);
                     if (!File.Exists(tempPath) || !CheckFileFormatVersion(tempPath)) run.WriteAsPbf(tempPath);
-                    rafFilePath = tempPath;
+                    pbfFilePath = tempPath;
                 }
             }
 
-            return new PbfLcMsRun(rafFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+            return new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
         public PbfLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
@@ -73,9 +73,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
         {
-            var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBebin, _offsetProductChromatogramEnd);
-            if (targetOffset < _offsetProductChromatogramBebin) return new Xic();
-            var xic = GetXicPointsWithin(minMz, maxMz, _offsetProductChromatogramBebin, _offsetProductChromatogramEnd, targetOffset);
+            var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBegin, _offsetProductChromatogramEnd);
+            if (targetOffset < _offsetProductChromatogramBegin) return new Xic();
+            var xic = GetXicPointsWithin(minMz, maxMz, _offsetProductChromatogramBegin, _offsetProductChromatogramEnd, targetOffset);
             if (!xic.Any()) return xic;
 
             var scanToXicPoint = new XicPoint[MaxLcScan - MinLcScan + 1];
@@ -101,7 +101,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if (offset < _offsetChromatogramStart) return new Xic();
+                if (offset < _offsetPrecursorChromatogramStart) return new Xic();
 
                 // binary search
                 var beginOffset = offset;
@@ -111,11 +111,11 @@ namespace InformedProteomics.Backend.MassSpecData
             else
             {
                 if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
-                targetOffset = maxBinIndex > _maxMzIndex ? _offsetChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
+                targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if (targetOffset < _offsetChromatogramStart) return new Xic();
-            var xic = GetXic(minMz, maxMz, _offsetChromatogramStart, _offsetChromatogramEnd, targetOffset);
+            if (targetOffset < _offsetPrecursorChromatogramStart) return new Xic();
+            var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramStart, _offsetPrecursorChromatogramEnd, targetOffset);
             if (!xic.Any()) return xic;
             xic.Sort();
             return Xic.GetSelectedXic(xic);
@@ -151,10 +151,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly double _productSignalToNoiseRatioThreshold;
 
         private readonly Object _lock = new Object();
-        private long _offsetChromatogramStart;
-        private long _offsetProductChromatogramBebin;
+        private long _offsetPrecursorChromatogramStart;
+        private long _offsetPrecursorChromatogramEnd;
+        private long _offsetProductChromatogramBegin;
         private long _offsetProductChromatogramEnd;
-        private long _offsetChromatogramEnd;
         //private long _offsetMetaInfo;
 
 //        private Dictionary<int, int> _scanNumToMsLevel;
@@ -181,8 +181,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _reader.BaseStream.Seek(-3*sizeof (long) - 1*sizeof (int), SeekOrigin.End);
 
-            _offsetChromatogramStart = _reader.ReadInt64();
-            _offsetChromatogramEnd = _offsetProductChromatogramBebin = _reader.ReadInt64();
+            _offsetPrecursorChromatogramStart = _reader.ReadInt64();
+            _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin = _reader.ReadInt64();
             _offsetProductChromatogramEnd = _reader.ReadInt64();
             // Read meta information
             var offsetMetaInfo = _offsetProductChromatogramEnd;
@@ -240,12 +240,13 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var minIndex = _reader.ReadInt32();
             var maxIndex = _reader.ReadInt32();
-            _chromMzIndexToOffset = new long[maxIndex - minIndex + 1];
+            _chromMzIndexToOffset = new long[maxIndex - minIndex + 2];
 
             for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
             {
                 _chromMzIndexToOffset[i] = _reader.ReadInt64();
             }
+            _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
             _minMzIndex = minIndex;
             _maxMzIndex = maxIndex;
 

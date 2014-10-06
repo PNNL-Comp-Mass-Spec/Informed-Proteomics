@@ -14,7 +14,7 @@ namespace InformedProteomics.TopDown.Scoring
         public static int MinCharge = 8;
         public static int MaxCharge = 25; 
 
-        private readonly InMemoryLcMsRun _run;
+        private readonly LcMsRun _run;
         private readonly Tolerance _tolerance;
         private readonly double[] _isotopeEnvelope; // from _minIsotopeIndex 
         
@@ -30,7 +30,7 @@ namespace InformedProteomics.TopDown.Scoring
         private const float MinIsotopeIntensity = 0.2f;
         
         
-        public TopDownScorer(Composition proteinComposition, InMemoryLcMsRun run, Tolerance tolernace, SubScoreFactory factory)
+        public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolernace, SubScoreFactory factory)
         {
             _run = run;
             _proteinCompositionPlusWater = proteinComposition + Composition.H2O;

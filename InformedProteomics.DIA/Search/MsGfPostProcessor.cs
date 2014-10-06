@@ -30,7 +30,7 @@ namespace InformedProteomics.DIA.Search
             ToleranceForBaseXic = tolForBaseXic;
             ToleranceFromBasicXic = tolFromBaseXic;
 
-            Run = new Dictionary<string, InMemoryLcMsRun>();
+            Run = new Dictionary<string, LcMsRun>();
             foreach (var specFilePath in specFilePaths)
             {
                 var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
@@ -39,7 +39,7 @@ namespace InformedProteomics.DIA.Search
             }
         }
 
-        public Dictionary<string,InMemoryLcMsRun> Run { get; private set; }
+        public Dictionary<string, LcMsRun> Run { get; private set; }
         public string MsGfResultPath { get; private set; }
         public Tolerance ToleranceForBaseXic { get; private set; }
         public Tolerance ToleranceFromBasicXic { get; private set; }

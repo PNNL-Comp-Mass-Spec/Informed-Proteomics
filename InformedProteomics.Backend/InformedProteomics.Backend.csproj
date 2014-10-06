@@ -128,10 +128,12 @@
     <Compile Include="Data\Composition\Averagine.cs" />
     <Compile Include="Data\Composition\IsotopomerEnvelope.cs" />
     <Compile Include="Data\Sequence\Cleavage.cs" />
+    <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\ChargeLcScanMatrix.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
+    <Compile Include="Data\Spectrometry\ILcMsMap.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
@@ -193,6 +195,7 @@
     <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\GeneratingFunctionForSkyline.cs" />
+    <Compile Include="Utils\IntRange.cs" />
     <Compile Include="Utils\ListUtil.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\NoiseFilter.cs" />

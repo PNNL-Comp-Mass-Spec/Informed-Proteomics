@@ -186,14 +186,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int GetBinNumber(double mz)
         {
             var converted = BitConverter.DoubleToInt64Bits(mz);
-            var rounded = (converted >> _numShifts) << _numShifts;
-            return (int)(rounded >> _numShifts);
+            return (int) (converted >> _numShifts);
+            //var rounded = (converted >> _numShifts) << _numShifts;
+            //return (int)(rounded >> _numShifts);
         }
 
-        public double GetMz(int binNum)
+        // inclusive
+        public double GetMzStart(int binNum)
         {
             var rounded = (long)binNum << _numShifts;
             return BitConverter.Int64BitsToDouble(rounded);
+        }
+
+        // exclusive
+        public double GetMzEnd(int binNum)
+        {
+            var rounded = (long)(binNum+1) << _numShifts;
+            return BitConverter.Int64BitsToDouble(rounded);
+        }
+
+        public double GetMzAverage(int binNum)
+        {
+            return (GetMzStart(binNum) + GetMzEnd(binNum))*0.5;
         }
 
         private readonly int _numShifts;

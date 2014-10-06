@@ -28,18 +28,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var minScanNum = this[0].ScanNum;
             var maxScanNum = this[Count - 1].ScanNum;
 
-            var intArr1 = new double[maxScanNum - minScanNum + 1];
+            var intArr1 = new double[Count];
+            var indexMap = new int[maxScanNum - minScanNum + 1];
+            var i = -1;
             foreach (var p in this)
             {
-                intArr1[p.ScanNum - minScanNum] = p.Intensity;
+                intArr1[++i] = p.Intensity;
+                indexMap[p.ScanNum - minScanNum] = (i+1);
             }
 
-            var intArr2 = new double[maxScanNum - minScanNum + 1];
+            var intArr2 = new double[Count];
             foreach (var p in other)
             {
-                var index = p.ScanNum - minScanNum;
-                if (index < 0 || index >= intArr2.Length) continue;
-                intArr2[p.ScanNum - minScanNum] = p.Intensity;
+                var i2 = p.ScanNum - minScanNum;
+                if (i2 < 0 || i2 >= indexMap.Length) continue;
+                var index = indexMap[i2] - 1;
+                if(index >= 0) intArr2[index] = p.Intensity;
             }
 
             var correlation = FitScoreCalculator.GetPearsonCorrelation(intArr1, intArr2);

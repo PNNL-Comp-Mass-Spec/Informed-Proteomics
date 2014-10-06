@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics;
 using MathNet.Numerics.NumberTheory;
@@ -415,11 +416,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         //    Peaks = filteredPeaks.ToArray();
         //}
 
-        public void FilterNoise(double? subSpectrumMzRange = null, double signalToNoiseRatio = 1.4826)
+        public void FilterNoise(double? mzWindowSize = null, double signalToNoiseRatio = 1.4826)
         {
             var minMz = Peaks[0].Mz;
             var maxMz = Peaks[Peaks.Length - 1].Mz;
-            var numSubSpectra = subSpectrumMzRange == null ? 1 : (int)((maxMz - minMz) / subSpectrumMzRange);
+            var numSubSpectra = mzWindowSize == null ? 1 : (int)((maxMz - minMz) / mzWindowSize);
             var range = (maxMz - minMz) / numSubSpectra;
 
             var subSpecList =
@@ -432,11 +433,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach (var subSpec in subSpecList)
             {
                 //Console.WriteLine(subSpec.Key);
-                PeakListUtils.FilterNoise(subSpec.ToList(), ref filteredPeaks);
+                PeakListUtils.FilterNoise(subSpec.ToList(), ref filteredPeaks, signalToNoiseRatio);
             }
             Peaks = filteredPeaks.ToArray();
         }
-
 
         private static Bucket GetMostAbundantIntensity(ref List<Peak> peaks)
         {

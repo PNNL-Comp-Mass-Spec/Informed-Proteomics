@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.Execution
         // 2: 1: #NCleavges <= Max AND Cleavages <= Max
         public int SearchMode { get; private set; } 
 
-        private InMemoryLcMsRun _run;
+        private LcMsRun _run;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedTopDownScorer _topDownScorer;
 

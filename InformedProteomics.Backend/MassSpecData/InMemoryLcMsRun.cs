@@ -7,12 +7,12 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class InMemoryLcMsRun: LcMsRun //ILcMsRun
     {
-        public static InMemoryLcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
         }
 
-        public static InMemoryLcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, 
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, 
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
             var pbfFilePath = Path.ChangeExtension(specFilePath, PbfLcMsRun.FileExtension);
