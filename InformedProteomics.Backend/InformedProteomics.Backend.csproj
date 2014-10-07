@@ -131,6 +131,7 @@
     <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\ChargeLcScanMatrix.cs" />
+    <Compile Include="Data\Spectrometry\ChargeScanRange.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
     <Compile Include="Data\Spectrometry\ILcMsMap.cs" />

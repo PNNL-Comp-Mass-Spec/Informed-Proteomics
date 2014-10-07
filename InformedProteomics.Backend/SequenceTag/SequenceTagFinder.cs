@@ -116,7 +116,7 @@ namespace InformedProteomics.Backend.SequenceTag
             return new string(charArray);
         }
 
-        private void PreProcessingSpectrum()
+        public void PreProcessingSpectrum()
         {
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(SpectrumData, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, new Tolerance(ProductTolerancePpm), 0.7);
             
