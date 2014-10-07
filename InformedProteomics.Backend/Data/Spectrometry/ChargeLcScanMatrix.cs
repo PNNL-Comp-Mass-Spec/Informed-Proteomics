@@ -66,20 +66,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _maxCharge = maxCharge;
         }
 
-        public IEnumerable<List<Tuple<int, int>>> GetProbableChargeScanRegions(double proteinMass)
+        public IEnumerable<List<ChargeScanPair>> GetProbableChargeScanRegions(double proteinMass)
         {
             BuildMatrix(proteinMass);
             var clusters = Segmentation(_sumOverIsotope);
             var filtered = clusters.Where(cluster => cluster.GetScore() < ScoreThreshold).ToList();
 
-            return filtered.Select(cluster => cluster.Members.Select(member => new Tuple<int, int>(member.Row + _minCharge, _ms1ScanNums[member.Col])).ToList()).ToList();
+            return filtered.Select(cluster => cluster.Members.Select(member => new ChargeScanPair(member.Row + _minCharge, _ms1ScanNums[member.Col])).ToList()).ToList();
         }
 
         public IEnumerable<List<Tuple<int, int, double>>> GetAllChargeScanRegions(double proteinMass)
         {
             BuildMatrix(proteinMass);
             var clusters = Segmentation(_sumOverIsotope);
-            return clusters.Select(cluster => cluster.Members.Select(member => new Tuple<int, int, double>(member.Row, member.Col, cluster.GetScore())).ToList()).ToList();
+            return clusters.Select(cluster => cluster.Members.Select(member => new Tuple<int, int, double>(member.Row + _minCharge, _ms1ScanNums[member.Col], cluster.GetScore())).ToList()).ToList();
         }
 
 
