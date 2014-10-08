@@ -141,6 +141,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
 
+        public override double MinMs1Mz { get { return _ms1PeakList[0].Mz; } }
+        public override double MaxMs1Mz { get { return _ms1PeakList[_ms1PeakList.Count - 1].Mz; } }
+
         /// <summary>
         /// Gets the spectrum of the specified scan number
         /// </summary>

@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Hybrid
         };
 
-        public ChargeLcScanMatrix(LcMsRun run, double minMz, double maxMz, int numBits = 26)
+        public ChargeLcScanMatrix(LcMsRun run, int numBits = 26)
         {
             _minCharge = 2;
             _maxCharge = 60;
@@ -36,8 +36,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _scoringType = ScoringMeasure.PearsonCorrelation;
             _scoreThreshold = 0.7;
             
-            _cachedMinBinNum = _comparer.GetBinNumber(minMz);
-            _cachedMaxBinNum = _comparer.GetBinNumber(maxMz);
+            _cachedMinBinNum = _comparer.GetBinNumber(_run.MinMs1Mz);
+            _cachedMaxBinNum = _comparer.GetBinNumber(_run.MaxMs1Mz);
 
             _cachedXic = new double[_cachedMaxBinNum - _cachedMinBinNum + 1][];
 

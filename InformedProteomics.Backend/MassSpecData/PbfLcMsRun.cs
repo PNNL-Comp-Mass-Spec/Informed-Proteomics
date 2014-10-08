@@ -57,7 +57,23 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
-            
+
+
+            _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
+            _minMs1Mz = _reader.ReadDouble();
+
+            _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
+            _maxMs1Mz = _reader.ReadDouble();
+        }
+
+        public override double MinMs1Mz
+        {
+            get { return _minMs1Mz; }
+        }
+
+        public override double MaxMs1Mz
+        {
+            get { return _maxMs1Mz; }
         }
 
         public override Spectrum GetSpectrum(int scanNum)
@@ -150,9 +166,12 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly double _precursorSignalToNoiseRatioThreshold;
         private readonly double _productSignalToNoiseRatioThreshold;
 
+        private readonly double _minMs1Mz;
+        private readonly double _maxMs1Mz;
+
         private readonly Object _lock = new Object();
         private long _offsetPrecursorChromatogramStart;
-        private long _offsetPrecursorChromatogramEnd;
+        private long _offsetPrecursorChromatogramEnd;   // exclusive
         private long _offsetProductChromatogramBegin;
         private long _offsetProductChromatogramEnd;
         //private long _offsetMetaInfo;

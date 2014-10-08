@@ -107,7 +107,7 @@ namespace InformedProteomics.TopDown.Execution
             //var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge, MaxPrecursorIonCharge, 
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, corrThreshold, corrThreshold);
 
-            var ms1Filter = new ChargeLcScanMatrix(_run, 600.0, 2000.0, 26);
+            var ms1Filter = new ChargeLcScanMatrix(_run);
             sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
