@@ -77,13 +77,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             foreach (var chargeScanRange in GetProbableChargeScanRegions(monoIsotopicMass))
             {
-                var minScanNum = chargeScanRange.MinCharge;
-                var maxScanNum = chargeScanRange.MaxCharge;
+                var minScanNum = chargeScanRange.MinScanNum;
+                var maxScanNum = chargeScanRange.MaxScanNum;
                 for (var charge = chargeScanRange.MinCharge; charge <= chargeScanRange.MaxCharge; charge++)
                 {
                     var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, mostAbundantIsotopeIndex);
                     ms2ScanList.AddRange(_run.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
-                        .Where(s => s >= minScanNum && s <= maxScanNum));
+                        .Where(scanNum => scanNum >= minScanNum && scanNum <= maxScanNum));
                 }
             }
             ms2ScanList.Sort();

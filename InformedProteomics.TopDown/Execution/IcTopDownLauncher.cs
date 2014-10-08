@@ -228,7 +228,8 @@ namespace InformedProteomics.TopDown.Execution
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;
 
-                if (numProteins%100000 == 0)
+                //if (numProteins%100000 == 0)
+                if(numProteins % 1 == 0)
                 {
                     Console.Write("Processing {0}{1} proteins...", numProteins,
                         numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");

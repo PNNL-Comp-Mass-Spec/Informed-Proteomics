@@ -29,7 +29,7 @@ namespace InformedProteomics.Test
         }
     }
     
-    public class ChargeLcScanMatrix
+    public class TestChargeLcScanMatrix
     {
         public int NumberOfLcScans { get; private set; }
         public int MinCharge { get; private set; }
@@ -52,7 +52,7 @@ namespace InformedProteomics.Test
             get { return NumberOfLcScans;  }
         }
 
-        public ChargeLcScanMatrix(int numberOfLcScans, int minCharge, int maxCharge)
+        public TestChargeLcScanMatrix(int numberOfLcScans, int minCharge, int maxCharge)
         {
             NumberOfLcScans = numberOfLcScans;
             MinCharge = minCharge;
