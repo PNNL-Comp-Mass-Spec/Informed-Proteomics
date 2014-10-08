@@ -4,10 +4,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using MathNet.Numerics;
-using MathNet.Numerics.NumberTheory;
 using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Data.Spectrometry

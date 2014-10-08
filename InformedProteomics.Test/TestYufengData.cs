@@ -259,10 +259,21 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestGetNumBins()
+        {
+            var comparer = new MzComparerWithBinning(27);
+            const double minMz = 3000.0; // 600.0
+            const double maxMz = 50000.0;    // 2000.0
+            var minBinNum = comparer.GetBinNumber(minMz);
+            var maxBinNum = comparer.GetBinNumber(maxMz);
+            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
+        }
+
+        [Test]
         public void TestGeneringAllXics()
         {
-            //var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
-            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             Assert.True(run != null);
             var comparer = new MzComparerWithBinning(27);
             const double minMz = 600.0; // 600.0
@@ -327,6 +338,38 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestGettingXicVector()
+        {
+            var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run2 = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            Assert.True(run1 != null && run2 != null);
+            var comparer = new MzComparerWithBinning(27);
+            const double minMz = 600.0; // 600.0
+            const double maxMz = 2000.0;    // 2000.0
+            var minBinNum = comparer.GetBinNumber(minMz);
+            var maxBinNum = comparer.GetBinNumber(maxMz);
+            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
+            var sw = new Stopwatch();
+            sw.Start();
+            for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+            {
+                var mzStart = comparer.GetMzStart(binNum);
+                var mzEnd = comparer.GetMzEnd(binNum);
+                var vec1 = run1.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
+                var vec2 = run2.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
+                Assert.True(vec1.Length == vec2.Length);
+                for (var i = 0; i < vec1.Length; i++)
+                {
+                    Assert.True(vec1[i] == vec2[i]);
+                }
+            }
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+            
+        }
+
+        [Test]
         public void TestAbpSumMs1Spectra()
         {
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
@@ -354,6 +397,24 @@ namespace InformedProteomics.Test
             {
                 Console.WriteLine(ion.GetIsotopeMz(i.Index)+"\t"+i.Ratio);
             }
+        }
+
+        [Test]
+        public void TestSumMs2Spectra()
+        {
+            const string specFilePath = @"H:\Research\QCShew_TopDown\Long\NewQC_LongSep_29Sep14_141001104925.raw";
+            const int minScanNum = 1289;
+            const int maxScanNum = 1389;
+            const int minCharge = 6;
+            const int maxCharge = 6;
+            const string sequence = "EIRGYRPPEPYKGKGVRYDDEEVRRKEAKKK";
+            var aaSet = new AminoAcidSet();
+            
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath);
+            
+            var scorer = new InformedTopDownScorer(run, aaSet, 1, minCharge - 1, new Tolerance(10));
+            scorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm,
+                Composition.Parse("C(166) H(270) N(52) O(49) S(0)"), minCharge, minScanNum);
         }
     }
 }

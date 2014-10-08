@@ -145,6 +145,7 @@
     <Compile Include="Data\Spectrometry\PeptideSpectrumMatch.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
+    <Compile Include="Data\Spectrometry\SummedSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />

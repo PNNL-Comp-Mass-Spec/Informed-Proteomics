@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Statistics;
 
@@ -55,7 +56,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // minScanNum, maxScanNum: inclusive
-        public Spectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
+        public SummedSpectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
         {
             if (minScanNum < MinLcScan) minScanNum = MinLcScan;
             if (maxScanNum > MaxLcScan) maxScanNum = MaxLcScan;
@@ -70,7 +71,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSummedSpectrum(scanNums, minScanNum);
         }
 
-        public Spectrum GetSummedSpectrum(IEnumerable<int> scanNums, int repScanNum = 0)
+        public SummedSpectrum GetSummedSpectrum(IList<int> scanNums, int repScanNum = 0)
         {
             var mzComparer = new MzComparerWithBinning();
 
@@ -109,7 +110,25 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             summedPeakList.Sort();
 
-            return new Spectrum(summedPeakList, repScanNum);
+            var summedSpec = new SummedSpectrum(summedPeakList, repScanNum) {ScanNums = scanNums};
+            return summedSpec;
+        }
+
+        // minScanNum, maxScanNum, minCharge, maxCharge: inclusive
+        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, ActivationMethod activationMethod, 
+            int minScanNum, int maxScanNum, int minCharge, int maxCharge)
+        {
+            var isoEnv = Averagine.GetIsotopomerEnvelope(monoIsotopicMass);
+            var ms2ScanNums = new List<int>();
+            for (var charge = minCharge; charge <= maxCharge; charge++)
+            {
+                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
+                ms2ScanNums.AddRange(GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
+                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum && ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod))
+                    ;
+            }
+            var summedSpec = GetSummedSpectrum(ms2ScanNums);
+            return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
         }
 
         /// <summary>
@@ -473,15 +492,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
         }
 
-        public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)
-        {
-            return
-                from ms2ScanNum in GetScanNumbers(2)
-                let productSpec = GetSpectrum(ms2ScanNum) as ProductSpectrum
-                where productSpec != null
-                where productSpec.IsolationWindow.Contains(precursorMz)
-                select ms2ScanNum;
-        }
+        //public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)
+        //{
+        //    return
+        //        from ms2ScanNum in GetScanNumbers(2)
+        //        let productSpec = GetSpectrum(ms2ScanNum) as ProductSpectrum
+        //        where productSpec != null
+        //        where productSpec.IsolationWindow.Contains(precursorMz)
+        //        select ms2ScanNum;
+        //}
 
         // Fields to be defined in a child
         protected Dictionary<int, int[]> IsolationMzBinToScanNums;

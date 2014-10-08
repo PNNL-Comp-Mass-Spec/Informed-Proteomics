@@ -1,52 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Printing;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
 
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class ChargeLcScanMatrix : ILcMsMap
+    public class ChargeLcScanMatrix : ILcMsMap, ISequenceFilter
     {
-        private LcMsRun _run;
-        private readonly int _numberOfScans;
-        private int _minCharge;
-        private int _maxCharge;
-        private double[,,] _data;
-        private double[,] _sumOverIsotope;
-        private double[] _envelopePdf;
-
-        private double _scoreThreshold = 0.5;
-        private readonly int[] _ms1ScanNums;
         int NRows { get { return _maxCharge - _minCharge + 1; } }
         int NColumns { get { return _numberOfScans; } }
         
-        private readonly MzComparerWithBinning _comparer;
-
-        // caching
-        private readonly double[][] _cachedXic;
-        private readonly int _cachedMinBinNum;
-        private readonly int _cachedMaxBinNum;
-
         public enum ScoringMeasure
         {
             PearsonCorrelation,
             KlDivergence,
             Hybrid
         };
-
-        private ScoringMeasure _scoringType;
 
         public ChargeLcScanMatrix(LcMsRun run, double minMz, double maxMz, int numBits = 27)
         {
@@ -73,6 +46,45 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double proteinMass)
+        {
+            BuildMatrix(proteinMass);
+            var clusters = Segmentation(_sumOverIsotope);
+
+            if (_scoringType == ScoringMeasure.PearsonCorrelation)
+            {
+                return clusters.Where(cluster => cluster.GetScore() > _scoreThreshold)
+                        .Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
+            }
+
+            if (_scoringType == ScoringMeasure.KlDivergence)
+            {
+                return clusters.Where(cluster => cluster.GetScore() < _scoreThreshold)
+                        .Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
+            }
+
+            return null;
+        }
+
+        // TODO: to be revisited by Sangtae
+        public IEnumerable<int> GetMatchingMs2ScanNums(double monoIsotopicMass)
+        {
+            var ms2ScanNums = new List<int>();
+            var chargeScanRegions = GetProbableChargeScanRegions(monoIsotopicMass);
+            foreach (var chargeScanRange in chargeScanRegions)
+            {
+                var minScanNum = chargeScanRange.MinCharge;
+                var maxScanNum = chargeScanRange.MaxCharge;
+
+                for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+                {
+                    if (_run.GetMsLevel(scanNum) == 2) ms2ScanNums.Add(scanNum);
+                }
+            }
+            ms2ScanNums.Sort();
+            return ms2ScanNums;
+        }
+ 
         public void SetScoringType(ScoringMeasure scoringType)
         {
             _scoringType = scoringType;
@@ -85,26 +97,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             _minCharge = minCharge;
             _maxCharge = maxCharge;
-        }
-
-        public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double proteinMass)
-        {
-            BuildMatrix(proteinMass);
-            var clusters = Segmentation(_sumOverIsotope);
-
-            if (_scoringType == ScoringMeasure.PearsonCorrelation)
-            {
-                var filtered = clusters.Where(cluster => cluster.GetScore() > _scoreThreshold).ToList();
-                return filtered.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
-            }
-            
-            if (_scoringType == ScoringMeasure.KlDivergence)
-            {
-                var filtered = clusters.Where(cluster => cluster.GetScore() < _scoreThreshold).ToList();
-                return filtered.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
-            }
-
-            return null;
         }
 
         public IEnumerable<ChargeScanRange> GetAllChargeScanRegions(double proteinMass, out double[] scores)
@@ -173,7 +165,27 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             return _data; 
         }
-        
+
+        private readonly LcMsRun _run;
+        private readonly int _numberOfScans;
+        private int _minCharge;
+        private int _maxCharge;
+        private double[, ,] _data;
+        private double[,] _sumOverIsotope;
+        private double[] _envelopePdf;
+
+        private double _scoreThreshold = 0.5;
+        private readonly int[] _ms1ScanNums;
+
+        private readonly MzComparerWithBinning _comparer;
+
+        // caching
+        private readonly double[][] _cachedXic;
+        private readonly int _cachedMinBinNum;
+        private readonly int _cachedMaxBinNum;
+
+        private ScoringMeasure _scoringType;
+
         private double GetIntensityThreshold(double[,] matrix)
         {
             double intensityThreshold = 0;
@@ -333,12 +345,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             if (_scoringType == ScoringMeasure.PearsonCorrelation)
                 return clusters.OrderByDescending(x => x.GetScore()).ToList();
-            else if (_scoringType == ScoringMeasure.KlDivergence)
+            if (_scoringType == ScoringMeasure.KlDivergence)
                 return clusters.OrderBy(x => x.GetScore()).ToList();
 
             return null;
         }
-    }
+   }
 
     class ChargeLcScanCluster
     {

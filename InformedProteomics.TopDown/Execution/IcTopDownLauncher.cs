@@ -94,7 +94,7 @@ namespace InformedProteomics.TopDown.Execution
 
             Console.Write("Reading raw file...");
             sw.Start();
-            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 1.4826);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -103,8 +103,11 @@ namespace InformedProteomics.TopDown.Execution
             sw.Reset();
             Console.Write("Determining precursor masses...");
             sw.Start();
-            var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge, MaxPrecursorIonCharge, 
-                MinSequenceMass, MaxSequenceMass, corrThreshold, corrThreshold, corrThreshold);
+            
+            //var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge, MaxPrecursorIonCharge, 
+            //    MinSequenceMass, MaxSequenceMass, corrThreshold, corrThreshold, corrThreshold);
+
+            var ms1Filter = new ChargeLcScanMatrix(_run, 600.0, 2000.0, 26);
             sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 

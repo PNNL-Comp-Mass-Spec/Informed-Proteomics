@@ -95,6 +95,77 @@ namespace InformedProteomics.TopDown.Scoring
 
             return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, corrMostAbundantPlusOneIsotope, corrMinusOneCharge, corrPlusOneCharge, modifications);
         }
+
+        //public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int minCharge, int maxCharge, int minScanNum, int maxScanNum)
+        //{
+        //    var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
+        //    if (seqGraph == null)
+        //    {
+        //        return null;
+        //    }
+
+        //    Tuple<double, string> scoreAndModifications = null;
+        //    var bestScore = double.NegativeInfinity;
+        //    var protCompositions = seqGraph.GetSequenceCompositions();
+        //    for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+        //    {
+        //        seqGraph.SetSink(modIndex);
+        //        var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+        //        if (!protCompositionWithH2O.Equals(composition)) continue;
+
+        //        var spec = Run.GetSummedMs2Spectrum(protCompositionWithH2O.Mass, minScanNum, maxScanNum, minCharge, maxCharge);
+        //        if (spec == null) return null;
+
+        //    //var annotation = "_." + seqStr + "._";
+        //        var scorer = new CorrMatchedPeakCounter(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge), Ms2CorrThreshold);
+
+        //        var curScoreAndModifications = seqGraph.GetScoreAndModifications(charge, scorer);
+        //        var curScore = curScoreAndModifications.Item1;
+        //        if (curScore > bestScore)
+        //        {
+        //            scoreAndModifications = curScoreAndModifications;
+        //            bestScore = curScore;
+        //        }
+        //    }
+
+        //    if (scoreAndModifications == null) return null;
+
+        //    var ms2Score = scoreAndModifications.Item1;
+        //    var modifications = scoreAndModifications.Item2;
+
+        //    var ion = new Ion(composition, charge);
+
+        //    // IsotopeCorrPrevMs1
+        //    var precursorSpec = Run.GetSpectrum(Run.GetPrecursorScanNum(ms2ScanNum));
+        //    var isotopeCorrPrevMs1 = precursorSpec == null ? 0.0 : precursorSpec.GetCorrScore(ion, Tolerance);
+
+        //    // IsotopeCorrNextMs1
+        //    var nextMs1Spec = Run.GetSpectrum(Run.GetNextScanNum(ms2ScanNum, 1));
+        //    var isotopeCorrNextMs1 = nextMs1Spec == null ? 0.0 : nextMs1Spec.GetCorrScore(ion, Tolerance);
+
+        //    var mostAbundantIsotopeMz = ion.GetMostAbundantIsotopeMz();
+        //    var xicThisPeak = Run.GetPrecursorExtractedIonChromatogram(mostAbundantIsotopeMz, Tolerance, ms2ScanNum);
+        //    if (xicThisPeak.Count < 2)
+        //    if (xicThisPeak.Count < 2)
+        //    {
+        //        return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, 0.0, 0.0, 0.0, modifications);
+        //    }
+
+        //    // check whether next isotope peak exists
+        //    var nextIsotopeMz = mostAbundantIsotopeMz + Constants.C13MinusC12 / charge;
+        //    var xicNextIsotope = Run.GetPrecursorExtractedIonChromatogram(nextIsotopeMz, Tolerance, ms2ScanNum);
+        //    var corrMostAbundantPlusOneIsotope = xicThisPeak.GetCorrelation(xicNextIsotope);
+
+        //    var mzChargeMinusOne = new Ion(composition, charge - 1).GetMostAbundantIsotopeMz();
+        //    var xicMinusOneCharge = Run.GetPrecursorExtractedIonChromatogram(mzChargeMinusOne, Tolerance, ms2ScanNum);
+        //    var corrMinusOneCharge = xicMinusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicMinusOneCharge) : 0;
+
+        //    var mzChargePlusOne = new Ion(composition, charge + 1).GetMostAbundantIsotopeMz();
+        //    var xicPlusOneCharge = Run.GetPrecursorExtractedIonChromatogram(mzChargePlusOne, Tolerance, ms2ScanNum);
+        //    var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
+
+        //    return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, corrMostAbundantPlusOneIsotope, corrMinusOneCharge, corrPlusOneCharge, modifications);
+        //}
     }
 
     public class IcScores
