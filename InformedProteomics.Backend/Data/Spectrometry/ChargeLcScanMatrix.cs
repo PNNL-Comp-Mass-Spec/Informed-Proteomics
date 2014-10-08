@@ -48,22 +48,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double proteinMass)
         {
+            var nominalMass = (int)System.Math.Round(proteinMass * Constants.RescalingConstant);
+
+            IEnumerable<ChargeScanRange> ranges;
+            if (_clusterMap.TryGetValue(nominalMass, out ranges)) return ranges;
+            
             BuildMatrix(proteinMass);
-            var clusters = Segmentation(_sumOverIsotope);
-
-            if (_scoringType == ScoringMeasure.PearsonCorrelation)
-            {
-                return clusters.Where(cluster => cluster.GetScore() > _scoreThreshold)
+            var clusters = GenerateClusters(_sumOverIsotope);
+            ranges = clusters.Where(cluster => cluster.GetScore() > _scoreThreshold)
                         .Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
-            }
+            _clusterMap[nominalMass] = ranges;
 
-            if (_scoringType == ScoringMeasure.KlDivergence)
-            {
-                return clusters.Where(cluster => cluster.GetScore() < _scoreThreshold)
-                        .Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
-            }
-
-            return null;
+            return ranges;
         }
 
         // TODO: to be revisited by Sangtae
@@ -102,10 +98,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IEnumerable<ChargeScanRange> GetAllChargeScanRegions(double proteinMass, out double[] scores)
         {
             BuildMatrix(proteinMass);
-            var clusters = Segmentation(_sumOverIsotope);
-
+            var clusters = GenerateClusters(_sumOverIsotope);
             scores = clusters.Select(ac => ac.GetScore()).ToArray();
-
             return clusters.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
         }
 
@@ -113,6 +107,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private void BuildMatrix(double proteinMass)
         {
             var isoEnv = Averagine.GetIsotopomerEnvelope(proteinMass);
+
             _envelopePdf = new double[isoEnv.Envolope.Length];
 
             for (var isotopeIndex = 0; isotopeIndex < isoEnv.Envolope.Length; isotopeIndex++)
@@ -183,6 +178,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double[][] _cachedXic;
         private readonly int _cachedMinBinNum;
         private readonly int _cachedMaxBinNum;
+
+        private readonly Dictionary<int, IEnumerable<ChargeScanRange>> _clusterMap; // NominalMass -> IEnumerable<ChargeScanRange>
 
         private ScoringMeasure _scoringType;
 
@@ -264,7 +261,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return score;
         }
         
-        private IEnumerable<ChargeLcScanCluster> Segmentation(double[,] matrix)
+        private IEnumerable<ChargeLcScanCluster> GenerateClusters(double[,] matrix)
         {
             var intensityThreshold = GetIntensityThreshold(matrix);
             var tempMap = new byte[NRows, NColumns];
