@@ -20,6 +20,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _minLcScan = 1;
             _maxLcScan = ReadNumSpectra();
+
             _msLevel = new Dictionary<int, int>();
         }
 

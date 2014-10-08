@@ -21,6 +21,9 @@ namespace InformedProteomics.Backend.MassSpecData
         public int MinMsLevel { get; protected set; }
         public int MaxMsLevel { get; protected set; }
 
+        public abstract double MinMs1Mz { get; protected set; }
+        public abstract double MaxMs1Mz { get; protected set; }
+
         public bool IsDia
         {
             get

@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Hybrid
         };
 
-        public ChargeLcScanMatrix(LcMsRun run, double minMz, double maxMz, int numBits = 27)
+        public ChargeLcScanMatrix(LcMsRun run, double minMz, double maxMz, int numBits = 26)
         {
             _minCharge = 2;
             _maxCharge = 60;
@@ -30,6 +30,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _comparer = new MzComparerWithBinning(numBits);
             
             _run = run;
+            _clusterMap = new Dictionary<int, IEnumerable<ChargeScanRange>>();
+            _binNumToMs2ScanNumsMap = new Dictionary<int, IEnumerable<int>>();
+
             _scoringType = ScoringMeasure.PearsonCorrelation;
             _scoreThreshold = 0.7;
             
@@ -46,39 +49,47 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
-        public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double proteinMass)
+        public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double monoIsotopicMass)
         {
-            var nominalMass = (int)System.Math.Round(proteinMass * Constants.RescalingConstant);
+            var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
 
             IEnumerable<ChargeScanRange> ranges;
-            if (_clusterMap.TryGetValue(nominalMass, out ranges)) return ranges;
-            
-            BuildMatrix(proteinMass);
+            if (_clusterMap.TryGetValue(binNumber, out ranges)) return ranges;
+
+            BuildMatrix(binNumber);
             var clusters = GenerateClusters(_sumOverIsotope);
             ranges = clusters.Where(cluster => cluster.GetScore() > _scoreThreshold)
                         .Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
-            _clusterMap[nominalMass] = ranges;
+            _clusterMap[binNumber] = ranges;
 
             return ranges;
         }
 
-        // TODO: to be revisited by Sangtae
         public IEnumerable<int> GetMatchingMs2ScanNums(double monoIsotopicMass)
         {
-            var ms2ScanNums = new List<int>();
-            var chargeScanRegions = GetProbableChargeScanRegions(monoIsotopicMass);
-            foreach (var chargeScanRange in chargeScanRegions)
+            var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
+            IEnumerable<int> ms2Scans;
+            if (_binNumToMs2ScanNumsMap.TryGetValue(binNumber, out ms2Scans)) return ms2Scans;
+
+            var ms2ScanList = new List<int>();
+            var isoEnv = Averagine.GetIsotopomerEnvelope(monoIsotopicMass);
+            var mostAbundantIsotopeIndex = isoEnv.MostAbundantIsotopeIndex;
+
+            foreach (var chargeScanRange in GetProbableChargeScanRegions(monoIsotopicMass))
             {
                 var minScanNum = chargeScanRange.MinCharge;
                 var maxScanNum = chargeScanRange.MaxCharge;
-
-                for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
+                for (var charge = chargeScanRange.MinCharge; charge <= chargeScanRange.MaxCharge; charge++)
                 {
-                    if (_run.GetMsLevel(scanNum) == 2) ms2ScanNums.Add(scanNum);
+                    var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, mostAbundantIsotopeIndex);
+                    ms2ScanList.AddRange(_run.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
+                        .Where(s => s >= minScanNum && s <= maxScanNum));
                 }
             }
-            ms2ScanNums.Sort();
-            return ms2ScanNums;
+            ms2ScanList.Sort();
+
+            _binNumToMs2ScanNumsMap.Add(binNumber, ms2ScanList);
+            return ms2ScanList;
         }
  
         public void SetScoringType(ScoringMeasure scoringType)
@@ -97,15 +108,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public IEnumerable<ChargeScanRange> GetAllChargeScanRegions(double proteinMass, out double[] scores)
         {
-            BuildMatrix(proteinMass);
+            var binNumber = _comparer.GetBinNumber(proteinMass);
+            BuildMatrix(binNumber);
             var clusters = GenerateClusters(_sumOverIsotope);
             scores = clusters.Select(ac => ac.GetScore()).ToArray();
             return clusters.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge)).ToList();
         }
 
 
-        private void BuildMatrix(double proteinMass)
+        private void BuildMatrix(int binNum)
         {
+            double proteinMass = _comparer.GetMzAverage(binNum);
             var isoEnv = Averagine.GetIsotopomerEnvelope(proteinMass);
 
             _envelopePdf = new double[isoEnv.Envolope.Length];
@@ -121,14 +134,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var abundantIsotopeMz = Ion.GetIsotopeMz(proteinMass, charge, isotopeIndex);
-                    var binNum = _comparer.GetBinNumber(abundantIsotopeMz);
+                    var curBinNum = _comparer.GetBinNumber(abundantIsotopeMz);
 
-                    if (binNum < _cachedMinBinNum || binNum > _cachedMaxBinNum) continue;
+                    if (curBinNum < _cachedMinBinNum || curBinNum > _cachedMaxBinNum) continue;
 
                     for (var scanIndex = 0; scanIndex < _numberOfScans; scanIndex++)
                     {
-                        _sumOverIsotope[charge - _minCharge, scanIndex] += _cachedXic[binNum - _cachedMinBinNum][scanIndex];
-                        _data[charge - _minCharge, scanIndex, isotopeIndex] = _cachedXic[binNum - _cachedMinBinNum][scanIndex];
+                        _sumOverIsotope[charge - _minCharge, scanIndex] += _cachedXic[curBinNum - _cachedMinBinNum][scanIndex];
+                        _data[charge - _minCharge, scanIndex, isotopeIndex] = _cachedXic[curBinNum - _cachedMinBinNum][scanIndex];
                     }
                 }
             }
@@ -136,7 +149,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public string PrintMatrix(double proteinMass)
         {
-            BuildMatrix(proteinMass);
+            var binNumber = _comparer.GetBinNumber(proteinMass);
+            BuildMatrix(binNumber);
 
             var sb = new StringBuilder();
 
@@ -156,7 +170,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public double[, ,] GetRawMatrix(double proteinMass)
         {
-            BuildMatrix(proteinMass);
+            var binNumber = _comparer.GetBinNumber(proteinMass);
+            BuildMatrix(binNumber);
 
             return _data; 
         }
@@ -179,7 +194,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly int _cachedMinBinNum;
         private readonly int _cachedMaxBinNum;
 
-        private readonly Dictionary<int, IEnumerable<ChargeScanRange>> _clusterMap; // NominalMass -> IEnumerable<ChargeScanRange>
+        private readonly Dictionary<int, IEnumerable<ChargeScanRange>> _clusterMap; // BinNum -> IEnumerable<ChargeScanRange>
+        private readonly Dictionary<int, IEnumerable<int>> _binNumToMs2ScanNumsMap;
 
         private ScoringMeasure _scoringType;
 

@@ -67,18 +67,6 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(run.GetNextScanNum(89));
         }
 
-        //[Test]
-        //public void TestReadingPbf()
-        //{
-        //    var sw = new System.Diagnostics.Stopwatch();
-
-        //    sw.Start();
-        //    var run = new InMemoryLcMsRun(new OldPbfReader(TestPbfFilePath));
-        //    Console.WriteLine(run.MaxLcScan);
-        //    var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-        //    Console.WriteLine(@"Done. {0:f4} sec", sec);
-        //}
-
         [Test]
         public void TestParsingSpectrumFile()
         {
