@@ -62,6 +62,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             // Account for the tolerance
             _sequenceMassBinToScanNumsMap = new Dictionary<int, IEnumerable<int>>();
+            var sumScanNums = 0L;
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
                 var sequenceMass = GetMass(binNum);
@@ -82,7 +83,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     }
                 }
                 _sequenceMassBinToScanNumsMap[binNum] = ms2ScanNums.ToArray();
+                sumScanNums += ms2ScanNums.Count;
             }
+            Console.WriteLine("#MS/MS matches per sequence: {0}", sumScanNums / (float)(maxBinNum-minBinNum+1));
             _map = null;
         }
 

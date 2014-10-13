@@ -400,40 +400,40 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.Write(sb.ToString());
         }
 
-        //public void FilterNoise(double signalToNoiseRatio = 1.4826)
-        //{
-        //    if (Peaks.Length < 2) return;
-        //    Array.Sort(Peaks, new IntensityComparer());
-        //    var medianIntPeak = Peaks[Peaks.Length / 2];
-        //    var noiseLevel = medianIntPeak.Intensity;
-
-        //    var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel * signalToNoiseRatio)).ToList();
-
-        //    filteredPeaks.Sort();
-        //    Peaks = filteredPeaks.ToArray();
-        //}
-
-        public void FilterNoise(double? mzWindowSize = null, double signalToNoiseRatio = 1.4826)
+        public void FilterNoise(double signalToNoiseRatio = 1.4826)
         {
-            var minMz = Peaks[0].Mz;
-            var maxMz = Peaks[Peaks.Length - 1].Mz;
-            var numSubSpectra = mzWindowSize == null ? 1 : (int)((maxMz - minMz) / mzWindowSize);
-            var range = (maxMz - minMz) / numSubSpectra;
+            if (Peaks.Length < 2) return;
+            Array.Sort(Peaks, new IntensityComparer());
+            var medianIntPeak = Peaks[Peaks.Length / 2];
+            var noiseLevel = medianIntPeak.Intensity;
 
-            var subSpecList =
-                from p in Peaks
-                group p by Math.Min((int)((p.Mz-minMz)/range), numSubSpectra-1)
-                into subSpectra
-                select subSpectra;
+            var filteredPeaks = Peaks.TakeWhile(peak => !(peak.Intensity < noiseLevel * signalToNoiseRatio)).ToList();
 
-            var filteredPeaks = new List<Peak>();
-            foreach (var subSpec in subSpecList)
-            {
-                //Console.WriteLine(subSpec.Key);
-                PeakListUtils.FilterNoise(subSpec.ToList(), ref filteredPeaks, signalToNoiseRatio);
-            }
+            filteredPeaks.Sort();
             Peaks = filteredPeaks.ToArray();
         }
+
+        //public void FilterNoise(double? mzWindowSize = null, double signalToNoiseRatio = 1.4826)
+        //{
+        //    var minMz = Peaks[0].Mz;
+        //    var maxMz = Peaks[Peaks.Length - 1].Mz;
+        //    var numSubSpectra = mzWindowSize == null ? 1 : (int)((maxMz - minMz) / mzWindowSize);
+        //    var range = (maxMz - minMz) / numSubSpectra;
+
+        //    var subSpecList =
+        //        from p in Peaks
+        //        group p by Math.Min((int)((p.Mz-minMz)/range), numSubSpectra-1)
+        //        into subSpectra
+        //        select subSpectra;
+
+        //    var filteredPeaks = new List<Peak>();
+        //    foreach (var subSpec in subSpecList)
+        //    {
+        //        //Console.WriteLine(subSpec.Key);
+        //        PeakListUtils.FilterNoise(subSpec.ToList(), ref filteredPeaks, signalToNoiseRatio);
+        //    }
+        //    Peaks = filteredPeaks.ToArray();
+        //}
 
         private static Bucket GetMostAbundantIntensity(ref List<Peak> peaks)
         {

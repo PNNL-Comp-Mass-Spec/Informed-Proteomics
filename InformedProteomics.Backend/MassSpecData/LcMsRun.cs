@@ -118,8 +118,8 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // minScanNum, maxScanNum, minCharge, maxCharge: inclusive
-        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, ActivationMethod activationMethod, 
-            int minScanNum, int maxScanNum, int minCharge, int maxCharge)
+        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass,
+            int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             var isoEnv = Averagine.GetIsotopomerEnvelope(monoIsotopicMass);
             var ms2ScanNums = new List<int>();
@@ -127,11 +127,20 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
                 ms2ScanNums.AddRange(GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
-                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum && ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod))
-                    ;
+                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum && 
+                        (activationMethod == ActivationMethod.Unknown || 
+                        ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod)))
+                        ;
             }
             var summedSpec = GetSummedSpectrum(ms2ScanNums);
             return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
+        }
+
+        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, ChargeScanRange range,
+            ActivationMethod activationMethod = ActivationMethod.Unknown)
+        {
+            return GetSummedMs2Spectrum(monoIsotopicMass, range.MinScanNum, range.MaxScanNum, range.MinCharge,
+                range.MaxCharge, activationMethod);
         }
 
         /// <summary>

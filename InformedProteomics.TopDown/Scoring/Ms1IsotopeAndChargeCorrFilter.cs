@@ -11,7 +11,6 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class Ms1IsotopeAndChargeCorrFilter : ISequenceFilter
     {
-        public const double RtWindowForSummingInMin = 1.0;
         public Ms1IsotopeAndChargeCorrFilter(
             LcMsRun run,
             Tolerance tolerance,
@@ -59,7 +58,7 @@ namespace InformedProteomics.TopDown.Scoring
             var ms2ScanNums = _run.GetScanNumbers(2);
             foreach (var ms2ScanNum in ms2ScanNums)
             {
-                //if (ms2ScanNum != 5675) continue;
+                //if (ms2ScanNum != 52468) continue;
                 SetLcMsMatches(ms2ScanNum);
             }
         }
@@ -70,89 +69,64 @@ namespace InformedProteomics.TopDown.Scoring
             if (productSpec == null) return;
 
             var isolationWindow = productSpec.IsolationWindow;
+            var minMz = isolationWindow.MinMz;
+            var maxMz = isolationWindow.MaxMz;
 
-            var rt = _run.GetElutionTime(ms2ScanNumber);
-            var rtMin = rt - RtWindowForSummingInMin / 2.0;
-            var rtMax = rt + RtWindowForSummingInMin / 2.0;
-
-            var minScanNum = ms2ScanNumber;
-            while (minScanNum >= _run.MinLcScan)
+            List<Peak> precursorPeakList = null;
+            List<Peak> precursorSpecWindow = null;
+            var precursorSpec = _run.GetSpectrum(_run.GetPrecursorScanNum(ms2ScanNumber));
+            if (precursorSpec != null)
             {
-                var prevScanNum = _run.GetPrevScanNum(minScanNum, 1);
-                if (_run.GetElutionTime(prevScanNum) < rtMin) break;
-                minScanNum = prevScanNum;
+                precursorPeakList = precursorSpec.GetPeakListWithin(minMz, maxMz);
+                precursorSpecWindow = precursorSpec.GetPeakListWithin(minMz-1.0, maxMz+1.0);
             }
 
-            var maxScanNum = ms2ScanNumber;
-            while (maxScanNum <= _run.MaxLcScan)
+            List<Peak> nextMs1PeakList = null;
+            List<Peak> nextMs1SpecWindow = null;
+            var nextScanNum = _run.GetNextScanNum(ms2ScanNumber, 1);
+            var nextSpec = _run.GetSpectrum(nextScanNum);
+            if (nextSpec != null)
             {
-                var nextScanNum = _run.GetNextScanNum(maxScanNum, 1);
-                if (_run.GetElutionTime(nextScanNum) > rtMax) break;
-                maxScanNum = nextScanNum;
+                nextMs1PeakList = nextSpec.GetPeakListWithin(minMz, maxMz);
+                nextMs1SpecWindow = nextSpec.GetPeakListWithin(minMz - 1.0, maxMz + 1.0);
             }
 
-            var summedSpectrum = _run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
-            var peakList = summedSpectrum.GetPeakListWithin(isolationWindow.MinMz, isolationWindow.MaxMz);
-            var specWindow = summedSpectrum.GetPeakListWithin(isolationWindow.MinMz - 1.0, isolationWindow.MaxMz + 1.0);
-            //var filteredPeakList = new List<Peak>();
-            //PeakListUtils.FilterNoise(peakList, ref filteredPeakList);
-            //new Spectrum(filteredPeakList, 0).Display();
-
-            //List<Peak> precursorPeakList = null;
-            //List<Peak> precursorSpecWindow = null;
-            //var precursorSpec = _run.GetSpectrum(_run.GetPrecursorScanNum(ms2ScanNumber));
-            //if (precursorSpec != null)
-            //{
-            //    precursorPeakList = precursorSpec.GetPeakListWithin(minMz, maxMz);
-            //    precursorSpecWindow = precursorSpec.GetPeakListWithin(minMz-1.0, maxMz+1.0);
-            //}
-
-            //List<Peak> nextMs1PeakList = null;
-            //List<Peak> nextMs1SpecWindow = null;
-            //var nextScanNum = _run.GetNextScanNum(ms2ScanNumber, 1);
-            //var nextSpec = _run.GetSpectrum(nextScanNum);
-            //if (nextSpec != null)
-            //{
-            //    nextMs1PeakList = nextSpec.GetPeakListWithin(minMz, maxMz);
-            //    nextMs1SpecWindow = nextSpec.GetPeakListWithin(minMz - 1.0, maxMz + 1.0);
-            //}
-
-            //List<Peak> peakList;
-            //if (precursorPeakList != null && nextMs1PeakList != null)
-            //{
-            //    peakList = PeakListUtils.Sum(precursorPeakList, nextMs1PeakList, _comparer);
-            //}
-            //else if (precursorPeakList != null)
-            //{
-            //    peakList = precursorPeakList;
-            //}
-            //else if (nextMs1PeakList != null)
-            //{
-            //    peakList = nextMs1PeakList;
-            //}
-            //else return;
+            List<Peak> peakList;
+            if (precursorPeakList != null && nextMs1PeakList != null)
+            {
+                peakList = PeakListUtils.Sum(precursorPeakList, nextMs1PeakList, _comparer);
+            }
+            else if (precursorPeakList != null)
+            {
+                peakList = precursorPeakList;
+            }
+            else if (nextMs1PeakList != null)
+            {
+                peakList = nextMs1PeakList;
+            }
+            else return;
 
             // Sort by intensity
-            specWindow.Sort(new IntensityComparer());
-            var remainingPeakList = new LinkedList<Peak>(specWindow);
+            peakList.Sort(new IntensityComparer());
+            var remainingPeakList = new LinkedList<Peak>(peakList);
 
-            SetLcMsMatches(remainingPeakList, ms2ScanNumber, peakList, MaxNumPeaksToConsider);
+            SetLcMsMatches(remainingPeakList, ms2ScanNumber, precursorSpecWindow, nextMs1SpecWindow, MaxNumPeaksToConsider);
         }
 
-        private void SetLcMsMatches(LinkedList<Peak> remainingPeakList, int scanNum, IList<Peak> peakList, int numPeaksToConsider)
+        private void SetLcMsMatches(LinkedList<Peak> remainingPeakList, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow, int numPeaksToConsider)
         {
             var numPeaksConsidered = 0;
             while(remainingPeakList.Any())
             {
                 var peakWithHighestIntensity = remainingPeakList.First.Value;
                 var peakMz = peakWithHighestIntensity.Mz;
-                SetLcMsMatches(peakMz, scanNum, peakList);
+                SetLcMsMatches(peakMz, scanNum, precursorSpecWindow, nextMs1SpecWindow);
                 if (++numPeaksConsidered >= numPeaksToConsider) break;
                 remainingPeakList.RemoveFirst();
             }
         }
 
-        private void SetLcMsMatches(double peakMz, int scanNum, IList<Peak> peakList)
+        private void SetLcMsMatches(double peakMz, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow)
         {
             var xicThisPeak = _run.GetPrecursorExtractedIonChromatogram(peakMz, _tolerance, scanNum);
             if (xicThisPeak.Count < 2) return;
@@ -172,12 +146,9 @@ namespace InformedProteomics.TopDown.Scoring
 
                 // Isotope correlation
                 var averagineIsotopeProfile = Averagine.GetTheoreticalIsotopeProfile(monoIsotopicMass, charge);
-                var isotopeCorr = peakList != null
-                    ? PeakListUtils.GetPearsonCorrelation(peakList, averagineIsotopeProfile, _comparer)
-                    : 0;
-                //var precursorIsotopeCorr = precursorSpecWindow != null ? PeakListUtils.GetPearsonCorrelation(precursorSpecWindow, averagineIsotopeProfile, _comparer) : 0;
-                //var nextMs1IsotopeCorr = nextMs1SpecWindow != null ? PeakListUtils.GetPearsonCorrelation(nextMs1SpecWindow, averagineIsotopeProfile, _comparer) : 0;
-                //var isotopeCorr = Math.Max(precursorIsotopeCorr, nextMs1IsotopeCorr);
+                var precursorIsotopeCorr = precursorSpecWindow != null ? PeakListUtils.GetPearsonCorrelation(precursorSpecWindow, averagineIsotopeProfile, _comparer) : 0;
+                var nextMs1IsotopeCorr = nextMs1SpecWindow != null ? PeakListUtils.GetPearsonCorrelation(nextMs1SpecWindow, averagineIsotopeProfile, _comparer) : 0;
+                var isotopeCorr = Math.Max(precursorIsotopeCorr, nextMs1IsotopeCorr);
                 if (isotopeCorr < _isotopeCorrThresholdThreshold) continue;
 
                 if (_chargeCorrThresholdThreshold > 0.0)

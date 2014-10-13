@@ -261,9 +261,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGetNumBins()
         {
-            var comparer = new MzComparerWithBinning(27);
-            const double minMz = 3000.0; // 600.0
-            const double maxMz = 50000.0;    // 2000.0
+            var comparer = new MzComparerWithBinning(26);
+            const double minMz = 5000.0; // 600.0
+            const double maxMz = 10000.0;    // 2000.0
             var minBinNum = comparer.GetBinNumber(minMz);
             var maxBinNum = comparer.GetBinNumber(maxMz);
             Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));

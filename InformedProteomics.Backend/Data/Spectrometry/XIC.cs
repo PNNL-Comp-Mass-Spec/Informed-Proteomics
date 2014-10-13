@@ -22,31 +22,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             if (Count == 0 || other == null || other.Count == 0) return 0;
 
-            //var minScanNum = Math.Min(this[0].ScanNum, other[0].ScanNum);
-            //var maxScanNum = Math.Max(this[Count-1].ScanNum, other[other.Count-1].ScanNum);
+            var count1 = Count;
+            var count2 = other.Count;
+            var index1 = 0;
+            var index2 = 0;
 
-            var minScanNum = this[0].ScanNum;
-            var maxScanNum = this[Count - 1].ScanNum;
-
-            var intArr1 = new double[Count];
-            var indexMap = new int[maxScanNum - minScanNum + 1];
-            var i = -1;
-            foreach (var p in this)
+            var intList1 = new List<double>();
+            var intList2 = new List<double>();
+            while (index1 < count1 && index2 < count2)
             {
-                intArr1[++i] = p.Intensity;
-                indexMap[p.ScanNum - minScanNum] = (i+1);
+                var comp = this[index1].ScanNum - other[index2].ScanNum;
+                if (comp < 0) ++index1;
+                else if (comp > 0) ++index2;
+                else
+                {
+                    intList1.Add(this[index1].Intensity);
+                    intList2.Add(other[index2].Intensity);
+                    ++index1;
+                    ++index2;
+                }
             }
 
-            var intArr2 = new double[Count];
-            foreach (var p in other)
-            {
-                var i2 = p.ScanNum - minScanNum;
-                if (i2 < 0 || i2 >= indexMap.Length) continue;
-                var index = indexMap[i2] - 1;
-                if(index >= 0) intArr2[index] = p.Intensity;
-            }
-
-            var correlation = FitScoreCalculator.GetPearsonCorrelation(intArr1, intArr2);
+            var correlation = FitScoreCalculator.GetPearsonCorrelation(intList1.ToArray(), intList2.ToArray());
             return correlation;
         }
 

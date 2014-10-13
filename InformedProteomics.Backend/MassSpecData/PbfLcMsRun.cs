@@ -55,6 +55,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 throw new FormatException("Illegal pbf file format!");
             }
+            CreatePrecursorNextScanMap();
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
@@ -216,9 +217,14 @@ namespace InformedProteomics.Backend.MassSpecData
             var isoWindowSet = new HashSet<IsolationWindow>();
             var isDda = false;
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
+            var minMsLevel = int.MaxValue;
+            var maxMsLevel = int.MinValue;
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
                 var msLevel = _reader.ReadInt32();
+                if (msLevel < minMsLevel) minMsLevel = msLevel;
+                if (msLevel > maxMsLevel) maxMsLevel = msLevel;
+
                 ScanNumToMsLevel[scanNum] = msLevel;
                 ScanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
                 if (msLevel == 2)
@@ -246,6 +252,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
             }
+
+            MinMsLevel = minMsLevel;
+            MaxMsLevel = maxMsLevel;
 
             IsDiaOrNull = !isDda;
 

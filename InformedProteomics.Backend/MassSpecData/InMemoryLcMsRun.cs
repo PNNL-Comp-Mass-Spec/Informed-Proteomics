@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class InMemoryLcMsRun: LcMsRun //ILcMsRun
+    public class InMemoryLcMsRun: LcMsRun //LcMsRun 
     {
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType)
         {

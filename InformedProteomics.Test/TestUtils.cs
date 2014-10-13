@@ -457,8 +457,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestNumIsoWindows()
         {
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            //const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";   // DDA
+            const string specFilePath = @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw"; // DIA
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
             Console.WriteLine("NumIsoWindows: " + run.GetNumUniqueIsoWindows());
             Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
         }

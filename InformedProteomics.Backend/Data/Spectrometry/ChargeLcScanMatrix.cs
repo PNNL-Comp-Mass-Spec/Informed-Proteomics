@@ -42,6 +42,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        public IEnumerable<ProductSpectrum> GetProductSpectra(double monoIsotopicMass)
+        {
+            return
+                GetProbableChargeScanRegions(monoIsotopicMass)
+                    .Select(r => _run.GetSummedMs2Spectrum(monoIsotopicMass, r));
+        }
+
         public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double monoIsotopicMass)
         {
             var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
