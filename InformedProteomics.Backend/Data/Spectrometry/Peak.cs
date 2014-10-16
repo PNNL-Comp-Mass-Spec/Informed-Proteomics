@@ -211,6 +211,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return (GetMzStart(binNum) + GetMzEnd(binNum))*0.5;
         }
 
+        public Tolerance GetTolerance()
+        {
+            // 27 bits: max error = 16 ppm, 28 bits (8 ppm), 26 bits (32 ppm)
+            var numBits = sizeof(double) * 8 - _numShifts;
+            var ppm = 16*Math.Pow(2, 27 - numBits);
+
+            return new Tolerance(ppm);
+        }
+
         private readonly int _numShifts;
     }
 
