@@ -507,7 +507,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (newCluster.GetScore() > envelopCorrTh)
                 {
                     var score2 = CalculateXicCorrelationOverTimeBetweenCharges(newCluster);
-                    if (score2 > chargeCorrTh) clusters.Add(newCluster);
+                    if (score2 > chargeCorrTh || newCluster.GetScore() > 0.9) clusters.Add(newCluster);
 
                     for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
                         for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) checkedOut[i][j] = true;
