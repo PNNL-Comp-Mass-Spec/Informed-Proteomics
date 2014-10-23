@@ -46,6 +46,44 @@ namespace InformedProteomics.Backend.Utils
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
         }
 
+        public static double GetPearsonCorrelation(double[] v1, int v1Index, double[] v2, int v2Index, int count)
+        {
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0;
+            if (count == 1) return 1.0;
+
+            // Compute means
+            var m1 = 0.0;
+            var m2 = 0.0;
+
+            for (var i = 0; i < count; i++)
+            {
+                m1 += v1[v1Index + i];
+                m2 += v2[v2Index + i];
+            }
+
+            m1 /= count;
+            m2 /= count;
+
+            // compute Pearson correlation
+            var cov = 0.0;
+            var s1 = 0.0;
+            var s2 = 0.0;
+
+            for (var i = 0; i < count; i++)
+            {
+                var d1 = v1[v1Index + i] - m1;
+                var d2 = v2[v2Index + i] - m2;
+                cov += d1 * d2;
+                s1 += d1 * d1;
+                s2 += d2 * d2;
+            }
+
+            if (s1 <= 0 || s2 <= 0) return 0;
+
+            return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
+        }
+
+
         // the larger the better
         public static double GetCosine(double[] theorPeakList, double[] observedPeakList)
         {

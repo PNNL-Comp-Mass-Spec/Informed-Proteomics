@@ -105,6 +105,8 @@ namespace InformedProteomics.Backend.SequenceTag
         {
             get
             {
+                if (Math.Abs(_eTrMax - _eTrMin) < 10E-9) return 0;
+                
                 double score = 0.5*NormalizeScore(EtrScore, _eTrMax, _eTrMin) +
                                NormalizeScore(EthScore, _eThMax, _eThMin);
                 return RescaleScore(score, _eThMax, _eThMin);

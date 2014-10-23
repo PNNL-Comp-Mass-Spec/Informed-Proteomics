@@ -192,6 +192,7 @@
     <Compile Include="SequenceTag\ScoringFunction.cs" />
     <Compile Include="SequenceTag\SequenceTagFinder.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
+    <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />
     <Compile Include="Utils\CubicSpline.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
