@@ -135,6 +135,7 @@
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
     <Compile Include="Data\Spectrometry\ILcMsMap.cs" />
+    <Compile Include="Data\Spectrometry\Ms1FeatureExtractor.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
