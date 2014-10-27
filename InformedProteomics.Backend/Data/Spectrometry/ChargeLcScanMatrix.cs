@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 using InformedProteomics.Backend.Data.Biology;
@@ -12,7 +13,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
-
+using MultiDimensionalPeakFinding;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -24,6 +25,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _maxCharge = 50;
             _ms1ScanNums = run.GetMs1ScanVector();
             _comparer = new MzComparerWithBinning(numBits);
+            _smoother = new SavitzkyGolaySmoother(9, 2);
 
             _nScans = _ms1ScanNums.Length;
             _nCharges = _maxCharge - _minCharge + 1;
@@ -51,11 +53,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             _intensityMap       = new double[_nCharges][];
+            _smoothIntensityMap = new double[_nCharges][];
             _correlationMap     = new double[_nCharges][];
             _xicMatrix          = new double[_nCharges][][];
             for (var i = 0; i < _nCharges; i++)
             {
                 _intensityMap[i] = new double[_nScans];
+                _smoothIntensityMap[i] = new double[_nScans];
                 _correlationMap[i] = new double[_nScans];
                 _xicMatrix[i] = new double[_nScans][];
                 for (var j = 0; j < _nScans; j++)
@@ -73,7 +77,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (_clusterMap.TryGetValue(binNumber, out ranges)) return ranges;
             
             BuildMatrix(binNumber);
-            var clusters = FindClusters(0.7, 0.6);
+            var clusters = FindClusters(0.7, 0.7);
             
             ranges = clusters.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge));
             return _clusterMap[binNumber] = ranges;
@@ -181,15 +185,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double[][] _intensityMap;
         private readonly double[][] _correlationMap;
         private readonly double[][][] _xicMatrix;
+
+        private readonly double[][] _smoothIntensityMap;
+
         
         private double[] _envelope;
         private int[] _envelopeIndex = null;
-        private const int MaxEnvelopeLength = 33;
+        private const int MaxEnvelopeLength = 100;
 
         private int[] _chargeIndexes;
 
         
         private readonly MzComparerWithBinning _comparer;
+        private readonly SavitzkyGolaySmoother _smoother;
 
         // caching
         private readonly double[][] _cachedXic;
@@ -198,8 +206,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly Dictionary<int, IEnumerable<ChargeScanRange>> _clusterMap; // BinNum -> IEnumerable<ChargeScanRange>
         private readonly Dictionary<int, IEnumerable<int>> _binNumToMs2ScanNumsMap;
-        
-        
         
         private double CalculateXicCorrelationOverTimeBetweenIsotopes(double proteinMass, ChargeLcScanCluster cluster)
         {
@@ -249,13 +255,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 for (var col = minCol; col <= maxCol; col++)
                 {
-                    if (_intensityMap[row][col] < 1) continue;
+                    if (_intensityMap[row][col] < 1E-6) continue;
 
                     profile1[col - minCol] += _xicMatrix[row][col][mostAbundantIsotopeIndex];
                     profile2[col - minCol] += _xicMatrix[row][col][mostAbundantIsotopeIndex - 1];
                     profile3[col - minCol] += _xicMatrix[row][col][mostAbundantIsotopeIndex + 1];
                 }
             }
+            /*
+            profile1 = _smoother.Smooth(profile1);
+            profile2 = _smoother.Smooth(profile2);
+            profile3 = _smoother.Smooth(profile3);
+            */
 
             return 0.5*
                    (FitScoreCalculator.GetPearsonCorrelation(profile1, profile2) +
@@ -264,11 +275,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private double CalculateXicCorrelationOverTimeBetweenCharges(ChargeLcScanCluster cluster)
         {
-            var maxCol = cluster.Members.Select(m => m.Col).Max();
-            var minCol = cluster.Members.Select(m => m.Col).Min();
+            var maxCol = cluster.MaxCol;
+            var minCol = cluster.MinCol;
+            var maxRow = cluster.MaxRow;
+            var minRow = cluster.MinRow;
 
             var colLen = maxCol - minCol + 1;
-            const int minColLen = 30;
+            int minColLen = Math.Max(colLen*2, 20);
 
             if (colLen < minColLen)
             {
@@ -281,10 +294,41 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     if (maxCol == _nScans - 1) minCol = maxCol - minColLen + 1;
                 }
             }
-            
-            var maxRow = cluster.Members.Select(m => m.Row).Max();
-            var minRow = cluster.Members.Select(m => m.Row).Min();
-            
+            var row1 = 0;
+            var row2 = 0;
+            if (maxRow == minRow)
+            {
+                row1 = minRow;
+                row2 = (row1 == _smoothIntensityMap.Length - 1) ? row1 - 1 : row1 + 1;
+            }
+
+            var temp = new List<KeyValuePair<double, int>>();
+            for (var row = minRow; row <= maxRow; row++)
+            {
+                var intensity = 0d;
+                for (var col = minCol; col <= maxCol; col++)
+                {
+                    intensity += _smoothIntensityMap[row][col];
+                }
+                temp.Add(new KeyValuePair<double, int>(intensity, row));
+            }
+
+            var i = 0;
+            foreach (var t in temp.OrderByDescending(x => x.Key))
+            {
+                if (i == 0) row1 = t.Value;
+                else
+                {
+                    row2 = t.Value;
+                    break;
+                }
+                i++;
+            }
+
+            return FitScoreCalculator.GetPearsonCorrelation(_smoothIntensityMap[row1], minCol, _smoothIntensityMap[row2], minCol,
+                maxCol - minCol + 1);
+
+            /*
             var row1 = (int)Math.Floor((maxRow + minRow) * 0.5);
             var row2 = row1 + 1;
             var row3 = row1 - 1;
@@ -300,20 +344,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 row2++;
                 row3++;
             }
-            //var row1 = cluster.Members[0].Row;
-            //var row2 = row1 + 1;
-            //if (row2 == _intensityMap.Length) row2 = row1 - 1;
-
-            //var profile1 = new double[maxCol - minCol + 1];
-            //var profile2 = new double[maxCol - minCol + 1];
-            //Array.Copy(_intensityMap[row1], minCol, profile1, 0, maxCol - minCol + 1);
-            //Array.Copy(_intensityMap[row2], minCol, profile2, 0, maxCol - minCol + 1);
 
             return 0.5*
                    (FitScoreCalculator.GetPearsonCorrelation(_intensityMap[row1], minCol, _intensityMap[row2], minCol,
                        maxCol - minCol + 1) +
                     FitScoreCalculator.GetPearsonCorrelation(_intensityMap[row1], minCol, _intensityMap[row3], minCol,
-                        maxCol - minCol + 1));
+                        maxCol - minCol + 1));*/
         }
 
         private void BuildMatrix(int binNum)
@@ -371,8 +407,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         for (var j = 0; j < _nScans; j++) _xicMatrix[charge - _minCharge][j][i] = 0;
                         continue;
                     }
+                    double[] xic = null;
 
-                    var xic = _cachedXic[curBinNum - _cachedMinBinNum];
+                    if (_cachedXic != null)
+                        xic = _cachedXic[curBinNum - _cachedMinBinNum];
+                    else
+                    {
+                        xic = _run.GetFullPrecursorIonExtractedIonChromatogramVector(_comparer.GetMzStart(curBinNum),
+                            _comparer.GetMzEnd(curBinNum));
+                    }
+
                     if (!observedCharges[charge - _minCharge] && xic.Any(x => x > 0)) observedCharges[charge - _minCharge] = true;
 
                     for (var j = 0; j < _nScans; j++)
@@ -397,6 +441,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             // Fill _correlationMap array
             foreach (var i in _chargeIndexes)
             {
+                _smoothIntensityMap[i] = _smoother.Smooth(_intensityMap[i]);
+                
                 for (var j = 0; j < _nScans; j++)
                 {
                     if (_intensityMap[i][j] < epsillon)
@@ -409,9 +455,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         _correlationMap[i][j] = FitScoreCalculator.GetPearsonCorrelation(_xicMatrix[i][j], 0, _envelope, 0,
                                                                                         _envelope.Length);
                     }
-                    
                 }
             }
+        }
+
+        public double[][] GetIntensityMap()
+        {
+            return _intensityMap;
+        }
+
+        public double[][] GetCorrelationMap()
+        {
+            return _correlationMap;
         }
         
         private double GetIntensityThreshold(double topRatio)
@@ -449,16 +504,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private List<ChargeLcScanCluster> FindClusters(double envelopCorrTh = 0.7, double chargeCorrTh = 0.5)
         {
-            const double corrLowerBound = 0.5;
-
+            const double corrLowerBound = 0.1;
+            const double corrSeedLowerBound = 0.1;
             var checkedOut = new bool[_nCharges][];
             for (var i = 0; i < _nCharges; i++) checkedOut[i] = new bool[_nScans];
             
             var clusters = new List<ChargeLcScanCluster>();
 
-            
-
-            foreach (var seedCell in GetSeedCells(corrLowerBound))
+            foreach (var seedCell in GetSeedCells(corrSeedLowerBound))
             {
                 if (checkedOut[seedCell.Row][seedCell.Col]) continue;
                 var newCluster = new ChargeLcScanCluster(seedCell, _xicMatrix[seedCell.Row][seedCell.Col], _intensityMap[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
@@ -485,7 +538,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                             var newScore = FitScoreCalculator.GetPearsonCorrelation(_envelope, tempEnvelope);
 
-                            if (newScore >= newCluster.Score || _correlationMap[k][l] > 0.85)
+                            if (newScore >= newCluster.Score || _correlationMap[k][l] > 0.9)
                             {
                                 var newMember = new ChargeLcScanCell(k, l);
                                 neighbors.Enqueue(newMember);
@@ -502,7 +555,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (newCluster.Score > envelopCorrTh)
                 {
                     var score2 = CalculateXicCorrelationOverTimeBetweenCharges(newCluster);
-                    if (score2 > chargeCorrTh || newCluster.Score > 0.88) clusters.Add(newCluster);
+                    if (score2 > chargeCorrTh || newCluster.Score > 0.9) clusters.Add(newCluster);
 
                     for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
                         for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) checkedOut[i][j] = true;
