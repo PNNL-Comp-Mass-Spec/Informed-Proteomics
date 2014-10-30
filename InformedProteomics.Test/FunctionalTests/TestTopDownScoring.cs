@@ -64,7 +64,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqComposition = seqCompositionArr[modIndex];
             var peptideComposition = seqComposition + Composition.H2O;
-            peptideComposition.GetIsotopomerEnvelope();
+            peptideComposition.GetIsotopomerEnvelopeRelativeIntensities();
 
             Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
             seqGraph.SetSink(modIndex);
@@ -122,7 +122,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqComposition = seqCompositionArr[modIndex];
             var peptideComposition = seqComposition + Composition.H2O;
-            peptideComposition.GetIsotopomerEnvelope();
+            peptideComposition.GetIsotopomerEnvelopeRelativeIntensities();
 
             Console.WriteLine("Composition: {0}, AveragineMass: {1}", seqComposition, seqComposition.Mass);
             seqGraph.SetSink(modIndex);

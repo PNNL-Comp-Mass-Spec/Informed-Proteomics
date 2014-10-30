@@ -125,7 +125,7 @@ namespace InformedProteomics.Backend.SequenceTag
 
                 var massTol = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[source].Mass);
                 var massDiff = _deconvolutedPeaks[target].Mass - _deconvolutedPeaks[source].Mass;
-                var residues = (from aa in aminoAcidArray where Math.Abs(aa.GetMass() - massDiff) < massTol select aa.Residue).ToList();
+                var residues = (from aa in aminoAcidArray where Math.Abs(aa.Mass - massDiff) < massTol select aa.Residue).ToList();
                 listOfAminoAcids.Add(residues.ToArray());
             }
 

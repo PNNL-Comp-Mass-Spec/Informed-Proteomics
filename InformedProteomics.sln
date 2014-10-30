@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PbfGen", "PbfGen\PbfGen.csp
 		{70A129AC-217A-4086-9ECB-63FF22289D90} = {70A129AC-217A-4086-9ECB-63FF22289D90}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelMSPathFinderT", "ParallelMSPathFinderT\ParallelMSPathFinderT.csproj", "{04E5216D-7451-4855-961F-EE212158AB73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -158,6 +160,17 @@ Global
 		{B31C2AC2-88C6-43C9-B809-26B7547592FF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B31C2AC2-88C6-43C9-B809-26B7547592FF}.Release|x64.ActiveCfg = Release|x64
 		{B31C2AC2-88C6-43C9-B809-26B7547592FF}.Release|x64.Build.0 = Release|x64
+		{04E5216D-7451-4855-961F-EE212158AB73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|x64.ActiveCfg = Release|x64
+		{04E5216D-7451-4855-961F-EE212158AB73}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

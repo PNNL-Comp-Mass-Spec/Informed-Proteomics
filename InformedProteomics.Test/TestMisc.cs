@@ -16,17 +16,11 @@ namespace InformedProteomics.Test
     public class TestMisc
     {
         [Test]
-        public void TestDivisionByInfinity()
-        {
-            Console.WriteLine(10f/float.NegativeInfinity);
-        }
-
-        [Test]
         public void ProcessIprg2015PreStudy()
         {
             const string dir = @"H:\Research\IPRG2015";
 
-            const string databaseFilePath = dir + @"\yeast6mix.fasta";
+            const string databaseFilePath = dir + @"\database\yeast6proteaprotein.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
@@ -103,7 +97,7 @@ namespace InformedProteomics.Test
         public void AddNaToTable()
         {
             const string dir = @"H:\Research\IPRG2015";
-            const string resultFilePath = dir + @"\AMT_Peptides.tsv";
+            const string resultFilePath = dir + @"\AMT_Peptides_Missing.tsv";
 
             const string outputFilePath = dir + @"\AMT_Peptides_NA.tsv";
             using (var writer = new StreamWriter(outputFilePath))
@@ -111,7 +105,8 @@ namespace InformedProteomics.Test
                 foreach (var line in File.ReadLines(resultFilePath))
                 {
                     var token = line.Split('\t');
-                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : t)));
+                    double result;
+                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : (Double.TryParse(t, out result) ? (result*1E6).ToString() : t))));
                 }
             }
         }
@@ -119,16 +114,28 @@ namespace InformedProteomics.Test
         [Test]
         public void AddProteinLengths()
         {
-            const string databaseFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            const string databaseFilePath = @"H:\Research\IPRG2015\database\yeast6proteaprotein.fasta";
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
-            const string proteinListPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\Proteins.txt";
-            foreach (var protein in File.ReadLines(proteinListPath))
+            const string resultPath = @"H:\Research\IPRG2015\AMT_Peptides_NA.tsv";
+            const string outputFilePath = @"H:\Research\IPRG2015\AMT_Peptides.tsv";
+            using (var writer = new StreamWriter(outputFilePath))
             {
-                var proteinId = protein.Split(null)[0];
-                var length = database.GetProteinLength(proteinId);
-                Console.WriteLine("{0}\t{1}", proteinId, length);
+                foreach (var line in File.ReadLines(resultPath))
+                {
+                    var data = line.Split(null);
+                    if (data.Length != 14) continue;
+                    var peptide = data[0];
+                    if (peptide.Equals("Peptide"))
+                    {
+                        writer.WriteLine("Peptide\tProtein\tLength\t{0}", string.Join("\t", data.Skip(2)));
+                        continue;
+                    }
+                    var protein = data[1];
+                    var length = database.GetProteinLength(protein);
+                    writer.WriteLine("{0}\t{1}\t{2}\t{3}", peptide, protein, length, string.Join("\t", data.Skip(2)));
+                }
             }
         }
 

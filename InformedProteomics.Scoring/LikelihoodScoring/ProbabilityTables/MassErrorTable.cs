@@ -60,7 +60,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         // found both peaks, compute mass error
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Both);
                         var aaIndex = (ionType.IsPrefixIon ? nextIonIndex : currIonIndex);
-                        var aaMz = pepSeq[aaIndex].GetMass()/charge;
+                        var aaMz = pepSeq[aaIndex].Mass/charge;
                         var massError = Math.Abs(nextPeak.Mz - currPeak.Mz) - aaMz;
                         _massError[ionType].AddDatum(massError);
                     }

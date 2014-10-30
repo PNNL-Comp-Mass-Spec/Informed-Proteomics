@@ -73,7 +73,7 @@ namespace InformedProteomics.IMS.IMSTraining
             var isotopomerEnvelop = new List<MSMSSpectrumPeak>();
             var composition = ionType.IsPrefixIon ? prefixComposition : suffixCompostion;
             var ion = ionType.GetIon(composition);
-            var theoreticalDist = ion.Composition.GetIsotopomerEnvelope();
+            var theoreticalDist = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var write = false;
             for (var i = -FeatureNode.OffsetFromMonoIsotope; i < theoreticalDist.Length; i++)
             {

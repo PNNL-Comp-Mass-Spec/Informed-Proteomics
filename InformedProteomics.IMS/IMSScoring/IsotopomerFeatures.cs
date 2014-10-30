@@ -19,7 +19,7 @@ namespace InformedProteomics.IMS.IMSScoring
                 //else if (ion.Charge == 2) BinningMultiplyFactor = 2;
             else BinningMultiplyFactor = 2;
 
-             var te = ion.Composition.GetIsotopomerEnvelope();
+             var te = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
              TheoreticalIsotopomerEnvelope = new double[(te.Length + FeatureNode.OffsetFromMonoIsotope) * BinningMultiplyFactor];
              for (var i = FeatureNode.OffsetFromMonoIsotope; i < te.Length + FeatureNode.OffsetFromMonoIsotope; i++)
             {

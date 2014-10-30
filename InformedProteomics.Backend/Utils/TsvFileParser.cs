@@ -8,9 +8,10 @@ namespace InformedProteomics.Backend.Utils
 {
     public class TsvFileParser
     {
-        public TsvFileParser(string fileName)
+        public TsvFileParser(string fileName, char delimiter = '\t')
         {
             FileName = fileName;
+            _delimeter = delimiter;
             Parse();
         }
 
@@ -99,6 +100,8 @@ namespace InformedProteomics.Backend.Utils
         private string[] _header;
         private string[] _rows;
         private Dictionary<string, List<string>> _data;
+        private readonly char _delimeter;
+
         private void Parse()
         {
             var rows = new List<string>();
@@ -107,7 +110,7 @@ namespace InformedProteomics.Backend.Utils
             var firstRow = true;
             foreach (var line in File.ReadLines(FileName))
             {
-                var token = line.Split('\t');
+                var token = line.Split(_delimeter);
                 if (firstRow)
                 {
                     _header = new string[token.Length];

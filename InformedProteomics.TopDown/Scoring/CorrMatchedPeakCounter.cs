@@ -30,7 +30,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
-                fragmentComposition.ComputeApproximateIsotopomerEnvelop();
+                //fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
                 var containsIon = false;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)

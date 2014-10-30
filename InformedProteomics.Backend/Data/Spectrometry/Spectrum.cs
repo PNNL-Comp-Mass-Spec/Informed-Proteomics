@@ -102,7 +102,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public bool ContainsIon(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelope();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
             var baseIsotopePeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
             if (baseIsotopePeakIndex < 0) return false;
@@ -162,7 +162,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public Peak[] GetAllIsotopePeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
             var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelope();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var baseIsotopMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
             var mostAbundantIsotopeMatchedPeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
             if (mostAbundantIsotopeMatchedPeakIndex < 0) return null;
@@ -314,7 +314,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             if (observedPeaks == null) return 0;
 
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelope();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var observedIntensities = new double[observedPeaks.Length];
 
             for (var i = 0; i < observedPeaks.Length; i++)
@@ -334,7 +334,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>fit score</returns>
         public double GetFitScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold)
         {
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelope();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
 
             if (observedPeaks == null) return 1;
@@ -358,7 +358,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             if (observedPeaks == null) return 0;
 
-            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelope();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var theoIntensities = new double[observedPeaks.Length];
             var observedIntensities = new double[observedPeaks.Length];
 

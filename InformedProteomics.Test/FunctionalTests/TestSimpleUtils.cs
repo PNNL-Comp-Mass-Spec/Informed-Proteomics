@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 
@@ -37,5 +39,14 @@ namespace InformedProteomics.Test.FunctionalTests
             //Assert.IsTrue(strSorted.Equals(shuffledSorted));
         }
 
+        [Test]
+        public void TestCompositionOperations()
+        {
+            var comp = new Composition(1, 2, 3, 4, 5);
+            var massComp = new CompositionWithDeltaMass(15.995);
+            var sum = comp + massComp + comp + massComp;
+            Console.WriteLine("{0}\t{1}\t{2}", sum, sum.Mass, sum.NominalMass);
+            Console.WriteLine(sum.GetIsotopomerEnvelope().MostAbundantIsotopeIndex);
+        }
     }
 }

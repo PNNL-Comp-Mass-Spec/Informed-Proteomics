@@ -51,21 +51,24 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDown\databases\ID_002166_F86E3B2F.fasta";
-            const string dbFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
+            const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+
+//            const string dbFile = @"C:\cygwin\home\kims336\Data\QCShew\ID_003456_9B916A8B.fasta";
+//            const string dbFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
 //            const string dbFile = @"H:\Research\CPTAC_Phospho\database\ID_004208_295531A4.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
-            //var numPeptides = indexedDb
-            //        .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-            //            21, 300, 1, 0).LongCount();
-            var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 150).LongCount();
+            var numPeptides = indexedDb
+                    .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+                        21, 300, 1, 0).LongCount();
+            //var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 150).LongCount();
             //var numPeptides =
             //    indexedDb.AnnotationsAndOffsets(7, 40, 2, 2, Enzyme.Trypsin).LongCount();
 
+
             //var numPeptides = indexedDb.AnnotationsAndOffsets(6, 40, 2, 2, Enzyme.Trypsin).LongCount();
-            //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(30, 250, 0)
+            //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(30, 250, 0).LongCount();
             //    .Select(annotationAndSequence => annotationAndSequence.Annotation.Length - 4)
             //    .Aggregate(0L, (current, length) => current + Math.Min(length - 29, 30));
 

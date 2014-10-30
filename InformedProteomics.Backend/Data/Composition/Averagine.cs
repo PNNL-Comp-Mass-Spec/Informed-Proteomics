@@ -63,8 +63,7 @@ namespace InformedProteomics.Backend.Data.Composition
             var numS = (int)Math.Round(S * numAveragines);
 
             if (numH == 0) numH = 1;
-            var composition = new Composition(numC, numH, numN, numO, numS);
-            return new IsotopomerEnvelope(composition.GetIsotopomerEnvelope(), composition.GetMostAbundantIsotopeZeroBasedIndex());
+            return IsoProfilePredictor.GetIsotopomerEnvelop(numC, numH, numN, numO, numS);
         }
     }
 }

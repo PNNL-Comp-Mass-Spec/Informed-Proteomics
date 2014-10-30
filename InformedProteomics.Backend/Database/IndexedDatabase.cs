@@ -44,6 +44,11 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        public int Search(string query)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
@@ -355,7 +360,7 @@ namespace InformedProteomics.Backend.Database
             //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
             var suffixArray = new int[sequence.Length-1];
             SAIS.sufsort(sequence, suffixArray, sequence.Length-1);
-
+            
             var prevIndex = sequence.Length - 1;
 
             var pLcp = new byte[suffixArray.Length];

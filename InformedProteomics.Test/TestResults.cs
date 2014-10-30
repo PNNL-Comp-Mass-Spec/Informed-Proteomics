@@ -15,7 +15,7 @@ namespace InformedProteomics.Test
         [Test]
         public void SummarizeAnilResults()
         {
-            const string resultFolder = @"H:\Research\Anil\Sep26";
+            const string resultFolder = @"H:\Research\Anil\Oct28";
             var actMethods = new[] { ActivationMethod.CID, ActivationMethod.ETD, ActivationMethod.HCD };
 
             Console.WriteLine("Data\tCID\t\tETD\t\tHCD\t");

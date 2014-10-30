@@ -1,17 +1,9 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Windows.Forms;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 using MultiDimensionalPeakFinding;
 

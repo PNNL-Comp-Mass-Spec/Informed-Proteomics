@@ -107,7 +107,7 @@ namespace InformedProteomics.Test
             //Assert.AreEqual(composition.ToPlainString(), "C34H51N7O14");
 
             Console.WriteLine("Isotopomer Envelope:");
-            foreach (var e in composition.GetIsotopomerEnvelope()) Console.WriteLine(e);
+            foreach (var e in composition.GetIsotopomerEnvelopeRelativeIntensities()) Console.WriteLine(e);
             Console.WriteLine();
 
             Console.WriteLine("Isotope ions:");
@@ -293,7 +293,7 @@ namespace InformedProteomics.Test
             var composition = new Composition(419, 699, 119, 129, 1);
             const int charge = 14;
             var ion = new Ion(composition + Composition.H2O, charge);
-            var ff = composition.GetIsotopomerEnvelope();
+            var ff = composition.GetIsotopomerEnvelopeRelativeIntensities();
             var isotopeIndex = -1;
             foreach (var ii in ff)
             {
@@ -320,7 +320,7 @@ namespace InformedProteomics.Test
                 var composition = aaSet.GetComposition(peptide);
                 var molFormula = composition.ToPlainString();
                 isoCalc.GetIsotopePattern(molFormula);
-                composition.GetIsotopomerEnvelope();
+                composition.GetIsotopomerEnvelopeRelativeIntensities();
             }
 
             Console.WriteLine("NumPeptides: " + numPeptides);

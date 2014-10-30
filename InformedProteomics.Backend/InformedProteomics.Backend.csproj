@@ -126,6 +126,9 @@
     <Compile Include="Database\AnnotationAndOffset.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Composition\Averagine.cs" />
+    <Compile Include="Data\Composition\AbstractComposition.cs" />
+    <Compile Include="Data\Composition\CompositionWithDeltaMass.cs" />
+    <Compile Include="Data\Composition\IsoProfilePredictor.cs" />
     <Compile Include="Data\Composition\IsotopomerEnvelope.cs" />
     <Compile Include="Data\Sequence\Cleavage.cs" />
     <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />

@@ -223,7 +223,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 foreach (var residue in keys)
                 {
                     var aa = GetAminoAcid(residue, location);
-                    Console.Write("{0}\t{1}\t{2}", residue, aa.GetMass(), aa.Composition);
+                    Console.Write("{0}\t{1}\t{2}", residue, aa.Mass, aa.Composition);
                     foreach (var modIndex in GetModificationIndices(residue, location))
                     {
                         Console.Write("\t" + _modificationParams.GetModification(modIndex));
@@ -290,7 +290,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
     public class ModifiedAminoAcid: AminoAcid
     {
-
         public ModifiedAminoAcid(AminoAcid aa, Modification modification) 
             : base(aa.Residue, aa.Name+"+"+modification.Name, aa.Composition+modification.Composition)
         {

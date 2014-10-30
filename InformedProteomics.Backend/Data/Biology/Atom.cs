@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Xml.Linq;
 
@@ -23,11 +21,6 @@ namespace InformedProteomics.Backend.Data.Biology
         public double Mass { get; private set; }
 
         public int NominalMass { get; private set; }
-
-        public double GetMass()
-        {
-            return Mass;
-        }
 
         public static readonly Atom[] AtomArr =
             {

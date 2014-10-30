@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Biology
         public IEnumerable<Isotope> GetIsotopes(double relativeIntensityThreshold)
         {
             var isotopeIndex = -1;
-            foreach (var isotopeRatio in Composition.GetIsotopomerEnvelope())
+            foreach (var isotopeRatio in Composition.GetIsotopomerEnvelopeRelativeIntensities())
             {
                 ++isotopeIndex;
                 if (isotopeRatio > relativeIntensityThreshold)
@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns>Enumerable of isotope peaks</returns>
         public IEnumerable<Isotope> GetIsotopes(int numIsotopes)
         {
-            var isotopes = Composition.GetIsotopomerEnvelope();
+            var isotopes = Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
             Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
@@ -90,7 +90,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public IList<Isotope> GetTop3Isotopes()
         {
-            var isotopes = Composition.GetIsotopomerEnvelope();
+            var isotopes = Composition.GetIsotopomerEnvelopeRelativeIntensities();
 
             var top3 = new List<Isotope>();
             var indexOfMostAbundantIsotope = Composition.GetMostAbundantIsotopeZeroBasedIndex();

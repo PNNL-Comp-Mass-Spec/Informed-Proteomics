@@ -38,7 +38,7 @@ namespace InformedProteomics.TopDown.Scoring
             _factory = factory;
 
             _maxIntensityIsotopeIndex = _proteinCompositionPlusWater.GetMostAbundantIsotopeZeroBasedIndex();
-            var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelope();
+            var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelopeRelativeIntensities();
 
             
 

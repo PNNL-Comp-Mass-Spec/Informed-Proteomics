@@ -33,8 +33,8 @@ namespace InformedProteomics.TopDown.Scoring
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
-                fragmentComposition.ComputeApproximateIsotopomerEnvelop();
-                var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelope();
+                //fragmentComposition.ComputeApproximateIsotopomerEnvelop();
+                var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelopeRelativeIntensities();
 
                 var bestCorrScore = -1.0;
                 var bestObsIntensity = -1.0;

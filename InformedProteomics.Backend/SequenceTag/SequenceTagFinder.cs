@@ -66,7 +66,7 @@ namespace InformedProteomics.Backend.SequenceTag
 
             for (int i = 0; i < AminoAcidsArray.Length; i++)
             {
-                MassArray[i] = AminoAcidsArray[i].GetComposition().Mass;
+                MassArray[i] = AminoAcidsArray[i].Composition.Mass;
             }
             MaxAminoAcidMass = MassArray.Max() + 1;
             MinAminoAcidMass = MassArray.Min() - 1;

@@ -181,7 +181,7 @@ namespace InformedProteomics.Test
             seqGraph.SetSink(0);
             var neutral = seqGraph.GetSinkSequenceCompositionWithH2O();
 
-            var theoProfile = neutral.GetIsotopomerEnvelope();
+            var theoProfile = neutral.GetIsotopomerEnvelopeRelativeIntensities();
             var expProfile = new double[theoProfile.Length];
             for (var charge = 22; charge <= 45; charge++)
             {

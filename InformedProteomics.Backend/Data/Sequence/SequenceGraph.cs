@@ -226,7 +226,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _sinkModIndex = modIndex;
             _sinkSequenceComposition = GetComposition(_index, modIndex);
             _sinkSequenceCompositionWithH2O = _sinkSequenceComposition + Composition.Composition.H2O;
-            _sinkSequenceCompositionWithH2O.ComputeApproximateIsotopomerEnvelop();
+            //_sinkSequenceCompositionWithH2O.ComputeApproximateIsotopomerEnvelop();
             _compNodeComposition = new Composition.Composition[MaxSeqIndex, _modificationParams.NumModificationCombinations];
         }
 

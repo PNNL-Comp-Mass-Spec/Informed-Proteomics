@@ -1,4 +1,5 @@
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -11,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             Residue = residue;
             Name = name;
             Composition = comp;
-            _mass = Composition.Mass;
+            Mass = Composition.Mass;
             _nominalMass = Composition.NominalMass;
         }
 
@@ -22,20 +23,17 @@ namespace InformedProteomics.Backend.Data.Sequence
         public char Residue { get; private set; }
         public string Name { get; private set; }
         public Composition.Composition Composition { get; private set; }
+        public double Mass { get; private set; }
 
         #endregion
 
         #region Getters
 
-        public Composition.Composition GetComposition()
-        {
-            return Composition;
-        }
+        //public IsotopomerEnvelope GetIsotopomerEnvelopeRelativeIntensities()
+        //{
+        //    return Composition.GetIsotopomerEnvelopeRelativeIntensities();
+        //}
 
-        public double GetMass()
-        {
-            return _mass;
-        }
         public int GetNominalMass()
         {
             return _nominalMass;
@@ -45,7 +43,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Private Members
 
-        private readonly double _mass;
         private readonly int _nominalMass;
 
         #endregion

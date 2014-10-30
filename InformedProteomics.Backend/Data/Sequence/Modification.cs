@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -8,21 +10,19 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int AccessionNum { get; private set; }
         public Composition.Composition Composition { get; private set; }
         public string Name { get; private set; }
-
-        public Composition.Composition GetComposition()
-        {
-            return Composition;
-        }
-
-        public double GetMass()
-        {
-            return Composition.Mass;
-        }
+        public double Mass { get { return Composition.Mass; } }
 
         private Modification(int accessionNum, Composition.Composition composition, string name)
         {
             AccessionNum = accessionNum;
             Composition = composition;
+            Name = name;
+        }
+
+        private Modification(int accessionNum, double deltaMass, string name)
+        {
+            AccessionNum = accessionNum;
+            Composition = new CompositionWithDeltaMass(deltaMass);
             Name = name;
         }
 
@@ -55,11 +55,17 @@ namespace InformedProteomics.Backend.Data.Sequence
             return null;
         }
 
-        public static IList<Modification> GetFromMass(string mass)
+        public static IList<Modification> GetFromMass(double mass)
         {
-            if (mass.StartsWith("+")) mass = mass.Substring(1);
+            var massStr = string.Format("{0:N3}", mass);
+            return GetFromMass(massStr);
+        }
+
+        public static IList<Modification> GetFromMass(string massStr)
+        {
+            if (massStr.StartsWith("+")) massStr = massStr.Substring(1);
             IList<Modification> modList;
-            return MassToModMap.TryGetValue(mass, out modList) ? modList : null;
+            return MassToModMap.TryGetValue(massStr, out modList) ? modList : null;
         }
 
         public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
@@ -140,6 +146,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (mod != null) return mod;
 
             mod = new Modification(-1, composition, name);
+            Register(mod);
+            return mod;
+        }
+
+        public static Modification RegisterAndGetModification(string name, double mass)
+        {
+            var modList = GetFromMass(mass);
+            if (modList != null && modList.Any()) return modList[0];
+
+            var mod = Get(name);
+            if (mod != null) return mod;
+
+            mod = new Modification(-1, mass, name);
             Register(mod);
             return mod;
         }

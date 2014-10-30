@@ -108,7 +108,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         }
         public Composition PeptideComposition
         {
-            get { return Sequence.GetComposition(); }
+            get { return Sequence.Composition; }
         }
 
         public List<Composition> Prefixes

@@ -8,8 +8,8 @@ namespace MSPathFinderT
 {
     internal class Program
     {
-        public const string Name = "MSPathFinderT";
-        public const string Version = "0.266 (Oct 12, 2014)";
+        public const string Name = "MSPathFinderT (NoFiltered MS2)";
+        public const string Version = "0.33 (Oct 28, 2014)";
         public const double DefaultCorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);

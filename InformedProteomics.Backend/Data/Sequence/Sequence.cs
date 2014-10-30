@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
@@ -44,16 +45,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         public Composition.Composition Composition { get; private set; }
-
-        public double GetMass()
-        {
-            return Composition.Mass;
-        }
-
-        public Composition.Composition GetComposition()
-        {
-            return Composition;
-        }
+        public double Mass { get { return Composition.Mass; } }
 
         public double GetMass(int from, int to)
         {
