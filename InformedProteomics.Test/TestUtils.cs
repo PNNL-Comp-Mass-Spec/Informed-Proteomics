@@ -429,6 +429,21 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestDeconvolutedIonTypes()
+        {
+            var comp1 = Composition.H2O;
+            var comp2 = new CompositionWithDeltaMass(-1);
+            Console.WriteLine(comp1 + comp2);
+            Console.WriteLine(comp1 - comp2);
+
+            var ionTypeFactory = IonTypeFactory.GetDeconvolutedIonTypeFactory(new[] {BaseIonType.B, BaseIonType.Y});
+            foreach (var ionType in ionTypeFactory.GetAllKnownIonTypes())
+            {
+                Console.WriteLine(ionType);
+            }
+        }
+
+        [Test]
         public void TestLinq()
         {
             var intArr = new List<double> {4.0, 1.0, 2.0, 6.0};

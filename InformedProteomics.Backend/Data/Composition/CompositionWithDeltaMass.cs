@@ -26,47 +26,17 @@ namespace InformedProteomics.Backend.Data.Composition
             get { return base.NominalMass + _deltaNominalMass; }
         }
 
-        public static CompositionWithDeltaMass operator +(CompositionWithDeltaMass c1, CompositionWithDeltaMass c2)
+        public new Composition Add(Composition c)
         {
-            var comp = (Composition)c1 + (Composition)c2;
-            return new CompositionWithDeltaMass(comp, c1._deltaMass+c2._deltaMass, c1._deltaNominalMass+c2._deltaNominalMass);
+            var comWithDelta = c as CompositionWithDeltaMass;
+            return comWithDelta == null ? 
+                new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass)
+                : new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
         }
 
-        public static CompositionWithDeltaMass operator +(Composition c1, CompositionWithDeltaMass c2)
+        public new Composition Negate()
         {
-            var comp = c1 + (Composition)c2;
-            return new CompositionWithDeltaMass(comp, c2._deltaMass, c2._deltaNominalMass);
-        }
-
-        public static CompositionWithDeltaMass operator +(CompositionWithDeltaMass c1, Composition c2)
-        {
-            return c2 + c1;
-        }
-
-        /// <summary>
-        /// Unary -
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static CompositionWithDeltaMass operator -(CompositionWithDeltaMass c)
-        {
-            var comp = -((Composition) c);
-            return new CompositionWithDeltaMass(comp, -c._deltaMass, -c._deltaNominalMass);
-        }
-
-        public static CompositionWithDeltaMass operator -(CompositionWithDeltaMass c1, CompositionWithDeltaMass c2)
-        {
-            return c1 + (-c2);
-        }
-
-        public static CompositionWithDeltaMass operator -(Composition c1, CompositionWithDeltaMass c2)
-        {
-            return c1 + (-c2);
-        }
-
-        public static CompositionWithDeltaMass operator -(CompositionWithDeltaMass c1, Composition c2)
-        {
-            return c1 + (-c2);
+            return new CompositionWithDeltaMass(base.Negate(), -_deltaMass, -_deltaNominalMass);
         }
 
         public override string ToString()
@@ -95,7 +65,8 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
-        private CompositionWithDeltaMass(Composition composition, double deltaMass, int deltaNominalMass): base(composition)
+        private CompositionWithDeltaMass(Composition composition, double deltaMass, int deltaNominalMass)
+            : base(composition)
         {
             _deltaMass = deltaMass;
             _deltaNominalMass = deltaNominalMass;

@@ -54,6 +54,43 @@ namespace InformedProteomics.Backend.Utils
             return bestPeakIndex == -1 ? null : peakList[bestPeakIndex];
         }
 
+        public static IList<Peak> FindAllPeaks(List<Peak> peakList, double mz, Tolerance tolerance)
+        {
+            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var minMz = mz - tolTh;
+            var maxMz = mz + tolTh;
+            return FindAllPeaks(peakList, minMz, maxMz);
+        }
+
+        public static IList<Peak> FindAllPeaks(List<Peak> peakList, double minMz, double maxMz)
+        {
+            //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
+            //return index < 0 ? null : peakList[index];
+            var index = peakList.BinarySearch(new Peak((minMz + maxMz) / 2, 0));
+            if (index < 0) index = ~index;
+
+            var matchedPeakList = new List<Peak>();
+            // go down
+            var i = index - 1;
+            while (i >= 0 && i < peakList.Count)
+            {
+                if (peakList[i].Mz <= minMz) break;
+                matchedPeakList.Add(peakList[i]);
+                --i;
+            }
+
+            // go up
+            i = index;
+            while (i >= 0 && i < peakList.Count)
+            {
+                if (peakList[i].Mz >= maxMz) break;
+                matchedPeakList.Add(peakList[i]);
+                ++i;
+            }
+            matchedPeakList.Sort();
+            return matchedPeakList;
+        }
+
         public static double GetPearsonCorrelation(IList<Peak> spec, IList<Peak> isoProfile,
             IComparer<Peak> comparer)
         {

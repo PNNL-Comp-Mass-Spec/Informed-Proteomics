@@ -68,6 +68,7 @@
     <Compile Include="Execution\MSAlignRescorer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\InformedTopDownScorer.cs" />
+    <Compile Include="Scoring\IsosFilter.cs" />
     <Compile Include="Scoring\Ms1IsotopeMostAbundantPlusOneFilter.cs" />
     <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />

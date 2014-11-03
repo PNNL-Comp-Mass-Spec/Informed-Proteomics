@@ -25,6 +25,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         // Z. instead of Z
         public static readonly BaseIonType Z = new BaseIonType("z", false, Composition.Composition.H2O-Composition.Composition.NH2+Composition.Composition.Hydrogen);  
 
+
         public static readonly IEnumerable<BaseIonType> AllBaseIonTypes = new List<BaseIonType> {A, B, C, X, Y, Z};
     }
 }
