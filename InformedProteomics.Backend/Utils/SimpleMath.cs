@@ -7,17 +7,23 @@ namespace InformedProteomics.Backend.Utils
 {
     public class SimpleMath
     {
-        public static int NChooseK(int n, int k)
+        public static double GetCombination(int n, int k)
         {
-            int num = 1;
-            for (int i = 0; i < k; i++)
-                num *= n - i;
-            int denom = 1;
-            for (int i = 0; i < k; i++)
-                denom *= k - i;
-            return num / denom;
+            var sum = GetLog10Combination(n, k);
+            return Math.Pow(10, sum);
         }
 
+        public static double GetLog10Combination(int n, int k)
+        {
+            double sum = 0;
+            for (var i = 0; i < k; i++)
+            {
+                sum += Math.Log(n - i, 10);
+                sum -= Math.Log(i + 1, 10);
+            }
+            return sum;
+        }
+        
         public static int[][] GetCombinationsWithRepetition(int n, int length)
         {
             if (n <= 0)
@@ -111,14 +117,7 @@ namespace InformedProteomics.Backend.Utils
         static public double GetKLDivergence(double[] P, double[] Q)
         {
             var ret = P.Select((t, i) => t*(Math.Log(t) - Math.Log(Q[i]))).Sum();
-
-            if (ret > 10000)
-            {
-                int a = 0;
-
-
-            }
-
+           
             return ret;
         }
     }

@@ -21,12 +21,36 @@ namespace InformedProteomics.Backend.Utils
             {
                 if (i < array.Length - 1)
                 {
-                    s.AppendFormat(formatString + ", ", array[i]);
+                    s.AppendFormat(formatString + "\t ", array[i]);
                 }
                 else
                 {
                     s.AppendFormat(formatString, array[i]);
                 }
+            }
+
+            return s.ToString();
+        }
+
+        public static string ToString<T>(T[][] array, string format = "")
+        {
+            var s = new StringBuilder();
+            var formatString = "{0" + format + "}";
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                for (var j = 0; j < array[i].Length; j++)
+                {
+                    if (j < array[i].Length - 1)
+                    {
+                        s.AppendFormat(formatString + "\t ", array[i][j]);
+                    }
+                    else
+                    {
+                        s.AppendFormat(formatString, array[i][j]);
+                    }                    
+                }
+                s.Append("\n");
             }
 
             return s.ToString();

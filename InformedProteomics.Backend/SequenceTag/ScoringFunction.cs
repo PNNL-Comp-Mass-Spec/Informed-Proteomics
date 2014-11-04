@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.SequenceTag
@@ -53,22 +52,9 @@ namespace InformedProteomics.Backend.SequenceTag
             var n1 = matchedPeakIndex[matchedPeakIndex.Count - 1] - matchedPeakIndex[0] + 1; //# of observed ions
             var m = matchedPeakIndex.Count; // # of matched ions
 
-            double score = NegativeLog10_NChooseK(n1, m) + NegativeLog10_NChooseK(n - n1, k - m) - NegativeLog10_NChooseK(n, k);
+            double score = SimpleMath.GetLog10Combination(n, k) - SimpleMath.GetLog10Combination(n1, m) - SimpleMath.GetLog10Combination(n - n1, k - m);
 
             return score;
-        }
-
-        public static double NegativeLog10_NChooseK(int n, int k)
-        {
-            double num = 0;
-            for (double i = 0; i < k; i++)
-                num -= Math.Log(n - i);
-
-            double denom = 0;
-            for (int i = 0; i < k; i++)
-                denom -= Math.Log(k - i, 10);
-
-            return num - denom;
         }
 
     }

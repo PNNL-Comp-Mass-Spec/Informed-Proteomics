@@ -5,6 +5,17 @@ namespace InformedProteomics.Backend.Utils
 {
     public class FitScoreCalculator
     {
+        //public static double GetNegativeLogHyperGeometricProbability(int n, int k, int n1, int k1)
+        public static double GetHyperGeometricProbability(int n, int k, int n1, int k1)
+        {
+            var score =
+                SimpleMath.GetLog10Combination(k, k1) +
+                SimpleMath.GetLog10Combination(n - k, n1 - k1) -
+                SimpleMath.GetLog10Combination(n, n1);
+
+            return Math.Pow(10, score);
+        }
+
         public static double GetPearsonCorrelation(double[] v1, double[] v2)
         {
             var dimension = v1.Length;
