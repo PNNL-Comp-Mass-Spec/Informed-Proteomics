@@ -436,7 +436,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(comp1 + comp2);
             Console.WriteLine(comp1 - comp2);
 
-            var ionTypeFactory = IonTypeFactory.GetDeconvolutedIonTypeFactory(new[] {BaseIonType.B, BaseIonType.Y});
+            var ionTypeFactory = IonTypeFactory.GetDeconvolutedIonTypeFactory(new[] {BaseIonType.B, BaseIonType.Y}, new[] { NeutralLoss.NoLoss, NeutralLoss.H2O});
             foreach (var ionType in ionTypeFactory.GetAllKnownIonTypes())
             {
                 Console.WriteLine(ionType);
