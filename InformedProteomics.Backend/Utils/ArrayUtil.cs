@@ -55,9 +55,21 @@ namespace InformedProteomics.Backend.Utils
 
             return s.ToString();
         }
+
+        public static int[] GetRankings(IEnumerable<double> values)
+        {
+            var temp = values.Select((v, i) => new KeyValuePair<double, int>(v, i)).ToList();
+        
+            var ranking = 1;
+            var rankingList = new int[temp.Count];
+
+            foreach (var t in temp.OrderByDescending(x => x.Key)) rankingList[t.Value] = ranking++;
+
+            return rankingList;
+        }
         
         // Kadane's algorithm
-        static int MaxSumSubarray(IList<int> a, out int start, out int len)
+        public static int MaxSumSubarray(IList<int> a, out int start, out int len)
         {
             start = 0;
             len = 1;
@@ -93,7 +105,7 @@ namespace InformedProteomics.Backend.Utils
             return sum;
         }
         // Kadane's algorithm
-        static double MaxSumSubarray(IList<double> a, out int start, out int len)
+        public static double MaxSumSubarray(IList<double> a, out int start, out int len)
         {
             start = 0;
             len = 1;
