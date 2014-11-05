@@ -24,7 +24,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             _ms1ScanNums = run.GetMs1ScanVector();
             _comparer = new MzComparerWithBinning(numBits);
-            _smoother = new SavitzkyGolaySmoother(9, 2);
+            //_smoother = new SavitzkyGolaySmoother(9, 2);
 
             _nScans = _ms1ScanNums.Length;
             _nCharges = _maxCharge - _minCharge + 1;
@@ -145,7 +145,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         
         private readonly MzComparerWithBinning _comparer;
-        private readonly SavitzkyGolaySmoother _smoother;
+        //private readonly SavitzkyGolaySmoother _smoother;
 
         // caching
         private readonly double[][] _cachedXic;

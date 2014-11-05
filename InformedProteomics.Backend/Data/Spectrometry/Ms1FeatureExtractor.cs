@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly int _maxSearchCharge;
         private readonly int _minSearchMassBin;
         private readonly int _maxSearchMassBin;
-
+        private readonly MzComparerWithBinning _comparer;
         private readonly LcMsRun _run;
 
 
@@ -127,10 +127,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _maxSearchCharge = searchMaxCharge;
             _run = run;
             _csm = new ChargeLcScanMatrix(run, 27, _minSearchCharge, _maxSearchCharge);
-            var comparer = _csm.GetMzComparerWithBinning();
-            
-            _minSearchMassBin = comparer.GetBinNumber(_minSearchMass);
-            _maxSearchMassBin = comparer.GetBinNumber(_maxSearchMass);
+            _comparer = _csm.GetMzComparerWithBinning();
+
+            _minSearchMassBin = _comparer.GetBinNumber(_minSearchMass);
+            _maxSearchMassBin = _comparer.GetBinNumber(_maxSearchMass);
             _massBinToClusterMap = new List<ChargeLcScanCluster>[_maxSearchMassBin - _minSearchMassBin + 1];
 
             for(var i = 0; i < _massBinToClusterMap.Length; i++)
@@ -139,38 +139,44 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public void Run()
         {
-            var ms1ScanNumbers = _run.GetMs1ScanVector();
-            
-            var comparer = _csm.GetMzComparerWithBinning();
+            //var ms1ScanNumbers = _run.GetMs1ScanVector();
 
             for (var binNum = _minSearchMassBin; binNum <= _maxSearchMassBin; binNum++)
             {
-
                 if ((binNum - _minSearchMassBin)%1000 == 0)
                 {
                     Console.WriteLine("Processed {0} mass bins for total {1} bins", binNum - _minSearchMassBin, _maxSearchMassBin - _minSearchMassBin + 1);
                 }
+                
+                var monoMass = _comparer.GetMzAverage(binNum);
+                //_massBinToClusterMap[binNum - _minSearchMassBin].AddRange(_csm.GetMs1Features(monoMass));
 
-                var monoMass = comparer.GetMzAverage(binNum);
 
-                var minShiftedMassBinIndex = Math.Max(comparer.GetBinNumber(monoMass - 3), _minSearchMassBin) - _minSearchMassBin;
-                var maxShiftedMassBinIndex = Math.Min(comparer.GetBinNumber(monoMass + 3), _maxSearchMassBin) - _minSearchMassBin;
+                var neighborMassBins = new List<int>();
 
-                foreach (var cluster in _csm.GetProbableChargeScanCluster(monoMass))
+                for (var i = -2; i <= 2; i++)
+                {
+                    if (i == 0) continue;
+                    var neighborIsotopebinNum = _comparer.GetBinNumber(monoMass + i);
+                    if (neighborIsotopebinNum >= _minSearchMassBin && neighborIsotopebinNum <= _maxSearchMassBin) neighborMassBins.Add(neighborIsotopebinNum);
+                }
+                
+                foreach (var cluster in _csm.GetMs1Features(monoMass))
                 {
                     // Before adding it, Check if there are existing neighbor that can be merged
-                    // search mass range = +-3 [Da]
+                    // search mass range = +-2 [Da]
                     cluster.Active = true;
                     var foundNeighbor = false;
-                    for (var neighborBin = minShiftedMassBinIndex; neighborBin <= maxShiftedMassBinIndex; neighborBin++)
+                    
+                    foreach (var neighborBin in neighborMassBins)
                     {
-                        foreach (var neighborCluster in _massBinToClusterMap[neighborBin])
+                        foreach (var neighborCluster in _massBinToClusterMap[neighborBin - _minSearchMassBin])
                         {
                             if (neighborCluster.Overlaps(cluster))
                             {
                                 if (neighborCluster.Active)
                                 {
-                                    if (neighborCluster.Score > cluster.Score)
+                                    if (neighborCluster.Score+neighborCluster.Score2 > cluster.Score+cluster.Score2)
                                     {
                                         cluster.Active = false;
                                     }
@@ -194,11 +200,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     }
 
                     _massBinToClusterMap[binNum - _minSearchMassBin].Add(cluster);
-
                     //scan, monomass, mz, charge, abundance, score
                     //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", scanNum, monoMass, mostAbundantIsotopeMz, charge, cluster.TotalIntensity, cluster.GetScore());
                 }
-            }            
+            }
         }
 
         public IEnumerable<Ms1Feature> GetMs1Features()
