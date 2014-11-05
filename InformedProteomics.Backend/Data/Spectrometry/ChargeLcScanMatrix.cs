@@ -383,8 +383,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
                 colLen = maxCol - minCol + 1;
             }
- 
-            var xicProfile = new double[4][];
+
+            var xicProfile = new double[_topEnvelopes.Length][];
             for (var i = 0; i < xicProfile.Length; i++) xicProfile[i] = new double[colLen];
 
             for (var row = minRow; row <= maxRow; row++)
@@ -393,10 +393,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     if (_intensityMap[row][col] < 1E-6) continue;
 
-                    xicProfile[0][col - minCol] += _xicMatrix[row][col][_mostAbundantIsotopeIndex];
-                    xicProfile[1][col - minCol] += _xicMatrix[row][col][_mostAbundantIsotopeIndex - 1];
-                    xicProfile[2][col - minCol] += _xicMatrix[row][col][_mostAbundantIsotopeIndex + 1];
-                    xicProfile[3][col - minCol] += _xicMatrix[row][col][_mostAbundantIsotopeIndex + 2];
+                    for (var k = 0; k < _topEnvelopes.Length; k++)
+                    {
+                        xicProfile[k][col - minCol] += _xicMatrix[row][col][_topEnvelopes[k]];    
+                    }
                 }
             }
 
@@ -456,14 +456,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return ret;
         }
 
+        private int[] _topEnvelopes;
+
         private void SetIsoEnvelope(double proteinMass)
         {
-            const double envelopeTh = 0.1;
-
+            //const double envelopeTh = 0.1;
             var isoEnv = Averagine.GetIsotopomerEnvelope(proteinMass);
-            var n = isoEnv.Envolope.Count(x => x > envelopeTh);
+            //var n = isoEnv.Envolope.Count(x => x > envelopeTh);
 
-            if (n <= MaxEnvelopeLength)
+            /*if (n <= MaxEnvelopeLength)
             {
                 _envelopeIndex  = new int[n];
                 _envelope       = new double[n];
@@ -478,6 +479,33 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                         if (isoEnv.MostAbundantIsotopeIndex == i) _mostAbundantIsotopeIndex = idx;
                         idx++;
+                    }
+                }
+            }*/
+
+            if (isoEnv.Envolope.Length < MaxEnvelopeLength)
+            {
+                _envelopeIndex = new int[isoEnv.Envolope.Length];
+                for (var i = 0; i < isoEnv.Envolope.Length; i++) _envelopeIndex[i] = i;
+                _envelope = isoEnv.Envolope;
+                _mostAbundantIsotopeIndex = isoEnv.MostAbundantIsotopeIndex;
+
+
+                if (isoEnv.Envolope.Length < 4)
+                    _topEnvelopes = _envelopeIndex;
+                else
+                {
+                    var sortedEnvelope = isoEnv.Envolope.ToList().OrderByDescending(x => x).ToArray();
+                    _topEnvelopes = new int[4];
+                    var idx = 0;
+                    for (var i = 0; i < isoEnv.Envolope.Length; i++)
+                    {
+                        if (_envelope[i] > sortedEnvelope[4])
+                        {
+                            _topEnvelopes[idx] = i;
+                            idx++;
+                        }
+                        
                     }
                 }
             }
@@ -499,6 +527,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         i++;
                     }
                 }
+
+                _topEnvelopes = new int[4];
+                var idx = 0;
+                for (i = 0; i < _envelopeIndex.Length; i++)
+                {
+                    if (_envelope[i] > sortedEnvelope[4])
+                    {
+                        _topEnvelopes[idx] = i;
+                        idx++;
+                    }
+                }
+
             }            
         }
 
@@ -706,6 +746,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (newCluster.Score > envelopCorrTh)
                 {
                     var score2 = CalculateXicCorrelationOverTimeBetweenIsotopes(monoMass, newCluster);
+                    newCluster.Score2 = score2;
                     if (score2 > isoCorrTh || (newCluster.Score > envelopCorrTh2 && score2 > isoCorrTh2)) clusters.Add(newCluster);
 
                     for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
@@ -777,6 +818,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     internal class ChargeLcScanCluster
     {
         internal double Score { get; private set; }
+        internal double Score2;
         internal readonly List<ChargeLcScanCell> Members;
 
         internal double HighestIntensity { get; private set; }
@@ -797,6 +839,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         internal ChargeLcScanCluster(ChargeLcScanCell seed, double[] seedEnvelope, double seedIntensity, double seedScore)
         {
             Score = seedScore;
+            Score2 = 0;
             SeedCorrelation = seedScore;
             Members = new List<ChargeLcScanCell> {seed};
 
