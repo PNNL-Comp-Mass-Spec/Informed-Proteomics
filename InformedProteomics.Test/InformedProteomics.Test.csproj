@@ -114,6 +114,7 @@
     <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="Obsolete\TestIMSScoring.cs" />
+    <Compile Include="TestLcMs1FeatureExtraction.cs" />
     <Compile Include="TestLcMsMap.cs" />
     <Compile Include="TestMisc.cs" />
     <Compile Include="TestIonFrequency.cs" />
