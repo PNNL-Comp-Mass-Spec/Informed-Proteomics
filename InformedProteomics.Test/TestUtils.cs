@@ -221,7 +221,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine((count-1)+": "+string.Join(",", combination));
             }
             Console.WriteLine("Count: " + count);
-            Console.WriteLine("Count2: " + SimpleMath.NChooseK(n + k - 1, k));
+            Console.WriteLine("Count2: " + SimpleMath.GetCombination(n + k - 1, k));
         }
 
         [Test]
