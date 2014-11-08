@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace InformedProteomics.Backend.Utils
@@ -55,19 +56,26 @@ namespace InformedProteomics.Backend.Utils
 
             return s.ToString();
         }
-
-        public static int[] GetRankings(IEnumerable<double> values)
-        {
-            var temp = values.Select((v, i) => new KeyValuePair<double, int>(v, i)).ToList();
         
+        public static int[] GetRankings(IEnumerable<double> values, double lowerBoundValue = 0.0d)
+        {
+            var temp = new List<KeyValuePair<double, int>>();
+            var i = 0;
+            foreach (var v in values)
+            {
+                if (v > lowerBoundValue) temp.Add(new KeyValuePair<double, int>(v, i));
+                i++;
+            }
+
             var ranking = 1;
-            var rankingList = new int[temp.Count];
-
-            foreach (var t in temp.OrderByDescending(x => x.Key)) rankingList[t.Value] = ranking++;
-
+            var rankingList = new int[i];
+            foreach (var t in temp.OrderByDescending(x => x.Key))
+            {
+                rankingList[t.Value] = ranking++;
+            }
             return rankingList;
         }
-        
+
         // Kadane's algorithm
         public static int MaxSumSubarray(IList<int> a, out int start, out int len)
         {

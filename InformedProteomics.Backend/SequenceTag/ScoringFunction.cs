@@ -52,7 +52,10 @@ namespace InformedProteomics.Backend.SequenceTag
             var n1 = matchedPeakIndex[matchedPeakIndex.Count - 1] - matchedPeakIndex[0] + 1; //# of observed ions
             var m = matchedPeakIndex.Count; // # of matched ions
 
-            double score = SimpleMath.GetLog10Combination(n, k) - SimpleMath.GetLog10Combination(n1, m) - SimpleMath.GetLog10Combination(n - n1, k - m);
+            //double score = SimpleMath.GetLogCombination(n, k) - SimpleMath.GetLogCombination(n1, m) - SimpleMath.GetLogCombination(n - n1, k - m);
+
+            var pvalue = FitScoreCalculator.GetHyperGeometricPvalue(n, k, n1, m);
+            var score = -Math.Log(pvalue);
 
             return score;
         }

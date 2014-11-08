@@ -9,17 +9,17 @@ namespace InformedProteomics.Backend.Utils
     {
         public static double GetCombination(int n, int k)
         {
-            var sum = GetLog10Combination(n, k);
-            return Math.Pow(10, sum);
+            var sum = GetLogCombination(n, k);
+            return Math.Exp(sum);
         }
 
-        public static double GetLog10Combination(int n, int k)
+        public static double GetLogCombination(int n, int k)
         {
             double sum = 0;
             for (var i = 0; i < k; i++)
             {
-                sum += Math.Log(n - i, 10);
-                sum -= Math.Log(i + 1, 10);
+                sum += Math.Log(n - i);
+                sum -= Math.Log(i + 1);
             }
             return sum;
         }

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows.Forms;
@@ -48,9 +49,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public double Score
         {
-            get { return _cluster.Score; }
+            get { return _cluster.GetScore(); }
         }
-
+        
         public int Charge
         {
             get
@@ -96,6 +97,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int MaxCharge
         {
             get { return _minCharge + _cluster.MaxRow; }
+        }
+
+        public double GetScore(int type)
+        {
+            if (type == 1) return _cluster.CorrBetweenObsTh;
+            
+            if (type == 2) return _cluster.CorrBetweenIsotopes;
+            
+            if (type == 3) return _cluster.RankSumScore;
+            
+            return _cluster.HyperGeometricScore;
         }
 
 
@@ -151,8 +163,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var monoMass = _comparer.GetMzAverage(binNum);
                 //_massBinToClusterMap[binNum - _minSearchMassBin].AddRange(_csm.GetMs1Features(monoMass));
 
-
                 var neighborMassBins = new List<int>();
+
+                if (binNum > _minSearchMassBin) neighborMassBins.Add(binNum - 1);
+                if (binNum < _maxSearchMassBin) neighborMassBins.Add(binNum + 1);
 
                 for (var i = -2; i <= 2; i++)
                 {
@@ -176,7 +190,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             {
                                 if (neighborCluster.Active)
                                 {
-                                    if (neighborCluster.Score+neighborCluster.Score2 > cluster.Score+cluster.Score2)
+                                    if (neighborCluster.GetScore() > cluster.GetScore())
                                     {
                                         cluster.Active = false;
                                     }
