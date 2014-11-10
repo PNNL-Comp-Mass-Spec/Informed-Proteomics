@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Utils
 {
     public class SimpleMath
     {
+        private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new Dictionary<Tuple<int, int>, double>();
+
         public static double GetCombination(int n, int k)
         {
             var sum = GetLogCombination(n, k);
@@ -15,12 +18,16 @@ namespace InformedProteomics.Backend.Utils
 
         public static double GetLogCombination(int n, int k)
         {
-            double sum = 0;
+            double sum = 0d;
+            if (LogCombinations.TryGetValue(new Tuple<int, int>(n, k), out sum)) return sum;
+
             for (var i = 0; i < k; i++)
             {
                 sum += Math.Log(n - i);
                 sum -= Math.Log(i + 1);
             }
+
+            LogCombinations.Add(new Tuple<int, int>(n, k), sum);
             return sum;
         }
         

@@ -118,5 +118,12 @@ namespace InformedProteomics.Backend.Data.Biology
             return isotopeMass/charge + Constants.Proton;
         }
 
+        public static double GetMonoIsotopicMass(double isotopeMz, int charge, int isotopeIndex)
+        {
+            var isotopeMass = (isotopeMz - Constants.Proton) * charge;
+            var monoIsotopeMass = isotopeMass - isotopeIndex * Constants.C13MinusC12;
+            return monoIsotopeMass;
+        }
+
     }
 }

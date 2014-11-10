@@ -31,7 +31,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 _ms1ScanNumToIndexMap.Add(_ms1ScanNums[i], i);
             }
-            
+
+            /*
+            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            {
+                var msLevel = run.GetMsLevel(scanNum);
+                if (msLevel != 2) continue;
+
+                var prevMs1ScanNum = run.GetPrevScanNum(scanNum, 1);
+                var nextMs1ScanNum = run.GetNextScanNum(scanNum, 1);
+            }
+            */
 
             _comparer = new MzComparerWithBinning(numBits);
 
@@ -79,11 +89,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _correlationMap     = new double[_nCharges][];
             _xicMatrix          = new double[_nCharges][][];
             _rankingMatrix      = new int[_nCharges][][];
+            _checkedOut = new bool[_nCharges][];
 
             for (var i = 0; i < _nCharges; i++)
             {
                 _intensityMapFull[i]            = new double[_nScans];
                 _intensityMapMostAbundant[i]    = new double[_nScans];
+                _checkedOut[i]                  = new bool[_nScans];
 
                 _correlationMap[i] = new double[_nScans];
                 _xicMatrix[i] = new double[_nScans][];
@@ -141,11 +153,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             for(var i = 0; i < clusters.Count; i++)
             {
                 scores[0][i] = clusters[i].CorrBetweenObsTh;
-                scores[1][i] = CalculateXicCorrelationOverTimeBetweenIsotopes(clusters[i]);
+                scores[1][i] = clusters[i].CorrBetweenIsotopes;
                 scores[2][i] = CalculateXicCorrelationOverTimeBetweenCharges(clusters[i]);
 
-                scores[3][i] = CalculateHyperGeometricScore(clusters[i]);
-                scores[4][i] = CalculateRankSumScore(clusters[i]);
+                scores[3][i] = clusters[i].HyperGeometricScore;
+                scores[4][i] = clusters[i].RankSumScore;
 
                 ms2ScanList[i] = GetMs2ScanNumbers(clusters[i]);
             }
@@ -192,11 +204,38 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly Dictionary<int, IEnumerable<ChargeLcScanCluster>> _clusterMap; // BinNum -> IEnumerable<ChargeScanRange>
         private readonly Dictionary<int, IEnumerable<int>> _binNumToMs2ScanNumsMap;
-
-
         private readonly Dictionary<int, int> _ms1ScanNumToIndexMap;
-        
-        
+
+
+        private IEnumerable<double> FindExactMassValue(ChargeLcScanCluster cluster)
+        {
+            var result = new List<double>();
+            for (var row = cluster.MinRow; row <= cluster.MaxRow; row++)
+            {
+                var charge = _minCharge + row;
+                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(_monoIsotopicMass, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
+
+                var binNum = _comparer.GetBinNumber(mostAbundantIsotopeMz);
+
+                //var minMs1 = _ms1ScanNums[cluster.MinCol];
+                //var maxMs1 = _ms1ScanNums[cluster.MaxCol];
+                //var xic =_run.GetFullPrecursorIonExtractedIonChromatogramVector(_comparer.GetMzStart(binNum), _comparer.GetMzEnd(binNum));
+
+                var xic =_run.GetFullPrecursorIonExtractedIonChromatogram(_comparer.GetMzStart(binNum),_comparer.GetMzEnd(binNum));
+
+                for (var t = cluster.MinCol; t <= cluster.MaxCol; t++)
+                {
+                    if (xic[t].Intensity > 0)
+                    {
+                        var monoMass =Ion.GetMonoIsotopicMass(mostAbundantIsotopeMz, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
+                        result.Add(monoMass);
+                    }
+                }
+            }
+
+            return result;
+        }
+
         internal IEnumerable<ChargeLcScanCluster> GetProbableChargeScanClusters(double monoIsotopicMass)
         {
             var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
@@ -233,11 +272,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return clusters;
         }
 
-        //private const int MaxMsScanNumPerCluster = 10;
         private HashSet<int> GetMs2ScanNumbers(ChargeLcScanCluster cluster)
         {
             var result = new HashSet<int>();
-            //var ms2ScanNumbers = new List<KeyValuePair<int, double>>();
             
             for (var row = cluster.MinRow; row <= cluster.MaxRow; row++)
             {
@@ -245,8 +282,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(_monoIsotopicMass, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
                 var ms2 = _run.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz);
 
-                //var ms2Set1 = ms2.Where(scanNum => scanNum >= _ms1ScanNums[cluster.MinCol] && scanNum <= _ms1ScanNums[cluster.MaxCol]); //.ToArray();
-                //for (var col = cluster.MinCol; col < cluster.MaxCol; col++)
                 var maxAbundance = 0d;
                 var selectedMs2ScanNum = 0;
                 foreach(var ms2ScanNum in ms2)
@@ -266,26 +301,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         maxAbundance = abundance;
                         selectedMs2ScanNum = ms2ScanNum;
                     }
-                    //ms2ScanNumbers.Add(new KeyValuePair<int, double>(ms2ScanNum, abundance));
                 }
-                //ms2ScanNumbers.UnionWith(ms2Set1);
-                /*
-                if (ms2Set1.Length > 0) continue;
-                
-                var minCol = Math.Max(cluster.MinCol - 1, 0);
-                var maxCol = Math.Min(cluster.MaxCol + 1, _ms1ScanNums.Length - 1);
-
-                var ms2Set2 = ms2.Where(scanNum => scanNum >= _ms1ScanNums[minCol] && scanNum <= _ms1ScanNums[maxCol]).ToArray();
-                ms2ScanNumbers.UnionWith(ms2Set2);*/
                 if (selectedMs2ScanNum > 0) result.Add(selectedMs2ScanNum);
             }
-            
-            /*
-            foreach (var ms2IntensityPair in ms2ScanNumbers.OrderByDescending(x => x.Value))
-            {
-                result.Add(ms2IntensityPair.Key);
-                if (result.Count > MaxMsScanNumPerCluster) break;
-            }*/
 
             return result;
         }
@@ -628,26 +646,29 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return seedCells.OrderByDescending(x => x.Key).Select(x => x.Value);
         }
 
+        private readonly bool[][] _checkedOut;
         // cutoff < Corr(thoeretical_envelope) * 2 + Corr(between isotopes)
         private List<ChargeLcScanCluster> FindClusters(double cutoff = 2.5, double hypergeometricCutoff = 50, double ranksumCutoff = 4)
         {
             BuildMatrix();
 
-            var checkedOut = new bool[_nCharges][];
-            for (var i = 0; i < _nCharges; i++) checkedOut[i] = new bool[_nScans];
+            //var checkedOut = new bool[_nCharges][];
+            //for (var i = 0; i < _nCharges; i++) checkedOut[i] = new bool[_nScans];
+
+            for (var i = 0; i < _nCharges; i++) Array.Clear(_checkedOut[i], 0, _checkedOut[i].Length);
             
             var clusters = new List<ChargeLcScanCluster>();
             var tempEnvelope = new double[_envelope.Length];
 
             foreach (var seedCell in GetSeedCells())
             {
-                if (checkedOut[seedCell.Row][seedCell.Col]) continue;
+                if (_checkedOut[seedCell.Row][seedCell.Col]) continue;
 
                 var newCluster = new ChargeLcScanCluster(seedCell, _xicMatrix[seedCell.Row][seedCell.Col], _envelope.Length, _intensityMapFull[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
                 var neighbors   = new Queue<ChargeLcScanCell>();
 
                 neighbors.Enqueue(seedCell); // pick a seed
-                checkedOut[seedCell.Row][seedCell.Col] = true;
+                _checkedOut[seedCell.Row][seedCell.Col] = true;
 
                 while (neighbors.Count > 0)
                 {
@@ -658,7 +679,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         for (var l = Math.Max(cell.Col - 1, 0); l <= Math.Min(cell.Col + 1, _nScans-1); l++)
                         {
-                            if (checkedOut[k][l] || _correlationMap[k][l] < CorrLowerBound) continue;
+                            if (_checkedOut[k][l] || _correlationMap[k][l] < CorrLowerBound) continue;
                             
                             for (var t = 0; t < tempEnvelope.Length; t++) tempEnvelope[t] = _xicMatrix[cell.Row][cell.Col][t] + _xicMatrix[k][l][t];
 
@@ -669,7 +690,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var newMember = new ChargeLcScanCell(k, l);
                                 neighbors.Enqueue(newMember);
                                 newCluster.AddMember(newMember, _intensityMapFull[k][l], _xicMatrix[k][l], newScore);
-                                checkedOut[k][l] = true;
+                                _checkedOut[k][l] = true;
                             }
                         }
                     }
@@ -677,19 +698,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                 newCluster.CorrBetweenObsTh = FitScoreCalculator.GetPearsonCorrelation(_envelope, newCluster.ObservedEnvelope);
 
-                newCluster.HyperGeometricScore = CalculateHyperGeometricScore(newCluster);
-                if (newCluster.HyperGeometricScore < hypergeometricCutoff) continue;
-
                 newCluster.RankSumScore = CalculateRankSumScore(newCluster);
                 if (newCluster.RankSumScore - 0.0005 * _monoIsotopicMass < ranksumCutoff) continue;
                 
                 newCluster.CorrBetweenIsotopes = CalculateXicCorrelationOverTimeBetweenIsotopes(newCluster);
                 if (newCluster.GetScore() < cutoff) continue;
 
+                newCluster.HyperGeometricScore = CalculateHyperGeometricScore(newCluster);
+                if (newCluster.HyperGeometricScore < hypergeometricCutoff) continue;
+
                 clusters.Add(newCluster);
 
                 for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
-                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) checkedOut[i][j] = true;
+                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) _checkedOut[i][j] = true;
                 
             }
 

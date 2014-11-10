@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -33,7 +34,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         public double Abundance
         {
-            get { return _cluster.TotalIntensity; }
+            //get { return _cluster.TotalIntensity; }
+            get { return _cluster.HighestIntensity; }
         }
 
         public IEnumerable<Tuple<int, double>> GetScanNumIntensityPair()
@@ -153,11 +155,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             //var ms1ScanNumbers = _run.GetMs1ScanVector();
 
+            var p = Process.GetCurrentProcess();
+            var sTm = p.UserProcessorTime.TotalMilliseconds;
+            var totalMassBins = _maxSearchMassBin - _minSearchMassBin + 1;
+
             for (var binNum = _minSearchMassBin; binNum <= _maxSearchMassBin; binNum++)
             {
                 if ((binNum - _minSearchMassBin)%1000 == 0)
                 {
-                    Console.WriteLine("Processed {0} mass bins for total {1} bins", binNum - _minSearchMassBin, _maxSearchMassBin - _minSearchMassBin + 1);
+                    var eTm = p.UserProcessorTime.TotalMilliseconds;
+                    var elapsed = (eTm - sTm)/60000;
+                    var processedBins = binNum - _minSearchMassBin;
+                    var remaining = (totalMassBins - processedBins)*(elapsed/processedBins);
+                    
+                    Console.WriteLine("Processed {0}/{1} mass bins; Elapsed Time = {2:0.0} [min]; Remaining Time = {3:0.0} [min]", processedBins, totalMassBins, elapsed, remaining);
                 }
                 
                 var monoMass = _comparer.GetMzAverage(binNum);
