@@ -138,7 +138,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _minSearchCharge = searchMinCharge;
             _maxSearchCharge = searchMaxCharge;
             _run = run;
-            _csm = new ChargeLcScanMatrix(run, 27, _minSearchCharge, _maxSearchCharge);
+            _csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge);
             _comparer = _csm.GetMzComparerWithBinning();
 
             _minSearchMassBin = _comparer.GetBinNumber(_minSearchMass);

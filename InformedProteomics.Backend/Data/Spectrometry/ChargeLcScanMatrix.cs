@@ -643,7 +643,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (checkedOut[seedCell.Row][seedCell.Col]) continue;
 
-                var newCluster = new ChargeLcScanCluster(seedCell, _xicMatrix[seedCell.Row][seedCell.Col], _intensityMapFull[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
+                var newCluster = new ChargeLcScanCluster(seedCell, _xicMatrix[seedCell.Row][seedCell.Col], _envelope.Length, _intensityMapFull[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
                 var neighbors   = new Queue<ChargeLcScanCell>();
 
                 neighbors.Enqueue(seedCell); // pick a seed
@@ -776,7 +776,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         internal bool Active;
         internal double[] IntensityAlongCol;
 
-        internal ChargeLcScanCluster(ChargeLcScanCell seed, double[] seedEnvelope, double seedIntensity, double seedCorr)
+        internal ChargeLcScanCluster(ChargeLcScanCell seed, double[] seedEnvelope, int envelopeLength, double seedIntensity, double seedCorr)
         {
             CorrBetweenObsTh = seedCorr;
             CorrBetweenIsotopes = 0;
@@ -786,8 +786,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             SeedCorrelation = seedCorr;
             Members = new List<ChargeLcScanCell> {seed};
 
-            ObservedEnvelope = new double[seedEnvelope.Length];
-            Array.Copy(seedEnvelope, ObservedEnvelope, seedEnvelope.Length);
+            ObservedEnvelope = new double[envelopeLength];
+            Array.Copy(seedEnvelope, ObservedEnvelope, envelopeLength);
 
             HighestIntensity = seedIntensity;
             _highestIntensityMemberIndex = 0;
