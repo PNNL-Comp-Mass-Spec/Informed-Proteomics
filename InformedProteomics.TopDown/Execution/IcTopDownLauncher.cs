@@ -40,11 +40,14 @@ namespace InformedProteomics.TopDown.Execution
             double precursorIonTolerancePpm = 10,
             double productIonTolerancePpm = 10,
             bool? runTargetDecoyAnalysis = true,
-            int searchMode = 1)
+            int searchMode = 1,
+            string isosFilePath = null
+            )
         {
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
+            IsosFilePath = isosFilePath;
             OutputDir = outputDir;
             MinSequenceLength = minSequenceLength;
             MaxSequenceLength = maxSequenceLength;
@@ -66,6 +69,7 @@ namespace InformedProteomics.TopDown.Execution
         public string DatabaseFilePath { get; private set; }
         public string OutputDir { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
+        public string IsosFilePath { get; private set; }
         public int MinSequenceLength { get; private set; }
         public int MaxSequenceLength { get; private set; }
         public int MaxNumNTermCleavages { get; private set; }
@@ -95,36 +99,40 @@ namespace InformedProteomics.TopDown.Execution
 
             Console.Write("Reading raw file...");
             sw.Start();
-            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
+            _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             sw.Reset();
-            Console.Write("Determining precursor masses...");
+            Console.Write("Extracting chromatograms for finding features...");
             sw.Start();
 
             //var lcMsMap = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge,
             //    MaxPrecursorIonCharge,
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
 
-            var ms1Filter = new ChargeLcScanMatrix(_run);
+            var ms1Filter = IsosFilePath == null
+                ? (ISequenceFilter) new ChargeLcScanMatrix(_run)
+                : new IsosFilter(_run, PrecursorIonTolerance, IsosFilePath);
+
             sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
-            sw.Reset();
-            Console.Write("Deconvoluting MS2 spectra...");
-            sw.Start();
+            //sw.Reset();
+            //Console.Write("Deconvoluting MS2 spectra...");
+            //sw.Start();
             _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
                 _run,
                 MinProductIonCharge, MaxProductIonCharge,
                 ProductIonTolerance
                 );
-            _ms2ScorerFactory.DeconvoluteProductSpectra();
-            sw.Stop();
-            sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+            //_ms2ScorerFactory.DeconvoluteAllProductSpectra();
+            //sw.Stop();
+            //sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+            //Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             // Target database
             var targetDb = new FastaDatabase(DatabaseFilePath);

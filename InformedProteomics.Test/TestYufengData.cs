@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
 
             var ms1Filter = new SimpleMs1Filter();
             var ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(run);
-            foreach(var ms2ScanNum in Ms2ScanNums) ms2ScorerFactory.DeconvoluteProductSpectrum(ms2ScanNum);
+            foreach(var ms2ScanNum in Ms2ScanNums) ms2ScorerFactory.GetScorer(ms2ScanNum);
 
             for (var numNTermCleavages = 0; numNTermCleavages <= 0; numNTermCleavages++)
             {

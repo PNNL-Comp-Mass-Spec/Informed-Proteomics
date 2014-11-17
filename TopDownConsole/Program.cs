@@ -8,8 +8,8 @@ namespace MSPathFinderT
 {
     internal class Program
     {
-        public const string Name = "MSPathFinderT (NoFiltered MS2)";
-        public const string Version = "0.33 (Oct 28, 2014)";
+        public const string Name = "MSPathFinderT";
+        public const string Version = "0.52 (Nov 10, 2014)";
         public const double DefaultCorrThreshold = 0.7;
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -46,7 +46,8 @@ namespace MSPathFinderT
                 {"-maxFragCharge", "15"},
                 {"-minMass", "3000.0"},
                 {"-maxMass", "50000.0"},
-                {"-corr", "0.7"}
+                {"-corr", "0.7"},
+                {"-isos", null}
             };
 
             for (var i = 0; i < args.Length/2; i++)
@@ -93,7 +94,8 @@ namespace MSPathFinderT
                     parameters.PrecursorIonTolerancePpm,
                     parameters.ProductIonTolerancePpm,
                     parameters.Tda,
-                    parameters.SearchMode
+                    parameters.SearchMode,
+                    parameters.IsosFilePath
                     );
                 topDownLauncher.RunSearch(parameters.CorrThreshold);
             }
@@ -122,7 +124,8 @@ namespace MSPathFinderT
                 "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n" +
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
-                "\t[-corr CorrThreshold] (correlation threshold, default: 0.7)\n"
+                "\t[-corr CorrThreshold] (correlation threshold, default: 0.7)\n" +
+                "\t[-isos IsosFile] (*.isos)\n"
                 );
         }
 

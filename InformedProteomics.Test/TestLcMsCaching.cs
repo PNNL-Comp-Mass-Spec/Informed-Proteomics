@@ -18,6 +18,18 @@ namespace InformedProteomics.Test
     internal class TestLcMsCaching
     {
         [Test]
+        public void TestIsosFilter()
+        {
+            const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";
+
+            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            var filter = new IsosFilter(run, new Tolerance(10), isosFilePath);
+            Console.WriteLine(string.Join("\t",filter.GetMatchingMs2ScanNums(30261.68374)));
+        }
+
+        [Test]
         public void FilteringEfficiencyQcShew()
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -427,7 +439,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             var runCache = new ProductScorerBasedOnDeconvolutedSpectra(run);
-            runCache.DeconvoluteProductSpectra();
+            runCache.DeconvoluteAllProductSpectra();
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);

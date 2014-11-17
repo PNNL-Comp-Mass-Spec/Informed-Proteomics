@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Biology
@@ -114,7 +112,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public static double GetIsotopeMz(double monoIsotopicMass, int charge, int isotopeIndex)
         {
-            var isotopeMass = monoIsotopicMass + isotopeIndex*Biology.Constants.C13MinusC12;
+            var isotopeMass = monoIsotopicMass + isotopeIndex*Constants.C13MinusC12;
             return isotopeMass/charge + Constants.Proton;
         }
 

@@ -163,8 +163,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
-            var baseIsotopMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
-            var mostAbundantIsotopeMatchedPeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
+            var mostAbundantIsotopeMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
+            var mostAbundantIsotopeMatchedPeakIndex = FindPeakIndex(mostAbundantIsotopeMz, tolerance);
             if (mostAbundantIsotopeMatchedPeakIndex < 0) return null;
 
             var observedPeaks = new Peak[isotopomerEnvelope.Length];

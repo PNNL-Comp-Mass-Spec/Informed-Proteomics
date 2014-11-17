@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Utils
 {
     public class SimpleMath
     {
+        public static int NChooseK(int n, int k)
+        {
+            int num = 1;
+            for (int i = 0; i < k; i++)
+                num *= n - i;
+            int denom = 1;
+            for (int i = 0; i < k; i++)
+                denom *= k - i;
+            return num/denom;
+        }
+
         private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new Dictionary<Tuple<int, int>, double>();
 
         public static double GetCombination(int n, int k)

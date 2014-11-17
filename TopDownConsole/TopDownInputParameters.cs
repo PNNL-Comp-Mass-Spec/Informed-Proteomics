@@ -27,6 +27,7 @@ namespace MSPathFinderT
         public double MinSequenceMass { get; set; }
         public double MaxSequenceMass { get; set; }
         public double CorrThreshold { get; set; }
+        public string IsosFilePath { get; set; }
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
@@ -53,6 +54,10 @@ namespace MSPathFinderT
             foreach (var searchMod in _searchModifications)
             {
                 Console.WriteLine(searchMod);
+            }
+            if (IsosFilePath != null)
+            {
+                Console.WriteLine("Getting MS1 features from {0}.", IsosFilePath);
             }
         }
 
@@ -95,14 +100,7 @@ namespace MSPathFinderT
             if (message != null) return message;
 
             var specFilePath = parameters["-s"];
-            if (Directory.Exists(specFilePath)) // Directory
-            {
-                SpecFilePaths = Directory.GetFiles(specFilePath, "*.raw");
-            }
-            else
-            {
-                SpecFilePaths = new[] { specFilePath };
-            }
+            SpecFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
             DatabaseFilePath = parameters["-d"];
 
             var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
@@ -133,6 +131,8 @@ namespace MSPathFinderT
                 AminoAcidSet = new AminoAcidSet();
                 _searchModifications = new SearchModification[0];
             }
+
+            IsosFilePath = parameters["-isos"];
 
             SearchMode = Convert.ToInt32(parameters["-m"]);
             if (SearchMode < 0 || SearchMode > 2)
@@ -188,7 +188,7 @@ namespace MSPathFinderT
             {
                 var key = keyValuePair.Key;
                 var value = keyValuePair.Value;
-                if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o")
+                if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" && keyValuePair.Key != "-isos")
                 {
                     return "Missing required parameter " + key + "!";
                 }
@@ -235,6 +235,17 @@ namespace MSPathFinderT
                     if (value != null && !File.Exists(value))
                     {
                         return "File not found." + value + "!";
+                    }
+                }
+                else if (key.Equals("-isos"))
+                {
+                    if (value != null && !File.Exists(value))
+                    {
+                        return "File not found." + value + "!";
+                    }
+                    if (value != null && !Path.GetExtension(value).ToLower().Equals(".csv"))
+                    {
+                        return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")!";
                     }
                 }
                 else

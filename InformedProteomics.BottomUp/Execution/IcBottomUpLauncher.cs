@@ -124,7 +124,7 @@ namespace InformedProteomics.BottomUp.Execution
                 new Tolerance(10),
                 0
                 );
-            _ms2ScorerFactory.DeconvoluteProductSpectra();
+            _ms2ScorerFactory.DeconvoluteAllProductSpectra();
             sw.Stop();
             sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);

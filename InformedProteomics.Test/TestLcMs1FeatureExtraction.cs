@@ -38,6 +38,12 @@ namespace InformedProteomics.Test
 
             var csm = new ChargeLcScanMatrix(run, NumBits, MinCharge, MaxCharge, false);
 
+            Console.WriteLine("Regions:");
+            foreach (var region in csm.GetProbableChargeScanRegions(proteinMass))
+            {
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", region.MinCharge, region.MaxCharge, region.MinScanNum, region.MaxScanNum);
+            }
+
             var ms2Nums = csm.GetMatchingMs2ScanNums(proteinMass);
 
             foreach (var ms2 in ms2Nums)

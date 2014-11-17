@@ -5,7 +5,6 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using MathNet.Numerics.Integration.Algorithms;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -41,6 +40,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     for (var scanNum = scanRange.Min; scanNum <= scanRange.Max; scanNum++)
                     {
+                        
                         if (scanNum < run.MinLcScan || scanNum > run.MaxLcScan) continue;
                         if (run.GetMsLevel(scanNum) == 2)
                         {
@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 massBinToScanNumsMapNoTolerance.Add(binNum, ms2ScanNums);
             }
 
-            // Account for the tolerance
+            // Account for mass tolerance
             _sequenceMassBinToScanNumsMap = new Dictionary<int, IEnumerable<int>>();
             var sumScanNums = 0L;
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)

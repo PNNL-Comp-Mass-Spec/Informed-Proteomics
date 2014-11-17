@@ -33,7 +33,7 @@ namespace InformedProteomics.Test
 
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 2, 10, 0, 1.1);
-            ms2Scorer.DeconvoluteProductSpectra();
+            ms2Scorer.DeconvoluteAllProductSpectra();
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
 
             var graph = SequenceGraph.CreateGraph(aaSet, annotation);

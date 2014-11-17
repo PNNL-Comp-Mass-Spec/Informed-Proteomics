@@ -44,28 +44,28 @@ namespace InformedProteomics.TopDown.Scoring
         {
             IScorer scorer;
             if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
-            return null;
+
+            scorer = GetScorer(scanNum);
+            if (scorer == null) return null;
+            return _ms2Scorer[scanNum] = scorer;
         }
 
-        public void DeconvoluteProductSpectra()
+        public void DeconvoluteAllProductSpectra()
         {
             foreach (var scanNum in _run.GetScanNumbers(2))
             {
-                var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-                if (spec == null) continue;
-                //if (spec.ScanNum != 879) continue;
-                var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
-                if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
+                GetScorer(scanNum);
             }
         }
 
-        public void DeconvoluteProductSpectrum(int scanNum)
+        public IScorer GetScorer(int scanNum)
         {
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-            if (spec == null) return;
+            if (spec == null) return null;
             //if (spec.ScanNum != 879) continue;
             var deconvolutedSpec = GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) as ProductSpectrum;
-            if (deconvolutedSpec != null) _ms2Scorer[scanNum] = new DeconvScorer(deconvolutedSpec, _productTolerance);
+            if (deconvolutedSpec != null) return new DeconvScorer(deconvolutedSpec, _productTolerance);
+            return null;
         }
 
         public Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold)
