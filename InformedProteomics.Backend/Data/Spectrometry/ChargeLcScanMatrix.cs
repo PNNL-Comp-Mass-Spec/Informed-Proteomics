@@ -1,644 +1,577 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Design;
-using System.Drawing.Text;
 using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
+using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
-using MultiDimensionalPeakFinding;
 using MathNet.Numerics.Distributions;
-
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class ChargeLcScanMatrix : ILcMsMap, ISequenceFilter
     {
-        public ChargeLcScanMatrix(LcMsRun run, int minCharge = 2, int maxCharge = 50, int numBits = 27, bool useCache = true)
+        public static void Initilize(LcMsRun run, int minScanCharge = 2, int maxScanCharge = 60, int numBits = 27)
         {
-            _minCharge = minCharge;
-            _maxCharge = maxCharge;
+            _run = run;
+            _minScanCharge = minScanCharge;
+            _maxScanCharge = maxScanCharge;
 
-            _ms1ScanNums = run.GetMs1ScanVector();
-            _ms1ScanNumToIndexMap = new Dictionary<int, int>();
-            for (var i = 0; i < _ms1ScanNums.Length; i++)
-            {
-                _ms1ScanNumToIndexMap.Add(_ms1ScanNums[i], i);
-            }
-
-            /*
-            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
-            {
-                var msLevel = run.GetMsLevel(scanNum);
-                if (msLevel != 2) continue;
-
-                var prevMs1ScanNum = run.GetPrevScanNum(scanNum, 1);
-                var nextMs1ScanNum = run.GetNextScanNum(scanNum, 1);
-            }
-            */
-
+            _mzTolerance = new Tolerance(10);
             _comparer = new MzComparerWithBinning(numBits);
 
+            _ms1ScanNums = run.GetMs1ScanVector();
+            _ms1ScanNumToIndexMap = new int[_ms1ScanNums.Last() - _ms1ScanNums.First() + 1];
+
             _nScans = _ms1ScanNums.Length;
-            _nCharges = _maxCharge - _minCharge + 1;
+            
+            for (var i = 0; i < _ms1ScanNums.Length; i++)
+                _ms1ScanNumToIndexMap[_ms1ScanNums[i] - _ms1ScanNums[0]] = i;
 
-            _run = run;
-            _clusterMap = new Dictionary<int, IEnumerable<ChargeLcScanCluster>>();
-            _binNumToMs2ScanNumsMap = new Dictionary<int, IEnumerable<int>>();
+            _ms1PeakList = new List<LcMsPeak>();
+            _cachedSpectrum = new List<ChargeLcScanSpectrum>();
 
-            _cachedMinBinNum = _comparer.GetBinNumber(_run.MinMs1Mz);
-            _cachedMaxBinNum = _comparer.GetBinNumber(_run.MaxMs1Mz);
-
-            if (useCache)
+            foreach (var scanNum in _ms1ScanNums)
             {
-                //Cache Xic data
-                _cachedXic = new double[_cachedMaxBinNum - _cachedMinBinNum + 1][];
-                for (var binNum = _cachedMinBinNum; binNum <= _cachedMaxBinNum; binNum++)
-                {
-                    var mzStart = _comparer.GetMzStart(binNum);
-                    var mzEnd = _comparer.GetMzEnd(binNum);
-                    var mzHalf = 0.5*(mzEnd - mzStart);
-                    var xic = _run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart - mzHalf, mzEnd + mzHalf);
-                    _cachedXic[binNum - _cachedMinBinNum] = xic;
-                }
-
-                // Generate Ranking information 
-                _cachedRanking = new int[_nScans][];
-                _cachedNumPeaks = new int[_nScans];
-                var tempXic = new double[_cachedMaxBinNum - _cachedMinBinNum + 1];
-                
-                for (var i = 0; i < _nScans; i++)
-                {
-                    for (var j = 0; j < _cachedMaxBinNum - _cachedMinBinNum + 1; j++)
-                    {
-                        tempXic[j] = _cachedXic[j][i];
-                    }
-                    _cachedNumPeaks[i] = tempXic.Where(x => x > 0).Count();
-                    _cachedRanking[i] = ArrayUtil.GetRankings(tempXic, 0.1d);
-                }
+                var spec = new ChargeLcScanSpectrum(_run.GetSpectrum(scanNum));
+                _cachedSpectrum.Add(spec);
+                foreach (var peak in spec.Peaks)
+                    _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
             }
+            _ms1PeakList.Sort();
+        }
 
-            _intensityMapFull           = new double[_nCharges][];
-            _intensityMapMostAbundant = new double[_nCharges][];
-            _correlationMap     = new double[_nCharges][];
-            _xicMatrix          = new double[_nCharges][][];
-            _rankingMatrix      = new int[_nCharges][][];
-            _checkedOut = new bool[_nCharges][];
+        public ChargeLcScanMatrix(LcMsRun run = null, int minScanCharge = 2, int maxScanCharge = 60, int numBits = 27)
+        {
+            if (run != null) Initilize(run, minScanCharge, maxScanCharge, numBits);
+            if (_run == null) throw new Exception("ChargeLcScanMatrix has not been initialized");
 
-            for (var i = 0; i < _nCharges; i++)
+            _intensityMapFull = new double[MaxChargeLength][];
+            _mostAbuIsotopeMzMap = new double[MaxChargeLength][];
+            _correlationMap = new double[MaxChargeLength][];
+            _featureMatrix = new double[MaxChargeLength][][];
+            _checkedOut = new bool[MaxChargeLength][];
+            _isotopeMzLb = new double[MaxChargeLength][];
+            _isotopeMzUb = new double[MaxChargeLength][];
+
+            for (var i = 0; i < MaxChargeLength; i++)
             {
-                _intensityMapFull[i]            = new double[_nScans];
-                _intensityMapMostAbundant[i]    = new double[_nScans];
-                _checkedOut[i]                  = new bool[_nScans];
-
+                _intensityMapFull[i] = new double[_nScans];
+                _mostAbuIsotopeMzMap[i] = new double[_nScans];
+                _checkedOut[i] = new bool[_nScans];
                 _correlationMap[i] = new double[_nScans];
-                _xicMatrix[i] = new double[_nScans][];
-                _rankingMatrix[i] = new int[_nScans][];
+                _featureMatrix[i] = new double[_nScans][];
+                _isotopeMzLb[i] = new double[MaxEnvelopeLength];
+                _isotopeMzUb[i] = new double[MaxEnvelopeLength];
 
                 for (var j = 0; j < _nScans; j++)
-                {
-                    _xicMatrix[i][j] = new double[MaxEnvelopeLength];
-                    _rankingMatrix[i][j] = new int[MaxEnvelopeLength];
-                }
+                    _featureMatrix[i][j] = new double[MaxEnvelopeLength];
             }
-
-            _observedCharges = new bool[_nCharges];
-        }
-
-        public IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double monoIsotopicMass)
-        {
-            var clusters = GetProbableChargeScanClusters(monoIsotopicMass);
-
-            return clusters.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge));
-        }
-
-        public IEnumerable<int> GetMatchingMs2ScanNums(double monoIsotopicMass)
-        {
-            var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
-            IEnumerable<int> ms2Scans;
-
-            if (_binNumToMs2ScanNumsMap.TryGetValue(binNumber, out ms2Scans)) return ms2Scans;
-
-            var clusters = GetProbableChargeScanClusters(monoIsotopicMass);
-            var ms2ScanSet = new HashSet<int>();
-
-            foreach (var cluster in clusters) ms2ScanSet.UnionWith(GetMs2ScanNumbers(cluster));
-            
-            var ms2ScanList = ms2ScanSet.ToList();
-            ms2ScanList.Sort();
-            
-            return _binNumToMs2ScanNumsMap[binNumber] = ms2ScanList;
-        }
-
-        public IEnumerable<ChargeScanRange> GetAllClusters(double monoIsotopicMass, out double[][] scores, out HashSet<int>[] ms2ScanList)
-        {
-            var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
-            _monoIsotopicMass = _comparer.GetMzAverage(binNumber);
-            //_monoIsotopicMass = monoIsotopicMass;
-
-            //var clusters = FindClusters(3.3, 50, 4);
-            var clusters = FindClusters(2.0, 30, 2);
-
-            scores = new double[6][];
-            for (var i = 0; i < scores.Length; i++) scores[i] = new double[clusters.Count];
-
-            ms2ScanList = new HashSet<int>[clusters.Count];
-
-            for(var i = 0; i < clusters.Count; i++)
-            {
-                scores[0][i] = clusters[i].CorrBetweenObsTh;
-                scores[1][i] = clusters[i].CorrBetweenIsotopes;
-                scores[2][i] = CalculateXicCorrelationOverTimeBetweenCharges(clusters[i]);
-
-                scores[3][i] = clusters[i].HyperGeometricScore;
-                scores[4][i] = clusters[i].RankSumScore;
-
-                ms2ScanList[i] = GetMs2ScanNumbers(clusters[i]);
-            }
-            
-            return clusters.Select(cluster => cluster.GetChargeScanRange(_ms1ScanNums, _minCharge));
-        }
-
-        public MzComparerWithBinning GetMzComparerWithBinning()
-        {
-            return _comparer;
-        }
-
-        private readonly LcMsRun _run;
-        private readonly int _minCharge;
-        private readonly int _maxCharge;
-        private readonly int _nCharges;
-        private readonly int _nScans;
-        private readonly int[] _ms1ScanNums;
-
-        private readonly double[][] _intensityMapFull;
-        private readonly double[][] _intensityMapMostAbundant;
-        private readonly double[][] _correlationMap;
-
-        private readonly double[][][] _xicMatrix;
-        private readonly int[][][] _rankingMatrix;
-
-        private readonly bool[] _observedCharges;
-
-        private double _monoIsotopicMass;
-        private double[] _envelope;
-        private int _mostAbundantIsotopeIndex;
-
-        private int[] _envelopeIndex = null;
-        private const int MaxEnvelopeLength = 50;
-        private int[] _chargeIndexes;
-        private readonly MzComparerWithBinning _comparer;
-
-        // caching
-        private readonly double[][] _cachedXic;
-        private readonly int _cachedMinBinNum;
-        private readonly int _cachedMaxBinNum;
-        private readonly int[][] _cachedRanking;
-        private readonly int[] _cachedNumPeaks;
-
-        private readonly Dictionary<int, IEnumerable<ChargeLcScanCluster>> _clusterMap; // BinNum -> IEnumerable<ChargeScanRange>
-        private readonly Dictionary<int, IEnumerable<int>> _binNumToMs2ScanNumsMap;
-        private readonly Dictionary<int, int> _ms1ScanNumToIndexMap;
-
-
-        private IEnumerable<double> FindExactMassValue(ChargeLcScanCluster cluster)
-        {
-            var result = new List<double>();
-            for (var row = cluster.MinRow; row <= cluster.MaxRow; row++)
-            {
-                var charge = _minCharge + row;
-                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(_monoIsotopicMass, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
-
-                var binNum = _comparer.GetBinNumber(mostAbundantIsotopeMz);
-
-                //var minMs1 = _ms1ScanNums[cluster.MinCol];
-                //var maxMs1 = _ms1ScanNums[cluster.MaxCol];
-                //var xic =_run.GetFullPrecursorIonExtractedIonChromatogramVector(_comparer.GetMzStart(binNum), _comparer.GetMzEnd(binNum));
-
-                var xic =_run.GetFullPrecursorIonExtractedIonChromatogram(_comparer.GetMzStart(binNum),_comparer.GetMzEnd(binNum));
-
-                for (var t = cluster.MinCol; t <= cluster.MaxCol; t++)
-                {
-                    if (xic[t].Intensity > 0)
-                    {
-                        var monoMass =Ion.GetMonoIsotopicMass(mostAbundantIsotopeMz, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
-                        result.Add(monoMass);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        internal IEnumerable<ChargeLcScanCluster> GetProbableChargeScanClusters(double monoIsotopicMass)
-        {
-            var binNumber = _comparer.GetBinNumber(monoIsotopicMass);
-            IEnumerable<ChargeLcScanCluster> clusters;
-
-            if (_clusterMap.TryGetValue(binNumber, out clusters))
-            {
-                return clusters;
-            }
-            
-            _monoIsotopicMass = _comparer.GetMzAverage(binNumber);
-
-            clusters = FindClusters(3.3, 50, 4);
-            return _clusterMap[binNumber] = clusters;
         }
         
-        internal IEnumerable<ChargeLcScanCluster> GetMs1Features(double monoIsotopicMass)
+        public static ChargeLcScanMatrix GetInstance()
         {
-            _monoIsotopicMass = monoIsotopicMass;
-            var clusters = FindClusters(3.5, 50, 4);
+            return new ChargeLcScanMatrix();
+        }
 
-            foreach (var c in clusters)
-            {
-                c.IntensityAlongCol = new double[c.MaxCol - c.MinCol + 1];
-                for (var col = c.MinCol; col <= c.MaxCol; col++)
-                {
-                    for (var row = c.MinRow; row <= c.MaxRow; row++)
-                    {
-                        c.IntensityAlongCol[col - c.MinCol] += _intensityMapFull[row][col];
-                    }
-                }
-            }
+        public IEnumerable<ChargeLcScanCluster> GetProbableChargeScanClusters(int queryMassBinNum)
+        {
+            return GetProbableChargeScanClusters(_comparer.GetMzAverage(queryMassBinNum));
+        }
 
+        public IEnumerable<Ms1Feature> GetProbableChargeScanRegions(double queryMass)
+        {
+            return GetProbableChargeScanClusters(queryMass);
+        }
+
+        public IEnumerable<ChargeLcScanCluster> GetProbableChargeScanClusters(double queryMass)
+        {
+            SetQueryMass(queryMass);
+            var clusters = FindClusters();
+            clusters = GetFilteredClusters(clusters);
             return clusters;
         }
 
-        private HashSet<int> GetMs2ScanNumbers(ChargeLcScanCluster cluster)
+        public IEnumerable<ChargeLcScanCluster> GetAllClusters(double queryMass)
         {
-            var result = new HashSet<int>();
-            
-            for (var row = cluster.MinRow; row <= cluster.MaxRow; row++)
+            SetQueryMass(queryMass);
+            var clusters = FindClusters();
+            clusters = GetFilteredClusters(clusters, false);
+            return clusters;
+        }
+
+
+        public IEnumerable<int> GetMatchingMs2ScanNums(double queryMass)
+        {
+            var clusters = GetProbableChargeScanClusters(queryMass);
+            var ms2ScanNumSet = new List<int>();
+            foreach (var cluster in clusters)
             {
-                var charge = _minCharge + row;
-                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(_monoIsotopicMass, charge, _envelopeIndex[_mostAbundantIsotopeIndex]);
-                var ms2 = _run.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz);
-
-                var maxAbundance = 0d;
-                var selectedMs2ScanNum = 0;
-                foreach(var ms2ScanNum in ms2)
+                for (var charge = cluster.MinCharge; charge <= cluster.MaxCharge; charge++)
                 {
-                    if (ms2ScanNum < _ms1ScanNums[cluster.MinCol] || ms2ScanNum > _ms1ScanNums[cluster.MaxCol])
-                        continue;
-                    
-                    var prevMs1ScanNum = _run.GetPrevScanNum(ms2ScanNum, 1);
-                    var nextMs1ScanNum = _run.GetNextScanNum(ms2ScanNum, 1);
-                    var col1 = _ms1ScanNumToIndexMap[prevMs1ScanNum];
-                    var col2 = _ms1ScanNumToIndexMap[nextMs1ScanNum];
-
-                    var abundance = _intensityMapMostAbundant[row][col1] + _intensityMapMostAbundant[row][col2];
-
-                    if (abundance > maxAbundance)
-                    {
-                        maxAbundance = abundance;
-                        selectedMs2ScanNum = ms2ScanNum;
-                    }
+                    var mostAbuMz = Ion.GetIsotopeMz(queryMass, charge, _isotopeList.GetMostAbundantIsotope().Index);
+                    var ms2ScanNums = _run.GetFragmentationSpectraScanNums(mostAbuMz);
+                    ms2ScanNumSet.AddRange(ms2ScanNums.Where(sn => sn > cluster.MinScanNum && sn < cluster.MaxScanNum));
                 }
-                if (selectedMs2ScanNum > 0) result.Add(selectedMs2ScanNum);
             }
-
-            return result;
+            return ms2ScanNumSet.Distinct();
         }
         
-        private double CalculateRankSumScore(ChargeLcScanCluster cluster)
+        public static MzComparerWithBinning GetMzComparerWithBinning()
         {
-            if (_cachedXic == null)
-            {
-                return 0;
-            }
+            return _comparer;
+        }
+      
+        private static LcMsRun _run;
+        private static int _minScanCharge;
+        private static int _maxScanCharge;
+        private static int _nScans;
+        private static int[] _ms1ScanNums;
+        private static int[] _ms1ScanNumToIndexMap;
+        private static MzComparerWithBinning _comparer;
+        private static Tolerance _mzTolerance;
+        private static List<ChargeLcScanSpectrum> _cachedSpectrum;
+        private static List<LcMsPeak> _ms1PeakList;
+        private const int MaxEnvelopeLength = 30;
+        private const int MaxChargeLength = 40;
+        private const double CorrLowerBound = 0.5d;
+        //private static SavitzkyGolaySmoother _smoother = new SavitzkyGolaySmoother(9, 2);
 
-            var minPvalue = 1.0d;
+        private readonly double[][] _intensityMapFull;
+        private readonly double[][] _mostAbuIsotopeMzMap;
+        private readonly double[][] _correlationMap;
+        private readonly double[][][] _featureMatrix;
+        private readonly bool[][] _checkedOut;
 
-            foreach (var cell in cluster.Members)
-            {
-                var r1 = 0;
-                var n1 = 0;
-                for (var i = 0; i < _envelope.Length; i++)
-                {
-                    if (_rankingMatrix[cell.Row][cell.Col][i] == 0) continue;
+        private readonly double[][] _isotopeMzLb;
+        private readonly double[][] _isotopeMzUb;
 
-                    r1 += _rankingMatrix[cell.Row][cell.Col][i];
-                    n1++;
-                }
+        private IsotopeList _isotopeList;
+        private int[] _chargeIndexes;
+        private IntRange _chargeRange;
+        private int _minChargeRangeLength;
+        private double _queryMass;
+        
 
-                var p1 = FitScoreCalculator.GetRankSumPvalue(_cachedNumPeaks[cell.Col], n1, r1);
-                if (p1 < minPvalue) minPvalue = p1;
-            }
+        private void SetQueryMass(double queryMass)
+        {
+            _queryMass = queryMass;
+            _chargeRange = GetScanChargeRange(_queryMass);
 
-            if (minPvalue < 10E-14) return 30;
-            return -Math.Log(minPvalue);
+            _minChargeRangeLength = Math.Min((int) Math.Ceiling((queryMass/1000d) - 15), 30);
+            _minChargeRangeLength = Math.Max(_minChargeRangeLength, 0);
         }
 
-        private double CalculateHyperGeometricScore(ChargeLcScanCluster cluster)
+        private IntRange GetScanChargeRange(double mass)
         {
-            if (_cachedXic == null) return 0;
-
-            var n = (_cachedMaxBinNum - _cachedMinBinNum + 1) * cluster.Members.Count;
-            var k = cluster.Members.Sum(cell => _cachedNumPeaks[cell.Col]);
-            var n1 = cluster.Members.Count*_envelope.Length;
-            var k1 = 0;
-            foreach (var cell in cluster.Members)
-            {
-                for (var i = 0; i < _envelope.Length; i++)
-                {
-                    if (_xicMatrix[cell.Row][cell.Col][i] > 0) k1++;
-                }
-            }
-            var pValue = FitScoreCalculator.GetHyperGeometricPvalue(n, k, n1, k1);
-
-            if (pValue < 10E-200) return 450;
-            return -Math.Log(pValue);
-        }
-
-        private double CalculateXicCorrelationOverTimeBetweenIsotopes(ChargeLcScanCluster cluster)
-        {
-            double ret = 0;
-            var maxCol = cluster.MaxCol;
-            var minCol = cluster.MinCol;
-            var maxRow = cluster.MaxRow;
-            var minRow = cluster.MinRow;
+            if (mass < 5000.0d) return new IntRange(_minScanCharge, 10);
             
-            var colLen = maxCol - minCol + 1;
-            const int minColLen = 30;
+            var chargeLb = (int)Math.Max(_minScanCharge, Math.Floor((13.0/2.5) * (mass / 10000d) - 0.6));
+            var chargeUb = (int)Math.Min(_maxScanCharge, Math.Ceiling(16 * (mass / 10000d) + 5));
+            if (chargeUb - chargeLb + 1 > MaxChargeLength) chargeUb = chargeLb + MaxChargeLength - 1;
 
-            if (colLen < minColLen)
-            {
-                minCol = Math.Max(minCol - (int)((minColLen - colLen) * 0.5), 0);
-
-                if (minCol == 0) maxCol = minCol + minColLen - 1;
-                else
-                {
-                    maxCol = Math.Min(maxCol + (int)((minColLen - colLen) * 0.5), _nScans - 1);
-                    if (maxCol == _nScans - 1)  minCol = maxCol - minColLen + 1;
-                }
-                colLen = maxCol - minCol + 1;
-            }
-
-            var xicProfile = new double[_topEnvelopes.Length][];
-            for (var i = 0; i < xicProfile.Length; i++) xicProfile[i] = new double[colLen];
-
-            for (var row = minRow; row <= maxRow; row++)
-            {
-                for (var col = minCol; col <= maxCol; col++)
-                {
-                    if (_intensityMapFull[row][col] < 1E-6) continue;
-
-                    for (var k = 0; k < _topEnvelopes.Length; k++)
-                    {
-                        xicProfile[k][col - minCol] += _xicMatrix[row][col][_topEnvelopes[k]];    
-                    }
-                }
-            }
-
-            for (var i = 1; i < xicProfile.Length; i++)
-            {
-                for (var j = i + 1; j < xicProfile.Length; j++)
-                {
-                    var coeff = FitScoreCalculator.GetPearsonCorrelation(xicProfile[i], xicProfile[j]);
-                    if (coeff < 1.0 && coeff > ret)
-                    {
-                        ret = coeff;
-                    }
-                }
-            }
-            return ret;
+            return new IntRange(chargeLb, chargeUb);
         }
 
-        private double CalculateXicCorrelationOverTimeBetweenCharges(ChargeLcScanCluster cluster)
+        private void BuildFeatureMatrix()
         {
-            var maxCol = cluster.MaxCol;
-            var minCol = cluster.MinCol;
-            var maxRow = cluster.MaxRow;
-            var minRow = cluster.MinRow;
+            var queryMassBinNum = _comparer.GetBinNumber(_queryMass);
+            _isotopeList = new IsotopeList(_comparer.GetMzAverage(queryMassBinNum), MaxEnvelopeLength);
 
-            var colLen = maxCol - minCol + 1;
-            const int minColLen = 20;
-
-            if (colLen < minColLen)
+            for (var row = 0; row < _chargeRange.Length; row++)
             {
-                minCol = Math.Max(minCol - (int)((minColLen - colLen) * 0.5), 0);
+                Array.Clear(_intensityMapFull[row], 0, _nScans);
+                Array.Clear(_mostAbuIsotopeMzMap[row], 0, _nScans);
+                Array.Clear(_correlationMap[row], 0, _nScans);
+                Array.Clear(_checkedOut[row], 0, _nScans);
 
-                if (minCol == 0) maxCol = minCol + minColLen - 1;
-                else
+                for (var col = 0; col < _nScans; col++)
                 {
-                    maxCol = Math.Min(maxCol + (int)((minColLen - colLen) * 0.5), _nScans - 1);
-                    if (maxCol == _nScans - 1) minCol = maxCol - minColLen + 1;
-                }
-                colLen = maxCol - minCol + 1;
-            }
-          
-            if (Math.Abs(minRow - maxRow) < 5)
-            {
-                minRow = Math.Max(minRow - 3, 0);
-                maxRow = Math.Min(maxRow + 3, _nCharges-1);
-            }
-
-            double ret = 0;
-            for (var row1 = minRow; row1 <= maxRow; row1++)
-            {
-                for (var row2 = row1+1; row2 <= maxRow; row2++)
-                {
-                    var c = FitScoreCalculator.GetPearsonCorrelation(_intensityMapMostAbundant[row1], minCol, _intensityMapMostAbundant[row2], minCol, maxCol - minCol + 1);
-
-                    if (c > ret) ret = c;
+                    Array.Clear(_featureMatrix[row][col], 0, _featureMatrix[row][col].Length);
                 }
             }
-            return ret;
-        }
-
-        private int[] _topEnvelopes;
-
-        private void SetIsoEnvelope()
-        {
-            const double envelopeTh = 0.09;
-            var isoEnv = Averagine.GetIsotopomerEnvelope(_monoIsotopicMass);
-            var isotopeRankings = ArrayUtil.GetRankings(isoEnv.Envolope);
-
-            var nEnvelope = Math.Min(isoEnv.Envolope.Count(x => x > envelopeTh), MaxEnvelopeLength);
-            var nTopEnvelope = Math.Min(nEnvelope, 4);
-
-            _envelope           = new double[nEnvelope];
-            _envelopeIndex      = new int[nEnvelope];
-            _topEnvelopes       = new int[nTopEnvelope];
             
-            var index = 0;
-            var indexTop = 0;
-            for (var i = 0; i < isoEnv.Envolope.Length; i++)
+            for (var row = 0; row < _chargeRange.Length; row++)
             {
-                if (isotopeRankings[i] > nEnvelope) continue;
-
-                _envelope[index] = isoEnv.Envolope[i];
-                _envelopeIndex[index] = i;
-                
-                if (i == isoEnv.MostAbundantIsotopeIndex) _mostAbundantIsotopeIndex = index;
-
-                if (isotopeRankings[i] <= nTopEnvelope)
+                var charge = row + _chargeRange.Min;
+                for (var i = 0; i < _isotopeList.Count; i++)
                 {
-                    _topEnvelopes[indexTop] = index;
-                    indexTop++;
-                }
-
-                index++;
-            }
-        }
-
-        private void BuildMatrix()
-        {
-            //var tolerance = new Tolerance(20);
-            SetIsoEnvelope();
-
-            Array.Clear(_observedCharges, 0, _observedCharges.Length);
-
-            for (var c = 0; c < _nCharges; c++)
-            {
-                Array.Clear(_intensityMapFull[c], 0, _nScans);
-                Array.Clear(_intensityMapMostAbundant[c], 0, _nScans);
-                Array.Clear(_correlationMap[c], 0, _nScans);
-
-                //for (var j = 0; j < _nScans; j++) Array.Clear(_xicMatrix[c][j], 0, MaxEnvelopeLength);
-            }
-
-            // Fill _intensityMap and _xicMatrix arrays
-            for (var c = 0; c < _nCharges; c++)
-            {
-                for (var i = 0; i < _envelopeIndex.Length; i++)
-                {
-                    var isotopeIndex = _envelopeIndex[i];
-                    var curMz = Ion.GetIsotopeMz(_monoIsotopicMass, c + _minCharge, isotopeIndex);
-                    
-                    var curBinNum = _comparer.GetBinNumber(curMz);
-                    if (curBinNum < _cachedMinBinNum || curBinNum > _cachedMaxBinNum)
-                    {
-                        for (var j = 0; j < _nScans; j++)
-                        {
-                            _xicMatrix[c][j][i] = 0;
-                            _rankingMatrix[c][j][i] = 0;
-                        }
-                        continue;
-                    }
-                    
-                    double[] xic = null;
-
-                    if (_cachedXic != null)
-                    {
-                        xic = _cachedXic[curBinNum - _cachedMinBinNum];
-                    }
-                    else
-                    {
-                        var mzStart = _comparer.GetMzStart(curBinNum);
-                        var mzEnd = _comparer.GetMzEnd(curBinNum);
-                        var mzHalf = 0.5 * (mzEnd - mzStart);
-                        xic = _run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart - mzHalf, mzEnd + mzHalf);
-
-                        //xic = _run.GetFullPrecursorIonExtractedIonChromatogramVector(curMz - tolerance.GetToleranceAsTh(curMz), curMz + tolerance.GetToleranceAsTh(curMz));
-                    }
-
-                    if (!_observedCharges[c] && xic.Any(x => x > 0)) _observedCharges[c] = true;
-
-                    for (var j = 0; j < _nScans; j++)
-                    {
-                        if (i == _mostAbundantIsotopeIndex) _intensityMapMostAbundant[c][j] += xic[j];
-                        
-                        _intensityMapFull[c][j] += xic[j];
-                        _xicMatrix[c][j][i] = xic[j];
-
-                        if (_cachedRanking != null)
-                        {
-                            _rankingMatrix[c][j][i] = _cachedRanking[j][curBinNum - _cachedMinBinNum];
-                        }
-                    }
-                    /*
-                    if (c < 30) continue;
-
-                    var cmax = Math.Min(c + 3, _nCharges - 1);
-                    var cmin = cmax - 6;
-                    
-                    for (var c2 = cmin; c2 <= cmax; c2++)
-                    {
-                        if (c == c2) continue;
-
-                        for (var j = 0; j < _nScans; j++)
-                        {
-                            _intensityMap[c2][j] += xic[j];
-                            _xicMatrix[c2][j][i] += xic[j];
-                        }
-                    }*/
-
+                    var isotopeIndex = _isotopeList[i].Index;
+                    var mzMin = Ion.GetIsotopeMz(_comparer.GetMzStart(queryMassBinNum), charge, isotopeIndex);
+                    var mzMax = Ion.GetIsotopeMz(_comparer.GetMzEnd(queryMassBinNum), charge, isotopeIndex);
+                    _isotopeMzLb[row][i] = mzMin - _mzTolerance.GetToleranceAsTh(mzMin);
+                    _isotopeMzUb[row][i] = mzMax + _mzTolerance.GetToleranceAsTh(mzMax);
                 }
             }
 
-            var k = 0;
-            _chargeIndexes = new int[_observedCharges.Where((x) => x == true).Count()];
-            for (var i = 0; i < _nCharges; i++)
+            var highestPeakIndex        = new int[_nScans];
+            var highestPeakIntensity    = new double[_nScans];
+            var observedCharges         = new bool[_chargeRange.Length];
+            // Build FeatureMatrix...Starting from the most abundant isotope
+            for (var row = 0; row < _chargeRange.Length; row++)
             {
-                if (!_observedCharges[i]) continue;
-                _chargeIndexes[k] = i;
-                k++;
+                Array.Clear(highestPeakIndex, 0, highestPeakIndex.Length);
+                Array.Clear(highestPeakIntensity, 0, highestPeakIntensity.Length);
+
+                for (var k = 0; k < _isotopeList.Count; k++)
+                {
+                    var i = _isotopeList.SortedIndexByIntensity[k]; // internal isotope index
+
+                    if (_isotopeMzLb[row][i] < _run.MinMs1Mz || _isotopeMzUb[row][i] > _run.MaxMs1Mz) continue;
+
+                    var st = _ms1PeakList.BinarySearch(new LcMsPeak(_isotopeMzLb[row][i], 0, 0));
+                    if (st < 0) st = ~st;
+
+                    for (var j = st; j < _ms1PeakList.Count; j++)
+                    {
+                        var ms1Peak = _ms1PeakList[j];
+                        if (ms1Peak.Mz > _isotopeMzUb[row][i]) break;
+                        var col = _ms1ScanNumToIndexMap[ms1Peak.ScanNum - _ms1ScanNums.First()];
+
+                        if (k <= 3)
+                        {
+                            _featureMatrix[row][col][i] = Math.Max(ms1Peak.Intensity, _featureMatrix[row][col][i]);
+                            if (_featureMatrix[row][col][i] > highestPeakIntensity[col])
+                            {
+                                highestPeakIndex[col] = i;
+                                highestPeakIntensity[col] = _featureMatrix[row][col][i];
+
+                                if (k == 0) _mostAbuIsotopeMzMap[row][col] = ms1Peak.Mz;
+                            }
+                        }
+                        else
+                        {
+                            if (_featureMatrix[row][col][i] > 0)
+                            {
+                                // if existing peak matches better, then skip
+                                if (highestPeakIntensity[col] > 0)
+                                {
+                                    var expectedIntensity = (highestPeakIntensity[col] * _isotopeList[i].Ratio) / _isotopeList[highestPeakIndex[col]].Ratio;
+                                    if (Math.Abs(ms1Peak.Intensity - expectedIntensity) < Math.Abs(_featureMatrix[row][col][i] - expectedIntensity)) // change peak
+                                        _featureMatrix[row][col][i] = ms1Peak.Intensity;
+                                }
+                                else
+                                {
+                                    _featureMatrix[row][col][i] = Math.Max(ms1Peak.Intensity, _featureMatrix[row][col][i]);
+                                }
+                            }
+                            else
+                            {
+                                _featureMatrix[row][col][i] = ms1Peak.Intensity;
+
+                            }
+                        }
+
+                        if (!observedCharges[row]) observedCharges[row] = true;
+                    }
+                }
             }
+
+            var temp = new List<int>();
+            for (var i = 0; i < observedCharges.Length; i++) if (observedCharges[i]) temp.Add(i);
+            _chargeIndexes = temp.ToArray();
 
             // Fill _correlationMap array
             foreach (var i in _chargeIndexes)
             {
                 for (var j = 0; j < _nScans; j++)
                 {
-                    if (_intensityMapFull[i][j] > 0)
-                    {
-                        _correlationMap[i][j] = FitScoreCalculator.GetPearsonCorrelation(_xicMatrix[i][j], 0, _envelope, 0, _envelope.Length);
-                    }
-                    else
-                    {
-                        _correlationMap[i][j] = 0;
-                    }
+                    _intensityMapFull[i][j] = _featureMatrix[i][j].Sum();
+                    if (!(_intensityMapFull[i][j] > 0)) continue;
+                    _correlationMap[i][j] = _isotopeList.GetPearsonCorrelation(_featureMatrix[i][j]);
                 }
             }
         }
 
-        public double[][] GetIntensityMap()
+
+        private List<ChargeLcScanCluster> FindClusters(double clusteringScoreCutoff = 0.7)
         {
-            return _intensityMapFull;
+            BuildFeatureMatrix(); // should be called first
+
+            var clusters = new List<ChargeLcScanCluster>();
+            var tempEnvelope = new double[_isotopeList.Count];
+
+            foreach (var seedCell in GetSeedCells(CorrLowerBound))
+            {
+                if (_checkedOut[seedCell.Row][seedCell.Col]) continue;
+
+                var chargeNeighborGap = 1;
+                var scanNeighborGap = 1;
+                if (seedCell.Row + _chargeRange.Min >= 20)
+                {
+                    scanNeighborGap = 2;
+                    chargeNeighborGap = 2;
+                }
+
+                var seedScore = _correlationMap[seedCell.Row][seedCell.Col];
+                var newCluster = new ChargeLcScanCluster(_chargeRange.Min, _ms1ScanNums, _isotopeList);
+                newCluster.AddMember(seedCell, _featureMatrix[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
+
+                var neighbors = new Queue<ChargeLcScanCell>();
+
+                neighbors.Enqueue(seedCell); // pick a seed
+                _checkedOut[seedCell.Row][seedCell.Col] = true;
+                
+                while (neighbors.Count > 0)
+                {
+                    var cell = neighbors.Dequeue();
+
+                    for (var k = Math.Max(cell.Row - chargeNeighborGap, _chargeIndexes.First()); k <= Math.Min(cell.Row + chargeNeighborGap, _chargeIndexes.Last()); k++)
+                    {
+                        for (var l = Math.Max(cell.Col - scanNeighborGap, 0); l <= Math.Min(cell.Col + scanNeighborGap, _nScans - 1); l++)
+                        {
+                            var distFromSeed = Math.Abs(seedCell.Col - l);
+
+                            if (_checkedOut[k][l] || (_correlationMap[k][l] < CorrLowerBound && distFromSeed > 1) ||
+                                (_correlationMap[k][l] < 0.2 && distFromSeed <= 1)) continue;
+
+                            for (var t = 0; t < tempEnvelope.Length; t++) tempEnvelope[t] = newCluster.ClusteringEnvelope[t] + _featureMatrix[k][l][t];
+                            var newScore = _isotopeList.GetPearsonCorrelation(tempEnvelope);
+
+                            var cellCorrTh = Math.Min(0.6 + (distFromSeed - 1) * 0.03, 0.9);
+                            var summmedCorrTh = Math.Min(0.8 + (distFromSeed - 1) * 0.015, 0.95);
+
+                            if (!(newCluster.ClusteringScore < newScore ||
+                                (distFromSeed < 5 && seedScore < newScore) ||
+                                (_correlationMap[k][l] > cellCorrTh && newScore > summmedCorrTh))) continue;
+
+                            var newMember = new ChargeLcScanCell(k, l);
+                            neighbors.Enqueue(newMember);
+                            newCluster.AddMember(newMember, _featureMatrix[k][l], newScore);
+                            _checkedOut[k][l] = true;
+                        }
+                    }
+                }
+
+                for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
+                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) _checkedOut[i][j] = true;
+
+                // high charges should be spread over a range
+                
+                if (newCluster.ClusteringScore < clusteringScoreCutoff || newCluster.ChargeLength < _minChargeRangeLength) continue;
+                if (newCluster.ScanLength <= 1) continue;
+
+                clusters.Add(newCluster);
+            }
+
+            return clusters;
         }
 
-        public double[][] GetCorrelationMap()
+
+        private List<ChargeLcScanCluster> GetFilteredClusters(IEnumerable<ChargeLcScanCluster> clusters, bool filtering = true)
         {
-            return _correlationMap;
+            var filteredClusters = new List<ChargeLcScanCluster>();
+
+            foreach (var cluster in clusters)
+            {
+                GetAccurateMassInfo(cluster);
+
+                if (cluster.Members.Count <= 1 || cluster.ScanLength <= 1) continue;
+                if (filtering && cluster.ChargeLength < _minChargeRangeLength) continue;
+                if (filtering && cluster.GetScore(ChargeLcScanScore.RankSum) + cluster.GetScore(ChargeLcScanScore.RankSumSummed) < 10) continue;
+                if (filtering && cluster.GetScore(ChargeLcScanScore.HyperGeometric) + cluster.GetScore(ChargeLcScanScore.HyperGeometricSummed) < 60) continue;
+                if (filtering && cluster.GetScore(ChargeLcScanScore.EnvelopeCorrelation) < 0.5) continue;
+                if (filtering && cluster.GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.6) continue;
+
+                filteredClusters.Add(cluster);
+            }
+
+            return filteredClusters;
         }
         
-        private static double GetThreshold(double topRatio, IEnumerable<double[]> data)
+        private void GetAccurateMassInfo(ChargeLcScanCluster cluster)
         {
-            double intensityThreshold = 0;
-            var nonZeroIntensities = new List<double>();
+            var bestEnvelopeCorrelation = -1.0d;
+            var bestRankSumScore = 1.0d;
+            var bestHyperGeometricScore = 1.0d;
+            
+            var summedK = 0;
+            var summedK1 = 0;
+            var summedN = 0;
+            var summedN1 = 0;
 
-            foreach (var t in data)
-                nonZeroIntensities.AddRange(t.Where(t1 => t1 > 0));
+            var minCol = cluster.MinCol;
+            var maxCol = cluster.MaxCol;
+            var minRow = cluster.MinRow;
+            var maxRow = cluster.MaxRow;
 
-            nonZeroIntensities.Sort();
+            var memberCorr = new List<double>();
+            var memberMass = new List<double>();
+            var memberRankSum = new List<double>();
+            
+            cluster.ClearMember();
 
-            if (nonZeroIntensities.Count > 2)
-                intensityThreshold = nonZeroIntensities[(int)Math.Floor(nonZeroIntensities.Count * (1-topRatio))];
+            for (var col = minCol; col <= maxCol; col++)
+            {
+                var scanNum = _ms1ScanNums[col];
+                for (var row = minRow; row <= maxRow; row++)
+                {
+                    var charge = row + _chargeRange.Min;
+                    var mostAbuIsoMz = _mostAbuIsotopeMzMap[row][col];
+                    
+                    if (!(mostAbuIsoMz > 0)) continue;
 
-            return intensityThreshold;
+                    var envelope = new double[_isotopeList.Count];
+                    var mass = Ion.GetMonoIsotopicMass(mostAbuIsoMz, charge, _isotopeList.GetMostAbundantIsotope().Index);
+                    var spectrum = GetSpectrum(col);
+                    Peak[] peaks;
+                    Peak[] observedPeaks;
+                    int[] observedPeakRanks;
+
+                    spectrum.GetRankSum(_isotopeList, charge, mass, _mzTolerance, out peaks, out observedPeaks, out observedPeakRanks);
+                    
+                    var k1 = 0;
+                    for (var i = 0; i < _isotopeList.Count; i++)
+                    {
+                        if (observedPeaks[i] == null) continue;
+                        envelope[i] = observedPeaks[i].Intensity;
+                        k1++;
+                    }
+                    
+                    var envCorr = _isotopeList.GetPearsonCorrelation(envelope);
+
+                    var binNum = spectrum.RankingWindowTolerance.GetBinNumber(mostAbuIsoMz);
+                    var maxMz = spectrum.RankingWindowTolerance.GetMzEnd(binNum);
+                    var minMz = spectrum.RankingWindowTolerance.GetMzStart(binNum);
+                    var n = (int)Math.Round((maxMz - minMz) / (0.5*(_mzTolerance.GetToleranceAsTh(maxMz)+_mzTolerance.GetToleranceAsTh(minMz))));
+                    var k = peaks.Length;
+                    var n1 = _isotopeList.Count;
+                    
+                    if (envCorr < CorrLowerBound || k1 < 3) continue;
+
+                    var ranksumScore = CalculateRankSumScore(peaks, observedPeaks, observedPeakRanks);
+                    var hyperGeoScore = CalculateHyperGeometricScore(n, k, n1, k1);
+
+                    //if (ranksumScore < 8 || hyperGeoScore < 10) continue;
+                    
+                    if (bestHyperGeometricScore < hyperGeoScore) bestHyperGeometricScore = hyperGeoScore;
+                    if (bestRankSumScore < ranksumScore) bestRankSumScore = ranksumScore;
+                    if (bestEnvelopeCorrelation < envCorr) bestEnvelopeCorrelation = envCorr;
+
+                    summedN += n;
+                    summedK += k;
+                    summedK1 += k1;
+                    summedN1 = n1;
+                    memberRankSum.Add(ranksumScore);
+
+                    cluster.AddMember(new ChargeLcScanCell(row, col), envelope);
+                    memberCorr.Add(envCorr);
+                    memberMass.Add(mass);
+                }
+            }
+            
+            cluster.SetScore(ChargeLcScanScore.EnvelopeCorrelation, bestEnvelopeCorrelation);
+            cluster.SetScore(ChargeLcScanScore.RankSum, bestRankSumScore);
+            cluster.SetScore(ChargeLcScanScore.HyperGeometric, bestHyperGeometricScore);
+
+            var summedRankSum = 0d;
+            var summedHyperGeo = 0d;
+            var summedCorr = 0d;
+            if (cluster.Members.Count > 0)
+            {
+                memberRankSum.Sort();
+                memberRankSum.Reverse();
+                for (var k = 0; k < memberRankSum.Count && k < 10; k++)
+                {
+                    summedRankSum += memberRankSum[k];
+                }
+                summedRankSum /= Math.Min(memberRankSum.Count, 10);
+                summedHyperGeo = CalculateHyperGeometricScore(summedN, summedK, summedN1, summedK1);
+                summedCorr = GetBestSummedCorrelation(cluster, memberCorr, memberMass);
+            }
+
+            cluster.SetScore(ChargeLcScanScore.EnvelopeCorrelationSummed, summedCorr);
+            cluster.SetScore(ChargeLcScanScore.RankSumSummed, summedRankSum);
+            cluster.SetScore(ChargeLcScanScore.HyperGeometricSummed, summedHyperGeo);
         }
 
-        private const double CorrSeedLowerBound = 0.5d;
-        private const double CorrLowerBound = 0.5d;
-        private IEnumerable<ChargeLcScanCell> GetSeedCells()
+        private double GetBestSummedCorrelation(ChargeLcScanCluster cluster, List<double> cellCorr, List<double> cellMass)
+        {
+            var cellCorrTemp = new double[cellCorr.Count];
+            var index = Enumerable.Range(0, cellCorrTemp.Length).ToArray();
+
+            Array.Copy(cellCorr.ToArray(), cellCorrTemp, cellCorr.Count);
+            Array.Sort(cellCorrTemp, index);
+            Array.Reverse(index);
+
+            var summedEnvelop = new double[_isotopeList.Count];
+            var summedCorr = 0d;
+            var tempMass = new List<KeyValuePair<int, double>>();
+
+            foreach (var j in index)
+            {
+                var tempEnvelop = new double[_isotopeList.Count];
+                for (var k = 0; k < _isotopeList.Count; k++) tempEnvelop[k] = summedEnvelop[k] + cluster.MemberEnvelope[j][k];
+                var tempCorr = _isotopeList.GetPearsonCorrelation(tempEnvelop);
+
+                if (!(tempCorr > summedCorr)) continue;
+
+                summedEnvelop = tempEnvelop;
+                summedCorr = tempCorr;
+
+                if (tempMass.Count < 10) tempMass.Add(new KeyValuePair<int, double>(j, cellMass[j]));
+            }
+            cluster.SummedEnvelope = summedEnvelop;
+
+            var medIdx = (int) Math.Round(tempMass.Count*0.5);
+            var i = 0;
+            foreach (var m in tempMass.OrderBy(x => x.Value))
+            {
+                if (i == medIdx)
+                {
+                    var row = cluster.Members[m.Key].Row;
+                    var col = cluster.Members[m.Key].Col;
+                    cluster.SetRepresentativeMass(m.Value, _mostAbuIsotopeMzMap[row][col], row + _chargeRange.Min, _ms1ScanNums[col]);
+                    break;
+                }
+                i++;
+            }
+            return summedCorr;
+        }
+
+        private static double CalculateHyperGeometricScore(int n, int k, int n1, int k1)
+        {
+            var pvalue = FitScoreCalculator.GetHyperGeometricPvalue(n, k, n1, k1);
+            if (pvalue > 0) return -Math.Log(pvalue, 2);
+            return 50;
+        }
+
+        private double CalculateRankSumScore(Peak[] peakList, Peak[] isotopePeaks, int[] isotopePeakRanks)
+        {
+            var n = 0;
+            var r = 0d;
+
+            for(var k = 0; k < _isotopeList.Count; k++)
+            {
+                var internalIndex = _isotopeList.SortedIndexByIntensity[k];
+
+                if (_isotopeList[internalIndex].Ratio < 0.4) break;
+
+                if (isotopePeakRanks[internalIndex] > 0)
+                {
+                    n++;
+                    r += isotopePeakRanks[internalIndex];
+                }
+            }
+            
+            if (peakList.Length == n) return 0d;
+            var pvalue = FitScoreCalculator.GetRankSumPvalue(peakList.Length, n, r);
+            if (pvalue > 0) return -Math.Log(pvalue, 2);
+            return 50;
+        }
+      
+       
+
+        private IEnumerable<ChargeLcScanCell> GetSeedCells(double seedCutoff)
         {
             var seedCells = new List<KeyValuePair<double, ChargeLcScanCell>>();
-
             foreach (var i in _chargeIndexes)
             {
                 for (var j = 0; j < _nScans; j++)
                 {
-                    if (_correlationMap[i][j] < CorrSeedLowerBound) continue;
-
+                    if (_correlationMap[i][j] < seedCutoff) continue;
                     seedCells.Add(new KeyValuePair<double, ChargeLcScanCell>(_correlationMap[i][j], new ChargeLcScanCell(i, j)));
                 }
             }
@@ -646,246 +579,270 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return seedCells.OrderByDescending(x => x.Key).Select(x => x.Value);
         }
 
-        private readonly bool[][] _checkedOut;
-        // cutoff < Corr(thoeretical_envelope) * 2 + Corr(between isotopes)
-        private List<ChargeLcScanCluster> FindClusters(double cutoff = 2.5, double hypergeometricCutoff = 50, double ranksumCutoff = 4)
+
+
+        private ChargeLcScanSpectrum GetSpectrum(int col)
         {
-            BuildMatrix();
+            return _cachedSpectrum[col];
+        }
 
-            //var checkedOut = new bool[_nCharges][];
-            //for (var i = 0; i < _nCharges; i++) checkedOut[i] = new bool[_nScans];
+        public double[][] GetCorrelationMap()
+        {
+            return _correlationMap;
+        }
+        
+        public double[][] GetIntensityMap()
+        {
+            return _intensityMapFull;
+        }
 
-            for (var i = 0; i < _nCharges; i++) Array.Clear(_checkedOut[i], 0, _checkedOut[i].Length);
-            
-            var clusters = new List<ChargeLcScanCluster>();
-            var tempEnvelope = new double[_envelope.Length];
+        
+    }
 
-            foreach (var seedCell in GetSeedCells())
+    public class IsotopeList : List<Isotope>
+    {
+        public double MonoIsotopeMass { get; private set; }
+        private readonly double[] _envelope;
+        //private readonly int[] _sortedIndex;
+        public int[] SortedIndexByIntensity { get; private set; }
+
+        public IsotopeList(double mass, int maxNumOfIsotopes, double relativeIntensityThreshold = 0.1)
+        {
+            MonoIsotopeMass = mass;
+            var isoEnv = Averagine.GetIsotopomerEnvelope(MonoIsotopeMass);
+            var isotopeRankings = ArrayUtil.GetRankings(isoEnv.Envolope);
+
+            for (var i = 0; i < isoEnv.Envolope.Length; i++)
             {
-                if (_checkedOut[seedCell.Row][seedCell.Col]) continue;
+                if (isoEnv.Envolope[i] < relativeIntensityThreshold || isotopeRankings[i] > maxNumOfIsotopes) continue;
+                
+                Add(new Isotope(i, isoEnv.Envolope[i]));
+            }
 
-                var newCluster = new ChargeLcScanCluster(seedCell, _xicMatrix[seedCell.Row][seedCell.Col], _envelope.Length, _intensityMapFull[seedCell.Row][seedCell.Col], _correlationMap[seedCell.Row][seedCell.Col]);
-                var neighbors   = new Queue<ChargeLcScanCell>();
+            _envelope = this.Select(iso => iso.Ratio).ToArray();
+            SortedIndexByIntensity = new int[Count];
 
-                neighbors.Enqueue(seedCell); // pick a seed
-                _checkedOut[seedCell.Row][seedCell.Col] = true;
+            for (var i = 0; i < Count; i++)
+            {
+                var rankingIndex = isotopeRankings[this[i].Index] - 1;
+                SortedIndexByIntensity[rankingIndex] = i;
+            }
+        }
 
-                while (neighbors.Count > 0)
+        public Isotope GetIsotopeRankedAt(int ranking)
+        {
+            return this[SortedIndexByIntensity[ranking - 1]];
+        }
+
+        public double GetPearsonCorrelation(double[] observedIsotopeEnvelop)
+        {
+            return FitScoreCalculator.GetPearsonCorrelation(_envelope, observedIsotopeEnvelop, _envelope.Length);
+        }
+
+        public Isotope GetMostAbundantIsotope()
+        {
+            return GetIsotopeRankedAt(1);
+        }
+    }
+
+
+    class ChargeLcScanSpectrum : Spectrum
+    {
+        internal ChargeLcScanSpectrum(Spectrum spec)
+            : base(spec.Peaks, spec.ScanNum)
+        {
+            _comparer = new MzComparerWithBinning(17);
+            _minBinNum = _comparer.GetBinNumber(MinMz);
+            _maxBinNum = _comparer.GetBinNumber(MaxMz);
+            _peakIndex = new IntRange[3][];
+            _peakRanking = new int[3][][];
+            for (var i = 0; i < 3; i++)
+            {
+                _peakIndex[i] = new IntRange[_maxBinNum - _minBinNum + 1];
+                _peakRanking[i] = new int[_maxBinNum - _minBinNum + 1][];
+            }
+
+
+            for (var binNum = _minBinNum; binNum <= _maxBinNum; binNum++)
+            {
+                var minMz = _comparer.GetMzAverage(binNum - 1);
+                var maxMz = _comparer.GetMzAverage(binNum + 1);
+
+                var startIndex = Array.BinarySearch(Peaks, new Peak(minMz - float.Epsilon, 0));
+                if (startIndex < 0) startIndex = ~startIndex;
+
+                // go up
+                var intensities = new List<double>();
+                var intensities1 = new List<double>();
+                var intensities2 = new List<double>();
+                var minMz0 = _comparer.GetMzStart(binNum);
+                var maxMz0 = _comparer.GetMzEnd(binNum);
+
+                var minMz1 = _comparer.GetMzAverage(binNum - 1);
+                var maxMz1 = _comparer.GetMzAverage(binNum);
+                var minMz2 = maxMz1;
+                var maxMz2 = _comparer.GetMzAverage(binNum + 1);
+
+                var start0 = Peaks.Length;
+                var start1 = Peaks.Length;
+                var start2 = Peaks.Length;
+                var end0 = -1;
+                var end1 = -1;
+                var end2 = -1;
+
+                var i = startIndex;
+                while (i < Peaks.Length)
                 {
-                    var cell = neighbors.Dequeue();
-                    const int chargeNeighborGap = 2;
-                    
-                    for (var k = Math.Max(cell.Row - chargeNeighborGap, _chargeIndexes.First()); k <= Math.Min(cell.Row + chargeNeighborGap, _chargeIndexes.Last()); k++)
+                    if (Peaks[i].Mz > maxMz) break;
+
+                    if (Peaks[i].Mz >= minMz0 && Peaks[i].Mz < maxMz0)
                     {
-                        for (var l = Math.Max(cell.Col - 1, 0); l <= Math.Min(cell.Col + 1, _nScans-1); l++)
+                        intensities.Add(Peaks[i].Intensity);
+                        if (i < start0) start0 = i;
+                        if (i > end0) end0 = i;
+                    }
+                    if (Peaks[i].Mz >= minMz1 && Peaks[i].Mz < maxMz1)
+                    {
+                        intensities1.Add(Peaks[i].Intensity);
+                        if (i < start1) start1 = i;
+                        if (i > end1) end1 = i;
+                    }
+                    if (Peaks[i].Mz >= minMz2 && Peaks[i].Mz < maxMz2)
+                    {
+                        intensities2.Add(Peaks[i].Intensity);
+                        if (i < start2) start2 = i;
+                        if (i > end2) end2 = i;
+                    }
+                    ++i;
+                }
+
+                if (end0 > -1)
+                {
+                    _peakIndex[0][binNum - _minBinNum] = new IntRange(start0, end0);
+                    _peakRanking[0][binNum - _minBinNum] = ArrayUtil.GetRankings(intensities);
+                }
+                if (end1 > -1)
+                {
+                    _peakIndex[1][binNum - _minBinNum] = new IntRange(start1, end1);
+                    _peakRanking[1][binNum - _minBinNum] = ArrayUtil.GetRankings(intensities1);
+                }
+
+                if (end2 > -1)
+                {
+                    _peakIndex[2][binNum - _minBinNum] = new IntRange(start2, end2);
+                    _peakRanking[2][binNum - _minBinNum] = ArrayUtil.GetRankings(intensities2);
+                }
+            }
+        }
+
+        internal MzComparerWithBinning RankingWindowTolerance { get { return _comparer; } }
+
+        internal int GetRanks(int binShift, int binIndex, int globalIndex)
+        {
+            int ret = 0;
+
+            if (globalIndex >= _peakIndex[binShift][binIndex].Min && globalIndex <= _peakIndex[binShift][binIndex].Max)
+                ret = _peakRanking[binShift][binIndex][globalIndex - _peakIndex[binShift][binIndex].Min];
+
+            return ret;
+        }
+
+        internal void GetRankSum(IsotopeList isotopeList, int charge, double monoIsotopeMass, Tolerance tolerance, out Peak[] peaks, out Peak[] observedPeaks, out int[] observedPeakRanks)
+        {
+            var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeList.GetMostAbundantIsotope().Index);
+            var mostAbundantIsotopePeakIndex = FindPeakIndex(mostAbundantIsotopeMz, tolerance);
+            if (mostAbundantIsotopePeakIndex < 0) throw new ArgumentOutOfRangeException();
+
+            var binNum = _comparer.GetBinNumber(mostAbundantIsotopeMz);
+            var binIndex = binNum - _minBinNum;
+            var binShift = 0;
+
+            var d0 = Math.Abs(_comparer.GetMzAverage(binNum) - mostAbundantIsotopeMz);
+            var d1 = Math.Abs(_comparer.GetMzStart(binNum) - mostAbundantIsotopeMz);
+            var d2 = Math.Abs(_comparer.GetMzEnd(binNum) - mostAbundantIsotopeMz);
+
+            if (d1 < d2 && d1 < d0) binShift = 1;
+            else if (d2 < d1 && d2 < d0) binShift = 2;
+
+            if (_peakIndex[binShift][binIndex] == null) throw new ArgumentOutOfRangeException();
+
+            peaks = new Peak[_peakIndex[binShift][binIndex].Max - _peakIndex[binShift][binIndex].Min + 1];
+            Array.Copy(Peaks, _peakIndex[binShift][binIndex].Min, peaks, 0, peaks.Length);
+
+            var mostAbuInternalIndex = isotopeList.SortedIndexByIntensity[0];
+            observedPeaks = new Peak[isotopeList.Count];
+            observedPeakRanks = new int[isotopeList.Count];
+            observedPeaks[mostAbuInternalIndex] = Peaks[mostAbundantIsotopePeakIndex];
+            observedPeakRanks[mostAbuInternalIndex] = GetRanks(binShift, binIndex, mostAbundantIsotopePeakIndex);
+
+            // go down
+            var peakIndex = mostAbundantIsotopePeakIndex - 1;
+            for (var isotopeInternalIndex = isotopeList.SortedIndexByIntensity[0] - 1; isotopeInternalIndex >= 0; isotopeInternalIndex--)
+            {
+                var isotopeIndex = isotopeList[isotopeInternalIndex].Index; //selectedIsotopeIndex[isotopeInternalIndex];
+                var isotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex; i >= 0; i--)
+                {
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz < minMz)
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    {
+                        var peak = Peaks[i];
+                        if (observedPeaks[isotopeInternalIndex] == null ||
+                            peak.Intensity > observedPeaks[isotopeInternalIndex].Intensity)
                         {
-                            if (_checkedOut[k][l] || _correlationMap[k][l] < CorrLowerBound) continue;
-                            
-                            for (var t = 0; t < tempEnvelope.Length; t++) tempEnvelope[t] = _xicMatrix[cell.Row][cell.Col][t] + _xicMatrix[k][l][t];
-
-                            var newScore = FitScoreCalculator.GetPearsonCorrelation(_envelope, tempEnvelope);
-
-                            if (_correlationMap[cell.Row][cell.Col] < newScore || _correlationMap[k][l] > 0.85)
-                            {
-                                var newMember = new ChargeLcScanCell(k, l);
-                                neighbors.Enqueue(newMember);
-                                newCluster.AddMember(newMember, _intensityMapFull[k][l], _xicMatrix[k][l], newScore);
-                                _checkedOut[k][l] = true;
-                            }
+                            observedPeaks[isotopeInternalIndex] = peak;
+                            observedPeakRanks[isotopeInternalIndex] = GetRanks(binShift, binIndex, i);
                         }
                     }
                 }
-
-                newCluster.CorrBetweenObsTh = FitScoreCalculator.GetPearsonCorrelation(_envelope, newCluster.ObservedEnvelope);
-
-                newCluster.RankSumScore = CalculateRankSumScore(newCluster);
-                if (newCluster.RankSumScore - 0.0005 * _monoIsotopicMass < ranksumCutoff) continue;
-                
-                newCluster.CorrBetweenIsotopes = CalculateXicCorrelationOverTimeBetweenIsotopes(newCluster);
-                if (newCluster.GetScore() < cutoff) continue;
-
-                newCluster.HyperGeometricScore = CalculateHyperGeometricScore(newCluster);
-                if (newCluster.HyperGeometricScore < hypergeometricCutoff) continue;
-
-                clusters.Add(newCluster);
-
-                for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
-                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) _checkedOut[i][j] = true;
-                
             }
 
-            clusters.Sort(ChargeLcScanCluster.CompareByCorrelation);
-            return clusters;
-        }
-
-        /*
-        public void PreparePrecursorXicVector()
-        {
-            _cachedMinBinNum = _comparer.GetBinNumber(_run.MinMs1Mz);
-            _cachedMaxBinNum = _comparer.GetBinNumber(_run.MaxMs1Mz);
-            _cachedXic = new double[_cachedMaxBinNum - _cachedMinBinNum + 1][];
-
-            for (var binNum = _cachedMinBinNum; binNum <= _cachedMaxBinNum; binNum++)
+            // go up
+            peakIndex = mostAbundantIsotopePeakIndex + 1;
+            for (var isotopeInternalIndex = mostAbuInternalIndex + 1; isotopeInternalIndex < isotopeList.Count; isotopeInternalIndex++)
             {
-                var mzStart = _comparer.GetMzStart(binNum);
-                var mzEnd = _comparer.GetMzEnd(binNum);
-                var mzHalf = 0.5*(mzEnd - mzStart);
-                var xic = _run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart - mzHalf, mzEnd + mzHalf);
-
-                _cachedXic[binNum - _cachedMinBinNum] = xic;
-            }
-        }
-                
-        public void PrepareSmoothFullPrecursorXicVector()
-        {
-            _cachedMinBinNum = _comparer.GetBinNumber(_run.MinMs1Mz);
-            _cachedMaxBinNum = _comparer.GetBinNumber(_run.MaxMs1Mz);
-            _cachedXic = new double[_cachedMaxBinNum - _cachedMinBinNum + 1][];
-
-            var binNumToAvgMass = new double[_cachedMaxBinNum - _cachedMinBinNum + 1];
-            for (var binNum = _cachedMinBinNum; binNum <= _cachedMaxBinNum; binNum++)
-            {
-                _cachedXic[binNum - _cachedMinBinNum] = new double[_nScans];
-                binNumToAvgMass[binNum - _cachedMinBinNum] = _comparer.GetMzAverage(binNum);
-            }
-
-            var xic = ((PbfLcMsRun)_run).GetAllPrecursorExtractedIonChromatogram();
-            var tolerance = _comparer.GetTolerance();
-
-            foreach (var xicPoint in xic)
-            {
-                var xicBinNum = _comparer.GetBinNumber(xicPoint.Mz);
-
-                var bandWidth = tolerance.GetToleranceAsTh(xicPoint.Mz) * 0.5;
-                var minBinNum = Math.Max(xicBinNum - 1, _cachedMinBinNum);
-                var maxBinNum = Math.Min(xicBinNum + 1, _cachedMaxBinNum);
-               
-                for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+                var isotopeIndex = isotopeList[isotopeInternalIndex].Index;
+                var isotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
+                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var minMz = isotopeMz - tolTh;
+                var maxMz = isotopeMz + tolTh;
+                for (var i = peakIndex; i < Peaks.Length; i++)
                 {
-                    var u = (xicPoint.Mz - binNumToAvgMass[binNum - _cachedMinBinNum]) / bandWidth;
-                    var smoothedIntensity = xicPoint.Intensity * (Math.Exp(-Math.Pow(u, 2) / 2));
-                    _cachedXic[binNum - _cachedMinBinNum][_ms1ScanNumToIndex[xicPoint.ScanNum]] += smoothedIntensity;
+                    var peakMz = Peaks[i].Mz;
+                    if (peakMz > maxMz)
+                    {
+                        peakIndex = i;
+                        break;
+                    }
+                    if (peakMz >= minMz)    // find match, move to next isotope
+                    {
+                        var peak = Peaks[i];
+                        if (observedPeaks[isotopeInternalIndex] == null ||
+                            peak.Intensity > observedPeaks[isotopeInternalIndex].Intensity)
+                        {
+                            observedPeaks[isotopeInternalIndex] = peak;
+                            observedPeakRanks[isotopeInternalIndex] = GetRanks(binShift, binIndex, i);
+                        }
+                    }
                 }
             }
         }
-        */
-   }
 
-    internal class ChargeLcScanCluster
-    {
-        //internal double Score { get; private set; }
+        internal double MinMz { get { return Peaks[0].Mz; } }
+        internal double MaxMz { get { return Peaks[Peaks.Length - 1].Mz; } }
 
-        internal double CorrBetweenObsTh;
-        internal double CorrBetweenIsotopes;
-        internal double RankSumScore;
-        internal double HyperGeometricScore;
-
-        internal readonly List<ChargeLcScanCell> Members;
-
-        internal double HighestIntensity { get; private set; }
-        internal double TotalIntensity { get; private set; }
-
-        private int _highestIntensityMemberIndex;
-        internal double[] ObservedEnvelope { get; private set; }
-        internal double SeedCorrelation { get; private set; }
-
-        internal int MaxCol { get; private set; }
-        internal int MinCol { get; private set; }
-        internal int MaxRow { get; private set; }
-        internal int MinRow { get; private set; }
-
-        internal bool Active;
-        internal double[] IntensityAlongCol;
-
-        internal ChargeLcScanCluster(ChargeLcScanCell seed, double[] seedEnvelope, int envelopeLength, double seedIntensity, double seedCorr)
-        {
-            CorrBetweenObsTh = seedCorr;
-            CorrBetweenIsotopes = 0;
-            RankSumScore = 0;
-            HyperGeometricScore = 0;
-
-            SeedCorrelation = seedCorr;
-            Members = new List<ChargeLcScanCell> {seed};
-
-            ObservedEnvelope = new double[envelopeLength];
-            Array.Copy(seedEnvelope, ObservedEnvelope, envelopeLength);
-
-            HighestIntensity = seedIntensity;
-            _highestIntensityMemberIndex = 0;
-
-            MaxCol = seed.Col;
-            MinCol = seed.Col;
-            MaxRow = seed.Row;
-            MinRow = seed.Row;
-            TotalIntensity = seedIntensity;
-        }
-
-        internal ChargeScanRange GetChargeScanRange(int[] ms1ScanNums, int minCharge)
-        {
-            var seedScanNum = ms1ScanNums[Members[0].Col];
-            return new ChargeScanRange(MinRow + minCharge, MaxRow + minCharge, ms1ScanNums[MinCol], ms1ScanNums[MaxCol], seedScanNum, GetScore());
-        }
-        /*
-        internal void SetScore(double s)
-        {
-            Score = s;
-        }*/
-
-        public double GetScore()
-        {
-            return CorrBetweenObsTh*3 + CorrBetweenIsotopes;
-        }
-
-        public bool Overlaps(ChargeLcScanCluster other)
-        {
-            return ((MinCol <= other.MinCol && other.MinCol <= MaxCol) ||
-                    (MinCol <= other.MaxCol && other.MaxCol <= MaxCol)) &&
-                   ((MinRow <= other.MinRow && other.MinRow <= MaxRow) ||
-                    (MinRow <= other.MaxRow && other.MaxRow <= MaxRow));
-        }
-
-        internal ChargeLcScanCell GetHighestIntensityCell()
-        {
-            return Members[_highestIntensityMemberIndex];
-        }
-
-        internal void AddMember(ChargeLcScanCell member, double memberIntensity, double[] newObservedEnvelope, double newCorr)
-        {
-            if (memberIntensity > HighestIntensity)
-            {
-                HighestIntensity = memberIntensity;
-                _highestIntensityMemberIndex = Members.Count;
-            }
-
-            TotalIntensity += memberIntensity;
-
-            if (member.Col > MaxCol) MaxCol = member.Col;
-            else if (member.Col < MinCol) MinCol = member.Col;
-            if (member.Row > MaxRow) MaxRow = member.Row;
-            else if (member.Row < MinRow) MinRow = member.Row;
-
-            CorrBetweenObsTh = newCorr;
-            for (var i = 0; i < ObservedEnvelope.Length; i++) ObservedEnvelope[i] += newObservedEnvelope[i];
-
-            Members.Add(member);
-        }
-
-        internal static int CompareByCorrelation(ChargeLcScanCluster x, ChargeLcScanCluster y)
-        {
-            return -x.GetScore().CompareTo(y.GetScore());
-        }
+        private readonly MzComparerWithBinning _comparer;
+        private readonly IntRange[][] _peakIndex;
+        private readonly int[][][] _peakRanking;
+        private readonly int _minBinNum;
+        private readonly int _maxBinNum;
     }
-
-    class ChargeLcScanCell
-    {
-        internal int Row;
-        internal int Col;
-
-        internal ChargeLcScanCell(int row, int col)
-        {
-            Row = row;
-            Col = col;
-        }
-    }
-    
 }

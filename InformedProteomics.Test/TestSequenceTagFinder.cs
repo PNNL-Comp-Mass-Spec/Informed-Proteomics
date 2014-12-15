@@ -31,26 +31,26 @@ namespace InformedProteomics.Test
             var headerList = tsvParser.GetHeaders();
             var tsvData = tsvParser.GetAllData();
 
-            int scanNum = 46562;
+            var scanNum = 46562;
 
-            string seqStr = "";
-            string modStr = "";
+            var seqStr = "";
+            var modStr = "";
             double qValue = 0.0;
 
             var rawReader = new XCaliburReader(TestRawFile);
 
             Spectrum spectrum = rawReader.ReadMassSpectrum(scanNum);
             Sequence sequence = IdentifiedSequenceTag.GenerateSequence(seqStr, modStr);
-
             var tagFinder = new SequenceTagFinder(spectrum);
 
             //var existingTags = tagFinder.ExtractExistingSequneceTags(sequence);
             //Console.Write(scanNum + "\t" + existingTags.Count);
 
-            var result = tagFinder.GetSequenceTags();
-
-            foreach (var tag in result)
-                Console.WriteLine(tag);
+            foreach (var tag in tagFinder.FindSequenceTags())
+            {
+                Console.WriteLine(tag.GetTagStrings());
+            }
+                
 
         }    
     }

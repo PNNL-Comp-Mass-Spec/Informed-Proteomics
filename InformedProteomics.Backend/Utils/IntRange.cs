@@ -25,8 +25,16 @@ namespace InformedProteomics.Backend.Utils
             return new IntRange(Math.Min(range1.Min, range2.Min), Math.Max(range1.Max, range2.Max));
         }
 
+        public void Add(int v)
+        {
+            if (v < Min) Min = v;
+            if (v > Max) Max = v;
+        }
+
         public int Min { get; private set; }
         public int Max { get; private set; }
+
+        public int Length { get { return Max - Min + 1; } }
 
         public int CompareTo(IntRange other)
         {

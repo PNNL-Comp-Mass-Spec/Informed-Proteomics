@@ -12,7 +12,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
-using MathNet.Numerics.Integration.Algorithms;
 
 namespace InformedProteomics.Test
 {
@@ -25,7 +24,6 @@ namespace InformedProteomics.Test
 
         private const int MinCharge = 2;
         private const int MaxCharge = 50;
-        private const int NumBits = 27;
 
         private static readonly IEnumerable<int> Ms2ScanNums = new[] { 46454, 46475, 46484, 46506, 46562, 46661 };
 
@@ -36,12 +34,12 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
             var ms1ScanNumbers = run.GetMs1ScanVector();
 
-            var csm = new ChargeLcScanMatrix(run, NumBits, MinCharge, MaxCharge, false);
+            var csm = new ChargeLcScanMatrix(run, MinCharge, MaxCharge);
 
             Console.WriteLine("Regions:");
-            foreach (var region in csm.GetProbableChargeScanRegions(proteinMass))
+            foreach (var cluster in csm.GetProbableChargeScanClusters(proteinMass))
             {
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", region.MinCharge, region.MaxCharge, region.MinScanNum, region.MaxScanNum);
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", cluster.MinCharge, cluster.MaxCharge, cluster.MinScanNum, cluster.MaxScanNum);
             }
 
             var ms2Nums = csm.GetMatchingMs2ScanNums(proteinMass);
@@ -50,13 +48,8 @@ namespace InformedProteomics.Test
             {
                 Console.WriteLine(ms2 + "\t" + Ms2ScanNums.Contains(ms2));
             }
-                
-
             
         }
-
-
-
 
     }
 }

@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Utils
 
             return s.ToString();
         }
-        
+
         public static int[] GetRankings(IEnumerable<double> values, double lowerBoundValue = 0.0d)
         {
             var temp = new List<KeyValuePair<double, int>>();

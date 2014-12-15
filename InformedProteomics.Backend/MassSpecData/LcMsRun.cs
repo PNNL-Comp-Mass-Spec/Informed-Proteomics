@@ -136,7 +136,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
         }
 
-        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, ChargeScanRange range,
+        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, Ms1Feature range,
             ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             return GetSummedMs2Spectrum(monoIsotopicMass, range.MinScanNum, range.MaxScanNum, range.MinCharge,

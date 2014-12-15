@@ -78,12 +78,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=2.3.0.25, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MathNet.Numerics, Version=2.5.0.27, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="MultiDimensionalPeakFinding">
-      <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>
     </Reference>
     <Reference Include="MwtWinDll">
       <HintPath>..\lib\MwtWinDll.dll</HintPath>
@@ -94,18 +91,6 @@
     <Reference Include="ProteowizardWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\x64\ProteowizardWrapper.dll</HintPath>
-    </Reference>
-    <Reference Include="QuickGraph">
-      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
-    </Reference>
-    <Reference Include="QuickGraph.Data">
-      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="QuickGraph.Graphviz">
-      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
-    </Reference>
-    <Reference Include="QuickGraph.Serialization">
-      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>
@@ -133,12 +118,12 @@
     <Compile Include="Data\Sequence\Cleavage.cs" />
     <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
+    <Compile Include="Data\Spectrometry\ChargeLcScanCluster.cs" />
     <Compile Include="Data\Spectrometry\ChargeLcScanMatrix.cs" />
-    <Compile Include="Data\Spectrometry\ChargeScanRange.cs" />
+    <Compile Include="Data\Spectrometry\Ms1Feature.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
     <Compile Include="Data\Spectrometry\ILcMsMap.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureExtractor.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
@@ -191,10 +176,9 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="SequenceTag\CandidatePathManager.cs" />
     <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
-    <Compile Include="SequenceTag\ScoringFunction.cs" />
     <Compile Include="SequenceTag\SequenceTagFinder.cs" />
+    <Compile Include="SequenceTag\SequenceTagGraph.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />
@@ -207,6 +191,7 @@
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\NoiseFilter.cs" />
     <Compile Include="Utils\PeakListUtils.cs" />
+    <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />

@@ -4,6 +4,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public interface ILcMsMap
     {
-        IEnumerable<ChargeScanRange> GetProbableChargeScanRegions(double monoIsotopicMass);
+        IEnumerable<Ms1Feature> GetProbableChargeScanRegions(double monoIsotopicMass);
     }
 }

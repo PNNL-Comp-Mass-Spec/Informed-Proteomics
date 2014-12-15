@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Utils;
-using MultiDimensionalPeakFinding;
+
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -12,8 +12,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         //public int Max { get; private set; }
 
     	private static readonly SavitzkyGolaySmoother Smoother;
-
-		static Xic()
+        static Xic()
 		{
 			Smoother = new SavitzkyGolaySmoother(9, 2);
 		}

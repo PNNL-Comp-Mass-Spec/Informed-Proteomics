@@ -1,62 +1,65 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Forms;
 using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Utils
 {
     public class FitScoreCalculator
     {
-        public static double GetHyperGeometricProbability(int n, int k, int n1, int k1)
+        public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0 )
         {
-            var score =
-                SimpleMath.GetLogCombination(k, k1) +
-                SimpleMath.GetLogCombination(n - k, n1 - k1) -
-                SimpleMath.GetLogCombination(n, n1);
-            return Math.Exp(score);
-        }
+            if (count == -1) count = v1.Length;
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0;
 
-        public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool overRepresentation = true)
-        {
-            var pvalue = 0.0d;
-            if (overRepresentation)
+            var s1 = 0d;
+            var s2 = 0d;
+
+            for (var i = 0; i < count; i++)
             {
-                for (var k2 = k1; k2 <= n1; k2++)
-                {
-                    var p = SimpleMath.GetLogCombination(k, k2) +
-                            SimpleMath.GetLogCombination(n - k, n1 - k2) -
-                            SimpleMath.GetLogCombination(n, n1);
-                    pvalue += Math.Exp(p);
-                }
+                s1 += v1[i + v1Index];
+                s2 += v2[i + v2Index];
             }
-            else
+
+            var bc = 0d;
+            for (var i = 0; i < count; i++)
             {
-                for (var k2 = 0; k2 <= k1; k2++)
-                {
-                    var p = SimpleMath.GetLogCombination(k, k2) +
-                            SimpleMath.GetLogCombination(n - k, n1 - k2) -
-                            SimpleMath.GetLogCombination(n, n1);
-                    pvalue += Math.Exp(p);
-                }                
+                var p = v1[i + v1Index] / s1;
+                var q = v2[i + v2Index] / s2;
+                bc += Math.Sqrt(p * q);
             }
-            return pvalue;
+
+            return -Math.Log(bc);            
         }
         
-        private static readonly Normal Gaussian = new Normal();
+        public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool upperTailProb = true)
+        {
+            var pValue = Hypergeometric.CDF(n, k, n1, k1);
+            if (upperTailProb) pValue = 1 - pValue;
+            else pValue = Math.Min(pValue, 1 - pValue);
 
-        // Type of alternative hypothesis = Right tail (it's fixed here)
-        public static double GetRankSumPvalue(double n, double n1, double r1 )
+            return pValue;
+        }
+
+        public static double GetRankSumPvalue(double n, double n1, double r1, bool upperTailProb = true)
         {
             var n2 = n - n1;
             var u1 = n1 * n2 + n1 * (n1 + 1) * 0.5 - r1;
 
             var meanU = 0.5 * (n1 * n2);
+            //var sigU = Math.Sqrt(n1*n2*(n1 + n2 + 1)/12);
             var logSigU = 0.5 * (Math.Log(n1) + Math.Log(n2) + Math.Log(n1 + n2 + 1) - Math.Log(12));
             var sigU = Math.Exp(logSigU);
-            var zScore = (u1 - meanU) / sigU;
+            
+            var pValue = Normal.CDF(meanU, sigU, u1);
+            
+            if (upperTailProb) pValue = 1 - pValue;
+            else pValue = Math.Min(pValue, 1 - pValue);
 
-            return 1 - Gaussian.CumulativeDistribution(zScore);
+            return Math.Abs(pValue); //negative tiny value
         }
-
+        
+        /*
         public static double GetPearsonCorrelation(double[] v1, double[] v2)
         {
             var dimension = v1.Length;
@@ -93,10 +96,11 @@ namespace InformedProteomics.Backend.Utils
             if (s1 <= 0 || s2 <= 0) return 0;
 
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
-        }
+        }*/
 
-        public static double GetPearsonCorrelation(double[] v1, int v1Index, double[] v2, int v2Index, int count)
+        public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
+            if (count == -1) count = v1.Length;
             if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0;
             if (count == 1) return 1.0;
 
@@ -130,43 +134,6 @@ namespace InformedProteomics.Backend.Utils
             if (s1 <= 0 || s2 <= 0) return 0;
 
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
-        }
-
-        public static float GetPearsonCorrelation(float[] v1, int v1Index, float[] v2, int v2Index, int count)
-        {
-            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0f;
-            if (count == 1) return 1.0f;
-
-            // Compute means
-            var m1 = 0.0f;
-            var m2 = 0.0f;
-
-            for (var i = 0; i < count; i++)
-            {
-                m1 += v1[v1Index + i];
-                m2 += v2[v2Index + i];
-            }
-
-            m1 /= count;
-            m2 /= count;
-
-            // compute Pearson correlation
-            var cov = 0.0f;
-            var s1 = 0.0f;
-            var s2 = 0.0f;
-
-            for (var i = 0; i < count; i++)
-            {
-                var d1 = v1[v1Index + i] - m1;
-                var d2 = v2[v2Index + i] - m2;
-                cov += d1 * d2;
-                s1 += d1 * d1;
-                s2 += d2 * d2;
-            }
-
-            if (s1 <= 0 || s2 <= 0) return 0;
-
-            return cov < 0f ? 0f : cov / (float)Math.Sqrt(s1 * s2);
         }
 
         // the larger the better
