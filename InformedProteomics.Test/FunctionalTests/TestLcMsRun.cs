@@ -215,5 +215,23 @@ namespace InformedProteomics.Test.FunctionalTests
             var productSpec = filtered as ProductSpectrum;
             Console.WriteLine(productSpec == null);
         }
+
+        [Test]
+        public void TestReadingCorruptedRawFile()
+        {
+            const string rawFilePath = @"H:\Research\Corrupted\YS_Shew_testHCD_CID.raw";
+            var reader = new XCaliburReader(rawFilePath);
+            reader.ReadMassSpectrum(17957);
+            try
+            {
+                reader.ReadMassSpectrum(17957);
+            }
+            catch (System.Runtime.InteropServices.COMException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.Write("Done");
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace PbfGen
     public class Program
     {
         public const string Name = "PbfGen";
-        public const string Version = "0.14 (Sept 11, 2014)";
+        public const string Version = "0.62 (Dec 11, 2014)";
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -30,7 +30,7 @@ namespace PbfGen
             var paramDic = new Dictionary<string, string>
             {
                 {"-s", null},
-                {"-o", null},
+                {"-o", null}
             };
 
             for (var i = 0; i < args.Length/2; i++)

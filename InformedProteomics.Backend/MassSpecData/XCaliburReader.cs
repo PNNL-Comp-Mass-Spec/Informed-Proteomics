@@ -30,7 +30,20 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>all spectra</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
-            for (var scanNum = _minLcScan; scanNum <= _maxLcScan; scanNum++) yield return ReadMassSpectrum(scanNum);
+            for (var scanNum = _minLcScan; scanNum <= _maxLcScan; scanNum++)
+            {
+                Spectrum spec = null;
+                try
+                {
+                    spec = ReadMassSpectrum(scanNum);
+                }
+                catch (System.Runtime.InteropServices.COMException e)
+                {
+                    Console.WriteLine("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
+                }
+
+                if(spec != null) yield return spec;
+            }
         }
 
         /// <summary>

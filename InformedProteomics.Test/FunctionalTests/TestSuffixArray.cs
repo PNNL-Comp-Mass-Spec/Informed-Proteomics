@@ -10,12 +10,31 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestSuffixArray
     {
         [Test]
+        public void TestSearching()
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            var db = new FastaDatabase(dbFile);
+            var searchableDb = new SearchableDatabase(db);
+            const string pattern = "NSGSHFCGGSLINSQWVVSAAH";
+            var position = searchableDb.Search(pattern);
+            Assert.True(position >= 0);
+            Console.WriteLine("Position: {0}", position);
+            Console.WriteLine("Matched indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern)));
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+        }
+
+        [Test]
         public void TestEnumeratingPeptides()
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 20))

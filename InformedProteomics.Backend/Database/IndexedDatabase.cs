@@ -12,20 +12,21 @@ namespace InformedProteomics.Backend.Database
     public class IndexedDatabase
     {
         public static readonly string PermutedLongestCommonPrefixFileExtension = ".icplcp";
+        public static readonly Encoding Encoding = FastaDatabase.Encoding;
 
         private readonly string _pLcpFilePath;
 
-        private readonly FastaDatabase _fastaDatabase;
-        protected byte[] PLcp;        
+        protected readonly FastaDatabase FastaDatabase;
+        protected byte[] PLcp;
 
         public IndexedDatabase(FastaDatabase fastaDatabase)
         {
-            _fastaDatabase = fastaDatabase;
-            var databaseFilePath = _fastaDatabase.GetFastaFilePath();
+            FastaDatabase = fastaDatabase;
+            var databaseFilePath = FastaDatabase.GetFastaFilePath();
             var databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
 
             _pLcpFilePath = databaseFilePathNoExt + PermutedLongestCommonPrefixFileExtension;
-            var lastWriteTimeHash = _fastaDatabase.GetLastWriteTimeHash();
+            var lastWriteTimeHash = FastaDatabase.GetLastWriteTimeHash();
 
             if (!File.Exists(_pLcpFilePath) || !FastaDatabase.CheckHashCodeBinaryFile(_pLcpFilePath, lastWriteTimeHash))
             {
@@ -42,11 +43,6 @@ namespace InformedProteomics.Backend.Database
                 PLcp = new byte[fileStream.Length - sizeof(int)];
                 fileStream.Read(PLcp, 0, PLcp.Length);
             }
-        }
-
-        public int Search(string query)
-        {
-            throw new NotImplementedException();
         }
 
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
@@ -93,7 +89,6 @@ namespace InformedProteomics.Backend.Database
 
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(int minLength, int maxLength, int numCTermCleavages)
         {
-            var encoding = Encoding.ASCII;
 
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
@@ -108,8 +103,8 @@ namespace InformedProteomics.Backend.Database
                             offset,
                             string.Format("{0}.{1}.{2}",
                             "_",
-                            encoding.GetString(seqArr, 0, length),
-                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
+                            Encoding.GetString(seqArr, 0, length),
+                            (i == 0 ? "_" : Encoding.GetString(seqArr, length, 1)))
                             );
                     }
                 }
@@ -209,7 +204,7 @@ namespace InformedProteomics.Backend.Database
             var curOffset = 0L;
 
             var offset = -1L;
-            foreach (var residue in _fastaDatabase.Characters())
+            foreach (var residue in FastaDatabase.Characters())
             {
                 ++offset;
                 if (residue == FastaDatabase.Delimiter)
@@ -247,7 +242,6 @@ namespace InformedProteomics.Backend.Database
                 isStandardAminoAcid[residue] = true;
             }
 
-            var encoding = FastaDatabase.Encoding;
             // pre, peptide sequence, next
             foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
             {
@@ -274,7 +268,7 @@ namespace InformedProteomics.Backend.Database
                             {
                                 if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                                 }
                             }
                             if (nmc > numMissedCleavages) break;
@@ -296,7 +290,7 @@ namespace InformedProteomics.Backend.Database
                             {
                                 if (ntt + (isCleavable[seqArr[i + 1]] ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                                 }
                             }
                         }
@@ -311,7 +305,7 @@ namespace InformedProteomics.Backend.Database
                         if (!isStandardAminoAcid[code]) break;
                         if (i >= minLength && i >= lcp)
                         {
-                            yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                            yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
                         }
                     }
                 }
@@ -325,7 +319,7 @@ namespace InformedProteomics.Backend.Database
             var lcpEnum = PLcps().GetEnumerator();
 
             var offset = -1L;
-            foreach (var residue in _fastaDatabase.Characters())
+            foreach (var residue in FastaDatabase.Characters())
             {
                 lcpEnum.MoveNext();
                 curSequence.AddLast(residue);
@@ -356,7 +350,7 @@ namespace InformedProteomics.Backend.Database
             if (File.Exists(_pLcpFilePath))
                 File.Delete(_pLcpFilePath);
 
-            var sequence = _fastaDatabase.GetSequence();
+            var sequence = FastaDatabase.GetSequence();
             //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
             var suffixArray = new int[sequence.Length-1];
             SAIS.sufsort(sequence, suffixArray, sequence.Length-1);
@@ -381,11 +375,11 @@ namespace InformedProteomics.Backend.Database
                     fs.WriteByte(lcp);
                 }
                 fs.Write(BitConverter.GetBytes(FastaDatabase.FileFormatId), 0, sizeof(int));
-                fs.Write(BitConverter.GetBytes(_fastaDatabase.GetLastWriteTimeHash()), 0, sizeof(int));
+                fs.Write(BitConverter.GetBytes(FastaDatabase.GetLastWriteTimeHash()), 0, sizeof(int));
             }
         }
 
-        private static byte GetLcp(IList<byte> sequence, int index1, int index2)
+        public static byte GetLcp(IList<byte> sequence, int index1, int index2)
         {
             var lcp = (byte)0;
 

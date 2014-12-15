@@ -131,6 +131,7 @@
     <Compile Include="TestRankScore.cs" />
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestResults.cs" />
+    <Compile Include="TestSelectivityScore.cs" />
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
@@ -167,6 +168,10 @@
     <ProjectReference Include="..\PbfGen\PbfGen.csproj">
       <Project>{b31c2ac2-88c6-43c9-b809-26b7547592ff}</Project>
       <Name>PbfGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SelectivityScore\SelectivityScore.csproj">
+      <Project>{19658c05-ef09-404d-959f-ef9a6029013b}</Project>
+      <Name>SelectivityScore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

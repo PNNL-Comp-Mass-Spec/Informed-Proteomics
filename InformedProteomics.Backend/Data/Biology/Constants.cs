@@ -14,5 +14,15 @@ namespace InformedProteomics.Backend.Data.Biology
         public const double C13 = 13.00335483;
         public const double C13MinusC12 = C13 - 12.0;
         public const double Proton = 1.00727649;
+
+        public static int GetBinNum(double m)
+        {
+            return (int)Math.Round(m * RescalingConstant);
+        }
+
+        public static int GetBinNumHighPrecision(double m)
+        {
+            return (int) Math.Round(m*RescalingConstantHighPrecision);
+        }
     }
 }

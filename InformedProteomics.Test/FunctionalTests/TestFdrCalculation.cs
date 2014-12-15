@@ -11,9 +11,9 @@ namespace InformedProteomics.Test.FunctionalTests
     {
         public void TestIcTopDown()
         {
-            const string targetResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V5\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv";
-            const string decoyResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V5\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
-            const string tdaResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V5\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            const string targetResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V62_Ms1Ft\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv";
+            const string decoyResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V62_Ms1Ft\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
+            const string tdaResultPath = @"H:\Research\QCShew_TopDown\Production\M1_V62_Ms1Ft\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -19,13 +20,54 @@ namespace InformedProteomics.Test
     public class TestYufengData
     {
         public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\Yufeng\raw\yufeng_column_test2.raw";
-        private static readonly IEnumerable<int> Ms2ScanNums = new[] { 46454, 46475, 46484, 46506, 46562, 46661 };
-        private class SimpleMs1Filter : ISequenceFilter
+
+        [Test]
+        public void AddMostAbundantIsotopePeakIntensity()
         {
-            public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
+            const string rawFilePath = @"H:\Research\Yufeng\40K\raw\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw";
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+
+            const string resultFilePath = @"H:\Research\Yufeng\40K\DMS\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv";
+
+            var parser = new TsvFileParser(resultFilePath);
+            var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
+            var scanNums = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
+            var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
+            var precursorIntensities = new double[parser.NumData];
+            var tolerance = new Tolerance(10);
+            for (var i = 0; i < parser.NumData; i++)
             {
-                return Ms2ScanNums;
+                var scanNum = scanNums[i];
+                var composition = compositions[i];
+                var charge = charges[i];
+                var precursorIon = new Ion(composition, charge);
+
+                var precursorScanNum = run.GetPrecursorScanNum(scanNum);
+                var precursorSpec = run.GetSpectrum(precursorScanNum);
+                var isotopePeaks = precursorSpec.GetAllIsotopePeaks(precursorIon, tolerance, 0.1);
+                if (isotopePeaks != null)
+                {
+                    var maxIntensity = 0.0;
+                    for (var j = 0; j < isotopePeaks.Length; j++)
+                    {
+                        if (isotopePeaks[j] != null && isotopePeaks[j].Intensity > maxIntensity)
+                            maxIntensity = isotopePeaks[j].Intensity;
+                    }
+                    precursorIntensities[i] = maxIntensity;
+                }
             }
+
+            // Writing
+            const string newResultFilePath = @"H:\Research\Yufeng\40K\DMS\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv";
+            using (var writer = new StreamWriter(newResultFilePath))
+            {
+                writer.WriteLine(string.Join("\t", parser.GetHeaders())+"\t"+"PrecursorIntensity");
+                for (var i = 0; i < parser.NumData; i++)
+                {
+                    writer.WriteLine(parser.GetRows()[i]+"\t"+precursorIntensities[i]);
+                }
+            }
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -113,6 +155,15 @@ namespace InformedProteomics.Test
                             precursorIon.GetMostAbundantIsotopeMz(), precursorIon.Charge, precursorIon.Composition.Mass, score);
                     }
                 }
+            }
+        }
+
+        private static readonly IEnumerable<int> Ms2ScanNums = new[] { 46454, 46475, 46484, 46506, 46562, 46661 };
+        private class SimpleMs1Filter : ISequenceFilter
+        {
+            public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
+            {
+                return Ms2ScanNums;
             }
         }
 

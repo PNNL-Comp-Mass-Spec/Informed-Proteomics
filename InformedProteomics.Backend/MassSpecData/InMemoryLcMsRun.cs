@@ -262,6 +262,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 scanNumToSpecOffset[scanNum - MinLcScan] = writer.BaseStream.Position;
                 var spec = GetSpectrum(scanNum);
+                if (spec == null) continue;
                 var productSpec = spec as ProductSpectrum;
                 scanNumToIsolationWindow[scanNum - MinLcScan] = productSpec == null ? null : productSpec.IsolationWindow;
                 WriteSpectrum(spec, writer);

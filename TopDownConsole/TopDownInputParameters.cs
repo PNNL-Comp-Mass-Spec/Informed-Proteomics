@@ -15,7 +15,7 @@ namespace MSPathFinderT
         public string OutputDir { get; set; }
         public AminoAcidSet AminoAcidSet { get; set; }
         public int SearchMode { get; set; }
-        public bool Tda { get; set; }
+        public bool? Tda { get; set; }
         public double PrecursorIonTolerancePpm { get; set; }
         public double ProductIonTolerancePpm { get; set; }
         public int MinSequenceLength { get; set; }
@@ -38,7 +38,7 @@ namespace MSPathFinderT
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchMode);
-            Console.WriteLine("Tda: " + Tda);
+            Console.WriteLine("Tda: " + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
             Console.WriteLine("MinSequenceLength: " + MinSequenceLength);
@@ -73,7 +73,7 @@ namespace MSPathFinderT
                     writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                     writer.WriteLine("SearchMode\t" + SearchMode);
-                    writer.WriteLine("Tda\t" + Tda);
+                    writer.WriteLine("Tda\t" + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                     writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
                     writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
@@ -144,11 +144,13 @@ namespace MSPathFinderT
             ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
 
             var tdaVal = Convert.ToInt32(parameters["-tda"]);
-            if (tdaVal != 0 && tdaVal != 1)
+            if (tdaVal != 0 && tdaVal != 1 && tdaVal != -1)
             {
                 return "Invalid value (" + tdaVal + ") for parameter -tda";
             }
-            Tda = (tdaVal == 1);
+            if (tdaVal == 1) Tda = true;
+            else if (tdaVal == -1) Tda = null;
+            else Tda = false;
 
             MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
             MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);
@@ -243,7 +245,7 @@ namespace MSPathFinderT
                     {
                         return "File not found." + value + "!";
                     }
-                    if (value != null && !Path.GetExtension(value).ToLower().Equals(".csv"))
+                    if (value != null && !Path.GetExtension(value).ToLower().Equals(".csv") && !Path.GetExtension(value).ToLower().Equals(".tsv"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")!";
                     }

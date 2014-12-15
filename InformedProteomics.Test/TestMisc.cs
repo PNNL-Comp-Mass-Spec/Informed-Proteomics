@@ -17,6 +17,29 @@ namespace InformedProteomics.Test
     public class TestMisc
     {
         [Test]
+        public void RemovePepFdrFromFile()
+        {
+            const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
+            foreach (var resultFile in Directory.GetFiles(henryResultPath, "*_FDR.tsv"))
+            {
+                var fileName = Path.GetFileName(resultFile);
+                if (fileName == null) continue;
+                var sample = fileName.Substring(0, 2);
+                Console.WriteLine("Processing {0}", sample);
+
+                var outputFilePath = henryResultPath + Path.DirectorySeparatorChar + "ID_" + sample + ".tsv";
+                Console.WriteLine("Writing to {0}", outputFilePath);
+                using (var writer = new StreamWriter(outputFilePath))
+                {
+                    foreach (var line in File.ReadLines(resultFile))
+                    {
+                        writer.WriteLine(line.Substring(0, line.LastIndexOf('\t')));
+                    }
+                }
+            }
+        }
+
+        [Test]
         public void CreatePeptideAbundanceTableWithSkyline()
         {
             // Reading Henry's results
@@ -60,7 +83,7 @@ namespace InformedProteomics.Test
             const string skylineFilePath = @"H:\Research\IPRG2015\MySkyline\TransitionResults.csv";
             var skylineTable = new TsvFileParser(skylineFilePath, ',');
 
-            const string outputFilePath = @"H:\Research\IPRG2015\MySkyline\SkylineTransitionResultsWithScores2.tsv";
+            const string outputFilePath = @"H:\Research\IPRG2015\MySkyline\SkylineTransitionResultsWithScores3.tsv";
             using (var writer = new StreamWriter(outputFilePath))
             {
                 var peptides = skylineTable.GetData("Peptide Sequence").ToArray();
@@ -68,19 +91,19 @@ namespace InformedProteomics.Test
                 var charges = skylineTable.GetData("Precursor Charge").Select(c => Convert.ToInt32(c)).ToArray();
                 var precursorMzs = skylineTable.GetData("Precursor Mz").Select(Convert.ToDouble).ToArray();
 
-                writer.WriteLine("{0}\tProbability\tQValue", string.Join("\t", skylineTable.GetHeaders()));
+                writer.WriteLine("{0}\tProbability\tQValue", string.Join("\t", skylineTable.GetHeaders().Take(skylineTable.GetHeaders().Count-2)));
                 for (var i = 0; i < skylineTable.NumData; i++)
                 {
                     var precursorMz = precursorMzs[i];
                     var charge = charges[i];
                     var nominalMass = (int)Math.Round(((precursorMz - Constants.Proton)*charge - Composition.H2O.Mass)*
                                       Constants.RescalingConstant);
-                    //var pepKey = peptides[i] + ":" + nominalMass;
-                    //if (!pepKeySet.Contains(pepKey))
-                    //{
-                    //    //Console.WriteLine("Removing {0}", pepKey);
-                    //    continue;
-                    //}
+                    var pepKey = peptides[i] + ":" + nominalMass;
+                    if (!pepKeySet.Contains(pepKey))
+                    {
+                        //Console.WriteLine("Removing {0}", pepKey);
+                        continue;
+                    }
                     var key = samples[i] + ":" + peptides[i] + ":" + nominalMass + ":" + charge;
                     double? prob = null, qValue = null;
                     Tuple<double, double> scores;
@@ -89,8 +112,13 @@ namespace InformedProteomics.Test
                         prob = scores.Item1;
                         qValue = scores.Item2;
                     }
-                    writer.WriteLine("{0}\t{1}\t{2}", 
-                        string.Join("\t", skylineTable.GetRows()[i].Split(',')), 
+                    var skylineData = skylineTable.GetRows()[i].Split(',');
+                    for (var j = 0; j < skylineData.Length - 2; j++)
+                    {
+                        if(j != 2) writer.Write(skylineData[j]+"\t");
+                        else writer.Write("" + skylineData[j][0] + skylineData[j][2]+"\t");
+                    }
+                    writer.WriteLine("{0}\t{1}", 
                         prob != null ? prob.ToString() : "NA",
                         qValue != null ? qValue.ToString() : "NA");
                 }

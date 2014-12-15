@@ -233,6 +233,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             }            
         }
 
+        public static AminoAcidSet GetStandardAminoAcidSet()
+        {
+            return _standardAminoAcidSet ?? (_standardAminoAcidSet = new AminoAcidSet());
+        }
+
+        public static AminoAcidSet GetStandardAminoAcidSetWithCarboamidomethylCys()
+        {
+            return _standardAminoAcidSetWithCarboamidomethylCys ?? 
+                (_standardAminoAcidSetWithCarboamidomethylCys = new AminoAcidSet(Modification.Carbamidomethylation));
+        }
+
+        private static AminoAcidSet _standardAminoAcidSet;
+        private static AminoAcidSet _standardAminoAcidSetWithCarboamidomethylCys;
+
         #region Private Members
 
         //private readonly Dictionary<char, AminoAcid> _residueMap = new Dictionary<char, AminoAcid>();

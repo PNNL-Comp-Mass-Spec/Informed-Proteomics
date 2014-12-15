@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Database\AnnotationAndOffset.cs" />
+    <Compile Include="Database\SearchableDatabase.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Composition\Averagine.cs" />
     <Compile Include="Data\Composition\AbstractComposition.cs" />

@@ -18,6 +18,38 @@ namespace InformedProteomics.Test
     internal class TestLcMsCaching
     {
         [Test]
+        public void TestClusterCentricSearch()
+        {
+            const string pfResultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            var tsvReader = new TsvFileParser(pfResultFilePath);
+
+            var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
+            var compositions = tsvReader.GetData("Composition").ToArray();
+            var qValues = tsvReader.GetData("QValue").Select(Convert.ToDouble).ToArray();
+
+            var compScanTable = new Dictionary<string, IList<int>>();
+            for(var i=0; i<qValues.Length; i++)
+            {
+                var qValue = qValues[i];
+                if (qValue > 0.01) break;
+                IList<int> scanNums;
+                if(compScanTable.TryGetValue(compositions[i], out scanNums))
+                {
+                    scanNums.Add(ms2Scans[i]);
+                }
+                else
+                {
+                    compScanTable.Add(compositions[i], new List<int> {ms2Scans[i]});
+                }
+            }
+
+            Console.Write("NumCompositions: {0}", compScanTable.Keys.Count);
+
+            const string featureFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+
+        }
+
+        [Test]
         public void TestIsosFilter()
         {
             const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";

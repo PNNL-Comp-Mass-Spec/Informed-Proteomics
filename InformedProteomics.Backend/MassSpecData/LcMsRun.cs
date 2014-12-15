@@ -542,6 +542,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var index = scanNum - MinLcScan;
 
                 var msLevel = GetMsLevel(scanNum);
+                if (msLevel == 0) continue; // corrupted scan
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
                 {
@@ -564,6 +565,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var index = scanNum - MinLcScan;
                 var msLevel = GetMsLevel(scanNum);
+                if (msLevel == 0) continue; // corrupted scan
 
                 // determine next scan
                 if (msLevel == nextMsLevel)

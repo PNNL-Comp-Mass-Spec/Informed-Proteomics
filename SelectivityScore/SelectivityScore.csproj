@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}</ProjectGuid>
+    <ProjectGuid>{19658C05-EF09-404D-959F-EF9A6029013B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>InformedProteomics.TopDown</RootNamespace>
-    <AssemblyName>InformedProteomics.TopDown</AssemblyName>
+    <RootNamespace>SelectivityScore</RootNamespace>
+    <AssemblyName>SelectivityScore</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +28,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -40,7 +37,6 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -50,7 +46,6 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -62,34 +57,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Execution\IcRescorer.cs" />
-    <Compile Include="Execution\IcTopDownLauncher.cs" />
-    <Compile Include="Execution\SequenceSpectrumMatch.cs" />
-    <Compile Include="Execution\MSAlignRescorer.cs" />
+    <Compile Include="SelectivityScoreCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scoring\InformedTopDownScorer.cs" />
-    <Compile Include="Scoring\IsosFilter.cs" />
-    <Compile Include="Scoring\Ms1FtFilter.cs" />
-    <Compile Include="Scoring\Ms1IsotopeMostAbundantPlusOneFilter.cs" />
-    <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
-    <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
-    <Compile Include="Scoring\LikelihoodScoringModel.cs" />
-    <Compile Include="Scoring\LikelihoodScorer.cs" />
-    <Compile Include="Scoring\MatchedPeakCounter.cs" />
-    <Compile Include="Scoring\Ms1IsotopeAndChargeCorrFilter.cs" />
-    <Compile Include="Scoring\Ms1ContainsIonFilter.cs" />
-    <Compile Include="Scoring\SubScoreFactory.cs" />
-    <Compile Include="Scoring\TopDownScorer.cs" />
-    <Compile Include="Scoring\TopDownTrainer.cs" />
+    <Compile Include="SelectivityScoreCalculatorUsingNominalMasses.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
-      <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
+      <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
       <Name>InformedProteomics.Backend</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InformedProteomics.Scoring\InformedProteomics.Scoring.csproj">
-      <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
-      <Name>InformedProteomics.Scoring</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -77,6 +77,42 @@ namespace InformedProteomics.Backend.Utils
             }
         }
 
+        public static int[][] GetNtoTheKCombinations(int n, int length)
+        {
+            if (n <= 0)
+                return null;
+
+            if (length == 0)
+            {
+                return new[] { new int[0] };
+            }
+            if (length == 1)
+            {
+                var combinations = new int[n][];
+                for (var i = 0; i < n; i++)
+                {
+                    combinations[i] = new[] { i };
+                }
+                return combinations;
+            }
+            else
+            {
+                var prevCombinations = GetNtoTheKCombinations(n, length - 1);
+                var combinations = new List<int[]>();
+                foreach (var combination in prevCombinations)
+                {
+                    for (var j = 0; j < n; j++)
+                    {
+                        var newCombination = new int[combination.Length + 1];
+                        Array.Copy(combination, newCombination, combination.Length);
+                        newCombination[newCombination.Length - 1] = j;
+                        combinations.Add(newCombination);
+                    }
+                }
+                return combinations.ToArray();
+            }
+        }
+
         static public double GetCorrelation(double[] v1, double[] v2)
         {
             if (v1.Length <= 1) return 0.0;

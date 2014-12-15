@@ -115,8 +115,10 @@ namespace InformedProteomics.TopDown.Execution
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
 
             var ms1Filter = IsosFilePath == null
-                ? (ISequenceFilter) new ChargeLcScanMatrix(_run)
-                : new IsosFilter(_run, PrecursorIonTolerance, IsosFilePath);
+                ? new ChargeLcScanMatrix(_run)
+                : Path.GetExtension(IsosFilePath).Equals(".csv") ? 
+                (ISequenceFilter) new IsosFilter(_run, PrecursorIonTolerance, IsosFilePath) 
+                : new Ms1FtFilter(_run, PrecursorIonTolerance, IsosFilePath);
 
             sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
