@@ -144,5 +144,35 @@ namespace InformedProteomics.Test.FunctionalTests
             var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
+
+        [Test]
+        public void TestMatchedPeakPostScorer()
+        {
+            // Parameters
+            var productIonTolerance = new Tolerance(10);
+            var scorer = new MatchedPeakPostScorer(productIonTolerance, 1, 10);
+            var sw = new System.Diagnostics.Stopwatch();
+
+            const int ms2ScanNum = 4658;
+            var sequence = new Sequence("GYSIKDIIYQGEKSGVHNWQTLSGQNFYWHPDWLHIAEDLTGHKATASIQAEGTKATQNEAEQTIVKHLNKS", new AminoAcidSet());
+
+            //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+            Assert.True(spec != null);
+
+            sw.Start();
+            var score = scorer.ComputeScore(spec, sequence);
+
+            Console.WriteLine("{0}\t{1}\t{2}", sequence, ms2ScanNum, score);
+
+            sw.Stop();
+            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+        }
+
+
     }
 }
