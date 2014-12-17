@@ -111,9 +111,11 @@ namespace InformedProteomics.TopDown.Scoring
                         {
                             if (baseIonType.IsPrefix) _prefixIonPeakIndex.Add(baseIsotopePeakIndex);
                             else _suffixIonPeakIndex.Add(baseIsotopePeakIndex);
+                            _nObservedIonPeaks++;
                         }
-                        _nObservedIonPeaks += nMatchedIsotopes;
-                        _nTheoreticalIonPeaks += nIsotopes;
+                        //_nObservedIonPeaks += nMatchedIsotopes;
+                        //_nTheoreticalIonPeaks += nIsotopes;
+                        _nTheoreticalIonPeaks++;
                     }
                 }
                 index++;
