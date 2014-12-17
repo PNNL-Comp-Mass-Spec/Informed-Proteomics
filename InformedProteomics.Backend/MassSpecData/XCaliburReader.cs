@@ -28,6 +28,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Reads all spectra
         /// </summary>
         /// <returns>all spectra</returns>
+        [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             for (var scanNum = _minLcScan; scanNum <= _maxLcScan; scanNum++)

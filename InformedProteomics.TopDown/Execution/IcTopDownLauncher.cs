@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -110,7 +108,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.Write("Extracting chromatograms for finding features...");
             sw.Start();
 
-            //var lcMsMap = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge,
+            //var sequenceFilter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge,
             //    MaxPrecursorIonCharge,
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
 
@@ -201,21 +199,21 @@ namespace InformedProteomics.TopDown.Execution
 
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database)
         {
-            var indexedDbTarget = new IndexedDatabase(database);
-            indexedDbTarget.Read();
+            var indexedDb = new IndexedDatabase(database);
+            indexedDb.Read();
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (SearchMode == 0)
             {
-                annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
             }
             else if (SearchMode == 2)
             {
-                annotationsAndOffsets = indexedDbTarget.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
+                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
                     MaxSequenceLength, MaxNumCTermCleavages);
             }
             else
             {
-                annotationsAndOffsets = indexedDbTarget
+                annotationsAndOffsets = indexedDb
                     .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
                         MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
             }
@@ -223,8 +221,7 @@ namespace InformedProteomics.TopDown.Execution
             return annotationsAndOffsets;
         }
 
-        //private SortedSet<SequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ILcMsMap lcMsMap)
-        private SortedSet<SequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter lcMsMap)
+        private SortedSet<SequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter)
         {
             var sw = new Stopwatch();
 
@@ -237,7 +234,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
 
-            foreach (var annotationAndOffset in annotationsAndOffsets.AsParallel())
+            foreach (var annotationAndOffset in annotationsAndOffsets)
             {
                 //++numProteins;
                 Interlocked.Increment(ref numProteins);
@@ -278,11 +275,8 @@ namespace InformedProteomics.TopDown.Execution
                         var sequenceMass = protCompositionWithH2O.Mass;
                         var modCombinations = modCombs[modIndex];
 
-                        foreach (var ms2ScanNum in lcMsMap.GetMatchingMs2ScanNums(sequenceMass))
-                        //foreach(var region in lcMsMap.GetProbableChargeScanRegions(sequenceMass))
+                        foreach (var ms2ScanNum in sequenceFilter.GetMatchingMs2ScanNums(sequenceMass))
                         {
-                            //var ms1ScanNum = region.RepresentativeScanNum;
-                            //var ms2ScanNum = _run.GetNextScanNum(ms1ScanNum, 2);
                             if (ms2ScanNum > _run.MaxLcScan) continue;
 
                             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -303,7 +297,6 @@ namespace InformedProteomics.TopDown.Execution
                             var prsm = new SequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
                                 numNTermCleavages,
                                 modCombinations, precursorIon, score);
-                                //modCombinations, precursorIon, score, region.Score);
 
                             if (matches[ms2ScanNum] == null)
                             {
@@ -328,135 +321,6 @@ namespace InformedProteomics.TopDown.Execution
                 }
             }
             return matches;
-        }
-
-        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsetsInParallel(FastaDatabase database)
-        {
-            database.Read();
-            var indexedDbTarget = new IndexedDatabase(database);
-            indexedDbTarget.Read();
-            IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
-            if (SearchMode == 0)
-            {
-                annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-            }
-            else if (SearchMode == 2)
-            {
-                annotationsAndOffsets = indexedDbTarget.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
-                    MaxSequenceLength, MaxNumCTermCleavages);
-            }
-            else
-            {
-                annotationsAndOffsets = indexedDbTarget
-                    .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-                        MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
-            }
-
-            return annotationsAndOffsets;
-        }
-
-        private SortedSet<SequenceSpectrumMatch>[] RunParallelSearch(FastaDatabase db, ISequenceFilter ms1Filter)
-        {
-            var sw = new Stopwatch();
-
-            var annotationsAndOffsets = GetAnnotationsAndOffsets(db);
-
-            var numProteins = 0;
-            sw.Reset();
-            sw.Start();
-
-            //var matches = new SortedSet<SequenceSpectrumMatch>[_run.MaxLcScan + 1];
-
-            var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
-
-            //foreach (var annotationAndOffset in annotationsAndOffsets.AsParallel())
-            Parallel.ForEach(annotationsAndOffsets, annotationAndOffset =>
-            {
-                //++numProteins;
-                Interlocked.Increment(ref numProteins);
-
-                var annotation = annotationAndOffset.Annotation;
-                var offset = annotationAndOffset.Offset;
-
-                if (numProteins%100000 == 0)
-                    //if(numProteins % 1 == 0)
-                {
-                    Console.Write("Processing {0}{1} proteins...", numProteins,
-                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
-                    if (numProteins != 0)
-                    {
-                        sw.Stop();
-                        var sec = sw.ElapsedTicks/(double) Stopwatch.Frequency;
-                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
-                        sw.Reset();
-                        sw.Start();
-                    }
-                }
-
-                var protSequence = annotation.Substring(2, annotation.Length - 4);
-
-                var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
-                    AminoAcid.ProteinCTerm);
-                if (seqGraph == null) return;
-
-                for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
-                {
-                    if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
-                    var numProteoforms = seqGraph.GetNumProteoforms();
-                    var modCombs = seqGraph.GetModificationCombinations();
-                    for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
-                    {
-                        seqGraph.SetSink(modIndex);
-                        var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                        var sequenceMass = protCompositionWithH2O.Mass;
-                        var modCombinations = modCombs[modIndex];
-
-                        foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
-                        {
-                            var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                            if (spec == null) continue;
-                            var charge =
-                                (int)
-                                    Math.Round(sequenceMass/
-                                               (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
-                            var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
-                            var score = seqGraph.GetScore(charge, scorer);
-                            if (score <= 3) continue;
-
-                            var precursorIon = new Ion(protCompositionWithH2O, charge);
-                            var sequence = protSequence.Substring(numNTermCleavages);
-                            var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
-                            var post = annotation[annotation.Length - 1];
-
-                            var prsm = new SequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
-                                numNTermCleavages,
-                                modCombinations, precursorIon, score);
-
-                            //if (matches[ms2ScanNum] == null)
-                            //{
-                            //    matches[ms2ScanNum] = new SortedSet<SequenceSpectrumMatch> {prsm};
-                            //}
-                            //else // already exists
-                            //{
-                            //    var existingMatches = matches[ms2ScanNum];
-                            //    if (existingMatches.Count < NumMatchesPerSpectrum) existingMatches.Add(prsm);
-                            //    else
-                            //    {
-                            //        var minScore = existingMatches.Min.Score;
-                            //        if (score > minScore)
-                            //        {
-                            //            existingMatches.Add(prsm);
-                            //            existingMatches.Remove(existingMatches.Min);
-                            //        }
-                            //    }
-                            //}
-                        }
-                    }
-                }
-            }
-                );
-            //return matches;
-            return new SortedSet<SequenceSpectrumMatch>[0];
         }
 
         private void WriteResultsToFile(SortedSet<SequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)

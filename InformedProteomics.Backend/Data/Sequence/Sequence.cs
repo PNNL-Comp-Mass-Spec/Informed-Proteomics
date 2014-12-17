@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
@@ -42,6 +43,48 @@ namespace InformedProteomics.Backend.Data.Sequence
                 composition += aa.Composition;
             }
             Composition = composition;
+        }
+
+        // modStr: E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27
+        public static Sequence CreateSequence(string sequence, string modStr, AminoAcidSet aminoAcidSet)
+        {
+            if(string.IsNullOrEmpty(modStr)) return new Sequence(sequence, aminoAcidSet);
+
+            var indexModMap = new Dictionary<int, Modification>();
+            foreach (var modIns in modStr.Split(','))
+            {
+                var token = modIns.Split(' ');
+                if (token.Length != 2) return null; // invalid modStr
+                var mod = Modification.Get(token[0]);
+                if (mod == null) return null;
+                var index = Convert.ToInt32(token[1])-1;
+                indexModMap.Add(index, mod);
+            }
+
+            var aaList = new List<AminoAcid>();
+            
+            for (var i=0; i<sequence.Length; i++)
+            {
+                var residue = sequence[i];
+                var aa = aminoAcidSet.GetAminoAcid(residue);
+                if (i == 0 && indexModMap.ContainsKey(-1))  // N-term modification
+                {
+                    var nTermMod = indexModMap[-1];
+                    aa = new ModifiedAminoAcid(aa, nTermMod);
+                }
+                Modification mod;
+                if (indexModMap.TryGetValue(i, out mod))
+                {
+                    var modifiedAa = new ModifiedAminoAcid(aa, mod);
+                    aaList.Add(modifiedAa);
+                }
+                else
+                {
+                    aaList.Add(aa);
+                }
+            }
+
+            return new Sequence(aaList);
         }
 
         public Composition.Composition Composition { get; private set; }

@@ -167,6 +167,12 @@ namespace InformedProteomics.Backend.Database
             return _databaseFilePath;
         }
 
+        public int GetNumEntries()
+        {
+            Read();
+            return _names.Count;
+        }
+
         public byte[] GetSequence()
         {
             if(_sequence == null)   Read();

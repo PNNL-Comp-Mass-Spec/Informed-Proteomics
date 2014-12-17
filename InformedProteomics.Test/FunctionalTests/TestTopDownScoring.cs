@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -156,8 +159,8 @@ namespace InformedProteomics.Test.FunctionalTests
             const int ms2ScanNum = 4658;
             var sequence = new Sequence("GYSIKDIIYQGEKSGVHNWQTLSGQNFYWHPDWLHIAEDLTGHKATASIQAEGTKATQNEAEQTIVKHLNKS", new AminoAcidSet());
 
-            //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -173,6 +176,46 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
+        [Test]
+        public void TestJungkapScoring()
+        {
+            const string rawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
+            var tolerance = new Tolerance(10);
+            const int minCharge = 1;
+            const int maxCharge = 15;
+
+            var aminoAcidSet = new AminoAcidSet();
+            var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
+
+            const string resultFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv";
+            var parser = new TsvFileParser(resultFileName);
+            var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
+            var protSequences = parser.GetData("Sequence").ToArray();
+            var modStrs = parser.GetData("Modifications").ToArray();
+            var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
+
+            const string outputFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
+            using (var writer = new StreamWriter(outputFileName))
+            {
+                writer.WriteLine(string.Join(",", parser.GetHeaders()) + "\tScore");
+                for (var i = 0; i < parser.NumData; i++)
+                {
+                    var scan = scans[i];
+                    var protSequence = protSequences[i];
+                    var modStr = modStrs[i];
+                    //if (scan != 1765) continue;
+                    var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
+                    //Console.WriteLine("{0}: {1} ? {2}", scan, sequence.Composition, compositions[i] - Composition.H2O);
+                    Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
+                    var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
+                    Assert.True(ms2Spec != null);
+                    var score = scorer.ComputeScore(ms2Spec, sequence);
+                    writer.WriteLine("{0}\t{1}", parser.GetRows()[i], score);
+                }
+            }
+            Console.WriteLine("Done");
+        }
     }
 }
