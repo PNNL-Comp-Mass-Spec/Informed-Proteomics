@@ -199,7 +199,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string outputFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
             using (var writer = new StreamWriter(outputFileName))
             {
-                writer.WriteLine(string.Join(",", parser.GetHeaders()) + "\tScore");
+                writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tScore");
                 for (var i = 0; i < parser.NumData; i++)
                 {
                     var scan = scans[i];
