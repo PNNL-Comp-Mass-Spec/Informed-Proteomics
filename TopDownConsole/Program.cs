@@ -9,8 +9,7 @@ namespace MSPathFinderT
     internal class Program
     {
         public const string Name = "MSPathFinderT";
-        public const string Version = "0.7 (Dec 15, 2014)";
-        public const double DefaultCorrThreshold = 0.7;
+        public const string Version = "0.75 (Jan 7, 2015)";
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
@@ -125,7 +124,7 @@ namespace MSPathFinderT
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
                 "\t[-corr CorrThreshold] (correlation threshold, default: 0.7)\n" +
-                "\t[-isos IsosFile] (*.isos)\n"
+                "\t[-isos IsosFile] (*.csv, *.tsv, or *.msalign)\n"
                 );
         }
 

@@ -13,8 +13,19 @@ using NUnit.Framework;
 namespace InformedProteomics.Test.FunctionalTests
 {
     [TestFixture]
+
     class TestTopDownScoring
     {
+        [Test]
+        public void TestReadingMsDeconvFile()
+        {
+            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+
+            const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
+            var parser = new MsDeconvFilter(run, new Tolerance(10), filePath);
+        }
+
         [Test]
         public void PrintAllScorers()
         {

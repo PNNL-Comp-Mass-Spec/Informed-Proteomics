@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -55,20 +56,30 @@ namespace InformedProteomics.Backend.MassSpecData
         public PbfLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
         {
             _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
-            if (ReadMetaInfo() == false)
-            {
-                throw new FormatException("Illegal pbf file format!");
-            }
-            CreatePrecursorNextScanMap();
+            _fileLock = new ReaderWriterLockSlim();
+
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
+            _fileLock.EnterReadLock();
+            try
+            {
+                if (ReadMetaInfo() == false)
+                {
+                    throw new FormatException("Illegal pbf file format!");
+                }
+                _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
+                _minMs1Mz = _reader.ReadDouble();
 
-            _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
-            _minMs1Mz = _reader.ReadDouble();
+                _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
+                _maxMs1Mz = _reader.ReadDouble();
+            }
+            finally
+            {
+                _fileLock.ExitReadLock();
+            }
 
-            _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
-            _maxMs1Mz = _reader.ReadDouble();
+            CreatePrecursorNextScanMap();
         }
 
         public override double MinMs1Mz
@@ -90,7 +101,13 @@ namespace InformedProteomics.Backend.MassSpecData
             else if (_productSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_productSignalToNoiseRatioThreshold);
             return spec;
         }
-        
+
+        public override IsolationWindow GetIsolationWindow(int scanNum)
+        {
+            long offset;
+            return !_scanNumToSpecOffset.TryGetValue(scanNum, out offset) ? null : ReadIsolationWindow(offset);
+        }
+
         public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
         {
             var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBegin, _offsetProductChromatogramEnd);
@@ -164,16 +181,15 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader.Close();
         }
 
-
-
+        private readonly ReaderWriterLockSlim _fileLock;
         private readonly BinaryReader _reader;
+
         private readonly double _precursorSignalToNoiseRatioThreshold;
         private readonly double _productSignalToNoiseRatioThreshold;
 
         private readonly double _minMs1Mz;
         private readonly double _maxMs1Mz;
 
-        private readonly Object _lock = new Object();
         private long _offsetPrecursorChromatogramStart;
         private long _offsetPrecursorChromatogramEnd;   // exclusive
         private long _offsetProductChromatogramBegin;
@@ -291,16 +307,61 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private Spectrum ReadSpectrum(long offset)
         {
-            lock (_lock)
+            _fileLock.EnterReadLock();
+            try
             {
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof (int)))
                 {
                     var spec = ReadSpectrum(_reader);
                     return spec;
                 }
                 return null;
             }
+            finally
+            {
+               _fileLock.ExitReadLock();
+            }
+        }
+
+        private IsolationWindow ReadIsolationWindow(long offset)
+        {
+            _fileLock.EnterReadLock();
+            try
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var isolationWindow = ReadIsolationWindow(_reader);
+                    return isolationWindow;
+                }
+                return null;
+            }
+            finally
+            {
+                _fileLock.ExitReadLock();
+            }
+        }
+
+        private static IsolationWindow ReadIsolationWindow(BinaryReader reader)
+        {
+            reader.ReadInt32(); // ScanNum
+            var msLevel = reader.ReadByte();
+            reader.ReadDouble();  // Elution time
+
+            if (msLevel <= 1) return null;
+
+            double? precursorMass = reader.ReadDouble();
+            if (precursorMass == 0.0) precursorMass = null;
+            int? precursorCharge = reader.ReadInt32();
+            if (precursorCharge == 0) precursorCharge = null;
+            reader.ReadByte();  // Activation Method
+            var isolationWindowTargetMz = reader.ReadDouble();
+            var isolationWindowLowerOffset = reader.ReadDouble();
+            var isolationWindowUpperOffset = reader.ReadDouble();
+
+            return new IsolationWindow(isolationWindowTargetMz, isolationWindowLowerOffset,
+                isolationWindowUpperOffset, precursorMass, precursorCharge);
         }
 
         private static Spectrum ReadSpectrum(BinaryReader reader)
@@ -362,12 +423,13 @@ namespace InformedProteomics.Backend.MassSpecData
             var minOffset = beginOffset;
             var maxOffset = endOffset;
             var curOffset = -1L;
-            // binary search
-            lock (_lock)
+            _fileLock.EnterReadLock();
+            try
             {
+                // binary search
                 while (minOffset <= maxOffset)
                 {
-                    curOffset = minOffset + (maxOffset - minOffset) / NumBytePeak / 2 * NumBytePeak;
+                    curOffset = minOffset + (maxOffset - minOffset)/NumBytePeak/2*NumBytePeak;
                     _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
                     var curMz = _reader.ReadDouble();
                     if (curMz < minMz) minOffset = curOffset + NumBytePeak;
@@ -378,6 +440,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
             }
+            finally
+            {
+                _fileLock.ExitReadLock();
+            }
+
             return curOffset;
         }
 
@@ -396,7 +463,8 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var xic = new Xic();
             var curOffset = targetOffset - NumBytePeak;
-            lock (_lock)
+            _fileLock.EnterReadLock();
+            try
             {
                 // go down
                 while (curOffset >= beginOffset)
@@ -423,6 +491,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     _reader.BaseStream.Seek(NumBytePeak, SeekOrigin.Current);
                     curOffset += NumBytePeak;
                 }                
+            }
+            finally
+            {
+                _fileLock.ExitReadLock();
             }
 
             return xic;

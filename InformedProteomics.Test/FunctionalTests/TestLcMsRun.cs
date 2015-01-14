@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
@@ -16,6 +15,20 @@ namespace InformedProteomics.Test.FunctionalTests
         public const string TestTopDownRawFilePathCid = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
         public const string TestQExactiveRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
         public const string TestQExactivePbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+
+
+        public void TestReadingIsolationWindows()
+        {
+            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun);
+            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            {
+                var isolationWindow = run.GetIsolationWindow(scanNum);
+                if (isolationWindow != null)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}", scanNum, isolationWindow.MonoisotopicMz ?? 0.0, isolationWindow.Charge ?? 0.0);
+                }
+            }
+        }
 
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()

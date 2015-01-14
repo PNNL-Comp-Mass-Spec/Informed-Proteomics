@@ -245,7 +245,10 @@ namespace MSPathFinderT
                     {
                         return "File not found." + value + "!";
                     }
-                    if (value != null && !Path.GetExtension(value).ToLower().Equals(".csv") && !Path.GetExtension(value).ToLower().Equals(".tsv"))
+                    if (value != null && 
+                        !Path.GetExtension(value).ToLower().Equals(".csv") && 
+                        !Path.GetExtension(value).ToLower().Equals(".tsv") &&
+                        !Path.GetExtension(value).ToLower().Equals(".msalign"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")!";
                     }

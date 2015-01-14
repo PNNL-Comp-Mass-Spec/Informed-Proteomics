@@ -159,6 +159,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
+        public override IsolationWindow GetIsolationWindow(int scanNum)
+        {
+            var spec = GetSpectrum(scanNum);
+            if (spec == null) return null;
+
+            var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
+            return productSpec == null ? null : productSpec.IsolationWindow;
+        }
+
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
         /// </summary>

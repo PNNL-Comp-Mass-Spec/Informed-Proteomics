@@ -72,6 +72,7 @@
     <Compile Include="Scoring\MatchedPeakPostScorer.cs" />
     <Compile Include="Scoring\Ms1FtFilter.cs" />
     <Compile Include="Scoring\Ms1IsotopeMostAbundantPlusOneFilter.cs" />
+    <Compile Include="Scoring\MsDeconvFilter.cs" />
     <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
     <Compile Include="Scoring\LikelihoodScoringModel.cs" />
