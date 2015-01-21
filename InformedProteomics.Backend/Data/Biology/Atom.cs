@@ -4,7 +4,9 @@ using System.Xml.Linq;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
-    public class Atom : IMatter
+    using System;
+
+    public class Atom : IMatter, IEquatable<Atom>
     {
         public Atom(string code, double mass, int nominalMass, string name)
         {
@@ -113,6 +115,24 @@ namespace InformedProteomics.Backend.Data.Biology
                 var name = element.Element("Name").Value;
                 var numIsotopes = int.Parse(element.Element("NumIsotopes").Value);
             }
+        }
+
+        public bool Equals(Atom other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.Name.Equals(other.Name);
+        }
+
+        public override bool Equals(object other) {
+            return Equals(other as Atom);
+        }
+
+        public override int GetHashCode() {
+            int result = 29;
+            result = result * 13 + (this.Name == null ? 0 : this.Name.GetHashCode());
+            result = result * 13 + (this.Code == null ? 0 : this.Code.GetHashCode());
+            return result;
         }
     }
 }
