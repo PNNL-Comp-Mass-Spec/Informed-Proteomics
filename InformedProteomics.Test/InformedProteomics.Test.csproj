@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
     <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
     <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
     <Compile Include="TestChargeLcScanMatrix.cs" />

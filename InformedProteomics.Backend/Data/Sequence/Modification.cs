@@ -28,13 +28,13 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public override int GetHashCode()
         {
-            return AccessionNum;
+            return AccessionNum > 0 ? AccessionNum : Name.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
             var otherMod = obj as Modification;
-            return otherMod != null && AccessionNum == otherMod.AccessionNum;
+            return otherMod != null && AccessionNum == otherMod.AccessionNum && Composition.Equals(otherMod.Composition);
         }
 
         /// <summary>

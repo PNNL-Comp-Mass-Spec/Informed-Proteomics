@@ -19,6 +19,12 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
+        public void TestForManyMods()
+        {
+            
+        }
+
+        [Test]
         public void TestForVlad()
         {
             const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
