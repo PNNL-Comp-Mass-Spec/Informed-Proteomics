@@ -7,8 +7,8 @@
     <ProjectGuid>{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MS1FeatureExtractor</RootNamespace>
-    <AssemblyName>MS1FeatureExtractor</AssemblyName>
+    <RootNamespace>ProMex</RootNamespace>
+    <AssemblyName>ProMex</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
@@ -89,6 +89,7 @@
     <Compile Include="Ms1FeaturePredictor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TsvFileReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

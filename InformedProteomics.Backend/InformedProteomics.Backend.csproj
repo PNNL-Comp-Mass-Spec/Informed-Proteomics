@@ -121,6 +121,7 @@
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\ChargeLcScanCluster.cs" />
     <Compile Include="Data\Spectrometry\ChargeLcScanMatrix.cs" />
+    <Compile Include="Data\Spectrometry\IMs1FeatureExtract.cs" />
     <Compile Include="Data\Spectrometry\Ms1Feature.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />

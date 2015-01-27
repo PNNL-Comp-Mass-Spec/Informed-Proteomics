@@ -35,7 +35,7 @@ namespace InformedProteomics.TopDown.Scoring
 
             FindMatchedPeaks();
 
-            var score = GetRankSumScore() + GetHyperGeometricScore();
+            var score = GetRankSumScore();
 
             return score;
         }
@@ -153,9 +153,9 @@ namespace InformedProteomics.TopDown.Scoring
                     var peakMz = _ms2Spec.Peaks[i].Mz;
                     if (peakMz < minMz)
                     {
-                        //return false;
-                        peakIndex = i;
-                        break;
+                        //peakIndex = i;
+                        //break;
+                        return false;
                     }
                     if (peakMz <= maxMz)    // find match, move to prev isotope
                     {
@@ -182,9 +182,9 @@ namespace InformedProteomics.TopDown.Scoring
                     var peakMz = _ms2Spec.Peaks[i].Mz;
                     if (peakMz > maxMz)
                     {
-                        //return false;
-                        peakIndex = i;
-                        break;
+                        //peakIndex = i;
+                        //break;
+                        return false;
                     }
                     if (peakMz >= minMz)    // find match, move to prev isotope
                     {

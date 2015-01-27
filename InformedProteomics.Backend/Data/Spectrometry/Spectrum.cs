@@ -25,7 +25,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             peaks.CopyTo(Peaks, 0);
             ScanNum = scanNum;
         }
-
+        
         public int ScanNum { get; private set; }
 
 		public string NativeId { get; set; }

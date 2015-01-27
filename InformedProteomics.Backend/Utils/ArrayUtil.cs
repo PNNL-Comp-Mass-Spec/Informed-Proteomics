@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 if (i < array.Length - 1)
                 {
-                    s.AppendFormat(formatString + "\t ", array[i]);
+                    s.AppendFormat(formatString + "\t", array[i]);
                 }
                 else
                 {
@@ -44,7 +44,7 @@ namespace InformedProteomics.Backend.Utils
                 {
                     if (j < array[i].Length - 1)
                     {
-                        s.AppendFormat(formatString + "\t ", array[i][j]);
+                        s.AppendFormat(formatString + "\t", array[i][j]);
                     }
                     else
                     {

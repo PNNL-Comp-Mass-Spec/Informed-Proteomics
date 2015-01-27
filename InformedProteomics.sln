@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PbfGen", "PbfGen\PbfGen.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelMSPathFinderT", "ParallelMSPathFinderT\ParallelMSPathFinderT.csproj", "{04E5216D-7451-4855-961F-EE212158AB73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS1FeatureExtractor", "MS1FeatureExtractor\MS1FeatureExtractor.csproj", "{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMex", "MS1FeatureExtractor\ProMex.csproj", "{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelectivityScore", "SelectivityScore\SelectivityScore.csproj", "{19658C05-EF09-404D-959F-EF9A6029013B}"
 EndProject

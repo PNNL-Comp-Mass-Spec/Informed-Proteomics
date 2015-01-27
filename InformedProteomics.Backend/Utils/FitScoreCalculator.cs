@@ -34,6 +34,8 @@ namespace InformedProteomics.Backend.Utils
         
         public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
+            if (k >= n) return 1.0d;
+            
             var pValue = Hypergeometric.CDF(n, k, n1, k1);
             if (upperTailProb) pValue = 1 - pValue;
             else pValue = Math.Min(pValue, 1 - pValue);
