@@ -98,21 +98,47 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "PoissonScore","AvgPoissonScore", "SummedPoissonScore",
             "BcDist", "SummedBcDist", 
             "KlDiv", "SummedKlDiv", 
-            "MzDiff", "AvgMzDiff", "XicCorr",
+            "MzDiffPpm", "AvgMzDiff", "XicCorr",
             "Envelope", "Probability", "Flag"
+        };
+
+        public static readonly string[] OldTsvHeaderWithScore = new string[]
+        {
+            "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge",
+            "rep_mz", "abundance", "summed_envelope_count", "scan_length", "envelope_corr",
+            "summed_envelope_corr", "ranksum_score", "avg_ranksum_score", "poisson_score",
+            "avg_poisson_score", "summed_poisson_score", "bc_distance", "summed_bc_distance",
+            "kl_divergence", "summed_kl_divergence", "mz_error",
+            "summed_mz_error", "xic_corr", "isotopic_envelope", "probability", "flag"
         };
 
         private static readonly string[] TsvHeader = new string[]
         {
             "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "BestCorr", "SummedCorr", 
-            "MzDiff", "XicCorr", 
+            "MzDiffPpm", "XicCorr", 
             "Envelope", "Probability", "Flag"
         };
-        
-        public static string GetHeaderString(bool withScore = false)
+
+        public static readonly string[] OldTsvHeader = new string[]
         {
-            return (withScore) ? ArrayUtil.ToString(TsvHeaderWithScore) : ArrayUtil.ToString(TsvHeader);
+            "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge", "rep_mz", "abundance", 
+            "envelope_corr","summed_envelope_corr", 
+            "mz_error", "xic_corr", 
+            "isotopic_envelope", "probability", "flag"
+        };
+
+        
+        public static string GetHeaderString(bool withScore = false, bool oldFormat = false)
+        {
+            if (oldFormat)
+            {
+                return (withScore) ? ArrayUtil.ToString(OldTsvHeaderWithScore) : ArrayUtil.ToString(OldTsvHeader); 
+            }
+            else
+            {
+                return (withScore) ? ArrayUtil.ToString(TsvHeaderWithScore) : ArrayUtil.ToString(TsvHeader);        
+            }
         }
 
         public override string ToString()
@@ -194,12 +220,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Members.AddRange(other.Members);
             MemberEnvelope.AddRange(other.MemberEnvelope);
         }*/
-
-        public static bool Merge(ChargeLcScanCluster c1, ChargeLcScanCluster c2, Tolerance tol)
+        private static readonly Tolerance MergeTolerance = new Tolerance(4);
+        public static bool Merge(ChargeLcScanCluster c1, ChargeLcScanCluster c2)
         {
             var scanLen = Math.Max(c1.ScanLength, c2.ScanLength);
             var overlapLength = 0;
-
             if (c1.MinCol <= c2.MinCol && c2.MinCol < c1.MaxCol)
             {
                 if (c2.MaxCol <= c1.MaxCol) overlapLength = scanLen;
@@ -217,28 +242,46 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             if (overlapLength < 0.75*scanLen) return false;
 
-            if (Math.Abs(c1.RepresentativeMass - c1.RepresentativeMass) > tol.GetToleranceAsTh(c1.RepresentativeMass))
+            if (Math.Abs(c1.RepresentativeMass - c2.RepresentativeMass) > MergeTolerance.GetToleranceAsTh(c1.RepresentativeMass))
                 return false;
 
             ChargeLcScanCluster src = null;
             ChargeLcScanCluster dest = null;
-
-            if (c1.Probability > c2.Probability)
+            if (c1.GoodEnough == c2.GoodEnough)
             {
-                dest = c1;
-                src = c2;
+                if (c1.Probability > c2.Probability)
+                {
+                    dest = c1;
+                    src = c2;
+                }
+                else
+                {
+                    dest = c2;
+                    src = c1;
+                }
             }
             else
             {
-                dest = c2;
-                src = c1;
+                if (c1.GoodEnough)
+                {
+                    dest = c1;
+                    src = c2;
+                }
+                else
+                {
+                    dest = c2;
+                    src = c1;
+                }                
             }
 
             if (dest.Active == false)
             {
-                return Merge(src, dest._mergedTo, tol);
+                return Merge(src, dest._mergedTo);
             }
             
+            //Console.Write("{0:0.00} {1} {2}", src.RepresentativeMass, src.MinScanNum, src.MaxScanNum);
+            //Console.WriteLine("  ->>  {0:0.00} {1} {2}", dest.RepresentativeMass, dest.MinScanNum, dest.MaxScanNum);
+
             src.Active = false;
             src._mergedTo = dest;
 

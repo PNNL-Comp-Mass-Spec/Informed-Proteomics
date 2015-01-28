@@ -47,6 +47,7 @@ namespace Mspot
                 {"-score", "n"},
                 {"-csv", "y"},
                 {"-minProbability", "0.1"},
+                {"-oldFormat", "n"},
                 //{"-svm", null},
             };
 
@@ -83,7 +84,13 @@ namespace Mspot
             _scoreReport = Str2Bool(_paramDic["-score"]);
             _massCollapse = Str2Bool(_paramDic["-massCollapse"]);
             _csvOutput  = Str2Bool(_paramDic["-csv"]);
+            _oldFormat = Str2Bool(_paramDic["-oldFormat"]);
 
+            Console.WriteLine("############################################");
+            Console.WriteLine(string.Format("{0}\t{1}", Name, Version));
+            foreach (var paramName in _paramDic.Keys)
+                Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
+            
             var attr = File.GetAttributes(_inputPath);
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
@@ -95,38 +102,6 @@ namespace Mspot
             {
                 ProcessFile(_inputPath);
             }
-        }
-
-        private static List<string> FilterFiles(List<string> fileNames)
-        {
-            var files = new Dictionary<string, bool>();
-            var filteredFiles = new List<string>();
-            
-            foreach (var path in fileNames)
-            {
-                bool pbf = path.EndsWith(".pbf");
-                bool raw = path.EndsWith(".raw");
-                if (pbf || raw)
-                {
-                    var j = path.LastIndexOf('.');
-                    var outPath = path.Substring(0, j);
-                    
-                    if (files.ContainsKey(outPath) && pbf)
-                    {
-                        files[outPath] = true;
-                    }
-                    else
-                    {
-                        files.Add(outPath, pbf);
-                    }
-                }                            
-            }
-
-            foreach (var path in files.Keys)
-            {
-                filteredFiles.Add(files[path] ? string.Format("{0}.pbf", path) : string.Format("{0}.raw", path));
-            }
-            return filteredFiles;
         }
 
         private static bool Str2Bool(string value)
@@ -152,9 +127,14 @@ namespace Mspot
         {
             if (path.EndsWith(".raw") || path.EndsWith(".pbf"))
             {
-                var j = path.LastIndexOf('.');
-                var outPath = path.Substring(0, j);
-                var tmpFile = Ms1FeatureExtract(path, outPath);
+                var rawFile = path;
+                var stopwatch = Stopwatch.StartNew();
+                Console.WriteLine("Start loading MS1 data from {0}", rawFile);
+                var run = PbfLcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
+                var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge);
+                Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+
+                var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput, _oldFormat);
             }
         }
 
@@ -167,38 +147,10 @@ namespace Mspot
         private static bool _scoreReport;
         private static bool _csvOutput;
         private static double _probabilityThreshold;
+        private static bool _oldFormat;
         private static IMs1FeaturePredictor _predictor;
         private static Dictionary<string, string> _paramDic;
-
-        private static string Ms1FeatureExtract(string rawFile, string outFile)
-        {
-            var tsvFilePath = string.Format("{0}.ms1ft", outFile);
-            var csvFilePath = string.Format("{0}_ms1ft.csv", outFile);
-
-            //Console.WriteLine("Input File\t{0}", rawFile);
-            foreach (var paramName in _paramDic.Keys)
-            {
-                Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
-            }
-            
-            var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine("Start loading MS1 data from {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
-            var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge);
-            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-
-            stopwatch.Reset();
-            stopwatch.Start();
-            Console.WriteLine("Start MS1 feature extracting...");
-            Console.WriteLine("Output File\t{0}", tsvFilePath);
-            if (_csvOutput) Console.WriteLine("Csv Output File\t{0}", csvFilePath);
-            var nFeatures = csm.GenerateFeatureFile(tsvFilePath, csvFilePath, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput);
-            stopwatch.Stop();
-
-            Console.WriteLine("Complete MS1 feature finding...Total Extracted Features = {0}...Elapsed Time = {1:0.000} [sec]", nFeatures, (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            return tsvFilePath;
-        }
-
+      
         private static void PrintUsageInfo(string message = null)
         {
             if (message != null) Console.WriteLine("Error: " + message);
@@ -213,8 +165,57 @@ namespace Mspot
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" + 
                 "\t[-massCollapse n (default: n)]\n" +
                 "\t[-score n (default: n)]\n" +
-                "\t[-csv y (default: y)]\n"
+                "\t[-csv y (default: y)]\n" +
+                "\t[-oldFormat n (default: n)]\n"
                 );
+        }
+
+
+        private static List<string> FilterFiles(List<string> fileNames)
+        {
+            var files = new Dictionary<string, bool>();
+            var filteredFiles = new List<string>();
+
+            foreach (var path in fileNames)
+            {
+                bool pbf = path.EndsWith(".pbf");
+                bool raw = path.EndsWith(".raw");
+                if (pbf || raw)
+                {
+                    var j = path.LastIndexOf('.');
+                    var outPath = path.Substring(0, j);
+
+                    if (pbf)
+                    {
+                        if (files.ContainsKey(outPath))
+                        {
+                            files.Remove(outPath);
+                            files.Add(outPath, true);
+                        }
+                        else
+                        {
+                            files.Add(outPath, pbf);
+                        }
+                    }
+                    else
+                    {
+                        if (files.ContainsKey(outPath))
+                        {
+
+                        }
+                        else
+                        {
+                            files.Add(outPath, pbf);
+                        }
+                    }
+                }
+            }
+
+            foreach (var path in files.Keys)
+            {
+                filteredFiles.Add(files[path] ? string.Format("{0}.pbf", path) : string.Format("{0}.raw", path));
+            }
+            return filteredFiles;
         }
     }
     

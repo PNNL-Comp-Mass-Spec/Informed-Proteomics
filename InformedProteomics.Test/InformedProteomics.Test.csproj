@@ -97,7 +97,6 @@
     <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
     <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
     <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
-    <Compile Include="TestChargeLcScanMatrix.cs" />
     <Compile Include="FunctionalTests\TestMzMLReader.cs" />
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
@@ -117,7 +116,6 @@
     <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="Obsolete\TestIMSScoring.cs" />
-    <Compile Include="TestLcMs1FeatureExtraction.cs" />
     <Compile Include="TestLcMsMap.cs" />
     <Compile Include="TestMisc.cs" />
     <Compile Include="TestIonFrequency.cs" />
@@ -128,6 +126,7 @@
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
     <Compile Include="FunctionalTests\TestSuffixArray.cs" />
     <Compile Include="TestLcMsCaching.cs" />
+    <Compile Include="TestProMex.cs" />
     <Compile Include="TestRankProbability.cs" />
     <Compile Include="TestRankScore.cs" />
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />

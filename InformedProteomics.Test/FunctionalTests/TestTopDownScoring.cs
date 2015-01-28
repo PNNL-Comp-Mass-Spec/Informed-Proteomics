@@ -200,14 +200,14 @@ namespace InformedProteomics.Test.FunctionalTests
             var aminoAcidSet = new AminoAcidSet();
             var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
 
-            const string resultFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv";
+            const string resultFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
             var parser = new TsvFileParser(resultFileName);
             var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var protSequences = parser.GetData("Sequence").ToArray();
             var modStrs = parser.GetData("Modifications").ToArray();
             var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
 
-            const string outputFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
+            const string outputFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
             using (var writer = new StreamWriter(outputFileName))
             {
                 writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tScore");

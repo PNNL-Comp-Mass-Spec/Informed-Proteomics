@@ -13,7 +13,7 @@ using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class ChargeLcScanMatrix : ILcMsMap, ISequenceFilter
+    public class ChargeLcScanMatrix : ILcMsMap, ISequenceFilter, IMs1FeatureExtract
     {
         public ChargeLcScanMatrix(LcMsRun run, int minScanCharge = 2, int maxScanCharge = 60, int maxThreadCount = -1, int numBits = 27)
         {
@@ -66,8 +66,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
-        public int GenerateFeatureFile(string outTsvFilePath, string outCsvFilePath, double minMass = 3000, double maxMass = 50000, bool massCollapse = false, double probabilityThreshold = 0.5, bool scoreReport = false, bool csvOutput = false)
+        public string GetFeatureFile(string rawFilePath, double minSearchMass = 3000, double maxSearchMass = 50000)
         {
+            var outTsvFilePath = GetFeatureFilePath(rawFilePath);
+            if (File.Exists(outTsvFilePath)) return outTsvFilePath;
+            return GenerateFeatureFile(rawFilePath, minSearchMass, maxSearchMass, false, 0.2, false, true);
+        }
+
+        public string GenerateFeatureFile(string rawFilePath, double minMass = 3000, double maxMass = 50000, bool massCollapse = false, 
+            double probabilityThreshold = 0.5, bool scoreReport = false, bool csvOutput = false, bool oldFormat = false)
+        {
+            var j = rawFilePath.LastIndexOf('.');
+            var outPath = rawFilePath.Substring(0, j);
+
+            var outTsvFilePath = GetFeatureFilePath(rawFilePath);
+            var outCsvFilePath = string.Format("{0}_ms1ft.csv", outPath);
+            
             _minSearchMassBin = _comparer.GetBinNumber(minMass);
             _maxSearchMassBin = _comparer.GetBinNumber(maxMass);
             //_predictor = predictor;
@@ -83,10 +97,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             var tsvWriter = new System.IO.StreamWriter(outTsvFilePath);
-            tsvWriter.WriteLine(ChargeLcScanCluster.GetHeaderString(scoreReport));
+            tsvWriter.WriteLine(ChargeLcScanCluster.GetHeaderString(scoreReport, oldFormat));
 
-            Console.WriteLine("Start extracting MS1 features");
-            //var totalMassBins = _maxSearchMassBin - _minSearchMassBin + 1;
+            Console.WriteLine("Start MS1 feature extracting...");
+            Console.WriteLine("Mass Range {0} ~ {1}", minMass, maxMass);
+            Console.WriteLine("Charge Range {0} ~ {1}", _minScanCharge, _maxScanCharge);
+            Console.WriteLine("Output File\t{0}", outTsvFilePath);
+
+            if (csvOutput) Console.WriteLine("Csv Output File\t{0}", outCsvFilePath);
+
             var binNumCursor = _minSearchMassBin;
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Stop(); stopwatch.Reset();
@@ -112,7 +131,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             tsvWriter.Close();
             if (csvOutput) csvWriter.Close();
 
-            return _nOutFatures;
+            Console.WriteLine("Complete MS1 feature finding...Total Extracted Features = {0}...Elapsed Time = {1:0.000} [sec]", _nOutFatures, (stopwatch.ElapsedMilliseconds) / 1000.0d);
+
+            return outTsvFilePath;
+            //return _nOutFatures;
         }
 
         public IEnumerable<ChargeLcScanCluster> GetProbableChargeScanClusters(int queryMassBinNum)
@@ -207,6 +229,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private int[] _chargeIndexes;
         private IntRange _chargeRange;
         private double _queryMass;
+
+        private string GetFeatureFilePath(string rawFilePath)
+        {
+            var j = rawFilePath.LastIndexOf('.');
+            var outPath = rawFilePath.Substring(0, j);
+            var outTsvFilePath = string.Format("{0}.ms1ft", outPath);
+            return outTsvFilePath;
+        }
 
         private void SetQueryMass(double queryMass)
         {
@@ -364,12 +394,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var tempEnvelope = new double[_isotopeList.Count];
             int chargeNeighborGap = 2;
             const int scanNeighborGap = 1;
-            /*
-            if (_queryMass > 35000) chargeNeighborGap = 10;
-            else if (_queryMass > 25000) chargeNeighborGap = 6;
-            else if (_queryMass > 13000) chargeNeighborGap = 3;
-            else if (_queryMass > 8000) chargeNeighborGap = 2;*/
-            
+         
             foreach (var seedCell in GetSeedCellsByCorr())
             {
                 if (_checkedOut[seedCell.Row][seedCell.Col]) continue;
@@ -410,7 +435,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             var newDivergence = _isotopeList.GetBhattacharyyaDistance(tempEnvelope);
 
                             if ((newCluster.ClusteringScore < newCorr || newCluster.ClusteringScore2 > newDivergence) ||
-                                (distFromSeed < 1 && seedScore < newCorr))
+                                (distFromSeed < 1 && seedScore < newCorr) || (_correlationMap[k][l] > 0.9))
                             {
                                 var newMember = new ChargeLcScanCell(k, l);
                                 neighbors.Enqueue(newMember);
@@ -711,10 +736,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach (var j in index)
             {
                 Array.Clear(tempEnvelop, 0, tempEnvelop.Length);
+                
                 for (var k = 0; k < _isotopeList.Count; k++) tempEnvelop[k] = summedEnvelop[k] + cluster.MemberEnvelope[j][k];
-
                 var tempCorr = _isotopeList.GetPearsonCorrelation(tempEnvelop);
-                if (tempCorr < summedCorr) continue;
+
+                if (tempCorr < summedCorr)
+                {
+                     if (_isotopeList.GetPearsonCorrelation(cluster.MemberEnvelope[j]) < 0.9) continue;
+                }
                 
                 summedCorr = tempCorr;
                 
@@ -792,14 +821,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                 // Before adding it, Check if there are existing neighbor that can be merged
                 // search mass range = +-2 [Da]
-
+                
                 var foundNeighbor = false;
                 //var massTol = MzTolerance.GetToleranceAsTh(cluster.RepresentativeMass);
                 foreach (var neighborBin in neighborMassBins)
                 {
                     foreach (var neighborCluster in _massBinToClusterMap[neighborBin - _minSearchMassBin])
                     {
-                        foundNeighbor = ChargeLcScanCluster.Merge(cluster, neighborCluster, MzTolerance);
+                        foundNeighbor = ChargeLcScanCluster.Merge(cluster, neighborCluster);
                     }
 
                     if (foundNeighbor) break;
@@ -838,6 +867,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _massBinToClusterMap[binNum - _minSearchMassBin].Clear();
             }
         }
+
     }
 
     public class IsotopeList : List<Isotope>
