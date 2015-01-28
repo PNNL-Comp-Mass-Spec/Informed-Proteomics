@@ -128,7 +128,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "isotopic_envelope", "probability", "flag"
         };
 
-        
         public static string GetHeaderString(bool withScore = false, bool oldFormat = false)
         {
             if (oldFormat)
@@ -543,8 +542,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     return EnvelopeCount > 1 &&
                            GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.75 &&
                            GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.8 &&
-                           GetScore(ChargeLcScanScore.RankSum) > 6.5 &&
-                           GetScore(ChargeLcScanScore.Poisson) > 12 &&
+                           (GetScore(ChargeLcScanScore.RankSum) > 6.5 ||
+                           GetScore(ChargeLcScanScore.Poisson) > 12) &&
+                           GetScore(ChargeLcScanScore.BhattacharyyaDistance) < 0.1 &&
+                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.05 &&
+                           GetScore(ChargeLcScanScore.MzError) < 3 &&
+                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
+                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
+                    
+                    /*return EnvelopeCount > 1 &&
+                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.75 &&
+                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.8 &&
+                           (GetScore(ChargeLcScanScore.RankSum) > 6.5 &&
+                           GetScore(ChargeLcScanScore.Poisson) > 12 ) &&
                            GetScore(ChargeLcScanScore.BhattacharyyaDistance) < 0.05 &&
                            GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.03 &&
                            GetScore(ChargeLcScanScore.KullbackLeiblerDivergence) < 0.3 &&
@@ -552,10 +562,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                            GetScore(ChargeLcScanScore.MzError) < 3 &&
                            GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
                            GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
+                     */
                 }
                 else
                 {
                     return EnvelopeCount > 1 &&
+                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.6 &&
+                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.85 &&
+                           (GetScore(ChargeLcScanScore.RankSum) > 8 ||
+                            GetScore(ChargeLcScanScore.Poisson) > 25) &&
+                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.025 &&
+                           GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) < 0.14 &&
+                           GetScore(ChargeLcScanScore.MzError) < 3 &&
+                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
+                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
+                    
+
+                    /*return EnvelopeCount > 1 &&
                            GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.6 &&
                            GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.85 &&
                            GetScore(ChargeLcScanScore.RankSum) > 8 &&
@@ -564,7 +587,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                            GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) < 0.14 &&
                            GetScore(ChargeLcScanScore.MzError) < 3 &&
                            GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
-                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
+                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;*/
                 }
 
             }
