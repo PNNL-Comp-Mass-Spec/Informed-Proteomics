@@ -47,6 +47,7 @@ namespace Mspot
                 {"-score", "n"},
                 {"-csv", "y"},
                 {"-minProbability", "0.1"},
+                {"-maxThreads", "0"},
                 {"-oldFormat", "n"},
                 //{"-svm", null},
             };
@@ -69,6 +70,7 @@ namespace Mspot
             _minSearchCharge = Int32.Parse(_paramDic["-minCharge"]);
             _maxSearchCharge = Int32.Parse(_paramDic["-maxCharge"]);
             _inputPath = _paramDic["-i"];
+            _maxThreads = Int32.Parse(_paramDic["-maxThreads"]);
             
             /*
             var svmFile = paramDic["-svm"];
@@ -131,7 +133,7 @@ namespace Mspot
                 var stopwatch = Stopwatch.StartNew();
                 Console.WriteLine("Start loading MS1 data from {0}", rawFile);
                 var run = PbfLcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
-                var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge);
+                var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
                 Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
                 var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput, _oldFormat);
@@ -150,6 +152,7 @@ namespace Mspot
         private static bool _oldFormat;
         private static IMs1FeaturePredictor _predictor;
         private static Dictionary<string, string> _paramDic;
+        private static int _maxThreads;
       
         private static void PrintUsageInfo(string message = null)
         {
@@ -166,6 +169,7 @@ namespace Mspot
                 "\t[-massCollapse n (default: n)]\n" +
                 "\t[-score n (default: n)]\n" +
                 "\t[-csv y (default: y)]\n" +
+                "\t[-maxThreads 0 (default: 0 (no limit))]\n" +
                 "\t[-oldFormat n (default: n)]\n"
                 );
         }

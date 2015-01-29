@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class ChargeLcScanMatrix : ILcMsMap, ISequenceFilter, IMs1FeatureExtract
     {
-        public ChargeLcScanMatrix(LcMsRun run, int minScanCharge = 2, int maxScanCharge = 60, int maxThreadCount = -1, int numBits = 27)
+        public ChargeLcScanMatrix(LcMsRun run, int minScanCharge = 2, int maxScanCharge = 60, int maxThreadCount = 0, int numBits = 27)
         {
             _run = run;
             _minScanCharge = minScanCharge;
