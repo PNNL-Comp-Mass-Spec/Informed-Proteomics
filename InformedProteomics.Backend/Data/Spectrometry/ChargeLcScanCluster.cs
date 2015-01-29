@@ -91,7 +91,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public static readonly string[] TsvHeaderWithScore = new string[]
         {
-            "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
+            "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "ObservedEnvelopes", "ScanLength",
             "BestCorr", "SummedCorr", 
             "RanksumScore", "AvgRanksumScore",
@@ -99,33 +99,33 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "BcDist", "SummedBcDist", 
             "KlDiv", "SummedKlDiv", 
             "MzDiffPpm", "AvgMzDiff", "XicCorr",
-            "Envelope", "Probability", "Flag"
+            "Envelope", "Probability", "GoodEnough"
         };
 
         public static readonly string[] OldTsvHeaderWithScore = new string[]
         {
-            "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge",
+            "FeatureID", "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge",
             "rep_mz", "abundance", "summed_envelope_count", "scan_length", "envelope_corr",
             "summed_envelope_corr", "ranksum_score", "avg_ranksum_score", "poisson_score",
             "avg_poisson_score", "summed_poisson_score", "bc_distance", "summed_bc_distance",
             "kl_divergence", "summed_kl_divergence", "mz_error",
-            "summed_mz_error", "xic_corr", "isotopic_envelope", "probability", "flag"
+            "summed_mz_error", "xic_corr", "isotopic_envelope", "probability", "good_enough"
         };
 
         private static readonly string[] TsvHeader = new string[]
         {
-            "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
+            "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "BestCorr", "SummedCorr", 
             "MzDiffPpm", "XicCorr", 
-            "Envelope", "Probability", "Flag"
+            "Envelope", "Probability", "GoodEnough"
         };
 
         public static readonly string[] OldTsvHeader = new string[]
         {
-            "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge", "rep_mz", "abundance", 
+            "FeatureID", "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge", "rep_mz", "abundance", 
             "envelope_corr","summed_envelope_corr", 
             "mz_error", "xic_corr", 
-            "isotopic_envelope", "probability", "flag"
+            "isotopic_envelope", "probability", "good_enough"
         };
 
         public static string GetHeaderString(bool withScore = false, bool oldFormat = false)

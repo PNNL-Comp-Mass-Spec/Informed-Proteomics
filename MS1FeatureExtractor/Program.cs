@@ -18,7 +18,7 @@ namespace Mspot
     class Program
     {
         public const string Name = "ProMex";
-        public const string Version = "1.0 (Jan 23, 2014)";
+        public const string Version = "ver. 1.0 (Jan 29, 2014)";
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -88,8 +88,7 @@ namespace Mspot
             _csvOutput  = Str2Bool(_paramDic["-csv"]);
             _oldFormat = Str2Bool(_paramDic["-oldFormat"]);
 
-            Console.WriteLine("############################################");
-            Console.WriteLine(string.Format("{0}\t{1}", Name, Version));
+            Console.WriteLine("****** {0}\t{1} ************", Name, Version);
             foreach (var paramName in _paramDic.Keys)
                 Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
             

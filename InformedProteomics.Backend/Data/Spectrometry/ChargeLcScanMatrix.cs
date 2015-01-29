@@ -96,7 +96,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (csvOutput)
             {
                 csvWriter = new System.IO.StreamWriter(outCsvFilePath);
-                csvWriter.WriteLine("scan_num,charge,monoisotopic_mw,mz,abundance,probability");
+                csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
             }
 
             var tsvWriter = new System.IO.StreamWriter(tmpTsvFilePath);
@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (csvOutput) csvWriter.Close();
 
             File.Move(tmpTsvFilePath, outTsvFilePath);
-            Console.WriteLine("Complete MS1 feature finding; Elapsed Time = {1:0.000} sec; Total Extracted Features = {0}", (stopwatch.ElapsedMilliseconds) / 1000.0d, _nOutFatures);
+            Console.WriteLine("Complete MS1 feature finding; Elapsed Time = {0:0.000} sec; Total Extracted Features = {1}", (stopwatch.ElapsedMilliseconds) / 1000.0d, _nOutFatures);
             return outTsvFilePath;
         }
 
@@ -390,7 +390,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return seedCells.OrderByDescending(x => x.Key).Select(x => x.Value);
         }
 
-        private List<ChargeLcScanCluster> FindClusters(double clusteringScoreCutoff = 0.7)
+        private List<ChargeLcScanCluster> FindClusters(double clusteringScoreCutoff = 0.6)
         {
             BuildFeatureMatrix(); // should be called first
 
@@ -851,19 +851,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     if (!cluster.Active) continue;
                     if (cluster.GoodEnough || cluster.Probability > probabilityThreshold)
                     {
-                        tsvWriter.WriteLine(cluster.GetString(scoreReport));
                         _nOutFatures++;
-
+                        
+                        tsvWriter.WriteLine("{0}\t{1}", _nOutFatures, cluster.GetString(scoreReport));
                         if (csvWriter != null)
                         {
-                            //csvWriter.WriteLine("scan_num,charge,monoisotopic_mw,mz,abundance");
+                            //csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
                             for (var j = 0; j < cluster.Members.Count; j++)
                             {
                                 var m = cluster.Members[j];
                                 var idx = _mostAbuIsotopePeakIndex[m.Row][m.Col];
                                 var mz = _ms1PeakArr[idx].Mz;
+                                var mass = cluster.RepresentativeMass;
                                 var abundance = cluster.MemberEnvelope[j].Sum();
-                                csvWriter.WriteLine(string.Format("{0},{1},{2},{3},{4},{5}", _ms1ScanNums[m.Col], m.Row+_chargeRange.Min, _accurateMass[m.Row][m.Col], mz, abundance, cluster.Probability));
+                                csvWriter.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6}", _ms1ScanNums[m.Col], m.Row + _chargeRange.Min, abundance, mz, 1.0 - cluster.Probability, mass, _nOutFatures));
                             }
                         }
                     }
