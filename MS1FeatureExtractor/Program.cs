@@ -28,7 +28,13 @@ namespace Mspot
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
-          
+
+            if (args.Length == 0)
+            {
+                PrintUsageInfo();
+                return;
+            }
+
             if (args.Length % 2 != 0)
             {
                 PrintUsageInfo("The number of arguments must be even.");
@@ -48,8 +54,6 @@ namespace Mspot
                 {"-csv", "y"},
                 {"-minProbability", "0.1"},
                 {"-maxThreads", "0"},
-                {"-oldFormat", "n"},
-                //{"-svm", null},
             };
 
             for (var i = 0; i < args.Length / 2; i++)
@@ -86,8 +90,7 @@ namespace Mspot
             _scoreReport = Str2Bool(_paramDic["-score"]);
             _massCollapse = Str2Bool(_paramDic["-massCollapse"]);
             _csvOutput  = Str2Bool(_paramDic["-csv"]);
-            _oldFormat = Str2Bool(_paramDic["-oldFormat"]);
-
+            
             Console.WriteLine("****** {0}\t{1} ************", Name, Version);
             foreach (var paramName in _paramDic.Keys)
                 Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
@@ -129,13 +132,17 @@ namespace Mspot
             if (path.EndsWith(".raw") || path.EndsWith(".pbf"))
             {
                 var rawFile = path;
+                var outFile = ChargeLcScanMatrix.GetFeatureFilePath(rawFile);
+
+                if (File.Exists(outFile)) return;
+
                 var stopwatch = Stopwatch.StartNew();
                 Console.WriteLine("Start loading MS1 data from {0}", rawFile);
                 var run = PbfLcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
                 var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
                 Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
-                var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput, _oldFormat);
+                var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput);
             }
         }
 
@@ -148,7 +155,6 @@ namespace Mspot
         private static bool _scoreReport;
         private static bool _csvOutput;
         private static double _probabilityThreshold;
-        private static bool _oldFormat;
         private static IMs1FeaturePredictor _predictor;
         private static Dictionary<string, string> _paramDic;
         private static int _maxThreads;
@@ -167,9 +173,7 @@ namespace Mspot
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" + 
                 "\t[-massCollapse n (default: n)]\n" +
                 "\t[-score n (default: n)]\n" +
-                "\t[-csv y (default: y)]\n" +
-                "\t[-maxThreads 0 (default: 0 (no limit))]\n" +
-                "\t[-oldFormat n (default: n)]\n"
+                "\t[-maxThreads 0 (default: 0 (no limit))]\n"
                 );
         }
 

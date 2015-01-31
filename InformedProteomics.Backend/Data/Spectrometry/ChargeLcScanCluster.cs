@@ -27,10 +27,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public const int MzError = 11;
         public const int MzErrorSummed = 12;
-        //public const int EnvelopeCorrelationSummedRegion = 11;
-        //public const int BhattacharyyaDistanceSummedRegion = 12;
-        //public const int KullbackLeiblerDivergenceSummedRegion = 13;
-
         public const int XicCorrelation = 13;
 
         public const int Count = 14;
@@ -101,7 +97,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "MzDiffPpm", "AvgMzDiff", "XicCorr",
             "Envelope", "Probability", "GoodEnough"
         };
-
+        /*
         public static readonly string[] OldTsvHeaderWithScore = new string[]
         {
             "FeatureID", "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge",
@@ -111,7 +107,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "kl_divergence", "summed_kl_divergence", "mz_error",
             "summed_mz_error", "xic_corr", "isotopic_envelope", "probability", "good_enough"
         };
-
+        
+        public static readonly string[] OldTsvHeader = new string[]
+        {
+            "FeatureID", "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge", "rep_mz", "abundance", 
+            "envelope_corr","summed_envelope_corr", 
+            "mz_error", "xic_corr", 
+            "isotopic_envelope", "probability", "good_enough"
+        };
+        */
         private static readonly string[] TsvHeader = new string[]
         {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
@@ -120,24 +124,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "Envelope", "Probability", "GoodEnough"
         };
 
-        public static readonly string[] OldTsvHeader = new string[]
+        public static string GetHeaderString(bool withScore = false)
         {
-            "FeatureID", "min_scan_num", "max_scan_num", "min_charge", "max_charge", "monoisotopic_mw", "rep_scan_num", "rep_charge", "rep_mz", "abundance", 
-            "envelope_corr","summed_envelope_corr", 
-            "mz_error", "xic_corr", 
-            "isotopic_envelope", "probability", "good_enough"
-        };
-
-        public static string GetHeaderString(bool withScore = false, bool oldFormat = false)
-        {
-            if (oldFormat)
-            {
-                return (withScore) ? ArrayUtil.ToString(OldTsvHeaderWithScore) : ArrayUtil.ToString(OldTsvHeader); 
-            }
-            else
-            {
-                return (withScore) ? ArrayUtil.ToString(TsvHeaderWithScore) : ArrayUtil.ToString(TsvHeader);        
-            }
+            return (withScore) ? ArrayUtil.ToString(TsvHeaderWithScore) : ArrayUtil.ToString(TsvHeader);        
         }
 
         public override string ToString()
@@ -192,33 +181,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             return _scores[scoreType];
         }
-        /*
-        public bool Overlaps(ChargeLcScanCluster other)
-        {
-            const int colBuf = 1;
-            const int rowBuf = 0;
-
-            var ret = ((MinCol - colBuf <= other.MinCol && other.MinCol <= MaxCol + colBuf) ||
-                       (MinCol - colBuf <= other.MaxCol && other.MaxCol <= MaxCol + colBuf)) &&
-                       ((MinRow - rowBuf <= other.MinRow && other.MinRow <= MaxRow + rowBuf) ||
-                       (MinRow - rowBuf <= other.MaxRow && other.MaxRow <= MaxRow + rowBuf));
-            return ret;
-        }
-
-        public void Merge(ChargeLcScanCluster other)
-        {
-            other.Active = false;
-
-            if (other.MaxCol > MaxCol) MaxCol = other.MaxCol;
-            if (other.MinCol < MinCol) MinCol = other.MinCol;
-            if (other.MaxRow > MaxRow) MaxRow = other.MaxRow;
-            if (other.MinRow < MinRow) MinRow = other.MinRow;
-
-            for (var i = 0; i < ClusteringEnvelope.Length; i++) ClusteringEnvelope[i] += other.ClusteringEnvelope[i];
-
-            Members.AddRange(other.Members);
-            MemberEnvelope.AddRange(other.MemberEnvelope);
-        }*/
+        
         private static readonly Tolerance MergeTolerance = new Tolerance(4);
         public static bool Merge(ChargeLcScanCluster c1, ChargeLcScanCluster c2)
         {
@@ -415,23 +378,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private static readonly double[] LogisticRegressionBetaVector = new double[]
         {
-           -7.15033200804863,
-            0.0220549212206611,
-            0.0249168026525095,
-            0.939145522477711,
-            0.583517589604168,
-            -0.0150451406056677,
-            0.153177295586215,
-            0.0478942403605061,
-            -0.0486082363616788,
-            0.0311058121940271,
-            -23.7861581005366,
-            -45.5501966890813,
-            0.399020146402469,
-            0.791998829823084,
-            0.00709010776893553,
-            0.0841190811384717,
-            2.25891024616995
+          -9.80322248576848,
+            0.0177345049138546,
+            0.0182034423264027,
+            1.34377709499630,
+            1.22056790970138,
+            -0.0121680010258230,
+            0.212804311237213,
+            0.0438596045871836,
+            -0.0537174416494930,
+            0.0627816486522023,
+            11.7161939412475,
+            97.3958203478190,
+            -28.4567577808012,
+            -87.3263081327653,
+            -0.0594784589790504,
+            0.0707772936171733,
+            2.25809384761825
         };
         
         internal double GetProbabilityByLogisticRegression()
@@ -455,79 +418,92 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (RepresentativeMass < 2000)
                 {
                     if (GetScore(ChargeLcScanScore.EnvelopeCorrelation) < 0.5) return true;
-                    if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergence) > 5) return true;
                     if (GetScore(ChargeLcScanScore.RankSum) < 4.3219) return true;
                     if (GetScore(ChargeLcScanScore.Poisson) < 4.3219) return true;
                     return false;
                 }
 
-                if (EnvelopeCount < 2)
+                if (EnvelopeCount < 10)
                 {
-                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelation) < 0.85) return true;
-                    if (GetScore(ChargeLcScanScore.RankSum) < 6.6439) return true;
-                    if (GetScore(ChargeLcScanScore.Poisson) < 6.6439) return true;
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.015) return true;
-                    //if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergence) > 0.1) return true;
-                    if (GetScore(ChargeLcScanScore.MzError) > 5) return true;
-                    if (GetScore(ChargeLcScanScore.XicCorrelation) < 0.4) return true;
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.007 && GetScore(ChargeLcScanScore.RankSum) < 9) return true;
+                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.5) return true;
+                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.08) return true;
 
-                    return true;
+                    if (GetScore(ChargeLcScanScore.RankSum) < 9 && GetScore(ChargeLcScanScore.Poisson) < 15 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01) return true;
+
+                    if (GetScore(ChargeLcScanScore.RankSum) < 8 && GetScore(ChargeLcScanScore.Poisson) < 15 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.005) return true;
+
+                    if (GetScore(ChargeLcScanScore.RankSum) < 7 && GetScore(ChargeLcScanScore.Poisson) < 10)
+                        return true;
+
+                    if (GetScore(ChargeLcScanScore.RankSum) < 6 || GetScore(ChargeLcScanScore.Poisson) < 6.6439)
+                        return true;
+
+                    if (GetScore(ChargeLcScanScore.RankSum) < 8 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.005)
+                        return true;
+
+                    if (GetScore(ChargeLcScanScore.Poisson) < 15 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.005)
+                        return true;
+
+                    if (GetScore(ChargeLcScanScore.MzError) > 5) return true;
+                    if (GetScore(ChargeLcScanScore.MzErrorSummed) > 9) return true;
+
+                    if (GetScore(ChargeLcScanScore.XicCorrelation) < 0.4 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.005) return true;
+
+                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 10 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.005) return true;
                 }
                 else
                 {
-                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelation) < 0.5) return true;
-                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.7) return true;
-                    if (GetScore(ChargeLcScanScore.RankSum) < 5) return true;
-                    if (GetScore(ChargeLcScanScore.Poisson) < 10) return true;
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 10) return true;
+                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.6) return true;
+                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.08) return true;
+                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 1) return true;
+                    if (GetScore(ChargeLcScanScore.EnvelopeCorrelation) < 0.4) return true;
+                    if (GetScore(ChargeLcScanScore.RankSum) < 4.3219) return true;
+                    if (GetScore(ChargeLcScanScore.Poisson) < 6.6439) return true;
 
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 15 && EnvelopeCount > 4) return true;
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 30 && EnvelopeCount > 6) return true;
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 35 && EnvelopeCount > 9) return true;
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 45 && EnvelopeCount > 11) return true;
-                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 49 && EnvelopeCount > 14) return true;
+                    if (GetScore(ChargeLcScanScore.RankSum) < 6 && GetScore(ChargeLcScanScore.Poisson) < 20 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.015 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.9) return true;
 
-
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.044) return true;
-                    if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) > 0.5) return true;
-
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.3) return true;
-                    if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergence) > 5.5) return true;
-
-                    if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) > 0.3 &&
-                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.03) return true;
-
-                    if (GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) > 0.25 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.85) return true;
+                    if (GetScore(ChargeLcScanScore.RankSum) < 8 && GetScore(ChargeLcScanScore.Poisson) < 18 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.015 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.9) return true;
 
                     if (GetScore(ChargeLcScanScore.RankSum) < 6 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.85) return true;
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.95) return true;
 
-                    if (GetScore(ChargeLcScanScore.Poisson) < 15 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.85) return true;
+                    if (GetScore(ChargeLcScanScore.Poisson) < 10 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.95) return true;
 
+                    if (GetScore(ChargeLcScanScore.RankSumMedian) < 2 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.95) return true;
 
-                    if (GetScore(ChargeLcScanScore.MzError) > 5) return true;
-                    if (GetScore(ChargeLcScanScore.MzErrorSummed) > 8) return true;
+                    if (GetScore(ChargeLcScanScore.RankSumMedian) < 4.5 &&
+                        GetScore(ChargeLcScanScore.PoissonMedian) < 6 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.95) return true;
 
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.02 &&
-                        GetScore(ChargeLcScanScore.RankSum) < 25 &&
-                        GetScore(ChargeLcScanScore.Poisson) < 12 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.75) return true;
+                    if (GetScore(ChargeLcScanScore.RankSumMedian) > 7 &&
+                        GetScore(ChargeLcScanScore.PoissonMedian) < 8 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.95) return true;
 
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.03 &&
-                        GetScore(ChargeLcScanScore.RankSum) < 10 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.85) return true;
+                    if (GetScore(ChargeLcScanScore.PoissonMedian) < 9 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.015 &&
+                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.9) return true;
 
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.03 &&
-                        GetScore(ChargeLcScanScore.RankSum) < 20 &&
-                        GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) < 0.85) return true;
+                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 16) return true;
 
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.08 && EnvelopeCount < 3) return true;
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.14 && EnvelopeCount < 4) return true;
-                    if (GetScore(ChargeLcScanScore.BhattacharyyaDistance) > 0.16 && EnvelopeCount < 5) return true;
-
+                    if (GetScore(ChargeLcScanScore.PoissonSummed) < 45 &&
+                        GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) > 0.01) return true;
                 }
                 return false;
             }
@@ -537,59 +513,30 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             get
             {
-                if (RepresentativeMass < 15000)
-                {
-                    return EnvelopeCount > 1 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.75 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.8 &&
-                           (GetScore(ChargeLcScanScore.RankSum) > 6.5 ||
-                           GetScore(ChargeLcScanScore.Poisson) > 12) &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistance) < 0.1 &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.05 &&
-                           GetScore(ChargeLcScanScore.MzError) < 3 &&
-                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
-                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
-                    
-                    /*return EnvelopeCount > 1 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.75 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.8 &&
-                           (GetScore(ChargeLcScanScore.RankSum) > 6.5 &&
-                           GetScore(ChargeLcScanScore.Poisson) > 12 ) &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistance) < 0.05 &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.03 &&
-                           GetScore(ChargeLcScanScore.KullbackLeiblerDivergence) < 0.3 &&
-                           GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) < 0.2 &&
-                           GetScore(ChargeLcScanScore.MzError) < 3 &&
-                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
-                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
-                     */
+               if (RepresentativeMass < 13000)
+               {
+                   return GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.8 &&
+                          GetScore(ChargeLcScanScore.RankSum) > 6 &&
+                          GetScore(ChargeLcScanScore.RankSumMedian) > 3 &&
+                          GetScore(ChargeLcScanScore.Poisson) > 12 &&
+                          GetScore(ChargeLcScanScore.PoissonMedian) > 8 &&
+                          GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.01 &&
+                          GetScore(ChargeLcScanScore.MzError) < 3 &&
+                          GetScore(ChargeLcScanScore.MzErrorSummed) < 5 &&
+                          GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
                 }
                 else
                 {
-                    return EnvelopeCount > 1 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.6 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.85 &&
-                           (GetScore(ChargeLcScanScore.RankSum) > 8 ||
-                            GetScore(ChargeLcScanScore.Poisson) > 25) &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.025 &&
-                           GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) < 0.14 &&
-                           GetScore(ChargeLcScanScore.MzError) < 3 &&
-                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
-                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;
-                    
-
-                    /*return EnvelopeCount > 1 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.6 &&
-                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.85 &&
+                    return GetScore(ChargeLcScanScore.EnvelopeCorrelation) > 0.6 &&
+                           GetScore(ChargeLcScanScore.EnvelopeCorrelationSummed) > 0.95 &&
                            GetScore(ChargeLcScanScore.RankSum) > 8 &&
-                           GetScore(ChargeLcScanScore.Poisson) > 25 &&
-                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.025 &&
-                           GetScore(ChargeLcScanScore.KullbackLeiblerDivergenceSummed) < 0.14 &&
+                           GetScore(ChargeLcScanScore.RankSumMedian) > 3 &&
+                           GetScore(ChargeLcScanScore.Poisson) > 10 &&
+                           GetScore(ChargeLcScanScore.PoissonMedian) > 8 &&
+                           GetScore(ChargeLcScanScore.BhattacharyyaDistanceSummed) < 0.01 &&
                            GetScore(ChargeLcScanScore.MzError) < 3 &&
-                           GetScore(ChargeLcScanScore.MzErrorSummed) < 6 &&
-                           GetScore(ChargeLcScanScore.XicCorrelation) > 0.2;*/
+                           GetScore(ChargeLcScanScore.MzErrorSummed) < 5;
                 }
-
             }
         }
     }
