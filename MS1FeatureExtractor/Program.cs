@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +20,14 @@ namespace Mspot
     class Program
     {
         public const string Name = "ProMex";
-        public const string Version = "ver. 1.0 (Jan 29, 2014)";
+        public static string Version 
+        {
+            get
+            {
+                var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return string.Format("version {0}.{1}.{2} (January 30, 2014)", programVersion.Major, programVersion.Minor, programVersion.Build);
+            }
+        }
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
@@ -51,7 +60,7 @@ namespace Mspot
                 {"-maxMass", "50000.0"},
                 {"-massCollapse", "n"},
                 {"-score", "n"},
-                {"-csv", "y"},
+                {"-csv", "n"},
                 {"-minProbability", "0.1"},
                 {"-maxThreads", "0"},
             };
@@ -86,15 +95,16 @@ namespace Mspot
             }
             _predictor = new Ms1FeatureSvmPredictor(svmModel);
             */
-
             _scoreReport = Str2Bool(_paramDic["-score"]);
             _massCollapse = Str2Bool(_paramDic["-massCollapse"]);
             _csvOutput  = Str2Bool(_paramDic["-csv"]);
             
             Console.WriteLine("****** {0}\t{1} ************", Name, Version);
             foreach (var paramName in _paramDic.Keys)
+            {
+                if (paramName.Equals("-csv") && !_csvOutput) continue;
                 Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
-            
+            }
             var attr = File.GetAttributes(_inputPath);
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
@@ -162,8 +172,8 @@ namespace Mspot
         private static void PrintUsageInfo(string message = null)
         {
             if (message != null) Console.WriteLine("Error: " + message);
+            Console.WriteLine("****** {0}\t{1} ************", Name, Version);
             Console.WriteLine(
-                Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
                 "\t[-minProbability 0.1 (default: 0.1)]\n" +

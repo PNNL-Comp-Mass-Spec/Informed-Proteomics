@@ -104,12 +104,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var tsvWriter = new System.IO.StreamWriter(tmpTsvFilePath);
             tsvWriter.WriteLine(ChargeLcScanCluster.GetHeaderString(scoreReport));
-
+            
             Console.WriteLine("Start MS1 feature extracting...");
-            Console.WriteLine("Mass Range {0} - {1}", minMass, maxMass);
-            Console.WriteLine("Charge Range {0} - {1}", _minScanCharge, _maxScanCharge);
-            Console.WriteLine("Output File\t{0}", outTsvFilePath);
-
+            Console.WriteLine("Mass Range: {0} - {1}", minMass, maxMass);
+            Console.WriteLine("Charge Range: {0} - {1}", _minScanCharge, _maxScanCharge);
+            Console.WriteLine("Output File: {0}", outTsvFilePath);
             if (csvOutput) Console.WriteLine("Csv Output File\t{0}", outCsvFilePath);
 
             var binNumCursor = _minSearchMassBin;
@@ -130,7 +129,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                     //var remaining = (totalMassBins - processedBins) * (elapsed / processedBins);
                     FlushOutput(binNumCursor, binNum - 500, tsvWriter, probabilityThreshold, scoreReport, csvWriter);
-                    Console.WriteLine("Processing {0:0.00} % of mass bins ({1:0.000} Da); Elapsed Time = {2:0.000} sec; # of features = {3}", processedPercentage, _comparer.GetMzEnd(binNum), elapsed, _nOutFatures);
+                    Console.WriteLine("Processing {0:0.00}% of mass bins ({1:0.000} Da); Elapsed Time = {2:0.000} sec; # of features = {3}", processedPercentage, _comparer.GetMzEnd(binNum), elapsed, _nOutFatures);
                     binNumCursor = binNum - 500 + 1;
                 }
             }
