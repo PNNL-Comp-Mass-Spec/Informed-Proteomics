@@ -6,16 +6,16 @@ using InformedProteomics.TopDown.Execution;
 
 namespace MSPathFinderT
 {
-    internal class Program
+    public class Program
     {
         public const string Name = "MSPathFinderT";
-        public const string Version = "0.75 (Jan 7, 2015)";
+        public const string Version = "0.91 (Feb 11, 2015)";
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
         private const uint EnableExtendedFlags = 0x0080;
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
@@ -38,15 +38,15 @@ namespace MSPathFinderT
                 {"-f", "10"},
                 {"-tda", "0"},
                 {"-minLength", "21"},
-                {"-maxLength", "300"},
+                {"-maxLength", "500"},
                 {"-minCharge", "2"},
-                {"-maxCharge", "30"},
+                {"-maxCharge", "50"},
                 {"-minFragCharge", "1"},
-                {"-maxFragCharge", "15"},
+                {"-maxFragCharge", "20"},
                 {"-minMass", "3000.0"},
                 {"-maxMass", "50000.0"},
-                {"-corr", "0.7"},
-                {"-isos", null}
+                {"-feature", null},
+                {"-minProb", "0.1"}
             };
 
             for (var i = 0; i < args.Length/2; i++)
@@ -94,9 +94,10 @@ namespace MSPathFinderT
                     parameters.ProductIonTolerancePpm,
                     parameters.Tda,
                     parameters.SearchMode,
-                    parameters.IsosFilePath
+                    parameters.FeatureFilePath,
+                    parameters.FeatureMinProbability
                     );
-                topDownLauncher.RunSearch(parameters.CorrThreshold);
+                topDownLauncher.RunSearch();
             }
         }
 
@@ -116,15 +117,14 @@ namespace MSPathFinderT
                 "\t[-f FragmentIonToleranceInPpm] (e.g. 10, Default: 10)\n" +
                 "\t[-tda 0/1] (0: don't search decoy database (default), 1: search shuffled decoy database)\n" +
                 "\t[-minLength MinSequenceLength] (minimum sequence length, default: 21)\n" +
-                "\t[-maxLength MaxSequenceLength] (maximum sequence length, default: 300)\n" +
+                "\t[-maxLength MaxSequenceLength] (maximum sequence length, default: 500)\n" +
                 "\t[-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 2)\n" +
-                "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 30)\n" +
+                "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 50)\n" +
                 "\t[-minFragCharge MinPrecursorCharge] (minimum fragment ion charge, default: 1)\n" +
-                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 15)\n" +
+                "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 20)\n" +
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
-                "\t[-corr CorrThreshold] (correlation threshold, default: 0.7)\n" +
-                "\t[-isos IsosFile] (*.csv, *.tsv, or *.msalign)\n"
+                "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n"
                 );
         }
 

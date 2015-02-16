@@ -363,7 +363,7 @@ namespace InformedProteomics.Test
             {
                 graph.SetSink(i);
                 Console.WriteLine("ModComb: " + graph.GetModificationCombinations()[i]);
-                var score = graph.GetScore(charge, scorer);
+                var score = graph.GetFragmentScore(scorer);
                 Console.WriteLine("Fast search score: " + score);
                 var composition = graph.GetSinkSequenceCompositionWithH2O();
 

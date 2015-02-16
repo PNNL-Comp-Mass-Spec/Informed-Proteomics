@@ -277,7 +277,7 @@ namespace InformedProteomics.BottomUp.Execution
                         var charge =
                             (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                         var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
-                        var score = seqGraph.GetScore(charge, scorer);
+                        var score = seqGraph.GetFragmentScore(scorer);
                         if (score <= 2) continue;
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);

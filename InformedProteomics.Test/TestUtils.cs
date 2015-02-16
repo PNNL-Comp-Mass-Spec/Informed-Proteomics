@@ -22,6 +22,32 @@ namespace InformedProteomics.Test
     internal class TestUtils
     {
         [Test]
+        public void TestCountingMs2Scans()
+        {
+            var numSpectra = 0;
+            const string rawFileDir = @"H:\Research\TopDownTestData";
+            foreach (var rawFilePath in Directory.GetFiles(rawFileDir, "*.raw"))
+            {
+                var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+                numSpectra += run.GetScanNumbers(2).Count;
+            }
+            Console.WriteLine(numSpectra);
+        }
+
+        [Test]
+        public void TestFloatBinning()
+        {
+            const double minMass = 200;
+            const double maxMass = 50000;
+            const int numBits = 29;
+
+            var comparer = new MzComparerWithBinning(numBits);
+            Console.WriteLine(comparer.GetBinNumber(maxMass));
+            Console.WriteLine(comparer.GetBinNumber(maxMass) - comparer.GetBinNumber(minMass) + 1);
+            Console.WriteLine(LcMsMatchMap.GetBinNumber(maxMass) - LcMsMatchMap.GetBinNumber(minMass) + 1);
+        }
+
+        [Test]
         public void TestGeneratingNtoKCombinationsWithRepetition()
         {
             const int n = 3;

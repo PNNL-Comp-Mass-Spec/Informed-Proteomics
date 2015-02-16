@@ -26,8 +26,8 @@ namespace MSPathFinderT
         public int MaxProductIonCharge { get; set; }
         public double MinSequenceMass { get; set; }
         public double MaxSequenceMass { get; set; }
-        public double CorrThreshold { get; set; }
-        public string IsosFilePath { get; set; }
+        public string FeatureFilePath { get; set; }
+        public double FeatureMinProbability { get; set; }
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
@@ -36,6 +36,7 @@ namespace MSPathFinderT
         {
             foreach (var specFilePath in SpecFilePaths) Console.WriteLine("\t{0}", specFilePath);
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
+            Console.WriteLine("FeatureFilePath: {0}", FeatureFilePath ?? "N/A");
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchMode);
             Console.WriteLine("Tda: " + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
@@ -49,15 +50,16 @@ namespace MSPathFinderT
             Console.WriteLine("MaxProductIonCharge: " + MaxProductIonCharge);
             Console.WriteLine("MinSequenceMass: " + MinSequenceMass);
             Console.WriteLine("MaxSequenceMass: " + MaxSequenceMass);
+            Console.WriteLine("MinFeatureProbability: " + FeatureMinProbability);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + _maxNumDynModsPerSequence);
             Console.WriteLine("Modifications: ");
             foreach (var searchMod in _searchModifications)
             {
                 Console.WriteLine(searchMod);
             }
-            if (IsosFilePath != null)
+            if (FeatureFilePath != null)
             {
-                Console.WriteLine("Getting MS1 features from {0}.", IsosFilePath);
+                Console.WriteLine("Getting MS1 features from {0}.", FeatureFilePath);
             }
         }
 
@@ -72,6 +74,7 @@ namespace MSPathFinderT
                 {
                     writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+                    writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(Path.ChangeExtension(specFilePath, ".ms1ft")));
                     writer.WriteLine("SearchMode\t" + SearchMode);
                     writer.WriteLine("Tda\t" + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
@@ -84,6 +87,7 @@ namespace MSPathFinderT
                     writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
                     writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
                     writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
+                    writer.WriteLine("MinFeatureProbability\t" + FeatureMinProbability);
                     writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
                     foreach (var searchMod in _searchModifications)
                     {
@@ -132,7 +136,7 @@ namespace MSPathFinderT
                 _searchModifications = new SearchModification[0];
             }
 
-            IsosFilePath = parameters["-isos"];
+            FeatureFilePath = parameters["-feature"];
 
             SearchMode = Convert.ToInt32(parameters["-m"]);
             if (SearchMode < 0 || SearchMode > 2)
@@ -180,7 +184,11 @@ namespace MSPathFinderT
                 return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
             }
 
-            CorrThreshold = Convert.ToDouble(parameters["-corr"]);
+            FeatureMinProbability = Convert.ToDouble(parameters["-minProb"]);
+            if (FeatureMinProbability < 0.0 || FeatureMinProbability > 1.0)
+            {
+                return "FeatureMinProbability must be in [0,1]!";
+            }
             return null;
         }
 
@@ -190,7 +198,7 @@ namespace MSPathFinderT
             {
                 var key = keyValuePair.Key;
                 var value = keyValuePair.Value;
-                if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" && keyValuePair.Key != "-isos")
+                if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" && keyValuePair.Key != "-feature")
                 {
                     return "Missing required parameter " + key + "!";
                 }
@@ -239,7 +247,7 @@ namespace MSPathFinderT
                         return "File not found." + value + "!";
                     }
                 }
-                else if (key.Equals("-isos"))
+                else if (key.Equals("-feature"))
                 {
                     if (value != null && !File.Exists(value))
                     {
@@ -247,7 +255,7 @@ namespace MSPathFinderT
                     }
                     if (value != null && 
                         !Path.GetExtension(value).ToLower().Equals(".csv") && 
-                        !Path.GetExtension(value).ToLower().Equals(".tsv") &&
+                        !Path.GetExtension(value).ToLower().Equals(".ms1ft") &&
                         !Path.GetExtension(value).ToLower().Equals(".msalign"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")!";

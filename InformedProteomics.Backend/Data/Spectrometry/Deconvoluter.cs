@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry

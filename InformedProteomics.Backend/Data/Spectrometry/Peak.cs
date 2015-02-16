@@ -166,6 +166,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return GetBinNumber(x.Mz) == GetBinNumber(y.Mz);
         }
 
+        public bool Equals(double x, double y)
+        {
+            return GetBinNumber(x) == GetBinNumber(y);
+        }
+
         public int GetHashCode(Peak p)
         {
             return GetBinNumber(p.Mz);

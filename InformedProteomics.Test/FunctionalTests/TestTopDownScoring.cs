@@ -91,7 +91,7 @@ namespace InformedProteomics.Test.FunctionalTests
             Assert.True(spec != null);
 
             var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 10);
-            var score = seqGraph.GetScore(charge, scorer);
+            var score = seqGraph.GetFragmentScore(scorer);
 
             Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), ms2ScanNum, score);
 
@@ -150,7 +150,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             //var scorer = new MatchedPeakCounter(spec, productIonTolerance, 1, 10);
             var scorer = new CorrMatchedPeakCounter(spec, productIonTolerance, 1, 10);
-            var score = seqGraph.GetScore(charge, scorer);
+            var score = seqGraph.GetFragmentScore(scorer);
 
             Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), ms2ScanNum, score);
 

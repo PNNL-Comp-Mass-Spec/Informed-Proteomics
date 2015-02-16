@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
+
 
 namespace InformedProteomics.Test
 {
@@ -25,6 +24,18 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
             IMs1FeatureExtract extractor = new ChargeLcScanMatrix(run, minScanCharge, maxScanCharge, maxThreads);
             var outputFilePath = extractor.GetFeatureFile(specFilePath, minScanMass, maxScanMass);
+        }
+
+        [Test]
+        public void TestProMexFilter()
+        {
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+            var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath, 0.15);
+
+//            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
+            Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
         }
     }
 }

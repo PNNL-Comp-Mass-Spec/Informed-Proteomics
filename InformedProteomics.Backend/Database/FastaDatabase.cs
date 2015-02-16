@@ -35,9 +35,12 @@ namespace InformedProteomics.Backend.Database
             _databaseFilePath = databaseFilePath;
             _lastWriteTimeHash = File.GetLastWriteTime(_databaseFilePath).GetHashCode();
 
-            var databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
-            _seqFilePath = databaseFilePathNoExt + SeqFileExtension;
-            _annoFilePath = databaseFilePathNoExt + AnnotationFileExtension;
+            //var databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
+            //_seqFilePath = databaseFilePathNoExt + SeqFileExtension;
+            //_annoFilePath = databaseFilePathNoExt + AnnotationFileExtension;
+
+            _seqFilePath = Path.ChangeExtension(databaseFilePath, SeqFileExtension);
+            _annoFilePath = Path.ChangeExtension(databaseFilePath, AnnotationFileExtension);
 
             if (!File.Exists(_seqFilePath) 
                 || !File.Exists(_annoFilePath) 

@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
     <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
+    <Compile Include="FunctionalTests\TestTopDownConsole.cs" />
     <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
     <Compile Include="FunctionalTests\TestMzMLReader.cs" />
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
+    <Compile Include="TestFastProteinId.cs" />
     <Compile Include="TestIcBottomUp.cs" />
     <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
@@ -173,6 +175,10 @@
     <ProjectReference Include="..\SelectivityScore\SelectivityScore.csproj">
       <Project>{19658c05-ef09-404d-959f-ef9a6029013b}</Project>
       <Name>SelectivityScore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TopDownConsole\MSPathFinderT.csproj">
+      <Project>{dfbecbac-7fda-4c78-9f4e-cc21c79a6db6}</Project>
+      <Name>MSPathFinderT</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
