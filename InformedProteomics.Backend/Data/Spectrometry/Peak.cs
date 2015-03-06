@@ -13,8 +13,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Intensity = intensity;
         }
 
-        public double Mz { get; private set; }
-        public double Intensity { get; private set; }
+        public double Mz { get; protected set; }
+        public double Intensity { get; protected set; }
 
         public int CompareTo(Peak other)
         {
@@ -224,6 +224,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             return new Tolerance(ppm);
         }
+
+        public int Ppm 
+        {
+            get
+            {
+                var numBits = sizeof(double) * 8 - _numShifts;
+                var ppm = (int)(16 * Math.Pow(2, 27 - numBits));
+                return ppm;
+            } 
+        }
+
 
         private readonly int _numShifts;
     }

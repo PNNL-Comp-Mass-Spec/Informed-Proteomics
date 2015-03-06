@@ -22,7 +22,7 @@ namespace InformedProteomics.Test
             const int maxThreads = 10;
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
-            IMs1FeatureExtract extractor = new ChargeLcScanMatrix(run, minScanCharge, maxScanCharge, maxThreads);
+            IMs1FeatureExtract extractor = new Ms1FeatureMatrix(run, minScanCharge, maxScanCharge, maxThreads);
             var outputFilePath = extractor.GetFeatureFile(specFilePath, minScanMass, maxScanMass);
         }
 

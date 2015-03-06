@@ -3,19 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
-using LibSVMsharp;
-using LibSVMsharp.Helpers;
 
-namespace Mspot
+namespace ProMex
 {
     class Program
     {
@@ -25,7 +17,7 @@ namespace Mspot
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (January 30, 2014)", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (February 19, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 
@@ -40,8 +32,15 @@ namespace Mspot
 
             if (args.Length == 0)
             {
-                PrintUsageInfo();
-                return;
+                //PrintUsageInfo();
+                //return;
+                args = new string[6];
+                args[0] = "-i";
+                args[1] = @"D:\MassSpecFiles\training\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+                args[2] = "-minMass";
+                args[3] = "3500";
+                args[4] = "-maxMass";
+                args[5] = "4500";
             }
 
             if (args.Length % 2 != 0)
@@ -61,7 +60,7 @@ namespace Mspot
                 {"-massCollapse", "n"},
                 {"-score", "n"},
                 {"-csv", "n"},
-                {"-minProbability", "0.1"},
+                {"-minProbability", "0.00"},
                 {"-maxThreads", "0"},
             };
 
@@ -139,17 +138,17 @@ namespace Mspot
 
         public static void ProcessFile(string path)
         {
-            if (path.EndsWith(".raw") || path.EndsWith(".pbf"))
+            if (path.EndsWith(".raw") || path.EndsWith(".pbf") || path.EndsWith(".mzML"))
             {
                 var rawFile = path;
-                var outFile = ChargeLcScanMatrix.GetFeatureFilePath(rawFile);
+                var outFile = Ms1FeatureMatrix.GetFeatureFilePath(rawFile);
 
                 if (File.Exists(outFile)) return;
 
                 var stopwatch = Stopwatch.StartNew();
                 Console.WriteLine("Start loading MS1 data from {0}", rawFile);
-                var run = PbfLcMsRun.GetLcMsRun(rawFile, MassSpecDataType.XCaliburRun, 0, 0.0);
-                var csm = new ChargeLcScanMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
+                var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 0, 0.0);
+                var csm = new Ms1FeatureMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
                 Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
                 var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _massCollapse, _probabilityThreshold, _scoreReport, _csvOutput);
@@ -176,11 +175,11 @@ namespace Mspot
             Console.WriteLine(
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
-                "\t[-minProbability 0.1 (default: 0.1)]\n" +
-                "\t[-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 2)\n" +
-                "\t[-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 60)\n" +
-                "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
-                "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" + 
+                "\t[-minProbability 0.1 (default: 0.00)]\n" +
+                "\t[-minCharge MinCharge] (minimum charge state, default: 2)\n" +
+                "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
+                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 3000.0)\n" +
+                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" + 
                 "\t[-massCollapse n (default: n)]\n" +
                 "\t[-score n (default: n)]\n" +
                 "\t[-maxThreads 0 (default: 0 (no limit))]\n"

@@ -11,6 +11,7 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsMap
     {
+        /*
         public void TestCalculatingNumBins()
         {
             const int numBits = 26;
@@ -30,7 +31,7 @@ namespace InformedProteomics.Test
             const string testRawFilePath = @"\\protoapps\UserData\Sangtae\Yufeng\raw\yufeng_column_test2.raw";
             const double monoIsotopicMass = 12377.46179;
             var run = PbfLcMsRun.GetLcMsRun(testRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var map = new ChargeLcScanMatrix(run);
+            var map = new Ms1FeatureMatrix(run);
             var regions = map.GetProbableChargeScanRegions(monoIsotopicMass);
             var scanNums = map.GetMatchingMs2ScanNums(12377.46179).ToList();
             Console.WriteLine("NumRegions: " + regions.Count());
@@ -60,7 +61,7 @@ namespace InformedProteomics.Test
             var run = InMemoryLcMsRun.GetLcMsRun(testRawFilePath, MassSpecDataType.XCaliburRun, 0, 1.4826);
             Console.WriteLine("Done.");
 
-            var map = new ChargeLcScanMatrix(run, numBits);
+            var map = new Ms1FeatureMatrix(run, numBits);
             var sw = new Stopwatch();
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
@@ -93,5 +94,6 @@ namespace InformedProteomics.Test
             Console.WriteLine("NumScanNums: " + scanNums.Count);
             Console.WriteLine(string.Join("\t", scanNums));
         }
+         */
     }
 }

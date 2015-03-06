@@ -76,6 +76,28 @@ namespace InformedProteomics.Backend.Utils
             return rankingList;
         }
 
+        public static int[] GetRankings(IEnumerable<double> values, out double median, double lowerBoundValue = 0.0d)
+        {
+            var temp = new List<KeyValuePair<double, int>>();
+            var i = 0;
+            foreach (var v in values)
+            {
+                if (v > lowerBoundValue) temp.Add(new KeyValuePair<double, int>(v, i));
+                i++;
+            }
+
+            var ranking = 1;
+            var rankingList = new int[i];
+            var medianRanking = (int)Math.Max(Math.Round(0.5*i), 1);
+            median = 0;
+            foreach (var t in temp.OrderByDescending(x => x.Key))
+            {
+                if (ranking == medianRanking) median = t.Key;
+                rankingList[t.Value] = ranking++;
+            }
+            return rankingList;
+        }
+
         // Kadane's algorithm
         public static int MaxSumSubarray(IList<int> a, out int start, out int len)
         {

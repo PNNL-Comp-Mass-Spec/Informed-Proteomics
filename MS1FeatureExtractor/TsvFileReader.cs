@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Utils;
 
-namespace MS1FeatureExtractor
+namespace ProMex
 {
     public class TsvFileReader
     {

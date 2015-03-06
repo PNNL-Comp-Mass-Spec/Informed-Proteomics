@@ -25,8 +25,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             peaks.CopyTo(Peaks, 0);
             ScanNum = scanNum;
         }
+
+        public Spectrum(int scanNum)
+        {
+            ScanNum = scanNum;
+        }
         
-        public int ScanNum { get; private set; }
+        public int ScanNum { get; protected set; }
 
 		public string NativeId { get; set; }
 
@@ -39,7 +44,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double ElutionTime { get; set; }
 
         // Peaks are assumed to be sorted according to m/z
-        public Peak[] Peaks { get; private set; }
+        public Peak[] Peaks { get; protected set; }
 
         /// <summary>
         /// Finds the maximum intensity peak within the specified range
@@ -465,17 +470,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         for (var i = prevSt; i <= prevEd; i++) intensityValues.Remove(Peaks[i].Intensity);
                     }
                 }
-
-                //var iData = new double[ed - st + 1];
-                //for (var i = st; i <= ed; i++) iData[i - st] = Peaks[i].Intensity;
-                //Array.Sort(iData);
                 
                 var intensityMedian = intensityValues.Median();
-                /*if (iData.Length % 2 == 0)
-                    intensityMedian = iData[(int)(iData.Length * 0.5)];
-                else
-                    intensityMedian = 0.5 * (iData[(int)(iData.Length * 0.5)] + iData[(int)(iData.Length * 0.5) + 1]);*/
-
                 if (peak.Intensity > intensityMedian*signalToNoiseRatio) filteredPeaks.Add(peak);
 
                 prevSt = st;

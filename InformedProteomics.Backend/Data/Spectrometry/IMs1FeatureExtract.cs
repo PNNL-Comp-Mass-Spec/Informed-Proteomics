@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     
     public interface IMs1FeaturePredictor
     {
-        bool Predict(ChargeLcScanCluster cluster);
-        double PredictProbability(ChargeLcScanCluster cluster);
+        bool Predict(Ms1FeatureCluster cluster);
+        double PredictProbability(Ms1FeatureCluster cluster);
     }
 }

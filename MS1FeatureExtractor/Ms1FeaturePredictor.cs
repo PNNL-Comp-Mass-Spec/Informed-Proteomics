@@ -4,8 +4,9 @@ using LibSVMsharp.Extensions;
 using System;
 using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace Mspot
+namespace ProMex
 {
+    /*
     public class Ms1FeatureSvmPredictor : IDisposable, IMs1FeaturePredictor
     {
         public Ms1FeatureSvmPredictor(string svmFilePath)
@@ -156,5 +157,5 @@ namespace Mspot
 
         }
 
-    }
+    }*/
 }

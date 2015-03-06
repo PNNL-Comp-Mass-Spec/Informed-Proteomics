@@ -122,7 +122,7 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     Console.Write("Running ProMex...");
                     sw.Start();
-                    var extractor = new ChargeLcScanMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
+                    var extractor = new Ms1FeatureMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
                     ms1FtFilePath = extractor.GetFeatureFile(SpecFilePath, MinSequenceMass, MaxSequenceMass);
                 }
                 sw.Reset();
@@ -150,7 +150,7 @@ namespace InformedProteomics.TopDown.Execution
                     Console.Write("Reading MS-Align+ results...");
                     ms1Filter = new MsDeconvFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
-                else ms1Filter = new ChargeLcScanMatrix(_run);
+                else ms1Filter = null; //new Ms1FeatureMatrix(_run);
             }
 
             sw.Stop();
