@@ -28,6 +28,7 @@ namespace InformedProteomics.Backend.Data.Biology
             {
                 new Atom("H", H, 1, "Hydrogen"),
                 new Atom("2H", 2.014101779, 2, "Deuterium"),
+                new Atom("D", 2.014101779, 2, "Deuterium"),
                 new Atom("Li", 7.016003, 7, "Lithium"),
                 new Atom("C", C, 12, "Carbon"),
                 new Atom("13C", Constants.C13, 13, "Carbon13"),
