@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 
@@ -11,6 +12,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     {
         public const byte EnvelopeCorrelation = 0;
         public const byte EnvelopeCorrelationSummed = 1;
+        //public const byte EnvelopeCorrelationSummedOverCharges = 2;
+        //public const byte EnvelopeCorrelationSummedOverTimes = 3;
+
         public const byte RankSum = 2;
         public const byte Poisson = 3;
 
@@ -29,15 +33,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class Ms1FeatureCluster : Ms1Feature
     {
         public IsotopeList IsotopeList { get; private set; }
-        //public double ClusteringScore { get; internal set; }
-        //public double ClusteringScore2 { get; internal set; }
         public double Probability { get; private set; }
 
         public override int MinScanNum
         {
             get
             {
-                if ((ScanLength < 11) && MinCol - 1 >= 0) return _ms1ScanNums[MinCol - 1];
+                if (HasMs2Spectra && NormalizedElutionLength < 0.01)
+                {
+                    for (var i = MinCol-1; i >= 0; i--)
+                    {
+                        if (_ms1ScanNums[MinCol] - _ms1ScanNums[i] > (MinCol - i)) return _ms1ScanNums[i];
+                    }
+                }
+                //if ((ScanLength < 11) && MinCol - 1 >= 0) return _ms1ScanNums[MinCol - 1];
                 return _ms1ScanNums[MinCol];
             }
         }
@@ -46,20 +55,31 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             get
             {
-                if ((ScanLength < 11) && MaxCol + 1 < _ms1ScanNums.Length) return _ms1ScanNums[MaxCol + 1];
+                if (HasMs2Spectra && NormalizedElutionLength < 0.01)
+                {
+                    for (var i = MaxCol + 1; i < _ms1ScanNums.Length; i++)
+                    {
+                        if (_ms1ScanNums[i] - _ms1ScanNums[MaxCol] > (i - MaxCol)) return _ms1ScanNums[i];
+                    }
+                }
+                //if ((ScanLength < 11) && MaxCol + 1 < _ms1ScanNums.Length) return _ms1ScanNums[MaxCol + 1];
                 return _ms1ScanNums[MaxCol];
             }
         }
 
         public override int MinCharge { get { return _minCharge + MinRow; } }
         public override int MaxCharge { get { return _minCharge + MaxRow; } }
-
         public int ScanLength { get { return MaxCol - MinCol + 1; } }
         public int ChargeLength { get { return MaxRow - MinRow + 1; } }
-
         public int GoodEnvelopeCount { get; internal set; }
-
-        public double Abundance { get { return SummedEnvelope.Sum(); } }
+        public double Abundance 
+        {
+            get
+            {
+                //return SummedEnvelope.Sum();
+                return (from envelope in Envelopes from p in envelope.Peaks where p != null && p.Active select p.Intensity).Sum();
+            }
+        }
         public double GetScore(byte scoreType) { return _scores[scoreType]; }
         public double[] SummedEnvelope { get; private set; }
         public double NormalizedElutionLength { get; internal set; }
@@ -106,6 +126,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "ObservedEnvelopes", "ScanLength",
             "BestCorr", "SummedCorr", 
+            //"SummedCorrOverCharges", "SummedCorrOverTimes", 
             "RanksumScore", "PoissonScore",
             "BcDist", "SummedBcDist", 
             "SummedBcDistOverCharges", "SummedBcDistOverTimes", 
@@ -152,7 +173,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 sb.AppendFormat("\t{0:0.00000}", GetScore(Ms1FeatureScore.EnvelopeCorrelation));
                 sb.AppendFormat("\t{0:0.00000}", GetScore(Ms1FeatureScore.EnvelopeCorrelationSummed));
-                sb.AppendFormat("\t{0:0.00000}", GetScore(Ms1FeatureScore.MzError));
+                sb.AppendFormat("\t{0:0.00000}", GetScore(Ms1FeatureScore.TotalMzError));
                 sb.AppendFormat("\t{0:0.00000}", GetScore(Ms1FeatureScore.XicCorrMean));
             }
 
@@ -178,8 +199,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         internal int MinCol { get; private set; }
         internal int MaxRow { get; private set; }
         internal int MinRow { get; private set; }
-        //internal readonly HashSet<Ms1FeatureCluster> OverlappedFeatures;
 
+        internal static bool HasMs2Spectra;
+        
         internal HashSet<Ms1FeatureCluster> OverlappedFeatures
         {
             // definition
@@ -207,7 +229,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly int _minCharge;
         private static readonly double LogP1 = -Math.Log(0.01, 2);
         private static readonly double LogP2 = -Math.Log(0.02, 2);
-        private static readonly double LogP5 = -Math.Log(0.05, 2);
+        private static readonly double LogP01 = -Math.Log(0.001, 2);
 
         internal Ms1FeatureCluster(int minCharge, int[] ms1ScanNums, IsotopeList isoList)
         {
@@ -218,8 +240,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Envelopes = new List<ObservedEnvelope>();
             
             ClusteringEnvelope = new double[IsotopeList.Count];
-            //ClusteringScore = 0;
-            //ClusteringScore2 = 0; 
             _scores = new double[Ms1FeatureScore.Count];
             
             MaxCol = 0;
@@ -231,9 +251,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Flag = 0;
         }
 
-        internal void UpdateScores(bool firstTime = false)
+        internal void UpdateScores(IList<Ms1Spectrum> spectra, double seedMass = -1.0d, bool firstTime = false)
         {
             if (Envelopes.Count < 1) return;
+            if (seedMass > 0) RepresentativeMass = seedMass;
 
             var bestEnvelopeCorrelation = 0.0d;
             var bestBhattacharyyaDistance = 1.0d;
@@ -256,20 +277,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             for (var e = 0; e < Envelopes.Count; e++)
             {
                 var envelope = Envelopes[e];
-                var mostAbuPeak = envelope.Peaks[IsotopeList.SortedIndexByIntensity[0]];
+                /*var mostAbuPeak = envelope.Peaks[IsotopeList.SortedIndexByIntensity[0]];
                 if (!mostAbuPeak.Active)
                 {
                     memberCorr[e] = 0d;
                     memberBc[e] = 1.0d;
                     continue;
                 }
-
                 var spectrum = mostAbuPeak.Spectrum;
-                var statSigTestResult = spectrum.TestStatisticalSignificance(IsotopeList, envelope.Peaks);
+                */
+                var spectrum = spectra[envelope.Col];
+                var statSigTestResult = spectrum.TestStatisticalSignificance(IsotopeList, envelope);
                 var envCorr = envelope.GetPearsonCorrelation(IsotopeList.Envelope);
                 var bcDistance = envelope.GetBhattacharyyaDistance(IsotopeList.EnvelopePdf);
 
-                if (bcDistance < repEnvelope2Bc)
+                if (statSigTestResult != null && bcDistance < repEnvelope2Bc)
                 {
                     repEnvelope2Bc = bcDistance;
                     repEnvelope2 = envelope;
@@ -282,14 +304,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     envelopePerCharge[envelope.Row - MinRow][i] += envelope.Peaks[i].Intensity;
                 }
 
-                if (envCorr > 0.6 && bcDistance < 0.3 && statSigTestResult.PoissonScore > LogP2 && statSigTestResult.RankSumScore > LogP2)
+                double envTh;
+                if (RepresentativeMass > 25000) envTh = 0.4;
+                else if (RepresentativeMass > 15000) envTh = 0.5;
+                else envTh = 0.6;
+
+                if (envCorr > envTh && bcDistance < 0.3 && statSigTestResult.PoissonScore > LogP2 && statSigTestResult.RankSumScore > LogP2)
                 {
                     GoodEnvelopeCount++;
-                    if (firstTime) envelope.GoodEnough = true;
+                    if (firstTime && envCorr > 0.6 && bcDistance < 0.3) envelope.GoodEnough = true;
                     
                     if (bestPoissonScore < statSigTestResult.PoissonScore) bestPoissonScore = statSigTestResult.PoissonScore;
                     if (bestRankSumScore < statSigTestResult.RankSumScore) bestRankSumScore = statSigTestResult.RankSumScore;
-
                     if (bestEnvelopeCorrelation < envCorr) bestEnvelopeCorrelation = envCorr;
                     if (bcDistance < bestBhattacharyyaDistance)
                     {
@@ -297,9 +323,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         repEnvelope = envelope;
                     }
                 }
-
+              
                 memberCorr[e] = envCorr;
                 memberBc[e] = bcDistance;
+                //var mostAbuInternalIndex = IsotopeList.SortedIndexByIntensity[0];
+                //var repPeak = envelope.Peaks[mostAbuInternalIndex];
+                //var mass = Ion.GetMonoIsotopicMass(repPeak.Mz, _minCharge + envelope.Row, IsotopeList[mostAbuInternalIndex].Index);
+                //Console.Write(mass); Console.Write("\t");
+                /*Console.Write(_ms1ScanNums[envelope.Col]); Console.Write("\t");
+                Console.Write(envCorr);Console.Write("\t");
+                Console.Write(bcDistance); Console.Write("\t");
+                Console.Write(statSigTestResult == null ? 0 : statSigTestResult.PoissonScore); Console.Write("\t");
+                Console.Write(statSigTestResult == null ? 0 : statSigTestResult.RankSumScore); Console.Write("\n");*/
             }
 
             if (RepresentativeCharge < 1)
@@ -307,32 +342,42 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (repEnvelope == null) repEnvelope = repEnvelope2;
                 if (repEnvelope == null) throw new Exception("Cannot find representative envelope");
 
-                var mostAbuInternalIndex = IsotopeList.SortedIndexByIntensity[0];
-                var repPeak = repEnvelope.Peaks[mostAbuInternalIndex];
+                //var mostAbuInternalIndex = IsotopeList.SortedIndexByIntensity[0];
+                //var repPeak = repEnvelope.Peaks[mostAbuInternalIndex];
+                var repPeak = repEnvelope.Peaks[repEnvelope.RefIsotopeInternalIndex];
                 RepresentativeCharge = _minCharge + repEnvelope.Row;
-                RepresentativeMass = Ion.GetMonoIsotopicMass(repPeak.Mz, RepresentativeCharge, IsotopeList[mostAbuInternalIndex].Index);
+                RepresentativeMass = Ion.GetMonoIsotopicMass(repPeak.Mz, RepresentativeCharge, IsotopeList[repEnvelope.RefIsotopeInternalIndex].Index);
                 RepresentativeMz = repPeak.Mz;
                 RepresentativeScanNum = _ms1ScanNums[repEnvelope.Col];
             }
             
             var bestBcPerTime = 10d;
+            //var bestCorrPerTime = 0d;
             for (var col = MinCol; col <= MaxCol; col++)
             {
                 var bc = IsotopeList.GetBhattacharyyaDistance(envelopePerTime[col - MinCol]);
                 if (bc < bestBcPerTime) bestBcPerTime = bc;
+                //var corr = IsotopeList.GetPearsonCorrelation(envelopePerTime[col - MinCol]);
+                //if (corr > bestCorrPerTime) bestCorrPerTime = corr;
             }
             var bestBcPerCharge = 10d;
+            //var bestCorrPerCharge = 0d;
             for (var row = MinRow; row <= MaxRow; row++)
             {
                 var bc = IsotopeList.GetBhattacharyyaDistance(envelopePerCharge[row - MinRow]);
                 if (bc < bestBcPerCharge) bestBcPerCharge = bc;
+                //var corr = IsotopeList.GetPearsonCorrelation(envelopePerCharge[row - MinRow]);
+                //if (corr > bestCorrPerCharge) bestCorrPerCharge = corr;
             }
 
             var bestMzErrorPpm = 10d;
             var totalMzErrorPpm = 0d;
             var totalMzPairCount = 0;
-            foreach (var envelope in Envelopes.Where(e => e.GoodEnough))
+            //foreach (var envelope in Envelopes)
+            for (var i = 0; i < Envelopes.Count; i++)
             {
+                if (memberBc[i] > 0.3 && memberCorr[i] > 0.6) continue;
+                var envelope = Envelopes[i];
                 var mzErrorPpm = 0d;
                 var n = 0;
                 var charge = _minCharge + envelope.Row;
@@ -352,11 +397,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             
             SetScore(Ms1FeatureScore.TotalMzError, totalMzErrorPpm/totalMzPairCount);
             SetScore(Ms1FeatureScore.EnvelopeCorrelation, bestEnvelopeCorrelation);
+            //SetScore(Ms1FeatureScore.EnvelopeCorrelationSummedOverCharges, bestCorrPerCharge);
+            //SetScore(Ms1FeatureScore.EnvelopeCorrelationSummedOverTimes, bestCorrPerTime);
+
             SetScore(Ms1FeatureScore.RankSum, bestRankSumScore);
             SetScore(Ms1FeatureScore.Poisson, bestPoissonScore);
             SetScore(Ms1FeatureScore.BhattacharyyaDistance, bestBhattacharyyaDistance);
-            SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges, bestBcPerTime);
-            SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverTimes, bestBcPerCharge);
+            SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges, bestBcPerCharge);
+            SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverTimes, bestBcPerTime);
             SetScore(Ms1FeatureScore.MzError, bestMzErrorPpm);
             SetSummedEnvelope(memberCorr, memberBc);
           
@@ -440,7 +488,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 Array.Copy(tempEnvelop, SummedEnvelope, tempEnvelop.Length);
             }
             SetScore(Ms1FeatureScore.EnvelopeCorrelationSummed, summedCorr);
-            
         }
 
         internal bool GoodEnough
@@ -452,17 +499,39 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 // basic filtering conditions
                 if (GetScore(Ms1FeatureScore.RankSum) < LogP2) return false;
                 if (GetScore(Ms1FeatureScore.Poisson) < LogP2) return false;
-                if (GetScore(Ms1FeatureScore.EnvelopeCorrelation) < 0.6) return false;
-                if (GetScore(Ms1FeatureScore.EnvelopeCorrelationSummed) < 0.7) return false;
-                if (GetScore(Ms1FeatureScore.BhattacharyyaDistance) > 0.3) return false;
-                if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummed) > 0.1) return false;
-                if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges) > 0.12) return false;
-                if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverTimes) > 0.12) return false;
-                if (GetScore(Ms1FeatureScore.XicCorrMean) > 0.3) return false;
-                if (GetScore(Ms1FeatureScore.XicCorrMin) > 0.2) return false;
-                if (GetScore(Ms1FeatureScore.MzError) > 4) return false;
-                if (GetScore(Ms1FeatureScore.TotalMzError) > 5) return false;
-                
+
+                if (RepresentativeMass < 15000)
+                {
+                    if (GetScore(Ms1FeatureScore.EnvelopeCorrelation) < 0.6) return false;
+                    //if (GetScore(Ms1FeatureScore.EnvelopeCorrelationSummed) < 0.8) return false;
+                    if (GetScore(Ms1FeatureScore.EnvelopeCorrelationSummed) < 0.85) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistance) > 0.25) return false;
+                    //if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummed) > 0.06) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummed) > 0.02) return false;
+                    //if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges) > 0.1) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges) > 0.08) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverTimes) > 0.1) return false;
+                    if (GetScore(Ms1FeatureScore.XicCorrMean) > 0.4) return false;
+                    if (GetScore(Ms1FeatureScore.XicCorrMin) > 0.2) return false;
+                    if (GetScore(Ms1FeatureScore.MzError) > 3) return false;
+                    if (GetScore(Ms1FeatureScore.TotalMzError) > 5.5) return false;                
+
+                }
+                else
+                {
+                    if (GetScore(Ms1FeatureScore.EnvelopeCorrelationSummed) < 0.9) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistance) > 0.25) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummed) > 0.02) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverCharges) > 0.06) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverTimes) > 0.06) return false;
+                    if (GetScore(Ms1FeatureScore.XicCorrMean) > 0.3) return false;
+                    if (GetScore(Ms1FeatureScore.XicCorrMin) > 0.1) return false;
+                    if (GetScore(Ms1FeatureScore.MzError) > 3) return false;
+                    if (GetScore(Ms1FeatureScore.TotalMzError) > 5) return false;                
+                }
+
+                //if (GetScore(Ms1FeatureScore.MzError) > 2.5) return false;
+                //if (GetScore(Ms1FeatureScore.TotalMzError) > 5) return false;                
                 /** further considerations: 
                   * short features must have a strong evidence
                   * high charge molecules should have high "summed" scores
@@ -475,19 +544,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private static readonly double[] LogisticRegressionBetaVector = new double[]
         {
-            -6.32017825981311,
-            1.81729164993594,
-            0.666260087669721,
-            0.0300213257125810,
-            0.0351494822314954,
-            3.44370112481914,
-            32.6628108691280,
-            -28.9890069475280,
-            -71.9737221672874,
-            -1.10305154889920,
-            3.73686326096962,
-            0.122237630801168,
-            0.496631413971031              
+            -8.52042312495273,
+            0.237435456731829,
+            4.76922550884920,
+            0.0212744645901429,
+            0.0351984907187377,
+            -3.47853119696852,
+            66.3708381353204,
+            -84.4218790598161,
+            -40.3630741260841,
+            -2.12695121580512,
+            2.18539266537223,
+            0.277896712109527,
+            0.379116560394854
         };
         
         internal double GetProbabilityByLogisticRegression()
@@ -504,37 +573,29 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
     class ObservedEnvelope
     {
-        internal ObservedEnvelope(int row, int col, Ms1Peak[] peaks, int nIsotopes)
+        internal ObservedEnvelope(int row, int col, Ms1Peak[] peaks, IsotopeList isotopeList)
         {
             Row = row;
             Col = col;
-            Peaks = new Ms1Peak[nIsotopes];
-            Array.Copy(peaks, Peaks, nIsotopes);
+            Peaks = new Ms1Peak[isotopeList.Count];
+            Array.Copy(peaks, Peaks, isotopeList.Count);
             GoodEnough = false;
 
-            for (var i = 0; i < Peaks.Length; i++)
+            foreach(var i in isotopeList.SortedIndexByIntensity)
             {
                 if (Peaks[i] != null && Peaks[i].Active)
                 {
-                    MinMzPeak = Peaks[i];
-                    break;
-                }
-            }
-            for (var i = nIsotopes - 1; i >= 0; i--)
-            {
-                if (Peaks[i] != null && Peaks[i].Active)
-                {
-                    MaxMzPeak = Peaks[i];
-                    break;
+                    RefIsotopeInternalIndex = i;
+                    break;                    
                 }
             }
         }
-
 
         internal int Row { get; private set; }
         internal int Col { get; private set; }
         internal Ms1Peak[] Peaks { get; private set; }
         internal bool GoodEnough { get; set; }
+        internal byte RefIsotopeInternalIndex { get; private set; }
 
         internal int NumberOfPeaks
         {
@@ -562,18 +623,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         internal double GetBhattacharyyaDistance(double[] theoreticalEnvelope)
         {
             return Peaks.GetBhattacharyyaDistance(theoreticalEnvelope);
-        }
-        
-        internal Ms1Peak MinMzPeak { get; private set; }
-        internal Ms1Peak MaxMzPeak { get; private set; }
-
-        internal bool Overlap(ObservedEnvelope other)
-        {
-            if (Col != other.Col) return false;
-            if (MinMzPeak.Mz > other.MaxMzPeak.Mz) return false;
-            if (MaxMzPeak.Mz < other.MinMzPeak.Mz) return false;
-            
-            return true;
         }
     }
 }

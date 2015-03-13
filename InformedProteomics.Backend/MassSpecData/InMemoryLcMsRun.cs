@@ -159,6 +159,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
+        public override Ms1Spectrum GetMs1Spectrum(int scanNum)
+        {
+            //throw new NotImplementedException();
+            var spec = GetSpectrum(scanNum);
+            var ms1ScanNums = GetMs1ScanVector();
+            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
+            if (ms1ScanIndex < 0) return null;
+            return new Ms1Spectrum(scanNum, ms1ScanIndex, spec.Peaks);
+        }
+
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             var spec = GetSpectrum(scanNum);

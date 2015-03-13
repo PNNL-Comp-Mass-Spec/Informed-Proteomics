@@ -26,8 +26,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 InMemoryLcMsRun run;
                 if (dataType == MassSpecDataType.XCaliburRun)
                 {
-                    run = new InMemoryLcMsRun(new XCaliburReader(specFilePath),
-                        0, 0);
+                    run = new InMemoryLcMsRun(new XCaliburReader(specFilePath), 0, 0);
                 }
 	            else if (dataType == MassSpecDataType.MzMLFile)
 	            {
@@ -297,6 +296,47 @@ namespace InformedProteomics.Backend.MassSpecData
         public static int GetMzBinIndex(double mz)
         {
             return (int) (mz / MzBinSize);
+        }
+
+        public override Ms1Spectrum GetMs1Spectrum(int scanNum)
+        {
+            long offset;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
+
+            var ms1ScanNums = GetMs1ScanVector();
+            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
+            if (ms1ScanIndex < 0) return null;
+
+            lock (_fileLock)
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var ms1ScanNum  = _reader.ReadInt32();
+                    var msLevel     = _reader.ReadByte();
+                    var elutionTime = _reader.ReadDouble();
+                    var numPeaks    = _reader.ReadInt32();
+
+                    // load peaks
+                    var peaks = new Ms1Peak[numPeaks];
+                    for (var i = 0; i < numPeaks; i++)
+                    {
+                        var mz = _reader.ReadDouble();
+                        var intensity = _reader.ReadSingle();
+                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = ms1ScanIndex };
+                    }
+
+                    // Create Ms1Spectrum
+                    var ms1Spec = new Ms1Spectrum(scanNum, ms1ScanIndex, peaks)
+                    {
+                        ElutionTime = elutionTime,
+                        MsLevel = msLevel
+                    };
+                    
+                    return ms1Spec;
+                }
+                return null;
+            }
         }
 
         private Spectrum ReadSpectrum(long offset)
