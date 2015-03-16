@@ -252,6 +252,55 @@ namespace InformedProteomics.Test.FunctionalTests
                 if (curScoreAndModifications != null) Console.WriteLine("Score: {0}, Modifications: {1}", curScoreAndModifications.Item1, curScoreAndModifications.Item2);
             }
         }
+
+        [Test]
+        public void TestCreatingHistoneGraph()
+        {
+            const int numMaxModsPerProtein = 11;
+
+            // Histone H4
+            const string annotation =
+                "_.MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG._";
+
+            // Histone H3.1
+//            const string annotation =
+//                "_.MARTKQTARKSTGGKAPRKQLATKAARKSAPATGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQRLVREIAQDFKTDLRFQSSAVMALQEACEAYLVGLFEDTNLCAIHAKRVTIMPKDIQLARRIRGERA._";
+
+            var acetylR = new SearchModification(Modification.Acetylation, 'R', SequenceLocation.Everywhere, false);
+            var acetylK = new SearchModification(Modification.Acetylation, 'K', SequenceLocation.Everywhere, false);
+            var methylR = new SearchModification(Modification.Methylation, 'R', SequenceLocation.Everywhere, false);
+            var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
+            var diMethylR = new SearchModification(Modification.DiMethylation, 'R', SequenceLocation.Everywhere, false);
+            var diMethylK = new SearchModification(Modification.DiMethylation, 'K', SequenceLocation.Everywhere, false);
+            var triMethylR = new SearchModification(Modification.TriMethylation, 'R', SequenceLocation.Everywhere, false);
+            var phosphoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
+            var phosphoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
+            var phosphoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                acetylR,
+                acetylK,
+                methylR,
+                methylK,
+                diMethylR,
+                diMethylK,
+                triMethylR,
+                phosphoS,
+                phosphoT,
+                phosphoY
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            var graph = SequenceGraph.CreateGraph(aaSet, annotation);
+
+            var numFragCompositions = graph.GetNumFragmentCompositions();
+            var numProteoforms = graph.GetNumProteoforms();
+            var numSeqCompositions = graph.GetNumSequenceCompositions();
+
+            Console.WriteLine("NumFragmentCompositions: " + numFragCompositions);
+            Console.WriteLine("NumProteoforms: " + numProteoforms);
+            Console.WriteLine("NumSequenceCompositions: " + numSeqCompositions);
+        }
     }
 
 

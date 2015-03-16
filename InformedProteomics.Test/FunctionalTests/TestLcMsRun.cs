@@ -246,5 +246,13 @@ namespace InformedProteomics.Test.FunctionalTests
 
             Console.Write("Done");
         }
+
+        [Test]
+        public void TestReadingSingleSpecMzMlFile()
+        {
+            const string filePath = @"D:\Research\Data\TRex\VNVADCGAEALAR.mzML";
+            var run = PbfLcMsRun.GetLcMsRun(filePath, MassSpecDataType.MzMLFile);
+            Console.WriteLine(run.MaxLcScan);
+        }
     }
 }

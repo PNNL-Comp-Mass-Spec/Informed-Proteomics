@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -289,8 +290,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Precursor ion chromatograms
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
-            var minMzIndex = PbfLcMsRun.GetMzBinIndex(Ms1PeakList[0].Mz);
-            var maxMzIndex = PbfLcMsRun.GetMzBinIndex(Ms1PeakList[Ms1PeakList.Count - 1].Mz);
+
+            var minMzIndex = Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(Ms1PeakList[0].Mz) : 0;
+            var maxMzIndex = Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(Ms1PeakList[Ms1PeakList.Count - 1].Mz) : -1;
 
             var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
@@ -306,7 +308,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 writer.Write(peak.Mz);
                 writer.Write((float)peak.Intensity);
                 writer.Write(peak.ScanNum);
-            }
+            }                
 
             // Product ion chromatograms
             var ms2PeakList = new List<LcMsPeak>();
@@ -345,6 +347,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 writer.Write(scanNumToSpecOffset[scanNum - MinLcScan]);
             }
+
             // Precursor chromatogram index
             writer.Write(minMzIndex);   // min index
             writer.Write(maxMzIndex);

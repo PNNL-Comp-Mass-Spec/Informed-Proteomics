@@ -130,9 +130,9 @@ namespace InformedProteomics.Backend.Data.Biology
         }
 
         public override int GetHashCode() {
-            int result = 29;
-            result = result * 13 + (this.Name == null ? 0 : this.Name.GetHashCode());
-            result = result * 13 + (this.Code == null ? 0 : this.Code.GetHashCode());
+            var result = 29;
+            result = result * 13 + (Name == null ? 0 : Name.GetHashCode());
+            result = result * 13 + (Code == null ? 0 : Code.GetHashCode());
             return result;
         }
     }
