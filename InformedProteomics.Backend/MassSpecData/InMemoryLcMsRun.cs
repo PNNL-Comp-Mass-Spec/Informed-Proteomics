@@ -28,7 +28,7 @@ namespace InformedProteomics.Backend.MassSpecData
 				}
 				else if (dataType == MassSpecDataType.MzMLFile)
 				{
-					run = new InMemoryLcMsRun(new MzMLReader(specFilePath), 0, 0);
+					run = new InMemoryLcMsRun(new MzMLReader(specFilePath, true), 0, 0);
 				}
                 else run = null;
                 if (run == null) throw new Exception("Unsupported raw file format!");
