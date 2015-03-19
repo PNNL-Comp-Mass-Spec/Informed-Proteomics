@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return new InMemoryLcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
-        public InMemoryLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
+        public InMemoryLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, bool ms1Only = false)
         {
             ScanNumElutionTimeMap = new Dictionary<int, double>();
             ScanNumToMsLevel = new Dictionary<int, int>();
@@ -80,7 +80,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     _scanNumSpecMap.Add(spec.ScanNum, spec);
                 }
-                else if(spec.MsLevel == 2)
+                else if (spec.MsLevel == 2 && !ms1Only)
                 {
                     var productSpec = spec as ProductSpectrum;
 
@@ -167,7 +167,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var ms1ScanNums = GetMs1ScanVector();
             var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
             if (ms1ScanIndex < 0) return null;
-            return new Ms1Spectrum(scanNum, ms1ScanIndex, spec.Peaks);
+            return new Ms1Spectrum(scanNum, (ushort) ms1ScanIndex, spec.Peaks);
         }
 
         public override IsolationWindow GetIsolationWindow(int scanNum)

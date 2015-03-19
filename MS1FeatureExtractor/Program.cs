@@ -17,7 +17,7 @@ namespace ProMex
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (March 9, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (March 18, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 
@@ -29,21 +29,22 @@ namespace ProMex
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
-            /*
+            
             if (args.Length == 0)
             {
                 //PrintUsageInfo();
                 //return;
-                args = new string[6];
+                args = new string[8];
                 args[0] = "-i";
-                //args[1] = @"D:\MassSpecFiles\training\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-                args[1] = @"D:\MassSpecFiles\test\QC_Shew_Intact_3_25Oct14_Bane_C2-14-08-02RZ.pbf";
+                args[1] = @"D:\MassSpecFiles\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
                 args[2] = "-minMass";
-                args[3] = "7377";
+                args[3] = "3000";
                 args[4] = "-maxMass";
-                args[5] = "7379";
+                args[5] = "50000";
+                args[6] = "-score";
+                args[7] = "y";
             }
-            */
+            
 
             if (args.Length == 0)
             {
@@ -151,8 +152,7 @@ namespace ProMex
 
                 var stopwatch = Stopwatch.StartNew();
                 Console.WriteLine("Start loading MS1 data from {0}", rawFile);
-                var run = PbfLcMsRun.GetLcMsRun(rawFile,
-                    path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 0, 0.0);
+                var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
                 var csm = new Ms1FeatureMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
                 Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                     (stopwatch.ElapsedMilliseconds)/1000.0d);

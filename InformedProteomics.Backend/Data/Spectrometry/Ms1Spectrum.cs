@@ -15,11 +15,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             IndexInSpectrum = indexInSpec;
             Active = true;
-            _minorIsotopeFeatures = new List<Ms1FeatureCluster>();
-            _majorIsotopeFeatures = new List<Ms1FeatureCluster>();
         }
         
-        public Ms1Peak(double mz, double intensity) : base(mz, intensity) { }
         public int IndexInSpectrum { get; private set; }
         public bool Active { get; private set; }
 
@@ -30,27 +27,30 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         public void TagMajorPeakOf(Ms1FeatureCluster feature)
         {
+            if (_majorIsotopeFeatures == null) _majorIsotopeFeatures = new List<Ms1FeatureCluster>();
             _majorIsotopeFeatures.Add(feature);
         }
         public void TagMinorPeakOf(Ms1FeatureCluster feature)
         {
+            if (_minorIsotopeFeatures == null) _minorIsotopeFeatures = new List<Ms1FeatureCluster>();
             _minorIsotopeFeatures.Add(feature);
         }
 
         public IEnumerable<Ms1FeatureCluster> GetTaggedAllFeatures()
         {
-            foreach (var f in _minorIsotopeFeatures) yield return f;
-            foreach (var f in _majorIsotopeFeatures) yield return f;
+            if (_minorIsotopeFeatures != null) foreach (var f in _minorIsotopeFeatures) yield return f;
+            if (_majorIsotopeFeatures != null) foreach (var f in _majorIsotopeFeatures) yield return f;
         }
         public IEnumerable<Ms1FeatureCluster> GetTaggedMajorFeatures()
         {
-            return _majorIsotopeFeatures;
+            if (_majorIsotopeFeatures != null) foreach (var f in _majorIsotopeFeatures) yield return f;
+            //return _majorIsotopeFeatures;
         }
         
-        internal int Ms1SpecIndex { get; set; }
+        internal ushort Ms1SpecIndex { get; set; }
 
-        private readonly List<Ms1FeatureCluster> _minorIsotopeFeatures;
-        private readonly List<Ms1FeatureCluster> _majorIsotopeFeatures;
+        private List<Ms1FeatureCluster> _minorIsotopeFeatures;
+        private List<Ms1FeatureCluster> _majorIsotopeFeatures;
     }
    
     public class Ms1Spectrum : Spectrum
@@ -60,7 +60,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double MaxMz { get { return Peaks[Peaks.Length - 1].Mz; } }
         public static readonly double RelativeSignificantIntesnityThreshold = 0.7d;
         public static readonly double RelativeIntesnityThresholdForRankSum = 0.1d;
-        //private static readonly MzComparerWithBinning _mzBin = new MzComparerWithBinning(28);
 
         public Ms1Spectrum(int scanNum, int index, Ms1Peak[] peaks)
             : base(scanNum)
@@ -69,10 +68,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = peaks;
             MedianIntensity = Peaks.Select(p => p.Intensity).Median();
             _peakRanker = new PeakRanker(Peaks);
-            //MsLevel = 1;
         }
         
-        public Ms1Spectrum(int scanNum, int index, Peak[] peaks, bool shuffle = false): base(scanNum)
+        public Ms1Spectrum(int scanNum, ushort index, Peak[] peaks, bool shuffle = false): base(scanNum)
         {
             Index = index;
             MsLevel = 1;
@@ -100,6 +98,48 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _peakRanker = new PeakRanker(Peaks, 19);    
         }
 
+        public bool CorrectChargeState(ObservedEnvelope envelope, int minScanCharge)
+        {
+            var checkCharge = envelope.Row + minScanCharge;
+            if (checkCharge > 20) return true; //high charge (> +20), just pass
+
+            var peakStartIndex = envelope.MinMzPeak.IndexInSpectrum;
+            var peakEndIndex = envelope.MaxMzPeak.IndexInSpectrum;
+            var nPeaks = peakEndIndex - peakStartIndex + 1;
+            
+            if (nPeaks < 10) return false;
+            if (envelope.NumberOfPeaks > nPeaks*0.7) return true;
+
+            var tolerance = new Tolerance(5);
+            var threshold = nPeaks*0.5;
+            var mzTol = tolerance.GetToleranceAsTh(Peaks[peakStartIndex].Mz);
+
+            var minCheckCharge = Math.Max(checkCharge * 2 - 1, 4);
+            var maxCheckCharge = Math.Min(checkCharge * 5 + 1, 60);
+            var maxDeltaMz = Constants.C13MinusC12 / minCheckCharge + mzTol;
+            var nChargeGaps = new int[maxCheckCharge - minCheckCharge + 1];
+
+            for (var i = peakStartIndex; i <= peakEndIndex; i++)
+            {
+                for (var j = i + 1; j <= peakEndIndex; j++)
+                {
+                    var deltaMz = Peaks[j].Mz - Peaks[i].Mz;
+
+                    if (deltaMz > maxDeltaMz) break;
+                    for (var c = Math.Round(1 / (deltaMz + mzTol)); c <= Math.Round(1 / (deltaMz - mzTol)); c++)
+                    {
+                        if (c < minCheckCharge || c > maxCheckCharge) continue;
+                        var k = (int) c - minCheckCharge;
+                        nChargeGaps[k]++;
+
+                        if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > 1.25*envelope.NumberOfPeaks) return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public Ms1Peak[] GetAllIsotopePeaks(double monoIsotopeMass, int charge, IsotopeList isotopeList, Tolerance tolerance)
         {
             var observedPeaks = new Ms1Peak[isotopeList.Count];
@@ -108,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
 
-            var index = Array.BinarySearch(Peaks, new Ms1Peak(minMz, 0));
+            var index = Array.BinarySearch(Peaks, new Ms1Peak(minMz, 0, 0));
             if (index < 0) index = ~index;
 
             var bestPeakIndex = -1;
@@ -129,7 +169,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var peakIndex = (bestPeakIndex >= 0) ? bestPeakIndex + 1 : index;
             // go up
-            //for (var isotopeIndex = 1; isotopeIndex < isotopeList.Count; isotopeIndex++)
             for (var j = 1; j < isotopeList.Count; j++)
             {
                 var isotopeIndex = isotopeList[j].Index;
@@ -160,16 +199,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return observedPeaks;            
         }
 
-        internal StatSigTestResult TestStatisticalSignificance(IsotopeList isotopeList, ObservedEnvelope envelope)
+        public StatSigTestResult TestStatisticalSignificance(IsotopeList isotopeList, ObservedEnvelope envelope)
         {
             int peakStartIndex;
             Tuple<double, double> mzBoundary;
-            
             //var mostAbuPeak = isotopePeaks[isotopeList.SortedIndexByIntensity[0]];
             //if (mostAbuPeak == null) return null;
             var refPeak = envelope.Peaks[envelope.RefIsotopeInternalIndex];
             var rankings = _peakRanker.GetLocalRankings(refPeak.Mz, out peakStartIndex, out mzBoundary);
-
             // smallest delta_mz = 0.01 (th) ?
             var ret = new StatSigTestResult
             {
@@ -177,7 +214,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 LocalMzEnd = mzBoundary.Item2,
                 NumberOfLocalPeaks = rankings.Length,
                 NumberOfPossiblePeaks = (int)Math.Ceiling(100 * (mzBoundary.Item2 - mzBoundary.Item1)),
-                //NumberOfPossiblePeaks = _mzBin.GetBinNumber(mzBoundary.Item2) - _mzBin.GetBinNumber(mzBoundary.Item1) + 1,
                 NumberOfIsotopePeaks = isotopeList.Count
             };
 
@@ -338,16 +374,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int NumberOfIsotopePeaks { get; internal set; } // k
         public int NumberOfLocalPeaks { get; internal set; } // n1
         public int NumberOfMatchedIsotopePeaks { get; internal set; } // k1
-
+        
         public uint IsotopePeakRankSum { get; internal set; }
-
+        
         public double RankSumScore { get; internal set; }
         public double PoissonScore { get; internal set; }
 
         public double LocalMzStart { get; internal set; }
         public double LocalMzEnd { get; internal set; }
-
-
+        
         public StatSigTestResult()
         {
             NumberOfPossiblePeaks = 0;

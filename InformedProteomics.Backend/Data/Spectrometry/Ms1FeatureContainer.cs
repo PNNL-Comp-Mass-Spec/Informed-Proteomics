@@ -37,17 +37,47 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _spectrums = ms1Spectra;
         }
 
-        public void Add(Ms1FeatureCluster newFeature)
+        public bool Add(Ms1FeatureCluster newFeature)
         {
+            /*
+            for (var i = _featureList.Count - 1; i >= 0; i--)
+            {
+                var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
+                var massDiffPpm = (1e6*massDiff) / newFeature.RepresentativeMass;
+                if (massDiffPpm > 20) break;
+                if (massDiff < 1e-8)
+                {
+                    if ((_featureList[i].MinCol <= newFeature.MinCol && newFeature.MinCol <= _featureList[i].MaxCol) ||
+                        (_featureList[i].MinCol <= newFeature.MaxCol && newFeature.MaxCol <= _featureList[i].MaxCol))
+                    {
+                        var set1 = new HashSet<Ms1Peak>(newFeature.GetMajorPeaks());
+                        set1.ExceptWith(_featureList[i].GetMajorPeaks());
+
+                        var set2 = new HashSet<Ms1Peak>(newFeature.GetMinorPeaks());
+                        set2.ExceptWith(_featureList[i].GetMinorPeaks());
+
+                        _featureList[i].Merge(newFeature);
+                        _featureList[i].UpdateScores(_spectrums);
+
+                        foreach (var peak in set1) peak.TagMajorPeakOf(_featureList[i]);
+                        foreach (var peak in set2) peak.TagMinorPeakOf(_featureList[i]);
+                        
+                        // already exists, then skip!
+                        return false;
+                    }
+                }
+            }*/
+            
             foreach (var peak in newFeature.GetMajorPeaks())
                 peak.TagMajorPeakOf(newFeature);
 
-            foreach (var peak in newFeature.GetMajorPeaks())
+            foreach (var peak in newFeature.GetMinorPeaks())
                 peak.TagMinorPeakOf(newFeature);
-
+            
             _featureList.Add(newFeature);
+            return true;
         }
-
+        
         public void Add(IEnumerable<Ms1FeatureCluster> features)
         {
             foreach(var f in features) Add(f);
@@ -78,7 +108,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private IList<Ms1FeatureCluster> RemoveOverlappedFeatures(SortedSet<Ms1FeatureCluster> featureSet)
         {
             var outFeatures = new List<Ms1FeatureCluster>();
-
+            var tol = new Tolerance(5);
             while (true)
             {
                 if (featureSet.Count < 1) break;
@@ -86,22 +116,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var bestFeature = featureSet.First();
                 featureSet.Remove(bestFeature);
                 outFeatures.Add(bestFeature);
+                var massTol = tol.GetToleranceAsTh(bestFeature.RepresentativeMass);
                 
                 var tempList = new List<Ms1FeatureCluster>();
                 foreach (var f in bestFeature.OverlappedFeatures)
                 {
-                    if (featureSet.Remove(f)) tempList.Add(f);
+                    if (featureSet.Remove(f))
+                    {
+                        var massDiff = Math.Abs(bestFeature.RepresentativeMass - f.RepresentativeMass);
+                        //if (massDiff < massTol || Math.Abs(massDiff - 1.0) < massTol || Math.Abs(massDiff - 2.0) < massTol)
+                        if ((Math.Abs(massDiff - 1.0) < massTol || Math.Abs(massDiff - 2.0) < massTol) && bestFeature.SimilarScore(f))
+                        {
+                            outFeatures.Add(f);
+                            continue;
+                        }
+                        
+                        tempList.Add(f);
+                    }
                 }
 
                 bestFeature.InActivateSignificantPeaks();
-
                 foreach (var f in tempList)
                 {
-                    if (f.RepresentativeScanNum == 5726 && f.MinCharge == 9)
-                    {
-                        var debug = 0;
-                    }
-                    
                     f.UpdateScores(_spectrums);
                     if (f.GoodEnough) featureSet.Add(f);
                 }

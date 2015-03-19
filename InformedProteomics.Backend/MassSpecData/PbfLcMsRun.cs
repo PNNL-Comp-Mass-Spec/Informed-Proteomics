@@ -323,7 +323,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         var mz = _reader.ReadDouble();
                         var intensity = _reader.ReadSingle();
-                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = ms1ScanIndex };
+                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = (ushort) ms1ScanIndex };
                     }
 
                     // Create Ms1Spectrum
