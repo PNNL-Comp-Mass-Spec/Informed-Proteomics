@@ -22,7 +22,7 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            var reader = new MzMLReader(filePath, true);
+            var reader = new MzMLReader(filePath);
             var spectra = reader.ReadAllSpectra();
             timer.Stop();
             Console.WriteLine("Time: " + timer.Elapsed);
