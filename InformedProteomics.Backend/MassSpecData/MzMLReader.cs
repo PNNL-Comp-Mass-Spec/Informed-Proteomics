@@ -164,7 +164,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _offsets.Clear();
                 OffsetsMapInt.Clear();
                 OffsetsMapNative.Clear();
-                IdNativeMap.Clear();
+                IdToNativeMap.Clear();
             }
 
             public IndexListType IndexType = IndexListType.Unknown;
@@ -178,7 +178,8 @@ namespace InformedProteomics.Backend.MassSpecData
             public List<IndexItem> Offsets { get { return _offsets; } }
             public readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
             public readonly Dictionary<long, long> OffsetsMapInt = new Dictionary<long, long>();
-            public readonly Dictionary<long, string> IdNativeMap = new Dictionary<long, string>();
+            public readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
+            public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>(); 
 
             public void AddOffset(string idRef, string offset)
             {
@@ -203,7 +204,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 // This won't be sufficient until there is a valid parser for all forms of NativeID.
                 // Using artificial scan number for now.
                 OffsetsMapInt.Add(offset.IdNum, offset.Offset);
-                IdNativeMap.Add(offset.IdNum, offset.Ref);
+                IdToNativeMap.Add(offset.IdNum, offset.Ref);
+                NativeToIdMap.Add(offset.Ref, offset.IdNum);
                 /*if (IndexType == IndexListType.Spectrum)
                 {
                     long id = Int64.Parse(offset.Ref.Substring(offset.Ref.LastIndexOfAny(new char[] {'=', 'F'}) + 1));
@@ -217,7 +219,8 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 OffsetsMapNative.Clear();
                 OffsetsMapInt.Clear();
-                IdNativeMap.Clear();
+                IdToNativeMap.Clear();
+                NativeToIdMap.Clear();
                 foreach (var offset in _offsets)
                 {
                     AddMapForOffset(offset);
@@ -1561,7 +1564,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // If a random access reader, there is already a scan number stored, based on the order of the index. Use it instead.
             if (_randomAccess)
             {
-                scanNum = (int) (_spectrumOffsets.OffsetsMapNative[nativeId]);
+                scanNum = (int) (_spectrumOffsets.NativeToIdMap[nativeId]);
             }
             // This won't work; removed until a good parser for most forms of NativeID is available.
             /*// Find last non-digit
