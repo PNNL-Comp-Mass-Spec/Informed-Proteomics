@@ -369,6 +369,11 @@ namespace InformedProteomics.Backend.MassSpecData
             if (!_allRead && !_randomAccess)
             {
                 ReadMzMl();
+                _allRead = true;
+                foreach (var spec in _spectra)
+                {
+                    yield return spec;
+                }
             }
             else if (!_allRead)
             {
@@ -376,13 +381,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     IndexMzMl(); // Read the index and metadata so that we have a count of spectra
                 }
-                for (int i = 0; i < _spectrumOffsets.Offsets.Count; i++)
+                foreach (var specIndex in _spectrumOffsets.Offsets)
                 {
-                    _spectra.Add(ReadMassSpectrum((int)(_spectrumOffsets.Offsets[i].IdNum)));
+                    yield return ReadMassSpectrum((int)(specIndex.IdNum));
                 }
-                _allRead = true;
             }
-            return _spectra;
         }
 
         public Spectrum ReadMassSpectrum(int index)
