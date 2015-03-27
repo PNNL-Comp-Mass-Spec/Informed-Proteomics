@@ -65,7 +65,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return GenerateFeatureFile(rawFilePath, minSearchMass, maxSearchMass, false, true);
         }
         
-        public string GenerateFeatureFile(string rawFilePath, double minMass = 3000, double maxMass = 50000, bool scoreReport = false, bool csvOutput = false)
+        public string GenerateFeatureFile(string rawFilePath, double minMass = 3000, double maxMass = 50000, bool scoreReport = false, bool csvOutput = false, bool tmpOutput = false)
         {
             var j = rawFilePath.LastIndexOf('.');
             var outPath = rawFilePath.Substring(0, j);
@@ -116,36 +116,29 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 csvWriter = new StreamWriter(outCsvFilePath);
                 csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
             }
-            /*
-            tmpTsvFilePath = string.Format("{0}_ms1ft.tmp_all", outPath);
-            tmpTsvWriter = new StreamWriter(tmpTsvFilePath);
-            tmpTsvWriter.WriteLine(Ms1FeatureCluster.GetHeaderString(scoreReport));
-            foreach (var feature in container.GetAllFeatureClusters())
-            {
-                tmpTsvWriter.WriteLine("{0}\t{1}", feature.TempId, feature.GetString(scoreReport));
-            }
-            tmpTsvWriter.Close();
-            */
+
 
             Console.WriteLine("Start selecting mutually independent features from feature network graph");
             //Console.WriteLine("Generating feature network graphs from {0} features", container.NumberOfFeatures);
             var connectedFeatures = container.GetAllConnectedFeatures();
             //Console.WriteLine("Number of connected components = {0};  elapsed time = {1:0.000} sec", connectedFeatures.Count, (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            /*
-            var tmpTsvFilePath = string.Format("{0}_ms1ft.tmp", outPath);
-            var tmpTsvWriter = new StreamWriter(tmpTsvFilePath);
-            tmpTsvWriter.WriteLine(Ms1FeatureCluster.GetHeaderString(scoreReport));
-            var clusterId = 0;
-            foreach (var featureSet in connectedFeatures)
+
+            if (tmpOutput)
             {
-                clusterId++;
-                foreach (var feature in featureSet)
+                var tmpTsvFilePath = string.Format("{0}.tmp", outTsvFilePath);
+                var tmpTsvWriter = new StreamWriter(tmpTsvFilePath);
+                tmpTsvWriter.WriteLine(Ms1FeatureCluster.GetHeaderString(scoreReport));
+                var clusterId = 0;
+                foreach (var featureSet in connectedFeatures)
                 {
-                    tmpTsvWriter.WriteLine("{0}\t{1}", clusterId, feature.GetString(scoreReport));
+                    clusterId++;
+                    foreach (var feature in featureSet)
+                    {
+                        tmpTsvWriter.WriteLine("{0}\t{1}", clusterId, feature.GetString(scoreReport));
+                    }
                 }
+                tmpTsvWriter.Close();                
             }
-            tmpTsvWriter.Close();
-            */
             
             var filteredFeatures = container.GetFilteredFeatures(connectedFeatures);
             //Console.WriteLine("# of selected features = {0}; # of connected components = {1}; elapsed time = {2:0.000} sec", filteredFeatures.Count, nCc, (stopwatch.ElapsedMilliseconds) / 1000.0d);
@@ -624,11 +617,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 minCol = Math.Max(minCol - (int)((MinXicWindowLength - colLen) * 0.5), 0);
 
-                if (minCol == 0) maxCol = minCol + MinXicWindowLength - 1;
+                if (minCol == 0)
+                {
+                    maxCol = Math.Min(minCol + MinXicWindowLength - 1, _nScans - 1);
+                }
                 else
                 {
                     maxCol = Math.Min(maxCol + (int)((MinXicWindowLength - colLen) * 0.5), _nScans - 1);
-                    if (maxCol == _nScans - 1) minCol = maxCol - MinXicWindowLength + 1;
+                    if (maxCol == _nScans - 1) minCol = Math.Max(maxCol - MinXicWindowLength + 1, 0);
                 }
                 colLen = maxCol - minCol + 1;
             }

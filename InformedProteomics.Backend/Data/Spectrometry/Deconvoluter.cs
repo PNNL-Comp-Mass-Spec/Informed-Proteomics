@@ -108,5 +108,47 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             monoIsotopePeakList.Sort();
             return monoIsotopePeakList;
         }
+
+        public static List<DeconvolutedPeak> FilterOut(List<DeconvolutedPeak> peaks, double windowSize, int topRankCutoff)
+        {
+                // select each peak if it is top n within window (-window,+window) around it
+                //Spectrum retSpec = (Spectrum)s.clone();
+                //retSpec.clear();    // remove all peaks 
+                var retSpec = new List<DeconvolutedPeak>();
+                for (int peakIndex = 0; peakIndex < peaks.Count; peakIndex++)
+                {
+                    int rank = 1;
+
+                    var thisPeak = peaks[peakIndex];
+                    var thisMass = thisPeak.Mass;
+                    var thisInten = thisPeak.Intensity;
+
+                    // move left
+                    int prevIndex = peakIndex - 1;
+                    while (prevIndex >= 0)
+                    {
+                        var prevPeak = peaks[prevIndex];
+                        if (thisMass - prevPeak.Mass > windowSize) break;
+                        if (prevPeak.Intensity > thisInten) rank++;
+                        prevIndex--;
+                    }
+
+                    // move right
+                    int nextIndex = peakIndex + 1;
+                    while (nextIndex < peaks.Count)
+                    {
+                        var nextPeak = peaks[nextIndex];
+                        if (nextPeak.Mass - thisMass > windowSize) break;
+                        if (nextPeak.Intensity > thisInten) rank++;
+                        nextIndex++;
+                    }
+
+                    if (rank <= topRankCutoff) retSpec.Add(thisPeak);
+                }
+
+            return retSpec;
+        }
+
+        
     }
 }

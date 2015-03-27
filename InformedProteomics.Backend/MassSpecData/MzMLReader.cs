@@ -1766,6 +1766,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     intensities = bda;
                 }
             }
+            
             if (!centroided)
             {
                 // Centroid spectrum

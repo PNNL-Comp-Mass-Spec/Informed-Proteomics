@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return new InMemoryLcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
 
-        public InMemoryLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, bool ms1Only = false)
+        public InMemoryLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
         {
             ScanNumElutionTimeMap = new Dictionary<int, double>();
             ScanNumToMsLevel = new Dictionary<int, int>();
@@ -68,19 +68,20 @@ namespace InformedProteomics.Backend.MassSpecData
 
             foreach (var spec in massSpecDataReader.ReadAllSpectra())
             {
-                //Console.WriteLine("Reading Scan {0}", spec.ScanNum);
+                //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
                 ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;
                 ScanNumElutionTimeMap[spec.ScanNum] = spec.ElutionTime;
                 if (spec.MsLevel == 1)
                 {
                     if (precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(precursorSignalToNoiseRatioThreshold);
+
                     foreach (var peak in spec.Peaks)
                     {
                         _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
                     }
                     _scanNumSpecMap.Add(spec.ScanNum, spec);
                 }
-                else if (spec.MsLevel == 2 && !ms1Only)
+                else if (spec.MsLevel == 2)
                 {
                     var productSpec = spec as ProductSpectrum;
 

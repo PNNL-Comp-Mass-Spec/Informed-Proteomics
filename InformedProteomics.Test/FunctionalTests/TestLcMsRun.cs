@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
@@ -253,6 +254,31 @@ namespace InformedProteomics.Test.FunctionalTests
             const string filePath = @"D:\Research\Data\TRex\VNVADCGAEALAR.mzML";
             var run = PbfLcMsRun.GetLcMsRun(filePath, MassSpecDataType.MzMLFile);
             Console.WriteLine(run.MaxLcScan);
+        }
+
+
+        [Test]
+        public void TestReadingBrukerDaltonDataSet()
+        {
+            const string FileExtension = ".pbf";
+            const string specFilePath = @"D:\MassSpecFiles\ICR\20141212FGWT1_F5_1_01_3230.mzML";
+            Console.WriteLine("TEst start");
+            //var reader = new BrukerReader(specFilePath);
+            var reader = new MzMLReader(specFilePath);
+
+            var run = new InMemoryLcMsRun(reader, 1.4826, 1.4826);
+            //var run = new InMemoryLcMsRun(reader, 3, 1.4826);
+            var pbfFilePath = Path.ChangeExtension(specFilePath, FileExtension);
+            run.WriteAsPbf(pbfFilePath);
+            /*
+            foreach (var spec in reader.ReadAllSpectra())
+            {
+                if (spec != null)
+                {
+                    Console.WriteLine(spec.ScanNum);
+                }
+            }*/
+            Console.WriteLine("TEst end");
         }
     }
 }

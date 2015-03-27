@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -17,7 +18,7 @@ namespace ProMex
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (March 18, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (March 23, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 
@@ -29,22 +30,6 @@ namespace ProMex
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
-            
-            if (args.Length == 0)
-            {
-                //PrintUsageInfo();
-                //return;
-                args = new string[8];
-                args[0] = "-i";
-                args[1] = @"D:\MassSpecFiles\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
-                args[2] = "-minMass";
-                args[3] = "3000";
-                args[4] = "-maxMass";
-                args[5] = "50000";
-                args[6] = "-score";
-                args[7] = "y";
-            }
-            
 
             if (args.Length == 0)
             {
@@ -67,6 +52,7 @@ namespace ProMex
                 {"-maxMass", "50000.0"},
                 {"-score", "n"},
                 {"-csv", "n"},
+                {"-tmp", "n"},
                 {"-maxThreads", "0"},
             };
 
@@ -92,23 +78,34 @@ namespace ProMex
        
             _scoreReport = Str2Bool(_paramDic["-score"]);
             _csvOutput  = Str2Bool(_paramDic["-csv"]);
-
+            _tmpOutput = Str2Bool(_paramDic["-tmp"]);
             Console.WriteLine("************ {0}\t{1} ************", Name, Version);
             foreach (var paramName in _paramDic.Keys)
             {
                 if (paramName.Equals("-csv") && !_csvOutput) continue;
+                if (paramName.Equals("-tmp") && !_tmpOutput) continue;
                 Console.WriteLine("{0}\t{1}", paramName, _paramDic[paramName]);
             }
             var attr = File.GetAttributes(_inputPath);
+
+
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
-                var allFiles = new List<string>();
-                ProcessDirectory(_inputPath, ref allFiles);
-                foreach (var path in FilterFiles(allFiles)) ProcessFile(path);
+                //var allFiles = new List<string>();
+                ProcessDirectory(_inputPath);
+                //foreach (var path in FilterFiles(allFiles)) ProcessFile(path);
             }
             else
             {
-                ProcessFile(_inputPath);
+                if (!MsRawFile(_inputPath) && !MsPbfFile(_inputPath))
+                {
+                    Console.WriteLine("Not supported file extension");
+                }
+                else
+                {
+                    ProcessFile(_inputPath);    
+                }
+                
             }
         }
 
@@ -117,53 +114,59 @@ namespace ProMex
             return (value.Equals("y") || value.Equals("Y"));
         }
 
-        public static void ProcessDirectory(string targetDirectory, ref List<string> fileNames)
+        private static void ProcessDirectory(string targetDirectory)
         {
-            //var fileNames = new List<string>();
+            // Process the list of files found in the directory. 
             var fileEntries = Directory.GetFiles(targetDirectory);
-            foreach (var fileName in fileEntries)
+            foreach (string fileName in fileEntries)
             {
-                fileNames.Add(fileName);
+                if (MsRawFile(fileName))
+                {
+                    var pbfFilePath = Path.ChangeExtension(fileName, "pbf");
+                    if (!File.Exists(pbfFilePath)) ProcessFile(fileName);
+                }
+                else if (MsPbfFile(fileName)) ProcessFile(fileName);
             }
 
+            // Recurse into subdirectories of this directory. 
+            /*
             var subdirectoryEntries = Directory.GetDirectories(targetDirectory);
-            foreach (var subdirectory in subdirectoryEntries)
-                ProcessDirectory(subdirectory, ref fileNames);
+            foreach (string subdirectory in subdirectoryEntries)
+                ProcessDirectory(subdirectory);
+            */
         }
 
-        public static void ProcessFile(string path)
+        private static bool MsRawFile(string path)
         {
-            if (path.EndsWith(".raw") || path.EndsWith(".pbf") || path.EndsWith(".mzML"))
+            return (path.EndsWith(".raw") || path.EndsWith(".mzML"));
+        }
+        private static bool MsPbfFile(string path)
+        {
+            return path.EndsWith(".pbf");
+        }
+        private static void ProcessFile(string path)
+        {
+            var rawFile = path;
+            var outFile = Ms1FeatureMatrix.GetFeatureFilePath(rawFile);
+
+            if (File.Exists(outFile))
             {
-                var rawFile = path;
-                var outFile = Ms1FeatureMatrix.GetFeatureFilePath(rawFile);
-
-                if (File.Exists(outFile))
-                {
-                    Console.WriteLine("ProMex output already exists: {0}", outFile);
-                    return;
-                }
-
-                if (!File.Exists(rawFile))
-                {
-                    Console.WriteLine("Cannot find input file: {0}", rawFile);
-                    return;                    
-                }
-
-                var stopwatch = Stopwatch.StartNew();
-                Console.WriteLine("Start loading MS1 data from {0}", rawFile);
-                var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
-                var csm = new Ms1FeatureMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
-                Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
-                    (stopwatch.ElapsedMilliseconds)/1000.0d);
-                //GC.Collect();
-                var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _scoreReport,
-                    _csvOutput);
+                Console.WriteLine("ProMex output already exists: {0}", outFile);
+                return;
             }
-            else
+
+            if (!File.Exists(rawFile))
             {
-                Console.WriteLine("Not supported file extension");
+                Console.WriteLine("Cannot find input file: {0}", rawFile);
+                return;                    
             }
+
+            var stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("Start loading MS1 data from {0}", rawFile);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
+            var csm = new Ms1FeatureMatrix(run, _minSearchCharge, _maxSearchCharge, _maxThreads);
+            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            var outputFile = csm.GenerateFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _scoreReport, _csvOutput, _tmpOutput);
         }
 
         private static double _minSearchMass;
@@ -173,10 +176,10 @@ namespace ProMex
         private static string _inputPath;
         private static bool _scoreReport;
         private static bool _csvOutput;
-        //private static double _probabilityThreshold;
-        ///private static IMs1FeaturePredictor _predictor;
+        private static bool _tmpOutput;
         private static Dictionary<string, string> _paramDic;
         private static int _maxThreads;
+
       
         private static void PrintUsageInfo(string message = null)
         {
@@ -195,53 +198,6 @@ namespace ProMex
                 );
         }
 
-
-        private static IEnumerable<string> FilterFiles(IEnumerable<string> fileNames)
-        {
-            var files = new Dictionary<string, bool>();
-            var filteredFiles = new List<string>();
-
-            foreach (var path in fileNames)
-            {
-                bool pbf = path.EndsWith(".pbf");
-                bool raw = path.EndsWith(".raw");
-                if (pbf || raw)
-                {
-                    var j = path.LastIndexOf('.');
-                    var outPath = path.Substring(0, j);
-
-                    if (pbf)
-                    {
-                        if (files.ContainsKey(outPath))
-                        {
-                            files.Remove(outPath);
-                            files.Add(outPath, true);
-                        }
-                        else
-                        {
-                            files.Add(outPath, pbf);
-                        }
-                    }
-                    else
-                    {
-                        if (files.ContainsKey(outPath))
-                        {
-
-                        }
-                        else
-                        {
-                            files.Add(outPath, pbf);
-                        }
-                    }
-                }
-            }
-
-            foreach (var path in files.Keys)
-            {
-                filteredFiles.Add(files[path] ? string.Format("{0}.pbf", path) : string.Format("{0}.raw", path));
-            }
-            return filteredFiles;
-        }
     }
     
 }

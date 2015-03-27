@@ -4,67 +4,20 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.SequenceTag
 {
-    public class GraphEdge : IEquatable<GraphEdge>
-    {
-        public int Node1 { get; private set; }
-        public int Node2 { get; private set; }
-
-        public GraphEdge(int node1, int node2)
-        {
-            Node1 = node1;
-            Node2 = node2;
-        }
-
-        public bool Equals(GraphEdge other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Node1 == other.Node1 && Node2 == other.Node2;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((GraphEdge)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Node1 * 397) ^ Node2;
-            }
-        }
-
-        public static bool operator ==(GraphEdge edge1, GraphEdge edge2)
-        {
-            if ((object)edge1 == null || ((object)edge2) == null)
-                return Object.Equals(edge1, edge2);
-
-            return edge1.Equals(edge2);
-        }
-
-        public static bool operator !=(GraphEdge edge1, GraphEdge edge2)
-        {
-            if (edge1 == null || edge2 == null)
-                return !Object.Equals(edge1, edge2);
-
-            return !(edge1.Equals(edge2));
-        }
-    }
-
     public class SequenceTagGraph<T> where T : GraphEdge
     {
         private List<T>[] _adjList;
         private bool[] _hasInEdge;
 
-        public SequenceTagGraph() { }
+        public SequenceTagGraph(int maxTagLen = 8)
+        {
+            MaxTagLen = maxTagLen;
+        }
 
-        public SequenceTagGraph(int nodeCount)
+        public SequenceTagGraph(int nodeCount, int maxTagLen = 8)
         {
             SetNodeCount(nodeCount);
+            MaxTagLen = maxTagLen;
         }
 
         public void SetNodeCount(int nodeCount)
@@ -86,6 +39,21 @@ namespace InformedProteomics.Backend.SequenceTag
         public bool HasInEdge(int node)
         {
             return _hasInEdge[node];
+        }
+
+        public int GetEdgeCount()
+        {
+            return _adjList.Sum(edges => edges.Count);
+        }
+
+        public int GetNodeCount()
+        {
+            return _adjList.Length;
+        }
+
+        public IEnumerable<int> Nodes()
+        {
+            return Enumerable.Range(0, _adjList.Length);
         }
 
         public IEnumerable<int> Roots()
@@ -135,17 +103,24 @@ namespace InformedProteomics.Backend.SequenceTag
         //private Stack<int> _nodeList;
         private Stack<T> _edgeList;
         private bool[] _nodeVisitFlag;
-
+        protected int MaxTagLen;
         public void FindPaths(int node, bool firstCall = true, T e = null)
         {
-            if (firstCall) 
+            if (firstCall)
             {
                 _nodeVisitFlag = new bool[_adjList.Length];
-                //_nodeList = new Stack<int>();
                 _edgeList = new Stack<T>();
             }
+            else
+            {
+                if (_edgeList.Count >= MaxTagLen)
+                {
+                    ProcessPath(_edgeList.Reverse());
+                    _edgeList.Clear();
+                    return;
+                }
+            }
 
-            //_nodeList.Push(node);
             if (e != null) _edgeList.Push(e);
 
             _nodeVisitFlag[node] = true;
@@ -165,7 +140,7 @@ namespace InformedProteomics.Backend.SequenceTag
                 ProcessPath(_edgeList.Reverse());
             }
             _nodeVisitFlag[node] = false;
-            //_nodeList.Pop();
+            
             if (_edgeList.Count > 0) _edgeList.Pop();
         }
     }

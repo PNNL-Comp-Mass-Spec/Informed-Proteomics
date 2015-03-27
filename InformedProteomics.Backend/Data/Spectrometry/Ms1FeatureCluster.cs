@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
@@ -29,7 +30,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public const byte XicCorrMin = 9;
         public const byte MzError = 10;
         public const byte TotalMzError = 11;
-        public const byte Count = 12;
+
+        public const byte BhattacharyyaDistanceSummedOverEvenCharges = 12;
+        public const byte BhattacharyyaDistanceSummedOverOddCharges = 13;
+
+        public const byte AbundanceChangesOverCharges = 14;
+
+        public const byte Count = 15;
     }
 
     public class Ms1FeatureCluster : Ms1Feature
@@ -137,6 +144,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             "SummedBcDistOverCharges", "SummedBcDistOverTimes", 
             "XicDist", "MinXicDist",
             "MzDiffPpm", "TotalMzDiffPpm",
+            "bcDistEvenCharge", "bcDistanceOddCharge", "AbundanceChange",
             "Envelope", 
             "Probability", "GoodEnough"
         };
@@ -373,12 +381,44 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var bc = IsotopeList.GetBhattacharyyaDistance(envelopePerTime[col - MinCol]);
                 if (bc < bestBcPerTime) bestBcPerTime = bc;
             }
+            
             var bestBcPerCharge = 10d;
+            var bestBcEvenCharge = 10d;
+            var bestBcOddCharge = 10d;
+            var abuPerCharge = new double[ChargeLength];
+            var maxAbuRow = MinRow;
             for (var row = MinRow; row <= MaxRow; row++)
             {
                 var bc = IsotopeList.GetBhattacharyyaDistance(envelopePerCharge[row - MinRow]);
                 if (bc < bestBcPerCharge) bestBcPerCharge = bc;
+                
+                if ((row + _minCharge)%2 == 0)
+                {
+                    if (bc < bestBcEvenCharge) bestBcEvenCharge = bc;
+                }
+                else
+                {
+                    if (bc < bestBcOddCharge) bestBcOddCharge = bc;
+                }
+                abuPerCharge[row - MinRow] = envelopePerCharge[row - MinRow].Sum();
+
+                if (abuPerCharge[maxAbuRow - MinRow] < abuPerCharge[row - MinRow]) maxAbuRow = row;
             }
+
+            if (ChargeLength > 1)
+            {
+                var meanStd = abuPerCharge.MeanStandardDeviation();
+                SetScore(Ms1FeatureScore.AbundanceChangesOverCharges, meanStd.Item2 / meanStd.Item1);
+                SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverEvenCharges, bestBcEvenCharge);
+                SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverOddCharges, bestBcOddCharge);
+            }
+            else
+            {
+                SetScore(Ms1FeatureScore.AbundanceChangesOverCharges, 0);
+                SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverEvenCharges, bestBcPerCharge);
+                SetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverOddCharges, bestBcPerCharge);                
+            }
+
 
             var bestMzErrorPpm = 10d;
             var totalMzErrorPpm = 0d;
@@ -517,6 +557,25 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (GetScore(Ms1FeatureScore.RankSum) < LogP2) return false;
                 if (GetScore(Ms1FeatureScore.Poisson) < LogP2) return false;
 
+                if (RepresentativeMass < 8000)
+                {
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverEvenCharges) > 0.2) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverOddCharges) > 0.15) return false;
+                    if (GetScore(Ms1FeatureScore.AbundanceChangesOverCharges) > 1.75) return false; 
+                }
+                else if (RepresentativeMass < 15000)
+                {
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverEvenCharges) > 0.1) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverOddCharges) > 0.08) return false;
+                    if (GetScore(Ms1FeatureScore.AbundanceChangesOverCharges) > 1.5) return false;
+                }
+                else
+                {
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverEvenCharges) > 0.1) return false;
+                    if (GetScore(Ms1FeatureScore.BhattacharyyaDistanceSummedOverOddCharges) > 0.08) return false;
+                    if (GetScore(Ms1FeatureScore.AbundanceChangesOverCharges) > 1.3) return false;
+                }
+
                 if (RepresentativeMass < 15000)
                 {
                     if (GetScore(Ms1FeatureScore.EnvelopeCorrelation) < 0.6) return false; 
@@ -558,19 +617,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private static readonly double[] LogisticRegressionBetaVector = new double[]
         {
-            -8.52042312495273,
-            0.237435456731829,
-            4.76922550884920,
-            0.0212744645901429,
-            0.0351984907187377,
-            -3.47853119696852,
-            66.3708381353204,
-            -84.4218790598161,
-            -40.3630741260841,
-            -2.12695121580512,
-            2.18539266537223,
-            0.277896712109527,
-            0.379116560394854
+            -13.2533634280100,
+            -1.15180441819635,
+            12.7696665111291,
+            0.0252168712214531,
+            0.0345913636891164,
+            -6.70169446935268,
+            0.594148009986426,
+            -2.54090490836123,
+            -15.7574867934127,
+            -3.96462362695165,
+            -6.84017486290071,
+            0.697533501805824,
+            0.282385690399132,
+            -3.98134292531727,
+            -12.6184672341575,
+            1.04475408931452
         };
         
         internal double GetProbabilityByLogisticRegression()
