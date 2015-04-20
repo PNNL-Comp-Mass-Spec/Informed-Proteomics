@@ -6,6 +6,7 @@ namespace InformedProteomics.Backend.Data.Biology
 {
     using System;
 
+    [Serializable]
     public class Atom : IMatter, IEquatable<Atom>
     {
         public Atom(string code, double mass, int nominalMass, string name)
