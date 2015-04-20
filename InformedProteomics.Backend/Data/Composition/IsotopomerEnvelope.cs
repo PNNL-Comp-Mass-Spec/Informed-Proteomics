@@ -1,5 +1,8 @@
 ﻿namespace InformedProteomics.Backend.Data.Composition
 {
+    using System;
+
+    [Serializable]
     public class IsotopomerEnvelope
     {
         public IsotopomerEnvelope(double[] envolope, int mostAbundantIsotopeIndex)

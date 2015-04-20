@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
+    [Serializable]
     public class Composition: AbstractComposition
     {
         public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);

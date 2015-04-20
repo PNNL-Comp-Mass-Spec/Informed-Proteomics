@@ -2,6 +2,9 @@
 
 namespace InformedProteomics.Backend.Data.Composition
 {
+    using System;
+
+    [Serializable]
     public abstract class AbstractComposition
     {
         public abstract double Mass { get; }
