@@ -558,5 +558,51 @@ namespace InformedProteomics.Test
                 }
             }
         }
+
+        [Test]
+        public void TestUpdateModificationComposition()
+        {
+            const string modName1 = "mod1";
+            var composition1 = new Composition(0, 1, 0, 2, 0, 0);
+            var mod = Modification.RegisterAndGetModification(modName1, composition1);
+            Assert.NotNull(mod);
+
+            var getmod = Modification.Get(modName1);
+            Assert.NotNull(getmod);
+            Assert.AreEqual(mod, getmod);
+
+            const string modName2 = "mod2";
+            var composition2 = new Composition(1,0,2,4,1,9);
+            var editedMod = Modification.UpdateAndGetModification(modName2, composition2);
+            Assert.NotNull(editedMod);
+
+            var getEditedMod = Modification.Get(modName2);
+            Assert.NotNull(getEditedMod);
+            Assert.AreEqual(editedMod, getEditedMod);
+            Assert.AreNotEqual(mod, getEditedMod);
+        }
+
+        [Test]
+        public void TestUpdateModificationMass()
+        {
+            const string modName1 = "mod1";
+            const int mass1 = 1000;
+            var mod = Modification.RegisterAndGetModification(modName1, mass1);
+            Assert.NotNull(mod);
+
+            var getmod = Modification.Get(modName1);
+            Assert.NotNull(getmod);
+            Assert.AreEqual(mod, getmod);
+
+            const string modName2 = "mod2";
+            const int mass2 = 1100;
+            var editedMod = Modification.UpdateAndGetModification(modName2, mass2);
+            Assert.NotNull(editedMod);
+
+            var getEditedMod = Modification.Get(modName2);
+            Assert.NotNull(getEditedMod);
+            Assert.AreEqual(editedMod, getEditedMod);
+            Assert.AreNotEqual(mod, getEditedMod);
+        }
     }
 }

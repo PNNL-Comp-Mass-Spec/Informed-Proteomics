@@ -162,6 +162,60 @@ namespace InformedProteomics.Backend.Data.Sequence
             Register(mod);
             return mod;
         }
+        
+        // Added by Chris
+        /// <summary>
+        /// Register a new modification or update existing modification.
+        /// </summary>
+        /// <param name="name">The name of the modification.</param>
+        /// <param name="composition">The composition of the modification.</param>
+        /// <returns>Registered modification.</returns>
+        public static Modification UpdateAndGetModification(string name, Composition.Composition composition)
+        {
+            if (NameToModMap.ContainsKey(name)) NameToModMap.Remove(name);
+
+            var massStr = string.Format("{0:N3}", composition.Mass);
+            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+
+            var modification = new Modification(-1, composition, name);
+            Register(modification);
+
+            return modification;
+        }
+
+        // Added by Chris
+        /// <summary>
+        /// Register a new modification or update an existing modification.
+        /// </summary>
+        /// <param name="name">The name of the modification.</param>
+        /// <param name="mass">The mass of the modification.</param>
+        /// <returns>Registered modification.</returns>
+        public static Modification UpdateAndGetModification(string name, double mass)
+        {
+            if (NameToModMap.ContainsKey(name)) NameToModMap.Remove(name);
+
+            var massStr = string.Format("{0:N3}", mass);
+            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+
+            var modification = new Modification(-1, mass, name);
+            Register(modification);
+
+            return modification;
+        }
+
+        // Added by Chris
+        /// <summary>
+        /// Unregister a modification by name.
+        /// Added by Chris.
+        /// </summary>
+        /// <param name="modification">The modification to remove.</param>
+        public static void UnregisterModification(Modification modification)
+        {
+            if (NameToModMap.ContainsKey(modification.Name)) NameToModMap.Remove(modification.Name);
+
+            var massStr = string.Format("{0:N3}", modification.Mass);
+            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+        }
 
         private static void Register(Modification modification)
         {
