@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="Execution\IcRescorer.cs" />
     <Compile Include="Execution\IcTopDownLauncher.cs" />
+    <Compile Include="Execution\Ms1FeatureFinderInputParameter.cs" />
+    <Compile Include="Execution\Ms1FeatureFinderLauncher.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
     <Compile Include="Execution\SequenceSpectrumMatch.cs" />
     <Compile Include="Execution\MSAlignRescorer.cs" />

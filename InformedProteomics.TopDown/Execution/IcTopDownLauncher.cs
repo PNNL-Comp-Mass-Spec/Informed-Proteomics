@@ -117,13 +117,21 @@ namespace InformedProteomics.TopDown.Execution
             if (FeatureFilePath == null)
             {
                 // Checks whether SpecFileName.ms1ft exists
-                var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, ".ms1ft");
+                var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
                     Console.Write("Running ProMex...");
                     sw.Start();
-                    var extractor = new Ms1FeatureMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
-                    ms1FtFilePath = extractor.GetFeatureFile(SpecFilePath, MinSequenceMass, MaxSequenceMass);
+                    var param = new Ms1FeatureFinderInputParameter
+                    {
+                        InputPath = SpecFilePath,
+                        MinSearchCharge = MinPrecursorIonCharge,
+                        MaxSearchCharge = MaxPrecursorIonCharge
+                    };
+                    var featureFinder = new Ms1FeatureFinderLauncher(param);
+                    featureFinder.Run();
+                    //var extractor = new Ms1FeatureMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
+                    //ms1FtFilePath = extractor.GetFeatureFile(SpecFilePath, MinSequenceMass, MaxSequenceMass);
                 }
                 sw.Reset();
                 sw.Start();

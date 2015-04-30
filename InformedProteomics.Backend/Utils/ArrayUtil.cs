@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Utils
         /// </summary>
         /// <param name="array">The array</param>
         /// <param name="format">Optional. A string to use to format each value. Must contain the colon, so something like ':0.000'</param>
-        public static string ToString<T>(T[] array, string format = "")
+        public static string ToString<T>(T[] array, string deliminator = "\t", string format = "")
         {
             var s = new StringBuilder();
             var formatString = "{0" + format + "}";
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 if (i < array.Length - 1)
                 {
-                    s.AppendFormat(formatString + "\t", array[i]);
+                    s.AppendFormat(formatString + deliminator, array[i]);
                 }
                 else
                 {
@@ -33,7 +33,7 @@ namespace InformedProteomics.Backend.Utils
             return s.ToString();
         }
 
-        public static string ToString<T>(T[][] array, string format = "")
+        public static string ToString<T>(T[][] array, string deliminator = "\t", string format = "")
         {
             var s = new StringBuilder();
             var formatString = "{0" + format + "}";
@@ -44,7 +44,7 @@ namespace InformedProteomics.Backend.Utils
                 {
                     if (j < array[i].Length - 1)
                     {
-                        s.AppendFormat(formatString + "\t", array[i][j]);
+                        s.AppendFormat(formatString + deliminator, array[i][j]);
                     }
                     else
                     {

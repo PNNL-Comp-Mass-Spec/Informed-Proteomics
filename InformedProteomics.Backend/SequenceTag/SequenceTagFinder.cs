@@ -33,7 +33,8 @@ namespace InformedProteomics.Backend.SequenceTag
 
             _spectrum = spec;
             _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.7);
-            if (_deconvolutedPeaks.Count > 1000) _deconvolutedPeaks = Deconvoluter.FilterOut(_deconvolutedPeaks, 101, 10);
+            
+            if (_deconvolutedPeaks.Count > 1000) _deconvolutedPeaks = Deconvoluter.FilterOut(_deconvolutedPeaks, 101, 20);
 
             SetNodeCount(_deconvolutedPeaks.Count);
             CollectSequenceTagGraphEdges();

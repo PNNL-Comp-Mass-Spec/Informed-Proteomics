@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -72,6 +73,48 @@ namespace InformedProteomics.Test.FunctionalTests
                 Assert.True(xic1[i].Equals(xic2[i]));
             }
             Console.WriteLine("Done");
+        }
+
+        [Test]
+        public void TestPbf()
+        {
+            var jobid = new int[]
+            {
+                1178207, 1178208, 1178209, 1178210, 1178211, 1178212, 1178213, 1178214, 1178215, 1178216, 1178217,
+                1178218, 1178219, 1178220, 1178221,
+                1178222, 1178223, 1178224, 1178225, 1178226, 1178227, 1178228, 1178229, 1178230, 1178231, 1178232,
+                1178233, 1178234, 1178235, 1178236,
+                1178237, 1178238, 1178239, 1178240, 1178241, 1178242, 1178243, 1178244, 1178245, 1178246, 1178247,
+                1178248, 1178249, 1178250, 1178251,
+                1178252, 1178253, 1178254, 1178255, 1178256, 1178257
+            };
+
+            var did = new int[]
+            {
+                02, 01, 04, 05, 03, 07, 10, 08, 09, 11, 14, 17, 25, 21, 24, 15, 26,
+                20, 19, 22, 16, 12, 06, 18, 28, 23, 27, 29, 36, 30, 37, 38, 33,
+                46, 40, 45, 44, 41, 34, 13, 43, 31, 32, 39, 42, 47, 35, 50, 48, 51, 49
+            };
+            
+            //const string pbfPath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3";
+            //const string ms1ftPAth = @"\\proto-5\VOrbiETD02\2014_3\Lewy_intact_02\PMX201503271049_Auto{0}";
+
+            for (var i = 0; i < 51; i++)
+            {
+
+                var id = string.Format("00{0}", did[i]);
+                id = id.Substring(id.Length - 2);
+                var j = jobid[i];
+
+                var srcFile = string.Format(
+                    @"\\proto-5\VOrbiETD02\2014_3\Lewy_intact_{0}\PMX201503271049_Auto{1}\Lewy_intact_{2}.ms1ft", id, j, id);
+
+                var destFile = string.Format(@"D:\MassSpecFiles\Lewy\Lewy_intact_{0}.ms1ft", id);
+                File.Copy(srcFile, destFile);
+                //var fname = string.Format(@"{0}\Lewy_intact_{1}.pbf", pbfPath, id);
+                //var pbfRun = new PbfLcMsRun(fname);
+                //Console.WriteLine("{0}\t{1}", pbfRun.MaxLcScan, pbfRun.GetElutionTime(pbfRun.MaxLcScan));
+            }
         }
 
         [Test]

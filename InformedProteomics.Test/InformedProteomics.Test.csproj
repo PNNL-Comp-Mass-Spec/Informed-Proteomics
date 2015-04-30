@@ -68,6 +68,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MathNet.Numerics.3.2.3\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="MTDBFramework">
+      <HintPath>..\lib\MTDBFramework.dll</HintPath>
+    </Reference>
     <Reference Include="MultiDimensionalPeakFinding">
       <HintPath>..\lib\x64\MultiDimensionalPeakFinding.dll</HintPath>
     </Reference>

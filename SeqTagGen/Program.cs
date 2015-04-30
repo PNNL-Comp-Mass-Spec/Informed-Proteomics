@@ -42,6 +42,7 @@ namespace SeqTagGen
             _paramDic = new Dictionary<string, string>
             {
                 {"-i", null},
+                {"-o", null},
                 {"-t", "5"},
                 {"-minLen", "5"},
                 {"-maxTags", "100"},
@@ -64,6 +65,7 @@ namespace SeqTagGen
             _minLen = Int32.Parse(_paramDic["-minLen"]);
             _maxTags = Int32.Parse(_paramDic["-maxTags"]);
             _inputPath = _paramDic["-i"];
+            _outFolderPath = _paramDic["-o"];
 
             var attr = File.GetAttributes(_inputPath);
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -104,6 +106,13 @@ namespace SeqTagGen
         {
             var rawFile = path;
             var outFile = Path.ChangeExtension(path, "seqtag");
+            //var tmpOutFile = Path.ChangeExtension(path, "tmp.seqtag");
+
+            if (_outFolderPath != null)
+            {
+                if (!Directory.Exists(_outFolderPath)) Directory.CreateDirectory(_outFolderPath);
+                outFile = _outFolderPath + @"\" + Path.GetFileName(outFile);
+            }
 
             if (File.Exists(outFile))
             {
@@ -117,12 +126,14 @@ namespace SeqTagGen
                 return;
             }
 
+            var tmpOutFile = Path.ChangeExtension(outFile, "seqtag.tmp");
+
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine("Input data : {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
             var ms2ScanNums = run.GetScanNumbers(2);
             var totalScans = ms2ScanNums.Count;
-            var tmpOutFile = Path.ChangeExtension(path, "tmp.seqtag");
+            
             var tmpWriter = new StreamWriter(tmpOutFile);
 
             tmpWriter.WriteLine("ScanNum\tSequenceTag\tIsPrefix\tFlankingMass");
@@ -176,6 +187,7 @@ namespace SeqTagGen
         private static Tolerance _tolerance;
         private static int _minLen;
         private static string _inputPath;
+        private static string _outFolderPath;
         private static int _maxTags;
         private static Dictionary<string, string> _paramDic;
         private static void PrintUsageInfo(string message = null)
@@ -185,6 +197,7 @@ namespace SeqTagGen
             Console.WriteLine(
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
+                "\t[-o OutFolder (default: InputFolder)]\n" +
                 "\t[-t Tolerance (default: 5 ppm)]\n"+
                 "\t[-minLen MinSequenceTagLength] (minimum length of sequence tag, default: 5)\n" +
                 "\t[-maxTags MaxNumberOfSequenceTags] (maximum number of sequence tags per spectrum, default: 100, unlimited: -1)\n" +

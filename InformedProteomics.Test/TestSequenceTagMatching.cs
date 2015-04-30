@@ -252,7 +252,7 @@ namespace InformedProteomics.Test
                         {
                             isHeader = false;
                             nColumn = line.Split('\t').Length;
-                            //writer.WriteLine(line + "\t" + "Proteins" + "\t" + "Mass" + "\t" + "DetectedFlankingMass" + "\t" + "ExpectedFlankingMass");
+                            writer.WriteLine(line + "\t" + "Protein" + "\t" + "DetectedFlankingMass" + "\t" + "ExpectedFlankingMass" + "\t" + "DeltaMass");
                             continue;
                         }
 
@@ -289,8 +289,8 @@ namespace InformedProteomics.Test
 
                                 if (idx < 0) break; //no matching
 
-                                var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
-                                //var nClv = (nTerminal) ? 2 : 1; 
+                                //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
+                                var nClv = (nTerminal) ? 2 : 1; 
 
                                 for (var j = 0; j < nClv; j++)
                                 {
@@ -301,8 +301,8 @@ namespace InformedProteomics.Test
                                     var massDiff = (detectedFlankingMass - flankComposition.Mass);
                                     if (massDiff > -500 && massDiff < 2000)
                                     {
-                                        writer.WriteLine(massDiff);
-                                        //writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", line, j, idx, detectedFlankingMass, flankComposition.Mass);
+                                        //writer.WriteLine(massDiff);
+                                        writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", line, protName, detectedFlankingMass, flankComposition.Mass, massDiff);
                                     }
 
                                     if (massDiff > 2000) break;

@@ -16,8 +16,11 @@ namespace InformedProteomics.Test
         {
             //const string TestRawFile = @"D:\\Vlad_TopDown\\raw\\yufeng_column_test2.raw";
             //const string TestResultFile = @"D:\\Vlad_TopDown\\results\\yufeng_column_test2_IcTda.tsv";
-            const string TestRawFile = @"D:\MassSpecFiles\training\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string TestResultFile = @"D:\MassSpecFiles\results\ProMex\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            //const string TestRawFile = @"D:\MassSpecFiles\training\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            //const string TestResultFile = @"D:\MassSpecFiles\results\ProMex\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+
+            const string TestRawFile = @"D:\MassSpecFiles\Lewy\Lewy_intact_01.raw";
+            const string TestResultFile = @"D:\MassSpecFiles\Lewy\Lewy_intact_01_IcTda.tsv";
             
             //const int MaxTags = 100000;
             var tsvParser = new TsvFileParser(TestResultFile);
@@ -29,31 +32,36 @@ namespace InformedProteomics.Test
             var nSpec = 0;
             var nHitSpec = 0;
 
-            for (var i = 0; i < ms2ScanNumbers.Count; i++)
+            var targetScans = new int[] {6681};
+
+            //for (var i = 0; i < ms2ScanNumbers.Count; i++)
+            foreach(var scanNum in targetScans)
             {
-                var scanNum = Int32.Parse(ms2ScanNumbers[i]);
+                //var scanNum = Int32.Parse(ms2ScanNumbers[i]);
+                
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
                 int tsvIndex = ms2ScanNumbers.FindIndex(x => Int32.Parse(x) == scanNum);
                 var qValue = Double.Parse(tsvData["QValue"].ElementAt(tsvIndex));
-                if (qValue > 0.01) continue;
+                //if (qValue > 0.01) continue;
 
                 var seqStr = tsvData["Sequence"].ElementAt(tsvIndex).Trim();
                 var modStr = tsvData["Modifications"].ElementAt(tsvIndex).Trim();
-                //Console.WriteLine(spectrum.ScanNum);
+                
                 var tagFinder = new SequenceTagFinder(spectrum, new Tolerance(5), 5);
                 var nTags = 0;
                 var nHit = 0;
                 foreach (var tag in tagFinder.FindSequenceTags())
                 {
                     nTags++;
-                    //if (tag.Count >= 5 && nTags < MaxTags)
-                    //{
-                        foreach (var tagStr in tag.GetTagStrings())
-                        {
-                            if (seqStr.Contains(tagStr) || seqStr.Contains(Reverse(tagStr))) nHit++;
-                        }
-                    //}
+                    
+                    
+                    foreach (var tagStr in tag.GetTagStrings())
+                    {
+                        Console.WriteLine(tagStr);
+                        
+                        if (seqStr.Contains(tagStr) || seqStr.Contains(Reverse(tagStr))) nHit++;
+                    }
                 }
                 nSpec++;
                 if (nHit > 0) nHitSpec++;

@@ -15,10 +15,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             IndexInSpectrum = indexInSpec;
             Active = true;
+            Quantified = false;
         }
         
         public int IndexInSpectrum { get; private set; }
         public bool Active { get; private set; }
+        public bool Quantified { get; internal set; }
 
         public void InActivate()
         {

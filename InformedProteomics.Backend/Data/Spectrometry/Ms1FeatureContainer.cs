@@ -86,24 +86,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IList<Ms1FeatureCluster> GetFilteredFeatures(IList<SortedSet<Ms1FeatureCluster>> connectedFeatureList)
         {
             var filteredFeatures = new List<Ms1FeatureCluster>();
-            //var stopwatch = Stopwatch.StartNew();
-            var i = 0;
             foreach (var featureSet in connectedFeatureList)
             {
-                i++;
-                var n1 = featureSet.Count;
-                //Console.Write("Processing {0} connected component; # of features = {1}", i, n1);
                 var newList = RemoveOverlappedFeatures(featureSet);
-                var n2 = newList.Count;
-                filteredFeatures.AddRange(newList);
-                //Console.WriteLine("...reduced to {0} ", n2);
-            }
+                
+                foreach (var f in newList) f.UpdateAbundance();
 
-            //stopwatch.Stop();
-            //var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
-            //Console.WriteLine("# of filtered features = {0};  Elapsed Time = {1:0.000} sec", filteredFeatures.Count, elapsed);
+                filteredFeatures.AddRange(newList);
+            }
             return filteredFeatures;
         }
+
+
+        private bool SimilarScore(Ms1FeatureCluster f1, Ms1FeatureCluster f2)
+        {
+            if (Math.Abs(f1.GetScore(Ms1FeatureScore.EnvelopeCorrelation) -
+                         f2.GetScore(Ms1FeatureScore.EnvelopeCorrelation)) > 0.05) return false;
+
+            if (Math.Abs(f1.GetScore(Ms1FeatureScore.BhattacharyyaDistance) -
+                                     f2.GetScore(Ms1FeatureScore.BhattacharyyaDistance)) > 0.01) return false;
+            return true;
+        }
+        
 
         private IList<Ms1FeatureCluster> RemoveOverlappedFeatures(SortedSet<Ms1FeatureCluster> featureSet)
         {
@@ -124,8 +128,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     if (featureSet.Remove(f))
                     {
                         var massDiff = Math.Abs(bestFeature.RepresentativeMass - f.RepresentativeMass);
-                        //if (massDiff < massTol || Math.Abs(massDiff - 1.0) < massTol || Math.Abs(massDiff - 2.0) < massTol)
-                        if ((Math.Abs(massDiff - 1.0) < massTol || Math.Abs(massDiff - 2.0) < massTol) && bestFeature.SimilarScore(f))
+                        if ((Math.Abs(massDiff - 1.0) < massTol || Math.Abs(massDiff - 2.0) < massTol) && SimilarScore(bestFeature, f))
                         {
                             outFeatures.Add(f);
                             continue;
