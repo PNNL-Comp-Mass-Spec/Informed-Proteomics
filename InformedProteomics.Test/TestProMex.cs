@@ -37,6 +37,7 @@ namespace InformedProteomics.Test
                 var scan = int.Parse(tsvParser.GetData("Scan")[i]);
                 var charge = int.Parse(tsvParser.GetData("Charge")[i]);
                 var mass = double.Parse(tsvParser.GetData("Mass")[i]);
+                var qvalue = double.Parse(tsvParser.GetData("QValue")[i]);
 
                 var ms2Feature = new Ms2Feature()
                 {
@@ -46,7 +47,7 @@ namespace InformedProteomics.Test
                 };
                 
                 var score = featureFinder.GetMs1EvidenceScore(ms2Feature);
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", scan, mass, charge, score);
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", scan, mass, charge, qvalue, score);
             }   
         }
             

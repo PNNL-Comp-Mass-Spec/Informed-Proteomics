@@ -67,9 +67,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     var bcDist = obsEnv.GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
                     var corrCoeff = obsEnv.GetPearsonCorrelation(TheoreticalEnvelope.Envelope);
 
-                    if (bcDist < 0.1 || corrCoeff > 0.8)
+                    if (bcDist < 0.1)
                     {
-                        return Math.Max(corrCoeff, 1 - bcDist);
+                        return 1 - bcDist;
+                    }
+                    if (corrCoeff > 0.85)
+                    {
+                        return corrCoeff;
                     }
 
                     bcDistances.Add(bcDist);
@@ -80,7 +84,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             if (bcDistances.Count < 1) return 0d;
 
-            return Math.Max(1 - bcDistances.Min(), correlations.Max());
+            //return Math.Max(1 - bcDistances.Min(), correlations.Max());
+            return correlations.Max();
         }
 
 
