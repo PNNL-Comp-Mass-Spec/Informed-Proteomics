@@ -37,28 +37,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var correlations = new List<double>();
             var enelopes    = new List<ObservedEnvelope>();
             var maxSearchScans = (int) Math.Max(ms1ScanNums.Length - ms1ScanIndex + 1, ms1ScanIndex);
-            var reachRight = false;
-            var reachLeft = false;
             
             for (var i = 0; i <= maxSearchScans; i++)
             {
                 for (var j = 0; j < 2; j++)
                 {
                     if (i == 0 && j > 0) continue;
-                    
-                    if (reachRight && reachLeft) break;
 
                     var col = (j < 1) ? ms1ScanIndex + i : ms1ScanIndex - i;
-                    if (!reachRight && (col >= ms1ScanNums.Length || Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime))
-                    {
-                        reachRight = true;
-                        continue;
-                    }
-                    if (!reachLeft && (col < 0 || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime))
-                    {
-                        reachLeft = true;
-                        continue;
-                    }
+                    if (col >= ms1ScanNums.Length || col < 0) continue;
+                    if (Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime) continue;
 
                     var ms1Spec = Spectrums[col];
                     var observedPeaks = ms1Spec.GetAllIsotopePeaks(QueryMass, charge, TheoreticalEnvelope, MzTolerance);
