@@ -11,9 +11,6 @@ using InformedProteomics.Backend.Quantification;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
-using MTDBFramework.Algorithms;
-using MTDBFramework.Data;
-using MTDBFramework.IO;
 using NUnit.Framework;
 
 

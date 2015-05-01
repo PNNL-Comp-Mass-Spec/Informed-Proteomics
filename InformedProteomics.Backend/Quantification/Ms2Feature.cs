@@ -14,6 +14,7 @@ namespace InformedProteomics.Backend.Quantification
         public double Mass { get; set; }
 
         public string DataSetId { get; set; }
+        public int Id { get; set; }
         public string Sequence { get; set; }
     }
 
