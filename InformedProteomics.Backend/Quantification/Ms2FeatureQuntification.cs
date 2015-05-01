@@ -49,12 +49,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     if (reachRight && reachLeft) break;
 
                     var col = (j < 1) ? ms1ScanIndex + i : ms1ScanIndex - i;
-                    if (!reachRight && Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime)
+                    if (!reachRight && (col >= ms1ScanNums.Length || Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime))
                     {
                         reachRight = true;
                         continue;
                     }
-                    if (!reachLeft && Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime)
+                    if (!reachLeft && (col < 0 || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime))
                     {
                         reachLeft = true;
                         continue;
@@ -85,8 +85,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (bcDistances.Count < 1) return 0d;
             return correlations.Max();
         }
-
-
+        
         protected override double GetBcDistTh(double normalizedElutionLen)
         {
             if (QueryMass < 15000)

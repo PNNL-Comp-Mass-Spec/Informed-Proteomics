@@ -20,6 +20,15 @@ namespace InformedProteomics.Test
     public class TestProMex
     {
         [Test]
+        public void TestQuantBottomUpData()
+        {
+            var m = 500;
+            var theoreticalEnvelope = new IsotopeList(m, 30, 0.1);
+        }
+        
+
+
+        [Test]
         public void TestMs1EvidenceScore()
         {
             const string TestRawFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01.pbf";
@@ -50,12 +59,6 @@ namespace InformedProteomics.Test
             
 
 
-        [Test]
-        public void TestQuantBottomUpData()
-        {
-                  
-        }
-        
         
         [Test]
         public void TestPredictPTMfromMs1ft()

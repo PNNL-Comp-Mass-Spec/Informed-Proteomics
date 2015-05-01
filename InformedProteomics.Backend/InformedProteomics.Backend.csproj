@@ -129,7 +129,6 @@
     <Compile Include="Data\Spectrometry\Ms1FeatureCluster.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureContainer.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureMatrix.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureQuntify.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureScore.cs" />
     <Compile Include="Data\Spectrometry\Ms1Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />

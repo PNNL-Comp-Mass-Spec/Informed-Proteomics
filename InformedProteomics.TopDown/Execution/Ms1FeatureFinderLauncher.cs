@@ -89,8 +89,10 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine("Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
 
-            var extractor = new Ms1FeatureMatrix(run, Parameters.MinSearchCharge, Parameters.MaxSearchCharge, Parameters.MaxThreads);
+            var extractor = Ms1FeatureMatrix.Create(run, Parameters.MinSearchCharge, Parameters.MaxSearchCharge, Parameters.MaxThreads);
             Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            
+            
             //extractor.GetFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _scoreReport, _csvOutput, _tmpOutput);
             //var outTsvFilePath = Path.ChangeExtension(rawFile, FileExtension);
             //if (File.Exists(outTsvFilePath)) return outTsvFilePath;

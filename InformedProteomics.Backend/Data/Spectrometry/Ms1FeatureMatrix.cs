@@ -16,15 +16,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Ms1FeatureMatrix
     {
-        public Ms1FeatureMatrix(LcMsRun run, int minScanCharge = 2, int maxScanCharge = 60, int maxThreadCount = 0, int numBits = 27)
+        protected Ms1FeatureMatrix(LcMsRun run, int minScanCharge, int maxScanCharge, int maxThreadCount)
         {
             Run = run;
-            MinScanCharge  = minScanCharge;
-            MaxScanCharge  = maxScanCharge;
+            MinScanCharge = minScanCharge;
+            MaxScanCharge = maxScanCharge;
             _maxThreadCount = maxThreadCount;
-            Comparer        = new MzComparerWithBinning(numBits);
-            _ms1PeakList    = new List<Ms1Peak>();
-            Spectrums      = new List<Ms1Spectrum>();
+
+            _ms1PeakList = new List<Ms1Peak>();
+            Spectrums = new List<Ms1Spectrum>();
             var ms1ScanNums = run.GetMs1ScanVector();
             NScans = ms1ScanNums.Length;
 
@@ -35,28 +35,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _ms1PeakList.AddRange((Ms1Peak[])ms1Spec.Peaks);
             }
             _ms1PeakList.Sort();
-
-            CorrelationMap     = new double[MaxChargeLength][];
-            DistanceMap        = new double[MaxChargeLength][];
-            AccurateMass       = new double[MaxChargeLength][];
-            FeatureMatrix      = new Ms1Peak[MaxChargeLength][][];
-            _checkedOut         = new bool[MaxChargeLength][];
-
-            for (var i = 0; i < MaxChargeLength; i++)
-            {
-                _checkedOut[i]          = new bool[NScans];
-                CorrelationMap[i]      = new double[NScans];
-                FeatureMatrix[i]       = new Ms1Peak[NScans][];
-                DistanceMap[i]         = new double[NScans];
-                AccurateMass[i]        = new double[NScans];
-
-                for (var j = 0; j < NScans; j++)
-                {
-                    FeatureMatrix[i][j] = new Ms1Peak[MaxEnvelopeLength];
-                }
-            }
         }
 
+        public static Ms1FeatureMatrix Create(LcMsRun run, int minScanCharge, int maxScanCharge, int maxThreadCount = 0, int numBits = 27)
+        {
+            var matrix = new Ms1FeatureMatrix(run, minScanCharge, maxScanCharge, maxThreadCount);
+            matrix.SetFeatureMatrix(numBits);
+            return matrix;
+        }
+        
         public IList<Ms1FeatureCluster> GetProbableClusters(int queryMassBinNum)
         {
             return GetProbableClusters(Comparer.GetMzAverage(queryMassBinNum));
@@ -96,7 +83,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return idx < 0 ? null : Spectrums[idx];
         }
 
-        public readonly MzComparerWithBinning Comparer;
+        public MzComparerWithBinning Comparer;
         public readonly static Tolerance MzTolerance = new Tolerance(5);
 
         public LcMsRun Run;
@@ -109,12 +96,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private static List<Ms1Peak> _ms1PeakList;
         protected const int MaxEnvelopeLength = 30;
         protected const int MaxChargeLength = 40;
-        private readonly bool[][] _checkedOut;
 
-        protected readonly double[][] CorrelationMap;
-        protected readonly double[][] DistanceMap;
-        protected readonly double[][] AccurateMass;
-        protected readonly Ms1Peak[][][] FeatureMatrix;
+        private bool[][] _checkedOut;
+        protected double[][] CorrelationMap;
+        protected double[][] DistanceMap;
+        protected double[][] AccurateMass;
+        protected Ms1Peak[][][] FeatureMatrix;
 
         protected IsotopeList TheoreticalEnvelope;
         protected int[] Rows;
@@ -124,7 +111,31 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         protected int MinSearchMassBin;
         protected int MaxSearchMassBin;
         protected double QueryMass;
+        
+        protected void SetFeatureMatrix(int numBits = 27)
+        {
+            Comparer = new MzComparerWithBinning(numBits);
+            CorrelationMap = new double[MaxChargeLength][];
+            DistanceMap = new double[MaxChargeLength][];
+            AccurateMass = new double[MaxChargeLength][];
+            FeatureMatrix = new Ms1Peak[MaxChargeLength][][];
+            _checkedOut = new bool[MaxChargeLength][];
 
+            for (var i = 0; i < MaxChargeLength; i++)
+            {
+                _checkedOut[i] = new bool[NScans];
+                CorrelationMap[i] = new double[NScans];
+                FeatureMatrix[i] = new Ms1Peak[NScans][];
+                DistanceMap[i] = new double[NScans];
+                AccurateMass[i] = new double[NScans];
+
+                for (var j = 0; j < NScans; j++)
+                {
+                    FeatureMatrix[i][j] = new Ms1Peak[MaxEnvelopeLength];
+                }
+            }
+        }
+        
         protected void SetQueryMass(double queryMass)
         {
             QueryMass = queryMass;
@@ -145,6 +156,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new IntRange(chargeLb, chargeUb);
         }
 
+       
         protected void BuildFeatureMatrix()
         {
             var queryMassBinNum     = Comparer.GetBinNumber(QueryMass);
