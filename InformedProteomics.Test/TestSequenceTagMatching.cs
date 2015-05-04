@@ -166,8 +166,8 @@ namespace InformedProteomics.Test
             const int minTagLength = 5;
 
             var proteinToScan = new Dictionary<string, HashSet<int>>();
-            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
-            //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+            //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+            const string fastaFilePath = @"\\protoapps\UserData\Jungkap\Co_culture\ID_003539_768ADBFA.fasta";
             //const string fastaFilePath =
             //    @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
 
@@ -175,7 +175,10 @@ namespace InformedProteomics.Test
             var searchableDb = new SearchableDatabase(fastaDb);
             Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
 
-            const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
+            //const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
+            //const string tagFilePath = @"\\protoapps\UserData\Jungkap\Co_culture\23B_pellet_TD_3Feb14_Bane_PL011402.seqtag";
+            const string tagFilePath = @"D:\MassSpecFiles\co_culture\23A_pellet_TD_3Feb14_Bane_PL011402.seqtag";
+
             var isHeader = true;
             var numMatchedPairs = 0;
             foreach (var line in File.ReadAllLines(tagFilePath))

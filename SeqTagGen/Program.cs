@@ -45,7 +45,7 @@ namespace SeqTagGen
                 {"-o", null},
                 {"-t", "5"},
                 {"-minLen", "5"},
-                {"-maxTags", "100"},
+                {"-maxTags", "-1"},
                 {"-maxThreads", "0"},
             };
 
@@ -143,6 +143,7 @@ namespace SeqTagGen
             foreach (var scanNum in ms2ScanNums)
             {
                 var ms2Spec = run.GetSpectrum(scanNum) as ProductSpectrum;
+                
                 var tagFinder = new SequenceTagFinder(ms2Spec, _tolerance, _minLen);
 
                 var nTags = 0;
@@ -159,6 +160,7 @@ namespace SeqTagGen
                         }    
                     }
                 }
+
                 nProcessed++;
                 avgTags += nTags;
 
@@ -200,7 +202,7 @@ namespace SeqTagGen
                 "\t[-o OutFolder (default: InputFolder)]\n" +
                 "\t[-t Tolerance (default: 5 ppm)]\n"+
                 "\t[-minLen MinSequenceTagLength] (minimum length of sequence tag, default: 5)\n" +
-                "\t[-maxTags MaxNumberOfSequenceTags] (maximum number of sequence tags per spectrum, default: 100, unlimited: -1)\n" +
+                "\t[-maxTags MaxNumberOfSequenceTags] (maximum number of sequence tags per spectrum, default: -1, unlimited: -1)\n" +
                 "\t[-maxThreads 0 (default: 0 (no limit))]\n"
                 );
         }

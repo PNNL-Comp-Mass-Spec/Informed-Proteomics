@@ -18,6 +18,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         }
 
+        
+
         public double GetMs1EvidenceScore(Ms2Feature ms2Feature)
         {
             SetQueryMass(ms2Feature.Mass);

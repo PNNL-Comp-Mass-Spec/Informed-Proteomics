@@ -22,8 +22,13 @@ namespace InformedProteomics.Test
         [Test]
         public void TestQuantBottomUpData()
         {
-            var m = 500;
-            var theoreticalEnvelope = new IsotopeList(m, 30, 0.1);
+            for (var m = 500; m < 5000; m += 100)
+            {
+                var theoreticalEnvelope = new IsotopeList(m, 30, 0.1);    
+
+                Console.WriteLine("{0}\t{1}", m, theoreticalEnvelope.Count);
+            }
+            
         }
         
 

@@ -13,19 +13,43 @@ namespace InformedProteomics.Backend.Quantification
         public int Charge { get; set; }
         public double Mass { get; set; }
 
+        public double Net { get; set; }
+
         public string DataSetId { get; set; }
         public int Id { get; set; }
         public string Sequence { get; set; }
-    }
 
-    public class MatchedMs1Feature : Ms1Feature
-    {
-        public MatchedMs1Feature(LcMsRun run, Ms2Feature ms2Feature) : base(run)
+        public bool LinkedToSameMs1Feature(Ms2Feature other)
         {
-            _ms2Feature = ms2Feature;
+            return Ms1Feature.Ms2FeatureSet.Contains(other);
         }
 
-        private readonly Ms2Feature _ms2Feature;
-        //public List<Ms2Feature> Ms2Features { get; private set; }
+        public QuantifiedMs1Feature Ms1Feature 
+        {
+            get { return _ms1Feature; }
+            set
+            {
+                _ms1Feature = value;
+                _ms1Feature.LinkMs2Feature(this);
+            }
+        }
+
+        private QuantifiedMs1Feature _ms1Feature;
+    }
+
+    public class QuantifiedMs1Feature : Ms1FeatureCluster
+    {
+        public QuantifiedMs1Feature(LcMsRun run, byte minCharge, IsotopeList isoList, double repMass, int repCharge, double repMz, int repScanNum) : 
+            base(run, minCharge, isoList, repMass, repCharge, repMz, repScanNum)
+        {
+            Ms2FeatureSet = new HashSet<Ms2Feature>();
+        }
+
+        public void LinkMs2Feature(Ms2Feature m2)
+        {
+            Ms2FeatureSet.Add(m2);
+        }
+
+        public readonly HashSet<Ms2Feature> Ms2FeatureSet;
     }
 }

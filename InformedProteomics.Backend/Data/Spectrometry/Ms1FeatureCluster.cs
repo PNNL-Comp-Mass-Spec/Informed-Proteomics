@@ -49,12 +49,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var ms1ScanNums = Run.GetMs1ScanVector();
 
-            if (MinScanNum == 0 || envelope.Col > MaxCol)
+            if (MaxScanNum == 0 || envelope.Col > MaxCol)
             {
                 MaxCol = envelope.Col;
                 MaxScanNum = ms1ScanNums[MaxCol];
             }
-            if (MaxScanNum == 0 || envelope.Col < MinCol)
+            if (MinScanNum == 0 || envelope.Col < MinCol)
             {
                 MinCol = envelope.Col;
                 MinScanNum = ms1ScanNums[MinCol];
