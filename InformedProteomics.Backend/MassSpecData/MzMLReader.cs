@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -17,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private StreamReader _fileReader = null;
         private XmlReader _xmlReaderForYield = null;
         private bool _reduceMemoryUsage = false;
-        private long _artificialScanNum = 0;
+        private long _artificialScanNum = 1;
         private long _numSpectra = -1;
         private IndexList _spectrumOffsets = new IndexList() {IndexType = IndexList.IndexListType.Spectrum};
         private IndexList _chromatogramOffsets = new IndexList() { IndexType = IndexList.IndexListType.Chromatogram };
@@ -146,7 +147,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private class IndexList
         {
-            private long _artificialScanNum = 0;
+            private long _artificialScanNum = 1;
             public class IndexItem // A struct would be faster, but it can also be a pain since it is a value type
             {
                 public string Ref;
@@ -163,7 +164,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             public void Clear()
             {
-                _artificialScanNum = 0;
+                _artificialScanNum = 1;
                 _offsets.Clear();
                 OffsetsMapInt.Clear();
                 OffsetsMapNative.Clear();
@@ -192,7 +193,13 @@ namespace InformedProteomics.Backend.MassSpecData
 
             public void AddOffset(string idRef, long offset)
             {
-                var item = new IndexItem(idRef, offset, _artificialScanNum++);
+                var scanNum = _artificialScanNum++;
+                long num;
+                if (NativeIdConversion.TryGetScanNumberLong(idRef, out num))
+                {
+                    scanNum = num;
+                }
+                var item = new IndexItem(idRef, offset, scanNum);
                 AddMapForOffset(item);
                 _offsets.Add(item);
             }
@@ -230,6 +237,117 @@ namespace InformedProteomics.Backend.MassSpecData
                     AddMapForOffset(offset);
                 }
             }
+        }
+
+        public static class NativeIdConversion
+        {
+            private static Dictionary<string, string> ParseNativeId(string nativeId)
+            {
+                var tokens = nativeId.Split(new char[] {'\t', ' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+                var map = new Dictionary<string, string>();
+                foreach (var token in tokens)
+                {
+                    var equals = token.IndexOf('=');
+                    var name = token.Substring(0, equals);
+                    var value = token.Substring(equals + 1);
+                    map.Add(name, value);
+                }
+                return map;
+            }
+
+            public static bool TryGetScanNumberLong(string nativeId, out long num)
+            {
+                return long.TryParse(GetScanNumber(nativeId), out num);
+            }
+
+            public static bool TryGetScanNumberInt(string nativeId, out int num)
+            {
+                return int.TryParse(GetScanNumber(nativeId), out num);
+            }
+
+            // Code is ported from MSData.cpp in ProteoWizard
+            public static string GetScanNumber(string nativeId)
+            {
+                // TODO: Add interpreter for Waters' S0F1, S1F1, S0F2,... format
+                //switch (nativeIdFormat)
+                //{
+                //    case MS_spectrum_identifier_nativeID_format: // mzData
+                //        return value(id, "spectrum");
+                //
+                //    case MS_multiple_peak_list_nativeID_format: // MGF
+                //        return value(id, "index");
+                //
+                //    case MS_Agilent_MassHunter_nativeID_format:
+                //        return value(id, "scanId");
+                //
+                //    case MS_Thermo_nativeID_format:
+                //        // conversion from Thermo nativeIDs assumes default controller information
+                //        if (id.find("controllerType=0 controllerNumber=1") != 0)
+                //            return "";
+                //
+                //        // fall through to get scan
+                //
+                //    case MS_Bruker_Agilent_YEP_nativeID_format:
+                //    case MS_Bruker_BAF_nativeID_format:
+                //    case MS_scan_number_only_nativeID_format:
+                //        return value(id, "scan");
+                //
+                //    default:
+                //        if (bal::starts_with(id, "scan=")) return value(id, "scan");
+                //        else if (bal::starts_with(id, "index=")) return value(id, "index");
+                //        return "";
+                //}
+                if (nativeId.Contains("="))
+                {
+                    var map = ParseNativeId(nativeId);
+                    if (map.ContainsKey("spectrum"))
+                    {
+                        return map["spectrum"];
+                    }
+                    if (map.ContainsKey("index"))
+                    {
+                        return map["index"];
+                    }
+                    if (map.ContainsKey("scanId"))
+                    {
+                        return map["scanId"];
+                    }
+                    if (map.ContainsKey("scan"))
+                    {
+                        return map["scan"];
+                    }
+                }
+
+                // No equals sign, don't have parser breakdown
+                // Or key data not found in breakdown of nativeId
+                return nativeId;
+            }
+
+            //public static string GetNativeId(string scanNumber)
+            //{
+            //    switch (nativeIdFormat)
+            //    {
+            //        case MS_Thermo_nativeID_format:
+            //            return "controllerType=0 controllerNumber=1 scan=" + scanNumber;
+            //
+            //        case MS_spectrum_identifier_nativeID_format:
+            //            return "spectrum=" + scanNumber;
+            //
+            //        case MS_multiple_peak_list_nativeID_format:
+            //            return "index=" + scanNumber;
+            //
+            //        case MS_Agilent_MassHunter_nativeID_format:
+            //            return "scanId=" + scanNumber;
+            //
+            //        case MS_Bruker_Agilent_YEP_nativeID_format:
+            //        case MS_Bruker_BAF_nativeID_format:
+            //        case MS_scan_number_only_nativeID_format:
+            //            return "scan=" + scanNumber;
+            //
+            //        default:
+            //            return "";
+            //    }
+            //}
         }
 
         private readonly Dictionary<string, List<Param>> _referenceableParamGroups = new Dictionary<string, List<Param>>();
@@ -425,7 +543,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (_reduceMemoryUsage)
             {
-                _artificialScanNum = 0;
+                _artificialScanNum = 1;
                 ReadMzMl();
 
                 while (_xmlReaderForYield.ReadState == ReadState.Interactive)
@@ -473,7 +591,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (!_allRead)
             {
-                _artificialScanNum = 0;
+                _artificialScanNum = 1;
                 _reduceMemoryUsage = false; // They called this on a non-random access reader, now they suffer the consequences.
                 ReadMzMl();
             }
@@ -1606,25 +1724,25 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 nativeId = reader.GetAttribute("nativeID"); // Native ID in mzML_1.0.0
             }
-            //int scanNum = Convert.ToInt32(spectrumId.Substring(spectrumId.LastIndexOf("scan=") + 5));
-            // TODO: Get rid of this hack, use something with nativeID. May involve special checks for mzML version
-            int scanNum = (int)(_artificialScanNum++);
+
+            int scanNum = -1;
             // If a random access reader, there is already a scan number stored, based on the order of the index. Use it instead.
             if (_randomAccess)
             {
                 scanNum = (int) (_spectrumOffsets.NativeToIdMap[nativeId]);
             }
-            // This won't work; removed until a good parser for most forms of NativeID is available.
-            /*// Find last non-digit
-            int pos = 0;
-            for (int i = 0; i < nativeId.Length; i++)
+            else
             {
-                if (!char.IsDigit(nativeId[i]))
+                scanNum = (int)(_artificialScanNum++);
+                // Interpret the NativeID (if the format has an interpreter) and use it instead of the artificial number.
+                // TODO: Better handling than the artificial ID for other nativeIDs (ones currently not supported)
+                int num = 0;
+                if (NativeIdConversion.TryGetScanNumberInt(nativeId, out num))
                 {
-                    pos = i;
+                    scanNum = num;
                 }
             }
-            scanNum = Int32.Parse(nativeId.Substring(pos + 1));*/
+
             int defaultArraySize = Convert.ToInt32(reader.GetAttribute("defaultArrayLength"));
             reader.ReadStartElement("spectrum"); // Throws exception if we are not at the "spectrum" tag.
             bool is_ms_ms = false;
