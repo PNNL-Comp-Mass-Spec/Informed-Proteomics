@@ -62,15 +62,20 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             _maxSequenceMass = maxSequenceMass;
             _minProductIonCharge = minProductIonCharge;
             _maxProductIonCharge = maxProductIonCharge;
+            MinScan = int.MinValue;
+            MaxScan = int.MaxValue;
         }
 
+
+        public int MinScan { get; set; }
+        public int MaxScan { get; set; }
 
         public void RunSearch()
         {
             Console.WriteLine("Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStartIndex\tEndIndex\tProteinLength");
             foreach (var ms2ScanNum in _tagParser.GetScanNums())
             {
-                RunSearch(ms2ScanNum);
+                if(ms2ScanNum >= MinScan && ms2ScanNum <= MaxScan) RunSearch(ms2ScanNum);
             }
         }
 
@@ -100,7 +105,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     tagSequenceMatch.ProteinName,
                     tagMatch.StartIndex,
                     tagMatch.EndIndex,
-                    tagSequenceMatch.Sequence.Length
+                    _fastaDb.GetProteinLength(tagSequenceMatch.ProteinName)
                     );
             }
         }

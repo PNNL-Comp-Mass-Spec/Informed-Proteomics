@@ -21,8 +21,9 @@ namespace InformedProteomics.Test
         public void TestTagBasedSearch()
         {
 //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
-            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+//            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 //            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
+            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 5;
@@ -30,7 +31,7 @@ namespace InformedProteomics.Test
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 200);
 
 //            const string fastaFilePath = @"H:\Research\Lewy\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+            const string fastaFilePath = @"H:\Research\Weijun_TopDown\database\ID_005140_7A170668.fasta";
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
 
@@ -44,7 +45,9 @@ namespace InformedProteomics.Test
         private void TestTagBasedSearch(LcMsRun run, SequenceTagParser tagParser,
             FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
         {
-            var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
+            var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet, 6, 60000.0);
+            engine.MinScan = 3700;
+            engine.MaxScan = 3900;
             engine.RunSearch();
         }
 
@@ -201,8 +204,8 @@ namespace InformedProteomics.Test
             const int minTagLength = 6;
 
             var proteinToScan = new Dictionary<string, HashSet<int>>();
-            //const string fastaFilePath =
-            //    @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string fastaFilePath =
+                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
 
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
