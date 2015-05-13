@@ -188,7 +188,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new int[0];
         }
 
-        [Obsolete("This method ignores N- and C-term specific modifications.")]
+        // This method ignores N- and C-term specific modifications.
         public Composition.Composition GetComposition(string sequence)
         {
             var composition = Composition.Composition.Zero;

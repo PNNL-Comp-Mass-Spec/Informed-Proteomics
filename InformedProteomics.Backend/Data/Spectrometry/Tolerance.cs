@@ -42,6 +42,13 @@
             return GetToleranceAsTh(mz)*charge;
         }
 
+        public bool IsWithin(double mz1, double mz2)
+        {
+            var tolTh = GetToleranceAsTh(mz1);
+            if (tolTh < 0) tolTh = -tolTh;
+            return mz2 > mz1 - tolTh && mz2 < mz1 + tolTh;
+        }
+
         public override string ToString()
         { 
             return string.Format("{0}{1}", _value, _unit);

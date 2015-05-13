@@ -258,7 +258,7 @@ namespace InformedProteomics.TopDown.Execution
             return annotationsAndOffsets;
         }
 
-        private SortedSet<SequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter)
+        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter)
         {
             var sw = new Stopwatch();
 
@@ -267,7 +267,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Reset();
             sw.Start();
 
-            var matches = new SortedSet<SequenceSpectrumMatch>[_run.MaxLcScan+1];
+            var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan+1];
 
             var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
 
@@ -331,13 +331,13 @@ namespace InformedProteomics.TopDown.Execution
                             var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
                             var post = annotation[annotation.Length - 1];
 
-                            var prsm = new SequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
+                            var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
                                 numNTermCleavages,
                                 modCombinations, precursorIon, score);
 
                             if (matches[ms2ScanNum] == null)
                             {
-                                matches[ms2ScanNum] = new SortedSet<SequenceSpectrumMatch> {prsm};
+                                matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> {prsm};
                             }
                             else // already exists
                             {
@@ -360,7 +360,7 @@ namespace InformedProteomics.TopDown.Execution
             return matches;
         }
 
-        private void WriteResultsToFile(SortedSet<SequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)
+        private void WriteResultsToFile(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)
         {
             using (var writer = new StreamWriter(outputFilePath))
             {
@@ -374,7 +374,7 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         var sequence = match.Sequence;
                         var offset = match.Offset;
-                        var start = database.GetZeroBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
+                        var start = database.GetOneBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
                         var end = start + sequence.Length - 1;
                         var proteinName = database.GetProteinName(match.Offset);
                         var protLength = database.GetProteinLength(proteinName);

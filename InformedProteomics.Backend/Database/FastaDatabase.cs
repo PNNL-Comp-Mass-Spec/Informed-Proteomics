@@ -176,6 +176,12 @@ namespace InformedProteomics.Backend.Database
             return _names.Count;
         }
 
+        public IEnumerable<string> GetProteinNames()
+        {
+            Read();
+            return _names.Values;
+        }
+
         public byte[] GetSequence()
         {
             if(_sequence == null)   Read();
@@ -232,9 +238,14 @@ namespace InformedProteomics.Backend.Database
             return Encoding.GetString(_sequence, (int)(offset + 1), length);
         }
 
-        public int GetZeroBasedPositionInProtein(long offset)
+        public int GetOneBasedPositionInProtein(long offset)
         {
             return (int)(offset - GetOffsetKey(offset));
+        }
+
+        public int GetZeroBasedPositionInProtein(long offset)
+        {
+            return GetOneBasedPositionInProtein(offset) - 1;
         }
 
         internal int GetLastWriteTimeHash()

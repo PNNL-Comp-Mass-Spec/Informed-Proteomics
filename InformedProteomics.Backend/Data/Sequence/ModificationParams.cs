@@ -106,11 +106,12 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, _maxNumDynModsPerSequence);
             _modificationCombinations = new ModificationCombination[combinations.Length];
-            int index = -1;
+            var index = -1;
             foreach (var combination in combinations)
             {
                 var modList = (from i in combination where i > 0 select _modifications[i - 1]).ToList();
-                _modificationCombinations[++index] = new ModificationCombination(modList);
+                var modComb = new ModificationCombination(modList);
+                _modificationCombinations[++index] = modComb;
                 var hashValue = ToHash(combination);
                 _indexToHashValue[index] = hashValue;
                 _hashValueToModCombIndex[hashValue] = index;

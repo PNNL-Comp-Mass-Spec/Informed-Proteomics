@@ -1,48 +1,33 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Sequence : List<AminoAcid>, IMolecule
     {
-		public static readonly AminoAcidSet StandardAminoAcidSet;
-		public static readonly AminoAcidSet StandardAminoAcidSetWithFixedCarbamidoMethyl;
-
-	    static Sequence()
-	    {
-			StandardAminoAcidSet = new AminoAcidSet();
-			StandardAminoAcidSetWithFixedCarbamidoMethyl = new AminoAcidSet(Modification.Carbamidomethylation);
-	    }
-
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
-            var composition = Data.Composition.Composition.Zero;
+            var aminoAcids = aaArr as IList<AminoAcid> ?? aaArr.ToList();
 
-            foreach (var aa in aaArr)
+            PrefixComposition = new Composition.Composition[aminoAcids.Count + 1];
+            PrefixComposition[0] = Data.Composition.Composition.Zero;
+            for (var i = 0; i < aminoAcids.Count; i++)
             {
+                var aa = aminoAcids[i] ?? AminoAcid.Empty;
                 Add(aa);
-                composition += aa.Composition;
+                PrefixComposition[i+1] = PrefixComposition[i] + aa.Composition;
             }
 
-            Composition = composition;
+            Composition = PrefixComposition[aminoAcids.Count];
+            _prefixMass = PrefixComposition.Select(c => c.Mass).ToArray();
         }
 
-        public Sequence(string sequence, AminoAcidSet aminoAcidSet)
+        public Sequence(string sequence, AminoAcidSet aminoAcidSet): this(sequence.Select(aminoAcidSet.GetAminoAcid))
         {
-            var composition = Data.Composition.Composition.Zero;
-            foreach (var residue in sequence)
-            {
-                var aa = aminoAcidSet.GetAminoAcid(residue);
-                Add(aa);
-                composition += aa.Composition;
-            }
-            Composition = composition;
         }
 
         // modStr: E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27
@@ -87,24 +72,25 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Sequence(aaList);
         }
 
+        // 1-based: PrefixComposition[0] = Composition.Zero
+        public Composition.Composition[] PrefixComposition { get; private set; }
         public Composition.Composition Composition { get; private set; }
         public double Mass { get { return Composition.Mass; } }
 
+        private readonly double[] _prefixMass;
+
+        // from: inclusive
+        // to: exclusive
         public double GetMass(int from, int to)
         {
-            return GetComposition(from, to).Mass;
+            return _prefixMass[to] - _prefixMass[from];
         }
 
         // from: inclusive
         // to: exclusive
         public Composition.Composition GetComposition(int from, int to)
         {
-            from = Math.Max(from, 0);
-            to = Math.Min(to, Count);
-            var composition = Data.Composition.Composition.Zero;
-            for (var i = from; i < to; i++)
-                composition += this[i].Composition;
-            return composition;
+            return PrefixComposition[to] - PrefixComposition[from];
         }
 
         public IEnumerable<Cleavage> GetInternalCleavages()
@@ -124,25 +110,27 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public IEnumerable<Composition.Composition> GetPrefixCompositions()
         {
-            var compositions = new Composition.Composition[Count];
-            var prefixComposition = Data.Composition.Composition.Zero;
-            var index = -1;
-            foreach (var aa in this)
-            {
-                compositions[++index] = (prefixComposition += aa.Composition);
-            }
-            return compositions;
+            //var compositions = new Composition.Composition[Count];
+            //var prefixComposition = Data.Composition.Composition.Zero;
+            //var index = -1;
+            //foreach (var aa in this)
+            //{
+            //    compositions[++index] = (prefixComposition += aa.Composition);
+            //}
+            //return compositions;
+            return PrefixComposition.Skip(1);
         }
 
         public IEnumerable<Composition.Composition> GetSuffixCompositions()
         {
-            var compositions = new Composition.Composition[Count];
-            var suffixComposition = Data.Composition.Composition.Zero;
-            for(var index = 0; index < Count; ++index)
-            {
-                compositions[index] = (suffixComposition += this[Count-1-index].Composition);
-            }
-            return compositions;
+            //var compositions = new Composition.Composition[Count];
+            //var suffixComposition = Data.Composition.Composition.Zero;
+            //for(var index = 0; index < Count; ++index)
+            //{
+            //    compositions[index] = (suffixComposition += this[Count-1-index].Composition);
+            //}
+            //return compositions;
+            return PrefixComposition.Reverse().Select(c => Composition - c).Take(Count);
         }
 
         public Ion GetPrecursorIon(int charge)
@@ -190,7 +178,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+")) return null;
 
-            var stdAaSet = StandardAminoAcidSet;
+            var stdAaSet = AminoAcidSet.GetStandardAminoAcidSet();
             var aaList = new List<AminoAcid>();
 
             var matches = Regex.Matches(msgfPlusPeptideStr, "("+aminoAcidRegex+"|"+massRegex+")");

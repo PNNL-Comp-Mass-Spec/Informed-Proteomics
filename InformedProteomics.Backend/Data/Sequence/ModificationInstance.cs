@@ -1,44 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace InformedProteomics.Backend.Data.Sequence
+﻿namespace InformedProteomics.Backend.Data.Sequence
 {
     public class ModificationInstance
     {
-        public ModificationInstance(IEnumerable<Modification> modifications)
+        public ModificationInstance(Modification modification, int index)
         {
-            Modifications = modifications;
-            Composition = Composition.Zero;
-            foreach(var modification in Modifications)
-            {
-                Composition += modification.Composition;
-            }
+            Modification = modification;
+            Index = index;
         }
 
-        private Composition _composition;
-        private double _mass;
+        public Modification Modification { get; private set; }
+        public int Index { get; private set; }
 
-        public IEnumerable<Modification> Modifications { get; private set; }
-        public Composition Composition 
-        { 
-            get { return _composition; }
-            private set 
-            { 
-                _composition = value;
-                _mass = value.GetMass();
-            }
+        public override string ToString()
+        {
+            return Modification.Name + " " + (Index+1);
         }
 
-        public int GetNumModifications()
+        public ModificationInstance GetModificationInstanceWithOffset(int offset)
         {
-            return Modifications.Count();
-        }
-
-        public double GetMass()
-        {
-            return _mass;
+            return new ModificationInstance(Modification, Index + offset);
         }
     }
 }

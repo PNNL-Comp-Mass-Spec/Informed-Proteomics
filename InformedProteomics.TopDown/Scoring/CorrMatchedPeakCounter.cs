@@ -6,15 +6,22 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class CorrMatchedPeakCounter : IScorer
     {
-        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7)
+        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7):
+            this(ms2Spec, tolerance, tolerance, minCharge, maxCharge, corrScoreThreshold)
+        {
+        }
+
+        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance prefixTolerance, Tolerance suffixTolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7)
         {
             _ms2Spec = ms2Spec;
-            _tolerance = tolerance;
+            _prefixTolerance = prefixTolerance;
+            _suffixTolerance = suffixTolerance;
             _minCharge = minCharge;
             _maxCharge = maxCharge;
             _corrScoreThreshold = corrScoreThreshold;
             _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
         }
+
 
         public double GetPrecursorIonScore(Ion precursorIon)
         {
@@ -30,13 +37,14 @@ namespace InformedProteomics.TopDown.Scoring
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
+                var tolerance = baseIonType.IsPrefix ? _prefixTolerance : _suffixTolerance;
                 //fragmentComposition.ComputeApproximateIsotopomerEnvelop();
 
                 var containsIon = false;
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
-                    if (_ms2Spec.GetCorrScore(ion, _tolerance) > _corrScoreThreshold)
+                    if (_ms2Spec.GetCorrScore(ion, tolerance) > _corrScoreThreshold)
                     {
                         containsIon = true;
                         break;
@@ -49,7 +57,8 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         private readonly ProductSpectrum _ms2Spec;
-        private readonly Tolerance _tolerance;
+        private readonly Tolerance _prefixTolerance;
+        private readonly Tolerance _suffixTolerance;
         private readonly int _minCharge;
         private readonly int _maxCharge;
         private readonly BaseIonType[] _baseIonTypes;
@@ -59,6 +68,7 @@ namespace InformedProteomics.TopDown.Scoring
         static CorrMatchedPeakCounter()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
+//            BaseIonTypesCID = new[] { BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
         }
     }

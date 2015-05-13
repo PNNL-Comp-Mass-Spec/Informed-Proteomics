@@ -248,7 +248,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
                 var composition = protCompositions[modIndex];
                 Console.WriteLine("{0}\t{1}", composition, composition.Mass);
-                var curScoreAndModifications = seqGraph.GetScoreAndModifications(0, new DummyScorer());
+                var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(new DummyScorer());
                 if (curScoreAndModifications != null) Console.WriteLine("Score: {0}, Modifications: {1}", curScoreAndModifications.Item1, curScoreAndModifications.Item2);
             }
         }

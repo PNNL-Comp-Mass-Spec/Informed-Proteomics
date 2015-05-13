@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.Utils
             var targetData = File.ReadAllLines(targetResultFilePath);
             var decoyData = File.ReadAllLines(decoyResultFilePath);
 
-            if (targetData.Length <= 1 || decoyData.Length <= 1) return false;
+            if (targetData.Length < 1 || decoyData.Length < 1) return false;
 
             var targetHeaders = targetData[0].Split('\t');
             var decoyHeaders = decoyData[0].Split('\t');
@@ -107,7 +107,7 @@ namespace InformedProteomics.Backend.Utils
             var targetData = File.ReadAllLines(targetResultFilePath);
             var decoyData = File.ReadAllLines(decoyResultFilePath);
 
-            if (targetData.Length <= 1 || decoyData.Length <= 1) return false;
+            if (targetData.Length < 1 || decoyData.Length < 1) return false;
 
             var targetHeaders = targetData[0].Split('\t');
             var decoyHeaders = decoyData[0].Split('\t');

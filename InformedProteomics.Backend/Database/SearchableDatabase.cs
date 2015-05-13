@@ -10,6 +10,7 @@ namespace InformedProteomics.Backend.Database
     {
         public SearchableDatabase(FastaDatabase fastaDatabase)
         {
+            FastaDatabase = fastaDatabase;
             _sequence = fastaDatabase.GetSequence();
             _suffixArray = new int[_sequence.Length];
             SAIS.sufsort(_sequence, _suffixArray, _sequence.Length);
@@ -28,6 +29,8 @@ namespace InformedProteomics.Backend.Database
 
             InitializeLcps(neighboringLcps, _leftLcps, _rightLcps, 0, _suffixArray.Length-1);
         }
+
+        public FastaDatabase FastaDatabase { get; private set; }
 
         /// <summary>
         /// Find all occurrences of pattern in the fasta sequence. Return all matched indices.

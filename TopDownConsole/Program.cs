@@ -9,7 +9,7 @@ namespace MSPathFinderT
     public class Program
     {
         public const string Name = "MSPathFinderT";
-        public const string Version = "0.91 (Feb 11, 2015)";
+        public const string Version = "0.92 (Mar 31, 2015)";
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 

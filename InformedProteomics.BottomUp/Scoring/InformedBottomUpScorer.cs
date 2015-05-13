@@ -34,7 +34,7 @@ namespace InformedProteomics.BottomUp.Scoring
         private readonly RankScore _rankScorer;
         private readonly Dictionary<int, ScoredSpectrum> _scoredSpectra;
 
-        public IcBottomUpScores GetScores(SequenceSpectrumMatch match, Composition composition, int charge,
+        public IcBottomUpScores GetScores(DatabaseSequenceSpectrumMatch match, Composition composition, int charge,
             int ms2ScanNum)
         {
             return GetScores(match.Pre, match.Sequence, match.Post, match.NTerm, match.CTerm, composition, charge, ms2ScanNum);
@@ -75,7 +75,7 @@ namespace InformedProteomics.BottomUp.Scoring
                 var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                 if (!protCompositionWithH2O.Equals(composition)) continue;
 
-                var curScoreAndModifications = seqGraph.GetScoreAndModifications(charge, scoredSpectrum);
+                var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scoredSpectrum);
                 var curScore = curScoreAndModifications.Item1;
                 if (curScore > bestScore)
                 {

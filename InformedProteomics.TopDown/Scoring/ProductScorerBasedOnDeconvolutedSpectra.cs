@@ -12,7 +12,7 @@ namespace InformedProteomics.TopDown.Scoring
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
             ILcMsRun run, 
-            int minProductCharge = 1, int maxProductCharge = 10,
+            int minProductCharge = 1, int maxProductCharge = 20,
             double productTolerancePpm = 10,
             int isotopeOffsetTolerance = 2,
             double filteringWindowSize = 1.1

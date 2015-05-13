@@ -4,6 +4,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.TopDown.Execution;
 
 namespace InformedProteomics.TopDown.Scoring
 {
@@ -26,6 +27,7 @@ namespace InformedProteomics.TopDown.Scoring
         public Tolerance Tolerance { get; private set; }
         public double Ms2CorrThreshold { get; private set; }
 
+//        public DatabaseSequenceSpectrumMatch 
         public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
             var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -49,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                 if (!protCompositionWithH2O.Equals(composition)) continue;
                 
-                var curScoreAndModifications = seqGraph.GetScoreAndModifications(charge, scorer);
+                var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
                 var curScore = curScoreAndModifications.Item1;
                 if (curScore > bestScore)
                 {
@@ -119,7 +121,7 @@ namespace InformedProteomics.TopDown.Scoring
         //    //var annotation = "_." + seqStr + "._";
         //        var scorer = new CorrMatchedPeakCounter(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge), Ms2CorrThreshold);
 
-        //        var curScoreAndModifications = seqGraph.GetScoreAndModifications(charge, scorer);
+        //        var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(charge, scorer);
         //        var curScore = curScoreAndModifications.Item1;
         //        if (curScore > bestScore)
         //        {

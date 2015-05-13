@@ -280,5 +280,14 @@ namespace InformedProteomics.Test.FunctionalTests
             }*/
             Console.WriteLine("TEst end");
         }
+
+        [Test]
+        public void TestReadingRawFileWithSingleMs2Spectrum()
+        {
+            const string specFilePath = @"H:\Research\Jared\2015-05-06_Carbonic_HCD_854_50AVG.raw";
+//            var run = (InMemoryLcMsRun) InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+//            run.WriteAsPbf(Path.ChangeExtension(specFilePath, ".pbf"));
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath);
+        }
     }
 }

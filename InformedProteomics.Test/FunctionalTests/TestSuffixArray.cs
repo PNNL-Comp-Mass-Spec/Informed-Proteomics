@@ -18,11 +18,13 @@ namespace InformedProteomics.Test.FunctionalTests
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
             var db = new FastaDatabase(dbFile);
             var searchableDb = new SearchableDatabase(db);
-            const string pattern = "NSGSHFCGGSLINSQWVVSAAH";
+            //const string pattern = "NSGSHFCGGSLINSQWVVSAAH";
+            const string pattern = "FPTDDDDK";
             var position = searchableDb.Search(pattern);
             Assert.True(position >= 0);
             Console.WriteLine("Position: {0}", position);
             Console.WriteLine("Matched indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern)));
+            Console.WriteLine("Protein indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern).Select(i => db.GetOneBasedPositionInProtein(i))));
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);
@@ -195,7 +197,7 @@ namespace InformedProteomics.Test.FunctionalTests
                     offset, 
                     db.GetProteinName(offset), 
                     db.GetProteinLength(db.GetProteinName(offset)), 
-                    db.GetZeroBasedPositionInProtein(offset)+1);
+                    db.GetOneBasedPositionInProtein(offset)+1);
             }
         }
 

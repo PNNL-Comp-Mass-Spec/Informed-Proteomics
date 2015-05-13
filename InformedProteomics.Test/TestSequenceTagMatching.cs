@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using MathNet.Numerics.Statistics;
+using InformedProteomics.TopDown.PostProcessing;
+using InformedProteomics.TopDown.TagBasedSearch;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -16,11 +18,39 @@ namespace InformedProteomics.Test
     public class TestSequenceTagMatching
     {
         [Test]
-        public void FindProteins()
+        public void TestTagBasedSearch()
         {
+//            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+//            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
+            const int minTagLength = 5;
+            var tagFilePath = Path.ChangeExtension(rawFilePath, ".seqtag");
+            var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 200);
+
+//            const string fastaFilePath = @"H:\Research\Lewy\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+            var fastaDb = new FastaDatabase(fastaFilePath);
+
+            var tolerance = new Tolerance(10);
+//            var aaSet = new AminoAcidSet(@"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt");
+            var aaSet = new AminoAcidSet(@"H:\Research\QCShew_TopDown\Production\Mods.txt");
+
+            TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+        }
+
+        private void TestTagBasedSearch(LcMsRun run, SequenceTagParser tagParser,
+            FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
+        {
+            var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
+            engine.RunSearch();
+        }
+
+        [Test]
+        public void FindProteins()
+        {
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
@@ -42,7 +72,6 @@ namespace InformedProteomics.Test
 
                     var token = line.Split('\t');
                     if (token.Length != 3) continue;
-                    var scan = Convert.ToInt32(token[0]);
                     var tag = token[1];
 
                     var matchedProteins =
@@ -59,11 +88,11 @@ namespace InformedProteomics.Test
         [Test]
         public void CountMatchedProteins()
         {
-            const int minTagLength = 6;
+            const int minTagLength = 3;
 
             var scanToProtein = new Dictionary<int, string>();
             var idTag = new Dictionary<int, bool>();
-            const string resultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V62_Ms1Ft3\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            const string resultFilePath = @"H:\Research\ProMex\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             var parser = new TsvFileParser(resultFilePath);
             var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var proteinNames = parser.GetData("ProteinName").ToArray();
@@ -78,15 +107,15 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
-            //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
-            const string fastaFilePath =
-                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+//            const string fastaFilePath =
+//                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
             Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
 
-            const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
+            const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.seqtag";
 
             var hist = new Dictionary<int, int>();
             
@@ -104,7 +133,7 @@ namespace InformedProteomics.Test
                 }
 
                 var token = line.Split('\t');
-                if (token.Length != 3) continue;
+                if (token.Length < 3) continue;
                 var scan = Convert.ToInt32(token[0]);
                 var proteinId = scanToProtein.ContainsKey(scan) ? scanToProtein[scan] : null;
 
@@ -128,17 +157,23 @@ namespace InformedProteomics.Test
 
                 if (proteinSetForThisScan == null) continue;
 
+                var numMatchesForThisTag = 0;
                 foreach (var matchedProtein in searchableDb.FindAllMatchedSequenceIndices(tag)
                     .Select(index => fastaDb.GetProteinName(index)))
                 {
                     proteinSetForThisScan.Add(matchedProtein);
-                    totalNumMatches++;
+                    ++numMatchesForThisTag;
 
                     if (proteinId != null && matchedProtein.Equals(proteinId))
                     {
                         idTag[scan] = true;
                     }
                 }
+                totalNumMatches += numMatchesForThisTag;
+//                if (numMatchesForThisTag > 10)
+//                {
+//                    Console.WriteLine("{0}\t{1}", tag, numMatchesForThisTag);
+//                }
             }
 
             if (proteinSetForThisScan != null)
@@ -163,11 +198,9 @@ namespace InformedProteomics.Test
         [Test]
         public void CountMatchedScansPerProtein()
         {
-            const int minTagLength = 5;
+            const int minTagLength = 6;
 
             var proteinToScan = new Dictionary<string, HashSet<int>>();
-            //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
-            const string fastaFilePath = @"\\protoapps\UserData\Jungkap\Co_culture\ID_003539_768ADBFA.fasta";
             //const string fastaFilePath =
             //    @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
 
@@ -283,7 +316,7 @@ namespace InformedProteomics.Test
                         foreach (var protName in matchedProteins)
                         {
                             var seqStr = fastaDb.GetProteinSequence(protName);
-                            var oriSeq = new Sequence(seqStr, Sequence.StandardAminoAcidSet);
+                            var oriSeq = new Sequence(seqStr, AminoAcidSet.GetStandardAminoAcidSet());
                             
                             var startIdx = 0;
                             while (true)

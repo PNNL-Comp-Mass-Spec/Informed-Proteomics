@@ -53,6 +53,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -67,8 +71,15 @@
     <Compile Include="Execution\Ms1FeatureFinderInputParameter.cs" />
     <Compile Include="Execution\Ms1FeatureFinderLauncher.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
-    <Compile Include="Execution\SequenceSpectrumMatch.cs" />
+    <Compile Include="Scoring\Ms1FtParser.cs" />
+    <Compile Include="TagBasedSearch\FeatureBasedTagSearchEngine.cs" />
+    <Compile Include="TagBasedSearch\ScanBasedTagSearchEngine.cs" />
+    <Compile Include="Execution\DatabaseSequenceSpectrumMatch.cs" />
     <Compile Include="Execution\MSAlignRescorer.cs" />
+    <Compile Include="PostProcessing\MatchedTagSet.cs" />
+    <Compile Include="PostProcessing\MSPathFinderId.cs" />
+    <Compile Include="PostProcessing\MSPathFinderParser.cs" />
+    <Compile Include="PostProcessing\SequenceTagParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\InformedTopDownScorer.cs" />
     <Compile Include="Scoring\IsosFilter.cs" />
@@ -86,6 +97,8 @@
     <Compile Include="Scoring\SubScoreFactory.cs" />
     <Compile Include="Scoring\TopDownScorer.cs" />
     <Compile Include="Scoring\TopDownTrainer.cs" />
+    <Compile Include="TagBasedSearch\TagMatch.cs" />
+    <Compile Include="TagBasedSearch\TagMatchFinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">

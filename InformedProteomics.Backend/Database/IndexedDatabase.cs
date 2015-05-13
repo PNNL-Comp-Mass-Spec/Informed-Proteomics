@@ -495,5 +495,4 @@ namespace InformedProteomics.Backend.Database
         public byte[] Sequence { set; get; }
         public long Offset { set; get; }
     }
-
 }

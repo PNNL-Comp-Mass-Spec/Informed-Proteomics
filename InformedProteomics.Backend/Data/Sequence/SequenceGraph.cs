@@ -259,12 +259,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return fragmentScore;
         }
 
-        public Tuple<double, string> GetScoreAndModifications(int charge, IScorer scorer)
+        public Tuple<double, string> GetFragmentScoreAndModifications(IScorer scorer)
         {
-            var precursorIon = new Ion(_sinkSequenceCompositionWithH2O, charge);
+//            var precursorIon = new Ion(_sinkSequenceCompositionWithH2O, charge);
 
             // Get 
-            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
+//            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
 
             var nodeScore = new double?[_maxSeqIndex][];
             var maxScore = new Tuple<double, string>[_maxSeqIndex][];
@@ -279,10 +279,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             var fragmentScore = GetFragmentScoreAndModifications(_index, _sinkModIndex, scorer, nodeScore,
                 maxScore);
 
-            return new Tuple<double, string>(fragmentScore.Item1 + precursorIonScore, fragmentScore.Item2);
+            return new Tuple<double, string>(fragmentScore.Item1, fragmentScore.Item2);
         }
 
-        protected SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
+        private SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
         {
             _aminoAcidSet = aminoAcidSet;
             _sequence = sequence;

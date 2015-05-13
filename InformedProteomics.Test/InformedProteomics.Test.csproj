@@ -96,6 +96,8 @@
   <ItemGroup>
     <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
     <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
+    <Compile Include="FunctionalTests\TestReadingProMex.cs" />
+    <Compile Include="FunctionalTests\TestSpectrumMethods.cs" />
     <Compile Include="FunctionalTests\TestTopDownConsole.cs" />
     <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
     <Compile Include="FunctionalTests\TestMzMLReader.cs" />
@@ -114,6 +116,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestFastProteinId.cs" />
+    <Compile Include="TestFeatureBasedSearch.cs" />
     <Compile Include="TestIcBottomUp.cs" />
     <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="TestSelectivityScore.cs" />
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestSequenceTagMatching.cs" />
+    <Compile Include="TestTagBasedSearch.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
   </ItemGroup>

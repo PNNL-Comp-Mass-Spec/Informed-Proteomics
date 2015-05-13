@@ -118,6 +118,8 @@
     <Compile Include="Data\Composition\IsotopomerEnvelope.cs" />
     <Compile Include="Data\Sequence\Cleavage.cs" />
     <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />
+    <Compile Include="Data\Sequence\ModificationInstance.cs" />
+    <Compile Include="Data\Sequence\ShiftedSequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\IMs1Feature.cs" />
     <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
