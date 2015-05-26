@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Windows.Forms;
 
 namespace InformedProteomics.Backend.SequenceTag
 {
@@ -91,44 +93,110 @@ namespace InformedProteomics.Backend.SequenceTag
             return (from t in _adjList from edge in t where edge.Node2 == node select edge).ToList();
         }
 
-        protected virtual void ProcessPath(IEnumerable<T> edges)
+
+        public List<List<int>> ConnnectedComponents()
+        {
+            /*
+            var adjList = new List<int>[features.Count];
+            for (var i = 0; i < features.Count; i++) adjList[i] = new List<int>();
+            for (var i = 0; i < features.Count; i++)
+            {
+                for (var j = i + 1; j < features.Count; j++)
+                {
+                    if (features[j].Mass - features[i].Mass > 2.3) break;
+
+                    //if (SameFeature(features[i], features[j]))
+                    if (features[i].Equals(features[j]))
+                    {
+                        adjList[i].Add(j);
+                        adjList[j].Add(i);
+                    }
+                }
+            }*/
+
+            var componentSet = new List<List<int>>();
+            var visited = new bool[GetNodeCount()];
+            for (var i = 0; i < GetNodeCount(); i++)
+            {
+                if (visited[i]) continue;
+
+                var component = new List<int>();
+                var neighbors = new Queue<int>();
+                neighbors.Enqueue(i);
+                while (true)
+                {
+                    if (neighbors.Count < 1) break;
+                    var j = neighbors.Dequeue();
+                    if (visited[j]) continue;
+                    visited[j] = true;
+
+                    component.Add(j);
+                    foreach (var edge in _adjList[j])
+                    {
+                        if (visited[edge.Node2]) continue;
+                        neighbors.Enqueue(edge.Node2);
+                    }
+                }
+                componentSet.Add(component);
+            }
+            return componentSet;
+        }
+
+
+        protected virtual bool ProcessPath(IEnumerable<T> edges)
         {
             foreach (var edge in edges)
             {
                 Console.Write(edge.Node1 + "-" + edge.Node2 + "\t");
             }
             Console.Write("\n");
+
+            return true;
         }
 
-        //private Stack<int> _nodeList;
-        private Stack<T> _edgeList;
-        private bool[] _nodeVisitFlag;
+        protected virtual bool AlreadyUsedPeak(int node)
+        {
+            return false;
+        }
+
+        protected bool StopFindPath;
+        protected readonly Stack<T> EdgeList = new Stack<T>();
+        
+        protected bool[] NodeVisitFlag;
         protected int MaxTagLen;
         public void FindPaths(int node, bool firstCall = true, T e = null)
         {
             if (firstCall)
             {
-                _nodeVisitFlag = new bool[_adjList.Length];
-                _edgeList = new Stack<T>();
+                NodeVisitFlag = new bool[_adjList.Length];
+                //EdgeList = new Stack<T>();
+                EdgeList.Clear();
             }
             else
             {
-                if (_edgeList.Count >= MaxTagLen)
+                if (EdgeList.Count >= MaxTagLen)
                 {
-                    ProcessPath(_edgeList.Reverse());
-                    _edgeList.Clear();
+                    ProcessPath(EdgeList.Reverse());
+                    EdgeList.Clear();
+                    return;
+                }
+
+                //if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths)
+                if (StopFindPath)
+                {
+                    EdgeList.Clear();
                     return;
                 }
             }
 
-            if (e != null) _edgeList.Push(e);
-
-            _nodeVisitFlag[node] = true;
+            if (e != null) EdgeList.Push(e);
+            NodeVisitFlag[node] = true;
             
             bool flag = false;
             foreach(var edge in OutEdges(node))
             {
-                if (!_nodeVisitFlag[edge.Node2])
+                //if (!NodeVisitFlag[edge.Node2])
+                if (!NodeVisitFlag[edge.Node2] && !AlreadyUsedPeak(edge.Node2))
                 {
                     flag = true;
                     FindPaths(edge.Node2, false, edge);
@@ -137,11 +205,12 @@ namespace InformedProteomics.Backend.SequenceTag
             
             if(!flag)
             {
-                ProcessPath(_edgeList.Reverse());
+                var t = ProcessPath(EdgeList.Reverse());
+                if (t == false) return;
             }
-            _nodeVisitFlag[node] = false;
+            NodeVisitFlag[node] = false;
             
-            if (_edgeList.Count > 0) _edgeList.Pop();
+            if (EdgeList.Count > 0) EdgeList.Pop();
         }
     }
 }

@@ -42,6 +42,7 @@ namespace ProMex
             _paramDic = new Dictionary<string, string>
             {
                 {"-i", null},
+                {"-o", null},
                 {"-minCharge", "2"},
                 {"-maxCharge", "60"},
                 {"-minMass", "3000.0"},
@@ -80,6 +81,7 @@ namespace ProMex
             Console.WriteLine(
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
+                "\t[-o OutFolder (default : InputFolder)]\n" +
                 "\t[-minCharge MinCharge] (minimum charge state, default: 2)\n" +
                 "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
                 "\t[-minMass MinMassInDa] (minimum mass in Da, default: 3000.0)\n" +

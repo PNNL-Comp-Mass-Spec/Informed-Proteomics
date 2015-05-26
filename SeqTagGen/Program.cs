@@ -16,7 +16,15 @@ namespace SeqTagGen
     class Program
     {
         public const string Name = "SeqTagGen";
-        public const string Version = "0.1 (March 23, 2015)";
+        public static string Version
+        {
+            get
+            {
+                var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return string.Format("version {0}.{1}.{2} (May 07, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+            }
+        }
+
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
@@ -136,7 +144,7 @@ namespace SeqTagGen
             
             var tmpWriter = new StreamWriter(tmpOutFile);
 
-            tmpWriter.WriteLine("ScanNum\tSequenceTag\tIsPrefix\tFlankingMass");
+            tmpWriter.WriteLine("ScanNum\tSequenceTag\tIsPrefix\tFlankingMass\tRankSumPvalue\tMassRMSE");
 
             var avgTags = 0;
             var nProcessed = 0;
@@ -150,13 +158,17 @@ namespace SeqTagGen
                 foreach (var tag in tagFinder.FindSequenceTags())
                 {
                     var flankingMass = tagFinder.DeconvolutedPeaks[tag[0].Node1].Mass;
+                    
+
                     nTags++;
                     if (tag.Count >= 6 || (nTags < _maxTags && _maxTags > 0))
                     {
-                        foreach (var tagStr in tag.GetTagStrings())
+                        double[] rmse;
+                        var tagStrSet = tag.GetTagStrings(out rmse);
+                        for(var t = 0; t < tagStrSet.Length; t++)
                         {
-                            tmpWriter.WriteLine("{0}\t{1}\t1\t{2}", scanNum, tagStr, flankingMass);
-                            tmpWriter.WriteLine("{0}\t{1}\t0\t{2}", scanNum, SequenceTag.Reverse(tagStr), flankingMass);
+                            tmpWriter.WriteLine("{0}\t{1}\t1\t{2}\t{3}\t{4}", scanNum, tagStrSet[t], flankingMass, tag.Score, rmse[t]);
+                            tmpWriter.WriteLine("{0}\t{1}\t0\t{2}\t{3}\t{4}", scanNum, SequenceTag.Reverse(tagStrSet[t]), flankingMass, tag.Score, rmse[t]);
                         }    
                     }
                 }

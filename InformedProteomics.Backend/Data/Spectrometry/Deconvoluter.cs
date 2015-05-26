@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
             Spectrum spec, int minCharge, int maxCharge, 
             int isotopeOffsetTolerance, double filteringWindowSize,
-            Tolerance tolerance, double corrScoreThreshold)
+            Tolerance tolerance, double corrScoreThreshold, double bcDistThreshold = 1.0)
         {
             var peaks = spec.Peaks;
 
@@ -75,8 +75,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         //        charge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance])
                         //    continue;
 
-                        var monoIsotopeMass = (peakMz - Constants.Proton) * charge - isotopeIndex * Constants.C13MinusC12;
-
+                        //var monoIsotopeMass = (peakMz - Constants.Proton) * charge - isotopeIndex * Constants.C13MinusC12;
+                        var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
                         var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
                         var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope,
                             tolerance, 0.1);
@@ -92,6 +92,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         }
                         var corr = FitScoreCalculator.GetPearsonCorrelation(envelop, observedIntensities);
                         if (corr < corrScoreThreshold) continue;
+                        
+                        var bcDist = FitScoreCalculator.GetBhattacharyyaDistance(envelop, observedIntensities);
+                        if (bcDist > bcDistThreshold) continue;
+                        
 
                         // monoIsotopeMass is valid
                         monoIsotopePeakList.Add(new DeconvolutedPeak(peak, monoIsotopeMass, charge));

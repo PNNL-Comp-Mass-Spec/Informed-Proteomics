@@ -32,12 +32,13 @@ namespace InformedProteomics.Test
             var nSpec = 0;
             var nHitSpec = 0;
 
-            var targetScans = new int[] {6681};
+            //var targetScans = new int[] {6681};
+            
 
-            //for (var i = 0; i < ms2ScanNumbers.Count; i++)
-            foreach(var scanNum in targetScans)
+            for (var i = 0; i < ms2ScanNumbers.Count; i++)
+            //foreach(var scanNum in targetScans)
             {
-                //var scanNum = Int32.Parse(ms2ScanNumbers[i]);
+                var scanNum = Int32.Parse(ms2ScanNumbers[i]);
                 
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
@@ -54,12 +55,11 @@ namespace InformedProteomics.Test
                 foreach (var tag in tagFinder.FindSequenceTags())
                 {
                     nTags++;
-                    
-                    
-                    foreach (var tagStr in tag.GetTagStrings())
+
+                    double[] rmse;
+                    foreach (var tagStr in tag.GetTagStrings(out rmse))
                     {
-                        Console.WriteLine(tagStr);
-                        
+                        //Console.WriteLine(tagStr);
                         if (seqStr.Contains(tagStr) || seqStr.Contains(Reverse(tagStr))) nHit++;
                     }
                 }
@@ -105,7 +105,8 @@ namespace InformedProteomics.Test
                 var n = 0;
                 foreach (var tag in tagFinder.FindSequenceTags())
                 {
-                    var seqTags = tag.GetTagStrings();
+                    double[] rmse;
+                    var seqTags = tag.GetTagStrings(out rmse);
                     n += seqTags.Length;
                 }
                 Console.WriteLine(n);

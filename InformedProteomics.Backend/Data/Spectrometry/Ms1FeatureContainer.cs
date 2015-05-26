@@ -39,7 +39,24 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public bool Add(Ms1FeatureCluster newFeature)
         {
+            
+            for (var i = _featureList.Count - 1; i >= 0; i--)
+            {
+                if (!_featureList[i].CoEluted(newFeature)) continue;
+                var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
+
+                //if (massDiff > 1.5) break;
+                //var massDiffPpm = (1e6 * massDiff) / newFeature.RepresentativeMass;
+                //if (massDiffPpm < 2.5)
+                if (massDiff < 1e-6)
+                {
+                    // already exists, then skip!
+                    _featureList[i].Merge(newFeature);
+                    return false;
+                }
+            }
             /*
+            
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
                 var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
@@ -83,18 +100,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach(var f in features) Add(f);
         }
 
-        public IList<Ms1FeatureCluster> GetFilteredFeatures(IList<SortedSet<Ms1FeatureCluster>> connectedFeatureList)
+        public IEnumerable<Ms1FeatureCluster> GetFilteredFeatures(IList<SortedSet<Ms1FeatureCluster>> connectedFeatureList)
         {
             var filteredFeatures = new List<Ms1FeatureCluster>();
             foreach (var featureSet in connectedFeatureList)
             {
                 var newList = RemoveOverlappedFeatures(featureSet);
-                
                 foreach (var f in newList) f.UpdateAbundance();
-
                 filteredFeatures.AddRange(newList);
             }
-            return filteredFeatures;
+            return filteredFeatures.OrderBy(f => f.RepresentativeMass);
         }
 
 

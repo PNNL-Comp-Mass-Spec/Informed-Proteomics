@@ -5,6 +5,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Quantification;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 
@@ -52,7 +53,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         {
             _run = run;
             _ms2Scorer = ms2Scorer;
-            _featureFinder = new Ms2FeatureQuntification(run);
+            _featureFinder = new TargetMs1FeatureMatrix(run);
             _tagParser = tagParser;
             _fastaDb = fastaDb;
             _searchableDb = new SearchableDatabase(fastaDb);
@@ -212,7 +213,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly FastaDatabase _fastaDb;
         private readonly SearchableDatabase _searchableDb;
 
-        private readonly Ms2FeatureQuntification _featureFinder; 
+        private readonly TargetMs1FeatureMatrix _featureFinder; 
 
         private readonly Tolerance _tolerance;
         private readonly AminoAcidSet _aaSet;

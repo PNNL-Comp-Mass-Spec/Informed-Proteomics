@@ -10,13 +10,12 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
-using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Ms1FeatureMatrix
     {
-        protected Ms1FeatureMatrix(LcMsRun run, int minScanCharge, int maxScanCharge, int maxThreadCount)
+        public Ms1FeatureMatrix(LcMsRun run, int minScanCharge, int maxScanCharge, int maxThreadCount, MzComparerWithBinning comparer, bool useMassBinning = true)
         {
             Run = run;
             MinScanCharge = minScanCharge;
@@ -26,7 +25,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _ms1PeakList = new List<Ms1Peak>();
             Spectrums = new List<Ms1Spectrum>();
             var ms1ScanNums = run.GetMs1ScanVector();
-            NScans = ms1ScanNums.Length;
+
+            NColumns = ms1ScanNums.Length;
+            NRows = maxScanCharge - minScanCharge + 1;
 
             for (var i = 0; i < Math.Min(ms1ScanNums.Length, ushort.MaxValue); i++)
             {
@@ -35,18 +36,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _ms1PeakList.AddRange((Ms1Peak[])ms1Spec.Peaks);
             }
             _ms1PeakList.Sort();
-        }
 
-        public static Ms1FeatureMatrix Create(LcMsRun run, int minScanCharge, int maxScanCharge, int maxThreadCount = 0, int numBits = 27)
-        {
-            var matrix = new Ms1FeatureMatrix(run, minScanCharge, maxScanCharge, maxThreadCount);
-            matrix.SetFeatureMatrix(numBits);
-            return matrix;
-        }
-        
-        public IList<Ms1FeatureCluster> GetProbableClusters(int queryMassBinNum)
-        {
-            return GetProbableClusters(Comparer.GetMzAverage(queryMassBinNum));
+            _featureArrayCreated = false;
+            _comparer = comparer;
+            UseMassBinning = useMassBinning;
+            MzTolerance = new Tolerance(5);
         }
 
         public IList<Ms1FeatureCluster> GetProbableClusters(double queryMass)
@@ -83,53 +77,62 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return idx < 0 ? null : Spectrums[idx];
         }
 
-        public MzComparerWithBinning Comparer;
-        public readonly static Tolerance MzTolerance = new Tolerance(5);
+
+        public readonly Tolerance MzTolerance;
 
         public LcMsRun Run;
         public List<Ms1Spectrum> Spectrums;
-        public int MinScanCharge;
-        public int MaxScanCharge;
-        public int NScans;
+        public readonly int MinScanCharge;
+        public readonly int MaxScanCharge;
+
+        protected readonly int NColumns;
+        protected readonly int NRows;
+
+        //protected const int MaxChargeLength = 50;
         private readonly int _maxThreadCount;
-        
+        private readonly MzComparerWithBinning _comparer;
+
         private static List<Ms1Peak> _ms1PeakList;
         protected const int MaxEnvelopeLength = 30;
-        protected const int MaxChargeLength = 40;
+        
 
-        private bool[][] _checkedOut;
+        private bool _featureArrayCreated;
+        protected bool[][] CheckedOut;
+
         protected double[][] CorrelationMap;
         protected double[][] DistanceMap;
         protected double[][] AccurateMass;
         protected Ms1Peak[][][] FeatureMatrix;
 
-        protected IsotopeList TheoreticalEnvelope;
+        public IsotopeList TheoreticalEnvelope;
         protected int[] Rows;
         protected int[] Cols;
-        public IntRange ChargeRange;
 
         protected int MinSearchMassBin;
         protected int MaxSearchMassBin;
         protected double QueryMass;
         
-        protected void SetFeatureMatrix(int numBits = 27)
+        protected void InitFeatureMatrix()
         {
-            Comparer = new MzComparerWithBinning(numBits);
-            CorrelationMap = new double[MaxChargeLength][];
-            DistanceMap = new double[MaxChargeLength][];
-            AccurateMass = new double[MaxChargeLength][];
-            FeatureMatrix = new Ms1Peak[MaxChargeLength][][];
-            _checkedOut = new bool[MaxChargeLength][];
+            if (_featureArrayCreated) return;
 
-            for (var i = 0; i < MaxChargeLength; i++)
+            _featureArrayCreated = true;
+
+            CorrelationMap = new double[NRows][];
+            DistanceMap = new double[NRows][];
+            AccurateMass = new double[NRows][];
+            FeatureMatrix = new Ms1Peak[NRows][][];
+            CheckedOut = new bool[NRows][];
+
+            for (var i = 0; i < NRows; i++)
             {
-                _checkedOut[i] = new bool[NScans];
-                CorrelationMap[i] = new double[NScans];
-                FeatureMatrix[i] = new Ms1Peak[NScans][];
-                DistanceMap[i] = new double[NScans];
-                AccurateMass[i] = new double[NScans];
+                CheckedOut[i] = new bool[NColumns];
+                CorrelationMap[i] = new double[NColumns];
+                FeatureMatrix[i] = new Ms1Peak[NColumns][];
+                DistanceMap[i] = new double[NColumns];
+                AccurateMass[i] = new double[NColumns];
 
-                for (var j = 0; j < NScans; j++)
+                for (var j = 0; j < NColumns; j++)
                 {
                     FeatureMatrix[i][j] = new Ms1Peak[MaxEnvelopeLength];
                 }
@@ -139,32 +142,32 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         protected void SetQueryMass(double queryMass)
         {
             QueryMass = queryMass;
-            ChargeRange = GetScanChargeRange(QueryMass);
-            //var queryMassBinNum     = Comparer.GetBinNumber(QueryMass);
             TheoreticalEnvelope = new IsotopeList(queryMass, MaxEnvelopeLength);
         }
 
-        protected IntRange GetScanChargeRange(double mass)
+        protected IEnumerable<int> GetSearchRows()
         {
-            if (mass < 5000.0d) return new IntRange(MinScanCharge, 10);
+            var chargeLowerBound = Math.Floor(QueryMass / Run.MaxMs1Mz);
+            var chargeUpperBound = Math.Ceiling(QueryMass / Run.MinMs1Mz);
 
-            var chargeLb = (int)Math.Max(MinScanCharge, Math.Floor((13.0 / 2.5) * (mass / 10000d) - 0.6));
-            var chargeUb = (int)Math.Min(MaxScanCharge, Math.Ceiling(18 * (mass / 10000d) + 8));
+            var rowLb = Math.Max(0, chargeLowerBound - MinScanCharge);
+            var rowUb = Math.Min(NRows - 1, chargeUpperBound - MinScanCharge);
 
-            if (chargeUb - chargeLb + 1 > MaxChargeLength) chargeUb = chargeLb + MaxChargeLength - 1;
-
-            return new IntRange(chargeLb, chargeUb);
+            return Enumerable.Range((int) rowLb, (int) (rowUb - rowLb + 1));
         }
 
+        protected bool UseMassBinning;
        
         protected void BuildFeatureMatrix()
         {
-            var queryMassBinNum     = Comparer.GetBinNumber(QueryMass);
+            if (!_featureArrayCreated) InitFeatureMatrix();
+            var queryMassBinNum = UseMassBinning ? _comparer.GetBinNumber(QueryMass) : 0;
 
             var options             = new ParallelOptions();
-            var observedRows        = new bool[ChargeRange.Length];
-            var observedCols        = new bool[NScans];
-            var rows                = Enumerable.Range(0, ChargeRange.Length);
+            var observedRows        = new bool[NRows];
+            var observedCols        = new bool[NColumns];
+            //var rows                = Enumerable.Range(0, ChargeRange.Length);
+            var rows = GetSearchRows();
 
             if (_maxThreadCount > 0) options.MaxDegreeOfParallelism = _maxThreadCount;
 
@@ -174,28 +177,43 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var minMs1Mz = _ms1PeakList.First().Mz;
             var maxMs1Mz = _ms1PeakList.Last().Mz;
 
+            var signalToNoiseRatioCutoff = (UseMassBinning) ? 1.4826 : 0d;
+            var nPeaksCutoff = (QueryMass > 2000) ? 3 : 2;
+            
             Parallel.ForEach(rows, options, row =>
             {
-                Array.Clear(CorrelationMap[row], 0, NScans);
-                Array.Clear(_checkedOut[row], 0, NScans);
-                Array.Clear(DistanceMap[row], 0, NScans);
-                Array.Clear(AccurateMass[row], 0, NScans);
+                Array.Clear(CorrelationMap[row], 0, NColumns);
+                Array.Clear(CheckedOut[row], 0, NColumns);
+                Array.Clear(DistanceMap[row], 0, NColumns);
+                Array.Clear(AccurateMass[row], 0, NColumns);
 
-                for (var col = 0; col < NScans; col++)
+                for (var col = 0; col < NColumns; col++)
                 {
                     Array.Clear(FeatureMatrix[row][col], 0, FeatureMatrix[row][col].Length);
                 }
 
-                var charge = row + ChargeRange.Min;
+                //var charge = row + ChargeRange.Min;
+                var charge = row + MinScanCharge;
                 for (var k = 0; k < TheoreticalEnvelope.Count; k++)
                 {
                     var i = TheoreticalEnvelope.SortedIndexByIntensity[k]; // internal isotope index
                     var isotopeIndex = TheoreticalEnvelope[i].Index;
+                    double isotopeMzLb;
+                    double isotopeMzUb;
 
-                    var isotopeMzLb = (k == 0) ? Ion.GetIsotopeMz(Comparer.GetMzStart(queryMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(Comparer.GetMzAverage(queryMassBinNum - 1), charge, isotopeIndex);
-                    var isotopeMzUb = (k == 0) ? Ion.GetIsotopeMz(Comparer.GetMzEnd(queryMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(Comparer.GetMzAverage(queryMassBinNum + 1), charge, isotopeIndex);
-                    
-                    //if (isotopeMzLb < _run.MinMs1Mz || isotopeMzUb > _run.MaxMs1Mz) continue;
+                    if (UseMassBinning)
+                    {
+                        isotopeMzLb = (k == 0) ? Ion.GetIsotopeMz(_comparer.GetMzStart(queryMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(_comparer.GetMzAverage(queryMassBinNum - 1), charge, isotopeIndex);
+                        isotopeMzUb = (k == 0) ? Ion.GetIsotopeMz(_comparer.GetMzEnd(queryMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(_comparer.GetMzAverage(queryMassBinNum + 1), charge, isotopeIndex);
+                    }
+                    else
+                    {
+                        var isotopeMz = Ion.GetIsotopeMz(QueryMass, charge, isotopeIndex);
+                        var mzTol = MzTolerance.GetToleranceAsTh(isotopeMz);
+                        isotopeMzLb = isotopeMz - mzTol;
+                        isotopeMzUb = isotopeMz + mzTol;
+                    }
+
                     if (isotopeMzLb < minMs1Mz || isotopeMzUb > maxMs1Mz) continue;
                     var st = _ms1PeakList.BinarySearch(new Ms1Peak(isotopeMzLb, 0, 0));
 
@@ -207,31 +225,30 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         if (ms1Peak.Mz > isotopeMzUb) break;
                         var col = ms1Peak.Ms1SpecIndex;
 
-                        if (k < 1) // if (k < 4)
+                        if (k == 0) // most abundant peak
                         {
                             if (FeatureMatrix[row][col][i] == null || ms1Peak.Intensity > FeatureMatrix[row][col][i].Intensity)
                             {
                                 FeatureMatrix[row][col][i] = ms1Peak;
                                 AccurateMass[row][col] = Ion.GetMonoIsotopicMass(ms1Peak.Mz, charge, isotopeIndex);
                             }
-                            // In case of top 3 isotopes, intense peaks are preferred
-                            //if (_featureMatrix[row][col][i] == null || ms1Peak.Intensity > _featureMatrix[row][col][i].Intensity) _featureMatrix[row][col][i] = ms1Peak;
-
-                            // accurate mass is derived from the most intense peak among top 3 isoptes
-                            //if ((!(_accurateMass[row][col] > 0)) || _featureMatrix[row][col][i].Intensity > _featureMatrix[row][col][_highestPeakIsotopeInternalIndex[row][col]].Intensity)
-                            //{
-                                //_highestPeakIsotopeInternalIndex[row][col] = i;
-                                //_accurateMass[row][col]         = Ion.GetMonoIsotopicMass(ms1Peak.Mz, charge, isotopeIndex);
-                            //}
                         }
                         else
                         {
-                            var mostAbuPeak = FeatureMatrix[row][col][mostAbuIsotopeInternalIndex];
-                            if (mostAbuPeak == null) continue;
-                            var expectedPeakMz = mostAbuPeak.Mz + (Constants.C13MinusC12*(isotopeIndex - mostAbuIsotopeIndex))/charge;
-
-                            //var mz = Ion.GetIsotopeMz(_accurateMass[row][col], charge, isotopeIndex);
-                            if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > MzTolerance.GetToleranceAsTh(ms1Peak.Mz)) continue;
+                            if (UseMassBinning)
+                            {
+                                // mass binning search mode, most abundant peak should be exist
+                                var mostAbuPeak = FeatureMatrix[row][col][mostAbuIsotopeInternalIndex];
+                                if (mostAbuPeak == null) continue;
+                                var expectedPeakMz = mostAbuPeak.Mz +
+                                                     (Constants.C13MinusC12*(isotopeIndex - mostAbuIsotopeIndex))/charge;
+                                if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > MzTolerance.GetToleranceAsTh(ms1Peak.Mz))
+                                    continue;
+                            }
+                            else
+                            {
+                                if (!(AccurateMass[row][col] > 0)) AccurateMass[row][col] = QueryMass;
+                            }
 
                             // in case of existing isotope peaks, select peaks maximizing envelope similairty
                             if (FeatureMatrix[row][col][i] != null)
@@ -240,33 +257,58 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var bc1 = FeatureMatrix[row][col].GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
                                 FeatureMatrix[row][col][i] = ms1Peak;
                                 var bc2 = FeatureMatrix[row][col].GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
-                                if (bc1 < bc2) FeatureMatrix[row][col][i] = tmpPeak;
+                                if (bc1 < bc2)
+                                    FeatureMatrix[row][col][i] = tmpPeak;
                             }
                             else
                             {
                                 FeatureMatrix[row][col][i] = ms1Peak;
+
                             }
                         }
                     }
                 }
 
-                for (var col = 0; col < NScans; col++)
+                for (var col = 0; col < NColumns; col++)
                 {
                     if (!(AccurateMass[row][col] > 0)) continue;
-                    var mostAbuPeakIntensity = FeatureMatrix[row][col][mostAbuIsotopeInternalIndex].Intensity;
-                    var signalToNoiseRatio = mostAbuPeakIntensity / Spectrums[col].MedianIntensity;
-                    if (signalToNoiseRatio > 1.4826 && FeatureMatrix[row][col].Count(p => p != null && p.Active) >= 3)
+
+                    if (UseMassBinning)
                     {
-                        CorrelationMap[row][col] = FeatureMatrix[row][col].GetPearsonCorrelation(TheoreticalEnvelope.Envelope);
-                        DistanceMap[row][col] = FeatureMatrix[row][col].GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
-                        if (!observedRows[row]) observedRows[row] = true;
-                        if (!observedCols[col]) observedCols[col] = true;
+                        var mostAbuPeakIntensity = FeatureMatrix[row][col][mostAbuIsotopeInternalIndex].Intensity;
+                        var signalToNoiseRatio = mostAbuPeakIntensity/Spectrums[col].MedianIntensity;
+                        if (signalToNoiseRatio > signalToNoiseRatioCutoff &&
+                            FeatureMatrix[row][col].Count(p => p != null && p.Active) >= nPeaksCutoff)
+                        {
+                            CorrelationMap[row][col] =
+                                FeatureMatrix[row][col].GetPearsonCorrelation(TheoreticalEnvelope.Envelope);
+                            DistanceMap[row][col] =
+                                FeatureMatrix[row][col].GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
+                            if (!observedRows[row]) observedRows[row] = true;
+                            if (!observedCols[col]) observedCols[col] = true;
+                        }
+                        else
+                        {
+                            AccurateMass[row][col] = 0d;
+                        }
                     }
                     else
                     {
-                        AccurateMass[row][col] = 0d;
-                        //_distanceMap[row][col] = 1.0d;
+                        if (FeatureMatrix[row][col].Count(p => p != null && p.Active) >= nPeaksCutoff)
+                        {
+                            CorrelationMap[row][col] =
+                                FeatureMatrix[row][col].GetPearsonCorrelation(TheoreticalEnvelope.Envelope);
+                            DistanceMap[row][col] =
+                                FeatureMatrix[row][col].GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
+                            if (!observedRows[row]) observedRows[row] = true;
+                            if (!observedCols[col]) observedCols[col] = true;
+                        }
+                        else
+                        {
+                            AccurateMass[row][col] = 0d;
+                        }
                     }
+
                 }
             }// end or row for-loop
             );
@@ -277,7 +319,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             temp.Clear();
             for (var i = 0; i < observedCols.Length; i++) if (observedCols[i]) temp.Add(i);
             Cols = temp.ToArray();
-
         }
 
         protected virtual IEnumerable<ObservedEnvelope> GetSeedCells()
@@ -374,14 +415,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var ms1ScanNums = Run.GetMs1ScanVector();
             foreach (var seedCell in GetSeedCells())
             {
-                if (_checkedOut[seedCell.Row][seedCell.Col]) continue;
+                if (CheckedOut[seedCell.Row][seedCell.Col]) continue;
                 var seedMass    = AccurateMass[seedCell.Row][seedCell.Col];
                 var seedMz      = seedCell.Peaks[seedCell.RefIsotopeInternalIndex].Mz;
-                var seedCharge  = ChargeRange.Min + seedCell.Row;
+                //var seedCharge  = ChargeRange.Min + seedCell.Row;
+                var seedCharge = MinScanCharge + seedCell.Row;
                 var seedScanNum = ms1ScanNums[seedCell.Col];
                 
                 var massTol     = MzTolerance.GetToleranceAsTh(seedMass);
-                var newCluster = new Ms1FeatureCluster(Run, (byte)ChargeRange.Min, TheoreticalEnvelope, seedMass, seedCharge, seedMz, seedScanNum);
+                var newCluster = new Ms1FeatureCluster(Run, (byte)MinScanCharge, TheoreticalEnvelope, seedMass, seedCharge, seedMz, seedScanNum);
 
                 Array.Clear(tempEnvelope2, 0, tempEnvelope2.Length);
                 seedCell.Peaks.SumEnvelopeTo(tempEnvelope2);
@@ -391,12 +433,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var neighbors = new Queue<ObservedEnvelope>();
 
                 neighbors.Enqueue(seedCell); // pick a seed
-                _checkedOut[seedCell.Row][seedCell.Col] = true;
+                CheckedOut[seedCell.Row][seedCell.Col] = true;
 
                 while (neighbors.Count > 0)
                 {
                     var cell = neighbors.Dequeue();
-                    var charge = cell.Row + ChargeRange.Min;
+                    var charge = cell.Row + MinScanCharge;
                     var chargeNeighborGap = GetScatteredChargeLength(charge);
                     var minRw = Math.Max(cell.Row - chargeNeighborGap, Rows.First());
                     var maxRw = Math.Min(cell.Row + chargeNeighborGap, Rows.Last());
@@ -411,7 +453,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                         for (var i = minRw; i <= maxRw; i++)
                         {
-                            if (_checkedOut[i][j]) continue;
+                            if (CheckedOut[i][j]) continue;
                             if (!(AccurateMass[i][j] > 0)) continue;
                             if (Math.Abs(seedMass - AccurateMass[i][j]) > massTol) continue;
 
@@ -428,7 +470,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var newEnvelope = new ObservedEnvelope(i, j, FeatureMatrix[i][j], TheoreticalEnvelope);
                                 neighbors.Enqueue(newEnvelope);
                                 newCluster.AddMember(newEnvelope);
-                                _checkedOut[i][j] = true;
+                                CheckedOut[i][j] = true;
                                 FeatureMatrix[i][j].SumEnvelopeTo(tempEnvelope2);
                                 normalizedElutionLength = newCluster.NetLength;
                             }
@@ -437,7 +479,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
 
                 for (var i = newCluster.MinRow; i <= newCluster.MaxRow; i++)
-                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) _checkedOut[i][j] = true;
+                    for (var j = newCluster.MinCol; j <= newCluster.MaxCol; j++) CheckedOut[i][j] = true;
 
                 var summedCorr = TheoreticalEnvelope.GetPearsonCorrelation(tempEnvelope2);
                 var summedBc = TheoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope2);
@@ -477,7 +519,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     }
                     else 
                     {
-                        var observedPeaks = Spectrums[col].GetAllIsotopePeaks(cluster.RepresentativeMass, row + ChargeRange.Min, TheoreticalEnvelope, MzTolerance);
+                        var observedPeaks = Spectrums[col].GetAllIsotopePeaks(cluster.RepresentativeMass, row + MinScanCharge, TheoreticalEnvelope, MzTolerance);
                         var obsEnv = new ObservedEnvelope(row, col, observedPeaks, TheoreticalEnvelope);
                         if (obsEnv.NumberOfPeaks < 3) continue;
                         cluster.AddMember(obsEnv);    
@@ -510,12 +552,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                 if (minCol == 0)
                 {
-                    maxCol = Math.Min(minCol + MinXicWindowLength - 1, NScans - 1);
+                    maxCol = Math.Min(minCol + MinXicWindowLength - 1, NColumns - 1);
                 }
                 else
                 {
-                    maxCol = Math.Min(maxCol + (int)((MinXicWindowLength - colLen) * 0.5), NScans - 1);
-                    if (maxCol == NScans - 1) minCol = Math.Max(maxCol - MinXicWindowLength + 1, 0);
+                    maxCol = Math.Min(maxCol + (int)((MinXicWindowLength - colLen) * 0.5), NColumns - 1);
+                    if (maxCol == NColumns - 1) minCol = Math.Max(maxCol - MinXicWindowLength + 1, 0);
                 }
                 colLen = maxCol - minCol + 1;
             }
@@ -594,6 +636,36 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public readonly byte[] SortedIndexByIntensity;
         public readonly byte[] IsotopeRanking;
         public readonly int NhighAbundantIsotopes;
+
+        public IsotopeList(double mass, double pdfCutoff = 0.01)
+        {
+            MonoIsotopeMass = mass;
+            var isoEnv = Averagine.GetIsotopomerEnvelope(MonoIsotopeMass);
+            var isotopeRankings = ArrayUtil.GetRankings(isoEnv.Envolope);
+            var s = isoEnv.Envolope.Sum();
+
+            var tempPdf = new double[isoEnv.Envolope.Length];
+
+            for (var i = 0; i < isoEnv.Envolope.Length; i++)
+            {
+                tempPdf[i] = isoEnv.Envolope[i] / s;
+                if (tempPdf[i] > pdfCutoff) Add(new Isotope(i, isoEnv.Envolope[i]));
+            }
+
+            Envelope                = this.Select(iso => iso.Ratio).ToArray();
+            SortedIndexByIntensity  = new byte[Count];
+            EnvelopePdf             = new double[Count];
+            IsotopeRanking          = new byte[Count];
+            
+            for (var i = 0; i < Count; i++)
+            {
+                IsotopeRanking[i] = (byte)isotopeRankings[this[i].Index];
+                var rankingIndex = isotopeRankings[this[i].Index] - 1;
+                SortedIndexByIntensity[rankingIndex] = (byte)i;
+                EnvelopePdf[i] = Envelope[i] / s;
+            }
+        }
+
         
         public IsotopeList(double mass, int maxNumOfIsotopes, double relativeIntensityThreshold = 0.1)
         {

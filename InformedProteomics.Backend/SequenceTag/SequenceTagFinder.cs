@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Windows.Forms;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Data.Sequence;
@@ -18,6 +18,7 @@ namespace InformedProteomics.Backend.SequenceTag
             _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToArray();
             _aminoAcidsArray = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
             _tolerance = tolerance;
+            //_tolerance = new Tolerance(2.5);
           
             if (_aminoAcidsArray.Length - 1 > Byte.MaxValue) throw new Exception("Too many amino acid types");
 
@@ -32,14 +33,12 @@ namespace InformedProteomics.Backend.SequenceTag
             _minTagLength = minTagLength;
 
             _spectrum = spec;
-            _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.7);
-            //Console.WriteLine("# of mz peaks = {0}, # of ms peaks = {1}", _spectrum.Peaks.Length, _deconvolutedPeaks.Count);
+            _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.5, 0.5);
+            //Console.WriteLine("[{0}] # of mz peaks = {1}, # of ms peaks = {2}", _spectrum.ScanNum, _spectrum.Peaks.Length, _deconvolutedPeaks.Count);
             //if (_deconvolutedPeaks.Count > 1000) _deconvolutedPeaks = Deconvoluter.FilterOut(_deconvolutedPeaks, 101, 20);
 
             SetNodeCount(_deconvolutedPeaks.Count);
-            _nodeKill = new bool[GetNodeCount()];
             CollectSequenceTagGraphEdges();
-            //Console.WriteLine(" # of nodes = {0}, # of edges = {1}", GetNodeCount(), GetEdgeCount());
 
             _candidateSet = new Dictionary<string, SequenceTag>();
             _minIndexList = new List<int>();
@@ -48,12 +47,30 @@ namespace InformedProteomics.Backend.SequenceTag
             _maxMassList = new List<double>();
             _rankingList = new List<int[]>();
             MaxTagLen = 8;
+
+            NumberOfProcessedPaths = 0;
+            MaxNumberOfProcessedPaths = 1024;
         }
         
         public IEnumerable<SequenceTag> FindSequenceTags()
         {
-            foreach(var node in Nodes())
+            var componentSet = ConnnectedComponents();
+            
+            //Console.WriteLine("\t# of nodes = {0}, # of edges = {1}, # of components = {2}", GetNodeCount(), GetEdgeCount(), componentSet.Count);
+
+            var startNodeSet = new List<int>();
+            foreach (var comp in componentSet)
             {
+                if (comp.Count < _minTagLength) continue;
+                startNodeSet.AddRange(comp);
+            }
+            
+            foreach (var node in startNodeSet)
+            {
+                NumberOfProcessedPaths = 0;
+                NumberOfAddedPaths = 0;
+                StopFindPath = false;
+
                 var edges = OutEdges(node);
                 if (edges.Count < 1) continue;
                 FindPaths(node);
@@ -62,7 +79,8 @@ namespace InformedProteomics.Backend.SequenceTag
             }
             
             var candidateList = _candidateSet.Values.ToList();
-            //candidateList.Sort();
+            candidateList.Sort();
+
             return candidateList;
         }
 
@@ -73,7 +91,7 @@ namespace InformedProteomics.Backend.SequenceTag
         private readonly double _minAminoAcidMass;
 
         // constant varialbes
-        private const int MaxCharge = 10;
+        private const int MaxCharge = 15;
         private const int MinCharge = 1;
         private const double FilteringWindowSize = 1.1;
         private const int IsotopeOffsetTolerance = 2;
@@ -84,7 +102,6 @@ namespace InformedProteomics.Backend.SequenceTag
         private readonly int _minTagLength;
         private readonly ProductSpectrum _spectrum;
         private readonly Dictionary<string, SequenceTag> _candidateSet;
-        private readonly bool[] _nodeKill;
 
         private void CollectSequenceTagGraphEdges()
         {
@@ -96,7 +113,7 @@ namespace InformedProteomics.Backend.SequenceTag
                 for (var j = i + 1; j < _deconvolutedPeaks.Count; j++)
                 {
                     if (_deconvolutedPeaks[i].MzPeak == _deconvolutedPeaks[j].MzPeak) continue;
-                    if (Math.Abs(_deconvolutedPeaks[i].Charge - _deconvolutedPeaks[j].Charge) > 2) continue;
+                    if (Math.Abs(_deconvolutedPeaks[i].Charge - _deconvolutedPeaks[j].Charge) > 1) continue;
 
                     var massTh2 = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[j].MzPeak.Mz) * _deconvolutedPeaks[j].Charge;
                     var massTh = Math.Min(massTh1, massTh2);
@@ -119,25 +136,29 @@ namespace InformedProteomics.Backend.SequenceTag
             }
         }
 
-        
+        protected override bool AlreadyUsedPeak(int node)
+        {
+            foreach (var e in EdgeList)
+            {
+                if (_deconvolutedPeaks[e.Node1].MzPeak == _deconvolutedPeaks[node].MzPeak) return true;
+                if (_deconvolutedPeaks[e.Node2].MzPeak == _deconvolutedPeaks[node].MzPeak) return true;
+            }
+            return false;
+        }
 
-        protected override void ProcessPath(IEnumerable<SequenceTagGraphEdge> edges)
+        protected int NumberOfAddedPaths;
+        protected int MaxNumberOfProcessedPaths;
+        protected int NumberOfProcessedPaths;
+
+        protected override bool ProcessPath(IEnumerable<SequenceTagGraphEdge> edges)
         {
             var tag = new SequenceTag(edges);
 
-            if (tag.Count < _minTagLength) return;
-            /*
-            var first = true;
-            foreach (var e in edges)
-            {
-                if (first) Console.Write(e.Node1);
-                Console.Write(" - ");
-                Console.Write(e.Node2);
-                first = false;
-            }
-            Console.Write("\n");
-            */
+            if (tag.Count < _minTagLength) return true;
+
+            NumberOfProcessedPaths++;
             tag.Score = GetRankSumScore(tag);
+            
             if (_candidateSet.ContainsKey(tag.HashString))
             {
                 if (_candidateSet[tag.HashString].Score < tag.Score) _candidateSet[tag.HashString] = tag;
@@ -145,7 +166,13 @@ namespace InformedProteomics.Backend.SequenceTag
             else
             {
                 _candidateSet.Add(tag.HashString, tag);
+                NumberOfAddedPaths++;
             }
+
+            if (NumberOfProcessedPaths > 100 && NumberOfProcessedPaths*0.3 > NumberOfAddedPaths) StopFindPath = true;
+            if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths) StopFindPath = true;
+
+            return true;
         }
 
         private readonly List<double> _minMassList;
@@ -153,6 +180,8 @@ namespace InformedProteomics.Backend.SequenceTag
         private readonly List<int> _minIndexList;
         private readonly List<int> _maxIndexList;
         private readonly List<int[]> _rankingList;
+
+        
 
         private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         static SequenceTagFinder()
@@ -163,6 +192,7 @@ namespace InformedProteomics.Backend.SequenceTag
         
         private double GetRankSumScore(SequenceTag seqTag)
         {
+            //const double massBuf = 1000.0d;
             var newRanking = true;
             var node1 = seqTag.First().Node1;
             var node2 = seqTag.Last().Node2;
@@ -226,8 +256,10 @@ namespace InformedProteomics.Backend.SequenceTag
             }
 
             var pvalue = FitScoreCalculator.GetRankSumPvalue(maxIndex - minIndex, nMatchedPeaks, rankSum);
-            if (pvalue > 0) return -Math.Log(pvalue, 2);
-            return 50;
+
+            return pvalue;
+            //if (pvalue > 0) return -Math.Log(pvalue, 2);
+            //return 50;
         }
 
         private double GetHyperGeometricScore(IEnumerable<SequenceTagGraphEdge> seqTag)

@@ -8,9 +8,9 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public abstract class Ms1Feature
+    public class Ms1Feature
     {
-        protected Ms1Feature(LcMsRun run)
+        public Ms1Feature(LcMsRun run)
         {
             Run = run;
             MinScanNum = 0;
@@ -18,9 +18,27 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             MinCharge = 0;
             MaxCharge = 0;
         }
+
+        public Ms1Feature(LcMsRun run, int minCharge, int maxCharge, int minScan, int maxScan, double abundance,
+                         double repMass, int repCharge, double repMz, int repScanNum) : this(run)
+        {
+            MinCharge = minCharge;
+            MaxCharge = maxCharge;
+            MinScanNum = minScan;
+            MaxScanNum = maxScan;
+            Abundance = abundance;
+            RepresentativeMass = repMass;
+            RepresentativeCharge = repCharge;
+            RepresentativeMz = repMz;
+            RepresentativeScanNum = repScanNum;
+        }
+
+        public List<ObservedEnvelope> EnvelopeList;
         
-        public string DataSetId { get; protected set; }
-        public int FeatureId { get; protected set; }
+        public int DataSetId { get; set; }
+        public int FeatureId { get; set; }
+
+        //public string Desc;
         
         public int MinCharge { get; protected set; }
         public int MaxCharge { get; protected set; }
@@ -47,7 +65,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double MinNet { get { return MinElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double NetLength { get { return MaxNet - MinNet; } }
         public double Net { get { return 0.5 * (MinNet + MaxNet); } }
-
+        
+        public bool CoEluted(Ms1Feature other, double tolNet = 0d)
+        {
+            if (MinNet - tolNet < other.MinNet || other.MinNet < MaxNet + tolNet) return true;
+            if (MinNet - tolNet < other.MaxNet || other.MaxNet < MaxNet + tolNet) return true;
+            if (other.MinNet - tolNet < MinNet || MinNet < other.MaxNet + tolNet) return true;
+            if (other.MinNet - tolNet < MaxNet || MaxNet < other.MaxNet + tolNet) return true;
+            return false;
+        }
+        
         protected readonly LcMsRun Run;
     }
 

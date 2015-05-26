@@ -158,6 +158,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         // 27 bits: max error = 16 ppm, 28 bits (8 ppm), 26 bits (32 ppm)
         public MzComparerWithBinning(int numBits = 27)
         {
+            NumBits = numBits;
             _numShifts = sizeof(double)*8 - numBits;
         }
 
@@ -235,7 +236,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             } 
         }
 
-
+        public readonly int NumBits;
         private readonly int _numShifts;
     }
 

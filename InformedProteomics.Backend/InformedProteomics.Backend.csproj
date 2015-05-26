@@ -131,6 +131,7 @@
     <Compile Include="Data\Spectrometry\Ms1FeatureCluster.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureContainer.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureMatrix.cs" />
+    <Compile Include="Data\Spectrometry\Ms1FeatureResult.cs" />
     <Compile Include="Data\Spectrometry\Ms1FeatureScore.cs" />
     <Compile Include="Data\Spectrometry\Ms1Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
@@ -156,6 +157,17 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
+    <Compile Include="MassFeature\IsotopeEnvelope.cs" />
+    <Compile Include="MassFeature\LcMsFeature.cs" />
+    <Compile Include="MassFeature\LcMsFeatureAlignment.cs" />
+    <Compile Include="MassFeature\LcMsFeatureContainer.cs" />
+    <Compile Include="MassFeature\LcMsFeatureScorer.cs" />
+    <Compile Include="MassFeature\LcMsFeatureScoreType.cs" />
+    <Compile Include="MassFeature\LcMsPeakCluster.cs" />
+    <Compile Include="MassFeature\LcMsPeakScorer.cs" />
+    <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
+    <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
+    <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MzMLReader.cs" />
     <Compile Include="MassSpecData\IChromatogramExtractor.cs" />
@@ -184,8 +196,8 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="Quantification\Ms2Feature.cs" />
-    <Compile Include="Quantification\Ms2FeatureQuntification.cs" />
+    <Compile Include="Quantification\TargetFeature.cs" />
+    <Compile Include="Quantification\TargetMs1FeatureMatrix.cs" />
     <Compile Include="SequenceTag\GraphEdge.cs" />
     <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
     <Compile Include="SequenceTag\SequenceTag.cs" />
