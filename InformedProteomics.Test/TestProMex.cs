@@ -20,6 +20,56 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
+
+        [Test]
+        public void CollectTrainingSet()
+        {
+            const string idFileFolder = @"\\protoapps\UserData\Jungkap\TrainingSet";
+            const string outFileFolder = @"\\protoapps\UserData\Jungkap\TrainingSet";
+            var rawFileLists = new string[]
+            {
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf"
+            };
+
+            //var trainingSetList = File.ReadAllLines(@"D:\MassSpecFiles\training\training_datasets.txt");
+            //var trainSet = trainingSetList.Where(set => !set.StartsWith("#")).ToList();
+
+            foreach (var dataset in rawFileLists)
+            {
+                var dataname = Path.GetFileNameWithoutExtension(dataset);
+                var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
+
+                Console.WriteLine(dataset);
+                Console.WriteLine(idFile);
+                var targetSets = TargetFeature.CollectUniqueTargets(dataset, idFile, 0.005);
+                Console.WriteLine(targetSets.Count);
+
+                var writer = new StreamWriter(string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset)));
+                writer.WriteLine("MinScan\tMaxScan\tMinCharge\tMaxCharge\tMass\tSequence\tModifications\tComposition");
+
+                foreach (var feature in targetSets)
+                {
+                    if (feature.Rows.Count < 2) continue;
+
+                    writer.Write(feature.MinScanNum); writer.Write("\t");
+                    writer.Write(feature.MaxScanNum); writer.Write("\t");
+                    writer.Write(feature.MinCharge); writer.Write("\t");
+                    writer.Write(feature.MaxCharge); writer.Write("\t");
+                    writer.Write(feature.Mass); writer.Write("\t");
+                    writer.Write(feature.Sequence); writer.Write("\t");
+                    writer.Write(feature.Modifications); writer.Write("\t");
+                    writer.Write(feature.Composition); writer.Write("\n");
+                }
+
+                writer.Close();
+            }
+        }
+        
         [Test]
         public void TestQuantTopDownData()
         {
@@ -38,8 +88,6 @@ namespace InformedProteomics.Test
             Console.WriteLine("{0}", ms1Feature.Abundance);
 
         }
-        
-        
         
         [Test]
         public void TestQuantBottomUpData()
@@ -158,72 +206,6 @@ namespace InformedProteomics.Test
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
             Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
         }
-        /*
-        [Test]
-        public void TestAnchorFeatures()
-        {
-            var featureDir = @"D:\Test\Quant\spike_in\ms1ft_unique";
-            var rawDir = @"D:\Test\Quant\spike_in\raw";
-            var idDir = @"D:\Test\Quant\spike_in\MSP_m0";
-
-            var dataset = new string[15]
-            {
-                "CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_2_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_3_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_4_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_5_27Apr15_Bane_14-09-03RZ",
-                
-                "CPTAC_Intact_Spike_5x_1_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_5x_2_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_5x_3b_30Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_5x_4_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_5x_5_27Apr15_Bane_14-09-01RZ",
-                
-                "CPTAC_Intact_Spike_10x_1_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_2_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_3_2May15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_4_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ",
-            };
-
-            var ms2Results = new List<TargetFeature>();
-            for(var i = 0; i < dataset.Length; i++)
-            {
-                var featureFilePath = string.Format(@"{0}\{1}.ms1ft", featureDir, dataset[i]);
-                var rawFilePath = string.Format(@"{0}\{1}.pbf", rawDir, dataset[i]);
-                var idFilePath = string.Format(@"{0}\{1}_IcTda.tsv", idDir, dataset[i]);
-
-                var ms2List = Ms1FeatureAlign.MathMs1Ms2Result(i, featureFilePath, rawFilePath, idFilePath);
-                ms2Results.AddRange(ms2List);
-              
-            }
-            var ms2Grouped = Ms1FeatureAlign.GroupTargetFeatures(ms2Results.OrderBy(m => m.Mass).ToList());
-
-            foreach (var ms2Set in ms2Grouped)
-            {
-                var netStart = new double[dataset.Length];
-                var netEnd = new double[dataset.Length];
-
-                foreach (var ms2 in ms2Set)
-                {
-                    netStart[ms2.LinkedMs1Feature.DataSetId] = ms2.LinkedMs1Feature.MinNet;
-                    netEnd[ms2.LinkedMs1Feature.DataSetId] = ms2.LinkedMs1Feature.MaxNet;
-                }
-
-                Console.Write(ms2Set[0].ProteinName);
-                Console.Write("\t");
-                Console.Write(ms2Set[0].Composition);
-                Console.Write("\t");
-                Console.Write(ms2Set[0].Mass);
-                
-
-                for (var k = 0; k < dataset.Length; k++) Console.Write("\t{0}", netStart[k]);
-                for (var k = 0; k < dataset.Length; k++) Console.Write("\t{0}", netEnd[k]);
-                
-                Console.Write("\n");
-            }
-        }*/
         
         [Test]
         public void TestAlignProMexResults()
@@ -380,97 +362,6 @@ namespace InformedProteomics.Test
             
         }
 
-
-        [Test]
-        public void ProMexDebug()
-        {
-            for (var mass = 500; mass < 100000; mass += 500)
-            {
-                var isotopes = new IsotopeList(mass, 0.01d);
-                //var isotopes = new IsotopeList(mass, 1000, 0.1);
-
-                Console.Write(mass);
-                Console.Write("\t");
-                Console.Write(isotopes.Count);
-                Console.Write("\t");
-
-                //for (var charge = 2; charge <= 60; charge++)
-                //{
-                var charge = 10;
-
-                
-                var minMz = Ion.GetIsotopeMz(mass, charge, isotopes.First().Index);
-                var maxMz = Ion.GetIsotopeMz(mass, charge, isotopes.Last().Index);
-                var ppm = ((maxMz - minMz)/minMz)*1e6;
-
-                Console.Write(isotopes.First().Index);
-                Console.Write("\t");
-                Console.Write(isotopes.Last().Index);
-                Console.Write("\t");
-                Console.Write(minMz);
-                Console.Write("\t");
-                Console.Write(maxMz);
-                Console.Write("\t");
-                Console.Write(ppm);
-                Console.Write("\t");
-                //}
-
-
-                //foreach(var p in isotopes.EnvelopePdf) Console.Write("{0}\t", p);
-
-                Console.Write("\n");
-            }
-            
-        }
-
-        [Test]
-        public void CollectTrainingSet()
-        {
-            const string idFileFolder = @"D:\MassSpecFiles\training\IcTda";
-            const string outFileFolder = @"D:\MassSpecFiles\training\target";
-            var rawFileLists = new string[]
-            {
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf"
-            };
-            
-            //var trainingSetList = File.ReadAllLines(@"D:\MassSpecFiles\training\training_datasets.txt");
-            //var trainSet = trainingSetList.Where(set => !set.StartsWith("#")).ToList();
-
-            foreach (var dataset in rawFileLists)
-            {
-                var dataname = Path.GetFileNameWithoutExtension(dataset);
-                var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
-
-                Console.WriteLine(dataset);
-                Console.WriteLine(idFile);
-                var targetSets = TargetFeature.CollectUniqueTargets(dataset, idFile, 0.005);
-                Console.WriteLine(targetSets.Count);
-
-                var writer = new StreamWriter(string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset)));
-                writer.WriteLine("MinScan\tMaxScan\tMinCharge\tMaxCharge\tMass\tSequence\tModifications\tComposition");
-
-                foreach (var feature in targetSets)
-                {
-                    if (feature.Rows.Count < 2) continue;
-
-                    writer.Write(feature.MinScanNum); writer.Write("\t");
-                    writer.Write(feature.MaxScanNum); writer.Write("\t");
-                    writer.Write(feature.MinCharge); writer.Write("\t");
-                    writer.Write(feature.MaxCharge); writer.Write("\t");
-                    writer.Write(feature.Mass); writer.Write("\t");
-                    writer.Write(feature.Sequence); writer.Write("\t");
-                    writer.Write(feature.Modifications); writer.Write("\t");
-                    writer.Write(feature.Composition); writer.Write("\n");
-                }
-
-                writer.Close();
-            }
-        }
         
         private void OutputEnvelopPeakStat(Ms1Feature feature, int baseCharge, LcMsRun run, IsotopeList isotopes, StreamWriter writer)
         {
@@ -590,6 +481,49 @@ namespace InformedProteomics.Test
                 Console.WriteLine(dataname);
             }
         }
+
+        [Test]
+        public void ProMexDebug()
+        {
+            for (var mass = 500; mass < 100000; mass += 500)
+            {
+                var isotopes = new IsotopeList(mass, 0.01d);
+                //var isotopes = new IsotopeList(mass, 1000, 0.1);
+
+                Console.Write(mass);
+                Console.Write("\t");
+                Console.Write(isotopes.Count);
+                Console.Write("\t");
+
+                //for (var charge = 2; charge <= 60; charge++)
+                //{
+                var charge = 10;
+
+
+                var minMz = Ion.GetIsotopeMz(mass, charge, isotopes.First().Index);
+                var maxMz = Ion.GetIsotopeMz(mass, charge, isotopes.Last().Index);
+                var ppm = ((maxMz - minMz) / minMz) * 1e6;
+
+                Console.Write(isotopes.First().Index);
+                Console.Write("\t");
+                Console.Write(isotopes.Last().Index);
+                Console.Write("\t");
+                Console.Write(minMz);
+                Console.Write("\t");
+                Console.Write(maxMz);
+                Console.Write("\t");
+                Console.Write(ppm);
+                Console.Write("\t");
+                //}
+
+
+                //foreach(var p in isotopes.EnvelopePdf) Console.Write("{0}\t", p);
+
+                Console.Write("\n");
+            }
+
+        }
+
     }
     
 
