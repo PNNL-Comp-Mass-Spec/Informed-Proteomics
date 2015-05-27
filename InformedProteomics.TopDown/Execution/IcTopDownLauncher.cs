@@ -40,7 +40,8 @@ namespace InformedProteomics.TopDown.Execution
             bool? runTargetDecoyAnalysis = true,
             int searchMode = 1,
             string featureFilePath = null,
-            double minFeatureProbability = 0.15
+            double minFeatureProbability = 0.15,
+            IEnumerable<int> scanNumbers = null 
             )
         {
             SpecFilePath = specFilePath;
@@ -64,6 +65,7 @@ namespace InformedProteomics.TopDown.Execution
             ProductIonTolerance = new Tolerance(productIonTolerancePpm);
             RunTargetDecoyAnalysis = runTargetDecoyAnalysis;
             SearchMode = searchMode;
+            ScanNumbers = scanNumbers;
         }
 
         public string SpecFilePath { get; private set; }
@@ -85,6 +87,7 @@ namespace InformedProteomics.TopDown.Execution
         public Tolerance PrecursorIonTolerance { get; private set; }
         public Tolerance ProductIonTolerance { get; private set; }
         public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
+        public IEnumerable<int> ScanNumbers { get; private set; }
 
         // 0: all internal sequences, 
         // 1: #NCleavges <= Max OR Cleavages <= Max (Default)
@@ -95,7 +98,7 @@ namespace InformedProteomics.TopDown.Execution
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedTopDownScorer _topDownScorer;
 
-        public void RunSearch(double corrThreshold = 0.7)
+        public void RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null)
         {
             var sw = new Stopwatch();
 
@@ -258,7 +261,7 @@ namespace InformedProteomics.TopDown.Execution
             return annotationsAndOffsets;
         }
 
-        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter)
+        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken=null)
         {
             var sw = new Stopwatch();
 
@@ -273,6 +276,11 @@ namespace InformedProteomics.TopDown.Execution
 
             foreach (var annotationAndOffset in annotationsAndOffsets)
             {
+                if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
+                {
+                    return matches;
+                }
+
                 //++numProteins;
                 Interlocked.Increment(ref numProteins);
 
@@ -312,7 +320,9 @@ namespace InformedProteomics.TopDown.Execution
                         var sequenceMass = protCompositionWithH2O.Mass;
                         var modCombinations = modCombs[modIndex];
 
-                        foreach (var ms2ScanNum in sequenceFilter.GetMatchingMs2ScanNums(sequenceMass))
+                        var ms2ScanNums = this.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
+
+                        foreach (var ms2ScanNum in ms2ScanNums)
                         {
                             if (ms2ScanNum > _run.MaxLcScan) continue;
 
