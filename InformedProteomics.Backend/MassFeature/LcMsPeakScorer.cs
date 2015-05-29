@@ -70,7 +70,7 @@ namespace InformedProteomics.Backend.MassFeature
             }
         }
         
-        public bool CheckChargeState(ObservedIsotopeEnvelope envelope, int minScanCharge)
+        public bool CheckChargeState(ObservedIsotopeEnvelope envelope)
         {
             var checkCharge = envelope.Charge;
             if (checkCharge > 20) return true; //high charge (> +20), just pass

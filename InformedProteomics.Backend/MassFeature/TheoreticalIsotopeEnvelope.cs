@@ -29,7 +29,7 @@ namespace InformedProteomics.Backend.MassFeature
                 Isotopes.Add(new Isotope(i, isoEnv.Envolope[i]));
             }
 
-            if (ratioSum > 0) throw new Exception("Abnormal Theoretical Envelope");
+            if (!(ratioSum > 0)) throw new Exception("Abnormal Theoretical Envelope");
 
             _probability            = new double[Isotopes.Count];
             Ranking                 = new int[Isotopes.Count];

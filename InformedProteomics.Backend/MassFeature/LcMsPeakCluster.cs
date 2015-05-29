@@ -11,6 +11,18 @@ namespace InformedProteomics.Backend.MassFeature
             Envelopes = new List<ObservedIsotopeEnvelope>();
             Run = run;
             AddObservedEnvelope(observedEnvelope);
+            //Scores = new LcMsFeatureScore();
+        }
+
+        public LcMsPeakCluster(LcMsRun run, double repMass, int repCharge, double repMz, int repScanNum, double abundance)
+            : base(repMass, repCharge, repMz, repScanNum, abundance)
+        {
+            Run = run;
+            Envelopes = new List<ObservedIsotopeEnvelope>();
+            MaxScanNum = repScanNum;
+            MinScanNum = repScanNum;
+            MinCharge = repCharge;
+            MaxCharge = repCharge;
         }
 
         public double[] EnvelopeDistanceScoreAcrossTime { get; internal set; }
@@ -82,5 +94,7 @@ namespace InformedProteomics.Backend.MassFeature
         }
         
         public List<ObservedIsotopeEnvelope> Envelopes { get; private set; }
+
+        //public LcMsFeatureScore Scores { get; internal set; }
     }
 }

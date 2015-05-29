@@ -17,6 +17,7 @@ namespace InformedProteomics.Backend.MassFeature
             Peaks = new Ms1Peak[theoreticalEnvelope.Size];
             
             Array.Copy(peaks, Peaks, theoreticalEnvelope.Size);
+            GoodEnough = false;
         }
 
         public override Isotope GetMostAbundantIsotope()
@@ -41,6 +42,8 @@ namespace InformedProteomics.Backend.MassFeature
         public int NumberOfPeaks { get { return Peaks.Count(x => x != null && x.Active); } }
 
         public double Abundance { get { return Peaks.Where(p => p != null && p.Active).Sum(p => p.Intensity); } }
+
+        public bool GoodEnough;
 
         public Ms1Peak RepresentativePeak
         {

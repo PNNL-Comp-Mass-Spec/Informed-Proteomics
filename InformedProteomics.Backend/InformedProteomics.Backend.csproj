@@ -157,12 +157,14 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
+    <Compile Include="MassFeature\IdentifiedProtein.cs" />
     <Compile Include="MassFeature\IsotopeEnvelope.cs" />
     <Compile Include="MassFeature\LcMsFeature.cs" />
     <Compile Include="MassFeature\LcMsFeatureAlignment.cs" />
     <Compile Include="MassFeature\LcMsFeatureContainer.cs" />
     <Compile Include="MassFeature\LcMsFeatureScorer.cs" />
-    <Compile Include="MassFeature\LcMsFeatureScoreType.cs" />
+    <Compile Include="MassFeature\LcMsFeatureScore.cs" />
+    <Compile Include="MassFeature\LcMsFeatureTrain.cs" />
     <Compile Include="MassFeature\LcMsPeakCluster.cs" />
     <Compile Include="MassFeature\LcMsPeakScorer.cs" />
     <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
@@ -214,6 +216,7 @@
     <Compile Include="Utils\IntRange.cs" />
     <Compile Include="Utils\ListUtil.cs" />
     <Compile Include="Utils\Misc.cs" />
+    <Compile Include="Utils\OtsuThreshold.cs" />
     <Compile Include="Utils\PeakListUtils.cs" />
     <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
