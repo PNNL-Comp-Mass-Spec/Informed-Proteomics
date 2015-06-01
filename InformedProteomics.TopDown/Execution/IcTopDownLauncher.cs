@@ -15,7 +15,7 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDownLauncher
     {
-        public const int NumMatchesPerSpectrum = 1;
+        //public const int NumMatchesPerSpectrum = 1;
         public const string TargetFileExtension = "_IcTarget.tsv";
         public const string DecoyFileExtension = "_IcDecoy.tsv";
         public const string TdaFileExtension = "_IcTda.tsv";
@@ -41,7 +41,8 @@ namespace InformedProteomics.TopDown.Execution
             int searchMode = 1,
             string featureFilePath = null,
             double minFeatureProbability = 0.15,
-            IEnumerable<int> scanNumbers = null 
+            IEnumerable<int> scanNumbers = null,
+            int numMatchesPerSpectrum = 1
             )
         {
             SpecFilePath = specFilePath;
@@ -66,6 +67,7 @@ namespace InformedProteomics.TopDown.Execution
             RunTargetDecoyAnalysis = runTargetDecoyAnalysis;
             SearchMode = searchMode;
             ScanNumbers = scanNumbers;
+            NumMatchesPerSpectrum = numMatchesPerSpectrum;
         }
 
         public string SpecFilePath { get; private set; }
@@ -88,6 +90,7 @@ namespace InformedProteomics.TopDown.Execution
         public Tolerance ProductIonTolerance { get; private set; }
         public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
         public IEnumerable<int> ScanNumbers { get; private set; }
+        public int NumMatchesPerSpectrum { get; private set; }
 
         // 0: all internal sequences, 
         // 1: #NCleavges <= Max OR Cleavages <= Max (Default)
