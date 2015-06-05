@@ -284,11 +284,13 @@ namespace InformedProteomics.TopDown.Execution
                     return matches;
                 }
 
-                //++numProteins;
-                Interlocked.Increment(ref numProteins);
-
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;
+
+                var protein = db.GetProteinName(offset);
+
+                //++numProteins;
+                Interlocked.Increment(ref numProteins);
 
                 if (numProteins%100000 == 0)
                 //if(numProteins % 10 == 0)

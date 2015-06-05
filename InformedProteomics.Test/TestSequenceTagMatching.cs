@@ -23,8 +23,8 @@ namespace InformedProteomics.Test
 //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
 //            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 //            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
-            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
-//            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+//            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
+            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 5;
@@ -32,14 +32,14 @@ namespace InformedProteomics.Test
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
 //            const string fastaFilePath = @"H:\Research\Lewy\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            const string fastaFilePath = @"H:\Research\Weijun_TopDown\database\ID_005140_7A170668.fasta";
+//            const string fastaFilePath = @"H:\Research\Weijun_TopDown\database\ID_005140_7A170668.fasta";
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
-//            const string fastaFilePath = @"H:\Research\Charles\TopDown\databases\ID_002166_F86E3B2F.icsfldecoy.fasta";
+            const string fastaFilePath = @"H:\Research\Charles\TopDown\databases\ID_002166_F86E3B2F.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
 //            var aaSet = new AminoAcidSet(@"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt");
-            var aaSet = new AminoAcidSet(@"H:\Research\QCShew_TopDown\Production\Mods.txt");
+            var aaSet = new AminoAcidSet(@"H:\Research\Charles\TopDown\Mods.txt");
 //            var aaSet = new AminoAcidSet();
 
             TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
