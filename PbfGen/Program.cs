@@ -60,7 +60,7 @@ namespace PbfGen
                 return;
             }
 
-            if (!Directory.Exists(specFilePath) && !Path.GetExtension(specFilePath).ToLower().Equals(".raw"))
+            if (!Directory.Exists(specFilePath) && !Path.GetExtension(specFilePath).ToLower().Equals(".raw") && !Path.GetExtension(specFilePath).ToLower().Equals(".mzml") && !specFilePath.ToLower().EndsWith(".mzml.gz"))
             {
                 PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath + ".");
                 return;
@@ -98,7 +98,16 @@ namespace PbfGen
                 else
                 {
                     Console.WriteLine("Creating {0} from {1}", rafFilePath, rawFilePath);
-                    var reader = new XCaliburReader(rawFilePath);
+                    IMassSpecDataReader reader = null;
+                    if (Path.GetExtension(rawFilePath).ToLower().Equals(".raw"))
+                    {
+                        reader = new XCaliburReader(rawFilePath);
+                    }
+                    else if (Path.GetExtension(rawFilePath).ToLower().Equals(".mzml") ||
+                             rawFilePath.ToLower().EndsWith(".mzml.gz"))
+                    {
+                        reader = new MzMLReader(rawFilePath, false, true);
+                    }
                     var run = new InMemoryLcMsRun(reader, 0, 0);
                     run.WriteAsPbf(rafFilePath);
                 }
