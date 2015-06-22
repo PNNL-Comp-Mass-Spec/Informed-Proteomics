@@ -52,9 +52,21 @@ namespace InformedProteomics.Backend.Database
                                enzyme.IsNTerm);
         }
 
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, Enzyme enzyme)
+        {
+            return AnnotationsAndOffsetsParallel(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
+                               enzyme.IsNTerm);
+        }
+
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
         {
             return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
+        }
+
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(int minLength, int maxLength)
+        {
+            return AnnotationsAndOffsetsParallel(minLength, maxLength, 0, 0, null, false);
         }
 
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
@@ -64,12 +76,11 @@ namespace InformedProteomics.Backend.Database
 
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
         {
-            var encoding = Encoding.ASCII;
-
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
-                var seqArr = seqWithOffset.Sequence;
+                var seqArr = Encoding.GetString(seqWithOffset.Sequence);
                 var offset = seqWithOffset.Offset;
+
                 for (var i = 0; i <= numCTermCleavages; i++)
                 {
                     var length = seqArr.Length - i;
@@ -77,10 +88,7 @@ namespace InformedProteomics.Backend.Database
                     {
                         yield return new AnnotationAndOffset(
                             offset,
-                            string.Format("{0}.{1}.{2}",
-                            "_",
-                            encoding.GetString(seqArr, 0, length),
-                            (i == 0 ? "_" : encoding.GetString(seqArr, length, 1)))
+                            "_." + seqArr.Substring(0, length) + "." + (i == 0 ? '_' : seqArr[length])
                             );
                     }
                 }
@@ -89,11 +97,11 @@ namespace InformedProteomics.Backend.Database
 
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(int minLength, int maxLength, int numCTermCleavages)
         {
-
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
-                var seqArr = seqWithOffset.Sequence;
+                var seqArr = Encoding.GetString(seqWithOffset.Sequence);
                 var offset = seqWithOffset.Offset;
+
                 for (var i = numCTermCleavages + 1; i <= seqArr.Length - minLength; i++)
                 {
                     var length = seqArr.Length - i;
@@ -101,10 +109,7 @@ namespace InformedProteomics.Backend.Database
                     {
                         yield return new AnnotationAndOffset(
                             offset,
-                            string.Format("{0}.{1}.{2}",
-                            "_",
-                            Encoding.GetString(seqArr, 0, length),
-                            (i == 0 ? "_" : Encoding.GetString(seqArr, length, 1)))
+                            "_." + seqArr.Substring(0, length) + "." + (i == 0 ? '_' : seqArr[length])
                             );
                     }
                 }
@@ -133,7 +138,7 @@ namespace InformedProteomics.Backend.Database
                         //  if (numNTermCleavage <= maxNumNTermCleavages) "both" else "cterm"
                         var cleavedAnnotation = numNTermCleavage == 0
                             ? annotation
-                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                            : annotation[1 + numNTermCleavage] + "." + annotation.Substring(2 + numNTermCleavage);
                         yield return new AnnotationAndOffset(offset + numNTermCleavage, cleavedAnnotation);
 
                     }
@@ -158,7 +163,7 @@ namespace InformedProteomics.Backend.Database
                         // N only
                         var cleavedAnnotation = numNTermCleavage == 0
                             ? annotation
-                            : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
+                            : annotation[1 + numNTermCleavage] + "." + annotation.Substring(2 + numNTermCleavage);
                         yield return new AnnotationAndOffset(offset + numNTermCleavage, cleavedAnnotation);
                     }
                 }
@@ -228,6 +233,7 @@ namespace InformedProteomics.Backend.Database
             var isCleavable = new bool[128];
             if (enzymaticResidues != null)
             {
+                // Could be run in parallel, but probably not worth the cost.
                 foreach (var residue in enzymaticResidues)
                 {
                     isCleavable[residue] = true;
@@ -237,17 +243,23 @@ namespace InformedProteomics.Backend.Database
             }
 
             var isStandardAminoAcid = new bool[256];
+            // Could be run in parallel, but probably not worth the cost.
             foreach (var residue in AminoAcid.StandardAminoAcidCharacters)
             {
                 isStandardAminoAcid[residue] = true;
             }
 
+            var seqBuild = new StringBuilder(maxLength + 3);
+
             // pre, peptide sequence, next
+            // Should probably be run in parallel
             foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
             {
-                var seqArr = seqAndLcp.Sequence;
+                var seqArr = Encoding.GetString(seqAndLcp.Sequence);
                 var lcp = seqAndLcp.Lcp;
                 var offset = seqAndLcp.Offset;
+                seqBuild.Clear();
+                seqBuild.Append(seqArr[0] + ".");
 
                 if (enzymaticResidues != null)  
                 {
@@ -258,17 +270,19 @@ namespace InformedProteomics.Backend.Database
                         if (isCleavable[seqArr[0]]) ++ntt;
                         if (ntt < numTolerableTermini-1) continue;
 
+                        // Could be run in parallel, but probably not worth the cost.
                         for (var i = 1; i < seqArr.Length-1; i++)
                         {
                             var code = seqArr[i];
                             if (!isStandardAminoAcid[code]) break;
                             if (isCleavable[code]) ++nmc;
 
+                            seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
                                 if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                                    yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
                             }
                             if (nmc > numMissedCleavages) break;
@@ -279,6 +293,7 @@ namespace InformedProteomics.Backend.Database
                         if (seqArr[0] == FastaDatabase.Delimiter || isCleavable[seqArr[1]]) ++ntt;
                         if (ntt < numTolerableTermini - 1) continue;
 
+                        // Could be run in parallel, but probably not worth the cost.
                         for (var i = 2; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
@@ -286,11 +301,12 @@ namespace InformedProteomics.Backend.Database
                             if (isCleavable[code]) ++nmc;
                             if (nmc > numMissedCleavages) break;
 
+                            seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
                                 if (ntt + (isCleavable[seqArr[i + 1]] ? 1 : 0) >= numTolerableTermini)
                                 {
-                                    yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                                    yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
                             }
                         }
@@ -298,17 +314,134 @@ namespace InformedProteomics.Backend.Database
                 }
                 else    // No enzyme
                 {
+                    // Could be run in parallel, but probably not worth the cost.
                     for (var i = 1; i < seqArr.Length-1; i++)
                     {
                         var code = seqArr[i];
-
                         if (!isStandardAminoAcid[code]) break;
+
+                        seqBuild.Append(code);
                         if (i >= minLength && i >= lcp)
                         {
-                            yield return new AnnotationAndOffset(offset, string.Format("{0}.{1}.{2}", (char)seqArr[0], Encoding.GetString(seqArr, 1, i), (char)seqArr[i + 1]));
+                            yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                         }
                     }
                 }
+            }
+        }
+
+        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
+                                                      int numMissedCleavages, IEnumerable<char> enzymaticResidues,
+                                                      bool isNTermEnzyme
+            )
+        {
+            var isCleavable = new bool[128];
+            if (enzymaticResidues != null)
+            {
+                // Could be run in parallel, but probably not worth the cost.
+                foreach (var residue in enzymaticResidues)
+                {
+                    isCleavable[residue] = true;
+                    if (isCleavable.Length > FastaDatabase.Delimiter)
+                        isCleavable[FastaDatabase.Delimiter] = true;
+                }
+            }
+
+            var isStandardAminoAcid = new bool[256];
+            // Could be run in parallel, but probably not worth the cost.
+            foreach (var residue in AminoAcid.StandardAminoAcidCharacters)
+            {
+                isStandardAminoAcid[residue] = true;
+            }
+
+            //int prevThreads, prevPorts;
+            //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
+            //ThreadPool.SetMinThreads(8, prevPorts);
+            // pre, peptide sequence, next
+            //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(48).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+        }
+
+        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallelInternal(int minLength, int numTolerableTermini,
+            int numMissedCleavages, IEnumerable<char> enzymaticResidues, bool isNTermEnzyme, SequenceLcpAndOffset seqAndLcp, bool[] isCleavable, bool[] isStandardAminoAcid
+            )
+        {
+            var seqArr = Encoding.GetString(seqAndLcp.Sequence);
+            var lcp = seqAndLcp.Lcp;
+            var offset = seqAndLcp.Offset;
+            var seqBuild = new StringBuilder(seqArr.Length + 3);
+            seqBuild.Append(seqArr[0] + ".");
+
+            if (enzymaticResidues != null)  
+            {
+                var ntt = 0;
+                var nmc = 0;
+                if (!isNTermEnzyme) // C-term enzyme 
+                {
+                    if (isCleavable[seqArr[0]]) ++ntt;
+                    if (!(ntt < numTolerableTermini-1))
+                    {
+                        // Could be run in parallel, but probably not worth the cost.
+                        for (var i = 1; i < seqArr.Length-1; i++)
+                        {
+                            var code = seqArr[i];
+                            if (!isStandardAminoAcid[code]) break;
+                            if (isCleavable[code]) ++nmc;
+
+                            seqBuild.Append(code);
+                            if (i >= minLength && i >= lcp)
+                            {
+                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                {
+                                    yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
+                                }
+                            }
+                            if (nmc > numMissedCleavages) break;
+                        }
+                    }
+                }
+                else // N-term enzyme
+                {
+                    if (seqArr[0] == FastaDatabase.Delimiter || isCleavable[seqArr[1]]) ++ntt;
+                    if (!(ntt < numTolerableTermini - 1))
+                    {
+                        // Could be run in parallel, but probably not worth the cost.
+                        for (var i = 2; i < seqArr.Length - 1; i++)
+                        {
+                            var code = seqArr[i];
+                            if (!isStandardAminoAcid[code]) break;
+                            if (isCleavable[code]) ++nmc;
+                            if (nmc > numMissedCleavages) break;
+
+                            seqBuild.Append(code);
+                            if (i >= minLength && i >= lcp)
+                            {
+                                if (ntt + (isCleavable[seqArr[i + 1]] ? 1 : 0) >= numTolerableTermini)
+                                {
+                                    yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else    // No enzyme
+            {
+                // Could be run in parallel, but probably not worth the cost.
+                for (var i = 1; i < seqArr.Length-1; i++)
+                {
+                    var code = seqArr[i];
+                    if (!isStandardAminoAcid[code]) break;
+
+                    seqBuild.Append(code);
+                    if (i >= minLength && i >= lcp)
+                    {
+                        yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
+                    }
+                }
+
             }
         }
 
@@ -319,6 +452,7 @@ namespace InformedProteomics.Backend.Database
             var lcpEnum = PLcps().GetEnumerator();
 
             var offset = -1L;
+            // Data dependency: cannot run in parallel; Also, not a significantly costly operation (< 10 seconds)
             foreach (var residue in FastaDatabase.Characters())
             {
                 lcpEnum.MoveNext();
@@ -335,6 +469,7 @@ namespace InformedProteomics.Backend.Database
                 lcpList.RemoveFirst();
             }
 
+            // Data dependency: cannot run in parallel; Also, not a significantly costly operation (< 10 seconds)
             while (curSequence.Count >= minLength)
             {
                 var seqArr = new byte[curSequence.Count];
@@ -359,6 +494,7 @@ namespace InformedProteomics.Backend.Database
 
             var pLcp = new byte[suffixArray.Length];
 
+            // Data dependency: cannot run in parallel
             foreach (var index in suffixArray)
             {
                 var lcp = GetLcp(sequence, prevIndex, index);

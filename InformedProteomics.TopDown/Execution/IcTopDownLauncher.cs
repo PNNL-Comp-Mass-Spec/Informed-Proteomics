@@ -93,8 +93,8 @@ namespace InformedProteomics.TopDown.Execution
         public int NumMatchesPerSpectrum { get; private set; }
 
         // 0: all internal sequences, 
-        // 1: #NCleavges <= Max OR Cleavages <= Max (Default)
-        // 2: 1: #NCleavges <= Max AND Cleavages <= Max
+        // 1: #NCleavages <= Max OR Cleavages <= Max (Default)
+        // 2: 1: #NCleavages <= Max AND Cleavages <= Max
         public int SearchMode { get; private set; } 
 
         private LcMsRun _run;

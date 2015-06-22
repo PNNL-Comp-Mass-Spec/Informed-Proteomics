@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Database;
@@ -17,7 +19,7 @@ namespace InformedProteomics.Test
         {
             var sw = new System.Diagnostics.Stopwatch();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
             var db = new FastaDatabase(dbFile);
             db.Read();
             var indexedDb = new IndexedDatabase(db);
@@ -49,7 +51,7 @@ namespace InformedProteomics.Test
         public void TestSumParallel()
         {
             //var array = Enumerable.Range(0, short.MaxValue).ToArray();
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
             var db = new FastaDatabase(dbFile);
             db.Read();
             //var indexedDb = new IndexedDatabase(db);
@@ -92,17 +94,28 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestSequenceEnumeration()
+        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
+        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
+        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
-            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(30, 250);
-            Parallel.ForEach(
+            var timeDB = sw.Elapsed;
+            Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(30, 250);
+            var timeGetAnn = sw.Elapsed;
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            /*/Parallel.ForEach(
                 annotationsAndOffsets,
                 //                new ParallelOptions { MaxDegreeOfParallelism = 2},
                 annotationAndOffset =>
@@ -110,36 +123,199 @@ namespace InformedProteomics.Test
                     Interlocked.Increment(ref numSequences);
                     //++numSequences;
                 }
-                );
+                );/**/
+            //annotationsAndOffsets.Select(annotationsAndOffset => annotationsAndOffset.)
+            // Below, original: 110, 109(total) seconds
+            // Parallelizing AnnotationsAndOffsetsNoEnzyme: 86 seconds
+            // Parallelizing AnnotationsAndOffsetsNoEnzyme, yield returns: 79.6, 94, 60, 60 seconds
+            //
+            // 3MB
+            // serial: 
+            // Parallel2: 107, 
+            //
+            // 6MB
+            // serial: 
+            // Parallel2: 
+            //
+            // 15MB
+            // serial: 
+            // Parallel2: 
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var fout = new StreamWriter(ofstream))
+            //{
+            //    foreach (var annOff in annotationsAndOffsets)
+            //    {
+            //        numSequences++;
+            //        fout.WriteLine(annOff.Annotation);
+            //    }
+            //}
+            numSequences = annotationsAndOffsets.Count();
+            var timeParForEach = sw.Elapsed;
+            Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);
-
+            //Assert.AreEqual(188961836, numSequences);
+            Assert.AreEqual(expected, numSequences);
         }
 
         [Test]
-        public void TestSequenceEnumerationSerial()
+        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
+        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
+        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
+        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
+        public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
-            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(30, 250);
-            foreach (var annotationsAndOffset in annotationsAndOffsets)
-            {
-                //Interlocked.Increment(ref numSequences);
-                ++numSequences;
-            }
+            var timeDB = sw.Elapsed;
+            Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0);
+            var timeGetAnn = sw.Elapsed;
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            /*/Parallel.ForEach(
+                annotationsAndOffsets,
+                //                new ParallelOptions { MaxDegreeOfParallelism = 2},
+                annotationAndOffset =>
+                {
+                    Interlocked.Increment(ref numSequences);
+                    //++numSequences;
+                }
+                );/**/
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var fout = new StreamWriter(ofstream))
+            //{
+            //    foreach (var annOff in annotationsAndOffsets)
+            //    {
+            //        numSequences++;
+            //        fout.WriteLine(annOff.Annotation);
+            //    }
+            //}
+            numSequences = annotationsAndOffsets.Count();
+            var timeParForEach = sw.Elapsed;
+            Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"{0:f4} sec", sec);
+            //Assert.AreEqual(188961836, numSequences);
+            Assert.AreEqual(expected, numSequences);
+        }
+
+        [Test]
+        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 2700388)]  // 1.5MB
+        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 4165765)]  // 3MB
+        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396)]  // 6MB
+        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
+        public void TestSequenceEnumerationNCTerm(double size, string dbFile, int expected)
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
+            var db = new FastaDatabase(dbFile);
+            var indexedDb = new IndexedDatabase(db);
+            var numSequences = 0L;
+            var timeDB = sw.Elapsed;
+            Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(21, 300, 1, 0);
+            var timeGetAnn = sw.Elapsed;
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            /*/Parallel.ForEach(
+                annotationsAndOffsets,
+                //                new ParallelOptions { MaxDegreeOfParallelism = 2},
+                annotationAndOffset =>
+                {
+                    Interlocked.Increment(ref numSequences);
+                    //++numSequences;
+                }
+                );/**/
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var fout = new StreamWriter(ofstream))
+            //{
+            //    foreach (var annOff in annotationsAndOffsets)
+            //    {
+            //        numSequences++;
+            //        fout.WriteLine(annOff.Annotation);
+            //    }
+            //}
+            numSequences = annotationsAndOffsets.Count();
+            var timeParForEach = sw.Elapsed;
+            Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
+
+            Console.WriteLine("NumPeptides: {0}", numSequences);
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+            //Assert.AreEqual(188961836, numSequences);
+            Assert.AreEqual(expected, numSequences);
+        }
+
+        [Test]
+        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
+        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
+        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
+            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
+            var db = new FastaDatabase(dbFile);
+            var indexedDb = new IndexedDatabase(db);
+            indexedDb.Read();
+            var numSequences = 0L;
+            var timeDB = sw.Elapsed;
+            Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(30, 250);
+            var timeGetAnn = sw.Elapsed;
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            //foreach (var annotationsAndOffset in annotationsAndOffsets)
+            //{
+            //    //Interlocked.Increment(ref numSequences);
+            //    ++numSequences;
+            //}
+            using (
+                var ofstream =
+                    new FileStream(
+                        Path.Combine(@"F:\InformedProteomicsTestFiles",
+                            Path.GetFileNameWithoutExtension(dbFile) + "_old.txt"), FileMode.Create))
+            using (var fout = new StreamWriter(ofstream))
+            {
+                foreach (var annOff in annotationsAndOffsets)
+                {
+                    numSequences++;
+                    fout.WriteLine(annOff.Annotation);
+                }
+            }
+            //numSequences = annotationsAndOffsets.Count();
+            var timeParForEach = sw.Elapsed;
+            Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
+
+            Console.WriteLine("NumPeptides: {0}", numSequences);
+            sw.Stop();
+            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            Console.WriteLine(@"{0:f4} sec", sec);
+            //Assert.AreEqual(188961836, numSequences);
+            Assert.AreEqual(expected, numSequences);
         }
 
         [Test]
