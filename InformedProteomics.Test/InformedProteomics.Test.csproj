@@ -143,6 +143,7 @@
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestSequenceTagMatching.cs" />
     <Compile Include="TestTagBasedSearch.cs" />
+    <Compile Include="TestUtex.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
   </ItemGroup>

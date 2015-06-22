@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Quantification;
 using InformedProteomics.Backend.Utils;
@@ -70,31 +71,31 @@ namespace InformedProteomics.TopDown.Execution
         {
             //var outTsvFilePath = Path.ChangeExtension(rawFile, FileExtension);
             var outTsvFilePath = Parameters.OutputPath + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "." + FileExtension;
-
-            var j = rawFile.LastIndexOf('.');
-            var outPath = rawFile.Substring(0, j);
-            var outCsvFilePath = string.Format("{0}_{1}.csv", outPath, FileExtension);
+            var outCsvFilePath = Parameters.OutputPath + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "_" + FileExtension + ".csv";
+            //var j = rawFile.LastIndexOf('.');
+            //var outPath = rawFile.Substring(0, j);
+            //var outCsvFilePath = string.Format("{0}_{1}.csv", outPath, FileExtension);
 
 
             if (File.Exists(outTsvFilePath))
             {
-                Console.WriteLine("ProMex output already exists: {0}", outTsvFilePath);
+                Console.WriteLine(@"ProMex output already exists: {0}", outTsvFilePath);
                 return;
             }
 
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine("Cannot find input file: {0}", rawFile);
+                Console.WriteLine(@"Cannot find input file: {0}", rawFile);
                 return;
             }
 
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine("Start loading MS1 data from {0}", rawFile);
+            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
             
             var comparer = new MzComparerWithBinning(27);
             var extractor = new Ms1FeatureMatrix(run, Parameters.MinSearchCharge, Parameters.MaxSearchCharge, Parameters.MaxThreads, comparer);
-            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             
             //extractor.GetFeatureFile(rawFile, _minSearchMass, _maxSearchMass, _scoreReport, _csvOutput, _tmpOutput);
             //var outTsvFilePath = Path.ChangeExtension(rawFile, FileExtension);
@@ -105,7 +106,7 @@ namespace InformedProteomics.TopDown.Execution
             var maxSearchMassBin = comparer.GetBinNumber(Parameters.MaxSearchMass);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
-            Console.WriteLine("Start MS1 feature extraction.");
+            Console.WriteLine(@"Start MS1 feature extraction.");
             //if (Parameters.CsvOutput) Console.WriteLine("Csv Output File\t{0}", outCsvFilePath);
 
             stopwatch.Restart();
@@ -120,14 +121,14 @@ namespace InformedProteomics.TopDown.Execution
                     var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
                     var processedPercentage = ((double)processedBins / totalMassBin) * 100;
-                    Console.WriteLine("Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}", processedPercentage, comparer.GetMzEnd(binNum), elapsed, container.NumberOfFeatures);
+                    Console.WriteLine(@"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}", processedPercentage, comparer.GetMzEnd(binNum), elapsed, container.NumberOfFeatures);
                 }
             }
 
-            Console.WriteLine("Complete MS1 feature extraction.");
-            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            Console.WriteLine(" - Number of extracted features = {0}", container.NumberOfFeatures);
-            extractor = null;
+            Console.WriteLine(@"Complete MS1 feature extraction.");
+            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
+            //extractor = null;
 
             // write result files
             StreamWriter csvWriter = null;
@@ -137,7 +138,7 @@ namespace InformedProteomics.TopDown.Execution
                 csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
             }
 
-            Console.WriteLine("Start selecting mutually independent features from feature network graph");
+            Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             var connectedFeatures = container.GetAllConnectedFeatures();
             if (Parameters.TmpOutput)
             {
@@ -158,11 +159,10 @@ namespace InformedProteomics.TopDown.Execution
             
             stopwatch.Stop();
 
-
-
-
             // Start to quantify accurate abundance
             stopwatch.Restart();
+
+            /*
             var quantAnalyzer = new TargetMs1FeatureMatrix(run);
             var oriResult = new List<Ms1FeatureCluster>();
             var quantResult = new List<Ms1Feature>();
@@ -174,7 +174,18 @@ namespace InformedProteomics.TopDown.Execution
                 quantResult.Add(ms1Feature);
                 oriResult.Add(cluster);
             }
-
+            */
+            var quantAnalyzer = new LcMsPeakMatrix(run);
+            var oriResult = new List<Ms1FeatureCluster>();
+            var quantResult = new List<LcMsPeakCluster>();
+            foreach (var cluster in container.GetFilteredFeatures(connectedFeatures))
+            {
+                var ms1Feature = quantAnalyzer.GetLcMsPeakCluster(cluster.RepresentativeMass,
+                    cluster.RepresentativeCharge, cluster.MinCharge, cluster.MaxCharge, cluster.RepresentativeScanNum);
+                quantResult.Add(ms1Feature);
+                oriResult.Add(cluster);
+            }
+            
             Console.WriteLine("Complete MS1 feature quantification");
             Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             quantAnalyzer = null;
@@ -183,7 +194,8 @@ namespace InformedProteomics.TopDown.Execution
             var featureId = 0;
             var ms1ScanNums = run.GetMs1ScanVector();
             var tsvWriter = new StreamWriter(outTsvFilePath);
-            tsvWriter.WriteLine(GetHeaderString() + "\tQMinScanNum\tQMaxScanNum\tQMinCharge\tQMaxCharge\tQAbundance");
+            tsvWriter.WriteLine(GetHeaderString());
+            //tsvWriter.WriteLine(GetHeaderString() + "\tQMinScanNum\tQMaxScanNum\tQMinCharge\tQMaxCharge\tQAbundance");
             
             //foreach (var cluster in container.GetFilteredFeatures(connectedFeatures))
             for (var i = 0; i < oriResult.Count; i++)
@@ -191,13 +203,26 @@ namespace InformedProteomics.TopDown.Execution
                 var cluster = oriResult[i];
 
                 featureId++;
-                //tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(cluster));
-                tsvWriter.Write("{0}\t{1}", featureId, GetString(cluster));
-                tsvWriter.WriteLine("\t{0}\t{1}\t{2}\t{3}\t{4}", 
-                    quantResult[i].MinScanNum, quantResult[i].MaxScanNum, 
-                    quantResult[i].MinCharge, quantResult[i].MaxCharge,
-                    quantResult[i].Abundance);
 
+                if (quantResult[i] != null) cluster.Abundance = quantResult[i].Abundance;
+                tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(cluster));
+
+                /*
+                if (quantResult[i] != null)
+                {
+                    tsvWriter.WriteLine("\t{0}\t{1}\t{2}\t{3}\t{4}",
+                        quantResult[i].MinScanNum, quantResult[i].MaxScanNum,
+                        quantResult[i].MinCharge, quantResult[i].MaxCharge,
+                        quantResult[i].Abundance);
+                }
+                else
+                {
+                    tsvWriter.WriteLine("\t{0}\t{1}\t{2}\t{3}\t{4}",
+                        oriResult[i].MinScanNum, oriResult[i].MaxScanNum,
+                        oriResult[i].MinCharge, oriResult[i].MaxCharge,
+                        0);
+                }*/
+                
                 if (csvWriter != null)
                 {
                     foreach (var envelope in cluster.Envelopes)

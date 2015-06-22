@@ -1,13 +1,92 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using InformedProteomics.Backend.Data.Spectrometry;
-using MathNet.Numerics.Statistics;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassFeature
 {
-    public class LcMsFeatureScorer
+    public class LcMsFeatureLikelihood
     {
+        public LcMsFeatureLikelihood(string scoreTableFolder)
+        {
+            _massBins = new double[] { 3500, 7500, 11500, 15500, 19500, 23500, 27500, 31500, 35500, 39500, 43500, 47500 };
+            _chargeScoreTable = new double[_massBins.Length][];
+            
+            var fname = string.Format(@"{0}\ChargeScore.tsv", scoreTableFolder);
+            var parser = new TsvFileParser(fname);
+            for(var i = 0; i < _massBins.Length; i++)
+            {
+                _chargeScoreTable[i] = new double[60];
+                for (var j = 0; j < 60; j++)
+                {
+                    var val = parser.GetData(string.Format("charge_{0}", j+1))[i];
+                    _chargeScoreTable[i][j] = double.Parse(val);
+                }
+            }
+
+            _simScoreTable = LoadTable(string.Format(@"{0}\SimScore.tsv", scoreTableFolder));
+            _intScoreTable = LoadTable(string.Format(@"{0}\IntScore.tsv", scoreTableFolder));
+            _abuScoreTable = LoadTable(string.Format(@"{0}\AbuScore.tsv", scoreTableFolder));
+        }
+
+        public double GetScore(LcMsPeakCluster feature)
+        {
+            var mi = (int) Math.Round((feature.Mass - 3500)/4000);
+            mi = (int) Math.Min(Math.Max(mi, 0), _massBins.Length - 1);
+            var score = 0d;
+            var abundance = feature.AbundanceDistributionAcrossCharge;
+
+            for (var charge = feature.MinCharge; charge <= feature.MaxCharge; charge++)
+            {
+                score += _chargeScoreTable[mi][charge - 1];
+
+                var abuScore = abundance[charge - feature.MinCharge];
+                var k = (int)Math.Min(Math.Max(Math.Round((abuScore - 0.01) / 0.02), 0), 49);
+                score += _abuScoreTable[mi][charge - 1][k];
+
+                if (abuScore < double.Epsilon) continue;
+
+                var simScore = Math.Min(feature.EnvelopeDistanceScoreAcrossCharge[charge - feature.MinCharge], 1.0d);
+                k = (int)Math.Min(Math.Max(Math.Round((simScore - 0.01) / 0.02), 0), 49);
+                score += _simScoreTable[mi][charge - 1][k];
+
+                var intScore = Math.Min(feature.EnvelopeIntensityScoreAcrossCharge[charge - feature.MinCharge]/10, 1.0d);
+                k = (int)Math.Min(Math.Max(Math.Round((intScore - 0.01) / 0.02), 0), 49);
+                score += _intScoreTable[mi][charge - 1][k];
+            }
+            return score;
+        }
+
+        private double[][][] LoadTable(string fname)
+        {
+            var parser = new TsvFileParser(fname);
+            var table = new double[_massBins.Length][][];
+
+            for (var i = 0; i < _massBins.Length; i++)
+            {
+                table[i] = new double[60][];
+                for (var j = 0; j < 60; j++)
+                {
+                    table[i][j] = new double[50];
+
+                    for (var k = 0; k < 50; k++)
+                    {
+                        var colData = parser.GetData(string.Format("{0}", k));
+                        var rowIdx = i*60 + j;
+
+                        table[i][j][k] = double.Parse(colData[rowIdx]);
+                    }
+                }
+            }
+            return table;
+        }
+
+        
+        private readonly double[][] _chargeScoreTable;
+        private readonly double[][][] _simScoreTable;
+        private readonly double[][][] _intScoreTable;
+        private readonly double[][][] _abuScoreTable;
+        private readonly double[] _massBins;
+
+        /*
         public LcMsFeatureScorer(List<Ms1Spectrum> spectra)
         {
             _ms1Spectra = spectra;
@@ -74,15 +153,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 var envCorr = envelope.GetPearsonCorrelation(theoreticalEnvelope);
                 var bcDistance = envelope.GetBhattacharyyaDistance(theoreticalEnvelope);
-                /*
-                for (var i = 0; i < theoreticalEnvelope.Size; i++)
-                {
-                    if (envelope.Peaks[i] == null || !envelope.Peaks[i].Active) continue;
-                    envelopePerTime[envelope.Col - MinCol][i] += envelope.Peaks[i].Intensity;
-                    envelopePerCharge[envelope.Row - MinRow][i] += envelope.Peaks[i].Intensity;
-                }
-                */
-
+        
                 if (envCorr > goodEnvCorrTh && bcDistance < goodEnvBcTh && statSigTestResult.PoissonScore > LogP2 && statSigTestResult.RankSumScore > LogP2)
                 {
                     if (initialEvaluation)
@@ -115,21 +186,8 @@ namespace InformedProteomics.Backend.MassFeature
             //if (GoodEnvelopeCount < 1 || repEnvelope == null) return null;
             if (GoodEnvelopeCount < 1) return null;
 
-            /*var repPeak = repEnvelope.Peaks[repEnvelope.RefIsotopeInternalIndex];
-            var repPeak = repEnvelope.RepresentativePeak;
-            var representativeCharge = repEnvelope.Charge;
-            var representativeMass = Ion.GetMonoIsotopicMass(repPeak.Mz, RepresentativeCharge, TheoreticalEnvelope[repEnvelope.RefIsotopeInternalIndex].Index);
-            var representativeMz = repPeak.Mz;
-            var representativeScanNum = Run.GetMs1ScanVector()[repEnvelope.Col];*/
-
             var bestBcPerTime = feature.EnvelopeDistanceScoreAcrossTime.Min();
-            /*
-            var bestBcPerTime = 10d;
-            for (var col = MinCol; col <= MaxCol; col++)
-            {
-                var bc = TheoreticalEnvelope.GetBhattacharyyaDistance(envelopePerTime[col - MinCol]);
-                if (bc < bestBcPerTime) bestBcPerTime = bc;
-            }*/
+       
 
             var bestBcPerCharge = 10d;
             var bestBcEvenCharge = 10d;
@@ -183,6 +241,6 @@ namespace InformedProteomics.Backend.MassFeature
         private readonly List<Ms1Spectrum> _ms1Spectra;
         private readonly LcMsPeakScorer[] _peakScorerForLargeMassFeature;
         private readonly LcMsPeakScorer[] _peakScorer;
-
+        */
     }
 }

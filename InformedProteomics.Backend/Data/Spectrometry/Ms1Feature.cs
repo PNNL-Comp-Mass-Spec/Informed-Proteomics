@@ -48,7 +48,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int MaxScanNum { get; protected set; }
         public int ScanLength { get { return (MaxScanNum == 0) ? 0 : MaxScanNum - MinScanNum + 1; } }
 
-        public double Abundance { get; protected set; }
+        public double Abundance { get; set; }
         
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }

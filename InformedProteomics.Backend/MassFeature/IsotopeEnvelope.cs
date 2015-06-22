@@ -14,6 +14,8 @@ namespace InformedProteomics.Backend.MassFeature
         public double MonoMass { get; protected set;  }
         public int Size { get { return Probability.Length; } }
 
+        public const double MaxBhattacharyyaDistance = 10.0d;
+
         public double GetBhattacharyyaDistance(IsotopeEnvelope other)
         {
             var bc = 0d;
@@ -23,6 +25,8 @@ namespace InformedProteomics.Backend.MassFeature
                 var q = other.Probability[i];
                 bc += Math.Sqrt(p * q);
             }
+            
+            if (!(bc > 0)) return MaxBhattacharyyaDistance;
 
             return -Math.Log(bc);            
         }
@@ -37,6 +41,8 @@ namespace InformedProteomics.Backend.MassFeature
                     s2 += isotopePeaks[i].Intensity;
             }
 
+            if (!(s2 > 0)) return MaxBhattacharyyaDistance;
+
             var bc = 0d;
             for (var i = 0; i < Size; i++)
             {
@@ -44,6 +50,8 @@ namespace InformedProteomics.Backend.MassFeature
                 var q = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity / s2 : 0;
                 bc += Math.Sqrt(p * q);
             }
+
+            if (!(bc > 0)) return MaxBhattacharyyaDistance;
 
             return -Math.Log(bc);
         }
@@ -57,6 +65,8 @@ namespace InformedProteomics.Backend.MassFeature
                 s2 += intensities[i];
             }
 
+            if (!(s2 > 0)) return MaxBhattacharyyaDistance;
+
             var bc = 0d;
             for (var i = 0; i < Size; i++)
             {
@@ -64,6 +74,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var q = intensities[i] / s2;
                 bc += Math.Sqrt(p * q);
             }
+            if (!(bc > 0)) return MaxBhattacharyyaDistance;
 
             return -Math.Log(bc);
         }

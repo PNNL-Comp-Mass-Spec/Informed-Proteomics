@@ -169,26 +169,32 @@ namespace InformedProteomics.Test
             //var maxScan = featureParser.GetData("MaxScan").Select(s => Convert.ToInt32(s)).ToArray();
             //var monoMass = featureParser.GetData("MonoMass").Select(s => Convert.ToDouble(s)).ToArray();
         }
-        
+
+
+
+
         [Test]
         public void TestGeneratingMs1FeatureFile()
         {
-            //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
-            const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
+            const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
+            //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
             
             const int minScanCharge = 2;
             const int maxScanCharge = 60;
             const double minScanMass = 3000;
-            const double maxScanMass = 3100;
+            const double maxScanMass = 5000;
             const int maxThreads = 10;
             
             var param = new Ms1FeatureFinderInputParameter
             {
                 InputPath = specFilePath,
+                OutputPath = @"D:\MassSpecFiles\UTEX",
                 MinSearchMass = minScanMass,
                 MaxSearchMass = maxScanMass,
                 MinSearchCharge = minScanCharge,
                 MaxSearchCharge = maxScanCharge,
+                CsvOutput = true,
+                ScoreReport = false,
                 MaxThreads = maxThreads
             };
             var featureFinder = new Ms1FeatureFinderLauncher(param);
@@ -206,109 +212,50 @@ namespace InformedProteomics.Test
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
             Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
         }
-        
+
+
         [Test]
         public void TestAlignProMexResults()
         {
-            //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            //var featureDir = @"D:\Test\Quant\Histone";
-            //var outFile = @"D:\Test\Quant\Histone\aligned_features.tsv";
-            //var dataset = new string[2] {"MZ20150405FG_MT_OXI", "MZ20150405FG_WT_OXI"};
-            
-            //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1";
-            //var featureDir = @"D:\Test\Quant\cptac_10rep";
-            //var outFile = @"D:\Test\CPTAC_Intact_rep10.tsv";
-            var featureDir = @"D:\MassSpecFiles\Plasma";
-            var rawDir = @"\\protoapps\UserData\Jungkap\plasma\raw";
-            var outFile = @"D:\MassSpecFiles\Plasma\aligned_features.tsv";
-            var dataset = new string[4]
+            var featureDir = @"D:\MassSpecFiles\UTEX";
+            var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
+            var outFile = @"D:\MassSpecFiles\UTEX\aligned_features.tsv";
+
+            var fileEntries = Directory.GetFiles(featureDir);
+
+            var dataset = new List<string>();
+            foreach (string fileName in fileEntries)
             {
-                "UC4_Intact_plasmaTest_41_6May15_Bane_14-09-01RZ",
-                "UC4_Intact_plasmaTest_144_6May15_Bane_14-09-01RZ",
-                "UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ",
-                "UC4_Intact_plasmaTest_92_6May15_Bane_14-09-01RZ"
-            };
+                if (fileName.EndsWith("ms1ft"))
+                {
+                    dataset.Add(Path.GetFileNameWithoutExtension(fileName));
+                }
+            }
+            dataset.Sort();
 
-            /*
-            var featureDir = @"D:\Test\Quant\spike_in\ms1ft";
-            var rawDir = @"\\protoapps\UserData\Jungkap\Quant";
-            var outFile = @"D:\Test\Quant\spike_in\aligned_features.tsv";
-
-            var dataset = new string[15]
-            {
-                "CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_2_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_3_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_4_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_1x_5_27Apr15_Bane_14-09-03RZ",
-                
-                "CPTAC_Intact_Spike_5x_1_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_5x_2_27Apr15_Bane_14-09-03RZ",
-                "CPTAC_Intact_Spike_5x_3b_30Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_5x_4_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_5x_5_27Apr15_Bane_14-09-01RZ",
-                
-                "CPTAC_Intact_Spike_10x_1_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_2_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_3_2May15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_4_27Apr15_Bane_14-09-01RZ",
-                "CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ",
-            };
-            */
-
-            //dataset[0] = "CPTAC_Intact_1to2_8Apr15_Bane_14-09-03RZa";
-            //dataset[1] = "CPTAC_Intact_1to5_8Apr15_Bane_14-09-03RZ";
-            //dataset[2] = "CPTAC_Intact_1to10_8Apr15_Bane_14-09-03RZ";
-            //dataset[3] = "CPTAC_Intact_1to20_8Apr15_Bane_14-09-03RZ";
-            //dataset[4] = "CPTAC_Intact_SpikeTest_8Apr15_Bane_14-09-03RZ";
-            //var minDatasetIndex = 0;
-            //var maxDatasetIndex = 4;
-            
-            //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3";
-            //var featureDir = @"D:\Test\Quant\lewy";
-            //var outFile = @"D:\Test\Quant\lewy\Lewy_Intact_by_ProMex.tsv";
-            /*
-            var rawDir = @"\\protoapps\UserData\Jungkap\SBEP";
-            var featureDir = @"D:\Test\Quant\SK";
-            var outFile = @"D:\Test\Quant\SK\SBEP_features.tsv";
-            var dataset = new string[8];
-            dataset[0] = "SBEP_STM_001_02222012_Aragon";
-            dataset[1] = "SBEP_STM_001_02272012_Aragon";
-            dataset[2] = "SBEP_STM_002_02222012_Aragon";
-            dataset[3] = "SBEP_STM_002_02222012_Aragon_120226215929";
-            dataset[4] = "SBEP_STM_003_02222012_Aragon";
-            dataset[5] = "SBEP_STM_003_02222012_Aragon_120227062113";
-            dataset[6] = "SBEP_STM_004_02222012_Aragon";
-            dataset[7] = "SBEP_STM_004_02272012_Aragon";
-            */
             var minDatasetIndex = 0;
-            var maxDatasetIndex = dataset.Length - 1;
+            var maxDatasetIndex = dataset.Count - 1;
 
             var rawFiles = new List<string>();
             var ms1ftFiles = new List<string>();
 
             for (var i = minDatasetIndex; i <= maxDatasetIndex; i++)
             {
-                //var rawFile = string.Format(@"{0}\CPTAC_Intact_rep{1}_15Jan15_Bane_C2-14-08-02RZ.pbf", rawDir, i);
-                //var ms1File = string.Format(@"{0}\CPTAC_Intact_rep{1}_15Jan15_Bane_C2-14-08-02RZ.ms1ft", featureDir, i);
-                //var rawFile = string.Format(@"{0}\Lewy_intact_{1}.pbf", rawDir, i.ToString("D2"));
-                //var ms1File = string.Format(@"{0}\Lewy_intact_{1}.ms1ft", featureDir, i.ToString("D2"));
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawDir, dataset[i]);
                 var ms1File = string.Format(@"{0}\{1}.ms1ft", featureDir, dataset[i]);
 
                 rawFiles.Add(rawFile);
                 ms1ftFiles.Add(ms1File);
+
+                Console.WriteLine(dataset[i]);
             }
             
             var align = new Ms1FeatureAlign(ms1ftFiles, rawFiles);
-            //align.AlignNetAll(maxDatasetIndex);
-
             var alignedFeatureList = align.GroupFeatures();
 
             Console.WriteLine("{0} alignments ",alignedFeatureList.Count);
             
             var writer = new StreamWriter(outFile);
-
             writer.Write("MonoMass\tMinNet\tMaxNet");
             for (var i = minDatasetIndex; i <= maxDatasetIndex; i++) writer.Write("\t{0}", i);
             for (var i = minDatasetIndex; i <= maxDatasetIndex; i++) writer.Write("\t{0}_minScan", i);
@@ -320,7 +267,7 @@ namespace InformedProteomics.Test
             {
                 writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", featureSet[0].RepresentativeMass, featureSet[0].MinNet, featureSet[0].MaxNet);
 
-                var features = new Ms1Feature[dataset.Length];
+                var features = new Ms1Feature[dataset.Count];
                 foreach (var f in featureSet) features[f.DataSetId] = f;
 
                 
@@ -351,18 +298,7 @@ namespace InformedProteomics.Test
                 writer.Write("\n");
             }
             writer.Close();
-            /*
-            for (var i = 0; i < nDataset; i++)
-            {
-                var wt = new StreamWriter(string.Format(@"{0}\{1}.fid2gid", featureDir, dataset[i]));
-                for(var j = 0; j < fid2gid[i].Length; j++) wt.WriteLine(fid2gid[i][j]);
-                wt.Close();
-            }
-            */
-            
         }
-
-        
 
         [Test]
         public void ProMexDebug()

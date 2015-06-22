@@ -1,4 +1,5 @@
-﻿using InformedProteomics.Backend.MassSpecData;
+﻿using System;
+using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.Backend.MassFeature
 {
@@ -40,7 +41,10 @@ namespace InformedProteomics.Backend.MassFeature
         public int RepresentativeScanNum { get; protected set; }
         public double RepresentativeMz { get; protected set; }
 
-        public double MinElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MinScanNum); }  }
+        public double MinElutionTime 
+        { 
+            get { return (Run == null) ? 0 : Run.GetElutionTime(MinScanNum); }  
+        }
         public double MaxElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MaxScanNum); } }
         public double ElutionTime { get { return (Run == null) ? 0 : 0.5 * (MinElutionTime + MaxElutionTime); } }
         public double ElutionLength { get { return (Run == null) ? 0 : MaxElutionTime - MinElutionTime; } }
@@ -50,15 +54,11 @@ namespace InformedProteomics.Backend.MassFeature
         public double NetLength { get { return (Run == null) ? 0 : MaxNet - MinNet; } }
         public double Net { get { return (Run == null) ? 0 : 0.5 * (MinNet + MaxNet); } }
         
-        public bool CoEluted(LcMsFeature other, double tolNet = 0d)
+        public bool CoElutedByNet(LcMsFeature other, double tolNet = 0d)
         {
             if (Run == null || other.Run == null)
             {
-                if (MinScanNum - 1 < other.MinScanNum || other.MinScanNum < MaxScanNum + 1) return true;
-                if (MinScanNum - 1 < other.MaxScanNum || other.MaxScanNum < MaxScanNum + 1) return true;
-                if (other.MinScanNum - 1 < MinScanNum || MinScanNum < other.MaxScanNum + 1) return true;
-                if (other.MinScanNum - 1 < MaxScanNum || MaxScanNum < other.MaxScanNum + 1) return true;
-                return false;
+                throw new LcMsRunNullException();
             }
             
             if (MinNet - tolNet < other.MinNet || other.MinNet < MaxNet + tolNet) return true;
@@ -67,7 +67,20 @@ namespace InformedProteomics.Backend.MassFeature
             if (other.MinNet - tolNet < MaxNet || MaxNet < other.MaxNet + tolNet) return true;
             return false;
         }
-        
+        public bool CoElutedByScanNum(LcMsFeature other, int tolScan = 0)
+        {
+            tolScan++;
+
+            if (MinScanNum - tolScan < other.MinScanNum || other.MinScanNum < MaxScanNum + tolScan) return true;
+            if (MinScanNum - tolScan < other.MaxScanNum || other.MaxScanNum < MaxScanNum + tolScan) return true;
+            if (other.MinScanNum - tolScan < MinScanNum || MinScanNum < other.MaxScanNum + tolScan) return true;
+            if (other.MinScanNum - tolScan < MaxScanNum || MaxScanNum < other.MaxScanNum + tolScan) return true;
+            return false;
+        }
+
         public LcMsRun Run { get; protected set; }
+
+        public class LcMsRunNullException : Exception { }
+
     }
 }

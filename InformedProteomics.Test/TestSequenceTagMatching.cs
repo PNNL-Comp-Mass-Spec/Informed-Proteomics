@@ -18,6 +18,26 @@ namespace InformedProteomics.Test
     public class TestSequenceTagMatching
     {
         [Test]
+        public void TestTagBasedSearchForLewy()
+        {
+            const string rawFilePath = @"D:\MassSpecFiles\Lewy\Lewy_AT_AD1_21May15_Bane_14-09-01RZ.pbf";
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+
+            const int minTagLength = 4;
+            var tagFilePath = Path.ChangeExtension(rawFilePath, ".seqtag");
+            var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
+
+            const string fastaFilePath = @"D:\MassSpecFiles\Lewy\a4_human.fasta";
+            var fastaDb = new FastaDatabase(fastaFilePath);
+
+            var tolerance = new Tolerance(10);
+            var aaSet = new AminoAcidSet(@"D:\MassSpecFiles\Lewy\Mods.txt");
+
+            TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+        }        
+        
+        
+        [Test]
         public void TestTagBasedSearch()
         {
 //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";

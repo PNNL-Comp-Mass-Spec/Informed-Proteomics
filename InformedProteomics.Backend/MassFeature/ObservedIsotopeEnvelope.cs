@@ -17,7 +17,12 @@ namespace InformedProteomics.Backend.MassFeature
             Peaks = new Ms1Peak[theoreticalEnvelope.Size];
             
             Array.Copy(peaks, Peaks, theoreticalEnvelope.Size);
-            GoodEnough = false;
+            //GoodEnough = false;
+        }
+
+        public double BhattacharyyaDistance
+        {
+            get { return TheoreticalEnvelope.GetBhattacharyyaDistance(Peaks); }
         }
 
         public override Isotope GetMostAbundantIsotope()
@@ -40,19 +45,13 @@ namespace InformedProteomics.Backend.MassFeature
         public Ms1Peak MinMzPeak { get { return Peaks.FirstOrDefault(t => t != null && t.Active); } }
         public Ms1Peak MaxMzPeak { get { return Peaks.LastOrDefault(t => t != null && t.Active); } }
         public int NumberOfPeaks { get { return Peaks.Count(x => x != null && x.Active); } }
-
         public double Abundance { get { return Peaks.Where(p => p != null && p.Active).Sum(p => p.Intensity); } }
-
-        public bool GoodEnough;
 
         public Ms1Peak RepresentativePeak
         {
             get
             {
-                foreach (var i in TheoreticalEnvelope.IndexOrderByRanking)
-                {
-                    if (Peaks[i] != null && Peaks[i].Active) return Peaks[i];
-                }
+                foreach (var i in TheoreticalEnvelope.IndexOrderByRanking) if (Peaks[i] != null && Peaks[i].Active) return Peaks[i];
                 return null;
             }
         }
