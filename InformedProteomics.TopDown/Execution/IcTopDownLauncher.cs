@@ -384,7 +384,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             var indexedDb = new IndexedDatabase(database);
             indexedDb.Read();
-            estimatedProteins = indexedDb.EstimateTotalPeptides(MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
+            estimatedProteins = indexedDb.EstimateTotalPeptides(SearchMode, MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (SearchMode == 0)
             {
@@ -437,8 +437,8 @@ namespace InformedProteomics.TopDown.Execution
                 if (numProteins%100000 == 0)
                 //if(numProteins % 10 == 0)
                 {
-                    Console.Write("Processing {0}{1} proteins..., {3:00.0}%", numProteins,
-                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins);
+                    Console.Write("Processing {0}{1} proteins..., {2:00.0}%...", numProteins,
+                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
                     if (numProteins != 0)
                     {
                         sw.Stop();
@@ -521,7 +521,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             var indexedDb = new IndexedDatabase(database);
             indexedDb.Read();
-            estimatedProteins = indexedDb.EstimateTotalPeptides(MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
+            estimatedProteins = indexedDb.EstimateTotalPeptides(SearchMode, MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (SearchMode == 0)
             {
@@ -599,8 +599,8 @@ namespace InformedProteomics.TopDown.Execution
                     if (numProteins % 100000 == 0)
                         //if(numProteins % 10 == 0)
                     {
-                        Console.Write("Processing {0}{1} proteins..., {3:00.0}%", numProteins,
-                            numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins);
+                        Console.Write("Processing {0}{1} proteins..., {2:00.0}%...", numProteins,
+                            numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
                         if (numProteins != 0)
                         {
                             lock (sw)
