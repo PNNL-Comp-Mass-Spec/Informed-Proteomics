@@ -112,9 +112,20 @@ namespace InformedProteomics.Test
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var estimatedAnnOff = indexedDb.EstimateTotalPeptides(0, 30, 250);
+            var timeEstimate = sw.Elapsed;
+            Console.WriteLine("Read Estimate in " + (timeEstimate - timeDB).TotalSeconds + " Seconds");
+            //int coreCount = 0;
+            //foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
+            //{
+            //    coreCount += int.Parse(item["NumberOfCores"].ToString());
+            //}
+            //Console.WriteLine("Number Of Cores: {0}", coreCount);
+            //Console.WriteLine("Processors: " + System.Environment.ProcessorCount);
+            Console.WriteLine("Estimated results: " + estimatedAnnOff);
             var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(30, 250);
             var timeGetAnn = sw.Elapsed;
-            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeEstimate).TotalSeconds + " Seconds");
             /*/Parallel.ForEach(
                 annotationsAndOffsets,
                 //                new ParallelOptions { MaxDegreeOfParallelism = 2},
@@ -175,14 +186,19 @@ namespace InformedProteomics.Test
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
+            const int numCTermCleavages = 0;
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
-            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0);
+            var estimatedAnnOff = indexedDb.EstimateTotalPeptides(2, 21, 300, 1, numCTermCleavages);
+            var timeEstimate = sw.Elapsed;
+            Console.WriteLine("Read Estimate in " + (timeEstimate - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Estimated results: " + estimatedAnnOff);
+            var annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, numCTermCleavages);
             var timeGetAnn = sw.Elapsed;
-            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeEstimate).TotalSeconds + " Seconds");
             /*/Parallel.ForEach(
                 annotationsAndOffsets,
                 //                new ParallelOptions { MaxDegreeOfParallelism = 2},
@@ -227,14 +243,20 @@ namespace InformedProteomics.Test
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
             //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
+            const int numNTermCleavages = 1;
+            const int numCTermCleavages = 0;
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
-            var annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(21, 300, 1, 0);
+            var estimatedAnnOff = indexedDb.EstimateTotalPeptides(1, 21, 300, numNTermCleavages, numCTermCleavages);
+            var timeEstimate = sw.Elapsed;
+            Console.WriteLine("Read Estimate in " + (timeEstimate - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Estimated results: " + estimatedAnnOff);
+            var annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(21, 300, numNTermCleavages, numCTermCleavages);
             var timeGetAnn = sw.Elapsed;
-            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeEstimate).TotalSeconds + " Seconds");
             /*/Parallel.ForEach(
                 annotationsAndOffsets,
                 //                new ParallelOptions { MaxDegreeOfParallelism = 2},
@@ -252,6 +274,10 @@ namespace InformedProteomics.Test
             //        numSequences++;
             //        fout.WriteLine(annOff.Annotation);
             //    }
+            //}
+            //foreach (var sao in annotationsAndOffsets)
+            //{
+            //    numSequences++;
             //}
             numSequences = annotationsAndOffsets.Count();
             var timeParForEach = sw.Elapsed;
@@ -285,9 +311,13 @@ namespace InformedProteomics.Test
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
+            var estimatedAnnOff = indexedDb.EstimateTotalPeptides(0, 30, 250);
+            var timeEstimate = sw.Elapsed;
+            Console.WriteLine("Read Estimate in " + (timeEstimate - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Estimated results: " + estimatedAnnOff);
             var annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(30, 250);
             var timeGetAnn = sw.Elapsed;
-            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeDB).TotalSeconds + " Seconds");
+            Console.WriteLine("Read Annotations in " + (timeGetAnn - timeEstimate).TotalSeconds + " Seconds");
             //foreach (var annotationsAndOffset in annotationsAndOffsets)
             //{
             //    //Interlocked.Increment(ref numSequences);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using SuffixArray;
@@ -53,10 +54,10 @@ namespace InformedProteomics.Backend.Database
         }
 
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme)
+                                                      int numMissedCleavages, Enzyme enzyme, int threads, CancellationToken? cancellationToken = null)
         {
             return AnnotationsAndOffsetsParallel(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
-                               enzyme.IsNTerm);
+                               enzyme.IsNTerm, threads, cancellationToken);
         }
 
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
@@ -64,9 +65,9 @@ namespace InformedProteomics.Backend.Database
             return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
         }
 
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(int minLength, int maxLength)
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(int minLength, int maxLength, int threads = 0, CancellationToken? cancellationToken = null)
         {
-            return AnnotationsAndOffsetsParallel(minLength, maxLength, 0, 0, null, false);
+            return AnnotationsAndOffsetsParallel(minLength, maxLength, 0, 0, null, false, threads, cancellationToken);
         }
 
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
@@ -79,6 +80,7 @@ namespace InformedProteomics.Backend.Database
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
                 var seqArr = Encoding.GetString(seqWithOffset.Sequence);
+                //var seqArr = seqWithOffset.Sequence;
                 var offset = seqWithOffset.Offset;
 
                 for (var i = 0; i <= numCTermCleavages; i++)
@@ -100,6 +102,7 @@ namespace InformedProteomics.Backend.Database
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
             {
                 var seqArr = Encoding.GetString(seqWithOffset.Sequence);
+                //var seqArr = seqWithOffset.Sequence;
                 var offset = seqWithOffset.Offset;
 
                 for (var i = numCTermCleavages + 1; i <= seqArr.Length - minLength; i++)
@@ -215,6 +218,7 @@ namespace InformedProteomics.Backend.Database
                 if (residue == FastaDatabase.Delimiter)
                 {
                     if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(buf.ToArray(), curOffset);
+                    //if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(Encoding.GetString(buf.ToArray()), curOffset);
                     buf = new List<byte>();
                     curOffset = offset;
                 }
@@ -223,6 +227,103 @@ namespace InformedProteomics.Backend.Database
                     if (buf != null) buf.Add(residue);
                 }
             }
+        }
+
+        public long EstimateTotalPeptides(int mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1, int numCTermCleavages = 0)
+        {
+            long count = 0;
+            if (mode == 0)
+            {
+                var curSequence = new LinkedList<byte>();
+                var lcpList = new LinkedList<byte>();
+                var lcpEnum = PLcps().GetEnumerator();
+                var fEnum = FastaDatabase.Characters().GetEnumerator();
+
+                var seps = new Queue<IntWrapper>();
+                bool read = false;
+                while ((read = fEnum.MoveNext()) || curSequence.Count >= minLength)
+                {
+                    if (read)
+                    {
+                        lcpEnum.MoveNext();
+                        curSequence.AddLast(fEnum.Current);
+                        lcpList.AddLast(lcpEnum.Current);
+
+                        if (fEnum.Current == FastaDatabase.Delimiter)
+                        {
+                            seps.Enqueue(new IntWrapper(curSequence.Count - 1));
+                        }
+
+                        if (curSequence.Count < maxLength + 2) continue;
+                    }
+
+                    if (seps.Count > 0 && seps.Peek().Value == 0)
+                    {
+                        seps.Dequeue();
+                    }
+
+                    var min = minLength > lcpList.First.Value ? minLength : lcpList.First.Value;
+                    if (seps.Count == 0 || seps.Peek().Value >= maxLength + 2)
+                    {
+                        count += maxLength + 2 - min;
+                    }
+                    else if (seps.Peek().Value >= min)
+                    {
+                        count += seps.Peek().Value - min;
+                    }
+
+                    curSequence.RemoveFirst();
+                    lcpList.RemoveFirst();
+                    foreach (var sep in seps)
+                    {
+                        --sep.Value;
+                    }
+                }
+            }
+            else
+            {
+                // mode 2
+                foreach (var sonc in SequencesWithOffsetNoCleavage())
+                {
+                    var seqLength = sonc.Sequence.Length;
+                    // mode 2
+                    for (int i = 0; i <= numCTermCleavages; i++)
+                    {
+                        // mode 2
+                        if (mode == 2 && minLength <= seqLength - i && seqLength - i <= maxLength)
+                        {
+                            count++;
+                        }
+                        // mode 1 #1
+                        if (mode == 1)
+                        {
+                            for (int j = 0; minLength <= seqLength - i - j; j++)
+                            {
+                                if (seqLength - i - j <= maxLength)
+                                {
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                    if (mode == 1)
+                    {
+                        // mode 1 #2
+                        for (int i = numCTermCleavages + 1; i <= seqLength - minLength; i++)
+                        {
+                            for (int j = 0; j <= numNTermCleavages; j++)
+                            {
+                                if (minLength <= seqLength - i - j &&
+                                    seqLength - i - j <= maxLength)
+                                {
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return count;
         }
 
         private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
@@ -256,6 +357,7 @@ namespace InformedProteomics.Backend.Database
             foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
             {
                 var seqArr = Encoding.GetString(seqAndLcp.Sequence);
+                //var seqArr = seqAndLcp.Sequence;
                 var lcp = seqAndLcp.Lcp;
                 var offset = seqAndLcp.Offset;
                 seqBuild.Clear();
@@ -330,9 +432,19 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        internal class IntWrapper
+        {
+            public int Value;
+
+            public IntWrapper(int value)
+            {
+                Value = value;
+            }
+        }
+
         private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, IEnumerable<char> enzymaticResidues,
-                                                      bool isNTermEnzyme
+                                                      bool isNTermEnzyme, int threads = 0, CancellationToken? cancellationToken = null
             )
         {
             var isCleavable = new bool[128];
@@ -354,14 +466,36 @@ namespace InformedProteomics.Backend.Database
                 isStandardAminoAcid[residue] = true;
             }
 
+            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
+            // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
+            int coreCount = 0;
+            try
+            {
+                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
+                {
+                    coreCount += int.Parse(item["NumberOfCores"].ToString());
+                }
+                //Console.WriteLine("Number Of Cores: {0}", coreCount);
+            }
+            catch (Exception)
+            {
+                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
+                coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
+            }
+
+            if (threads == 0 || threads > coreCount)
+            {
+                threads = coreCount;
+            }
             //int prevThreads, prevPorts;
             //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
             //ThreadPool.SetMinThreads(8, prevPorts);
+            CancellationToken token = cancellationToken != null ? (CancellationToken)cancellationToken : CancellationToken.None;
             // pre, peptide sequence, next
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(48).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
-            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(threads).WithCancellation(token).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
         }
 
         private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallelInternal(int minLength, int numTolerableTermini,
@@ -369,6 +503,7 @@ namespace InformedProteomics.Backend.Database
             )
         {
             var seqArr = Encoding.GetString(seqAndLcp.Sequence);
+            //var seqArr = seqAndLcp.Sequence;
             var lcp = seqAndLcp.Lcp;
             var offset = seqAndLcp.Offset;
             var seqBuild = new StringBuilder(seqArr.Length + 3);
@@ -461,10 +596,24 @@ namespace InformedProteomics.Backend.Database
 
                 if (curSequence.Count < maxLength) continue;
 
+                /**/
                 var seqArr = new byte[curSequence.Count];
                 curSequence.CopyTo(seqArr, 0);
-
                 yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, ++offset);
+                //yield return new SequenceLcpAndOffset(curSequence.ToArray(), lcpList.First.Value, ++offset);
+                /*/
+                var seqArr = Encoding.GetString(curSequence.ToArray());
+                var sep = seqArr.IndexOf('_', 1); // Is valid if separator is the prefix
+                ++offset;
+                if (sep == -1)
+                {
+                    yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, offset);
+                }
+                else if (sep > minLength)
+                {
+                    yield return new SequenceLcpAndOffset(seqArr.Substring(0, sep + 1), lcpList.First.Value, offset);
+                }
+                /**/
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
             }
@@ -472,9 +621,24 @@ namespace InformedProteomics.Backend.Database
             // Data dependency: cannot run in parallel; Also, not a significantly costly operation (< 10 seconds)
             while (curSequence.Count >= minLength)
             {
+                /**/
                 var seqArr = new byte[curSequence.Count];
                 curSequence.CopyTo(seqArr, 0);
                 yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, ++offset);
+                //yield return new SequenceLcpAndOffset(curSequence.ToArray(), lcpList.First.Value, ++offset);
+                /*/
+                var seqArr = Encoding.GetString(curSequence.ToArray());
+                var sep = seqArr.IndexOf('_', 1); // Is valid if separator is the prefix
+                ++offset;
+                if (sep == -1)
+                {
+                    yield return new SequenceLcpAndOffset(seqArr, lcpList.First.Value, offset);
+                }
+                else if (sep > minLength)
+                {
+                    yield return new SequenceLcpAndOffset(seqArr.Substring(0, sep + 1), lcpList.First.Value, offset);
+                }
+                /**/
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
             }
