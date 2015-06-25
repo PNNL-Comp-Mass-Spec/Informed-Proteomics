@@ -46,7 +46,8 @@ namespace MSPathFinderT
                 {"-minMass", "3000.0"},
                 {"-maxMass", "50000.0"},
                 {"-feature", null},
-                {"-minProb", "0.1"}
+                {"-minProb", "0.1"},
+                {"-threads", "0"},
             };
 
             for (var i = 0; i < args.Length/2; i++)
@@ -97,6 +98,10 @@ namespace MSPathFinderT
                     parameters.FeatureFilePath,
                     parameters.FeatureMinProbability
                     );
+
+                topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
+                topDownLauncher.ForceParallel = parameters.ForceParallel;
+
                 topDownLauncher.RunSearch();
             }
         }

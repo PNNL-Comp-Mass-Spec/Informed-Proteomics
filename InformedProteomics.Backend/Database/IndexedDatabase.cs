@@ -483,7 +483,7 @@ namespace InformedProteomics.Backend.Database
                 coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
             }
 
-            if (threads == 0 || threads > coreCount)
+            if (threads <= 0 || threads > coreCount)
             {
                 threads = coreCount;
             }

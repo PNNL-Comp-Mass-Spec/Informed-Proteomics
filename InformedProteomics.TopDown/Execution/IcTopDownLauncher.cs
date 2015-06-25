@@ -69,6 +69,8 @@ namespace InformedProteomics.TopDown.Execution
             SearchMode = searchMode;
             ScanNumbers = scanNumbers;
             NumMatchesPerSpectrum = numMatchesPerSpectrum;
+            MaxNumThreads = 0;
+            ForceParallel = false;
         }
 
         public string SpecFilePath { get; private set; }
@@ -92,6 +94,8 @@ namespace InformedProteomics.TopDown.Execution
         public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
         public IEnumerable<int> ScanNumbers { get; private set; }
         public int NumMatchesPerSpectrum { get; private set; }
+        public int MaxNumThreads { get; set; }
+        public bool ForceParallel { get; set; }
 
         // 0: all internal sequences, 
         // 1: #NCleavages <= Max OR Cleavages <= Max (Default)
@@ -105,6 +109,8 @@ namespace InformedProteomics.TopDown.Execution
         public void RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null)
         {
             var sw = new Stopwatch();
+            var swAll = new Stopwatch();
+            swAll.Start();
 
             Console.Write("Reading raw file...");
             sw.Start();
@@ -204,7 +210,15 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine("Searching the target database");
                 sw.Start();
-                var targetMatches = RunSearch(targetDb, ms1Filter);
+                SortedSet<DatabaseSequenceSpectrumMatch>[] targetMatches;
+                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+                {
+                    targetMatches = RunSearchParallel(targetDb, ms1Filter, MaxNumThreads);
+                }
+                else
+                {
+                    targetMatches = RunSearch(targetDb, ms1Filter);
+                }
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -225,7 +239,15 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine("Searching the decoy database");
                 sw.Start();
-                var decoyMatches = RunSearch(decoyDb, ms1Filter);
+                SortedSet<DatabaseSequenceSpectrumMatch>[] decoyMatches;
+                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+                {
+                    decoyMatches = RunSearchParallel(decoyDb, ms1Filter, MaxNumThreads);
+                }
+                else
+                {
+                    decoyMatches = RunSearch(decoyDb, ms1Filter);
+                }
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -239,11 +261,15 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             Console.WriteLine("Done.");
+            swAll.Stop();
+            Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
         }
 
         public void RunSearchParallel(double corrThreshold = 0.7, CancellationToken? cancellationToken = null)
         {
             var sw = new Stopwatch();
+            var swAll = new Stopwatch();
+            swAll.Start();
 
             Console.Write("Reading raw file...");
             sw.Start();
@@ -343,7 +369,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine("Searching the target database");
                 sw.Start();
-                var targetMatches = RunSearchParallel(targetDb, ms1Filter);
+                var targetMatches = RunSearchParallel(targetDb, ms1Filter, MaxNumThreads);
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -364,7 +390,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine("Searching the decoy database");
                 sw.Start();
-                var decoyMatches = RunSearchParallel(decoyDb, ms1Filter);
+                var decoyMatches = RunSearchParallel(decoyDb, ms1Filter, MaxNumThreads);
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -378,6 +404,8 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             Console.WriteLine("Done.");
+            swAll.Stop();
+            Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
         }
 
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins)
@@ -563,7 +591,7 @@ namespace InformedProteomics.TopDown.Execution
                 coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
             }
 
-            if (threads == 0 || threads > coreCount)
+            if (threads <= 0 || threads > coreCount)
             {
                 threads = coreCount;
             }

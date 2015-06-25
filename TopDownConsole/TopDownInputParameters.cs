@@ -28,6 +28,8 @@ namespace MSPathFinderT
         public double MaxSequenceMass { get; set; }
         public string FeatureFilePath { get; set; }
         public double FeatureMinProbability { get; set; }
+        public int MaxNumThreads { get; set; }
+        public bool ForceParallel { get; set; }
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
@@ -182,6 +184,13 @@ namespace MSPathFinderT
             if (MinSequenceMass > MaxSequenceMass)
             {
                 return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
+            }
+
+            MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
+            if (MaxNumThreads < 0)
+            {
+                ForceParallel = true;
+                MaxNumThreads = -MaxNumThreads;
             }
 
             FeatureMinProbability = Convert.ToDouble(parameters["-minProb"]);
