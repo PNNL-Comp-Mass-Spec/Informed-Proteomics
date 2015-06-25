@@ -95,6 +95,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
+        public int NumSpectra
+        {
+            get { return _scanNumToSpecOffset.Count; }
+        }
+
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             long offset;

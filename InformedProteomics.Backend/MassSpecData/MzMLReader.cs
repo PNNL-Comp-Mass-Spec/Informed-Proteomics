@@ -431,7 +431,20 @@ namespace InformedProteomics.Backend.MassSpecData
         }
         #endregion
 
-        public int NumSpectra { get { return (int)_numSpectra; } }
+        public int NumSpectra
+        {
+            get
+            {
+                if (!_haveMetaData)
+                {
+                    var tempBool = _reduceMemoryUsage; // Set a flag to avoid reading the entire file before returning.
+                    ReadMzMl(); // Read the index and metadata so that the offsets get populated
+                    // The number of spectra is an attribute in the spectrumList tag
+                    _reduceMemoryUsage = tempBool;
+                }
+                return (int) _numSpectra;
+            }
+        }
 
         #region Constructor
         /// <summary>
@@ -544,7 +557,10 @@ namespace InformedProteomics.Backend.MassSpecData
             if (_reduceMemoryUsage)
             {
                 _artificialScanNum = 1;
-                ReadMzMl();
+                if (!_haveMetaData)
+                {
+                    ReadMzMl();
+                }
 
                 while (_xmlReaderForYield.ReadState == ReadState.Interactive)
                 {
@@ -1495,6 +1511,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="reader">XmlReader that is only valid for the scope of the single "referenceableParamGroupList" element</param>
         private void ReadReferenceableParamGroupList(XmlReader reader)
         {
+            _referenceableParamGroups.Clear(); // In case of second read of file, clear out existing.
             reader.MoveToContent();
             int count = Convert.ToInt32(reader.GetAttribute("count"));
             reader.ReadStartElement("referenceableParamGroupList"); // Throws exception if we are not at the "referenceableParamGroupList" tag.

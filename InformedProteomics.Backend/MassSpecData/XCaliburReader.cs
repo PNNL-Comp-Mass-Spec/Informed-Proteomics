@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class XCaliburReader: IMassSpecDataReader
+    public class XCaliburReader : IMassSpecDataReader
     {
         // Parameters for centroiding spectra
         public const int PeakToBackgroundRatio = 0;
@@ -19,7 +19,8 @@ namespace InformedProteomics.Backend.MassSpecData
             _msfileReader.SetCurrentController(0, 1);
 
             _minLcScan = 1;
-            _maxLcScan = ReadNumSpectra();
+            _numSpectra = ReadNumSpectra();
+            _maxLcScan = _numSpectra;
 
             _msLevel = new Dictionary<int, int>();
         }
@@ -43,7 +44,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     Console.WriteLine("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
                 }
 
-                if(spec != null) yield return spec;
+                if (spec != null) yield return spec;
             }
         }
 
@@ -106,7 +107,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var elutionTime = RtFromScanNum(scanNum);
             var msLevel = ReadMsLevel(scanNum);
-            if (msLevel == 1) return new Spectrum(mzArr, intensityArr, scanNum)
+            if (msLevel == 1)
+                return new Spectrum(mzArr, intensityArr, scanNum)
                 {
                     ElutionTime = elutionTime
                 };
@@ -114,12 +116,12 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationWindow = ReadPrecursorInfo(scanNum);
 
             var productSpec = new ProductSpectrum(mzArr, intensityArr, scanNum)
-                {
-                    MsLevel = msLevel,
-                    ElutionTime = elutionTime,
-                    ActivationMethod = GetActivationMethod(scanNum),
-                    IsolationWindow = isolationWindow
-                };
+            {
+                MsLevel = msLevel,
+                ElutionTime = elutionTime,
+                ActivationMethod = GetActivationMethod(scanNum),
+                IsolationWindow = isolationWindow
+            };
             return productSpec;
         }
 
@@ -138,14 +140,14 @@ namespace InformedProteomics.Backend.MassSpecData
             // Get isolation window width
             //var isolationWindowWidth = ReadIsolationWidth(scanNum);
             var precursorInfo = ReadPrecursorInfoFromTrailerExtra(scanNum);
-            
+
             var isolationWindowWidth = precursorInfo.IsolationWidth;
             var monoisotopicMz = precursorInfo.MonoisotopicMz;
             var charge = precursorInfo.Charge;
 
             return new IsolationWindow(
-                isolationTargetMz, 
-                isolationWindowWidth / 2, 
+                isolationTargetMz,
+                isolationWindowWidth / 2,
                 isolationWindowWidth / 2,
                 monoisotopicMz,
                 charge
@@ -155,6 +157,11 @@ namespace InformedProteomics.Backend.MassSpecData
         public int GetMaxScanNum()
         {
             return _maxLcScan;
+        }
+
+        public int NumSpectra
+        {
+            get { return _numSpectra; }
         }
 
         public int GetMinScanNum()
@@ -183,6 +190,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
+        private readonly int _numSpectra;
         private readonly Dictionary<int, int> _msLevel;
 
         //private static DeconToolsPeakDetectorV2 _peakDetector;  // basic peak detector

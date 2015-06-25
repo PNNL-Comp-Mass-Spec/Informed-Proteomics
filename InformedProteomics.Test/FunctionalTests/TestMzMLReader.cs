@@ -23,10 +23,19 @@ namespace InformedProteomics.Test.FunctionalTests
             Stopwatch timer = new Stopwatch();
             timer.Start();
             var reader = new MzMLReader(filePath);
+            var constTime = timer.Elapsed;
+            Console.WriteLine("Constructor time: " + constTime);
+            var numSpectra = reader.NumSpectra;
+            var metaTime = timer.Elapsed - constTime;
+            Console.WriteLine("Metadata read time: " + metaTime);
             var spectra = reader.ReadAllSpectra();
+            var spectraCount = spectra.Count();
             timer.Stop();
+            Console.WriteLine("Spectra Read time: " + (timer.Elapsed - metaTime));
             Console.WriteLine("Time: " + timer.Elapsed);
-            Assert.AreEqual(expectedSpectra, spectra.Count());
+            Assert.AreEqual(expectedSpectra, numSpectra, "NumSpectra");
+            Assert.AreEqual(expectedSpectra, spectraCount, "SpectraCount");
+            Assert.AreEqual(numSpectra, spectraCount, "NumSpectra vs. SpectraCount");
             reader.Close();
         }
     }

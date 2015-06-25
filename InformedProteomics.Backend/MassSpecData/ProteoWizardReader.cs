@@ -43,6 +43,11 @@ namespace InformedProteomics.Backend.MassSpecData
             throw new NotImplementedException();
         }
 
+        public int NumSpectra
+        {
+            get { return _maxLcScan; }
+        }
+
         private readonly MsDataFileImpl _reader;
         private readonly int _minLcScan;
         private readonly int _maxLcScan;

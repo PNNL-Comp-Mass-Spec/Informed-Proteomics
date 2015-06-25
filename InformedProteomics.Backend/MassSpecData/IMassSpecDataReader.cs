@@ -12,6 +12,11 @@ namespace InformedProteomics.Backend.MassSpecData
         IEnumerable<Spectrum> ReadAllSpectra();
 
         /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
+        int NumSpectra { get; }
+
+        /// <summary>
         /// Close the reader
         /// </summary>
         void Close();
