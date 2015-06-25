@@ -323,20 +323,20 @@ namespace InformedProteomics.Test
             //    //Interlocked.Increment(ref numSequences);
             //    ++numSequences;
             //}
-            using (
-                var ofstream =
-                    new FileStream(
-                        Path.Combine(@"F:\InformedProteomicsTestFiles",
-                            Path.GetFileNameWithoutExtension(dbFile) + "_old.txt"), FileMode.Create))
-            using (var fout = new StreamWriter(ofstream))
-            {
-                foreach (var annOff in annotationsAndOffsets)
-                {
-                    numSequences++;
-                    fout.WriteLine(annOff.Annotation);
-                }
-            }
-            //numSequences = annotationsAndOffsets.Count();
+            //using (
+            //    var ofstream =
+            //        new FileStream(
+            //            Path.Combine(@"F:\InformedProteomicsTestFiles",
+            //                Path.GetFileNameWithoutExtension(dbFile) + "_old.txt"), FileMode.Create))
+            //using (var fout = new StreamWriter(ofstream))
+            //{
+            //    foreach (var annOff in annotationsAndOffsets)
+            //    {
+            //        numSequences++;
+            //        fout.WriteLine(annOff.Annotation);
+            //    }
+            //}
+            numSequences = annotationsAndOffsets.Count();
             var timeParForEach = sw.Elapsed;
             Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 
