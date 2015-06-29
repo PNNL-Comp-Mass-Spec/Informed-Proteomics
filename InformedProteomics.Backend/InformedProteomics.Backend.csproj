@@ -55,7 +55,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>InformedProteomics.Backend</RootNamespace>
     <AssemblyName>InformedProteomics.Backend</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
