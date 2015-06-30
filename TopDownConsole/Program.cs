@@ -16,7 +16,7 @@ namespace MSPathFinderT
 
         private const uint EnableExtendedFlags = 0x0080;
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
 
 #if (!DEBUG)
@@ -30,7 +30,7 @@ namespace MSPathFinderT
                 if (args.Length%2 != 0)
                 {
                     PrintUsageInfo("The number of arguments must be even.");
-                    return;
+                    return -1;
                 }
 
                 // initialize parameters
@@ -64,7 +64,7 @@ namespace MSPathFinderT
                     if (!paramDic.ContainsKey(key))
                     {
                         PrintUsageInfo("Invalid parameter: " + key);
-                        return;
+                        return -2;
                     }
                     paramDic[key] = value;
                 }
@@ -74,7 +74,7 @@ namespace MSPathFinderT
                 if (message != null)
                 {
                     PrintUsageInfo(message);
-                    return;
+                    return -3;
                 }
 
                 Console.WriteLine(Name + " " + Version);
@@ -118,8 +118,12 @@ namespace MSPathFinderT
             {
                 Console.WriteLine("Exception while processing: " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-            }
+                var errorCode = -Math.Abs(ex.Message.GetHashCode());
+                return errorCode;
+            }            
 #endif
+
+            return 0;
 
         }
 
