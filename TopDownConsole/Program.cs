@@ -9,7 +9,8 @@ namespace MSPathFinderT
     public class Program
     {
         public const string Name = "MSPathFinderT";
-        public const string Version = "0.92 (Mar 31, 2015)";
+        public const string Version = "0.93 (June 29, 2015)";
+
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
@@ -17,93 +18,109 @@ namespace MSPathFinderT
 
         public static void Main(string[] args)
         {
-            var handle = Process.GetCurrentProcess().MainWindowHandle;
-            SetConsoleMode(handle, EnableExtendedFlags);
 
-            if (args.Length%2 != 0)
+#if (!DEBUG)
+            try
             {
-                PrintUsageInfo("The number of arguments must be even.");
-                return;
-            }
+#endif
+          
+                var handle = Process.GetCurrentProcess().MainWindowHandle;
+                SetConsoleMode(handle, EnableExtendedFlags);
 
-            // initialize parameters
-            var paramDic = new Dictionary<string, string>
-            {
-                {"-s", null},
-                {"-d", null},
-                {"-o", null},
-                {"-m", "1"},
-                {"-mod", null},
-                {"-t", "10"},
-                {"-f", "10"},
-                {"-tda", "0"},
-                {"-minLength", "21"},
-                {"-maxLength", "500"},
-                {"-minCharge", "2"},
-                {"-maxCharge", "50"},
-                {"-minFragCharge", "1"},
-                {"-maxFragCharge", "20"},
-                {"-minMass", "3000.0"},
-                {"-maxMass", "50000.0"},
-                {"-feature", null},
-                {"-minProb", "0.1"},
-                {"-threads", "0"},
-            };
-
-            for (var i = 0; i < args.Length/2; i++)
-            {
-                var key = args[2*i];
-                var value = args[2*i + 1];
-                if (!paramDic.ContainsKey(key))
+                if (args.Length%2 != 0)
                 {
-                    PrintUsageInfo("Invalid parameter: " + key);
+                    PrintUsageInfo("The number of arguments must be even.");
                     return;
                 }
-                paramDic[key] = value;
-            }
 
-            var parameters = new TopDownInputParameters();
-            var message = parameters.Parse(paramDic);
-            if (message != null)
+                // initialize parameters
+                var paramDic = new Dictionary<string, string>
+                {
+                    {"-s", null},
+                    {"-d", null},
+                    {"-o", null},
+                    {"-m", "1"},
+                    {"-mod", null},
+                    {"-t", "10"},
+                    {"-f", "10"},
+                    {"-tda", "0"},
+                    {"-minLength", "21"},
+                    {"-maxLength", "500"},
+                    {"-minCharge", "2"},
+                    {"-maxCharge", "50"},
+                    {"-minFragCharge", "1"},
+                    {"-maxFragCharge", "20"},
+                    {"-minMass", "3000.0"},
+                    {"-maxMass", "50000.0"},
+                    {"-feature", null},
+                    {"-minProb", "0.1"},
+                    {"-threads", "0"},
+                };
+
+                for (var i = 0; i < args.Length/2; i++)
+                {
+                    var key = args[2*i];
+                    var value = args[2*i + 1];
+                    if (!paramDic.ContainsKey(key))
+                    {
+                        PrintUsageInfo("Invalid parameter: " + key);
+                        return;
+                    }
+                    paramDic[key] = value;
+                }
+
+                var parameters = new TopDownInputParameters();
+                var message = parameters.Parse(paramDic);
+                if (message != null)
+                {
+                    PrintUsageInfo(message);
+                    return;
+                }
+
+                Console.WriteLine(Name + " " + Version);
+                parameters.Display();
+                parameters.Write();
+
+                foreach (var specFilePath in parameters.SpecFilePaths)
+                {
+                    var topDownLauncher = new IcTopDownLauncher(
+                        specFilePath,
+                        parameters.DatabaseFilePath,
+                        parameters.OutputDir,
+                        parameters.AminoAcidSet,
+                        parameters.MinSequenceLength,
+                        parameters.MaxSequenceLength,
+                        1, // max number of N-term cleavages
+                        0, // max number of C-term cleavages
+                        parameters.MinPrecursorIonCharge,
+                        parameters.MaxPrecursorIonCharge,
+                        parameters.MinProductIonCharge,
+                        parameters.MaxProductIonCharge,
+                        parameters.MinSequenceMass,
+                        parameters.MaxSequenceMass,
+                        parameters.PrecursorIonTolerancePpm,
+                        parameters.ProductIonTolerancePpm,
+                        parameters.Tda,
+                        parameters.SearchMode,
+                        parameters.FeatureFilePath,
+                        parameters.FeatureMinProbability
+                        );
+
+                    topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
+                    topDownLauncher.ForceParallel = parameters.ForceParallel;
+
+                    topDownLauncher.RunSearch();
+                }
+
+#if (!DEBUG)
+            }
+            catch (Exception ex)
             {
-                PrintUsageInfo(message);
-                return;
+                Console.WriteLine("Exception while processing: " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
+#endif
 
-            Console.WriteLine(Name + " " + Version);
-            parameters.Display();
-            parameters.Write();
-
-            foreach (var specFilePath in parameters.SpecFilePaths)
-            {
-                var topDownLauncher = new IcTopDownLauncher(
-                    specFilePath,
-                    parameters.DatabaseFilePath,
-                    parameters.OutputDir,
-                    parameters.AminoAcidSet,
-                    parameters.MinSequenceLength,
-                    parameters.MaxSequenceLength,
-                    1, // max number of N-term cleavages
-                    0, // max number of C-term cleavages
-                    parameters.MinPrecursorIonCharge,
-                    parameters.MaxPrecursorIonCharge,
-                    parameters.MinProductIonCharge,
-                    parameters.MaxProductIonCharge,
-                    parameters.MinSequenceMass,
-                    parameters.MaxSequenceMass,
-                    parameters.PrecursorIonTolerancePpm,
-                    parameters.ProductIonTolerancePpm,
-                    parameters.Tda,
-                    parameters.SearchMode,
-                    parameters.FeatureFilePath,
-                    parameters.FeatureMinProbability
-                    );
-
-                topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
-                topDownLauncher.ForceParallel = parameters.ForceParallel;
-
-                topDownLauncher.RunSearch();
-            }
         }
 
 
@@ -131,6 +148,9 @@ namespace MSPathFinderT
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
                 "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n"
                 );
+
+            // Wait for 1.5 seconds
+            System.Threading.Thread.Sleep(1500);
         }
 
     }

@@ -102,6 +102,7 @@ namespace MSPathFinderT
 
         public string Parse(Dictionary<string, string> parameters)
         {
+
             var message = CheckIsValid(parameters);
             if (message != null) return message;
 
@@ -237,7 +238,7 @@ namespace MSPathFinderT
                     }
                     if (!File.Exists(value))
                     {
-                        return "File not found." + value + "!"; ;
+                        return "File not found: " + value + "!"; ;
                     }
                     var extension = Path.GetExtension(value).ToLower();
                     if (!extension.Equals(".fa") && !extension.Equals(".fasta"))
@@ -253,14 +254,14 @@ namespace MSPathFinderT
                 {
                     if (value != null && !File.Exists(value))
                     {
-                        return "File not found." + value + "!";
+                        return "File not found: " + value + "!";
                     }
                 }
                 else if (key.Equals("-feature"))
                 {
                     if (value != null && !File.Exists(value))
                     {
-                        return "File not found." + value + "!";
+                        return "File not found: " + value + "!";
                     }
                     if (value != null && 
                         !Path.GetExtension(value).ToLower().Equals(".csv") && 

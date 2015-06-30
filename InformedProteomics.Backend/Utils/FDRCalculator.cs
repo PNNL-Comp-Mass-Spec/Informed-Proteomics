@@ -51,23 +51,35 @@ namespace InformedProteomics.Backend.Utils
             var targetData = File.ReadAllLines(targetResultFilePath);
             var decoyData = File.ReadAllLines(decoyResultFilePath);
 
-            if (targetData.Length < 1 || decoyData.Length < 1) return false;
+            if (targetData.Length < 1)
+                throw new Exception("Target file is empty; cannot compute QValues");
+
+            if (decoyData.Length < 1)
+                throw new Exception("Decoy file is empty; cannot compute QValues");
 
             var targetHeaders = targetData[0].Split('\t');
             var decoyHeaders = decoyData[0].Split('\t');
 
-            if (targetHeaders.Length != decoyHeaders.Length) return false;
-            if (targetHeaders.Where((t, i) => !t.Equals(decoyHeaders[i])).Any()) return false;
+            if (targetHeaders.Length != decoyHeaders.Length)
+                throw new Exception("Header count doesn't match between target and decoy file; cannot compute QValues");
+
+            if (targetHeaders.Where((t, i) => !t.Equals(decoyHeaders[i])).Any())
+                throw new Exception("Headers don't match between target and decoy file; cannot compute QValues");
 
             _headers = targetHeaders;
 
             var concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
+            if (concatenated.Length == 0)
+                throw new Exception("No results found; cannot compute QValues");
+
             var scoreIndex = _headers.IndexOf("IcScore");
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("Score");
             if (scoreIndex < 0) scoreIndex = _headers.IndexOf("#MatchedFragments");
             var scanNumIndex = _headers.IndexOf("Scan");
             var proteinIndex = _headers.IndexOf("ProteinName");
-            if (scoreIndex < 0 || scanNumIndex < 0 || proteinIndex < 0) return false;
+
+            if (scoreIndex < 0 || scanNumIndex < 0 || proteinIndex < 0) 
+                return false;
 
             var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
                 .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
