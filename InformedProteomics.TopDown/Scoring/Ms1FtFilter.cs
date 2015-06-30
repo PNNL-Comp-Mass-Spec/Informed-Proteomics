@@ -37,13 +37,21 @@ namespace InformedProteomics.TopDown.Scoring
             var maxChargeArray = ftFileParser.GetData("MaxCharge").Select(s => Convert.ToInt32(s)).ToArray();
             var probArray = ftFileParser.GetData("Probability").Select(Convert.ToDouble).ToArray();
             var flagArray = ftFileParser.GetData("GoodEnough").Select(s => Convert.ToInt32(s)).ToArray();
+            var featureCountFiltered = 0;
 
             for (var i = 0; i < monoMassArr.Length; i++)
             {
-                if (flagArray[i] == 0 && probArray[i] < _minProbability) continue;
+                if (flagArray[i] == 0 && probArray[i] < _minProbability) 
+                    continue;
+
+                featureCountFiltered++;
+
                 var monoMass = monoMassArr[i];
                 _lcMsChargeMap.SetMatches(monoMass, minScanArray[i], maxScanArray[i], repScanArray[i], minChargeArray[i], maxChargeArray[i]);
             }
+
+            // NOTE: The DMS Analysis Manager looks for this statistic; do not change it
+            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
 
             _lcMsChargeMap.CreateMassToScanNumMap();
         }

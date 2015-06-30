@@ -46,6 +46,8 @@ namespace InformedProteomics.TopDown.Execution
             int numMatchesPerSpectrum = 1
             )
         {
+            ErrorMessage = string.Empty;
+
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
@@ -73,6 +75,7 @@ namespace InformedProteomics.TopDown.Execution
             ForceParallel = false;
         }
 
+        public string ErrorMessage { get; private set; }
         public string SpecFilePath { get; private set; }
         public string DatabaseFilePath { get; private set; }
         public string OutputDir { get; private set; }
@@ -106,13 +109,14 @@ namespace InformedProteomics.TopDown.Execution
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedTopDownScorer _topDownScorer;
 
-        public void RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null)
+        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null)
         {
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
             swAll.Start();
+            ErrorMessage = string.Empty;
 
-            Console.Write("Reading raw file...");
+            Console.Write(@"Reading raw file...");
             sw.Start();
             //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);
@@ -127,13 +131,13 @@ namespace InformedProteomics.TopDown.Execution
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
 
             ISequenceFilter ms1Filter;
-            if (FeatureFilePath == null)
+            if (string.IsNullOrWhiteSpace(FeatureFilePath))
             {
                 // Checks whether SpecFileName.ms1ft exists
                 var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
-                    Console.Write("Running ProMex...");
+                    Console.Write(@"Running ProMex...");
                     sw.Start();
                     var param = new Ms1FeatureFinderInputParameter
                     {
@@ -148,7 +152,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 sw.Reset();
                 sw.Start();
-                Console.Write("Reading ProMex results...");
+                Console.Write(@"Reading ProMex results...");
                 ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath, MinFeatureProbability);
             }
             else
@@ -158,17 +162,17 @@ namespace InformedProteomics.TopDown.Execution
                 var extension = Path.GetExtension(FeatureFilePath);
                 if (extension.ToLower().Equals(".csv"))
                 {
-                    Console.Write("Reading ICR2LS/Decon2LS results...");
+                    Console.Write(@"Reading ICR2LS/Decon2LS results...");
                     ms1Filter = new IsosFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
                 else if (extension.ToLower().Equals(".ms1ft"))
                 {
-                    Console.Write("Reading ProMex results...");
+                    Console.Write(@"Reading ProMex results...");
                     ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath, MinFeatureProbability);
                 }
                 else if (extension.ToLower().Equals(".msalign"))
                 {
-                    Console.Write("Reading MS-Align+ results...");
+                    Console.Write(@"Reading MS-Align+ results...");
                     ms1Filter = new MsDeconvFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
                 else ms1Filter = null; //new Ms1FeatureMatrix(_run);
@@ -200,7 +204,7 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
-                Console.Write("Reading the target database...");
+                Console.Write(@"Reading the target database...");
                 sw.Start();
                 targetDb.Read();
                 sw.Stop();
@@ -208,7 +212,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the target database");
+                Console.WriteLine(@"Searching the target database");
                 sw.Start();
                 SortedSet<DatabaseSequenceSpectrumMatch>[] targetMatches;
                 if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
@@ -229,7 +233,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 // Decoy database
                 sw.Reset();
-                Console.Write("Reading the decoy database...");
+                Console.Write(@"Reading the decoy database...");
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
                 decoyDb.Read();
@@ -237,7 +241,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the decoy database");
+                Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
                 SortedSet<DatabaseSequenceSpectrumMatch>[] decoyMatches;
                 if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
@@ -257,21 +261,31 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis == true)
             {
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                if (fdrCalculator.HasError())
+                {
+                    ErrorMessage = fdrCalculator.ErrorMessage;
+                    Console.WriteLine(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                    return false;
+                }
+                
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
 
-            Console.WriteLine("Done.");
+            Console.WriteLine(@"Done.");
             swAll.Stop();
             Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
+
+            return true;
         }
 
-        public void RunSearchParallel(double corrThreshold = 0.7, CancellationToken? cancellationToken = null)
+        public bool RunSearchParallel(double corrThreshold = 0.7, CancellationToken? cancellationToken = null)
         {
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
             swAll.Start();
+            ErrorMessage = string.Empty;
 
-            Console.Write("Reading raw file...");
+            Console.Write(@"Reading raw file...");
             sw.Start();
             //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);
@@ -292,7 +306,7 @@ namespace InformedProteomics.TopDown.Execution
                 var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
-                    Console.Write("Running ProMex...");
+                    Console.Write(@"Running ProMex...");
                     sw.Start();
                     var param = new Ms1FeatureFinderInputParameter
                     {
@@ -307,7 +321,9 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 sw.Reset();
                 sw.Start();
-                Console.Write("Reading ProMex results...");
+                
+                // NOTE: The DMS Analysis Manager looks for this text; do not change it
+                Console.Write(@"Reading ProMex results...");
                 ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath, MinFeatureProbability);
             }
             else
@@ -317,17 +333,17 @@ namespace InformedProteomics.TopDown.Execution
                 var extension = Path.GetExtension(FeatureFilePath);
                 if (extension.ToLower().Equals(".csv"))
                 {
-                    Console.Write("Reading ICR2LS/Decon2LS results...");
+                    Console.Write(@"Reading ICR2LS/Decon2LS results...");
                     ms1Filter = new IsosFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
                 else if (extension.ToLower().Equals(".ms1ft"))
                 {
-                    Console.Write("Reading ProMex results...");
+                    Console.Write(@"Reading ProMex results...");
                     ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath, MinFeatureProbability);
                 }
                 else if (extension.ToLower().Equals(".msalign"))
                 {
-                    Console.Write("Reading MS-Align+ results...");
+                    Console.Write(@"Reading MS-Align+ results...");
                     ms1Filter = new MsDeconvFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
                 else ms1Filter = null; //new Ms1FeatureMatrix(_run);
@@ -359,7 +375,7 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
-                Console.Write("Reading the target database...");
+                Console.Write(@"Reading the target database...");
                 sw.Start();
                 targetDb.Read();
                 sw.Stop();
@@ -367,7 +383,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the target database");
+                Console.WriteLine(@"Searching the target database");
                 sw.Start();
                 var targetMatches = RunSearchParallel(targetDb, ms1Filter, MaxNumThreads);
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
@@ -380,7 +396,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 // Decoy database
                 sw.Reset();
-                Console.Write("Reading the decoy database...");
+                Console.Write(@"Reading the decoy database...");
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
                 decoyDb.Read();
@@ -388,7 +404,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the decoy database");
+                Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
                 var decoyMatches = RunSearchParallel(decoyDb, ms1Filter, MaxNumThreads);
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
@@ -400,12 +416,21 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis == true)
             {
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                if (fdrCalculator.HasError())
+                {
+                    ErrorMessage = fdrCalculator.ErrorMessage;
+                    Console.WriteLine(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                    return false;
+                }
+
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
 
-            Console.WriteLine("Done.");
+            Console.WriteLine(@"Done.");
             swAll.Stop();
             Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
+
+            return true;
         }
 
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins)
@@ -438,7 +463,7 @@ namespace InformedProteomics.TopDown.Execution
             var sw = new Stopwatch();
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins);
-            Console.WriteLine("Estimated proteins: " + estimatedProteins);
+            Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
             var numProteins = 0;
             sw.Reset();
             sw.Start();
@@ -465,13 +490,13 @@ namespace InformedProteomics.TopDown.Execution
                 if (numProteins%100000 == 0)
                 //if(numProteins % 10 == 0)
                 {
-                    Console.Write("Processing {0}{1} proteins..., {2:00.0}%...", numProteins,
+                    Console.Write(@"Processing {0}{1} proteins..., {2:#0.0}%...", numProteins,
                         numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
                     if (numProteins != 0)
                     {
                         sw.Stop();
                         var sec = sw.ElapsedTicks/(double) Stopwatch.Frequency;
-                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
+                        Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
                     }
@@ -583,7 +608,7 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     coreCount += int.Parse(item["NumberOfCores"].ToString());
                 }
-                //Console.WriteLine("Number Of Cores: {0}", coreCount);
+                //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
             }
             catch (Exception)
             {
@@ -598,7 +623,7 @@ namespace InformedProteomics.TopDown.Execution
 
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsetsParallel(db, out estimatedProteins, threads, cancellationToken);
-            Console.WriteLine("Estimated proteins: " + estimatedProteins);
+            Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
             var numProteins = 0;
             sw.Reset();
             sw.Start();
@@ -627,7 +652,7 @@ namespace InformedProteomics.TopDown.Execution
                     if (numProteins % 100000 == 0)
                         //if(numProteins % 10 == 0)
                     {
-                        Console.Write("Processing {0}{1} proteins..., {2:00.0}%...", numProteins,
+                        Console.Write("Processing {0}{1} proteins..., {2:#0.0}%...", numProteins,
                             numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
                         if (numProteins != 0)
                         {
@@ -635,7 +660,7 @@ namespace InformedProteomics.TopDown.Execution
                             {
                                 sw.Stop();
                                 var sec = sw.ElapsedTicks / (double) Stopwatch.Frequency;
-                                Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
+                                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
                                 sw.Reset();
                                 sw.Start();
                             }

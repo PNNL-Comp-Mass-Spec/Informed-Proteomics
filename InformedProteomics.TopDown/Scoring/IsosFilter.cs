@@ -39,11 +39,17 @@ namespace InformedProteomics.TopDown.Scoring
             var fitStringArr = icrToolsparser.GetData("fit");
             var fitArray = fitStringArr == null ? null : icrToolsparser.GetData("fit").Select(Convert.ToDouble).ToArray();
 
+            var featureCountFiltered = 0;
+
             var minMass = double.MaxValue;
             var maxMass = 0.0;
             for (var i = 0; i < monoMassArr.Length; i++)
             {
-                if (fitArray != null && fitArray[i] > _fitScoreThreshold || chargeArray[i] <= 1) continue;
+                if (fitArray != null && fitArray[i] > _fitScoreThreshold || chargeArray[i] <= 1) 
+                    continue;
+
+                featureCountFiltered++;
+
                 var scan = scanArray[i];
                 var monoMass = monoMassArr[i];
                 if (minMass > monoMass) minMass = monoMass;
@@ -53,6 +59,8 @@ namespace InformedProteomics.TopDown.Scoring
                 var maxScan = _run.GetNextScanNum(scan, 1);
                 _lcMsMatchMap.SetMatches(monoMass, minScan, maxScan);
             }
+
+            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
 
             _lcMsMatchMap.CreateSequenceMassToMs2ScansMap(_run, _massTolerance, minMass, maxMass);
         }

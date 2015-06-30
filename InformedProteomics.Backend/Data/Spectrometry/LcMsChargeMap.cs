@@ -41,9 +41,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public void CreateMassToScanNumMap()
         {
+            /*
             var minMassBin = int.MaxValue;
             var maxMassBin = int.MinValue;
             var numScans = 0;
+            */
+
             foreach (var entry in _map)
             {
                 var massBin = entry.Key;
@@ -54,12 +57,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     if(bitArray[i]) ms2ScanList.Add(i + _run.MinLcScan);
                 }
-                if (massBin > maxMassBin) maxMassBin = massBin;
-                if (massBin < minMassBin) minMassBin = massBin;
+                
+                /*
+                if (massBin > maxMassBin) 
+                    maxMassBin = massBin;
+
+                if (massBin < minMassBin) 
+                    minMassBin = massBin;
+
                 numScans += ms2ScanList.Count;
+                 */
+
                 _sequenceMassBinToScanNumsMap.Add(massBin, ms2ScanList.ToArray());
             }
-            Console.WriteLine("#MS/MS matches per sequence: {0}", numScans / (float)(maxMassBin - minMassBin + 1));
+            // Console.WriteLine("#MS/MS matches per sequence: {0}", numScans / (float)(maxMassBin - minMassBin + 1));
 
             _scanToIsolationWindow = null;
         }

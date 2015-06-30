@@ -80,6 +80,7 @@ namespace InformedProteomics.Backend.MassFeature
 
         public LcMsRun Run { get; protected set; }
 
+        [Serializable]
         public class LcMsRunNullException : Exception { }
 
     }

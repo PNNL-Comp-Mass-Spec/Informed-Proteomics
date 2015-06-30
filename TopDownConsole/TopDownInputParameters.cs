@@ -36,10 +36,14 @@ namespace MSPathFinderT
 
         public void Display()
         {
-            foreach (var specFilePath in SpecFilePaths) Console.WriteLine("\t{0}", specFilePath);
+            foreach (var specFilePath in SpecFilePaths)
+            {
+                Console.WriteLine("SpectrumFilePath: " + specFilePath);
+            }
+
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
-            Console.WriteLine("FeatureFilePath: {0}", FeatureFilePath ?? "N/A");
-            Console.WriteLine("OutputDir: " + OutputDir);
+            Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
+            Console.WriteLine("OutputDir:        " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchMode);
             Console.WriteLine("Tda: " + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
@@ -55,13 +59,15 @@ namespace MSPathFinderT
             Console.WriteLine("MinFeatureProbability: " + FeatureMinProbability);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + _maxNumDynModsPerSequence);
             Console.WriteLine("Modifications: ");
+
             foreach (var searchMod in _searchModifications)
             {
                 Console.WriteLine(searchMod);
             }
+
             if (FeatureFilePath != null)
             {
-                Console.WriteLine("Getting MS1 features from {0}.", FeatureFilePath);
+                Console.WriteLine("Getting MS1 features from " + FeatureFilePath);
             }
         }
 
@@ -104,7 +110,8 @@ namespace MSPathFinderT
         {
 
             var message = CheckIsValid(parameters);
-            if (message != null) return message;
+            if (message != null) 
+                return message;
 
             var specFilePath = parameters["-s"];
             SpecFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
@@ -129,7 +136,8 @@ namespace MSPathFinderT
                 _searchModifications = parser.SearchModifications;
                 _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
 
-                if (_searchModifications == null) return "Error while parsing " + modFilePath + "!";
+                if (_searchModifications == null) 
+                    return "Error while parsing " + modFilePath + "!";
 
                 AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
             }
@@ -155,9 +163,13 @@ namespace MSPathFinderT
             {
                 return "Invalid value (" + tdaVal + ") for parameter -tda";
             }
-            if (tdaVal == 1) Tda = true;
-            else if (tdaVal == -1) Tda = null;
-            else Tda = false;
+
+            if (tdaVal == 1) 
+                Tda = true;
+            else if 
+                (tdaVal == -1) Tda = null;
+            else 
+                Tda = false;
 
             MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
             MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);

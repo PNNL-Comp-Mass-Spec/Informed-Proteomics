@@ -38,6 +38,8 @@ namespace InformedProteomics.BottomUp.Execution
             bool? runTargetDecoyAnalysis = true,
             int numTolerableTermini = 1)
         {
+            ErrorMessage = string.Empty;
+
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
@@ -74,6 +76,7 @@ namespace InformedProteomics.BottomUp.Execution
             NumTolerableTermini = numTolerableTermini;
         }
 
+        public string ErrorMessage { get; private set; }
         public string SpecFilePath { get; private set; }
         public string DatabaseFilePath { get; private set; }
         public string OutputDir { get; private set; }
@@ -95,11 +98,12 @@ namespace InformedProteomics.BottomUp.Execution
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedBottomUpScorer _bottomUpScorer;
 
-        public void RunSearch(double corrThreshold)
+        public bool RunSearch(double corrThreshold)
         {
             var sw = new Stopwatch();
+            ErrorMessage = string.Empty;
 
-            Console.Write("Reading raw file...");
+            Console.Write(@"Reading raw file...");
             sw.Start();
             _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             _bottomUpScorer = new InformedBottomUpScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
@@ -108,7 +112,7 @@ namespace InformedProteomics.BottomUp.Execution
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             sw.Reset();
-            Console.Write("Determining precursor masses...");
+            Console.Write(@"Determining precursor masses...");
             sw.Start();
             var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge, MaxPrecursorIonCharge,
                 400, 5000, corrThreshold, 0, 0);
@@ -116,7 +120,7 @@ namespace InformedProteomics.BottomUp.Execution
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
             sw.Reset();
-            Console.Write("Deconvoluting MS2 spectra...");
+            Console.Write(@"Deconvoluting MS2 spectra...");
             sw.Start();
             _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
                 _run,
@@ -144,7 +148,7 @@ namespace InformedProteomics.BottomUp.Execution
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
-                Console.Write("Reading the target database...");
+                Console.Write(@"Reading the target database...");
                 sw.Start();
                 targetDb.Read();
                 sw.Stop();
@@ -152,7 +156,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the target database");
+                Console.WriteLine(@"Searching the target database");
                 sw.Start();
                 var targetMatches = RunSearch(GetAnnotationsAndOffsets(targetDb), ms1Filter);
                 sw.Stop();
@@ -160,7 +164,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Target database search elapsed time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.Write("Rescoring and writing target results...");
+                Console.Write(@"Rescoring and writing target results...");
                 sw.Start();
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
@@ -172,7 +176,7 @@ namespace InformedProteomics.BottomUp.Execution
             {
                 // Decoy database
                 sw.Reset();
-                Console.Write("Reading the decoy database...");
+                Console.Write(@"Reading the decoy database...");
                 sw.Start();
                 var decoyDb = targetDb.Decoy(Enzyme);
                 decoyDb.Read();
@@ -180,7 +184,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.WriteLine("Searching the decoy database");
+                Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
                 var decoyMatches = RunSearch(GetAnnotationsAndOffsets(decoyDb), ms1Filter);
                 sw.Stop();
@@ -188,7 +192,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
 
                 sw.Reset();
-                Console.Write("Rescoring and writing decoy results...");
+                Console.Write(@"Rescoring and writing decoy results...");
                 sw.Start();
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
@@ -199,10 +203,18 @@ namespace InformedProteomics.BottomUp.Execution
             if (RunTargetDecoyAnalysis == true)
             {
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                if (fdrCalculator.HasError())
+                {
+                    ErrorMessage = fdrCalculator.ErrorMessage;
+                    Console.WriteLine(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                    return false;
+                }
+
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
 
-            Console.WriteLine("Done.");
+            Console.WriteLine(@"Done.");
+            return true;
         }
 
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database)
@@ -241,13 +253,13 @@ namespace InformedProteomics.BottomUp.Execution
 
                 if (numPeptides % 100000 == 0)
                 {
-                    Console.Write("Processing {0}{1} peptides...", numPeptides,
+                    Console.Write(@"Processing {0}{1} peptides...", numPeptides,
                         numPeptides == 1 ? "st" : numPeptides == 2 ? "nd" : numPeptides == 3 ? "rd" : "th");
                     if (numPeptides != 0)
                     {
                         sw.Stop();
                         var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
+                        Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
                         sw.Reset();
                         sw.Start();
                     }
@@ -336,11 +348,11 @@ namespace InformedProteomics.BottomUp.Execution
 
                         if (ion == null)
                         {
-                            Console.WriteLine("Null ion!");
+                            Console.WriteLine(@"Null ion!");
                         }
                         if (scores == null)
                         {
-                            Console.WriteLine("Null scores");
+                            Console.WriteLine(@"Null scores");
                         }
 
                         writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",

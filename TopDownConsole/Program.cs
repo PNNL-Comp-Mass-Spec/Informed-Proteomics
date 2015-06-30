@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.TopDown.Execution;
 
@@ -19,22 +20,30 @@ namespace MSPathFinderT
         public static int Main(string[] args)
         {
 
+            var errorCode = 0;
+
 #if (!DEBUG)
             try
             {
 #endif
-          
-                var handle = Process.GetCurrentProcess().MainWindowHandle;
-                SetConsoleMode(handle, EnableExtendedFlags);
 
-                if (args.Length%2 != 0)
-                {
-                    PrintUsageInfo("The number of arguments must be even.");
-                    return -1;
-                }
+            var handle = Process.GetCurrentProcess().MainWindowHandle;
+            SetConsoleMode(handle, EnableExtendedFlags);
 
-                // initialize parameters
-                var paramDic = new Dictionary<string, string>
+            if (args.Length == 0)
+            {
+                PrintUsageInfo();
+                return -1;
+            }
+
+            if (args.Length % 2 != 0)
+            {
+                PrintUsageInfo("The number of arguments must be even");
+                return -1;
+            }
+
+            // initialize parameters
+            var paramDic = new Dictionary<string, string>
                 {
                     {"-s", null},
                     {"-d", null},
@@ -57,80 +66,110 @@ namespace MSPathFinderT
                     {"-threads", "0"},
                 };
 
-                for (var i = 0; i < args.Length/2; i++)
+            for (var i = 0; i < args.Length / 2; i++)
+            {
+                var key = args[2 * i];
+                var value = args[2 * i + 1];
+                if (!paramDic.ContainsKey(key))
                 {
-                    var key = args[2*i];
-                    var value = args[2*i + 1];
-                    if (!paramDic.ContainsKey(key))
-                    {
-                        PrintUsageInfo("Invalid parameter: " + key);
-                        return -2;
-                    }
-                    paramDic[key] = value;
+                    PrintUsageInfo("Invalid parameter: " + key);
+                    return -2;
+                }
+                paramDic[key] = value;
+            }
+
+            var parameters = new TopDownInputParameters();
+            var message = parameters.Parse(paramDic);
+            if (message != null)
+            {
+                PrintUsageInfo(message);
+                return -3;
+            }
+
+            Console.WriteLine(Name + " " + Version);
+            parameters.Display();
+            parameters.Write();
+
+            foreach (var specFilePath in parameters.SpecFilePaths)
+            {
+                var topDownLauncher = new IcTopDownLauncher(
+                    specFilePath,
+                    parameters.DatabaseFilePath,
+                    parameters.OutputDir,
+                    parameters.AminoAcidSet,
+                    parameters.MinSequenceLength,
+                    parameters.MaxSequenceLength,
+                    1, // max number of N-term cleavages
+                    0, // max number of C-term cleavages
+                    parameters.MinPrecursorIonCharge,
+                    parameters.MaxPrecursorIonCharge,
+                    parameters.MinProductIonCharge,
+                    parameters.MaxProductIonCharge,
+                    parameters.MinSequenceMass,
+                    parameters.MaxSequenceMass,
+                    parameters.PrecursorIonTolerancePpm,
+                    parameters.ProductIonTolerancePpm,
+                    parameters.Tda,
+                    parameters.SearchMode,
+                    parameters.FeatureFilePath,
+                    parameters.FeatureMinProbability
+                    );
+
+                topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
+                topDownLauncher.ForceParallel = parameters.ForceParallel;
+
+                var success = topDownLauncher.RunSearch();
+
+                if (success)
+                {
+                    continue;
                 }
 
-                var parameters = new TopDownInputParameters();
-                var message = parameters.Parse(paramDic);
-                if (message != null)
+                // NOTE: The DMS Analysis Manager looks for this text; do not change it
+                var errorMsg = "Error processing " + Path.GetFileName(specFilePath) + ": ";
+
+                if (string.IsNullOrWhiteSpace(topDownLauncher.ErrorMessage))
                 {
-                    PrintUsageInfo(message);
-                    return -3;
+                    errorMsg += "unknown error";
+                }
+                else
+                {
+                    errorMsg += topDownLauncher.ErrorMessage;
                 }
 
-                Console.WriteLine(Name + " " + Version);
-                parameters.Display();
-                parameters.Write();
+                Console.WriteLine(errorMsg);
 
-                foreach (var specFilePath in parameters.SpecFilePaths)
+                if (errorCode == 0)
                 {
-                    var topDownLauncher = new IcTopDownLauncher(
-                        specFilePath,
-                        parameters.DatabaseFilePath,
-                        parameters.OutputDir,
-                        parameters.AminoAcidSet,
-                        parameters.MinSequenceLength,
-                        parameters.MaxSequenceLength,
-                        1, // max number of N-term cleavages
-                        0, // max number of C-term cleavages
-                        parameters.MinPrecursorIonCharge,
-                        parameters.MaxPrecursorIonCharge,
-                        parameters.MinProductIonCharge,
-                        parameters.MaxProductIonCharge,
-                        parameters.MinSequenceMass,
-                        parameters.MaxSequenceMass,
-                        parameters.PrecursorIonTolerancePpm,
-                        parameters.ProductIonTolerancePpm,
-                        parameters.Tda,
-                        parameters.SearchMode,
-                        parameters.FeatureFilePath,
-                        parameters.FeatureMinProbability
-                        );
-
-                    topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
-                    topDownLauncher.ForceParallel = parameters.ForceParallel;
-
-                    topDownLauncher.RunSearch();
+                    errorCode = -Math.Abs(errorMsg.GetHashCode());
+                    if (errorCode == 0)
+                        errorCode = -1;
                 }
+            }
 
 #if (!DEBUG)
             }
             catch (Exception ex)
             {
+                // NOTE: The DMS Analysis Manager looks for this text; do not change it
                 Console.WriteLine("Exception while processing: " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                var errorCode = -Math.Abs(ex.Message.GetHashCode());
-                return errorCode;
+                errorCode = -Math.Abs(ex.Message.GetHashCode());
+                if (errorCode == 0)
+                    errorCode = -1;
             }            
 #endif
 
-            return 0;
+            return errorCode;
 
         }
 
 
         private static void PrintUsageInfo(string message = null)
         {
-            if (message != null) Console.WriteLine("Error: " + message);
+            if (message != null)
+                Console.WriteLine("Error: " + message);
+
             Console.WriteLine(
                 Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +

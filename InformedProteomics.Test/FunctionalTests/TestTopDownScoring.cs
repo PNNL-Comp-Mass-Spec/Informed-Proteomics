@@ -238,6 +238,11 @@ namespace InformedProteomics.Test.FunctionalTests
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);
+            if (fdrCalculator.HasError())
+            {
+                throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+            }
+
             fdrCalculator.WriteTo(tdaResultPath);
             Console.WriteLine("Done");
         }

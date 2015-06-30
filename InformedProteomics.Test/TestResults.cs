@@ -72,7 +72,12 @@ namespace InformedProteomics.Test
             const string targetResultPath = path + "_IcTarget.tsv";
             const string decoyResultPath = path + "_IcDecoy.tsv";
 
-            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);
+            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);         
+            if (fdrCalculator.HasError())
+            {
+                throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+            }
+
             Console.WriteLine("NumPSMs: {0}", fdrCalculator.NumPsms);
             Console.WriteLine("NumPeptides: {0}", fdrCalculator.NumPeptides);
             Console.WriteLine("Done");
