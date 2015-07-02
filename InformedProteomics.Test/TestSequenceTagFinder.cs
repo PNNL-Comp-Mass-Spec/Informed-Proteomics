@@ -28,7 +28,7 @@ namespace InformedProteomics.Test
             var tsvData = tsvParser.GetAllData();
             var ms2ScanNumbers = tsvData["Scan"];
         
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFile, TestRawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFile, 0, 0);
             var nSpec = 0;
             var nHitSpec = 0;
 
@@ -86,7 +86,7 @@ namespace InformedProteomics.Test
 
 
             //var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile, 0, 0);
             var ms2ScanNums = run.GetScanNumbers(2);
             
             //for (var i = 12700; i < 13000; i++)

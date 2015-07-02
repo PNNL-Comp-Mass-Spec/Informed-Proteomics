@@ -105,7 +105,7 @@ namespace InformedProteomics.BottomUp.Execution
 
             Console.Write(@"Reading raw file...");
             sw.Start();
-            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            _run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, 1.4826, 1.4826);
             _bottomUpScorer = new InformedBottomUpScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;

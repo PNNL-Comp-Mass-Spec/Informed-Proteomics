@@ -138,7 +138,7 @@ namespace SeqTagGen
 
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine("Input data : {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, path.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
             var ms2ScanNums = run.GetScanNumbers(2);
             var totalScans = ms2ScanNums.Count;
             

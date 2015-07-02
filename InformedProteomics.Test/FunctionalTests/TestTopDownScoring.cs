@@ -64,7 +64,7 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
@@ -122,7 +122,7 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
@@ -173,7 +173,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
             var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             Assert.True(spec != null);
 

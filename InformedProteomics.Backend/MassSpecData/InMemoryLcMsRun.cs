@@ -9,26 +9,43 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class InMemoryLcMsRun: LcMsRun //LcMsRun 
     {
+        [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0, progress);
         }
 
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
+        public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
+        {
+            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0.0, 0.0, progress);
+        }
+
+        [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, double precursorSignalToNoiseRatioThreshold, 
+            double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
+        {
+            //var pbfFilePath = ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
+            //    productSignalToNoiseRatioThreshold, null, progress);
+            //
+            //return new InMemoryLcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
+            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold,
+                productSignalToNoiseRatioThreshold, progress);
+        }
+
+        public static LcMsRun GetLcMsRun(string specFilePath, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, 
+            IProgress<ProgressData> progress = null)
+        {
+            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold,
+                productSignalToNoiseRatioThreshold, progress);
+        }
+
+        public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader,
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
         {
-            var pbfFilePath = ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
+            var pbfFilePath = ConvertToPbf(specFilePath, specReader, precursorSignalToNoiseRatioThreshold,
                 productSignalToNoiseRatioThreshold, null, progress);
 
             return new InMemoryLcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
-        }
-
-        public static string ConvertToPbf(string specFilePath, MassSpecDataType dataType,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
-            string pbfFilePath = null, IProgress<ProgressData> progress = null)
-        {
-            return ConvertToPbf(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath),
-                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
         }
 
         public static string ConvertToPbf(string specFilePath, double precursorSignalToNoiseRatioThreshold,

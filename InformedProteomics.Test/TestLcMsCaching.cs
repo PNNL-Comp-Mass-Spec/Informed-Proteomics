@@ -67,7 +67,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Reading run: {0:f4} sec", sec);
@@ -183,7 +183,7 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Reading run: {0:f4} sec", sec);
@@ -346,7 +346,7 @@ namespace InformedProteomics.Test
             //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
 
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -374,7 +374,7 @@ namespace InformedProteomics.Test
                 @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.decoy.icresult";
                 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
             //const int minPrecursorCharge = 3;
             //const int maxPrecursorCharge = 30;
@@ -461,7 +461,7 @@ namespace InformedProteomics.Test
         public void TestMs2Caching()
         {
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
             const int minPrecursorIonCharge = 3; // 3
             const int maxPrecursorIonCharge = 30;// 67

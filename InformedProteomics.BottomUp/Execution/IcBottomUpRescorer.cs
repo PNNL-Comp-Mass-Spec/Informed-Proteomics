@@ -14,7 +14,7 @@ namespace InformedProteomics.BottomUp.Execution
     {
         public IcBottomUpRescorer(string specFilePath, string icResultFilePath, string outputFilePath, AminoAcidSet aaSet, Tolerance tolerance)
         {
-            _run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            _run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 0.0);
             Rescore(icResultFilePath, outputFilePath);
         }
 

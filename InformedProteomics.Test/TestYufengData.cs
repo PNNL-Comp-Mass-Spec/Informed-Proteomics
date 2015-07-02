@@ -19,15 +19,15 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestYufengData
     {
-        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\Yufeng\raw\yufeng_column_test2.raw";
+        public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\yufeng_column_test2.raw";
 
         [Test]
         public void AddMostAbundantIsotopePeakIntensity()
         {
-            const string rawFilePath = @"H:\Research\Yufeng\40K\raw\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw";
+            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw";
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const string resultFilePath = @"H:\Research\Yufeng\40K\DMS\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv";
+            const string resultFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv";
 
             var parser = new TsvFileParser(resultFilePath);
             var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
@@ -58,7 +58,7 @@ namespace InformedProteomics.Test
             }
 
             // Writing
-            const string newResultFilePath = @"H:\Research\Yufeng\40K\DMS\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv";
+            const string newResultFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv";
             using (var writer = new StreamWriter(newResultFilePath))
             {
                 writer.WriteLine(string.Join("\t", parser.GetHeaders())+"\t"+"PrecursorIntensity");
@@ -198,7 +198,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestRunningTimeSummingSpectra()
         {
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826) as PbfLcMsRun;
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 1.4826, 1.4826) as PbfLcMsRun;
 
             var sw = new Stopwatch();
             sw.Start();
@@ -323,7 +323,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneringAllXics()
         {
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             Assert.True(run != null);
             var comparer = new MzComparerWithBinning(27);
@@ -358,7 +358,7 @@ namespace InformedProteomics.Test
         public void TestGeneratingXicsOfAllCharges()
         {
             //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             var comparer = new MzComparerWithBinning(27);
             const string protSequence =
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
@@ -391,8 +391,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGettingXicVector()
         {
-            var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
-            var run2 = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
+            var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
+            var run2 = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             Assert.True(run1 != null && run2 != null);
             var comparer = new MzComparerWithBinning(27);
             const double minMz = 600.0; // 600.0
@@ -423,7 +423,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAbpSumMs1Spectra()
         {
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
 
             const int minScanNum = 5657;
             const int maxScanNum = 5699;
@@ -453,7 +453,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSumMs2Spectra()
         {
-            const string specFilePath = @"H:\Research\QCShew_TopDown\Long\NewQC_LongSep_29Sep14_141001104925.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\NewQC_LongSep_29Sep14_141001104925.raw";
             const int minScanNum = 1289;
             const int maxScanNum = 1389;
             const int minCharge = 6;

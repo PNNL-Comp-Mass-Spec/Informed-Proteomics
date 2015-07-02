@@ -91,7 +91,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
             
             var comparer = new MzComparerWithBinning(27);
             var extractor = new Ms1FeatureMatrix(run, Parameters.MinSearchCharge, Parameters.MaxSearchCharge, Parameters.MaxThreads, comparer);

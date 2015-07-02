@@ -21,7 +21,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var aaSet = new AminoAcidSet();
             var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0);
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 1.4826, 0);
             var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
             var scores = informedScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm,
                 composition, charge, scanNum);

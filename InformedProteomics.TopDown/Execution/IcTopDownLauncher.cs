@@ -119,7 +119,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.Write(@"Reading raw file...");
             sw.Start();
             //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
-            _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, 0, 0, prog);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -278,162 +278,7 @@ namespace InformedProteomics.TopDown.Execution
             return true;
         }
 
-        public bool RunSearchParallel(double corrThreshold = 0.7, CancellationToken? cancellationToken = null)
-        {
-            var sw = new Stopwatch();
-            var swAll = new Stopwatch();
-            swAll.Start();
-            ErrorMessage = string.Empty;
-
-            Console.Write(@"Reading raw file...");
-            sw.Start();
-            //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
-            _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);
-            _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
-            sw.Stop();
-            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-
-
-            //var sequenceFilter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge,
-            //    MaxPrecursorIonCharge,
-            //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
-
-            ISequenceFilter ms1Filter;
-            if (FeatureFilePath == null)
-            {
-                // Checks whether SpecFileName.ms1ft exists
-                var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
-                if (!File.Exists(ms1FtFilePath))
-                {
-                    Console.Write(@"Running ProMex...");
-                    sw.Start();
-                    var param = new Ms1FeatureFinderInputParameter
-                    {
-                        InputPath = SpecFilePath,
-                        MinSearchCharge = MinPrecursorIonCharge,
-                        MaxSearchCharge = MaxPrecursorIonCharge
-                    };
-                    var featureFinder = new Ms1FeatureFinderLauncher(param);
-                    featureFinder.Run();
-                    //var extractor = new Ms1FeatureMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
-                    //ms1FtFilePath = extractor.GetFeatureFile(SpecFilePath, MinSequenceMass, MaxSequenceMass);
-                }
-                sw.Reset();
-                sw.Start();
-                
-                // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                Console.Write(@"Reading ProMex results...");
-                ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath, MinFeatureProbability);
-            }
-            else
-            {
-                sw.Reset();
-                sw.Start();
-                var extension = Path.GetExtension(FeatureFilePath);
-                if (extension.ToLower().Equals(".csv"))
-                {
-                    Console.Write(@"Reading ICR2LS/Decon2LS results...");
-                    ms1Filter = new IsosFilter(_run, PrecursorIonTolerance, FeatureFilePath);
-                }
-                else if (extension.ToLower().Equals(".ms1ft"))
-                {
-                    Console.Write(@"Reading ProMex results...");
-                    ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath, MinFeatureProbability);
-                }
-                else if (extension.ToLower().Equals(".msalign"))
-                {
-                    Console.Write(@"Reading MS-Align+ results...");
-                    ms1Filter = new MsDeconvFilter(_run, PrecursorIonTolerance, FeatureFilePath);
-                }
-                else ms1Filter = null; //new Ms1FeatureMatrix(_run);
-            }
-
-            sw.Stop();
-            sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-
-            _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
-                _run,
-                MinProductIonCharge, MaxProductIonCharge,
-                ProductIonTolerance
-                );
-
-            // Target database
-            var targetDb = new FastaDatabase(DatabaseFilePath);
-            targetDb.Read();
-
-            //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
-
-            var targetOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + TargetFileExtension;
-            var decoyOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + DecoyFileExtension;
-            var tdaOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                    Path.GetFileNameWithoutExtension(SpecFilePath) + TdaFileExtension;
-
-            if (RunTargetDecoyAnalysis != null)
-            {
-                sw.Reset();
-                Console.Write(@"Reading the target database...");
-                sw.Start();
-                targetDb.Read();
-                sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-
-                sw.Reset();
-                Console.WriteLine(@"Searching the target database");
-                sw.Start();
-                var targetMatches = RunSearchParallel(targetDb, ms1Filter, MaxNumThreads);
-                WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
-                sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Target database search elapsed Time: {0:f4} sec", sec);
-            }
-
-            if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
-            {
-                // Decoy database
-                sw.Reset();
-                Console.Write(@"Reading the decoy database...");
-                sw.Start();
-                var decoyDb = targetDb.Decoy(null, true);
-                decoyDb.Read();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-
-                sw.Reset();
-                Console.WriteLine(@"Searching the decoy database");
-                sw.Start();
-                var decoyMatches = RunSearchParallel(decoyDb, ms1Filter, MaxNumThreads);
-                WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
-                sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
-            }
-
-            if (RunTargetDecoyAnalysis == true)
-            {
-                var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
-                if (fdrCalculator.HasError())
-                {
-                    ErrorMessage = fdrCalculator.ErrorMessage;
-                    Console.WriteLine(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
-                    return false;
-                }
-
-                fdrCalculator.WriteTo(tdaOutputFilePath);
-            }
-
-            Console.WriteLine(@"Done.");
-            swAll.Stop();
-            Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
-
-            return true;
-        }
-
-        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins)
+        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins, CancellationToken? cancellationToken = null)
         {
             var indexedDb = new IndexedDatabase(database);
             indexedDb.Read();
@@ -441,7 +286,14 @@ namespace InformedProteomics.TopDown.Execution
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (SearchMode == 0)
             {
-                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+                {
+                    annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(MinSequenceLength, MaxSequenceLength, MaxNumThreads, cancellationToken);
+                }
+                else
+                {
+                    annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                }
             }
             else if (SearchMode == 2)
             {
@@ -622,7 +474,7 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             long estimatedProteins;
-            var annotationsAndOffsets = GetAnnotationsAndOffsetsParallel(db, out estimatedProteins, threads, cancellationToken);
+            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
             Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
             var numProteins = 0;
             sw.Reset();

@@ -19,7 +19,7 @@ namespace InformedProteomics.Test
             var rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.pbf";
             var ms1ftFile = @"D:\MassSpecFiles\UTEX\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.ms1ft.bak";
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
             //Directory.GetDirectories(@"\\proto-4\VOrbiETD02\2015_2")
             var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
             var tsvParser = new TsvFileParser(ms1ftFile);
@@ -56,7 +56,7 @@ namespace InformedProteomics.Test
 
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
             var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 

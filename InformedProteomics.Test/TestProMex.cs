@@ -205,7 +205,7 @@ namespace InformedProteomics.Test
         public void TestProMexFilter()
         {
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
             const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath, 0.15);
 

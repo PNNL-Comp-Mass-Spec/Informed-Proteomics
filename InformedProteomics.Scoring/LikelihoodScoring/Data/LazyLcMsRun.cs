@@ -19,7 +19,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         private LcMsRun Lcms
         {
-            get { return _lcms ?? (_lcms = InMemoryLcMsRun.GetLcMsRun(_rawFileName, MassSpecDataType.XCaliburRun, _snr1, _snr2)); }
+            get { return _lcms ?? (_lcms = InMemoryLcMsRun.GetLcMsRun(_rawFileName, _snr1, _snr2)); }
         }
         private readonly string _rawFileName;
         private readonly double _snr1;

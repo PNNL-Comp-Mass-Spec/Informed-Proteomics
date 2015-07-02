@@ -55,6 +55,7 @@ namespace InformedProteomics.Backend.Utils
 
         // static for the case of multiple ProgressData objects being fed to "Progress.Report()"
         public static DateTime LastUpdated { get; private set; }
+        private static string _updateLock = String.Empty; // Only because we need a reference type for a lock
 
         private double _percent = 0;
         private double _minPercentage = 0;
@@ -101,12 +102,16 @@ namespace InformedProteomics.Backend.Utils
 
         public bool ShouldUpdate()
         {
-            if (DateTime.UtcNow >= LastUpdated.AddSeconds(UpdateFrequencySeconds))
+            var update = false;
+            lock (_updateLock)
             {
-                LastUpdated = DateTime.UtcNow;
-                return true;
+                if (DateTime.UtcNow >= LastUpdated.AddSeconds(UpdateFrequencySeconds))
+                {
+                    LastUpdated = DateTime.UtcNow;
+                    update = true;
+                }
             }
-            return false;
+            return update;
         }
     }
 }

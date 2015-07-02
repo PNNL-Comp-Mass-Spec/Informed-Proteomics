@@ -520,7 +520,7 @@ namespace InformedProteomics.Test
         {
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";   // DDA
             const string specFilePath = @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw"; // DIA
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath);
             Console.WriteLine("NumIsoWindows: " + run.GetNumUniqueIsoWindows());
             Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
         }
@@ -536,7 +536,7 @@ namespace InformedProteomics.Test
 
             // init
             var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(seqText);
-            var lcms = PbfLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
+            var lcms = PbfLcMsRun.GetLcMsRun(rawFilePath);
             var spectrum = lcms.GetSpectrum(scanNum);
 
             var ionTypeFactory = new IonTypeFactory(maxCharge);

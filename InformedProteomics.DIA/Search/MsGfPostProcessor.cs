@@ -33,7 +33,7 @@ namespace InformedProteomics.DIA.Search
             Run = new Dictionary<string, LcMsRun>();
             foreach (var specFilePath in specFilePaths)
             {
-                var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+                var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
                 var specFileKey = Path.GetFileNameWithoutExtension(specFilePath);
                 if(specFileKey != null) Run[specFileKey] = run;
             }

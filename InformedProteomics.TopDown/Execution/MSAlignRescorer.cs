@@ -14,7 +14,7 @@ namespace InformedProteomics.TopDown.Execution
         public MsAlignRescorer(string specFilePath, string msAlignFilePath, string outputFilePath, Tolerance tolerance, double ms2CorrThreshold = 0.7
             , int minProductIonCharge = 1, int maxProductIonCharge = 10)
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
             _topDownScorer = new InformedTopDownScorer(run, new AminoAcidSet(), minProductIonCharge, maxProductIonCharge, tolerance, ms2CorrThreshold);
             Rescore(msAlignFilePath, outputFilePath);
         }
