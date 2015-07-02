@@ -82,7 +82,7 @@ namespace ProMex
             {
 #endif
                 var param = new Ms1FeatureFinderInputParameter(_paramDic);
-                Console.WriteLine("************ {0}\t{1} ************", Name, Version);
+                Console.WriteLine("************ {0} {1} ************", Name, Version);
                 param.Display();
                 var launcher = new Ms1FeatureFinderLauncher(param);
                 launcher.Run();
@@ -106,9 +106,16 @@ namespace ProMex
 
         private static void PrintUsageInfo(string message = null)
         {
-            if (message != null) Console.WriteLine("Error: " + message);
-            Console.WriteLine("****** {0}\t{1} ************", Name, Version);
+            if (message != null)
+            {
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine("Error: " + message);
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine();
+            }
+
             Console.WriteLine(
+                Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
                 "\t[-o OutFolder (default : InputFolder)]\n" +

@@ -165,7 +165,14 @@ namespace PbfGen
 
         private static void PrintUsageInfo(string message = null)
         {
-            if (message != null) Console.WriteLine("Error: " + message);
+            if (message != null)
+            {
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine("Error: " + message);
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine();
+            }
+
             Console.WriteLine(
                 Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
