@@ -692,8 +692,14 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 _xmlReaderForYield.Close();
             }
-            _fileReader.Close();
-            _file.Close();
+            if (_fileReader != null)
+            {
+                _fileReader.Close();
+            }
+            if (_file != null)
+            {
+                _file.Close();
+            }
         }
 
         public void Cleanup()
