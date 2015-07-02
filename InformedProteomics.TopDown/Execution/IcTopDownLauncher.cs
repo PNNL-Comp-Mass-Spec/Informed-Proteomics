@@ -109,14 +109,28 @@ namespace InformedProteomics.TopDown.Execution
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
         private InformedTopDownScorer _topDownScorer;
 
-        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null)
+        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
         {
+            Progress<ProgressData> prog = new Progress<ProgressData>();
+            var progData = new ProgressData();
+            if (progress != null)
+            {
+                prog = new Progress<ProgressData>(p =>
+                {
+                    progData.Status = p.Status;
+                    progress.Report(progData.UpdatePercent(p.Percent));
+                });
+            }
+
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
             swAll.Start();
             ErrorMessage = string.Empty;
 
             Console.Write(@"Reading raw file...");
+            progData.Status = "Reading spectra file";
+            progData.IsPartialRange = true;
+            progData.MaxPercentage = 10.0;
             sw.Start();
             //_run = InMemoryLcMsRun.GetLcMsRun(SpecFilePath, MassSpecDataType.XCaliburRun, 0, 0);   // 1.4826
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, 0, 0, prog);
@@ -130,6 +144,7 @@ namespace InformedProteomics.TopDown.Execution
             //    MaxPrecursorIonCharge,
             //    MinSequenceMass, MaxSequenceMass, corrThreshold, 0.2, 0.2); //corrThreshold, corrThreshold);
 
+            progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
             if (string.IsNullOrWhiteSpace(FeatureFilePath))
             {
@@ -188,6 +203,10 @@ namespace InformedProteomics.TopDown.Execution
                 ProductIonTolerance
                 );
 
+            progData.StepRange(25.0);
+            progData.Status = "Reading Fasta File";
+            progress.Report(progData.UpdatePercent(100.0)); // Output 25.0%
+
             // Target database
             var targetDb = new FastaDatabase(DatabaseFilePath);
             targetDb.Read();
@@ -201,6 +220,9 @@ namespace InformedProteomics.TopDown.Execution
             var tdaOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
                                     Path.GetFileNameWithoutExtension(SpecFilePath) + TdaFileExtension;
 
+            progData.StepRange(60.0);
+            progData.Status = "Running Target search";
+            progress.Report(progData.UpdatePercent(0.0));
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
@@ -217,11 +239,11 @@ namespace InformedProteomics.TopDown.Execution
                 SortedSet<DatabaseSequenceSpectrumMatch>[] targetMatches;
                 if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
                 {
-                    targetMatches = RunSearchParallel(targetDb, ms1Filter, MaxNumThreads);
+                    targetMatches = RunSearchParallel(targetDb, ms1Filter, null, prog);
                 }
                 else
                 {
-                    targetMatches = RunSearch(targetDb, ms1Filter);
+                    targetMatches = RunSearch(targetDb, ms1Filter, null, prog);
                 }
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
@@ -229,6 +251,9 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Target database search elapsed Time: {0:f4} sec", sec);                
             }
 
+            progData.StepRange(95.0);
+            progData.Status = "Running Decoy search";
+            progress.Report(progData.UpdatePercent(0.0));
             if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
             {
                 // Decoy database
@@ -246,11 +271,11 @@ namespace InformedProteomics.TopDown.Execution
                 SortedSet<DatabaseSequenceSpectrumMatch>[] decoyMatches;
                 if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
                 {
-                    decoyMatches = RunSearchParallel(decoyDb, ms1Filter, MaxNumThreads);
+                    decoyMatches = RunSearchParallel(decoyDb, ms1Filter, null, prog);
                 }
                 else
                 {
-                    decoyMatches = RunSearch(decoyDb, ms1Filter);
+                    decoyMatches = RunSearch(decoyDb, ms1Filter, null, prog);
                 }
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
@@ -258,6 +283,9 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
             }
 
+            progData.StepRange(100.0);
+            progData.Status = "Writing combined results file";
+            progress.Report(progData.UpdatePercent(0.0));
             if (RunTargetDecoyAnalysis == true)
             {
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
@@ -270,6 +298,7 @@ namespace InformedProteomics.TopDown.Execution
                 
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
+            progress.Report(progData.UpdatePercent(100.0));
 
             Console.WriteLine(@"Done.");
             swAll.Stop();
@@ -310,8 +339,14 @@ namespace InformedProteomics.TopDown.Execution
             return annotationsAndOffsets;
         }
 
-        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken=null)
+        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
         {
+            if (progress == null)
+            {
+                progress = new Progress<ProgressData>();
+            }
+            var progData = new ProgressData();
+            progData.Status = "Searching for matches";
             var sw = new Stopwatch();
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins);
@@ -335,6 +370,8 @@ namespace InformedProteomics.TopDown.Execution
                 var offset = annotationAndOffset.Offset;
 
                 var protein = db.GetProteinName(offset);
+
+                progress.Report(progData.UpdatePercent((double)numProteins / (double)estimatedProteins * 100.0));
 
                 //++numProteins;
                 Interlocked.Increment(ref numProteins);
@@ -419,36 +456,20 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
             }
+            progress.Report(progData.UpdatePercent(100.0));
             return matches;
         }
 
-        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsetsParallel(FastaDatabase database, out long estimatedProteins, int threads = 0, CancellationToken? cancellationToken = null)
+        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearchParallel(FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
-            var indexedDb = new IndexedDatabase(database);
-            indexedDb.Read();
-            estimatedProteins = indexedDb.EstimateTotalPeptides(SearchMode, MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
-            IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
-            if (SearchMode == 0)
+            if (progress == null)
             {
-                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(MinSequenceLength, MaxSequenceLength, threads, cancellationToken);
+                progress = new Progress<ProgressData>();
             }
-            else if (SearchMode == 2)
-            {
-                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
-                    MaxSequenceLength, MaxNumCTermCleavages);
-            }
-            else
-            {
-                annotationsAndOffsets = indexedDb
-                    .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-                        MinSequenceLength, MaxSequenceLength, MaxNumNTermCleavages, MaxNumCTermCleavages);
-            }
+            var progData = new ProgressData();
+            progData.Status = "Searching for matches";
 
-            return annotationsAndOffsets;
-        }
-
-        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearchParallel(FastaDatabase db, ISequenceFilter sequenceFilter, int threads = 0, CancellationToken? cancellationToken = null)
-        {
+            var threads = MaxNumThreads;
             var sw = new Stopwatch();
 
             // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
@@ -496,29 +517,30 @@ namespace InformedProteomics.TopDown.Execution
 
                 var protein = db.GetProteinName(offset);
 
-                //lock (numProteins)
+                var tempNumProteins = Interlocked.Increment(ref numProteins);
+                //lock (progress)
                 //{
-                    //++numProteins;
-                    Interlocked.Increment(ref numProteins);
+                    progress.Report(progData.UpdatePercent((double)(tempNumProteins - 1) / (double)estimatedProteins * 100.0));
+                //}
 
-                    if (numProteins % 100000 == 0)
-                        //if(numProteins % 10 == 0)
+                if (tempNumProteins % 100000 == 0)
+                    //if(numProteins % 10 == 0)
+                {
+                    Console.Write("Processing {0}{1} proteins..., {2:#0.0}%...", tempNumProteins,
+                        tempNumProteins == 1 ? "st" : tempNumProteins == 2 ? "nd" : tempNumProteins == 3 ? "rd" : "th",
+                        (double)tempNumProteins / (double)estimatedProteins * 100.0);
+                    if (tempNumProteins != 0)
                     {
-                        Console.Write("Processing {0}{1} proteins..., {2:#0.0}%...", numProteins,
-                            numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
-                        if (numProteins != 0)
+                        lock (sw)
                         {
-                            lock (sw)
-                            {
-                                sw.Stop();
-                                var sec = sw.ElapsedTicks / (double) Stopwatch.Frequency;
-                                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-                                sw.Reset();
-                                sw.Start();
-                            }
+                            sw.Stop();
+                            var sec = sw.ElapsedTicks / (double) Stopwatch.Frequency;
+                            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+                            sw.Reset();
+                            sw.Start();
                         }
                     }
-                //}
+                }
 
                 var protSequence = annotation.Substring(2, annotation.Length - 4);
 
@@ -588,6 +610,7 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
             });
+            progress.Report(progData.UpdatePercent(100.0));
             return matches;
         }
 
