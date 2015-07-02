@@ -70,7 +70,7 @@ namespace PbfGen
 
                 if (!File.Exists(specFilePath) && !Directory.Exists(specFilePath))
                 {
-                    PrintUsageInfo("File not found: " + specFilePath + ".");
+                    PrintUsageInfo("File not found: " + specFilePath);
                     return -1;
                 }
 
@@ -79,14 +79,14 @@ namespace PbfGen
 
                 if (!Directory.Exists(specFilePath) && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
                 {
-                    PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath + ".");
+                    PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath);
                     return -1;
                 }
 
                 outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(specFilePath));
                 if (outputDir == null)
                 {
-                    PrintUsageInfo("Invalid raw file directory: " + specFilePath + ".");
+                    PrintUsageInfo("Invalid raw file directory: " + specFilePath);
                     return -1;
                 }
 
@@ -179,6 +179,9 @@ namespace PbfGen
                 "\t-s RawFilePath (*.raw or directory)\n" +
                 "\t[-o OutputDir]\n"
                 );
+
+            // Wait for 1.5 seconds
+            System.Threading.Thread.Sleep(1500);
         }
     }
 }

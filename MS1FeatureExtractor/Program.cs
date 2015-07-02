@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.TopDown.Execution;
 
@@ -33,9 +34,10 @@ namespace ProMex
 
                 if (args.Length == 0)
                 {
-                    PrintUsageInfo("Input file(or folder) path must be provided.");
+                    PrintUsageInfo();
                     return -1;
                 }
+
                 if (args.Length % 2 != 0)
                 {
                     PrintUsageInfo("The number of arguments must be even.");
@@ -68,6 +70,21 @@ namespace ProMex
                         return -1;
                     }
                     _paramDic[key] = value;
+                }
+
+                // Parse command line parameters
+                var inputFilePath = _paramDic["-i"];
+
+                if (inputFilePath == null)
+                {
+                    PrintUsageInfo("Missing required parameter -i!");
+                    return -1;
+                }
+
+                if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath))
+                {
+                    PrintUsageInfo("File not found: " + inputFilePath);
+                    return -1;
                 }
 
             }
@@ -127,6 +144,9 @@ namespace ProMex
                 //"\t[-quant y or n] (quantification purpose, default: n\n" +
                 "\t[-maxThreads 0 (default: 0 (no limit))]\n"
                 );
+
+            // Wait for 1.5 seconds
+            System.Threading.Thread.Sleep(1500);
         }
 
     }

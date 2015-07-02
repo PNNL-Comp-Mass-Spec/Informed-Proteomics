@@ -123,7 +123,7 @@ namespace MSPathFinderT
             {
                 if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
                 {
-                    return "OutputDir " + outputDir + " is not a directory!";
+                    return "OutputDir is not a directory: " + outputDir;
                 }
                 Directory.CreateDirectory(outputDir);
             }
@@ -137,7 +137,7 @@ namespace MSPathFinderT
                 _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
 
                 if (_searchModifications == null) 
-                    return "Error while parsing " + modFilePath + "!";
+                    return "Error while parsing " + modFilePath;
 
                 AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
             }
@@ -209,7 +209,7 @@ namespace MSPathFinderT
             FeatureMinProbability = Convert.ToDouble(parameters["-minProb"]);
             if (FeatureMinProbability < 0.0 || FeatureMinProbability > 1.0)
             {
-                return "FeatureMinProbability must be in [0,1]!";
+                return "FeatureMinProbability must be 0 or 1";
             }
             return null;
         }
@@ -222,40 +222,40 @@ namespace MSPathFinderT
                 var value = keyValuePair.Value;
                 if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" && keyValuePair.Key != "-feature")
                 {
-                    return "Missing required parameter " + key + "!";
+                    return "Missing required parameter " + key;
                 }
 
                 if (key.Equals("-s"))
                 {
                     if (value == null)
                     {
-                        return "Missing parameter " + key + "!";
+                        return "Missing parameter " + key;
                     }
                     if (!File.Exists(value) && !Directory.Exists(value))
                     {
-                        return "File not found: " + value + "!";
+                        return "File not found: " + value;
                     }
                     if (Directory.Exists(value)) continue;
                     var extension = Path.GetExtension(value);
                     if (!Path.GetExtension(value).ToLower().Equals(".raw") && !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
                     {
-                        return "Invalid extension for the parameter " + key + " (" + extension + ")!";
+                        return "Invalid extension for the parameter " + key + " (" + extension + ")";
                     }
                 }
                 else if(key.Equals("-d"))
                 {
                     if (value == null)
                     {
-                        return "Missing parameter " + key + "!";
+                        return "Missing required parameter " + key;
                     }
                     if (!File.Exists(value))
                     {
-                        return "File not found: " + value + "!"; ;
+                        return "File not found: " + value;
                     }
                     var extension = Path.GetExtension(value).ToLower();
                     if (!extension.Equals(".fa") && !extension.Equals(".fasta"))
                     {
-                        return "Invalid extension for the parameter " + key + " (" + extension + ")!";
+                        return "Invalid extension for the parameter " + key + " (" + extension + ")";
                     }
                 }
                 else if (key.Equals("-o"))
@@ -266,21 +266,21 @@ namespace MSPathFinderT
                 {
                     if (value != null && !File.Exists(value))
                     {
-                        return "File not found: " + value + "!";
+                        return "File not found: " + value;
                     }
                 }
                 else if (key.Equals("-feature"))
                 {
                     if (value != null && !File.Exists(value))
                     {
-                        return "File not found: " + value + "!";
+                        return "File not found: " + value;
                     }
                     if (value != null && 
                         !Path.GetExtension(value).ToLower().Equals(".csv") && 
                         !Path.GetExtension(value).ToLower().Equals(".ms1ft") &&
                         !Path.GetExtension(value).ToLower().Equals(".msalign"))
                     {
-                        return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")!";
+                        return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")";
                     }
                 }
                 else
@@ -288,7 +288,7 @@ namespace MSPathFinderT
                     double num;
                     if (!double.TryParse(value, out num))
                     {
-                        return "Invalid value (" + value + ") for the parameter " + key + "!";
+                        return "Invalid value (" + value + ") for the parameter " + key;
                     }
                 }
             }
