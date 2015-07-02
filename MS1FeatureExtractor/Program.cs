@@ -14,7 +14,7 @@ namespace ProMex
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (April 01, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (July 2, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 

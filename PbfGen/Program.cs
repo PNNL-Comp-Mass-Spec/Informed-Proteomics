@@ -12,7 +12,14 @@ namespace PbfGen
     public class Program
     {
         public const string Name = "PbfGen";
-        public const string Version = "0.62 (Dec 11, 2014)";
+        public static string Version
+        {
+            get
+            {
+                var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return string.Format("version {0}.{1}.{2} (July 2, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+            }
+        }
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
