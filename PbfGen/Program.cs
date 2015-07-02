@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 
 namespace PbfGen
 {
@@ -17,15 +18,17 @@ namespace PbfGen
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
+            var errorCode = 0;
+
             var handle = Process.GetCurrentProcess().MainWindowHandle;
             SetConsoleMode(handle, EnableExtendedFlags);
 
             if (args.Length == 0)
             {
                 PrintUsageInfo();
-                return;
+                return -1;
             }
 
             var paramDic = new Dictionary<string, string>
@@ -41,7 +44,7 @@ namespace PbfGen
                 if (!paramDic.ContainsKey(key))
                 {
                     PrintUsageInfo("Invalid parameter: " + key);
-                    return;
+                    return -1;
                 }
                 paramDic[key] = value;
             }
@@ -52,13 +55,13 @@ namespace PbfGen
             if (specFilePath == null)
             {
                 PrintUsageInfo("Missing required parameter -s!");
-                return;
+                return -1;
             }
 
             if (!File.Exists(specFilePath) && !Directory.Exists(specFilePath))
             {
                 PrintUsageInfo("File not found: " + specFilePath + ".");
-                return;
+                return -1;
             }
 
             var types = MassSpecDataReaderFactory.GetMassSpecDataTypeFilterList();
@@ -67,14 +70,14 @@ namespace PbfGen
             if (!Directory.Exists(specFilePath) && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
             {
                 PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath + ".");
-                return;
+                return -1;
             }
 
             var outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(specFilePath));
             if (outputDir == null)
             {
                 PrintUsageInfo("Invalid raw file directory: " + specFilePath + ".");
-                return;
+                return -1;
             }
 
             if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
@@ -83,40 +86,61 @@ namespace PbfGen
                 if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
                 {
                     PrintUsageInfo("OutputDir " + outputDir + " is not a directory!");
-                    return;
+                    return -1;
                 }
                 Directory.CreateDirectory(outputDir);
             }
 
             var specFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
 
-            foreach (var rawFilePath in specFilePaths)
+#if (!DEBUG)
+            try
             {
-                var rafFilePath = outputDir + Path.DirectorySeparatorChar +
-                                           Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension;
+#endif
+                foreach (var rawFilePath in specFilePaths)
+                {
+                    var pbfFilePath = outputDir + Path.DirectorySeparatorChar +
+                                               Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension;
 
-                if(File.Exists(rafFilePath) && PbfLcMsRun.CheckFileFormatVersion(rafFilePath))
-                {
-                    Console.WriteLine("{0} already exists.", rawFilePath);
-                }
-                else
-                {
-                    Console.WriteLine("Creating {0} from {1}", rafFilePath, rawFilePath);
-                    IMassSpecDataReader reader = null;
-                    if (Path.GetExtension(rawFilePath).ToLower().Equals(".raw"))
+                    if(File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath))
                     {
-                        reader = new XCaliburReader(rawFilePath);
+                        Console.WriteLine("{0} already exists.", rawFilePath);
                     }
-                    else if (Path.GetExtension(rawFilePath).ToLower().Equals(".mzml") ||
-                             rawFilePath.ToLower().EndsWith(".mzml.gz"))
+                    else
                     {
-                        reader = new MzMLReader(rawFilePath, false, true);
+                        Console.WriteLine("Creating {0} from {1}", pbfFilePath, rawFilePath);
+                        IMassSpecDataReader reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
+                        var progress = new Progress<ProgressData>(p =>
+                        {
+                            p.UpdateFrequencySeconds = 2;
+                            if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
+                            {
+                                Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
+                            }
+                        });
+                        //var run = new InMemoryLcMsRun(reader, 0, 0, progress);
+                        //Console.WriteLine();
+                        //run.WriteAsPbf(rafFilePath, progress);
+                        InMemoryLcMsRun.ConvertToPbf(rawFilePath, reader, 0, 0, pbfFilePath, progress);
+                        Console.WriteLine();
                     }
-                    var run = new InMemoryLcMsRun(reader, 0, 0);
-                    run.WriteAsPbf(rafFilePath);
                 }
+
+#if (!DEBUG)
             }
+            catch (Exception ex)
+            {
+                // NOTE: The DMS Analysis Manager looks for this text; do not change it
+                Console.WriteLine("Exception while processing: " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                errorCode = -Math.Abs(ex.Message.GetHashCode());
+                if (errorCode == 0)
+                    errorCode = -1;
+            }
+#endif
+
             Console.WriteLine("PbfFormatVersion: {0}", PbfLcMsRun.FileFormatId);
+            return errorCode;
         }
 
         private static void PrintUsageInfo(string message = null)
