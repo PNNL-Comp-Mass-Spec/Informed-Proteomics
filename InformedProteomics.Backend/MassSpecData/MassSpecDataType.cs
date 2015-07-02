@@ -9,5 +9,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         XCaliburRun,
 		MzMLFile,
+        PbfFile,
+        Unknown,
     }
 }

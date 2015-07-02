@@ -462,6 +462,15 @@ namespace InformedProteomics.Backend.MassSpecData
             _reduceMemoryUsage = tryReducingMemoryUsage;
             _unzippedFilePath = _filePath;
 
+            ConfigureFileHandles();
+        }
+
+        private void ConfigureFileHandles()
+        {
+            if (_file != null)
+            {
+                _file.Close();
+            }
             // Set a very large read buffer, it does decrease the read times for uncompressed files.
             _file = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
             /*****************************************************************************************************************************************************
@@ -471,17 +480,22 @@ namespace InformedProteomics.Backend.MassSpecData
             if (_filePath.EndsWith(".mzML.gz"))
             {
                 _isGzipped = true;
-                _file = new GZipStream(_file, CompressionMode.Decompress);
-                if (_randomAccess)
+                var file = new GZipStream(_file, CompressionMode.Decompress);
+                if (!_randomAccess)
+                {
+                    _file = file;
+                }
+                else
                 {
                     // Unzip the file to the temp path
                     _unzippedFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(_filePath));
                     using (_file)
+                    using (file)
                     using (
                         var tempFile = new FileStream(_unzippedFilePath, FileMode.Create, FileAccess.ReadWrite,
                             FileShare.None, 65536))
                     {
-                        _file.CopyTo(tempFile/*, 65536*/);
+                        file.CopyTo(tempFile/*, 65536*/);
                     }
                     _file = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
                 }
@@ -501,6 +515,14 @@ namespace InformedProteomics.Backend.MassSpecData
         #endregion
 
         #region Public interface functions for reading
+
+        public bool TryMakeRandomAccessCapable()
+        {
+            _randomAccess = true;
+            ConfigureFileHandles(); // Reopen the files
+            return true;
+        }
+
         /// <summary>
         /// Returns all mass spectra.
         /// Uses "yield return" to allow processing one spectra at a time if called from a foreach loop statement.

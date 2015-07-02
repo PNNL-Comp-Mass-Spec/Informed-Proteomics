@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -11,42 +12,16 @@ namespace InformedProteomics.Backend.MassSpecData
         public const int FileFormatId = 150604;
         public const string FileExtension = ".pbf";
         
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType = MassSpecDataType.XCaliburRun)
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType = MassSpecDataType.XCaliburRun, IProgress<ProgressData> progress = null)
         {
-            return GetLcMsRun(specFilePath, dataType, 0.0, 0.0);
+            return GetLcMsRun(specFilePath, dataType, 0.0, 0.0, progress);
         }
 
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
+            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
         {
-            var pbfFilePath = Path.ChangeExtension(specFilePath, FileExtension);
-
-            if (!File.Exists(pbfFilePath) || !CheckFileFormatVersion(pbfFilePath))
-            {
-                InMemoryLcMsRun run;
-                if (dataType == MassSpecDataType.XCaliburRun)
-                {
-                    run = new InMemoryLcMsRun(new XCaliburReader(specFilePath), 0, 0);
-                }
-	            else if (dataType == MassSpecDataType.MzMLFile)
-	            {
-		            run = new InMemoryLcMsRun(new MzMLReader(specFilePath), 0, 0);
-	            }
-                else run = null;
-                if (run == null) throw new Exception("Unsupported raw file format!");
-                try
-                {
-                    run.WriteAsPbf(pbfFilePath);
-                }
-                catch (UnauthorizedAccessException) // Cannot write to same directory, attemp to write to temp directory
-                {
-                    var fileName = Path.GetFileName(pbfFilePath);
-                    if (String.IsNullOrEmpty(fileName)) throw;  // invalid path?
-                    var tempPath = Path.Combine(Path.GetTempPath(), fileName);
-                    if (!File.Exists(tempPath) || !CheckFileFormatVersion(tempPath)) run.WriteAsPbf(tempPath);
-                    pbfFilePath = tempPath;
-                }
-            }
+            var pbfFilePath = InMemoryLcMsRun.ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
+                productSignalToNoiseRatioThreshold, null, progress);
 
             return new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
         }
@@ -93,6 +68,16 @@ namespace InformedProteomics.Backend.MassSpecData
             if (spec.MsLevel == 1 && _precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_precursorSignalToNoiseRatioThreshold);
             else if (_productSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_productSignalToNoiseRatioThreshold);
             return spec;
+        }
+
+        public Spectrum ReadMassSpectrum(int scanNum)
+        {
+            return GetSpectrum(scanNum);
+        }
+
+        public bool TryMakeRandomAccessCapable()
+        {
+            return true;
         }
 
         public int NumSpectra

@@ -177,6 +177,7 @@
     <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
     <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
+    <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />
     <Compile Include="MassSpecData\MzMLReader.cs" />
     <Compile Include="MassSpecData\IChromatogramExtractor.cs" />
     <Compile Include="MassSpecData\ILcMsRun.cs" />
@@ -224,6 +225,7 @@
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\OtsuThreshold.cs" />
     <Compile Include="Utils\PeakListUtils.cs" />
+    <Compile Include="Utils\ProgressData.cs" />
     <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
     <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

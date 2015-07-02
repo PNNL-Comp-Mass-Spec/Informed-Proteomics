@@ -49,6 +49,15 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Always random-access capable.
+        /// </summary>
+        /// <returns></returns>
+        public bool TryMakeRandomAccessCapable()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Reads the mass spectrum with the specified scanNum from the raw file
         /// </summary>
         /// <param name="scanNum">scan number</param>

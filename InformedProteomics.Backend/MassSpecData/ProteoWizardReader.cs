@@ -21,6 +21,11 @@ namespace InformedProteomics.Backend.MassSpecData
             throw new NotImplementedException();
         }
 
+        public bool TryMakeRandomAccessCapable()
+        {
+            return true;
+        }
+
         public Spectrum ReadMassSpectrum(int scanIndex)
         {
             var pwizSpec = _reader.GetCentroidedSpectrum(scanIndex);

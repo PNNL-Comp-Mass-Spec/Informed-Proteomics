@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.MassSpecData;
 
@@ -60,7 +61,10 @@ namespace PbfGen
                 return;
             }
 
-            if (!Directory.Exists(specFilePath) && !Path.GetExtension(specFilePath).ToLower().Equals(".raw") && !Path.GetExtension(specFilePath).ToLower().Equals(".mzml") && !specFilePath.ToLower().EndsWith(".mzml.gz"))
+            var types = MassSpecDataReaderFactory.GetMassSpecDataTypeFilterList();
+            types.Remove(".pbf");
+
+            if (!Directory.Exists(specFilePath) && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
             {
                 PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath + ".");
                 return;
