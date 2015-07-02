@@ -125,6 +125,8 @@ namespace MSPathFinderT
                     continue;
                 }
 
+                // topDownLauncher returned false (not successful)
+
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
                 var errorMsg = "Error processing " + Path.GetFileName(specFilePath) + ": ";
 
@@ -141,9 +143,13 @@ namespace MSPathFinderT
 
                 if (errorCode == 0)
                 {
+                    // This is the first error encountered; update the error code 
+                    // (though we will continue processing the next file if there is one)
                     errorCode = -Math.Abs(errorMsg.GetHashCode());
                     if (errorCode == 0)
-                        errorCode = -1;
+                        return -1;
+                    else
+                        return errorCode;
                 }
             }
 
@@ -156,7 +162,9 @@ namespace MSPathFinderT
                 Console.WriteLine(ex.StackTrace);
                 errorCode = -Math.Abs(ex.Message.GetHashCode());
                 if (errorCode == 0)
-                    errorCode = -1;
+                    return -1;
+                else
+                    return errorCode;
             }            
 #endif
 
