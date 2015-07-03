@@ -97,7 +97,7 @@ namespace InformedProteomics.Test
         [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
         [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
         [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -295,7 +295,7 @@ namespace InformedProteomics.Test
         [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
         [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
         [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
         {
             var sw = new System.Diagnostics.Stopwatch();

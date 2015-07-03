@@ -27,7 +27,7 @@ namespace InformedProteomics.Test.FunctionalTests
             sw.Start();
   //          const string outputFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
 //            const string outputFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
-            var outputFilePath = Path.ChangeExtension(specFilePath, ".raf");
+            var outputFilePath = PbfLcMsRun.GetPbfFileName(specFilePath);
             run.WriteAsPbf(outputFilePath);
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
             Console.WriteLine(@"Done. {0:f4} sec", sec);

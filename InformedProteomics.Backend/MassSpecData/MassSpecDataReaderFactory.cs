@@ -1,5 +1,5 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -63,6 +63,30 @@ namespace InformedProteomics.Backend.MassSpecData
         public static List<string> GetMassSpecDataTypeFilterList()
         {
             return new List<string>() { ".raw", ".mzml", ".mzml.gz", ".pbf" };
+        }
+
+        public static string ChangeExtension(string filePath, string newExt)
+        {
+            var path = filePath;
+            foreach (var ext in GetMassSpecDataTypeFilterList())
+            {
+                if (path.ToLower().EndsWith(ext))
+                {
+                    int pos = ext.IndexOf('.', 1);
+                    // Remove extra extensions
+                    if (pos > 0)
+                    {
+                        path = path.Remove(path.Length - (ext.Length - pos));
+                    }
+                    return Path.ChangeExtension(path, newExt);
+                }
+            }
+            return Path.ChangeExtension(path, newExt);
+        }
+
+        public static string RemoveExtension(string filePath)
+        {
+            return ChangeExtension(filePath, null);
         }
     }
 }

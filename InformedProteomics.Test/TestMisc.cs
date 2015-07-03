@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.DIA.Search;
 using NUnit.Framework;
@@ -156,7 +157,7 @@ namespace InformedProteomics.Test
         public void TestPathUtils()
         {
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
-            Console.WriteLine(Path.ChangeExtension(rawFilePath, "_Target.tsv"));
+            Console.WriteLine(MassSpecDataReaderFactory.RemoveExtension(rawFilePath) + "_Target.tsv");
             Console.WriteLine(Path.GetDirectoryName(rawFilePath));
             Console.WriteLine(Path.GetDirectoryName(rawFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFilePath)+"_IcTarget.tsv");
 

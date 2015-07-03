@@ -24,7 +24,7 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 4;
-            var tagFilePath = Path.ChangeExtension(rawFilePath, ".seqtag");
+            var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
             const string fastaFilePath = @"D:\MassSpecFiles\Lewy\a4_human.fasta";
@@ -48,7 +48,7 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 5;
-            var tagFilePath = Path.ChangeExtension(rawFilePath, ".seqtag");
+            var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
 //            const string fastaFilePath = @"H:\Research\Lewy\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";

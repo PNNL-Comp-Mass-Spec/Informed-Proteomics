@@ -12,6 +12,16 @@ namespace InformedProteomics.Backend.MassSpecData
         public const int FileFormatId = 150604;
         public const string FileExtension = ".pbf";
 
+        /// <summary>
+        /// Function to convert a spectra file name/path to a *.pbf name, even when it has multiple extensions (i.e., .mzML.gz)
+        /// </summary>
+        /// <param name="specFileName"></param>
+        /// <returns></returns>
+        public static string GetPbfFileName(string specFileName)
+        {
+            return MassSpecDataReaderFactory.ChangeExtension(specFileName, FileExtension);
+        }
+
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
         {

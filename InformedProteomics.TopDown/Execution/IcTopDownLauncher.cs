@@ -17,9 +17,9 @@ namespace InformedProteomics.TopDown.Execution
     public class IcTopDownLauncher
     {
         //public const int NumMatchesPerSpectrum = 1;
-        public const string TargetFileExtension = "_IcTarget.tsv";
-        public const string DecoyFileExtension = "_IcDecoy.tsv";
-        public const string TdaFileExtension = "_IcTda.tsv";
+        public const string TargetFileNameEnding = "_IcTarget.tsv";
+        public const string DecoyFileNameEnding = "_IcDecoy.tsv";
+        public const string TdaFileNameEnding = "_IcTda.tsv";
 
         public IcTopDownLauncher(
             string specFilePath,
@@ -121,6 +121,10 @@ namespace InformedProteomics.TopDown.Execution
                     progress.Report(progData.UpdatePercent(p.Percent));
                 });
             }
+            else
+            {
+                progress = new Progress<ProgressData>();
+            }
 
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
@@ -149,7 +153,7 @@ namespace InformedProteomics.TopDown.Execution
             if (string.IsNullOrWhiteSpace(FeatureFilePath))
             {
                 // Checks whether SpecFileName.ms1ft exists
-                var ms1FtFilePath = Path.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
+                var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
                     Console.Write(@"Running ProMex...");
@@ -212,13 +216,10 @@ namespace InformedProteomics.TopDown.Execution
             targetDb.Read();
 
 //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
-
-            var targetOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + TargetFileExtension;
-            var decoyOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + DecoyFileExtension;
-            var tdaOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                    Path.GetFileNameWithoutExtension(SpecFilePath) + TdaFileExtension;
+            var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
+            var targetOutputFilePath = Path.Combine(OutputDir, specFileName + TargetFileNameEnding);
+            var decoyOutputFilePath = Path.Combine(OutputDir, specFileName + DecoyFileNameEnding);
+            var tdaOutputFilePath = Path.Combine(OutputDir, specFileName + TdaFileNameEnding);
 
             progData.StepRange(60.0);
             progData.Status = "Running Target search";

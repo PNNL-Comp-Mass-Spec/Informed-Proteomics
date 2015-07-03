@@ -103,7 +103,7 @@ namespace SeqTagGen
             {
                 if (MsRawFile(fileName))
                 {
-                    var pbfFilePath = Path.ChangeExtension(fileName, "pbf");
+                    var pbfFilePath = PbfLcMsRun.GetPbfFileName(fileName);
                     if (!File.Exists(pbfFilePath)) ProcessFile(fileName);
                 }
                 else if (MsPbfFile(fileName)) ProcessFile(fileName);
@@ -113,7 +113,7 @@ namespace SeqTagGen
         private static void ProcessFile(string path)
         {
             var rawFile = path;
-            var outFile = Path.ChangeExtension(path, "seqtag");
+            var outFile = MassSpecDataReaderFactory.ChangeExtension(path, "seqtag");
             //var tmpOutFile = Path.ChangeExtension(path, "tmp.seqtag");
 
             if (_outFolderPath != null)
@@ -134,7 +134,7 @@ namespace SeqTagGen
                 return;
             }
 
-            var tmpOutFile = Path.ChangeExtension(outFile, "seqtag.tmp");
+            var tmpOutFile = MassSpecDataReaderFactory.ChangeExtension(outFile, "seqtag.tmp");
 
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine("Input data : {0}", rawFile);

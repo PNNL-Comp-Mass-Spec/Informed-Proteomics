@@ -44,11 +44,11 @@ namespace InformedProteomics.Test
             const int minMergedTagLength = 7;
             const int minNumTagMatches = 1;
 
-            var rawFileName = Path.ChangeExtension(dataSet, ".raw");
+            var rawFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".raw");
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
             var aminoAcidSet = AminoAcidSet.GetStandardAminoAcidSet();
-            var featureFileName = Path.ChangeExtension(dataSet, ".ms1ft");
+            var featureFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".ms1ft");
             var filter = new Ms1FtFilter(run, tolerance, featureFileName);
             var ms2ScanNums =
                 filter.GetMatchingMs2ScanNums(featureMass)
@@ -199,7 +199,7 @@ namespace InformedProteomics.Test
             const int scanNum = 4533;
 
             // Parse sequence tags
-            var tagFileName = Path.ChangeExtension(dataSet, ".seqtag");
+            var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
             const int minTagLength = 8;
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -227,7 +227,7 @@ namespace InformedProteomics.Test
             const double tolerancePpm = 13;
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
-            var rawFileName = Path.ChangeExtension(dataSet, ".raw");
+            var rawFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".raw");
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
             var idList =
@@ -237,7 +237,7 @@ namespace InformedProteomics.Test
 
 
             // Parse sequence tags
-            var tagFileName = Path.ChangeExtension(dataSet, ".seqtag");
+            var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
             const int minTagLength = 6;
             const int numProtMatches = 4;
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
@@ -246,8 +246,8 @@ namespace InformedProteomics.Test
             var searchableDb = new SearchableDatabase(fastaDb);
 
             var tagParser = new SequenceTagParser(tagFileName, minTagLength);
-            
-            var featureFileName = Path.ChangeExtension(dataSet, ".ms1ft");
+
+            var featureFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".ms1ft");
             var featureParser = new TsvFileParser(featureFileName);
 
             var minScan = featureParser.GetData("MinScan").Select(s => Convert.ToInt32(s)).ToArray();
@@ -391,11 +391,11 @@ namespace InformedProteomics.Test
             // Parse sequence tags
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
             const int minTagLength = 8;
-            var tagFileName = Path.ChangeExtension(dataSet, ".seqtag");
+            var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
             var tagParser = new SequenceTagParser(tagFileName, minTagLength);
 
             // Parse raw file
-            var rawFileName = Path.ChangeExtension(dataSet, ".raw");
+            var rawFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".raw");
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
             // Parse ID file

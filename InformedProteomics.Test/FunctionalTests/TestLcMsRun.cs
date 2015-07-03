@@ -260,7 +260,6 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingBrukerDaltonDataSet()
         {
-            const string FileExtension = ".pbf";
             const string specFilePath = @"D:\MassSpecFiles\ICR\20141212FGWT1_F5_1_01_3230.mzML";
             Console.WriteLine("TEst start");
             //var reader = new BrukerReader(specFilePath);
@@ -268,7 +267,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var run = new InMemoryLcMsRun(reader, 1.4826, 1.4826);
             //var run = new InMemoryLcMsRun(reader, 3, 1.4826);
-            var pbfFilePath = Path.ChangeExtension(specFilePath, FileExtension);
+            var pbfFilePath = PbfLcMsRun.GetPbfFileName(specFilePath);
             run.WriteAsPbf(pbfFilePath);
             /*
             foreach (var spec in reader.ReadAllSpectra())

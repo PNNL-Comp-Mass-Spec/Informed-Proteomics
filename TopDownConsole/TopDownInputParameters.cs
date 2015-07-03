@@ -82,7 +82,7 @@ namespace MSPathFinderT
                 {
                     writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                    writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(Path.ChangeExtension(specFilePath, ".ms1ft")));
+                    writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(specFilePath, ".ms1ft")));
                     writer.WriteLine("SearchMode\t" + SearchMode);
                     writer.WriteLine("Tda\t" + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);

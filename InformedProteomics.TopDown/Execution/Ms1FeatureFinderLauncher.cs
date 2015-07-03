@@ -50,7 +50,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 if (MsRawFile(fileName))
                 {
-                    var pbfFilePath = Path.ChangeExtension(fileName, "pbf");
+                    var pbfFilePath = PbfLcMsRun.GetPbfFileName(fileName);
                     if (!File.Exists(pbfFilePath)) ProcessFile(fileName);
                 }
                 else if (MsPbfFile(fileName)) ProcessFile(fileName);

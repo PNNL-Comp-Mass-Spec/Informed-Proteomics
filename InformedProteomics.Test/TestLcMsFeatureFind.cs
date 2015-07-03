@@ -50,7 +50,7 @@ namespace InformedProteomics.Test
         public void TestLcMsFeatureFinder()
         {
             var rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            var outTsvFilePath = Path.ChangeExtension(rawFile, "ms1ft");
+            var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
             var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood(scoreDataPath);
 

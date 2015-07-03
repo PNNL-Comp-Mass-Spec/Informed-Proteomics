@@ -88,7 +88,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (string.IsNullOrWhiteSpace(pbfFilePath))
             {
-                pbfPath = Path.ChangeExtension(specFilePath, PbfLcMsRun.FileExtension);
+                pbfPath = PbfLcMsRun.GetPbfFileName(specFilePath);
                 fileName = Path.GetFileName(pbfPath);
                 if (String.IsNullOrEmpty(fileName))
                 {
