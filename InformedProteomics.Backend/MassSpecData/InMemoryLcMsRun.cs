@@ -156,14 +156,14 @@ namespace InformedProteomics.Backend.MassSpecData
             var progressData = new ProgressData();
             progressData.Status = "Reading spectra from file";
 
-            var numSpectra = massSpecDataReader.NumSpectra;
+            NumSpectra = massSpecDataReader.NumSpectra;
             int specRead = 0;
             progressData.IsPartialRange = true;
             progressData.MaxPercentage = 95.0;
 
             foreach (var spec in massSpecDataReader.ReadAllSpectra())
             {
-                progress.Report(progressData.UpdatePercent((double)specRead / numSpectra * 100.0));
+                progress.Report(progressData.UpdatePercent((double)specRead / NumSpectra * 100.0));
                 specRead++;
                 //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
                 ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;

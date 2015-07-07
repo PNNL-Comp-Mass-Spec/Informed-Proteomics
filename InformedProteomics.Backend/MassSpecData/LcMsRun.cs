@@ -17,6 +17,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public int MinLcScan { get; protected set; }
         public int MaxLcScan { get; protected set; }
+        public int NumSpectra { get; protected set; }
 
         public int MinMsLevel { get; protected set; }
         public int MaxMsLevel { get; protected set; }

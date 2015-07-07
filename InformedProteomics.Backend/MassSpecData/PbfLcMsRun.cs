@@ -115,7 +115,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return true;
         }
 
-        public int NumSpectra
+        public new int NumSpectra
         {
             get { return _scanNumToSpecOffset.Count; }
         }
