@@ -90,6 +90,7 @@
     </Reference>
     <Reference Include="pwiz_bindings_cli">
       <HintPath>..\lib\x64\pwiz_bindings_cli.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>

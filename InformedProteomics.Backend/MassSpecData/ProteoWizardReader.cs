@@ -18,14 +18,17 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         public static Assembly ProteoWizardAssemblyResolver(object sender, ResolveEventArgs args)
         {
-            Console.WriteLine("In the assembly resolver!!");
             // https://support.microsoft.com/en-us/kb/837908
             //This handler is called only when the common language runtime tries to bind to the assembly and fails.
             string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
-            if (String.IsNullOrWhiteSpace(pwizPath))
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
+            {
+                pwizPath = @"C:\DMS_Programs\ProteoWizard";
+            }
+            if (string.IsNullOrWhiteSpace(pwizPath))
             {
                 var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-                if (String.IsNullOrWhiteSpace(progFiles))
+                if (string.IsNullOrWhiteSpace(progFiles))
                 {
                     return null;
                 }
