@@ -7,7 +7,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class InMemoryLcMsRun: LcMsRun //LcMsRun 
+    public class InMemoryLcMsRun : LcMsRun //LcMsRun 
     {
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, double precursorSignalToNoiseRatioThreshold, 
+        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, double precursorSignalToNoiseRatioThreshold,
             double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
         {
             //var pbfFilePath = ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 productSignalToNoiseRatioThreshold, progress);
         }
 
-        public static LcMsRun GetLcMsRun(string specFilePath, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, 
+        public static LcMsRun GetLcMsRun(string specFilePath, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold,
@@ -190,8 +190,8 @@ namespace InformedProteomics.Backend.MassSpecData
                             productSpec.FilterNoise(productSignalToNoiseRatioThreshold);
 
                         var isolationWindow = productSpec.IsolationWindow;
-                        var minBinNum = (int) Math.Round(isolationWindow.MinMz * IsolationWindowBinningFactor);
-                        var maxBinNum = (int) Math.Round(isolationWindow.MaxMz * IsolationWindowBinningFactor);
+                        var minBinNum = (int)Math.Round(isolationWindow.MinMz * IsolationWindowBinningFactor);
+                        var maxBinNum = (int)Math.Round(isolationWindow.MaxMz * IsolationWindowBinningFactor);
                         for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                         {
                             List<int> scanNumList;
@@ -231,7 +231,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             progress.Report(progressData.UpdatePercent(99.5));
             // Read MS levels and precursor information
-            
+
             MinLcScan = minScanNum;
             MaxLcScan = maxScanNum;
 
@@ -275,7 +275,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var ms1ScanNums = GetMs1ScanVector();
             var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
             if (ms1ScanIndex < 0) return null;
-            return new Ms1Spectrum(scanNum, (ushort) ms1ScanIndex, spec.Peaks);
+            return new Ms1Spectrum(scanNum, (ushort)ms1ScanIndex, spec.Peaks);
         }
 
         public override IsolationWindow GetIsolationWindow(int scanNum)
@@ -341,7 +341,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var xic = new Xic();
             //for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
-            foreach(var scanNum in GetFragmentationSpectraScanNums(precursorIonMz))
+            foreach (var scanNum in GetFragmentationSpectraScanNums(precursorIonMz))
             {
                 if (scanNum < minScanNum || scanNum > maxScanNum) continue;
                 var spec = GetSpectrum(scanNum) as ProductSpectrum;
@@ -367,7 +367,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
 
                 var peak = productSpec.FindPeak(productIonMz, tolerance);
-                if(peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+                if (peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
             }
 
             return productXic;
@@ -397,6 +397,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var scanNumToSpecOffset = new long[MaxLcScan - MinLcScan + 1];
             var scanNumToIsolationWindow = new IsolationWindow[MaxLcScan - MinLcScan + 1];
+
             // Spectra
             countTotal = MaxLcScan - MinLcScan;
             counter = 0;
@@ -485,6 +486,10 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.Status = "Writing metadata";
             progressData.IsPartialRange = false;
             progress.Report(progressData.UpdatePercent(99.8)); // Metadata: Approximately 0.2% of total file size
+
+            var warnedInvalidScanNum = false;
+            var warnedNullScanToIsolationWindow = false;
+
             writer.Write(MinLcScan);
             writer.Write(MaxLcScan);
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
@@ -492,10 +497,41 @@ namespace InformedProteomics.Backend.MassSpecData
                 var msLevel = GetMsLevel(scanNum);
                 writer.Write(GetMsLevel(scanNum));
                 writer.Write(GetElutionTime(scanNum));
+             
                 if (msLevel == 2)
                 {
-                    writer.Write((float)scanNumToIsolationWindow[scanNum - MinLcScan].MinMz);
-                    writer.Write((float)scanNumToIsolationWindow[scanNum - MinLcScan].MaxMz);
+                    float minMz = 0;
+                    float maxMz = 0;
+
+                    if (scanNum - MinLcScan < 0 || scanNum - MinLcScan >= scanNumToIsolationWindow.Length)
+                    {
+                        if (!warnedInvalidScanNum)
+                        {
+                            Console.WriteLine("\nWriteAsPbf encountered an invalid scan number: " + scanNum + "; " +
+                                              "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
+                            warnedInvalidScanNum = true;
+                        }
+                    }
+                    else
+                    {
+                        if (scanNumToIsolationWindow[scanNum - MinLcScan] == null)
+                        {
+                            if (!warnedNullScanToIsolationWindow)
+                            {
+                                Console.WriteLine("\nWriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan " + scanNum + "; " +
+                                                  "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
+                                warnedNullScanToIsolationWindow = true;
+                            }
+                        }
+                        else
+                        {
+                            minMz = (float)scanNumToIsolationWindow[scanNum - MinLcScan].MinMz;
+                            maxMz = (float)scanNumToIsolationWindow[scanNum - MinLcScan].MaxMz;
+                        }
+                    }
+
+                    writer.Write(minMz);
+                    writer.Write(maxMz);
                 }
                 writer.Write(scanNumToSpecOffset[scanNum - MinLcScan]);
             }
@@ -565,9 +601,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
     }
 
-    public class LcMsPeak: Peak
+    public class LcMsPeak : Peak
     {
-        public LcMsPeak(double mz, double intensity, int scanNum) : base(mz, intensity)
+        public LcMsPeak(double mz, double intensity, int scanNum)
+            : base(mz, intensity)
         {
             ScanNum = scanNum;
         }

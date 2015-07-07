@@ -1862,7 +1862,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 break;
                             case "MS:1000128":
                                 // name="profile spectrum"
-                                is_ms_ms = false;
+                                centroided = false;
                                 break;
                             case "MS:1000511":
                                 // name="ms level"

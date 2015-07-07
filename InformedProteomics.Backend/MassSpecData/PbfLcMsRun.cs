@@ -9,7 +9,9 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
     {
+        // This constant should be incremented by 1 if the binary file format is changed
         public const int FileFormatId = 150604;
+
         public const string FileExtension = ".pbf";
 
         /// <summary>
@@ -181,13 +183,18 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public static bool CheckFileFormatVersion(string filePath)
         {
-            var fs = File.OpenRead(filePath);
+            var pbfFile = new FileInfo(filePath);
+            if (!pbfFile.Exists || pbfFile.Length < sizeof(int))
+                return false;
+
+            var fs = new FileStream(pbfFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using (var reader = new BinaryReader(fs))
             {
                 fs.Seek(-1 * sizeof(int), SeekOrigin.End);
 
                 var fileFormatId = reader.ReadInt32();
-                if (fileFormatId != FileFormatId) return false;
+                if (fileFormatId != FileFormatId) 
+                    return false;
             }
             return true;
         }
