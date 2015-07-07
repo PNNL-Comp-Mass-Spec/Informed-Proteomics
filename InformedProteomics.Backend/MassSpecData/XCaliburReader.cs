@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
+using ThermoRawFileReaderDLL.FinniganFileIO;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -13,10 +13,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public XCaliburReader(string filePath)
         {
-            _msfileReader = (MSFileReaderLib.IXRawfile5) new MSFileReaderLib.MSFileReader_XRawfile();
+            _cachedScanInfo = new ThermoRawFileReaderDLL.clsScanInfo(-1);
 
-            _msfileReader.Open(filePath);
-            _msfileReader.SetCurrentController(0, 1);
+            _msfileReader = new ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO();
+            _msfileReader.OpenRawFile(filePath);
 
             _minLcScan = 1;
             _numSpectra = ReadNumSpectra();
@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     spec = ReadMassSpectrum(scanNum);
                 }
-                catch (System.Runtime.InteropServices.COMException e)
+                catch (System.Runtime.InteropServices.COMException ex)
                 {
                     Console.WriteLine("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
                 }
@@ -64,58 +64,19 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>mass spectrum</returns>
         public Spectrum ReadMassSpectrum(int scanNum)
         {
-            object peakArr = null;
-            object peakFlags = null;
-            var arraySize = 0;
 
-            _msfileReader.GetMassListFromScanNum(
-                ref scanNum,
-                null, // optional scan scanFilterString
-                0, // intensity cutoff type
-                0, // intensity cutoff value
-                0, // max number of peaks
-                0, // return centroided spectrum if nonzero
-                0, // centroid peak width
-                ref peakArr,
-                ref peakFlags,
-                ref arraySize);
+            var scanInfo = GetScanInfo(scanNum);
 
-            var vals = peakArr as double[,];
-
-            if (vals == null) return null;
-
-            var mzArr = new double[vals.GetLength(1)];
-            var intensityArr = new double[vals.GetLength(1)];
-
-            var sortRequired = false;
-
-            for (var i = 0; i < vals.GetLength(1); i++)
-            {
-                mzArr[i] = vals[0, i];
-                intensityArr[i] = vals[1, i];
-
-                if (i > 0 && mzArr[i] < mzArr[i - 1])
-                    sortRequired = true;
-            }
-
-            if (sortRequired)
-            {
-                Array.Sort(mzArr, intensityArr);
-            }
-
-            // Centroid spectrum
-            if (!ReadIsCentroidScan(scanNum))
-            {
-                // ProteoWizard
-                var centroider = new Centroider(mzArr, intensityArr);
-                double[] centroidedMzs, centroidedIntensities;
-                centroider.GetCentroidedData(out centroidedMzs, out centroidedIntensities);
-                mzArr = centroidedMzs;
-                intensityArr = centroidedIntensities;
-            }
+            double[] mzArr;
+            double[] intensityArr;
+            
+            _msfileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
 
             var elutionTime = RtFromScanNum(scanNum);
+
+            // Call scanInfo.MSLevel in order to update dictionary _msLevel
             var msLevel = ReadMsLevel(scanNum);
+
             if (msLevel == 1)
                 return new Spectrum(mzArr, intensityArr, scanNum)
                 {
@@ -126,14 +87,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var productSpec = new ProductSpectrum(mzArr, intensityArr, scanNum)
             {
-                MsLevel = msLevel,
+                MsLevel = scanInfo.MSLevel,
                 ElutionTime = elutionTime,
                 ActivationMethod = GetActivationMethod(scanNum),
                 IsolationWindow = isolationWindow
             };
             return productSpec;
         }
-
+  
         /// <summary>
         /// Reads the precursor information of the specified scan
         /// </summary>
@@ -147,7 +108,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationTargetMz = ReadIsolationWindowTargetMz(scanNum);
 
             // Get isolation window width
-            //var isolationWindowWidth = ReadIsolationWidth(scanNum);
             var precursorInfo = ReadPrecursorInfoFromTrailerExtra(scanNum);
 
             var isolationWindowWidth = precursorInfo.IsolationWidth;
@@ -178,43 +138,36 @@ namespace InformedProteomics.Backend.MassSpecData
             return _minLcScan;
         }
 
+
         public int ReadMsLevel(int scanNum)
         {
             int msLevel;
-            if (_msLevel.TryGetValue(scanNum, out msLevel)) return msLevel;
+            if (_msLevel.TryGetValue(scanNum, out msLevel)) 
+                return msLevel;
 
-            _msfileReader.GetMSOrderForScanNum(scanNum, ref msLevel);
-            _msLevel[scanNum] = msLevel;
+            var scanInfo = GetScanInfo(scanNum);
+            _msLevel[scanNum] = scanInfo.MSLevel;
 
-            return msLevel;
+            return scanInfo.MSLevel;
         }
 
         public double RtFromScanNum(int scanNum)
         {
-            var rt = 0.0;
-            _msfileReader.RTFromScanNum(scanNum, ref rt);
-            return rt;
+            var scanInfo = GetScanInfo(scanNum);
+            return scanInfo.RetentionTime;
         }
 
-        private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
+        // Obsolete: Now using ThermoRawFileReader")>
+        //private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
+        private readonly ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO _msfileReader;
+
+        private ThermoRawFileReaderDLL.clsScanInfo _cachedScanInfo;
+
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
         private readonly int _numSpectra;
         private readonly Dictionary<int, int> _msLevel;
 
-        //private static DeconToolsPeakDetectorV2 _peakDetector;  // basic peak detector
-
-        /// <summary>
-        /// Returns whether the specified scan is a centroid scan
-        /// </summary>
-        /// <param name="scanNum">scan number</param>
-        /// <returns>true if the specified scan is a centroid scan and false otherwise</returns>
-        private bool ReadIsCentroidScan(int scanNum)
-        {
-            var isCentroid = 0;
-            _msfileReader.IsCentroidScanForScanNum(scanNum, ref isCentroid);
-            return isCentroid != 0;
-        }
 
         /// <summary>
         /// Reads the isolation window target m/z
@@ -223,71 +176,49 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>isolation window target m/z</returns>
         private double ReadIsolationWindowTargetMz(int scanNum)
         {
-            string scanFilterString = null;
-            _msfileReader.GetFilterForScanNum(scanNum, ref scanFilterString);
-
+            // string scanFilterString = null;
+            // _msfileReader.GetFilterForScanNum(scanNum, ref scanFilterString);
+            
+            var scanInfo = GetScanInfo(scanNum);
+            
             var isolationTargetMz = -1.0;
-            if (scanFilterString != null)
+            if (!string.IsNullOrWhiteSpace(scanInfo.FilterText))
             {
-                isolationTargetMz = ParseMzValueFromThermoScanInfo(scanFilterString);
+                isolationTargetMz = ParseMzValueFromThermoScanInfo(scanInfo.FilterText);
             }
             return isolationTargetMz;
         }
-
-        ///// <summary>
-        ///// Reads the isolation window width in Th (e.g. 3 if +/- 1.5 Th)
-        ///// </summary>
-        ///// <param name="scanNum">scan number</param>
-        ///// <returns>isolation width</returns>
-        //private double ReadIsolationWidth(int scanNum)
-        //{
-        //    object value = null;
-        //    _msfileReader.GetTrailerExtraValueForScanNum(scanNum, "MS2 Isolation Width:", ref value);
-
-        //    return Convert.ToDouble(value);
-        //}
-
+     
         private PrecursorInfo ReadPrecursorInfoFromTrailerExtra(int scanNum)
         {
             if (ReadMsLevel(scanNum) == 1) return null;
 
-            object objLabels = null;
-            object objValues = null;
-            var intArrayCount = 0;
-
-            //if (scanNum == 18099)
-            //{
-            //    Console.WriteLine("***ScanNum: {0}", scanNum);
-            //}
-
-            _msfileReader.GetTrailerExtraForScanNum(scanNum, ref objLabels, ref objValues, ref intArrayCount);
-
-            var labels = objLabels as string[];
-            var values = objValues as string[];
-
-            if (labels == null || values == null || intArrayCount <= 0) return null;
-
             var isolationWidth = 0.0;
             double? monoIsotopicMz = 0.0;
             int? charge = null;
-            for (var i = 0; i < intArrayCount; i++)
+
+            var scanInfo = GetScanInfo(scanNum);
+            string valueText;
+            
+            if (scanInfo.TryGetScanEvent("Monoisotopic M/Z:", out valueText))
             {
-                //Console.WriteLine("{0}\t{1}", labels[i], values[i]);
-                if (labels[i].Equals("Monoisotopic M/Z:"))
-                {
-                    monoIsotopicMz = Convert.ToDouble(values[i]);
-                    if (monoIsotopicMz == 0.0) monoIsotopicMz = null;
-                }
-                else if (labels[i].Equals("Charge State:"))
-                {
-                    charge = Convert.ToInt32(values[i]);
-                    if (charge == 0) charge = null;
-                }
-                else if (labels[i].Equals("MS2 Isolation Width:"))
-                {
-                    isolationWidth = Convert.ToDouble(values[i]);
-                }
+                monoIsotopicMz = Convert.ToDouble(valueText);
+                if (monoIsotopicMz == 0.0) 
+                    monoIsotopicMz = null;
             }
+
+            if (scanInfo.TryGetScanEvent("Charge State:", out valueText))
+            {
+                charge = Convert.ToInt32(valueText);
+                if (charge == 0) 
+                    charge = null;
+            }
+
+            if (scanInfo.TryGetScanEvent("MS2 Isolation Width:", out valueText))
+            {
+                isolationWidth = Convert.ToDouble(valueText);
+            }
+
             return new PrecursorInfo(isolationWidth, monoIsotopicMz, charge);
         }
 
@@ -320,9 +251,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private int ReadNumSpectra()
         {
-            var numSpectra = 0;
+            var numSpectra = _msfileReader.GetNumScans();
 
-            _msfileReader.GetNumSpectra(ref numSpectra);
             return numSpectra;
         }
 
@@ -333,28 +263,43 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>activation method</returns>
         private ActivationMethod GetActivationMethod(int scanNum)
         {
-            var activationType = 0;
-            _msfileReader.GetActivationTypeForScanNum(scanNum, ReadMsLevel(scanNum), ref activationType);
-            switch (activationType)
+
+            var scanInfo = GetScanInfo(scanNum);
+
+            switch (scanInfo.ActivationType)
             {
-                case 0:
+                case FinniganFileReaderBaseClass.ActivationTypeConstants.CID:
                     return ActivationMethod.CID;
-                case 2:
+
+                case FinniganFileReaderBaseClass.ActivationTypeConstants.ECD:
                     return ActivationMethod.ECD;
-                case 3:
+
+                case FinniganFileReaderBaseClass.ActivationTypeConstants.PQD:
                     return ActivationMethod.PQD;
-                case 4:
+
+                case FinniganFileReaderBaseClass.ActivationTypeConstants.ETD:
                     return ActivationMethod.ETD;
-                case 5:
+
+                case FinniganFileReaderBaseClass.ActivationTypeConstants.HCD:
                     return ActivationMethod.HCD;
+
                 default:
                     return ActivationMethod.Unknown;
             }
         }
 
+        private ThermoRawFileReaderDLL.clsScanInfo GetScanInfo(int scanNum)
+        {
+            if (_cachedScanInfo == null || _cachedScanInfo.ScanNumber != scanNum)
+                _msfileReader.GetScanInfo(scanNum, out _cachedScanInfo);
+
+            return _cachedScanInfo;
+        }
+
         public void Close()
         {
-            if(_msfileReader != null) _msfileReader.Close();
+            if (_msfileReader != null)
+                _msfileReader.CloseRawFile();                
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.TopDown.Execution;
+using InformedProteomics.Backend.Utils;
 
 namespace ProMex
 {
@@ -15,7 +16,7 @@ namespace ProMex
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (July 2, 2015)", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (" + Misc.GetBuildDateTextFromVersion() + ")", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 

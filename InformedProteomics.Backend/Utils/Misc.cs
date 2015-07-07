@@ -1,11 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace InformedProteomics.Backend.Utils
 {
     public class Misc
     {
+        public static DateTime GetBuildDateFromVersion()
+        {
+            var version = Assembly.GetEntryAssembly().GetName().Version;
+            return GetBuildDateFromVersion(version);
+        }
+
+        public static DateTime GetBuildDateFromVersion(Version version)
+        {            
+            var buildDateTime = new DateTime(2000, 1, 1).Add(
+                new TimeSpan(TimeSpan.TicksPerDay * version.Build + // days since 1 January 2000
+                             TimeSpan.TicksPerSecond * 2 * version.Revision)); // seconds since midnight, (multiply by 2 to get original)
+
+            return buildDateTime;
+        }
+
+        public static string GetBuildDateTextFromVersion()
+        {
+            var version = Assembly.GetEntryAssembly().GetName().Version;
+            return GetBuildDateTextFromVersion(version);
+        }
+
+        public static string GetBuildDateTextFromVersion(Version version)
+        {
+            var buildDateTime = GetBuildDateFromVersion();
+            return buildDateTime.ToString("MMMM d, yyyy");
+        }
+
         public static List<string> GetPeptidesFromTxt(string fileName)
         {
             var peptides = new List<string>();
