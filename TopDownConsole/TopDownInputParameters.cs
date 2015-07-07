@@ -237,7 +237,8 @@ namespace MSPathFinderT
                     }
                     if (Directory.Exists(value)) continue;
                     var extension = Path.GetExtension(value);
-                    if (!Path.GetExtension(value).ToLower().Equals(".raw") && !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
+                    if (!Path.GetExtension(value).ToLower().Equals(".raw") && 
+                        !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")";
                     }
@@ -253,7 +254,8 @@ namespace MSPathFinderT
                         return "File not found: " + value;
                     }
                     var extension = Path.GetExtension(value).ToLower();
-                    if (!extension.Equals(".fa") && !extension.Equals(".fasta"))
+                    if (!extension.Equals(".fa") && 
+                        !extension.Equals(".fasta"))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")";
                     }

@@ -94,7 +94,7 @@ namespace InformedProteomics.TopDown.Execution
         public int MaxProductIonCharge { get; private set; }
         public Tolerance PrecursorIonTolerance { get; private set; }
         public Tolerance ProductIonTolerance { get; private set; }
-        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
+        public bool? RunTargetDecoyAnalysis { get; private set; }    // true: target and decoy, false: target only, null: decoy only
         public IEnumerable<int> ScanNumbers { get; private set; }
         public int NumMatchesPerSpectrum { get; private set; }
         public int MaxNumThreads { get; set; }
