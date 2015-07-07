@@ -88,9 +88,8 @@
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
     </Reference>
-    <Reference Include="ProteowizardWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\x64\ProteowizardWrapper.dll</HintPath>
+    <Reference Include="pwiz_bindings_cli">
+      <HintPath>..\lib\x64\pwiz_bindings_cli.dll</HintPath>
     </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>
@@ -260,15 +259,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="EDAL">
-      <Guid>{8E79B9A2-107E-4E91-A0FF-01F2591103F3}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="MSFileReaderLib">
       <Guid>{F0C5F3E3-4F2A-443E-A74D-0AABE3237494}</Guid>
       <VersionMajor>1</VersionMajor>

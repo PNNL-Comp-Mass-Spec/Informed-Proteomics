@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -21,7 +22,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader = new PbfLcMsRun(filePath);
                     break;
                 case MassSpecDataType.Unknown:
-                    //reader = new ProteoWizardReader(filePath);
+                    AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
+                    reader = new ProteoWizardReader(filePath);
                     break;
             }
 

@@ -83,7 +83,9 @@ namespace PbfGen
                     return -1;
                 }
 
-                outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(specFilePath));
+                // Must use "Path.GetFullPath" to return the absolute path when the source file is in the working directory
+                // But, it could cause problems with too-long paths.
+                outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(Path.GetFullPath(specFilePath)));
                 if (outputDir == null)
                 {
                     PrintUsageInfo("Invalid raw file directory: " + specFilePath);
@@ -121,7 +123,7 @@ namespace PbfGen
 
                     if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath))
                     {
-                        Console.WriteLine("{0} already exists.", rawFilePath);
+                        Console.WriteLine("{0} already exists.", pbfFilePath);
                     }
                     else
                     {

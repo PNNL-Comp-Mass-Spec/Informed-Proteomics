@@ -384,8 +384,6 @@ namespace InformedProteomics.Backend.MassSpecData
         public void WriteAsPbf(BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             long countTotal = 1;
-            double lastPct = 0;
-            double pct = 0;
             long counter = 0;
             if (progress == null)
             {

@@ -129,6 +129,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         private Dictionary<int, IList<IntRange>> _map;
-        private new Dictionary<int, IEnumerable<int>> _sequenceMassBinToScanNumsMap;
+        private Dictionary<int, IEnumerable<int>> _sequenceMassBinToScanNumsMap;
     }
 }
