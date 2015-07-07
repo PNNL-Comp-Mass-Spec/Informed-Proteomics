@@ -275,13 +275,14 @@ namespace InformedProteomics.Backend.Utils
                 return false;
             }
 
-            if (targetHeaders.Where((t, i) => !t.Equals(decoyHeaders[i])).Any())
+            if (!targetHeaders.SequenceEqual(decoyHeaders))
             {
                 ErrorMessage = errorBase + "Headers don't match between target and decoy file";
                 return false;
             }
 
-            _headers = targetHeaders;
+            if (_headers == null)
+                _headers = targetHeaders;
 
             concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
             if (concatenated.Length == 0)

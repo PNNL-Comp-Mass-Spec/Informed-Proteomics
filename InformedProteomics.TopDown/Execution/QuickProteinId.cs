@@ -91,7 +91,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
             }
             sw.Stop();
-            Console.WriteLine(@"{0:f4} sec.", sw.ElapsedTicks / (double)Stopwatch.Frequency);
+            Console.WriteLine(@"{0:f1} sec.", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -108,16 +108,9 @@ namespace InformedProteomics.TopDown.Execution
             {
                 if (++numProteins % 10 == 0)
                 {
-                    Console.WriteLine("Processing {0}{1} proteins...", numProteins,
-                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th");
-                    if (numProteins != 0)
-                    {
-                        sw.Stop();
-                        var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
-                        sw.Reset();
-                        sw.Start();
-                    }
+                    Console.WriteLine(@"Processing, {0} proteins done, {1:f1} sec elapsed",
+                        numProteins,
+                        sw.Elapsed.TotalSeconds);           
                 }
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;

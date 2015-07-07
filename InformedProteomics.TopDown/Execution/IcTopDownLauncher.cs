@@ -140,8 +140,7 @@ namespace InformedProteomics.TopDown.Execution
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, 0, 0, prog);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+            Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
 
             //var sequenceFilter = new Ms1IsotopeAndChargeCorrFilter(_run, PrecursorIonTolerance, MinPrecursorIonCharge,
@@ -198,8 +197,7 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+            Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
             _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
                 _run,
@@ -231,8 +229,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 targetDb.Read();
                 sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+                Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
                 sw.Reset();
                 Console.WriteLine(@"Searching the target database");
@@ -248,8 +245,8 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Target database search elapsed Time: {0:f4} sec", sec);                
+
+                Console.WriteLine(@"Target database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
             }
 
             progData.StepRange(95.0);
@@ -263,8 +260,8 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
                 decoyDb.Read();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+                Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");
@@ -280,8 +277,8 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
-                sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
+
+                Console.WriteLine(@"Decoy database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
             }
 
             progData.StepRange(100.0);
@@ -303,7 +300,7 @@ namespace InformedProteomics.TopDown.Execution
 
             Console.WriteLine(@"Done.");
             swAll.Stop();
-            Console.WriteLine(@"Total elapsed time for search: {0:f4} sec ({1:f4} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
+            Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1:f2} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
 
             return true;
         }
@@ -352,7 +349,10 @@ namespace InformedProteomics.TopDown.Execution
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins);
             Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
+            
             var numProteins = 0;
+            var lastUpdate = DateTime.UtcNow;
+
             sw.Reset();
             sw.Start();
 
@@ -377,19 +377,14 @@ namespace InformedProteomics.TopDown.Execution
                 //++numProteins;
                 Interlocked.Increment(ref numProteins);
 
-                if (numProteins%100000 == 0)
-                //if(numProteins % 10 == 0)
+                if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
                 {
-                    Console.Write(@"Processing {0}{1} proteins..., {2:#0.0}%...", numProteins,
-                        numProteins == 1 ? "st" : numProteins == 2 ? "nd" : numProteins == 3 ? "rd" : "th", (double)numProteins / (double)estimatedProteins * 100.0);
-                    if (numProteins != 0)
-                    {
-                        sw.Stop();
-                        var sec = sw.ElapsedTicks/(double) Stopwatch.Frequency;
-                        Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-                        sw.Reset();
-                        sw.Start();
-                    }
+                    lastUpdate = DateTime.UtcNow;
+
+                    Console.WriteLine(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
+                        numProteins,
+                        numProteins / (double)estimatedProteins * 100.0,
+                        sw.Elapsed.TotalSeconds);           
                 }
 
                 var protSequence = annotation.Substring(2, annotation.Length - 4);
@@ -498,7 +493,10 @@ namespace InformedProteomics.TopDown.Execution
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
             Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
+            
             var numProteins = 0;
+            var lastUpdate = DateTime.UtcNow;
+
             sw.Reset();
             sw.Start();
 
@@ -524,23 +522,14 @@ namespace InformedProteomics.TopDown.Execution
                     progress.Report(progData.UpdatePercent((double)(tempNumProteins - 1) / (double)estimatedProteins * 100.0));
                 //}
 
-                if (tempNumProteins % 100000 == 0)
-                    //if(numProteins % 10 == 0)
+                if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
                 {
-                    Console.Write("Processing {0}{1} proteins..., {2:#0.0}%...", tempNumProteins,
-                        tempNumProteins == 1 ? "st" : tempNumProteins == 2 ? "nd" : tempNumProteins == 3 ? "rd" : "th",
-                        (double)tempNumProteins / (double)estimatedProteins * 100.0);
-                    if (tempNumProteins != 0)
-                    {
-                        lock (sw)
-                        {
-                            sw.Stop();
-                            var sec = sw.ElapsedTicks / (double) Stopwatch.Frequency;
-                            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
-                            sw.Reset();
-                            sw.Start();
-                        }
-                    }
+                    lastUpdate = DateTime.UtcNow;
+
+                    Console.WriteLine(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
+                        tempNumProteins,
+                        tempNumProteins / (double)estimatedProteins * 100.0,
+                        sw.Elapsed.TotalSeconds);                    
                 }
 
                 var protSequence = annotation.Substring(2, annotation.Length - 4);
