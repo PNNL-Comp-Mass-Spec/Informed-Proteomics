@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -20,6 +21,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestTopDownScoringForAllXics()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Search parameters
             const int numNTermCleavages = 1;  // 30
             const int minLength = 7;
@@ -127,6 +131,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestMsAlignPlusResults()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             TopDownScorer.MaxCharge = 25;
             TopDownScorer.MinCharge = 8;
 
@@ -190,6 +197,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestTopDownScoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             TopDownScorer.MaxCharge = 25;
             TopDownScorer.MinCharge = 8;
 

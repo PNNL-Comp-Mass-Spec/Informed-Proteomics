@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -12,6 +13,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCompositions()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var comp1 = Modification.Oxidation.Composition;
             var comp2 = new Composition(1, 2, 3, 4, 5, 6,
                                         new[]

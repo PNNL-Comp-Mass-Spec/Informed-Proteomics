@@ -385,6 +385,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFeatureElutionProfile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
             var rawFileLists = new string[]
             {

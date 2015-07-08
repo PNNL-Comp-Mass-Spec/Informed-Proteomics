@@ -19,6 +19,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAveragine()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             for (var nominalMass = 1000; nominalMass <= 1000; nominalMass++)
             {
                 Console.WriteLine("{0}\t{1}", nominalMass, 

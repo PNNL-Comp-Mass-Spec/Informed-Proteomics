@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Reflection;
+using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests
 {
@@ -8,6 +9,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestManyModSearch()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_intact_01.raw";
             const string featureFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_intact_01.ms1ft";
             const string databaseFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\ID_004858_0EE8CF61.fasta";

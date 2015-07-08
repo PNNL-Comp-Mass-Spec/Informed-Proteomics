@@ -26,7 +26,6 @@ namespace InformedProteomics.Test
 
         private List<IonType> _ionTypes;
         private IonTypeFactory _ionTypeFactory;
-        private ActivationMethod _act;
         double _relativeIntensityThreshold = 1.0;
         private bool _combineCharges;
         private bool _useDecoy;
@@ -136,6 +135,7 @@ namespace InformedProteomics.Test
             var config = reader.GetNodes("vars").First();
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
             var actStr = config.Contents["activationmethod"].ToLower();
+            ActivationMethod _act;
             switch (actStr)
             {
                 case "hcd":

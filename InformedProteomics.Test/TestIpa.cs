@@ -16,6 +16,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestEdrnTargets()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dbFilePath = @"D:\Research\Data\EDRN\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var targetDb = new FastaDatabase(dbFilePath);
             var indexedDbTarget = new IndexedDatabase(targetDb);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSequenceEnumerationParallel2()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
 
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
@@ -50,6 +54,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSumParallel()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //var array = Enumerable.Range(0, short.MaxValue).ToArray();
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
             var db = new FastaDatabase(dbFile);
@@ -100,6 +107,9 @@ namespace InformedProteomics.Test
         //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -179,6 +189,9 @@ namespace InformedProteomics.Test
         [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
         public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -236,6 +249,9 @@ namespace InformedProteomics.Test
         [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
         public void TestSequenceEnumerationNCTerm(double size, string dbFile, int expected)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -298,6 +314,9 @@ namespace InformedProteomics.Test
         //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -351,6 +370,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrimesParallel()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var numbers = Enumerable.Range(3, 10000000 - 3);
 
             //var parallelQuery =
@@ -366,6 +388,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrimesSerial()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var numbers = Enumerable.Range(3, 10000000 - 3);
 
             var parallelQuery =

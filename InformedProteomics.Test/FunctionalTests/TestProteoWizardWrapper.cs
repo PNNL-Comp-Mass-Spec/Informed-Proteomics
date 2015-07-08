@@ -1,4 +1,5 @@
-﻿using InformedProteomics.Backend.MassSpecData;
+﻿using System.Reflection;
+using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests
@@ -11,6 +12,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestLoadingProteoWizardWrapper()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //try
             //{
             var reader = new ProteoWizardReader(TestRawFilePath);

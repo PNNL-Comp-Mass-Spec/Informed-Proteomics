@@ -27,7 +27,6 @@ namespace InformedProteomics.Test
         private double _noiseFiltration;
         private double _searchWidth;
 
-        private ActivationMethod _act;
         private int _precursorCharge;
         private double _binWidth;
 
@@ -203,6 +202,7 @@ namespace InformedProteomics.Test
             // Read program variables
             var config = reader.GetNodes("vars").First();
             var actStr = config.Contents["activationmethod"].ToLower();
+            ActivationMethod _act;
             switch (actStr)
             {
                 case "hcd":

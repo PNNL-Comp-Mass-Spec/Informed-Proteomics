@@ -20,6 +20,9 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateVennDiagrams()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // DIA
             const string rep1 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep1_Summary.tsv";
             const string rep2 = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep2_Summary.tsv";
@@ -47,6 +50,9 @@ namespace InformedProteomics.Test
         [Test]
         public void RunIpa()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\EDRN\Replicates_Frac7\343513_EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28.tsv";
             const string specFilePath = @"D:\Research\Data\EDRN\RawFiles\DIA_Replicate\343513_EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28.raw";
             const string outputFilePath = @"D:\Research\Data\EDRN\Replicates_Frac7\Rep5_Summary.tsv";
@@ -60,6 +66,9 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateSpecCount()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFileDir = @"D:\Research\Data\EDRN\DDA\NTT1_NoMod\";
             var resultFiles = Directory.GetFiles(resultFileDir, "*.tsv");
 
@@ -91,6 +100,9 @@ namespace InformedProteomics.Test
         [Test]
         public void SummarizeDda()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string spikedInPeptideFile = @"D:\Research\Data\EDRN\SpikedPeptides.txt";
             var spikedInPeptides = File.ReadAllLines(spikedInPeptideFile);
 
@@ -127,6 +139,9 @@ namespace InformedProteomics.Test
         [Test]
         public void GeneratePrmInfo()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFileDir = @"D:\Research\Data\EDRN\DDA\Heavy\";
 
             var resultFiles = Directory.GetFiles(resultFileDir, "*.tsv");
@@ -239,6 +254,9 @@ namespace InformedProteomics.Test
         [Test]
         public void ComputeSpikedInPeptideMzHist()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string pepListFile = @"C:\cygwin\home\kims336\Data\DIA\SpikedPeptides.txt";
 
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);

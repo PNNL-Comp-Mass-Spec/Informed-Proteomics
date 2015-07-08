@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -20,6 +21,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void CompareRt()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Q-Exactive
             //const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
             //const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
@@ -82,6 +86,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void CompareRtFusion()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Fusion
             const string qeDdaResult = @"D:\Research\Data\UW\Fusion\DDA_Summary.tsv";
             const string qeDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
@@ -130,6 +137,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void RunPeptideCentricAnalysis()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //TestQExactiveDdaDataPostProcessing();
             //TestQExactiveDiaDataPostProcessing();
             //TestQExactiveDiaDataPostProcessingNoEdgeNtt2();
@@ -142,6 +152,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestQExactiveDdaDataPostProcessing()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\UW\QExactive\DDA_Results\DDA_All.tsv";
             const string specFile = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA_NoCharge.raw";
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
@@ -156,6 +169,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestQExactiveDiaDataPostProcessing()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_All.tsv";
             var specFiles = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
@@ -184,6 +200,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestFusionDiaDataPostProcessing()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\UW\Fusion\DIA_Results\DIA_C_1_To_4.tsv";
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DIA_130412091220.raw";
             const string outputFilePath = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
@@ -198,6 +217,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestFusionDdaDataPostProcessing()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\UW\Fusion\DDA_Results\DDA_C_1_To_4.tsv";
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
             const string outputFilePath = @"D:\Research\Data\UW\Fusion\DDA_Summary.tsv";
@@ -212,6 +234,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestQExactiveDdaDataPostProcessingPerFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var ranges = new[] { "400to525", "525to650", "650to775", "775to900" };
             foreach (var range in ranges)
             {
@@ -237,6 +262,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void GenerateVennDiagrams()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Fusion
             const string fusionMsgfResult = @"D:\Research\Data\UW\Fusion\MSGFPlusResults\TI2.tsv";
             const string fusionDdaResult = @"D:\Research\Data\UW\Fusion\DDA_Summary.tsv";
@@ -271,6 +299,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void ProcessPemmrData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\PEMMR\Ox\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_All.tsv";
             const string outputFilePath = @"D:\Research\Data\PEMMR\Ox\IPA_Summary.tsv";
             const string specFilePath = @"D:\Research\Data\PEMMR\Spectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.raw"; ;
@@ -285,6 +316,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void GenerateVennDiagramsPeMmr()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // No PE-MMR
             const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
 
@@ -326,6 +360,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void ProcessMhcData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultPath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\carone_C1309_All.tsv";
             const string outputFilePath = @"D:\Research\Data\ImmunoPeptidomics\Benchmarking\IPA\IPA_Summary.tsv";
             var specFiles = Directory.GetFiles(@"D:\Research\Data\ImmunoPeptidomics\Benchmarking\raw", "*.raw");
@@ -348,6 +385,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestSpecEValueCalibration()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int targetCharge = 4;
             //const string resultFilePath = @"D:\Research\Data\UW\QExactive\DIA_Results\DIA_All.tsv";
             const string resultFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary - Copy.tsv";
@@ -435,6 +475,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestXicGen()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
 
@@ -476,6 +519,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void TestFusionDdaData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Parameters
             const double relativeIntensityThreshold = 0.7;
             const double precursorTolerancePpm = 20;
@@ -581,6 +627,9 @@ namespace InformedProteomics.Test.Obsolete
         [Test]
         public void AnalyizeFusionDdaData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Parameters
             const double relativeIntensityThreshold = 0.7;
             const double precursorTolerancePpm = 20;

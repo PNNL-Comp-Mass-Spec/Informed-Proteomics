@@ -232,6 +232,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestParsingCompositions()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string compStr = "CH-1N-3O23S";
             var composition = Composition.ParseFromPlainString(compStr);
             Console.WriteLine(composition);
@@ -240,6 +243,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGettingSequence()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string annotation = "_.AECMC._";
 
             // Configure amino acid set
@@ -281,6 +287,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCreatingHistoneGraph()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int numMaxModsPerProtein = 11;
 
             // Histone H4

@@ -36,6 +36,9 @@ namespace InformedProteomics.Test
         [Test]
         public void CorrScore()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\ScoreConfig.ini"));
 
             foreach (var name in _names)
