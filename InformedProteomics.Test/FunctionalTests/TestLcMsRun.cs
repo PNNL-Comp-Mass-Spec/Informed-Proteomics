@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
@@ -17,10 +18,18 @@ namespace InformedProteomics.Test.FunctionalTests
         public const string TestQExactiveRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
         public const string TestQExactivePbfFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
 
-
         public void TestReadingIsolationWindows()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestLcMsRun.TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestRawFilePath);
+                return;
+            }
+
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestRawFilePath, 10000, 10100);
             for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
             {
                 var isolationWindow = run.GetIsolationWindow(scanNum);
@@ -34,7 +43,16 @@ namespace InformedProteomics.Test.FunctionalTests
         //"\\protoapps\UserData\Sangtae\TopDownQCShew\raw";
         public void TestReadingScanNums()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestLcMsRun.TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestRawFilePath);
+                return;
+            }
+
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestRawFilePath, 20000, 20100);
 
             var msLevel = new Dictionary<int, int>();
 
@@ -77,20 +95,31 @@ namespace InformedProteomics.Test.FunctionalTests
                     Assert.True(run.GetNextScanNum(scanNum) == nextScanNum);
                 }
             }
-            Assert.True(run.GetNextScanNum(31151) == 31153);
-            Console.WriteLine(run.GetNextScanNum(89));
+            Assert.True(run.GetNextScanNum(20025) == 20032);
+            Console.WriteLine(run.GetNextScanNum(20025));
         }
 
-        [Test]
+        
+
         public void TestParsingSpectrumFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
 
-            var run = InMemoryLcMsRun.GetLcMsRun(TestTopDownRawFilePathCid);
+            if (!File.Exists(TestTopDownRawFilePathCid))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestTopDownRawFilePathCid);
+                return;
+            }
 
-            const int scanNum = 425;
+            const int SCAN = 425;
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestTopDownRawFilePathCid, SCAN, SCAN);
+
+            const int scanNum = SCAN;
             var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec != null)
             {
@@ -112,6 +141,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestXCaliburReader()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var xcaliburReader = new XCaliburReader(TestTopDownRawFilePathCid);
             var scans = new[] {423, 425};
             foreach (var scan in scans)
@@ -133,15 +165,28 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingDiaRawFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"H:\Research\Jarret\20mz\raw\Q_2014_0523_28_100_amol_uL_20mz.raw";
-            var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath);
-            var spec = run.GetSpectrum(100);
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
+            const int SCAN = 100;
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(rawFilePath, SCAN);
+            var spec = run.GetSpectrum(SCAN);
             spec.Display();
         }
 
         //[Test]
         //public void TestGeneratingProductXic()
         //{
+        //    var methodName = MethodBase.GetCurrentMethod().Name;
+        //    TestUtils.ShowStarting(methodName);
+
         //    const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
         //    var run1 = InMemoryLcMsRun.GetLcMsRun(rawFilePath, MassSpecDataType.XCaliburRun);
         //    var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
@@ -167,7 +212,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGeneratingProductManyXics()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath);
             //var run2 = new DiaLcMsRun(new OldPbfReader(Path.ChangeExtension(rawFilePath, ".pbf")), 0.0, 0.0);
 
@@ -221,6 +275,15 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestNoiseFiltration()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestQExactiveRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestQExactiveRawFilePath);
+                return;
+            }
+
             //var run = new PbfLcMsRun(TestQExactiveRawFilePath);
             var run = PbfLcMsRun.GetLcMsRun(TestQExactiveRawFilePath);
             //var run = InMemoryLcMsRun.GetLcMsRun(TestQExactiveRawFilePath, MassSpecDataType.XCaliburRun);
@@ -233,7 +296,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingCorruptedRawFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"H:\Research\Corrupted\YS_Shew_testHCD_CID.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var reader = new XCaliburReader(rawFilePath);
             reader.ReadMassSpectrum(17957);
             try
@@ -251,7 +323,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingSingleSpecMzMlFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string filePath = @"D:\Research\Data\TRex\VNVADCGAEALAR.mzML";
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(filePath);
             Console.WriteLine(run.MaxLcScan);
         }
@@ -260,8 +341,17 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingBrukerDaltonDataSet()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"D:\MassSpecFiles\ICR\20141212FGWT1_F5_1_01_3230.mzML";
-            Console.WriteLine("TEst start");
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            Console.WriteLine(@"Test start");
             //var reader = new BrukerReader(specFilePath);
             var reader = new MzMLReader(specFilePath);
 
@@ -277,13 +367,22 @@ namespace InformedProteomics.Test.FunctionalTests
                     Console.WriteLine(spec.ScanNum);
                 }
             }*/
-            Console.WriteLine("TEst end");
+            Console.WriteLine(@"Test end");
         }
 
         [Test]
         public void TestReadingRawFileWithSingleMs2Spectrum()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"H:\Research\Jared\2015-05-06_Carbonic_HCD_854_50AVG.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
 //            var run = (InMemoryLcMsRun) InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 //            run.WriteAsPbf(Path.ChangeExtension(specFilePath, ".pbf"));
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);

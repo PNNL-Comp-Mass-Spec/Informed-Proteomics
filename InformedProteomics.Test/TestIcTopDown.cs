@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -18,19 +19,36 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestIcTopDown
     {
-        [Test]
         public void TestForManyMods()
         {
-            
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            Console.WriteLine(@"Test not implemented: " + methodName);
         }
 
         [Test]
         public void TestForVlad()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
             const string dbFilePath = @"D:\Research\Data\Vlad\database\ID_004221_1C042A1F.fasta";
             //const string dbFilePath = @"D:\Research\Data\Vlad\database\HBA_MOUSE.fasta";
             const string outputDir = @"D:\Research\Data\Vlad\Ic\POPSICLETest_M1";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -75,11 +93,26 @@ namespace InformedProteomics.Test
         [Test]
         public void TestForYufeng()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // QC_Shew
             const string specFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
             //const string dbFilePath = @"H:\Research\Yufeng\TopDownYufeng\database\ID_002216_235ACCEA.fasta";
             const string dbFilePath = @"H:\Research\Yufeng\TopDownYufeng\database\SO_3942_Truncated.fasta";
             const string outputDir = @"H:\Research\Yufeng\TopDownYufeng\Debug";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -125,10 +158,31 @@ namespace InformedProteomics.Test
         [Test]
         public void TestForSbepData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //// Salmonella
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
             const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002166_F86E3B2F.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDown\Ic\Mod_M2";
+            const string outputDir = @"\\protoapps\userdata\Sangtae\TestData\Output\Mod_M2";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
+
+            if (!Directory.Exists(outputDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, outputDir);
+                return;
+            }
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -154,9 +208,24 @@ namespace InformedProteomics.Test
         [Test]
         public void TestForAaronData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\raw\MTB_intact_1.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\database\ID_003121_998584F8.fasta";
             const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownAaron\Ic\Mode1_07";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -184,6 +253,8 @@ namespace InformedProteomics.Test
         [Test]
         public void TestForJiaData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
 
             // QC_Shew
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
@@ -194,6 +265,18 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
             const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\D1_1_Mode1";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -227,10 +310,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestForQcShew()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // QC_Shew
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
             const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownQCShew\Test";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -256,10 +354,12 @@ namespace InformedProteomics.Test
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
-        [Test]
         public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
             bool? tda, int searchMode)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int minSequenceLength = 21; // 7
             const int maxSequenceLength = 300; // 1000
             const int minPrecursorIonCharge = 2; // 3
@@ -286,6 +386,9 @@ namespace InformedProteomics.Test
             double minSequenceMass, double maxSequenceMass,
             bool? tda, int searchMode)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Search parameters
             const int maxNumNTermCleavages = 1; // 30
             const int maxNumCTermCleavages = 0;
@@ -320,6 +423,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPrSm()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
             //const string annotation =
             //    "_.MKTKLSVLSAAMLAATLTMMPAVSQAAIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVG" +
@@ -335,6 +441,13 @@ namespace InformedProteomics.Test
             //const int ms2ScanNum = 46661;
 
             const string specFilePath = @"D:\Research\Data\Jon\AH_SF_mouseliver_3-1_Intact_2_6Feb14_Bane_PL011402.raw";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const int ms2ScanNum = 19011;
             const int charge = 7;
             const string annotation = "_.SKVSFKITLTSDPRLPYKVLSVPESTPFTAVLKFAAEEFKVPAATSAIITNDGIGINPAQTAGNVFLKHGSELRIIPRDRVGSC._";
@@ -378,9 +491,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMsAlignRescoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             const string msAlignResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
             const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod_Rescored.tsv";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(msAlignResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, msAlignResultPath);
+                return;
+            }
+
             var tolerance = new Tolerance(10.0);
 
             var rescorer = new MsAlignRescorer(specFilePath, msAlignResultPath, outputPath, tolerance, 0.7, 1, 15);
@@ -390,6 +519,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIcRescoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             //const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re.icdresult";
             //const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re_Rescored.icdresult";
@@ -397,6 +529,19 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.ictresult";
             const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.ictresult";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(icResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, icResultPath);
+                return;
+            }
+
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);

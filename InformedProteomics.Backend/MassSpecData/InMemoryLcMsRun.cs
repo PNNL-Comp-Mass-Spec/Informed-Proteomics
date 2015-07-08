@@ -9,10 +9,33 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class InMemoryLcMsRun : LcMsRun //LcMsRun 
     {
+        private struct SpectrumTrackingInfo
+        {
+            public int NumSpectra;
+            public double PrecursorSignalToNoiseRatioThreshold;
+            public double ProductSignalToNoiseRatioThreshold;
+
+            public int MinScanNum;
+            public int MaxScanNum;
+            public int MinMsLevel;
+            public int MaxMsLevel;
+            public int SpecRead;
+        }
+
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0, progress);
+        }
+
+        public static LcMsRun GetLcMsRunScanRange(string specFilePath, int singleScanNum)
+        {
+            return GetLcMsRun(specFilePath, singleScanNum, singleScanNum);
+        }
+
+        public static LcMsRun GetLcMsRunScanRange(string specFilePath, int scanStart, int scanEnd, IProgress<ProgressData> progress = null)
+        {
+            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0.0, 0.0, progress, scanStart, scanEnd);
         }
 
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
@@ -21,8 +44,12 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, double precursorSignalToNoiseRatioThreshold,
-            double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
+        public static LcMsRun GetLcMsRun(
+            string specFilePath, 
+            MassSpecDataType dataType, 
+            double precursorSignalToNoiseRatioThreshold,
+            double productSignalToNoiseRatioThreshold, 
+            IProgress<ProgressData> progress = null)
         {
             //var pbfFilePath = ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
             //    productSignalToNoiseRatioThreshold, null, progress);
@@ -32,20 +59,40 @@ namespace InformedProteomics.Backend.MassSpecData
                 productSignalToNoiseRatioThreshold, progress);
         }
 
-        public static LcMsRun GetLcMsRun(string specFilePath, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
+        public static LcMsRun GetLcMsRun(
+            string specFilePath, 
+            double precursorSignalToNoiseRatioThreshold, 
+            double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold,
                 productSignalToNoiseRatioThreshold, progress);
         }
 
-        public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
+        public static LcMsRun GetLcMsRun(
+            string specFilePath, 
+            IMassSpecDataReader specReader,
+            double precursorSignalToNoiseRatioThreshold, 
+            double productSignalToNoiseRatioThreshold, 
+            IProgress<ProgressData> progress = null,            
+            int scanStart = 0,
+            int scanEnd = 0)
         {
-            var pbfFilePath = ConvertToPbf(specFilePath, specReader, precursorSignalToNoiseRatioThreshold,
-                productSignalToNoiseRatioThreshold, null, progress);
+            var pbfFilePath = ConvertToPbf(
+                specFilePath, 
+                specReader, 
+                precursorSignalToNoiseRatioThreshold,
+                productSignalToNoiseRatioThreshold, 
+                null, 
+                progress);
 
-            return new InMemoryLcMsRun(new PbfLcMsRun(pbfFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
+            return new InMemoryLcMsRun(
+                new PbfLcMsRun(pbfFilePath), 
+                precursorSignalToNoiseRatioThreshold, 
+                productSignalToNoiseRatioThreshold, 
+                progress,
+                scanStart,
+                scanEnd);
         }
 
         public static string ConvertToPbf(string specFilePath, double precursorSignalToNoiseRatioThreshold,
@@ -131,8 +178,14 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return pbfPath;
         }
-
-        public InMemoryLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
+      
+        public InMemoryLcMsRun(
+            IMassSpecDataReader massSpecDataReader, 
+            double precursorSignalToNoiseRatioThreshold, 
+            double productSignalToNoiseRatioThreshold,            
+            IProgress<ProgressData> progress = null,
+            int scanStart = 0,
+            int scanEnd = 0)
         {
             ScanNumElutionTimeMap = new Dictionary<int, double>();
             ScanNumToMsLevel = new Dictionary<int, int>();
@@ -144,76 +197,47 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
 
             // Read all spectra
-            var minScanNum = int.MaxValue;
-            var maxScanNum = int.MinValue;
-            var minMsLevel = int.MaxValue;
-            var maxMsLevel = int.MinValue;
 
             if (progress == null)
             {
                 progress = new Progress<ProgressData>();
             }
-            var progressData = new ProgressData();
-            progressData.Status = "Reading spectra from file";
+            var progressData = new ProgressData
+            {
+                Status = "Reading spectra from file"
+            };
 
-            NumSpectra = massSpecDataReader.NumSpectra;
-            int specRead = 0;
+            var trackingInfo = new SpectrumTrackingInfo
+            {
+                NumSpectra = massSpecDataReader.NumSpectra,
+                PrecursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold,
+                ProductSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold,
+                SpecRead = 0,
+                MinScanNum = int.MaxValue,
+                MaxScanNum = int.MinValue,
+                MinMsLevel = int.MaxValue,
+                MaxMsLevel = int.MinValue
+            };
+
             progressData.IsPartialRange = true;
             progressData.MaxPercentage = 95.0;
 
-            foreach (var spec in massSpecDataReader.ReadAllSpectra())
+            if (scanStart > 0 && scanEnd >= scanStart)
             {
-                progress.Report(progressData.UpdatePercent((double)specRead / NumSpectra * 100.0));
-                specRead++;
-                //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
-                ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;
-                ScanNumElutionTimeMap[spec.ScanNum] = spec.ElutionTime;
-                if (spec.MsLevel == 1)
+                for (var scanNum = scanStart; scanNum <= scanEnd; scanNum++)
                 {
-                    if (precursorSignalToNoiseRatioThreshold > 0.0)
-                        spec.FilterNoise(precursorSignalToNoiseRatioThreshold);
-
-                    //foreach (var peak in spec.Peaks)
-                    //{
-                    //    _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
-                    //}
-                    _ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
-                    _scanNumSpecMap.Add(spec.ScanNum, spec);
+                    var spec = massSpecDataReader.ReadMassSpectrum(scanNum);
+                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec, progress, progressData);
                 }
-                else if (spec.MsLevel == 2)
-                {
-                    var productSpec = spec as ProductSpectrum;
-
-                    if (productSpec != null)
-                    {
-                        if (productSignalToNoiseRatioThreshold > 0.0)
-                            productSpec.FilterNoise(productSignalToNoiseRatioThreshold);
-
-                        var isolationWindow = productSpec.IsolationWindow;
-                        var minBinNum = (int)Math.Round(isolationWindow.MinMz * IsolationWindowBinningFactor);
-                        var maxBinNum = (int)Math.Round(isolationWindow.MaxMz * IsolationWindowBinningFactor);
-                        for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
-                        {
-                            List<int> scanNumList;
-                            if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
-                            {
-                                scanNumList = new List<int>();
-                                isolationMzBinToScanNums[binNum] = scanNumList;
-                            }
-                            scanNumList.Add(productSpec.ScanNum);
-                        }
-                        _scanNumSpecMap.Add(spec.ScanNum, productSpec);
-                    }
-                }
-
-                if (spec.ScanNum < minScanNum) minScanNum = spec.ScanNum;
-                if (spec.ScanNum > maxScanNum) maxScanNum = spec.ScanNum;
-
-                if (spec.MsLevel < minMsLevel) minMsLevel = spec.MsLevel;
-                if (spec.MsLevel > maxMsLevel) maxMsLevel = spec.MsLevel;
-
             }
-
+            else
+            {
+                foreach (var spec in massSpecDataReader.ReadAllSpectra())
+                {
+                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec, progress, progressData);
+                }
+            }
+                        
             progressData.Status = "Processing Isolation Bins";
             progressData.IsPartialRange = false;
             progress.Report(progressData.UpdatePercent(95.1));
@@ -232,11 +256,11 @@ namespace InformedProteomics.Backend.MassSpecData
             progress.Report(progressData.UpdatePercent(99.5));
             // Read MS levels and precursor information
 
-            MinLcScan = minScanNum;
-            MaxLcScan = maxScanNum;
+            MinLcScan = trackingInfo.MinScanNum;
+            MaxLcScan = trackingInfo.MaxScanNum;
 
-            MinMsLevel = minMsLevel;
-            MaxMsLevel = maxMsLevel;
+            MinMsLevel = trackingInfo.MinMsLevel;
+            MaxMsLevel = trackingInfo.MaxMsLevel;
 
             //var precursorMap = new Dictionary<int, int>();
             //var nextScanMap = new Dictionary<int, int>();
@@ -250,6 +274,64 @@ namespace InformedProteomics.Backend.MassSpecData
 
             progress.Report(progressData.UpdatePercent(100.0));
             CreatePrecursorNextScanMap();
+        }
+
+        private void HandleSpectrum(
+            ref SpectrumTrackingInfo trackingInfo,
+            Dictionary<int, List<int>> isolationMzBinToScanNums,
+            Spectrum spec, 
+            IProgress<ProgressData> progress, 
+            ProgressData progressData)
+        {
+            progress.Report(progressData.UpdatePercent(trackingInfo.SpecRead / (double)trackingInfo.NumSpectra * 100.0));
+            trackingInfo.SpecRead += 1;
+
+            //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
+            ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;
+            ScanNumElutionTimeMap[spec.ScanNum] = spec.ElutionTime;
+            if (spec.MsLevel == 1)
+            {
+                if (trackingInfo.PrecursorSignalToNoiseRatioThreshold > 0.0)
+                    spec.FilterNoise(trackingInfo.PrecursorSignalToNoiseRatioThreshold);
+
+                //foreach (var peak in spec.Peaks)
+                //{
+                //    _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
+                //}
+                _ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
+                _scanNumSpecMap.Add(spec.ScanNum, spec);
+            }
+            else if (spec.MsLevel == 2)
+            {
+                var productSpec = spec as ProductSpectrum;
+
+                if (productSpec != null)
+                {
+                    if (trackingInfo.ProductSignalToNoiseRatioThreshold > 0.0)
+                        productSpec.FilterNoise(trackingInfo.ProductSignalToNoiseRatioThreshold);
+
+                    var isolationWindow = productSpec.IsolationWindow;
+                    var minBinNum = (int)Math.Round(isolationWindow.MinMz * IsolationWindowBinningFactor);
+                    var maxBinNum = (int)Math.Round(isolationWindow.MaxMz * IsolationWindowBinningFactor);
+                    for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
+                    {
+                        List<int> scanNumList;
+                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                        {
+                            scanNumList = new List<int>();
+                            isolationMzBinToScanNums[binNum] = scanNumList;
+                        }
+                        scanNumList.Add(productSpec.ScanNum);
+                    }
+                    _scanNumSpecMap.Add(spec.ScanNum, productSpec);
+                }
+            }
+
+            if (spec.ScanNum < trackingInfo.MinScanNum) trackingInfo.MinScanNum = spec.ScanNum;
+            if (spec.ScanNum > trackingInfo.MaxScanNum) trackingInfo.MaxScanNum = spec.ScanNum;
+
+            if (spec.MsLevel < trackingInfo.MinMsLevel) trackingInfo.MinMsLevel = spec.MsLevel;
+            if (spec.MsLevel > trackingInfo.MaxMsLevel) trackingInfo.MaxMsLevel = spec.MsLevel;
         }
 
         public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }

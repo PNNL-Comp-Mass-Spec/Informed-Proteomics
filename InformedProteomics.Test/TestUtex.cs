@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 using System.Text;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Quantification;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.TopDown.Execution;
-using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -22,10 +15,27 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTagAlignedFeatures()
         {
-            var mspDir = @"D:\MassSpecFiles\UTEX\MSP";
-            var outFile = @"D:\MassSpecFiles\UTEX\aligned_features.tsv";
-            var resultFile = @"D:\MassSpecFiles\UTEX\aligned_ids.tsv";
-            var dataset = GetDataList();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
+            var mspDir = @"\\protoapps\UserData\Sangtae\TestData\Output\MSP";
+            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
+            var resultFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_ids.tsv";
+
+            if (!Directory.Exists(featureDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                return;
+            }
+
+            if (!Directory.Exists(mspDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, mspDir);
+                return;
+            }
+
+            var dataset = GetDataList(featureDir);
 
             var tsvParser = new TsvFileParser(outFile);
             var massList = new List<double>();
@@ -118,9 +128,8 @@ namespace InformedProteomics.Test
         }
 
 
-        private List<string> GetDataList()
-        {
-            var featureDir = @"D:\MassSpecFiles\UTEX";
+        private List<string> GetDataList(string featureDir)
+        {            
             var fileEntries = Directory.GetFiles(featureDir);
             var dataset = new List<string>();
             foreach (string fileName in fileEntries)
@@ -137,13 +146,26 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFeatureAlign()
         {
-            var featureDir = @"D:\MassSpecFiles\UTEX";
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
             var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            var outFile = @"D:\MassSpecFiles\UTEX\aligned_features.tsv";
+            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
 
-            var fileEntries = Directory.GetFiles(featureDir);
+            if (!Directory.Exists(featureDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                return;
+            }
 
-            var dataset = GetDataList();
+            if (!Directory.Exists(rawDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, rawDir);
+                return;
+            }
+
+            var dataset = GetDataList(featureDir);
             
             var minDatasetIndex = 0;
             var maxDatasetIndex = dataset.Count - 1;
@@ -155,6 +177,18 @@ namespace InformedProteomics.Test
             {
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawDir, dataset[i]);
                 var ms1File = string.Format(@"{0}\{1}.ms1ft", featureDir, dataset[i]);
+
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1File))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", ms1File);
+                    continue;
+                }
 
                 rawFiles.Add(rawFile);
                 ms1ftFiles.Add(ms1File);
@@ -215,10 +249,19 @@ namespace InformedProteomics.Test
         [Test]
         public void CopyUTEX()
         {
-            var featureDir = @"D:\MassSpecFiles\UTEX";
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
             var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            var outFile = @"D:\MassSpecFiles\UTEX\aligned_features.tsv";
+            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
             var dmsDir = @"\\proto-4\VOrbiETD02\2015_2";
+
+            if (!Directory.Exists(featureDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                return;
+            }
 
             var fileEntries = Directory.GetFiles(featureDir);
 

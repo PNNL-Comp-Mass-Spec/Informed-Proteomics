@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -14,6 +16,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSequenceTag()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //const string TestRawFile = @"D:\\Vlad_TopDown\\raw\\yufeng_column_test2.raw";
             //const string TestResultFile = @"D:\\Vlad_TopDown\\results\\yufeng_column_test2_IcTda.tsv";
             //const string TestRawFile = @"D:\MassSpecFiles\training\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
@@ -21,7 +26,19 @@ namespace InformedProteomics.Test
 
             const string TestRawFile = @"D:\MassSpecFiles\Lewy\Lewy_intact_01.raw";
             const string TestResultFile = @"D:\MassSpecFiles\Lewy\Lewy_intact_01_IcTda.tsv";
-            
+
+            if (!File.Exists(TestRawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFile);
+                return;
+            }
+
+            if (!File.Exists(TestResultFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestResultFile);
+                return;
+            }
+
             //const int MaxTags = 100000;
             var tsvParser = new TsvFileParser(TestResultFile);
             var headerList = tsvParser.GetHeaders();
@@ -82,8 +99,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSequenceTagGlycoData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFile = @"D:\MassSpecFiles\Glyco\User_sample_test_02252015.raw";
 
+            if (!File.Exists(rawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
+                return;
+            }
 
             //var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 0, 0);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -20,7 +21,16 @@ namespace InformedProteomics.Test
         [Test]
         public void RemovePepFdrFromFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
+            if (!Directory.Exists(henryResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
+                return;
+            }
+
             foreach (var resultFile in Directory.GetFiles(henryResultPath, "*_FDR.tsv"))
             {
                 var fileName = Path.GetFileName(resultFile);
@@ -43,10 +53,19 @@ namespace InformedProteomics.Test
         [Test]
         public void CreatePeptideAbundanceTableWithSkyline()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Reading Henry's results
             var pepKeySet = new HashSet<string>();
             var resultDic = new Dictionary<string, Tuple<double, double>>();
             const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
+            if (!Directory.Exists(henryResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
+                return;
+            }
+
             var aaSet = new AminoAcidSet();
             foreach (var resultFile in Directory.GetFiles(henryResultPath, "*.tsv"))
             {
@@ -82,6 +101,12 @@ namespace InformedProteomics.Test
             }
 
             const string skylineFilePath = @"H:\Research\IPRG2015\MySkyline\TransitionResults.csv";
+            if (!File.Exists(skylineFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, skylineFilePath);
+                return;
+            }
+
             var skylineTable = new TsvFileParser(skylineFilePath, ',');
 
             const string outputFilePath = @"H:\Research\IPRG2015\MySkyline\SkylineTransitionResultsWithScores3.tsv";
@@ -156,7 +181,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPathUtils()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             Console.WriteLine(MassSpecDataReaderFactory.RemoveExtension(rawFilePath) + "_Target.tsv");
             Console.WriteLine(Path.GetDirectoryName(rawFilePath));
             Console.WriteLine(Path.GetDirectoryName(rawFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFilePath)+"_IcTarget.tsv");

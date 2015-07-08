@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -24,7 +25,17 @@ namespace InformedProteomics.Test
         [Test]
         public void AddMostAbundantIsotopePeakIntensity()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw";
+
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const string resultFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv";
@@ -73,6 +84,9 @@ namespace InformedProteomics.Test
         [Test]
         public void Test43KProtein()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -110,6 +124,11 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 //            var aaSet = new AminoAcidSet();
 
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath);
             const string protSequence =
@@ -170,6 +189,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestDeconvolution()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             const int minScanNum = 46454;   // 635.43
             const int maxScanNum = 46661;   // 638.90
 
@@ -186,6 +214,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSumMs1Spectra()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             const int minScanNum = 46454;
             const int maxScanNum = 46661;
 
@@ -198,6 +235,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestRunningTimeSummingSpectra()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 1.4826, 1.4826) as PbfLcMsRun;
 
             var sw = new Stopwatch();
@@ -218,6 +264,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
 
             //var spec = run.GetSpectrum(46452); // 635.37
@@ -255,6 +310,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSmartIsoWindowSumming()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             const string protSequence =
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             const string annotation = "_." + protSequence + "._";
@@ -277,15 +341,20 @@ namespace InformedProteomics.Test
             Console.WriteLine("Corr: " + summedSpec.GetCorrScore(ion, tolerance));
         }
 
-        [Test]
         public void TestCorrelation()
         {
-            
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            Console.WriteLine(@"Test not implemented: " + methodName);
         }
 
         [Test]
         public void GetIsoProfile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string protSequence =
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             const string annotation = "_." + protSequence + "._";
@@ -312,6 +381,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGetNumBins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var comparer = new MzComparerWithBinning(26);
             const double minMz = 5000.0; // 600.0
             const double maxMz = 10000.0;    // 2000.0
@@ -323,6 +395,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneringAllXics()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
             Assert.True(run != null);
@@ -357,6 +438,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingXicsOfAllCharges()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             var comparer = new MzComparerWithBinning(27);
@@ -391,6 +481,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGettingXicVector()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestRawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                return;
+            }
+
             var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             var run2 = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             Assert.True(run1 != null && run2 != null);
@@ -423,7 +522,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAbpSumMs1Spectra()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + specFilePath);
+                return;
+            }
 
             const int minScanNum = 5657;
             const int maxScanNum = 5699;
@@ -440,6 +548,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsoProfile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string sequence = "MWYMISAQDVENSLEKRLAARPAHLARLQELADEGRLLVAGPHPAIDSENPGDAGFSGSLVVADFDSLATAQAWADADPYFAAGVYQSVVVKPFKRVLP";
             var aaSet = new AminoAcidSet();
             var comp = aaSet.GetComposition(sequence) + Composition.H2O;
@@ -453,7 +564,17 @@ namespace InformedProteomics.Test
         [Test]
         public void TestSumMs2Spectra()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\NewQC_LongSep_29Sep14_141001104925.raw";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + specFilePath);
+                return;
+            }
+
             const int minScanNum = 1289;
             const int maxScanNum = 1389;
             const int minCharge = 6;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -15,7 +16,16 @@ namespace InformedProteomics.Test
         [Test]
         public void SummarizeAnilResults()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFolder = @"H:\Research\Anil\Oct28";
+            if (!Directory.Exists(resultFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultFolder);
+                return;
+            }
+
             var actMethods = new[] { ActivationMethod.CID, ActivationMethod.ETD, ActivationMethod.HCD };
 
             Console.WriteLine("Data\tCID\t\tETD\t\tHCD\t");
@@ -64,13 +74,34 @@ namespace InformedProteomics.Test
         [Test]
         public void CountIdentifiedPeptides()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //const string targetResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcTarget.tsv";
             //const string decoyResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcDecoy.tsv";
             //const string path = @"H:\Research\Jarret\10mz\0amol\Q_2014_0523_10_0_amol_uL_10mz";
             const string path = @"H:\Research\Jarret\20mz\NTT2\Q_2014_0523_12_0_amol_uL_20mz";
+            if (!File.Exists(path))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, path);
+                return;
+            }
+
             //const string path = @"H:\Research\Jarret\DDA\NoMod_NTT2\Q_2014_0523_1_0_amol_uL_DDA";
             const string targetResultPath = path + "_IcTarget.tsv";
             const string decoyResultPath = path + "_IcDecoy.tsv";
+
+            if (!File.Exists(targetResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, targetResultPath);
+                return;
+            }
+
+            if (!File.Exists(decoyResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, decoyResultPath);
+                return;
+            }
 
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);         
             if (fdrCalculator.HasError())
@@ -86,6 +117,9 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateVennDiagrams()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // DIA
             const string dir = @"H:\Research\DDAPlus\NTT2";
 
@@ -96,6 +130,18 @@ namespace InformedProteomics.Test
 
             const string resultPath1 = ddaPlus1;
             const string resultPath2 = ddaPlus2;
+
+            if (!File.Exists(resultPath1))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath1);
+                return;
+            }
+
+            if (!File.Exists(resultPath2))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath2);
+                return;
+            }
 
             var result1 = new TsvFileParser(resultPath1);
             var result2 = new TsvFileParser(resultPath2);
@@ -113,7 +159,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIcrTools()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string icrToolsPath = @"H:\Research\Yufeng\TopDownYufeng\ICRTools\yufeng_column_test2_Isos.csv";
+            if (!File.Exists(icrToolsPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, icrToolsPath);
+                return;
+            }
+
             const double fitScoreThreshold = 0.15;
             var icrToolsparser = new TsvFileParser(icrToolsPath, ',');
             var monoMassArr = icrToolsparser.GetData("monoisotopic_mw").Select(Convert.ToDouble).ToArray();
@@ -127,6 +182,12 @@ namespace InformedProteomics.Test
             const double scanTolerance = 10.0;
 
             const string resultFilePath = @"H:\Research\Yufeng\TopDownYufeng\M1_V31\yufeng_column_test2_IcTda.tsv";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
             var parser = new TsvFileParser(resultFilePath);
             var qValues = parser.GetData("QValue").Select(Convert.ToDouble).ToArray();
             var masses = parser.GetData("Mass").Select(Convert.ToDouble).ToArray();

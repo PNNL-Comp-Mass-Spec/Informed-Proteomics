@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
@@ -82,6 +83,15 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void IonPresent()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(RawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, RawFile);
+                return;
+            }
+
             var spectrumMatchList = InitTest();
 
             var ionProbabilityTable = new Dictionary<IonType, Probability<IonType>>[MaxPrecCharge];
@@ -188,6 +198,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
         private const string IonProbabilityFileName =
             @"C:\Users\wilk011\Documents\DataFiles\TestFolder\IonProbabilities_CID_LowRes_Tryp";
+
         private IEnumerable<SpectrumMatch> InitTest()
         {
             var ionTypeFactory = new IonTypeFactory(_baseIons, _neutralLosses, MaxCharge);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
 using ThermoRawFileReaderDLL.FinniganFileIO;
@@ -16,6 +17,11 @@ namespace InformedProteomics.Backend.MassSpecData
             _cachedScanInfo = new ThermoRawFileReaderDLL.clsScanInfo(-1);
 
             _msfileReader = new ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO();
+
+            var dataFile = new FileInfo(filePath);
+            if (!dataFile.Exists)
+                throw new FileNotFoundException("Thermo .raw file not found: " + filePath, dataFile.FullName);
+
             _msfileReader.OpenRawFile(filePath);
 
             _minLcScan = 1;

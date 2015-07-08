@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -21,22 +22,51 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestUtils
     {
+        public static void ShowEnding(string methodName)
+        {
+            ShowMessage(methodName, "Ending");
+        }
+
+        public static void ShowStarting(string methodName)
+        {
+            ShowMessage(methodName, "Starting");
+        }
+
+        private static void ShowMessage(string methodName, string message)
+        {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + @", {0}, {1}", message, methodName);
+        }
+
         [Test]
         public void TestCountingMs2Scans()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var numSpectra = 0;
             const string rawFileDir = @"H:\Research\TopDownTestData";
+
+            if (!Directory.Exists(rawFileDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since folder not found: " + rawFileDir);
+                return;
+            }
+
             foreach (var rawFilePath in Directory.GetFiles(rawFileDir, "*.raw"))
             {
                 var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
                 numSpectra += run.GetScanNumbers(2).Count;
             }
             Console.WriteLine(numSpectra);
+
         }
 
         [Test]
         public void TestFloatBinning()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const double minMass = 200;
             const double maxMass = 50000;
             const int numBits = 29;
@@ -50,10 +80,13 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingNtoKCombinationsWithRepetition()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const int n = 3;
             const int k = 4;
             var combinations = SimpleMath.GetNtoTheKCombinations(n, k);
-            int count = 0;
+            var count = 0;
             foreach (var combination in combinations)
             {
                 ++count;
@@ -66,6 +99,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGeneratingCombinations()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const int n = 5;
             const int k = 3;
             var combinations = SimpleMath.GetCombinationsWithRepetition(n, k);
@@ -84,6 +120,9 @@ namespace InformedProteomics.Test
         [Test]
         public void ParseMsGfString()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string msgfPepStr = "+229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163";
             var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(msgfPepStr);
             var ion = new Ion(sequence.Composition + Composition.H2O, 4);
@@ -96,6 +135,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFormatting()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             Console.WriteLine("{0:N3}", Modification.Tmt6Plex.Composition.Mass);
             Console.WriteLine(Modification.GetFromMass("229.163")[0].Name);
         }
@@ -103,6 +145,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAveragine()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const double monoMass = 10247.5293287335;
             const int charge = 14;
             var profile = Averagine.GetTheoreticalIsotopeProfile(monoMass, charge);
@@ -115,6 +160,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAaSet()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //var oxEverywhere = new SearchModification(Modification.Oxidation, '*', SequenceLocation.Everywhere, true);
             //var acetylNTerm = new SearchModification(Modification.Acetylation, '*', SequenceLocation.PeptideNTerm,
             //    false);
@@ -150,6 +198,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptide()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //const string sequence = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
             const string sequence = "IRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
             //const string sequence = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
@@ -181,6 +232,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsoProfile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var composition = Composition.Parse("C(82) H(149) N(23) O(24) S(3)");
             const int charge = 3;
             var ion = new Ion(composition, charge);
@@ -194,6 +248,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestGetProductIons()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             var sequence = new Sequence("CCAADDKEACFAVEGPK", aaSet);
 
@@ -217,7 +274,10 @@ namespace InformedProteomics.Test
 
         [Test]
         public void TestSequenceGraph()
-        { 
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var phosPhoS = new SearchModification(Modification.Phosphorylation, 'S', SequenceLocation.Everywhere, false);
             var phosPhoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
             var phosPhoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
@@ -257,6 +317,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestModificationParams()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var modifications = new[] { Modification.Acetylation, Modification.Phosphorylation, Modification.Oxidation}; //, Modification.PyroGluQ };
             var modParams = new ModificationParams(modifications, 3);
             int numCombinations = modParams.NumModificationCombinations;
@@ -273,6 +336,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestCSharpSyntax()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //const string path = @"C:\cygwin\home\kims336\Developments\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
             //Console.WriteLine(Path.GetFileName(path));
             //Console.WriteLine(Path.GetFileNameWithoutExtension(path));
@@ -290,6 +356,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIonTypeGeneration()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var ionTypeFactory = new IonTypeFactory();
             int index = 0;
             foreach (var ionType in ionTypeFactory.GetAllKnownIonTypes())
@@ -303,6 +372,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsotopomerProfile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
             const string molFormula = "C83H136N22O24S1"; 
 //            const string molFormula = "C4195H6470N1164O1213S34";
@@ -326,6 +398,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //C78H120N22O28S3 C150H120N220O28S30
             //var additionalElements = new[]
             //    {
@@ -351,8 +426,17 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTimeToComputeIsotopomerProfiles()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt";
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             int numPeptides = 0;
             var sw = new System.Diagnostics.Stopwatch();
@@ -378,6 +462,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestReadingPnnlOmicsXmlFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
             var xdocument = XDocument.Load(xmlFileName);
             var parameterBaseElement = xdocument.Element("parameters");
@@ -404,6 +491,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIndexSorting()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var isotopes = new[] {0.8, 0.9, 0.6, 0.3};
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
@@ -418,6 +508,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestEnum()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const ActivationMethod activation = ActivationMethod.ETD;
             const byte code = (byte) activation;
             Console.WriteLine((byte)activation);
@@ -428,12 +521,18 @@ namespace InformedProteomics.Test
         [Test]
         public void TestOverflow()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             Console.WriteLine("{0}", Math.Exp(13021));
         }
 
         [Test]
         public void TestRegEx()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
             //const char delimiter = (char)FastaDatabase.Delimiter;
             //Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
@@ -448,6 +547,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestParsingComposition()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string compositionStr = "H(230) C(136) N(40) O(46) S 13C(6) 15N(2)";
             var composition = Composition.Parse(compositionStr);
             Console.WriteLine("{0}\t{1}", composition, composition.Mass);
@@ -456,6 +558,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIonTypeFactory()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string sequenceStr = "PEPTIDE";
             var aminoAcidSet = new AminoAcidSet();
             var sequence = new Sequence(sequenceStr, aminoAcidSet);
@@ -477,6 +582,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestDeconvolutedIonTypes()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var comp1 = Composition.H2O;
             var comp2 = new CompositionWithDeltaMass(-1);
             Console.WriteLine(comp1 + comp2);
@@ -492,6 +600,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestLinq()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var intArr = new List<double> {4.0, 1.0, 2.0, 6.0};
             Console.WriteLine(intArr.Median());
         }
@@ -499,6 +610,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestRegularExpressions()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string str = "C2HBr365Ag2";
             var matches = Regex.Matches(str, @"[A-Z][a-z]?\d*");
             foreach (var match in matches)
@@ -518,21 +632,41 @@ namespace InformedProteomics.Test
         [Test]
         public void TestNumIsoWindows()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";   // DDA
             const string specFilePath = @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw"; // DIA
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
             Console.WriteLine("NumIsoWindows: " + run.GetNumUniqueIsoWindows());
             Console.WriteLine("MinWidth: " + run.GetMinIsolationWindowWidth());
         }
 
+        [Test]
         [TestCase("EAQADAAAEIAEDAAEAEDAGKPK", @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw", 54407)]
         [TestCase("KYETIDSLQIDDLMNRREVRQPADWQADENGSNDKGNGKGEPAVKVDEVVKSAPAEAELKDADESPVK",
                   @"\\protoapps\UserData\Wilkins\TopDown\Anil\QC_Shew_IntactProtein_new_CID-30CE-4Sep14_Bane_C2Column_3.raw", 2755)]
         public void TestPpmErrorCalculation(string seqText, string rawFilePath, int scanNum)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
             const int maxCharge = 15;
             const double relIntThres = 0.1;
+
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
 
             // init
             var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(seqText);
@@ -562,6 +696,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestUpdateModificationComposition()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string modName1 = "mod1";
             var composition1 = new Composition(0, 1, 0, 2, 0, 0);
             var mod = Modification.RegisterAndGetModification(modName1, composition1);
@@ -585,6 +722,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestUpdateModificationMass()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            ShowStarting(methodName);
+
             const string modName1 = "mod1";
             const int mass1 = 1000;
             var mod = Modification.RegisterAndGetModification(modName1, mass1);

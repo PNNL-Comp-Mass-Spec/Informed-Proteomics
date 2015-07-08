@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -20,7 +21,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestClusterCentricSearch()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string pfResultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            if (!File.Exists(pfResultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pfResultFilePath);
+                return;
+            }
+
             var tsvReader = new TsvFileParser(pfResultFilePath);
 
             var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
@@ -52,9 +62,22 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsosFilter()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";
+            if (!File.Exists(isosFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, isosFilePath);
+                return;
+            }
 
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
             var filter = new IsosFilter(run, new Tolerance(10), isosFilePath);
@@ -64,9 +87,18 @@ namespace InformedProteomics.Test
         [Test]
         public void FilteringEfficiencyQcShew()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -109,6 +141,12 @@ namespace InformedProteomics.Test
             //Console.WriteLine("************ScanNums: " + string.Join("\t", ms1Filter.GetMatchingMs2ScanNums(protMass)));
 
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
             var tsvReader = new TsvFileParser(resultFilePath);
             var scanNums = tsvReader.GetData("Scan(s)");
             var charges = tsvReader.GetData("Charge");
@@ -180,9 +218,18 @@ namespace InformedProteomics.Test
         [Test]
         public void FilteringEfficiency()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
             var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
@@ -228,6 +275,12 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sec);
 
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_4PTMs.icresult";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
             var tsvReader = new TsvFileParser(resultFilePath);
             var compositions = tsvReader.GetData("Composition");
             var scanNums = tsvReader.GetData("ScanNum");
@@ -328,6 +381,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFloatingPointRounding()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int numShifts = 36;
             const double value = 7655.9568537625;
             var converted = BitConverter.DoubleToInt64Bits(value);
@@ -343,8 +399,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPossibleSequenceMasses()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
@@ -369,11 +433,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMs1Filtering()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFilePath =
             //    @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.tsv";
                 @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.decoy.icresult";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
                 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
             //const int minPrecursorCharge = 3;
@@ -460,7 +538,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMs2Caching()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
 
             const int minPrecursorIonCharge = 3; // 3
@@ -481,6 +568,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAveragine()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //for (var nominalMass = 1000; nominalMass <= 1000; nominalMass++)
             //{
             //    Console.WriteLine("{0}\t{1}", nominalMass,
@@ -495,9 +585,23 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMs1Signature()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
 
             const string resultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30";
+            if (!File.Exists(resultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
+                return;
+            }
+
             foreach (var resultFilePath in Directory.GetFiles(resultPath, "*.tsv"))
             {
                 Console.WriteLine(resultFilePath);
@@ -514,6 +618,7 @@ namespace InformedProteomics.Test
 
 //            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
+
             //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownJia\database\TargetProteins.fasta";
             var db = new FastaDatabase(dbFile);
             db.Read();

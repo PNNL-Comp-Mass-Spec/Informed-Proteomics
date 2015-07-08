@@ -1,0 +1,12 @@
+# This file is used to specify modifications for MSPathFinder
+
+# Max Number of Modifications per peptide
+NumMods=4
+
+# Static mods
+# None
+
+# Dynamic mods
+O1,M,opt,any,Oxidation     # Oxidation M
+H-1,C,opt,any,Dehydro     # Dehydro C
+C2H2O,*,opt,Prot-N-term,Acetyl     # Acetylation Protein N-term (C2H2O can be replaced with "H(2) C(2) O")

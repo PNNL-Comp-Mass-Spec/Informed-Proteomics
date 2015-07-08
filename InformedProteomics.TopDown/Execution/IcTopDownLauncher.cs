@@ -255,10 +255,11 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
             {
                 // Decoy database
-                sw.Reset();
-                Console.Write(@"Reading the decoy database...");
+                sw.Reset();                
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
+
+                Console.Write(@"Reading the decoy database...");
                 decoyDb.Read();
 
                 Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);

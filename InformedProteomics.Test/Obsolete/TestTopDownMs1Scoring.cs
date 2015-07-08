@@ -16,6 +16,7 @@ namespace InformedProteomics.Test.Obsolete
     [TestFixture]
     internal class TestTopDownMs1Scoring
     {
+        [Ignore]
         [Test]
         public void TestTopDownScoringForAllXics()
         {
@@ -122,6 +123,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
         }
 
+        [Ignore]
         [Test]
         public void TestMsAlignPlusResults()
         {
@@ -183,7 +185,8 @@ namespace InformedProteomics.Test.Obsolete
             writer.Close();
             reader.Close();
         }
-        
+
+        [Ignore]
         [Test]
         public void TestTopDownScoring()
         {

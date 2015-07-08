@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
@@ -16,8 +17,23 @@ namespace InformedProteomics.Test
         [Test]
         public void DebugLcMsMatrix()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.pbf";
-            var ms1ftFile = @"D:\MassSpecFiles\UTEX\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.ms1ft.bak";
+            var ms1ftFile = @"\\protoapps\UserData\Sangtae\TestData\Output\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.ms1ft.bak";
+
+            if (!File.Exists(rawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
+                return;
+            }
+
+            if (!File.Exists(ms1ftFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, ms1ftFile);
+                return;
+            }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
             //Directory.GetDirectories(@"\\proto-4\VOrbiETD02\2015_2")
@@ -49,8 +65,18 @@ namespace InformedProteomics.Test
         [Test]
         public void TestLcMsFeatureFinder()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
+            if (!File.Exists(rawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
+                return;
+            }
+
+            // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
+
             var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood(scoreDataPath);
 
@@ -133,8 +159,18 @@ namespace InformedProteomics.Test
         [Test]
         public void TestCollectTrainingSet()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string idFileFolder = @"D:\MassSpecFiles\training\IcTda";
             const string outFileFolder = @"D:\MassSpecFiles\training\refined_set";
+
+            if (!Directory.Exists(idFileFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                return;
+            }
+
             var rawFileLists = new string[]
             {
                 @"D:\MassSpecFiles\SBEP\SBEP_STM_001_02222012_Aragon.pbf",
@@ -157,7 +193,15 @@ namespace InformedProteomics.Test
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
 
                 Console.WriteLine(dataset);
+
+                if (!File.Exists(idFile))
+                {
+                    Console.WriteLine(@"Skipping file since not found: " + idFile);
+                    continue;
+                }
+
                 Console.WriteLine(idFile);
+
                 var targetSets = LcMsFeatureTrain.CollectTrainSet(dataset, idFile, 0.005);
                 Console.WriteLine(targetSets.Count);
                 var outFileName = string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset));
@@ -242,9 +286,24 @@ namespace InformedProteomics.Test
         [Test]
         public void TestLcMsFeatureLikelihood()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string folder = @"D:\MassSpecFiles\training";
+            if (!Directory.Exists(folder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, folder);
+                return;
+            }
+
             var likelihood = new LcMsFeatureLikelihood(folder);
             const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
+            if (!Directory.Exists(idFileFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                return;
+            }
+
             var rawFileLists = new string[]
             {
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",
@@ -256,6 +315,18 @@ namespace InformedProteomics.Test
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var featureList = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
                 var featureResult = string.Format(@"{0}\{1}.score.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
+
+                if (!File.Exists(featureList))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", featureList);
+                    continue;
+                }
+
+                if (!File.Exists(featureResult))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", featureResult);
+                    continue;
+                }
 
                 var writer = new StreamWriter(featureResult);
 
@@ -393,7 +464,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFeatureFindingWithAccurateMass()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
+            if (!Directory.Exists(idFileFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                return;
+            }
+
             var rawFileLists = new string[]
             {
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",                
@@ -414,6 +494,12 @@ namespace InformedProteomics.Test
 
             foreach (var dataset in rawFileLists)
             {
+                if (!File.Exists(dataset))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", dataset);
+                    continue;
+                }
+
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var featureList = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
                 var featureResult = string.Format(@"{0}\{1}.feature.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
@@ -494,7 +580,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestFeatureFindingWithMassBinning()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
+            if (!Directory.Exists(idFileFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                return;
+            }
+
             var rawFileLists = new string[]
             {
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",
@@ -515,6 +610,12 @@ namespace InformedProteomics.Test
             var id = 1;
             foreach (var dataset in rawFileLists)
             {
+                if (!File.Exists(dataset))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", dataset);
+                    continue;
+                }
+
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var featureList = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder,
                     Path.GetFileNameWithoutExtension(dataset));

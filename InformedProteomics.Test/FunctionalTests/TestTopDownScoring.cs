@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -19,7 +20,17 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingMsDeconvFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
@@ -29,22 +40,46 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void PrintAllScorers()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             //            Console.WriteLine(Convert.ToDouble("0"));
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt");
+            const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt";            
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
+                return;
+            }
+
+            var scoringModel = new LikelihoodScoringModel(filePath);
             scoringModel.PrintAllScores();
         }
 
         [Test]
         public void TestLikelihoodScorer()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
 //            Console.WriteLine(Convert.ToDouble("0"));
-            var scoringModel = new LikelihoodScoringModel(@"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filtration_2.txt");
+
+            const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filtration_2.txt";
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
+                return;
+            }
+
+            var scoringModel = new LikelihoodScoringModel(filePath);
             Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.99, 1200));
         }
 
         [Test]
         public void TestMatchedPeakCounter()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Parameters
             var precursorIonTolerance = new Tolerance(15);
             var productIonTolerance = new Tolerance(15);
@@ -64,6 +99,13 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
 
             sw.Start();
@@ -103,6 +145,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCorrMatchedPeakCounter()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Parameters
             var precursorIonTolerance = new Tolerance(10);
             var productIonTolerance = new Tolerance(10);
@@ -122,6 +167,12 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
 
             sw.Start();
@@ -162,6 +213,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestMatchedPeakPostScorer()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Parameters
             var productIonTolerance = new Tolerance(10);
             var scorer = new MatchedPeakPostScorer(productIonTolerance, 1, 10);
@@ -172,6 +226,12 @@ namespace InformedProteomics.Test.FunctionalTests
 
             const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
             var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -190,7 +250,17 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestJungkapScoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             var tolerance = new Tolerance(10);
@@ -232,6 +302,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void RecomputeFdr()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string targetResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
             const string decoyResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
             const string tdaResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";

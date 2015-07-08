@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -20,7 +21,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTagBasedSearchForLewy()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFilePath = @"D:\MassSpecFiles\Lewy\Lewy_AT_AD1_21May15_Bane_14-09-01RZ.pbf";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 4;
@@ -28,10 +38,23 @@ namespace InformedProteomics.Test
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
             const string fastaFilePath = @"D:\MassSpecFiles\Lewy\a4_human.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
-            var aaSet = new AminoAcidSet(@"D:\MassSpecFiles\Lewy\Mods.txt");
+            var modsFilePath = @"D:\MassSpecFiles\Lewy\Mods.txt";
+            if (!File.Exists(modsFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                return;
+            }
+
+            var aaSet = new AminoAcidSet(modsFilePath);            
 
             TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
         }        
@@ -40,11 +63,20 @@ namespace InformedProteomics.Test
         [Test]
         public void TestTagBasedSearch()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
 //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
 //            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 //            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
 //            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
             const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const int minTagLength = 5;
@@ -55,12 +87,24 @@ namespace InformedProteomics.Test
 //            const string fastaFilePath = @"H:\Research\Weijun_TopDown\database\ID_005140_7A170668.fasta";
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
             const string fastaFilePath = @"H:\Research\Charles\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
-//            var aaSet = new AminoAcidSet(@"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt");
-            var aaSet = new AminoAcidSet(@"H:\Research\Charles\TopDown\Mods.txt");
-//            var aaSet = new AminoAcidSet();
+
+            var modsFilePath = @"H:\Research\Charles\TopDown\Mods.txt";
+            if (!File.Exists(modsFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                return;
+            }
+
+            var aaSet = new AminoAcidSet(modsFilePath);
 
             TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
         }
@@ -77,11 +121,25 @@ namespace InformedProteomics.Test
         [Test]
         public void FindProteins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
 
             const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
+            if (!File.Exists(tagFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                return;
+            }
 
             const string outputFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_matchedtag.tsv";
             using (var writer = new StreamWriter(outputFilePath))
@@ -108,17 +166,26 @@ namespace InformedProteomics.Test
                     writer.WriteLine("{0}\t{1}\t{2}", line, matchedProteins.Length, matchedProteinStr);
                 }
             }
-            Console.WriteLine("Done.");
+            Console.WriteLine(@"Done");
         }
 
         [Test]
         public void CountMatchedProteins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int minTagLength = 3;
 
             var scanToProtein = new Dictionary<int, string>();
             var idTag = new Dictionary<int, bool>();
             const string resultFilePath = @"H:\Research\ProMex\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
             var parser = new TsvFileParser(resultFilePath);
             var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var proteinNames = parser.GetData("ProteinName").ToArray();
@@ -131,9 +198,21 @@ namespace InformedProteomics.Test
             }
 
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
 //            const string fastaFilePath =
 //                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
@@ -142,6 +221,11 @@ namespace InformedProteomics.Test
             Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
 
             const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.seqtag";
+            if (!File.Exists(tagFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                return;
+            }
 
             var hist = new Dictionary<int, int>();
             
@@ -224,19 +308,31 @@ namespace InformedProteomics.Test
         [Test]
         public void CountMatchedScansPerProtein()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int minTagLength = 6;
 
             var proteinToScan = new Dictionary<string, HashSet<int>>();
-            const string fastaFilePath =
-                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string fastaFilePath = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
-            Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
+            Console.WriteLine(@"Sequence length: {0}", fastaDb.GetSequence().Length);
 
             //const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
             //const string tagFilePath = @"\\protoapps\UserData\Jungkap\Co_culture\23B_pellet_TD_3Feb14_Bane_PL011402.seqtag";
             const string tagFilePath = @"D:\MassSpecFiles\co_culture\23A_pellet_TD_3Feb14_Bane_PL011402.seqtag";
+            if (!File.Exists(tagFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                return;
+            }
 
             var isHeader = true;
             var numMatchedPairs = 0;
@@ -282,7 +378,15 @@ namespace InformedProteomics.Test
         [Test]
         public void FindProteinDeltaMass()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string folderPath = @"D:\MassSpecFiles\Glyco\";
+            if (!Directory.Exists(folderPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, folderPath);
+                return;
+            }
 
             var fileSet = new string[]
             {
@@ -380,7 +484,7 @@ namespace InformedProteomics.Test
 
                     Console.WriteLine(@"{0} seq tags are processed", nReadSeqTag);
                 }
-                Console.WriteLine("Done.");
+                Console.WriteLine(@"Done");
             }
         }
 

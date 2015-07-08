@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Database;
 using NUnit.Framework;
@@ -12,10 +14,19 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestSearching()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             var searchableDb = new SearchableDatabase(db);
             //const string pattern = "NSGSHFCGGSLINSQWVVSAAH";
@@ -33,10 +44,19 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestEnumeratingPeptides()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 20))
@@ -51,10 +71,19 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestEnumeratingProteins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(10, 300, 3))
@@ -69,10 +98,18 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCountingPeptides()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
 
 //            const string dbFile = @"C:\cygwin\home\kims336\Data\QCShew\ID_003456_9B916A8B.fasta";
 //            const string dbFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
@@ -102,6 +139,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCountingProteoformsCloseToNTermOrCTerm()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int minSequenceLength = 21;   // 21
             const int maxSequenceLength = 300;  // 300
             const int maxNumNTermCleavages = 1;
@@ -112,6 +152,12 @@ namespace InformedProteomics.Test.FunctionalTests
 
             //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
 
@@ -184,7 +230,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGettingProteinLengthAndPosition()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             db.Read();
             var indexedDb = new IndexedDatabase(db);

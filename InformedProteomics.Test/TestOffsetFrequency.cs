@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -33,7 +34,17 @@ namespace InformedProteomics.Test
         [Test]
         public void OffsetFrequencyFunction()
         {
-            InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig.ini"));
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig.ini";
+            if (!File.Exists(configFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, configFilePath);
+                return;
+            }
+
+            InitTest(new ConfigFileReader(configFilePath));
 
             foreach (var name in _names)
             {
@@ -99,7 +110,17 @@ namespace InformedProteomics.Test
         [Test]
         public void PrecursorOffsetFrequencyFunction()
         {
-            InitTest(new ConfigFileReader(@"C:\Users\wilk011\Documents\DataFiles\PrecursorOffsetFreqConfig.ini"));
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\PrecursorOffsetFreqConfig.ini";
+            if (!File.Exists(configFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, configFilePath);
+                return;
+            }
+
+            InitTest(new ConfigFileReader(configFilePath));
 
             foreach (var name in _names)
             {

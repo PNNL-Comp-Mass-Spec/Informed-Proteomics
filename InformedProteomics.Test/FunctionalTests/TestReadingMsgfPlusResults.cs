@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
@@ -12,7 +15,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingTmtResultFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+           
             const string filePath = @"\\protoapps\UserData\Sangtae\TestData\MSGFPlusResultTMT10.tsv";
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
+                return;
+            }
+
             var parser = new TsvFileParser(filePath);
             var pepStrs = parser.GetData("Peptide");
             var formulaStrs = parser.GetData("Formula");

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -14,6 +16,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestBuildingReverseGraph()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string annotation = "_.MARTKQTARK._";
 
             // Configure amino acid set
@@ -42,6 +47,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestBuildingSequenceGraphLongProtein()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Configure amino acid set
             const int numMaxModsPerProtein = 6;
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
@@ -70,8 +78,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             var seqCompositions = seqGraph.GetSequenceCompositions();
 
-            //for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
-            const int modIndex = 4;
+            for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             {
                 var seqComposition = seqCompositions[modIndex];
                 Console.WriteLine("SequenceComposition: {0}", seqComposition);
@@ -89,6 +96,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGraphWithModifications()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string annotation = "_.MIALNKTPQTIVFYKPYGVLCQFTDNSAHPRPTLKDYINLPDLYPVGRLDQDSEGLLLLTSNGKLQHRLAHREFAHQRTYFAQVEGSPTDEDLEPLRRGITFADYPTRPAIAKIITEPDFPPRNPPIRYRASIPTSWLSITLTEGRNRQVRRMTAAVGFPTLRLVRVQIQVTGRSPQQGKGKSAATWCLTLEGLSPGQWRPLTPWEENFCQQLLTGNPNGPWQKKFGDRR._";
 
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -133,6 +143,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestCreatingAminoAcidSet()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Configure amino acid set
             var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.PeptideNTerm, false);
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -156,6 +169,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestNTermMods()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string annotation = "_.QARTKQTARK._";
 
             // Configure amino acid set
@@ -192,7 +208,17 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingModFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string modFilePath = @"..\..\..\TestFiles\Mods.txt";
+
+            if (!File.Exists(modFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modFilePath);
+                return;
+            }
+            
             var modFileParser = new ModFileParser(modFilePath);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)

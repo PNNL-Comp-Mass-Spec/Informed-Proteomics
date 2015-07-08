@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -15,7 +17,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGetAllIsotopePeaks()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"H:\Research\GlycoTopDown\raw\User_sample_test_02252015.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+            
             const int scanNum = 17338;
             const double relativeIntensity = 0.1;
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);

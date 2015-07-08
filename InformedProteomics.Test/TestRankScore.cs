@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -17,6 +18,9 @@ namespace InformedProteomics.Test
         [Test]
         public void RankScoreParamResources()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int ranks = 20;
             var rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Iontrap, Enzyme.Trypsin,
                                            Protocol.Standard);
@@ -37,8 +41,19 @@ namespace InformedProteomics.Test
         [Test]
         public void RankScore()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int ranks = 20;
-            var rankScorer = new RankScore(@"\\protoapps\UserData\Wilkins\DIA\DIA.txt");
+
+            const string filePath = @"\\protoapps\UserData\Wilkins\DIA\DIA.txt";
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
+                return;
+            }
+
+            var rankScorer = new RankScore(filePath);
             for (int charge = 1; charge < 4; charge++)
             {
                 var ionTypes = rankScorer.GetIonTypes(charge, 0);
@@ -56,10 +71,26 @@ namespace InformedProteomics.Test
         [Test]
         public void DiaRankScore()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dataFile =
     @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string tsvFile =
                 @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
+
+            if (!File.Exists(dataFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dataFile);
+                return;
+            }
+
+            if (!File.Exists(tsvFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tsvFile);
+                return;
+            }
+
             var parser = new TsvFileParser(tsvFile);
             var sequences = parser.GetData("Peptide");
             var charges = parser.GetData("Charge");

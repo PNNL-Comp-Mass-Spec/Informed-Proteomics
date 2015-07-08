@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
@@ -20,19 +22,22 @@ namespace InformedProteomics.Test.FunctionalTests
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\VA139IMSMS_compressed.mzML", 3145)] // Centroid, Agilent QTOF, compressed binary data
         public void TestReadMzML(string filePath, int expectedSpectra)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName + " (" + Path.GetFileName(filePath) + ")");
+
             Stopwatch timer = new Stopwatch();
             timer.Start();
             var reader = new MzMLReader(filePath);
             var constTime = timer.Elapsed;
-            Console.WriteLine("Constructor time: " + constTime);
+            Console.WriteLine(@"Constructor time: " + constTime);
             var numSpectra = reader.NumSpectra;
             var metaTime = timer.Elapsed - constTime;
-            Console.WriteLine("Metadata read time: " + metaTime);
+            Console.WriteLine(@"Metadata read time: " + metaTime);
             var spectra = reader.ReadAllSpectra();
             var spectraCount = spectra.Count();
             timer.Stop();
-            Console.WriteLine("Spectra Read time: " + (timer.Elapsed - metaTime));
-            Console.WriteLine("Time: " + timer.Elapsed);
+            Console.WriteLine(@"Spectra Read time: " + (timer.Elapsed - metaTime));
+            Console.WriteLine(@"Time: " + timer.Elapsed);
             Assert.AreEqual(expectedSpectra, numSpectra, "NumSpectra");
             Assert.AreEqual(expectedSpectra, spectraCount, "SpectraCount");
             Assert.AreEqual(numSpectra, spectraCount, "NumSpectra vs. SpectraCount");

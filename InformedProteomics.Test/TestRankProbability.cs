@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
@@ -16,7 +17,16 @@ namespace InformedProteomics.Test
         [Test]
         public void RankProbability()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string configurationFile = @"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini";
+            if (!File.Exists(configurationFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, configurationFile);
+                return;
+            }
+            
             var config = new TrainerConfiguration(configurationFile);
 
             var trainingParameters = new TrainingParameters(config);

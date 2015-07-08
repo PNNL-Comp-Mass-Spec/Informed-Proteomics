@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -17,12 +18,21 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestWritingPbfFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
 //            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             //const string specFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath) as InMemoryLcMsRun;
 
-            Console.WriteLine("Writing...");
+            Console.WriteLine(@"Writing...");
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
   //          const string outputFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
@@ -36,10 +46,25 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestReadingPbfFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string pbfFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            if (!File.Exists(pbfFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
+                return;
+            }
+
             var pbfRun = new PbfLcMsRun(pbfFilePath);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            if (!File.Exists(pbfFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
 
             // spectrum comparison
@@ -78,6 +103,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestPbf()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             var jobid = new int[]
             {
                 1178207, 1178208, 1178209, 1178210, 1178211, 1178212, 1178213, 1178214, 1178215, 1178216, 1178217,
@@ -109,8 +137,14 @@ namespace InformedProteomics.Test.FunctionalTests
                 var srcFile = string.Format(
                     @"\\proto-5\VOrbiETD02\2014_3\Lewy_intact_{0}\PMX201503271049_Auto{1}\Lewy_intact_{2}.ms1ft", id, j, id);
 
-                var destFile = string.Format(@"D:\MassSpecFiles\Lewy\Lewy_intact_{0}.ms1ft", id);
-                File.Copy(srcFile, destFile);
+                if (!File.Exists(srcFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, srcFile);
+                    return;
+                }
+
+                //var destFile = string.Format(@"D:\MassSpecFiles\Lewy\Lewy_intact_{0}.ms1ft", id);
+                //File.Copy(srcFile, destFile);
                 //var fname = string.Format(@"{0}\Lewy_intact_{1}.pbf", pbfPath, id);
                 //var pbfRun = new PbfLcMsRun(fname);
                 //Console.WriteLine("{0}\t{1}", pbfRun.MaxLcScan, pbfRun.GetElutionTime(pbfRun.MaxLcScan));
@@ -120,7 +154,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGetChrom()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var pbfRun = new PbfLcMsRun(rafFilePath);
 
             Console.WriteLine("Chromatogram");
@@ -136,15 +179,30 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestRunningTimeChromGen()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             //var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var rafRun = new PbfLcMsRun(rafFilePath);
 
             var tolerance = new Tolerance(10);
 
             const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            if (!File.Exists(dbFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
+                return;
+            }
+
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -183,13 +241,27 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGeneratingProductXic()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
 //            const string rawFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath);
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var rafRun = new PbfLcMsRun(rafFilePath);
 
             const double precursorIonMz = 815.16;
@@ -206,12 +278,27 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestGeneratingProductXics()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
 //            const string rawFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath);
 
 //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var rafRun = new PbfLcMsRun(rafFilePath);
 
             var tolerance = new Tolerance(10);
@@ -264,7 +351,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestSpectrumNavigation()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var rafRun = new PbfLcMsRun(rafFilePath);
            // var spec = rafRun.GetSpectrum(54531);
             var scanNum = rafRun.GetNextScanNum(54530, 1);
@@ -274,7 +370,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestPbfGen()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rafFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
+            if (!File.Exists(rafFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                return;
+            }
+
             var args = new[] {"-s", rafFilePath};
             PbfGen.Program.Main(args);
         }

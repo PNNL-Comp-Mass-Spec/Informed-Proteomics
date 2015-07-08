@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
@@ -16,6 +18,15 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void PrintOffsetFrequency()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TsvFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TsvFile);
+                return;
+            }
+
             var spectrumMatches = InitTest();
 
             using (var debugFile = new StreamWriter(OutputFileName))

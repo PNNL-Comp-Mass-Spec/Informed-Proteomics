@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -15,7 +17,17 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void ValidateIcResultsWithModifications()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1_Rescored.tsv";
+
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
             var parser = new TsvFileParser(resultFilePath);
             var sequences = parser.GetData("Sequence");
             var modifications = parser.GetData("Modifications");

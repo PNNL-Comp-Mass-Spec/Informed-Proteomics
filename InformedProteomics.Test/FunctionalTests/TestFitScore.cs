@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -15,7 +17,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestFitScoreCalculationCid()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathCid);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestLcMsRun.TestTopDownRawFilePathCid))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
+                return;
+            }
+
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestLcMsRun.TestTopDownRawFilePathCid, 5743, 5743);
             var spec = run.GetSpectrum(5743);
             Assert.True(spec != null);
 
@@ -43,7 +54,16 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestFitScoreCalculationEtd()
         {
-            var run = InMemoryLcMsRun.GetLcMsRun(TestLcMsRun.TestTopDownRawFilePathEtd);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(TestLcMsRun.TestTopDownRawFilePathEtd))
+            {
+                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
+                return;
+            }
+
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestLcMsRun.TestTopDownRawFilePathEtd, 810, 810);
             var spec = run.GetSpectrum(810) as ProductSpectrum;
             Assert.True(spec != null);
 
@@ -64,6 +84,9 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestFitScoreComputationTime()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int numTrials = 1000000;
             const int numIsotopes = 20;
 

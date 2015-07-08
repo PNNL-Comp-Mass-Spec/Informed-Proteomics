@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -16,9 +17,13 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestIprg
     {
+        [Ignore]
         [Test]
         public void TestReadingExcelFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFile = @"H:\Research\IPRG2015\Submissions\Submission_32080.xlsx";
 
         }
@@ -26,13 +31,28 @@ namespace InformedProteomics.Test
         [Test]
         public void ProcessIprg2015PreStudy()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dir = @"H:\Research\IPRG2015";
 
             const string databaseFilePath = dir + @"\database\yeast6proteaprotein.fasta";
+            if (!File.Exists(databaseFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
+                return;
+            }
+
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
             const string jobFilePath = dir + @"\Jobs.tsv";
+            if (!File.Exists(jobFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, jobFilePath);
+                return;
+            }
+
             var jobParser = new TsvFileParser(jobFilePath);
             var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32(j)).ToArray();
             var experiments = jobParser.GetData("Experiments").Select(e => e.Split('_')[2]).ToArray();
@@ -104,8 +124,17 @@ namespace InformedProteomics.Test
         [Test]
         public void AddNaToTable()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dir = @"H:\Research\IPRG2015";
             const string resultFilePath = dir + @"\AMT_Peptides_Missing.tsv";
+
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
 
             const string outputFilePath = dir + @"\AMT_Peptides_NA.tsv";
             using (var writer = new StreamWriter(outputFilePath))
@@ -122,11 +151,26 @@ namespace InformedProteomics.Test
         [Test]
         public void AddProteinLengths()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string databaseFilePath = @"H:\Research\IPRG2015\database\yeast6proteaprotein.fasta";
+            if (!File.Exists(databaseFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
+                return;
+            }
+
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
             const string resultPath = @"H:\Research\IPRG2015\AMT_Peptides_NA.tsv";
+            if (!File.Exists(resultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
+                return;
+            }
+
             const string outputFilePath = @"H:\Research\IPRG2015\AMT_Peptides.tsv";
             using (var writer = new StreamWriter(outputFilePath))
             {
@@ -150,9 +194,18 @@ namespace InformedProteomics.Test
         [Test]
         public void GetProteinAccessions()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string uniprotAccession = "[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}";
             var uniProtPattern = new Regex(uniprotAccession);
             const string databaseFilePath = @"H:\Research\IPRG2015\Henry_results\iPRG2015.TargDecoy.fasta";
+            if (!File.Exists(databaseFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
+                return;
+            }
+
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
             var nameToAccession = new Dictionary<string, string>();
@@ -170,6 +223,12 @@ namespace InformedProteomics.Test
             }
 
             const string resultPath = @"H:\Research\IPRG2015\Henry_results\ProteinNames.txt";
+            if (!File.Exists(resultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
+                return;
+            }
+
             foreach (var line in File.ReadLines(resultPath))
             {
                 if (line.Length == 0) continue;
@@ -195,12 +254,27 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateMagnusAbrfSpecCountAllProteins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dir = @"H:\Research\IPRG2015\Magnus";
+            if (!Directory.Exists(dir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
+                return;
+            }
+
             const double qValueThreshold = 0.01;
             //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
             const string resultDir = dir + @"\beforeRefinery20ppm";
+                if (!Directory.Exists(resultDir))
+                {
+                    Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                    return;
+                }
+
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
 
             var specCount = new Dictionary<string, int[]>();  // protein name => array of counts
@@ -241,6 +315,12 @@ namespace InformedProteomics.Test
 
             // Writing
             const string databaseFilePath = dir + @"\database\iPRG2015.fasta";
+            if (!File.Exists(databaseFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
+                return;
+            }
+
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
 
@@ -273,12 +353,27 @@ namespace InformedProteomics.Test
         [Test]
         public void GenerateAbrfSpecCountAllProteins()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dir = @"H:\Research\IPRG2015";
+            if (!Directory.Exists(dir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
+                return;
+            }
+
             const double qValueThreshold = 0.01;
             //var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             //var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
             const string resultDir = dir + @"\NTT1";
+            if (!Directory.Exists(resultDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                return;
+            }
+
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
 
             var specCount = new Dictionary<string, int[]>();  // protein name => array of counts
@@ -351,13 +446,27 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAbrfSpecCount()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string dir = @"D:\Research\Data\IPRG2014";
+            if (!Directory.Exists(dir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
+                return;
+            }
+
             const double qValueThreshold = 0.01;
             var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
             const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.revCat.fasta";
             const string resultDir = dir + @"\10ppm_TI0_NTT1";
+            if (!Directory.Exists(resultDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                return;
+            }
 
             Console.WriteLine("Run\tTotal PSM\t" + string.Join("\t", names));
 
@@ -411,7 +520,16 @@ namespace InformedProteomics.Test
         [Test]
         public void CreateTargetList()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string databaseFilePath = @"D:\Research\Data\IPRG2014\database\SpikedInPeptides.fasta";
+            if (!File.Exists(databaseFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
+                return;
+            }
+
             var database = new FastaDatabase(databaseFilePath);
             database.Read();
             var indexedDatabase = new IndexedDatabase(database);

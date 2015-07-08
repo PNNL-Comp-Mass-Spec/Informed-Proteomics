@@ -17,6 +17,7 @@ namespace InformedProteomics.Test.Obsolete
     [TestFixture]
     public class TestEdrn
     {
+        [Ignore]
         [Test]
         public void GenerateVennDiagrams()
         {
@@ -46,6 +47,7 @@ namespace InformedProteomics.Test.Obsolete
         }
 
 
+        [Ignore]
         [Test]
         public void RunIpa()
         {
@@ -59,6 +61,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void GenerateSpecCount()
         {
@@ -90,6 +93,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void SummarizeDda()
         {
@@ -126,6 +130,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumIdentifiedPeptides: {0}", numIdentifiedPeptides);
         }
 
+        [Ignore]
         [Test]
         public void GeneratePrmInfo()
         {
@@ -140,6 +145,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void GeneratePrmInfo(string resultFilePath, string outputFilePath)
         {
@@ -238,6 +244,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("\t{0}", numPeptides);
         }
 
+        [Ignore]
         [Test]
         public void ComputeSpikedInPeptideMzHist()
         {

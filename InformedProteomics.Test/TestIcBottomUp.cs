@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
@@ -19,7 +20,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestChaoChaoWhim()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFileDir = @"D:\Research\Data\ChaoChao\WHIM\raw";
+            if (!Directory.Exists(specFileDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
+                return;
+            }
+
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*.raw"))
             {
                 Console.WriteLine("****** Processing {0}", specFilePath);
@@ -27,10 +37,24 @@ namespace InformedProteomics.Test
             }
         }
 
-        [Test]
         public void TestChaoChao(string specFilePath)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const string dbFilePath = @"D:\Research\Data\ChaoChao\database\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
+
             const string outputDir = @"D:\Research\Data\ChaoChao\Ic\";
 
             // Configure amino acid set
@@ -86,7 +110,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestEdrn()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFileDir = @"H:\Research\EDRN\RawFiles\DIA";
+            if (!Directory.Exists(specFileDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
+                return;
+            }
+
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DIA*.raw"))
             {
                 Console.WriteLine("****** Processing {0}", specFilePath);
@@ -94,11 +127,25 @@ namespace InformedProteomics.Test
             }
         }
 
-        [Test]
         public void TestEdrn(string specFilePath)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const string dbFilePath = @"H:\Research\EDRN\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             const string outputDir = @"H:\Research\EDRN\Ic";
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
@@ -125,7 +172,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMaccossDia()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
+            if (!Directory.Exists(specFileDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
+                return;
+            }
+
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DIA*.raw"))
             {
                 Console.WriteLine("****** Processing {0}", specFilePath);
@@ -136,7 +192,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMaccossDda()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
+            if (!Directory.Exists(specFileDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
+                return;
+            }
+
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DDA*.raw"))
             {
                 Console.WriteLine("****** Processing {0}", specFilePath);
@@ -145,11 +210,25 @@ namespace InformedProteomics.Test
         }
 
 
-        [Test]
         public void TestMaccoss(string specFilePath)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const string dbFilePath = @"D:\Research\Data\UW\QExactive\M_musculus_Uniprot_withContam.fasta";
             const string outputDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Mass";
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
@@ -176,10 +255,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestQcShewQExactive()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // QC_Shew QE
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\ID_003456_9B916A8B.fasta";
             const string outputDir = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT2_Mass";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -206,10 +300,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestDdaPlus()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // QC_Shew QE
             const string specFilePath = @"H:\Research\DDAPlus\raw\20140701_yeast_DDA_01.raw";
             const string dbFilePath = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
             const string outputDir = @"H:\Research\DDAPlus\Test";
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(dbFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                return;
+            }
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -233,9 +342,11 @@ namespace InformedProteomics.Test
             TestBottomUpSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, ntt);
         }
 
-        [Test]
         public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int searchMode, double corrThreshold = 0.3)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             // Search parameters
             const int minSequenceLength = 6; // 7
             const int maxSequenceLength = 40; // 1000

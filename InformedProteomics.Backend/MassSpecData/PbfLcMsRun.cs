@@ -46,7 +46,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
-        public static LcMsRun GetLcMsRun(string specFilePath, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, 
+        public static LcMsRun GetLcMsRun(
+            string specFilePath, 
+            double precursorSignalToNoiseRatioThreshold, 
+            double productSignalToNoiseRatioThreshold, 
             IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
@@ -63,6 +66,17 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public PbfLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
         {
+            var specFile = new FileInfo(specFileName);
+            if (!specFile.Exists)
+            {
+                throw new FileNotFoundException("File not found by PbfLcMsRun", specFile.FullName);
+            }
+
+            if (specFile.Length < 28)
+            {
+                throw new FormatException("Illegal pbf file (too small)!");
+            }
+
             _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
             _fileLock = new Object();
 
@@ -77,6 +91,16 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
                 _minMs1Mz = _reader.ReadDouble();
+
+                if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
+                {
+                    throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is < 0)");
+                }
+
+                if (_offsetPrecursorChromatogramEnd - NumBytePeak >= specFile.Length)
+                {
+                    throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is past the end of the file)");
+                }
 
                 _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
                 _maxMs1Mz = _reader.ReadDouble();
@@ -241,7 +265,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var fileFormatId = _reader.ReadInt32();
             if (fileFormatId != FileFormatId) return false;
 
-            _reader.BaseStream.Seek(-3*sizeof (long) - 1*sizeof (int), SeekOrigin.End);
+            _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
 
             _offsetPrecursorChromatogramStart = _reader.ReadInt64();
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin = _reader.ReadInt64();

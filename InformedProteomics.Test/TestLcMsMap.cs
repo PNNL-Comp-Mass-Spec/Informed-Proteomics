@@ -59,7 +59,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("NumBins: {0}", numBins);
             Console.Write("Reading raw file...");
             var run = InMemoryLcMsRun.GetLcMsRun(testRawFilePath, MassSpecDataType.XCaliburRun, 0, 1.4826);
-            Console.WriteLine("Done.");
+            Console.WriteLine(@"Done");
 
             var map = new Ms1FeatureMatrix(run, numBits);
             var sw = new Stopwatch();

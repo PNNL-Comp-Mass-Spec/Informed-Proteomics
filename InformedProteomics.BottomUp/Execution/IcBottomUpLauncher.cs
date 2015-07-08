@@ -213,7 +213,7 @@ namespace InformedProteomics.BottomUp.Execution
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
 
-            Console.WriteLine(@"Done.");
+            Console.WriteLine(@"Done");
             return true;
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -24,7 +25,16 @@ namespace InformedProteomics.Test
         [Test]
         public void CollectTrainingSet()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string idFileFolder = @"\\protoapps\UserData\Jungkap\TrainingSet";
+            if (!Directory.Exists(idFileFolder))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                return;
+            }
+
             const string outFileFolder = @"\\protoapps\UserData\Jungkap\TrainingSet";
             var rawFileLists = new string[]
             {
@@ -41,6 +51,12 @@ namespace InformedProteomics.Test
 
             foreach (var dataset in rawFileLists)
             {
+                if (!File.Exists(dataset))
+                {
+                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", dataset);
+                    continue;
+                }
+
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
 
@@ -73,7 +89,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestQuantTopDownData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string rawFile = @"D:\Test\Quant\spike_in\raw\CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ.pbf";
+            if (!File.Exists(rawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
             //var target = new TargetFeature(8445.573787, 9, 3084);
@@ -92,6 +117,9 @@ namespace InformedProteomics.Test
         [Test]
         public void TestQuantBottomUpData()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             for (var m = 500; m < 5000; m += 100)
             {
                 var theoreticalEnvelope = new IsotopeList(m, 30, 0.1);    
@@ -104,8 +132,22 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMs1EvidenceScore()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string TestRawFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01.pbf";
+            if (!File.Exists(TestRawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFile);
+                return;
+            }
+
             const string TestResultFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01_IcTda.tsv";
+            if (!File.Exists(TestResultFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestResultFile);
+                return;
+            }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
             var tsvParser = new TsvFileParser(TestResultFile);
@@ -128,8 +170,17 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPredictPTMfromMs1ft()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
-            const string ms1ftFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+            if (!File.Exists(resultFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                return;
+            }
+
+            // const string ms1ftFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
 
             var parser = new TsvFileParser(resultFilePath);
             var sequences = parser.GetData("Sequence");
@@ -170,13 +221,26 @@ namespace InformedProteomics.Test
             //var monoMass = featureParser.GetData("MonoMass").Select(s => Convert.ToDouble(s)).ToArray();
         }
 
-
-
-
         [Test]
         public void TestGeneratingMs1FeatureFile()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            const string outFolderPath = @"\\protoapps\UserData\Sangtae\TestData\Output";
+            if (!Directory.Exists(outFolderPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
+                return;
+            }
+
             //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
             
             const int minScanCharge = 2;
@@ -188,7 +252,7 @@ namespace InformedProteomics.Test
             var param = new Ms1FeatureFinderInputParameter
             {
                 InputPath = specFilePath,
-                OutputPath = @"D:\MassSpecFiles\UTEX",
+                OutputPath = outFolderPath,
                 MinSearchMass = minScanMass,
                 MaxSearchMass = maxScanMass,
                 MinSearchCharge = minScanCharge,
@@ -204,9 +268,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestProMexFilter()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
+            
             const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+            if (!File.Exists(ms1FtPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, ms1FtPath);
+                return;
+            }
+
             var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath, 0.15);
 
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
@@ -217,9 +297,18 @@ namespace InformedProteomics.Test
         [Test]
         public void TestAlignProMexResults()
         {
-            var featureDir = @"D:\MassSpecFiles\UTEX";
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
+            if (!Directory.Exists(featureDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                return;
+            }
+
             var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            var outFile = @"D:\MassSpecFiles\UTEX\aligned_features.tsv";
+            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
 
             var fileEntries = Directory.GetFiles(featureDir);
 
@@ -244,12 +333,30 @@ namespace InformedProteomics.Test
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawDir, dataset[i]);
                 var ms1File = string.Format(@"{0}\{1}.ms1ft", featureDir, dataset[i]);
 
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1File))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    continue;
+                }
+
                 rawFiles.Add(rawFile);
                 ms1ftFiles.Add(ms1File);
 
                 Console.WriteLine(dataset[i]);
             }
-            
+
+            if (rawFiles.Count == 0)
+            {
+                Console.WriteLine(@"Warning: No files were found in method {0}", methodName);
+                return;
+            }
+
             var align = new Ms1FeatureAlign(ms1ftFiles, rawFiles);
             var alignedFeatureList = align.GroupFeatures();
 
@@ -303,6 +410,9 @@ namespace InformedProteomics.Test
         [Test]
         public void ProMexDebug()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             for (var mass = 500; mass < 100000; mass += 500)
             {
                 var isotopes = new IsotopeList(mass, 0.01d);

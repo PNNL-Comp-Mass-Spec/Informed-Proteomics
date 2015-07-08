@@ -31,9 +31,9 @@ namespace InformedProteomics.Backend.Database
 
             if (!File.Exists(_pLcpFilePath) || !FastaDatabase.CheckHashCodeBinaryFile(_pLcpFilePath, lastWriteTimeHash))
             {
-                Console.Write("Generating " + _pLcpFilePath + "...");
+                Console.Write("Generating " + _pLcpFilePath + " ... ");
                 CreatePermutedLongestCommonPrefixFile();
-                Console.WriteLine("\tDone.");
+                Console.WriteLine("Done");
             }
         }
 

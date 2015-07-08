@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -21,7 +22,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPsm()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const char pre = 'R';
             const string sequence = "LENWPPASLADDL";
             const char post = 'A';
@@ -50,8 +60,24 @@ namespace InformedProteomics.Test
         [Test]
         public void TestVennDiagram()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string result1Path = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod_NTT1.tsv";
             const string result2Path = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT1_Test\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTda.tsv";
+
+            if (!File.Exists(result1Path))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, result1Path);
+                return;
+            }
+
+            if (!File.Exists(result2Path))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, result2Path);
+                return;
+            }
+
             const double pepQValueThreshold = 0.01;
             var result1 = new TsvFileParser(result1Path);
             var result2 = new TsvFileParser(result2Path);
@@ -67,7 +93,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestLogLikelihoodScoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             const string seqStr = "IAHESDDEKGHAAK";
             var composition = Composition.Parse("C(62) H(98) N(20) O(24) S(0)");
             const int charge = 4;
@@ -85,7 +120,16 @@ namespace InformedProteomics.Test
         [Test]
         public void TestInitialScoring()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string icResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT2_03_NoMod_NoRescoring\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTarget.tsv";
+            if (!File.Exists(icResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, icResultPath);
+                return;
+            }
+
             var icParser = new TsvFileParser(icResultPath);
             var icScans = icParser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var icPeptides = icParser.GetData("Sequence");
@@ -96,8 +140,14 @@ namespace InformedProteomics.Test
                 map.Add(icScans[i]+":"+icPeptides[i], icScore[i]);
             }
 
-            const string msgfPlusResulPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
-            var msgfPlusResults = new MsGfResults(msgfPlusResulPath);
+            const string msgfPlusResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
+            if (!File.Exists(msgfPlusResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, msgfPlusResultPath);
+                return;
+            }
+
+            var msgfPlusResults = new MsGfResults(msgfPlusResultPath);
             var matches = msgfPlusResults.GetMatchesAtPsmFdr(0.01);
             //Console.WriteLine("NumMatches: {0}", matches.Count);
             Console.WriteLine("ScanNum\tPeptide\tSpecEValue\tIcScore");
@@ -115,10 +165,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestMs1Filter()
         {
-            const string msgfPlusResulPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
-            var msgfPlusResults = new MsGfResults(msgfPlusResulPath);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string msgfPlusResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
+            if (!File.Exists(msgfPlusResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, msgfPlusResultPath);
+                return;
+            }
+
+            var msgfPlusResults = new MsGfResults(msgfPlusResultPath);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 0);
             var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10), 1, 4,
                 400, 5000, 0.3, 0, 0);
@@ -147,8 +212,17 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptideLevelStats()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const int topK = 10;
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
+            if (!Directory.Exists(resultDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                return;
+            }
+
             var concatenated = new List<string>();
             const string mzRange = "650to775";
             foreach (var specFilePath in Directory.GetFiles(resultDir, "*DIA*" + mzRange + "*IcTarget.tsv"))
@@ -223,7 +297,16 @@ namespace InformedProteomics.Test
         [Test]
         public void CompareIpaIc()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_03";
+            if (!Directory.Exists(resultDir))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                return;
+            }
+
             var targetPeptides = new HashSet<string>();
             foreach (var icResultFilePath in Directory.GetFiles(resultDir, "*DIA*IcTarget.tsv"))
             {
@@ -232,6 +315,12 @@ namespace InformedProteomics.Test
             }
 
             const string ipaResultPath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
+            if (!File.Exists(ipaResultPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, methodName);
+                return;
+            }            
+
             var parser = new TsvFileParser(ipaResultPath);
             var ipaPeptides = parser.GetPeptides(0.005).Select(p => p.Replace("C+57.021", "C"));
             var ipaOnly = 0;

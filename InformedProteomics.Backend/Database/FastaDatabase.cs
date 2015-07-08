@@ -52,12 +52,13 @@ namespace InformedProteomics.Backend.Database
                 || !CheckHashCodeBinaryFile(_seqFilePath, _lastWriteTimeHash)
                 || !CheckHashCodeTextFile(_annoFilePath, _lastWriteTimeHash))
             {
-                Console.Write("Generating " + _seqFilePath + " and " + _annoFilePath + "...");
+                Console.WriteLine("Generating " + _seqFilePath + " and ");
+                Console.Write("Generating " + _annoFilePath + " ... ");
 
                 DeleteOldIndexFiles(_databaseFilePath, isDecoy);
 
                 GenerateMetaFiles();
-                Console.WriteLine("\tDone.");
+                Console.WriteLine("Done");
             }
 
             IsDecoy = isDecoy;

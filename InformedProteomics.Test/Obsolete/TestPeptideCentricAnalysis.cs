@@ -16,6 +16,7 @@ namespace InformedProteomics.Test.Obsolete
     [TestFixture]
     internal class TestPeptideCentricAnalysis
     {
+        [Ignore]
         [Test]
         public void CompareRt()
         {
@@ -77,6 +78,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void CompareRtFusion()
         {
@@ -124,6 +126,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void RunPeptideCentricAnalysis()
         {
@@ -135,6 +138,7 @@ namespace InformedProteomics.Test.Obsolete
             TestQExactiveDdaDataPostProcessingPerFile();
         }
 
+        [Ignore]
         [Test]
         public void TestQExactiveDdaDataPostProcessing()
         {
@@ -148,6 +152,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestQExactiveDiaDataPostProcessing()
         {
@@ -161,6 +166,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestQExactiveDiaDataPostProcessingNoEdgeNtt2()
         {
@@ -174,6 +180,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestFusionDiaDataPostProcessing()
         {
@@ -187,6 +194,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestFusionDdaDataPostProcessing()
         {
@@ -200,6 +208,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestQExactiveDdaDataPostProcessingPerFile()
         {
@@ -224,6 +233,7 @@ namespace InformedProteomics.Test.Obsolete
         }
 
 
+        [Ignore]
         [Test]
         public void GenerateVennDiagrams()
         {
@@ -257,6 +267,7 @@ namespace InformedProteomics.Test.Obsolete
                               vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
         }
 
+        [Ignore]
         [Test]
         public void ProcessPemmrData()
         {
@@ -270,6 +281,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void GenerateVennDiagramsPeMmr()
         {
@@ -310,6 +322,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void ProcessMhcData()
         {
@@ -331,6 +344,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
+        [Ignore]
         [Test]
         public void TestSpecEValueCalibration()
         {
@@ -417,6 +431,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void TestXicGen()
         {
@@ -457,6 +472,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
+        [Ignore]
         [Test]
         public void TestFusionDdaData()
         {
@@ -561,6 +577,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine(@"TimeForPrecursorValidation {0:f4} sec", sec);
         }
 
+        [Ignore]
         [Test]
         public void AnalyizeFusionDdaData()
         {
