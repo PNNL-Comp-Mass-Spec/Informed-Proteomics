@@ -532,8 +532,8 @@ namespace InformedProteomics.TopDown.Execution
                             start, // Start
                             end, // End
                             ion.Charge, // precursorCharge
-                            ion.GetMostAbundantIsotopeMz(), // MostAbundantIsotopeMz
-                            ion.Composition.Mass,   // Mass
+                            Misc.DblToString(ion.GetMostAbundantIsotopeMz(), 7), // MostAbundantIsotopeMz
+                            Misc.DblToString(ion.Composition.Mass, 7),   // Mass
                             scores.Ms2Score    // Score (re-scored)
                             );
                     }

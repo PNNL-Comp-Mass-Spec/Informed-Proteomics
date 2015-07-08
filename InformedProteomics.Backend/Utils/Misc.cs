@@ -7,6 +7,42 @@ namespace InformedProteomics.Backend.Utils
 {
     public class Misc
     {
+        private static byte mFormatStringPrecision = 1;
+        private static string mFormatString = "0.0";
+
+        /// <summary>
+        /// Format the value to a string with a fixed number of decimal points
+        /// </summary>
+        /// <param name="value">Value to format</param>
+        /// <param name="digitsOfPrecision">Digits of precision (0 or higher)</param>
+        /// <returns>String representation of the value</returns>
+        /// <remarks>If digitsOfPrecision is 0, will round the number to the nearest integer</remarks>
+        public static string DblToString(double value, byte digitsOfPrecision)
+        {
+            if (Math.Abs(value) < float.Epsilon)
+                return "0";
+
+            if (digitsOfPrecision == 0)
+                return value.ToString("0");
+
+            if (digitsOfPrecision == mFormatStringPrecision)
+            {
+                return value.ToString(mFormatString);
+            }
+
+            mFormatString = "0.0";
+
+            if (digitsOfPrecision > 1)
+            {
+                // Update format string to be of the form "0.0#######"
+                mFormatString += new string('#', digitsOfPrecision - 1);                
+            }
+
+            mFormatStringPrecision = digitsOfPrecision;
+
+            return value.ToString(mFormatString);
+        }
+
         public static DateTime GetBuildDateFromVersion()
         {
             var version = Assembly.GetEntryAssembly().GetName().Version;

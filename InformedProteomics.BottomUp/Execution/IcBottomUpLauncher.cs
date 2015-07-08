@@ -368,30 +368,12 @@ namespace InformedProteomics.BottomUp.Execution
                             start, // Start
                             end, // End
                             ion.Charge, // precursorCharge
-                            ion.GetMostAbundantIsotopeMz(), // MostAbundantIsotopeMz
-                            ion.Composition.Mass,   // Mass
+                            Misc.DblToString(ion.GetMostAbundantIsotopeMz(), 7), // MostAbundantIsotopeMz
+                            Misc.DblToString(ion.Composition.Mass, 7),   // Mass
                             match.Score,
                             scores.Score    // Score (re-scored)
                             );
 
-                        //writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
-                        //    scanNum,
-                        //    match.Pre,
-                        //    sequence, // Sequence
-                        //    match.Post,
-                        //    match.Modifications, // Modifications
-                        //    ion.Composition, // Composition
-                        //    proteinName, // ProteinName
-                        //    database.GetProteinDescription(match.Offset), // ProteinDescription
-                        //    protLength, // ProteinLength
-                        //    start, // Start
-                        //    end, // End
-                        //    ion.Charge, // precursorCharge
-                        //    ion.GetMostAbundantIsotopeMz(), // MostAbundantIsotopeMz
-                        //    ion.Composition.Mass,   // Mass
-                        //    match.Score, // #MatchedFragments
-                        //    0  // Score (re-scored)
-                        //    );
                     }
                 }
             }

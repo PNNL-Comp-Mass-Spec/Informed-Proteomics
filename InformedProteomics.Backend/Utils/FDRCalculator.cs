@@ -125,11 +125,11 @@ namespace InformedProteomics.Backend.Utils
                     ++NumPsms;
             }
 
-            _results = distinctSorted.Select((r, i) => r + "\t" + qValue[i]).ToArray();
+            _results = distinctSorted.Select((r, i) => r + "\t" + Misc.DblToString(qValue[i], 8)).ToArray();
 
             return true;
         }
-
+      
         private bool CalculatePepQValues(string targetResultFilePath, string decoyResultFilePath)
         {
 
@@ -219,7 +219,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 var columns = _results[i].Split('\t');
                 var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
-                _results[i] = _results[i] + "\t" + annotationToPepQValue[annotation];
+                _results[i] = _results[i] + "\t" + Misc.DblToString(annotationToPepQValue[annotation], 8);
             }
 
             return true;
