@@ -41,7 +41,6 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 //if (flagArray[i] == 0 && probArray[i] < _minProbability)  continue;
                 featureCountFiltered++;
-                
                 var monoMass = monoMassArr[i];
                 _lcMsChargeMap.SetMatches(monoMass, minScanArray[i], maxScanArray[i], repScanArray[i], minChargeArray[i], maxChargeArray[i]);
             }

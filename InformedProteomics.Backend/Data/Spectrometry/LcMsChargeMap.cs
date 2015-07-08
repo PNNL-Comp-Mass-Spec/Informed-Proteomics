@@ -72,7 +72,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             // determine bit array
             var bitArray = new BitArray(_run.MaxLcScan - _run.MinLcScan + 1);
 
-            var registeredMs2Scans = new SortedList<double, int>();
+            //var registeredMs2Scans = new SortedList<double, int>();
+            var registeredMs2Scans = new List<KeyValuePair<double, int>>();
+
             var repRt = _run.GetElutionTime(repScanNum);
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
@@ -86,14 +88,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         Averagine.GetIsotopomerEnvelope(monoIsotopicMass).MostAbundantIsotopeIndex);
                     if (isolationWindow.Contains(mz))
                     {
-//                        bitArray.Set(scanNum - _run.MinLcScan, true);
                         var rt = _run.GetElutionTime(scanNum);
-                        registeredMs2Scans.Add(Math.Abs(rt - repRt), scanNum);
+                        //registeredMs2Scans.Add(Math.Abs(rt - repRt), scanNum);
+                        registeredMs2Scans.Add(new KeyValuePair<double, int>(Math.Abs(rt - repRt), scanNum));
                     }
                 }
             }
 
-            foreach (var e in registeredMs2Scans.Take(_maxNumMs2ScansPerMass))
+            //foreach (var e in registeredMs2Scans.Take(_maxNumMs2ScansPerMass))
+            foreach (var e in registeredMs2Scans.OrderBy(x => x.Key).Take(_maxNumMs2ScansPerMass))
             {
                 var scanNum = e.Value;
                 bitArray.Set(scanNum - _run.MinLcScan, true);

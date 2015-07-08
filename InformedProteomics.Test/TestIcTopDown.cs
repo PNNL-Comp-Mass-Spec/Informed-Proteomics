@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
             //var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             ////            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             //var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
-            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            //var pyroGluQ = new SearchModification(Modification.PTeyroGluQ, 'Q', SequenceLocation.Everywhere, false);
             //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
             //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
             //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
@@ -314,7 +314,7 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             // QC_Shew
-            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3";
+            const string specFilePath = @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf";
             const string dbFilePath = @"D:\MSPathFinder\Fasta\ID_002216_235ACCEA.fasta";
             const string outputDir = @"D:\MassSpecFiles\training\test";
 
