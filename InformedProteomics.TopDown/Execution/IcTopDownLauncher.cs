@@ -115,6 +115,7 @@ namespace InformedProteomics.TopDown.Execution
                 prog = new Progress<ProgressData>(p =>
                 {
                     progData.Status = p.Status;
+                    progData.StatusInternal = p.StatusInternal;
                     progress.Report(progData.UpdatePercent(p.Percent));
                 });
             }
@@ -229,15 +230,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine(@"Searching the target database");
                 sw.Start();
-                SortedSet<DatabaseSequenceSpectrumMatch>[] targetMatches;
-                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
-                {
-                    targetMatches = RunSearchParallel(targetDb, ms1Filter, null, prog);
-                }
-                else
-                {
-                    targetMatches = RunSearch(targetDb, ms1Filter, null, prog);
-                }
+                var targetMatches = RunSearch(targetDb, ms1Filter, null, prog);
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
                 sw.Stop();
 
@@ -262,15 +255,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
-                SortedSet<DatabaseSequenceSpectrumMatch>[] decoyMatches;
-                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
-                {
-                    decoyMatches = RunSearchParallel(decoyDb, ms1Filter, null, prog);
-                }
-                else
-                {
-                    decoyMatches = RunSearch(decoyDb, ms1Filter, null, prog);
-                }
+                var decoyMatches = RunSearch(decoyDb, ms1Filter, null, prog);
                 WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
 
@@ -343,11 +328,11 @@ namespace InformedProteomics.TopDown.Execution
             progData.Status = "Searching for matches";
             var sw = new Stopwatch();
             long estimatedProteins;
-            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins);
+            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
             Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
             
             var numProteins = 0;
-            var lastUpdate = DateTime.UtcNow;
+            var lastUpdate = DateTime.MinValue; // Force original update of 0%
 
             sw.Reset();
             sw.Start();
@@ -356,79 +341,140 @@ namespace InformedProteomics.TopDown.Execution
 
             var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
 
-            foreach (var annotationAndOffset in annotationsAndOffsets)
+            if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
             {
-                if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
+                var threads = MaxNumThreads;
+
+                // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
+                // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
+                int coreCount = 0;
+                try
                 {
-                    return matches;
-                }
-
-                var annotation = annotationAndOffset.Annotation;
-                var offset = annotationAndOffset.Offset;
-
-                var protein = db.GetProteinName(offset);
-
-                progress.Report(progData.UpdatePercent((double)numProteins / (double)estimatedProteins * 100.0));
-
-                //++numProteins;
-                Interlocked.Increment(ref numProteins);
-
-                if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
-                {
-                    lastUpdate = DateTime.UtcNow;
-
-                    Console.WriteLine(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
-                        numProteins,
-                        numProteins / (double)estimatedProteins * 100.0,
-                        sw.Elapsed.TotalSeconds);           
-                }
-
-                var protSequence = annotation.Substring(2, annotation.Length - 4);
-
-                var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
-                    AminoAcid.ProteinCTerm);
-                if (seqGraph == null) continue;
-
-                for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
-                {
-                    if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
-                    var numProteoforms = seqGraph.GetNumProteoforms();
-                    var modCombs = seqGraph.GetModificationCombinations();
-                    for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
+                    foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
                     {
-                        seqGraph.SetSink(modIndex);
-                        var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                        var sequenceMass = protCompositionWithH2O.Mass;
-                        var modCombinations = modCombs[modIndex];
+                        coreCount += int.Parse(item["NumberOfCores"].ToString());
+                    }
+                    //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
+                }
+                catch (Exception)
+                {
+                    // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
+                    coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
+                }
 
-                        var ms2ScanNums = this.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
+                if (threads <= 0 || threads > coreCount)
+                {
+                    threads = coreCount;
+                }
 
-                        foreach (var ms2ScanNum in ms2ScanNums)
+                var pfeOptions = new ParallelOptions();
+                pfeOptions.MaxDegreeOfParallelism = threads;
+                pfeOptions.CancellationToken = cancellationToken != null ? cancellationToken.Value : CancellationToken.None;
+
+                Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
+                {
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                    SearchForMatches(annotationAndOffset, db, sequenceFilter, matches, maxNumNTermCleavages);
+                });
+            }
+            else
+            {
+                foreach (var annotationAndOffset in annotationsAndOffsets)
+                {
+                    if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
+                    {
+                        return matches;
+                    }
+
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                    SearchForMatches(annotationAndOffset, db, sequenceFilter, matches, maxNumNTermCleavages);
+                }
+            }
+            progData.StatusInternal = string.Empty;
+            progress.Report(progData.UpdatePercent(100.0));
+            return matches;
+        }
+
+        private void SearchProgressReport(ref int numProteins, ref DateTime lastUpdate, long estimatedProteins, Stopwatch sw, IProgress<ProgressData> progress, ProgressData progData)
+        {
+            var tempNumProteins = Interlocked.Increment(ref numProteins) - 1;
+            //lock (progress)
+            //{
+            progData.StatusInternal = String.Format(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
+                    tempNumProteins,
+                    tempNumProteins / (double)estimatedProteins * 100.0,
+                    sw.Elapsed.TotalSeconds);
+            progress.Report(progData.UpdatePercent(tempNumProteins / (double)estimatedProteins * 100.0));
+            //}
+
+            if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
+            {
+                lastUpdate = DateTime.UtcNow;
+
+                Console.WriteLine(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
+                    tempNumProteins,
+                    tempNumProteins / (double)estimatedProteins * 100.0,
+                    sw.Elapsed.TotalSeconds);
+            }
+        }
+
+        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, FastaDatabase db,
+            ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages)
+        {
+            var annotation = annotationAndOffset.Annotation;
+            var offset = annotationAndOffset.Offset;
+
+            //var protein = db.GetProteinName(offset);
+
+            var protSequence = annotation.Substring(2, annotation.Length - 4);
+
+            var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
+                AminoAcid.ProteinCTerm);
+            if (seqGraph == null) return; // No matches will be found without a sequence graph.
+
+            for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
+            {
+                if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
+                var numProteoforms = seqGraph.GetNumProteoforms();
+                var modCombs = seqGraph.GetModificationCombinations();
+                for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
+                {
+                    seqGraph.SetSink(modIndex);
+                    var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+                    var sequenceMass = protCompositionWithH2O.Mass;
+                    var modCombinations = modCombs[modIndex];
+
+                    var ms2ScanNums = this.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
+
+                    foreach (var ms2ScanNum in ms2ScanNums)
+                    {
+                        if (ms2ScanNum > _run.MaxLcScan) continue;
+
+                        var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                        if (spec == null) continue;
+                        var charge =
+                            (int)
+                                Math.Round(sequenceMass /
+                                           (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
+                        var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
+                        var score = seqGraph.GetFragmentScore(scorer);
+                        if (score <= 3) continue;
+
+                        var precursorIon = new Ion(protCompositionWithH2O, charge);
+                        var sequence = protSequence.Substring(numNTermCleavages);
+                        var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
+                        var post = annotation[annotation.Length - 1];
+
+                        var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
+                            numNTermCleavages,
+                            modCombinations, precursorIon, score);
+
+                        // Lock necessary for parallel search
+                        lock (matches)
                         {
-                            if (ms2ScanNum > _run.MaxLcScan) continue;
-
-                            var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                            if (spec == null) continue;
-                            var charge =
-                                (int)
-                                    Math.Round(sequenceMass/
-                                               (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
-                            var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
-                            var score = seqGraph.GetFragmentScore(scorer);
-                            if (score <= 3) continue;
-
-                            var precursorIon = new Ion(protCompositionWithH2O, charge);
-                            var sequence = protSequence.Substring(numNTermCleavages);
-                            var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
-                            var post = annotation[annotation.Length - 1];
-
-                            var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
-                                numNTermCleavages,
-                                modCombinations, precursorIon, score);
-
                             if (matches[ms2ScanNum] == null)
                             {
-                                matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> {prsm};
+                                matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> { prsm };
                             }
                             else // already exists
                             {
@@ -448,156 +494,6 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
             }
-            progress.Report(progData.UpdatePercent(100.0));
-            return matches;
-        }
-
-        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearchParallel(FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
-        {
-            if (progress == null)
-            {
-                progress = new Progress<ProgressData>();
-            }
-            var progData = new ProgressData();
-            progData.Status = "Searching for matches";
-
-            var threads = MaxNumThreads;
-            var sw = new Stopwatch();
-
-            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
-            // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
-            int coreCount = 0;
-            try
-            {
-                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
-                {
-                    coreCount += int.Parse(item["NumberOfCores"].ToString());
-                }
-                //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
-            }
-            catch (Exception)
-            {
-                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
-                coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
-            }
-
-            if (threads <= 0 || threads > coreCount)
-            {
-                threads = coreCount;
-            }
-
-            long estimatedProteins;
-            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
-            Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
-            
-            var numProteins = 0;
-            var lastUpdate = DateTime.UtcNow;
-
-            sw.Reset();
-            sw.Start();
-
-            var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
-
-            var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
-
-            var pfeOptions = new ParallelOptions();
-            pfeOptions.MaxDegreeOfParallelism = threads;
-            pfeOptions.CancellationToken = cancellationToken != null ? (CancellationToken)cancellationToken : CancellationToken.None;
-
-            //foreach (var annotationAndOffset in annotationsAndOffsets)
-            Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
-            {
-                var annotation = annotationAndOffset.Annotation;
-                var offset = annotationAndOffset.Offset;
-
-                var protein = db.GetProteinName(offset);
-
-                var tempNumProteins = Interlocked.Increment(ref numProteins);
-                //lock (progress)
-                //{
-                    progress.Report(progData.UpdatePercent((double)(tempNumProteins - 1) / (double)estimatedProteins * 100.0));
-                //}
-
-                if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
-                {
-                    lastUpdate = DateTime.UtcNow;
-
-                    Console.WriteLine(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
-                        tempNumProteins,
-                        tempNumProteins / (double)estimatedProteins * 100.0,
-                        sw.Elapsed.TotalSeconds);                    
-                }
-
-                var protSequence = annotation.Substring(2, annotation.Length - 4);
-
-                var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
-                    AminoAcid.ProteinCTerm);
-                if (seqGraph == null) return; // Early exit from this iteration, not for the function.
-
-                for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
-                {
-                    if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
-                    var numProteoforms = seqGraph.GetNumProteoforms();
-                    var modCombs = seqGraph.GetModificationCombinations();
-                    for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
-                    {
-                        seqGraph.SetSink(modIndex);
-                        var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                        var sequenceMass = protCompositionWithH2O.Mass;
-                        var modCombinations = modCombs[modIndex];
-
-                        var ms2ScanNums = this.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
-
-                        foreach (var ms2ScanNum in ms2ScanNums)
-                        {
-                            if (ms2ScanNum > _run.MaxLcScan) continue;
-
-                            var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                            if (spec == null) continue;
-                            var charge =
-                                (int)
-                                    Math.Round(sequenceMass /
-                                               (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
-                            var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
-                            var score = seqGraph.GetFragmentScore(scorer);
-                            if (score <= 3) continue;
-
-                            var precursorIon = new Ion(protCompositionWithH2O, charge);
-                            var sequence = protSequence.Substring(numNTermCleavages);
-                            var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
-                            var post = annotation[annotation.Length - 1];
-
-                            var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset,
-                                numNTermCleavages,
-                                modCombinations, precursorIon, score);
-
-                            lock (matches)
-                            {
-                                if (matches[ms2ScanNum] == null)
-                                {
-                                    matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> {prsm};
-                                }
-                                else // already exists
-                                {
-                                    var existingMatches = matches[ms2ScanNum];
-                                    if (existingMatches.Count < NumMatchesPerSpectrum) existingMatches.Add(prsm);
-                                    else
-                                    {
-                                        var minScore = existingMatches.Min.Score;
-                                        if (score > minScore)
-                                        {
-                                            existingMatches.Add(prsm);
-                                            existingMatches.Remove(existingMatches.Min);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            progress.Report(progData.UpdatePercent(100.0));
-            return matches;
         }
 
         private void WriteResultsToFile(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)

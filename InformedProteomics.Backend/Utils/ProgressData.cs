@@ -5,6 +5,7 @@ namespace InformedProteomics.Backend.Utils
     public class ProgressData
     {
         public string Status { get; set; }
+        public string StatusInternal { get; set; }
 
         public double Percent
         {

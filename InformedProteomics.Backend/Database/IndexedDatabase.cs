@@ -490,7 +490,7 @@ namespace InformedProteomics.Backend.Database
             //int prevThreads, prevPorts;
             //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
             //ThreadPool.SetMinThreads(8, prevPorts);
-            CancellationToken token = cancellationToken != null ? (CancellationToken)cancellationToken : CancellationToken.None;
+            CancellationToken token = cancellationToken != null ? cancellationToken.Value : CancellationToken.None;
             // pre, peptide sequence, next
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(48).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
