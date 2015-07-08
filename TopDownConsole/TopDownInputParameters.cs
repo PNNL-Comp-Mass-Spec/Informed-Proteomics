@@ -27,7 +27,6 @@ namespace MSPathFinderT
         public double MinSequenceMass { get; set; }
         public double MaxSequenceMass { get; set; }
         public string FeatureFilePath { get; set; }
-        public double FeatureMinProbability { get; set; }
         public int MaxNumThreads { get; set; }
         public bool ForceParallel { get; set; }
 
@@ -56,7 +55,6 @@ namespace MSPathFinderT
             Console.WriteLine("MaxProductIonCharge: " + MaxProductIonCharge);
             Console.WriteLine("MinSequenceMass: " + MinSequenceMass);
             Console.WriteLine("MaxSequenceMass: " + MaxSequenceMass);
-            Console.WriteLine("MinFeatureProbability: " + FeatureMinProbability);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + _maxNumDynModsPerSequence);
             Console.WriteLine("Modifications: ");
 
@@ -95,7 +93,6 @@ namespace MSPathFinderT
                     writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
                     writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
                     writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
-                    writer.WriteLine("MinFeatureProbability\t" + FeatureMinProbability);
                     writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
                     foreach (var searchMod in _searchModifications)
                     {
@@ -103,7 +100,6 @@ namespace MSPathFinderT
                     }
                 }
             }
-
         }
 
         public string Parse(Dictionary<string, string> parameters)
@@ -205,12 +201,7 @@ namespace MSPathFinderT
                 ForceParallel = true;
                 MaxNumThreads = -MaxNumThreads;
             }
-
-            FeatureMinProbability = Convert.ToDouble(parameters["-minProb"]);
-            if (FeatureMinProbability < 0.0 || FeatureMinProbability > 1.0)
-            {
-                return "FeatureMinProbability must be 0 or 1";
-            }
+            
             return null;
         }
 

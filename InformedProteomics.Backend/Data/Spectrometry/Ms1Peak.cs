@@ -13,19 +13,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             IndexInSpectrum = indexInSpec;
             Active = true;
-            Quantified = false;
         }
-
-        public int IndexInSpectrum { get; private set; }
-        public bool Active { get; private set; }
-        public bool Quantified { get; internal set; }
-
+        
         public void InActivate()
         {
             Active = false;
         }
-
-
+        
         public void TagMajorPeakOf(LcMsPeakCluster feature)
         {
             if (_majorIsotopeFeatures == null) _majorTaggedFeatures = new List<LcMsPeakCluster>();
@@ -47,10 +41,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (_majorTaggedFeatures != null) foreach (var f in _majorTaggedFeatures) yield return f;
         }
 
+        public int IndexInSpectrum { get; private set; }
+        public bool Active { get; private set; }
+        public ushort Ms1SpecIndex { get; set; }
         
         private List<LcMsPeakCluster> _minorTaggedFeatures;
         private List<LcMsPeakCluster> _majorTaggedFeatures;
-
 
         public void TagMajorPeakOf(Ms1FeatureCluster feature)
         {
@@ -72,11 +68,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             if (_majorIsotopeFeatures != null) foreach (var f in _majorIsotopeFeatures) yield return f;
         }
-
-        internal ushort Ms1SpecIndex { get; set; }
+        
         private List<Ms1FeatureCluster> _minorIsotopeFeatures;
         private List<Ms1FeatureCluster> _majorIsotopeFeatures;
- 
     }
    
 }

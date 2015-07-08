@@ -70,7 +70,10 @@ namespace InformedProteomics.Test
 //            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 //            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
 //            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
-            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+//            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            const string rawFilePath = @"D:\MassSpecFiles\60k\Yufeng_SampleTest1_150614113438.pbf";
+            //const string rawFilePath = @"D:\MassSpecFiles\60k\NCR_50K_Test_24Jun15_Bane_15-02-02RZ.pbf";
+
             if (!File.Exists(rawFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -83,10 +86,8 @@ namespace InformedProteomics.Test
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
-//            const string fastaFilePath = @"H:\Research\Lewy\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-//            const string fastaFilePath = @"H:\Research\Weijun_TopDown\database\ID_005140_7A170668.fasta";
-//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
-            const string fastaFilePath = @"H:\Research\Charles\TopDown\databases\ID_002166_F86E3B2F.fasta";
+            const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_003836_DA9CC1E4.fasta";
+            //const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_004973_9BA6912F.fasta";
             if (!File.Exists(fastaFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
@@ -96,8 +97,10 @@ namespace InformedProteomics.Test
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
+//            var modsFilePath = @"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt";
+            var modsFilePath = @"D:\MassSpecFiles\60k\Mods.txt";
+//            var modsFilePath = "";
 
-            var modsFilePath = @"H:\Research\Charles\TopDown\Mods.txt";
             if (!File.Exists(modsFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modsFilePath);

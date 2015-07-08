@@ -98,7 +98,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 return;
             }
 
-            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+            const string specFilePath = @"\\protoapps\UserData\Jungkap\Joshua\testData\SBEP_STM_001_02272012_Aragon.raw";
 
             if (!File.Exists(specFilePath))
             {

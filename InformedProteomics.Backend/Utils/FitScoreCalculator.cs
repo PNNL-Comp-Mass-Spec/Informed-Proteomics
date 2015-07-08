@@ -21,8 +21,7 @@ namespace InformedProteomics.Backend.Utils
                 s2 += v2[i + v2Index];
             }
 
-            if (s1 < double.Epsilon) s1 = 1.0d;
-            if (s2 < double.Epsilon) s2 = 1.0d;
+            if (!(s1 > 0) || !(s2 > 0)) return Double.PositiveInfinity;
 
             var bc = 0d;
             for (var i = 0; i < count; i++)

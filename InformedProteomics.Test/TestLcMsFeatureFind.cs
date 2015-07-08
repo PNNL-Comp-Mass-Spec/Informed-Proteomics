@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -14,53 +16,26 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsFeatureFind
     {
+
         [Test]
-        public void DebugLcMsMatrix()
+        public void TestIsotopeCount()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            var rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.pbf";
-            var ms1ftFile = @"\\protoapps\UserData\Sangtae\TestData\Output\Syn_utex2973_Top_01_TopDown_7May15_Bane_14-09-01RZ.ms1ft.bak";
-
-            if (!File.Exists(rawFile))
+            for (var m = 1000; m < 30000; m += 1000)
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
-            }
+                var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
+                var n = 2; //Math.Ceiling(TheoreticalEnvelope.Size*0.5);
 
-            if (!File.Exists(ms1ftFile))
-            {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, ms1ftFile);
-                return;
-            }
+                var j = 0;
+                for (var i = 0; i < TheoreticalEnvelope.IndexOrderByRanking.Length; i++)
+                {
+                    var k = TheoreticalEnvelope.IndexOrderByRanking[i];
+                    if (TheoreticalEnvelope.Isotopes[k].Ratio < 0.3) break;
+                    j++;
+                }
+                Console.WriteLine("{0}\t{1}\t{2}", m, j, TheoreticalEnvelope.Size);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
-            //Directory.GetDirectories(@"\\proto-4\VOrbiETD02\2015_2")
-            var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
-            var tsvParser = new TsvFileParser(ms1ftFile);
-
-            for (var i = 0; i < tsvParser.NumData; i++)
-            {
-                //var featureDist = string.Format(@"D:\MassSpecFiles\training\{0}\{1}.txt", Path.GetFileNameWithoutExtension(dataset), i);
-                //var distWriter = new StreamWriter(featureDist);
-
-                var minScan = int.Parse(tsvParser.GetData("MinScan")[i]);
-                var maxScan = int.Parse(tsvParser.GetData("MaxScan")[i]);
-                var minCharge = int.Parse(tsvParser.GetData("MinCharge")[i]);
-                var maxCharge = int.Parse(tsvParser.GetData("MaxCharge")[i]);
-
-                var repCharge = int.Parse(tsvParser.GetData("RepCharge")[i]);
-                var repScan = int.Parse(tsvParser.GetData("RepScan")[i]);
-
-                var mass = double.Parse(tsvParser.GetData("MonoMass")[i]);
-                var feature = featureFinder.GetLcMsPeakCluster(mass, repCharge, minScan, maxScan, repScan);
-                Console.Write(i); Console.Write("\t");
-                Console.Write(mass); Console.Write("\t");
-                Console.WriteLine(feature == null ? 0 : feature.Abundance);
             }
         }
-        
         
         [Test]
         public void TestLcMsFeatureFinder()
@@ -83,13 +58,12 @@ namespace InformedProteomics.Test
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
-            var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0, scorer);
+            var featureFinder = new LcMsPeakMatrix(run, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer);
             var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3000);
-            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3001);
+            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3010);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
             Console.WriteLine(@"Start MS1 feature extraction.");
@@ -112,10 +86,8 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Complete MS1 feature extraction.");
             Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
-            
 
             // write result files
-            
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             var connectedFeatures = container.GetAllConnectedFeatures();
           
@@ -141,12 +113,27 @@ namespace InformedProteomics.Test
                 Console.Write(feature.MaxScanNum); Console.Write("\t");
                 Console.Write(feature.MinCharge); Console.Write("\t");
                 Console.Write(feature.MaxCharge); Console.Write("\t");
-                Console.Write(feature.MinElutionTime); Console.Write("\t");
-                Console.Write(feature.MaxElutionTime); Console.Write("\t");
-                Console.Write(feature.MaxElutionTime - feature.MinElutionTime); Console.Write("\t");
+                
+                Console.Write(feature.RepresentativeScanNum); Console.Write("\t");
+                Console.Write(feature.RepresentativeMz); Console.Write("\t");
+                Console.Write(feature.RepresentativeCharge); Console.Write("\t");
 
                 //Console.Write(feature.BestSummedEnvelopeDistance); Console.Write("\t");
                 //Console.Write(feature.BestEnvelopeDistance); Console.Write("\t");
+                Console.Write(feature.BestDistanceScoreAcrossCharge[0]); Console.Write("\t");
+                Console.Write(feature.BestDistanceScoreAcrossCharge[1]); Console.Write("\t");
+
+                Console.Write(feature.BestCorrelationScoreAcrossCharge[0]); Console.Write("\t");
+                Console.Write(feature.BestCorrelationScoreAcrossCharge[1]); Console.Write("\t");
+
+                Console.Write(feature.BestIntensityScoreAcrossCharge[0]); Console.Write("\t");
+                Console.Write(feature.BestIntensityScoreAcrossCharge[1]); Console.Write("\t");
+
+                Console.Write(feature.AbundanceDistributionAcrossCharge[0]); Console.Write("\t");
+                Console.Write(feature.AbundanceDistributionAcrossCharge[1]); Console.Write("\t");
+
+                Console.Write(feature.XicCorrelationBetweenBestCharges[0]); Console.Write("\t");
+                Console.Write(feature.XicCorrelationBetweenBestCharges[1]); Console.Write("\t");
 
                 Console.Write(feature.Score); Console.Write("\n");
                 featureId++;
@@ -157,7 +144,7 @@ namespace InformedProteomics.Test
         
         
         [Test]
-        public void TestCollectTrainingSet()
+        public void CollectTrainingSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
@@ -173,9 +160,9 @@ namespace InformedProteomics.Test
 
             var rawFileLists = new string[]
             {
+                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",                
                 @"D:\MassSpecFiles\SBEP\SBEP_STM_001_02222012_Aragon.pbf",
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",
-                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
                 @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_3_2Feb15_Bane_C2Column4.pbf",
                 @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf",                
@@ -205,6 +192,7 @@ namespace InformedProteomics.Test
                 var targetSets = LcMsFeatureTrain.CollectTrainSet(dataset, idFile, 0.005);
                 Console.WriteLine(targetSets.Count);
                 var outFileName = string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset));
+           
                 if (File.Exists(outFileName)) continue;
 
                 var writer =
@@ -249,7 +237,8 @@ namespace InformedProteomics.Test
             public double[] BestIntensityScoreAcrossCharge { get; private set; }            
             */
             
-            for(var charge = feature.MinCharge; charge <= feature.MaxCharge; charge++)
+            //for(var charge = feature.MinCharge; charge <= feature.MaxCharge; charge++)
+            for(var i = 0; i < 2; i++)
             {
                 writer.Write(id);
                 writer.Write("\t");
@@ -257,28 +246,36 @@ namespace InformedProteomics.Test
                 writer.Write(feature.Mass);
                 writer.Write("\t");                
 
-                writer.Write(charge);
+                writer.Write(feature.BestCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.EnvelopeDistanceScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.EnvelopeDistanceScoreAcrossCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.EnvelopeCorrelationScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.EnvelopeCorrelationScoreAcrossCharge[i]);
                 writer.Write("\t");
                 
-                writer.Write(feature.EnvelopeIntensityScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.EnvelopeIntensityScoreAcrossCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.BestDistanceScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.BestDistanceScoreAcrossCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.BestCorrelationScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.BestCorrelationScoreAcrossCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.BestIntensityScoreAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.BestIntensityScoreAcrossCharge[i]);
                 writer.Write("\t");
 
-                writer.Write(feature.AbundanceDistributionAcrossCharge[charge - feature.MinCharge]);
+                writer.Write(feature.AbundanceDistributionAcrossCharge[i]);
+                writer.Write("\t");
+
+                writer.Write(feature.XicCorrelationBetweenBestCharges[0]);
+                writer.Write("\t");
+
+                writer.Write(feature.XicCorrelationBetweenBestCharges[1]);
+                //writer.Write("\t");
+
                 writer.Write("\n");
             }   
         }
@@ -333,7 +330,7 @@ namespace InformedProteomics.Test
                 writer.WriteLine("MinScan\tMaxScan\tMinCharge\tMaxCharge\tMinTime\tMaxTime\tElution\tGood");
 
                 var run = PbfLcMsRun.GetLcMsRun(dataset);
-                var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
+                var featureFinder = new LcMsPeakMatrix(run);
                 var tsvParser = new TsvFileParser(featureList);
 
                 for (var i = 0; i < tsvParser.NumData; i++)
@@ -462,122 +459,6 @@ namespace InformedProteomics.Test
         */
 
         [Test]
-        public void TestFeatureFindingWithAccurateMass()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
-            if (!Directory.Exists(idFileFolder))
-            {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
-                return;
-            }
-
-            var rawFileLists = new string[]
-            {
-                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",                
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"D:\MassSpecFiles\SBEP\SBEP_STM_001_02222012_Aragon.pbf",
-                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_3_2Feb15_Bane_C2Column4.pbf",
-                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
-                @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
-                @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf"
-            };
-
-            var id = 1;
-
-            foreach (var dataset in rawFileLists)
-            {
-                if (!File.Exists(dataset))
-                {
-                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", dataset);
-                    continue;
-                }
-
-                var dataname = Path.GetFileNameWithoutExtension(dataset);
-                var featureList = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
-                var featureResult = string.Format(@"{0}\{1}.feature.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
-                var targetStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\stats\{0}.tsv", Path.GetFileNameWithoutExtension(dataset)));
-                var decoyStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\stats\{0}_decoy.tsv", Path.GetFileNameWithoutExtension(dataset)));
-
-                //if (File.Exists(featureResult)) continue;
-                //var statWriter = new StreamWriter(featureStat);
-                var writer = new StreamWriter(featureResult);
-
-                writer.Write("Ms2MinScan\tMs2MaxScan\tMs2MinCharge\tMs2MaxCharge\tMass\t");
-                writer.WriteLine("MinScan\tMaxScan\tMinCharge\tMaxCharge\tMinTime\tMaxTime\tElution\tGood");
-
-                var run = PbfLcMsRun.GetLcMsRun(dataset);
-                var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
-                var tsvParser = new TsvFileParser(featureList);
-
-                for (var i = 0; i < tsvParser.NumData; i++)
-                {
-                    //var featureDist = string.Format(@"D:\MassSpecFiles\training\{0}\{1}.txt", Path.GetFileNameWithoutExtension(dataset), i);
-                    //var distWriter = new StreamWriter(featureDist);
-
-                    var minScan = int.Parse(tsvParser.GetData("MinScan")[i]);
-                    var maxScan = int.Parse(tsvParser.GetData("MaxScan")[i]);
-                    var minCharge = int.Parse(tsvParser.GetData("MinCharge")[i]);
-                    var maxCharge = int.Parse(tsvParser.GetData("MaxCharge")[i]);
-                    var mass = double.Parse(tsvParser.GetData("Mass")[i]);
-                    var sequence = tsvParser.GetData("Sequence")[i];
-                    var composition = tsvParser.GetData("Composition")[i];
-
-                    var charge = 0.5 * (minCharge + maxCharge);
-                    var scan = 0.5 * (minScan + maxScan);
-                    
-                    var feature = featureFinder.GetLcMsPeakCluster(mass, (int)charge, minScan, maxScan);
-
-                    if (feature == null) continue;
-
-                    writer.Write(minScan); writer.Write("\t");
-                    writer.Write(maxScan); writer.Write("\t");
-                    writer.Write(minCharge); writer.Write("\t");
-                    writer.Write(maxCharge); writer.Write("\t");
-                    writer.Write(mass); writer.Write("\t");
-
-                    writer.Write(feature.MinScanNum); writer.Write("\t");
-                    writer.Write(feature.MaxScanNum); writer.Write("\t");
-                    writer.Write(feature.MinCharge); writer.Write("\t");
-                    writer.Write(feature.MaxCharge); writer.Write("\t");
-                    writer.Write(feature.MinElutionTime); writer.Write("\t");
-                    writer.Write(feature.MaxElutionTime); writer.Write("\t");
-                    writer.Write(feature.MaxElutionTime - feature.MinElutionTime); writer.Write("\t");
-
-                    var good = (feature.MinScanNum <= minScan && feature.MaxScanNum >= maxScan);
-
-                    writer.Write(good ? 1 : 0);
-                    writer.Write("\n");
-
-                    if (feature.EnvelopeDistanceScoreAcrossCharge == null) continue;
-
-                    OutputEnvelopPeakStat(id, feature, targetStatWriter);
-                    
-                    feature.UpdateWithDecoyScore(featureFinder.Ms1Spectra, 2, 60);
-                    OutputEnvelopPeakStat(id, feature, decoyStatWriter);
-                    id++;
-
-                    //OutputEnvelopPeakStat(ms1Feature, featureFinder.MinScanCharge, run, feature.Envelopes[0].TheoreticalEnvelope, statWriter);
-                    //Console.WriteLine("{0}\t{1}", i, composition);
-                    //distWriter.Write(ms1Feature.Desc);
-                    //distWriter.Close();
-                }
-                writer.Close();
-                targetStatWriter.Close();
-                decoyStatWriter.Close();
-                Console.WriteLine(dataname);
-            }
-        }
-
-
-        [Test]
         public void TestFeatureFindingWithMassBinning()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -592,16 +473,16 @@ namespace InformedProteomics.Test
 
             var rawFileLists = new string[]
             {
-                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",                                
+                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_3_2Feb15_Bane_C2Column4.pbf",                
+                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",                
+                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",                
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"D:\MassSpecFiles\SBEP\SBEP_STM_001_02222012_Aragon.pbf",
-                @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_3_2Feb15_Bane_C2Column4.pbf",
-                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
                 @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
                 @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf",
             };
@@ -621,17 +502,16 @@ namespace InformedProteomics.Test
                     Path.GetFileNameWithoutExtension(dataset));
                 
                 var run = PbfLcMsRun.GetLcMsRun(dataset);
-                var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
+                var featureFinder = new LcMsPeakMatrix(run);
                 var tsvParser = new TsvFileParser(featureList);
-
                 var featureResult = string.Format(@"{0}\{1}.ms1ft", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
                 var targetStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\stats\{0}.tsv", Path.GetFileNameWithoutExtension(dataset)));
                 var decoyStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\stats\{0}_decoy.tsv", Path.GetFileNameWithoutExtension(dataset)));
-
-                
                 var writer = new StreamWriter(featureResult);
+
                 writer.Write("Ms2MinScan\tMs2MaxScan\tMs2MinCharge\tMs2MaxCharge\tMs2Mass\t");
-                writer.WriteLine("Mass\tMinScan\tMaxScan\tMinCharge\tMaxCharge\tMinTime\tMaxTime\tElution\tGood\tCorr\tDist");
+                writer.Write("Mass\tMinScan\tMaxScan\tMinCharge\tMaxCharge\tMinTime\tMaxTime\tElution\tGood\tCorr\tDist");
+                writer.WriteLine("\tseedDist\tseedCorr\tseedPoisson\tseedRanksum");
 
                 for (var i = 0; i < tsvParser.NumData; i++)
                 {
@@ -642,7 +522,6 @@ namespace InformedProteomics.Test
                     var mass = double.Parse(tsvParser.GetData("Mass")[i]);
                     var sequence = tsvParser.GetData("Sequence")[i];
                     var composition = tsvParser.GetData("Composition")[i];
-
                     var charge = 0.5*(minCharge + maxCharge);
                     var scan = 0.5*(minScan + maxScan);
 
@@ -653,45 +532,36 @@ namespace InformedProteomics.Test
                     writer.Write(mass); writer.Write("\t");
 
                     var binNum = featureFinder.Comparer.GetBinNumber(mass);
-                    var features = featureFinder.FindFeatures(binNum);
+                    
+                    var binNumList = new int[] {binNum, binNum - 1, binNum + 1};
                     LcMsPeakCluster refinedFeature = null;
 
-                    var massTh = tolerance.GetToleranceAsTh(mass);
-
-                    foreach (var feature in features)
+                    foreach(var bi in binNumList)
                     {
-                        if (Math.Abs(mass - feature.Mass) < massTh && feature.MinScanNum <= scan && scan <= feature.MaxScanNum)
-                        {
-                            refinedFeature = feature;
-                            break;
-                        }
-                    }
-
-                    if (refinedFeature == null)
-                    {
-                        features = featureFinder.FindFeatures(binNum - 1);
+                        var tempList = new List<LcMsPeakCluster>();
+                        var features = featureFinder.FindFeatures(bi);
+                        var massTh = tolerance.GetToleranceAsTh(mass);
                         foreach (var feature in features)
                         {
-                            if (Math.Abs(mass - feature.Mass) < massTh && feature.MinScanNum <= scan && scan <= feature.MaxScanNum)
-                            {
-                                refinedFeature = feature;
-                                break;
-                            }
+                            if (Math.Abs(mass - feature.Mass) < massTh) tempList.Add(feature);
                         }
-                    }
-                    if (refinedFeature == null)
-                    {
-                        features = featureFinder.FindFeatures(binNum + 1);
-                        foreach (var feature in features)
+                        
+                        var nHits = 0;
+                        var scans = Enumerable.Range(minScan, maxScan - minScan + 1);
+                        foreach (var feature in tempList)
                         {
-                            if (Math.Abs(mass - feature.Mass) < massTh && feature.MinScanNum <= scan && scan <= feature.MaxScanNum)
+                            var scans2 = Enumerable.Range(feature.MinScanNum, feature.MaxScanNum - feature.MinScanNum + 1);
+                            var hitScans = scans.Intersect(scans2).Count();
+                            if (hitScans > nHits)
                             {
                                 refinedFeature = feature;
-                                break;
+                                nHits = hitScans;
                             }
                         }
-                    }
 
+                        if (nHits > 0) break;
+                    }
+                    
                     if (refinedFeature != null)
                     {
                         writer.Write(refinedFeature.Mass); writer.Write("\t");
@@ -705,24 +575,19 @@ namespace InformedProteomics.Test
 
                         var good = (refinedFeature.MinScanNum <= minScan && refinedFeature.MaxScanNum >= maxScan);
 
-                        writer.Write(good ? 1 : 0); writer.Write("\t");
+                        writer.Write(good ? 1 : 0); writer.Write("\n");
                         //writer.Write(0); writer.Write("\t");
                         //writer.Write(0); writer.Write("\n");
-                        writer.Write(refinedFeature.tempInitialCorr); writer.Write("\t");
-                        writer.Write(refinedFeature.tempInitialDist); writer.Write("\n");
-
+                        
                         OutputEnvelopPeakStat(id, refinedFeature, targetStatWriter);
-
-                        //featureFinder.EvaludateSummedDecoyEnvelope(refinedFeature);
-                        refinedFeature.UpdateWithDecoyScore(featureFinder.Ms1Spectra, 2, 60);
+                        
+                        refinedFeature.UpdateWithDecoyScore(featureFinder.Ms1Spectra);
                         OutputEnvelopPeakStat(id, refinedFeature, decoyStatWriter);
                         id++;
 
                     }
                     else
                     {
-                        writer.Write(0); writer.Write("\t");
-                        writer.Write(0); writer.Write("\t");
                         writer.Write(0); writer.Write("\t");
                         writer.Write(0); writer.Write("\t");
                         writer.Write(0); writer.Write("\t");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -53,6 +54,16 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 foreach (var i in TheoreticalEnvelope.IndexOrderByRanking) if (Peaks[i] != null && Peaks[i].Active) return Peaks[i];
                 return null;
+            }
+        }
+
+        public double HighestIntensity
+        {
+            get
+            {
+                var ret = 0d;
+                foreach (var peak in Peaks.Where(p => p != null && p.Active)) if (peak.Intensity > ret) ret = peak.Intensity;
+                return ret;
             }
         }
 

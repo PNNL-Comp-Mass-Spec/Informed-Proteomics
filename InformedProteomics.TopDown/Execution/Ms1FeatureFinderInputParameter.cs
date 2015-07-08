@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -16,10 +13,9 @@ namespace InformedProteomics.TopDown.Execution
         public string InputPath;
         public bool ScoreReport;
         public bool CsvOutput;
-        public bool TmpOutput;
+
         public int MaxThreads;
         public string OutputPath;
-        //public bool Quant;
 
         public Ms1FeatureFinderInputParameter()
         {
@@ -29,7 +25,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxSearchCharge = 60;
             ScoreReport = false;
             CsvOutput = true;
-            TmpOutput = false;
+
             MaxThreads = -1;
         }
 
@@ -40,25 +36,18 @@ namespace InformedProteomics.TopDown.Execution
 
         public void Parse(Dictionary<string, string> paramDic)
         {
-
             MinSearchMass = Math.Max(double.Parse(paramDic["-minMass"]), 100);
             MaxSearchMass = Math.Min(double.Parse(paramDic["-maxMass"]), 500000);
-
-
+            
             MinSearchCharge = (int)Math.Max(double.Parse(paramDic["-minCharge"]), 2);
             MaxSearchCharge = (int)Math.Min(double.Parse(paramDic["-maxCharge"]), 60);
             InputPath = paramDic["-i"];
             OutputPath = paramDic["-o"];
-
-            if (OutputPath == null) OutputPath = Path.GetDirectoryName(InputPath);
-
+            //OutputPath = (OutputPath == null) ? Path.GetDirectoryName(Path.GetFullPath(InputPath)) : Path.GetDirectoryName(OutputPath);
             MaxThreads = Int32.Parse(paramDic["-maxThreads"]);
 
             ScoreReport = Str2Bool(paramDic["-score"]);
             CsvOutput = Str2Bool(paramDic["-csv"]);
-            TmpOutput = Str2Bool(paramDic["-tmp"]);
-            //_quant = Str2Bool(_paramDic["-quant"]);
-
         }
 
         public void Display()
@@ -70,7 +59,9 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine("MaxMass\t{0}", MaxSearchMass);
             Console.WriteLine("MinCharge\t{0}", MinSearchCharge);
             Console.WriteLine("MaxCharge\t{0}", MaxSearchCharge);
+            
             Console.WriteLine("ScoreReport\t{0}", ScoreReport ? "Y" : "N");
+
             Console.WriteLine("MaxThreads\t{0}", MaxThreads);
         }
 
@@ -78,6 +69,5 @@ namespace InformedProteomics.TopDown.Execution
         {
             return (value.Equals("y") || value.Equals("Y"));
         }
-
     }
 }

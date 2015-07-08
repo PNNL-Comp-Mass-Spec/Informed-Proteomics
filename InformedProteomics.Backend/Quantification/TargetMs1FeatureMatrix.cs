@@ -31,7 +31,7 @@ namespace InformedProteomics.Backend.Quantification
 
             return ms1Feature;
         }
-        
+      
         public double GetMs1EvidenceScore(TargetFeature targetFeature)
         {
             SetQueryMass(targetFeature.Mass);

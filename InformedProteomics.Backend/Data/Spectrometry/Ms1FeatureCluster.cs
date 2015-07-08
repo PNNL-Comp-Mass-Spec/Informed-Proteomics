@@ -182,6 +182,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public void UpdateScores(IList<Ms1Spectrum> spectra)
         {
+/*            
             if (Envelopes.Count < 1) return;
 
             var bestEnvelopeCorrelation = 0.0d;
@@ -355,6 +356,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Probability = GetProbabilityByLogisticRegression();
 
             _scoreInit = true;
+ */
         }
 
         public void SetScore(byte scoreType, double scoreValue)

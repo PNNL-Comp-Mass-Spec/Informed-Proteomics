@@ -104,8 +104,6 @@ namespace ProMex
                 param.Display();
                 var launcher = new Ms1FeatureFinderLauncher(param);
                 launcher.Run();
-                return 0;
-
 #if (!DEBUG)
             }
             catch (Exception ex)
@@ -120,6 +118,7 @@ namespace ProMex
                     return errorCode;
             }
 #endif
+            return 0;
         }
 
         private static void PrintUsageInfo(string message = null)
@@ -142,7 +141,6 @@ namespace ProMex
                 "\t[-minMass MinMassInDa] (minimum mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
                 "\t[-score y or n (default: n)]\n" +
-                //"\t[-quant y or n] (quantification purpose, default: n\n" +
                 "\t[-maxThreads 0 (default: 0 (no limit))]\n"
                 );
 

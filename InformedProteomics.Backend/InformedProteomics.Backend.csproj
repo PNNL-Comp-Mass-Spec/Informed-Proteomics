@@ -171,7 +171,6 @@
     <Compile Include="MassFeature\LcMsFeatureComparer.cs" />
     <Compile Include="MassFeature\LcMsFeatureContainer.cs" />
     <Compile Include="MassFeature\LcMsFeatureLikelihood.cs" />
-    <Compile Include="MassFeature\LcMsFeatureScore.cs" />
     <Compile Include="MassFeature\LcMsFeatureTrain.cs" />
     <Compile Include="MassFeature\LcMsPeakCluster.cs" />
     <Compile Include="MassFeature\LcMsPeakScorer.cs" />

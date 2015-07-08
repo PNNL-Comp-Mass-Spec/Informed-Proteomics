@@ -314,9 +314,9 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             // QC_Shew
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
-            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownQCShew\Test";
+            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3";
+            const string dbFilePath = @"D:\MSPathFinder\Fasta\ID_002216_235ACCEA.fasta";
+            const string outputDir = @"D:\MassSpecFiles\training\test";
 
             if (!File.Exists(specFilePath))
             {
@@ -333,12 +333,7 @@ namespace InformedProteomics.Test
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
-//            var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
-            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
-            //var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
-            //var deamdN = new SearchModification(Modification.Deamidation, 'N', SequenceLocation.Everywhere, false);
-            //var deamdQ = new SearchModification(Modification.Deamidation, 'Q', SequenceLocation.Everywhere, false);
 
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>

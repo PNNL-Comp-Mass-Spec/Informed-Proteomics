@@ -9,16 +9,14 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class Ms1FtFilter : ISequenceFilter
     {
-        public Ms1FtFilter(LcMsRun run, Tolerance massTolerance, string ms1FtFileName, double minProbability = 0.0)
+        public Ms1FtFilter(LcMsRun run, Tolerance massTolerance, string ms1FtFileName)
         {
             _lcMsChargeMap = new LcMsChargeMap(run, massTolerance);
-            _minProbability = minProbability;
 
             Read(ms1FtFileName);
         }
 
         private readonly LcMsChargeMap _lcMsChargeMap;
-        private readonly double _minProbability;
 
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
@@ -35,17 +33,15 @@ namespace InformedProteomics.TopDown.Scoring
             var repScanArray = ftFileParser.GetData("RepScan").Select(s => Convert.ToInt32(s)).ToArray();
             var minChargeArray = ftFileParser.GetData("MinCharge").Select(s => Convert.ToInt32(s)).ToArray();
             var maxChargeArray = ftFileParser.GetData("MaxCharge").Select(s => Convert.ToInt32(s)).ToArray();
-            var probArray = ftFileParser.GetData("Probability").Select(Convert.ToDouble).ToArray();
-            var flagArray = ftFileParser.GetData("GoodEnough").Select(s => Convert.ToInt32(s)).ToArray();
+            //var probArray = ftFileParser.GetData("Probability").Select(Convert.ToDouble).ToArray();
+            //var flagArray = ftFileParser.GetData("GoodEnough").Select(s => Convert.ToInt32(s)).ToArray();
             var featureCountFiltered = 0;
 
             for (var i = 0; i < monoMassArr.Length; i++)
             {
-                if (flagArray[i] == 0 && probArray[i] < _minProbability) 
-                    continue;
-
+                //if (flagArray[i] == 0 && probArray[i] < _minProbability)  continue;
                 featureCountFiltered++;
-
+                
                 var monoMass = monoMassArr[i];
                 _lcMsChargeMap.SetMatches(monoMass, minScanArray[i], maxScanArray[i], repScanArray[i], minChargeArray[i], maxChargeArray[i]);
             }

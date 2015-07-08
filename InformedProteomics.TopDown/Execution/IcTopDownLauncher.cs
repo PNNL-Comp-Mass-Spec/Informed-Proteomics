@@ -41,7 +41,6 @@ namespace InformedProteomics.TopDown.Execution
             bool? runTargetDecoyAnalysis = true,
             int searchMode = 1,
             string featureFilePath = null,
-            double minFeatureProbability = 0.15,
             IEnumerable<int> scanNumbers = null,
             int numMatchesPerSpectrum = 1
             )
@@ -53,7 +52,6 @@ namespace InformedProteomics.TopDown.Execution
             AminoAcidSet = aaSet;
             FeatureFilePath = featureFilePath;
 
-            MinFeatureProbability = minFeatureProbability;
             OutputDir = outputDir;
             MinSequenceLength = minSequenceLength;
             MaxSequenceLength = maxSequenceLength;
@@ -81,7 +79,6 @@ namespace InformedProteomics.TopDown.Execution
         public string OutputDir { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
         public string FeatureFilePath { get; private set; }
-        public double MinFeatureProbability { get; private set; }
         public int MinSequenceLength { get; private set; }
         public int MaxSequenceLength { get; private set; }
         public int MaxNumNTermCleavages { get; private set; }
@@ -111,7 +108,7 @@ namespace InformedProteomics.TopDown.Execution
 
         public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
         {
-            Progress<ProgressData> prog = new Progress<ProgressData>();
+            var prog = new Progress<ProgressData>();
             var progData = new ProgressData();
             if (progress != null)
             {
@@ -165,13 +162,11 @@ namespace InformedProteomics.TopDown.Execution
                     };
                     var featureFinder = new Ms1FeatureFinderLauncher(param);
                     featureFinder.Run();
-                    //var extractor = new Ms1FeatureMatrix(_run, MinPrecursorIonCharge, MaxPrecursorIonCharge);
-                    //ms1FtFilePath = extractor.GetFeatureFile(SpecFilePath, MinSequenceMass, MaxSequenceMass);
                 }
                 sw.Reset();
                 sw.Start();
                 Console.Write(@"Reading ProMex results...");
-                ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath, MinFeatureProbability);
+                ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath);
             }
             else
             {
@@ -186,7 +181,7 @@ namespace InformedProteomics.TopDown.Execution
                 else if (extension.ToLower().Equals(".ms1ft"))
                 {
                     Console.Write(@"Reading ProMex results...");
-                    ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath, MinFeatureProbability);
+                    ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath);
                 }
                 else if (extension.ToLower().Equals(".msalign"))
                 {

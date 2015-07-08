@@ -15,24 +15,21 @@ namespace InformedProteomics.Backend.MassFeature
             _scorer = scorer;
         }
 
-        public const double ScoreThreshold = -10;
+        public const double ScoreThreshold = 0;
+        public const double CorrThreshold = 0.65;
 
         public bool Add(LcMsPeakCluster newFeature)
         {
-            //newFeature.Score = _scorer.GetScore(newFeature);
             if (newFeature.Score < ScoreThreshold) return false;
+            if (newFeature.BestCorrelationScore < CorrThreshold) return false;
             
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
-                //if (!_featureList[i].CoElutedByScanNum(newFeature)) continue;
                 var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
-                
                 if (massDiff < 1e-6)
                 {
                     var coeLen = _featureList[i].CoElutionLength(newFeature);
                     if (coeLen / _featureList[i].ElutionLength > 0.6 && coeLen / newFeature.ElutionLength > 0.6) return false;
-                    // already exists, then skip!
-                    //_featureList[i].Merge(newFeature);
                 }
             }
             
@@ -66,8 +63,9 @@ namespace InformedProteomics.Backend.MassFeature
         
         private bool SimilarScore(LcMsPeakCluster f1, LcMsPeakCluster f2)
         {
-            if (f1.Score > ScoreThreshold && f2.Score > ScoreThreshold) return true;
-            if (Math.Abs(f1.Score - f2.Score)/Math.Max(f1.Score, f2.Score) < 0.2) return true;
+            if (f1.Score >= ScoreThreshold && f1.BestCorrelationScore > CorrThreshold 
+             && f2.Score >= ScoreThreshold && f2.BestCorrelationScore > CorrThreshold) return true;
+            //if (Math.Abs(f1.Score - f2.Score)/Math.Max(f1.Score, f2.Score) < 0.2) return true;
 
             return false;
         }
@@ -107,7 +105,7 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     f.UpdateScore(_spectra);
                     f.Score = _scorer.GetScore(f);
-                    if (f.Score > ScoreThreshold) featureSet.Add(f);
+                    if (f.Score > ScoreThreshold && f.BestCorrelationScore > CorrThreshold) featureSet.Add(f);
                 }
             }
 

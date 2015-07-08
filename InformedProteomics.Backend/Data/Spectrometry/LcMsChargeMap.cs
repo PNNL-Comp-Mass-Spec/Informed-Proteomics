@@ -51,27 +51,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 var massBin = entry.Key;
                 var bitArray = entry.Value;
-
                 var ms2ScanList = new List<int>();
                 for (var i = 0; i < bitArray.Count; i++)
                 {
                     if(bitArray[i]) ms2ScanList.Add(i + _run.MinLcScan);
                 }
-                
-                /*
-                if (massBin > maxMassBin) 
-                    maxMassBin = massBin;
-
-                if (massBin < minMassBin) 
-                    minMassBin = massBin;
-
-                numScans += ms2ScanList.Count;
-                 */
 
                 _sequenceMassBinToScanNumsMap.Add(massBin, ms2ScanList.ToArray());
             }
             // Console.WriteLine("#MS/MS matches per sequence: {0}", numScans / (float)(maxMassBin - minMassBin + 1));
-
             _scanToIsolationWindow = null;
         }
 

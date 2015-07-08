@@ -287,7 +287,7 @@ namespace InformedProteomics.Test
                 return;
             }
 
-            var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath, 0.15);
+            var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath);
 
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
             Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));

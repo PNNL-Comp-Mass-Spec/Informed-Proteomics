@@ -18,7 +18,8 @@ namespace InformedProteomics.Backend.MassFeature
             
             var tsvReader = new TsvFileParser(idFilePath);
             var run = PbfLcMsRun.GetLcMsRun(pbfFilePath);
-            var targetSet = new Dictionary<string, IdentifiedProtein>();
+            //var targetSet = new Dictionary<string, IdentifiedProtein>();
+            var targetSet = new Dictionary<string, List<IdentifiedProtein>>();
 
             var scanNums = new int[tsvReader.NumData];
             for (var i = 0; i < tsvReader.NumData; i++) scanNums[i] = int.Parse(tsvReader.GetData("Scan")[i]);
@@ -52,36 +53,49 @@ namespace InformedProteomics.Backend.MassFeature
 
                 if (!good) continue;
 
-                IdentifiedProtein ip;
-
-                if (targetSet.TryGetValue(comp, out ip))
+                List<IdentifiedProtein> ipList;
+                var found = false;
+                if (targetSet.TryGetValue(comp, out ipList))
                 {
-                    var minNet = run.GetElutionTime(ip.MinScanNum) / run.GetElutionTime(run.MaxLcScan);
-                    var maxNet = run.GetElutionTime(ip.MaxScanNum) / run.GetElutionTime(run.MaxLcScan);
-                    var net = run.GetElutionTime(scan) / run.GetElutionTime(run.MaxLcScan);
-                    var netDiff = (net >= minNet && net <= maxNet) ? 0d : Math.Min(Math.Abs(minNet - net), Math.Abs(maxNet - net));
+                    foreach (var ip in ipList)
+                    {
+                        var minNet = run.GetElutionTime(ip.MinScanNum) / run.GetElutionTime(run.MaxLcScan);
+                        var maxNet = run.GetElutionTime(ip.MaxScanNum) / run.GetElutionTime(run.MaxLcScan);
+                        var net = run.GetElutionTime(scan) / run.GetElutionTime(run.MaxLcScan);
+                        var netDiff = (net >= minNet && net <= maxNet) ? 0d : Math.Min(Math.Abs(minNet - net), Math.Abs(maxNet - net));
 
-                    if (netDiff > netTh)
-                    {
-                        //Console.WriteLine("{0}\t{1}", scan, seq);
+                        if (netDiff > netTh)
+                        {
+                            //Console.WriteLine("{0}\t{1}", scan, seq);
+                        }
+                        else
+                        {
+                            ip.MaxScanNum = Math.Max(ip.MaxScanNum, scan);
+                            ip.MinScanNum = Math.Min(ip.MinScanNum, scan);
+                            ip.MaxCharge = Math.Max(ip.MaxCharge, charge);
+                            ip.MinCharge = Math.Min(ip.MinCharge, charge);
+                            ip.Rows.Add(row);
+                            found = true;
+                            break;
+                        }                        
                     }
-                    else
-                    {
-                        ip.MaxScanNum = Math.Max(ip.MaxScanNum, scan);
-                        ip.MinScanNum = Math.Min(ip.MinScanNum, scan);
-                        ip.MaxCharge = Math.Max(ip.MaxCharge, charge);
-                        ip.MinCharge = Math.Min(ip.MinCharge, charge);
-                        ip.Rows.Add(row);
-                    }
+                    if (!found) ipList.Add(identifiedProtein);
                 }
                 else
                 {
                     identifiedProtein.Rows.Add(row);
-                    targetSet.Add(comp, identifiedProtein);
+                    var newIpList = new List<IdentifiedProtein>();
+                    newIpList.Add(identifiedProtein);
+                    targetSet.Add(comp, newIpList);
                 }
             }
 
-            return targetSet.Values;
+            var ret = new List<IdentifiedProtein>();
+            foreach (var ipList in targetSet.Values)
+            {
+                ret.AddRange(ipList);
+            }
+            return ret;
         }
 
         private static bool IsGoodTarget(ProductSpectrum ms2Spec, Sequence sequence)
