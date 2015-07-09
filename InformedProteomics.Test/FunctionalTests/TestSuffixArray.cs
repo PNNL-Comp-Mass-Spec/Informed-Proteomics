@@ -37,8 +37,8 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("Matched indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern)));
             Console.WriteLine("Protein indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern).Select(i => db.GetOneBasedPositionInProtein(i))));
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+            
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -64,8 +64,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+            
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -91,8 +91,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+            
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -132,8 +132,8 @@ namespace InformedProteomics.Test.FunctionalTests
 
             Console.WriteLine("NumPeptides: {0}", numPeptides);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -223,8 +223,8 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("C-term only: {0}", cTermOnly);
             Console.WriteLine("All: {0}", both + nTermOnly + cTermOnly);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -308,8 +308,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //    var lastLine = File.ReadLines(bigDbFile).Last();
         //    sw.Stop();
 
-        //    var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-        //    Console.WriteLine(@"{0:f4} sec", sec);
+        //    Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         //    Console.WriteLine(lastLine);
         //}
 
@@ -323,8 +322,8 @@ namespace InformedProteomics.Test.FunctionalTests
         //    var db = new FastaDatabase(dbFile);
         //    db.Decoy(Enzyme.Trypsin);
         //    sw.Stop();
-        //    var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-        //    Console.WriteLine(@"{0:f4} sec", sec);
+
+        //    Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         //}
     }
 }

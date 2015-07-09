@@ -30,17 +30,21 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public static LcMsRun GetLcMsRunScanRange(string specFilePath, int singleScanNum)
         {
-            return GetLcMsRun(specFilePath, singleScanNum, singleScanNum);
+            var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath);
+            return GetLcMsRun(specFilePath, reader, 0.0, 0.0, null, singleScanNum, singleScanNum);
+
         }
 
         public static LcMsRun GetLcMsRunScanRange(string specFilePath, int scanStart, int scanEnd, IProgress<ProgressData> progress = null)
         {
-            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0.0, 0.0, progress, scanStart, scanEnd);
+            var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath);
+            return GetLcMsRun(specFilePath, reader, 0.0, 0.0, progress, scanStart, scanEnd);
         }
 
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
         {
-            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0.0, 0.0, progress);
+            var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath);
+            return GetLcMsRun(specFilePath, reader, 0.0, 0.0, progress);
         }
 
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]

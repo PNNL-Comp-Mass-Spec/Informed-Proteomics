@@ -200,15 +200,16 @@ namespace InformedProteomics.Test
 
             const int minScanNum = 46454;   // 635.43
             const int maxScanNum = 46661;   // 638.90
+            const int MAX_POINTS = 50;
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
             if (run == null) return;
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
             summedSpec.FilterNoise(50.0);
-//            summedSpec.Display();
+            // summedSpec.Display(MAX_POINTS);
 
             var deconvoluted = ProductScorerBasedOnDeconvolutedSpectra.GetDeconvolutedSpectrum(summedSpec, 2, 45, new Tolerance(10), 0.9, 2);
-            deconvoluted.Display();
+            deconvoluted.Display(MAX_POINTS);
         }
 
         [Test]
@@ -225,11 +226,13 @@ namespace InformedProteomics.Test
 
             const int minScanNum = 46454;
             const int maxScanNum = 46661;
+            const int MAX_POINTS = 50;
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
             if (run == null) return;
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
-            summedSpec.Display();
+
+            summedSpec.Display(MAX_POINTS);
         }
 
         [Test]
@@ -257,8 +260,8 @@ namespace InformedProteomics.Test
                     Math.Min(scanNum + windowSize, run.MaxLcScan));
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+            
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -389,7 +392,10 @@ namespace InformedProteomics.Test
             const double maxMz = 10000.0;    // 2000.0
             var minBinNum = comparer.GetBinNumber(minMz);
             var maxBinNum = comparer.GetBinNumber(maxMz);
-            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
+            var numBins = maxBinNum - minBinNum;
+            Console.WriteLine(@"NumBins: " + numBins);
+
+            Assert.IsTrue(numBins == 16384);
         }
 
         [Test]
@@ -431,8 +437,8 @@ namespace InformedProteomics.Test
                 //if(++numBinsProcessed % 1000 == 0) Console.WriteLine(numBinsProcessed);
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -460,7 +466,24 @@ namespace InformedProteomics.Test
             var proteinMass = neutral.Mass;
             var isoEnv = Averagine.GetIsotopomerEnvelope(proteinMass);
 
-            Console.WriteLine("Charge\t" + string.Join("\t", run.GetScanNumbers(1)));
+            const bool SHOW_ALL_SCANS = false;
+            var targetColIndex = 0;
+
+            if (SHOW_ALL_SCANS)           
+                Console.WriteLine("Charge\t" + string.Join("\t", run.GetScanNumbers(1)));
+            else
+            {
+                // Just display data for scan 161
+                Console.WriteLine("Charge\t161");
+                foreach (var scanNumber in run.GetScanNumbers(1))
+                {
+                    if (scanNumber == 161)
+                        break;
+                    targetColIndex++;
+                }
+
+            }
+
             const int minCharge = 2;
             const int maxCharge = 60;
             for (var charge = minCharge; charge <= maxCharge; charge++)
@@ -474,7 +497,12 @@ namespace InformedProteomics.Test
 
                 var xic = run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
                 Console.Write(charge+"\t");
-                Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
+
+                
+                if (SHOW_ALL_SCANS)
+                    Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
+                else
+                    Console.WriteLine(xic[targetColIndex].Intensity);
             }
         }
 
@@ -514,8 +542,8 @@ namespace InformedProteomics.Test
                 }
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
             
         }
 
@@ -535,6 +563,7 @@ namespace InformedProteomics.Test
 
             const int minScanNum = 5657;
             const int maxScanNum = 5699;
+            const int MAX_POINTS = 50;
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
             if (run == null) return;
@@ -542,7 +571,7 @@ namespace InformedProteomics.Test
             var peakList = summedSpec.GetPeakListWithin(1180.0, 1192.0);
             var filteredPeakList = new List<Peak>();
             PeakListUtils.FilterNoise(peakList, ref filteredPeakList);
-            new Spectrum(filteredPeakList, 0).Display();
+            new Spectrum(filteredPeakList, 0).Display(MAX_POINTS);
         }
 
         [Test]

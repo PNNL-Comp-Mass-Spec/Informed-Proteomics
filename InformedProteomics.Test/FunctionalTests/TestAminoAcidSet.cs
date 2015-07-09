@@ -6,6 +6,7 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestAminoAcidSet
     {
+        [Ignore]
         public void TestParsingManyMods()
         {
             const string modFilePath = @"H:\Research\Lewy\MSPathFinder_Mods.txt";
@@ -13,6 +14,7 @@ namespace InformedProteomics.Test.FunctionalTests
             aaSet.Display();
         }
 
+        [Ignore]
         public void TestParsingGlycoMods()
         {
             const string modFilePath = @"C:\cygwin\home\kims336\Data\Debug\MSPathFinder_Mods.txt";

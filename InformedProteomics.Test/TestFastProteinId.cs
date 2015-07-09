@@ -76,7 +76,7 @@ namespace InformedProteomics.Test
                 }
             }
             sw.Stop();
-            Console.WriteLine(@"{0:f4} sec.", sw.ElapsedTicks / (double)Stopwatch.Frequency);
+            Console.WriteLine(@"{0:f4} sec.", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -98,8 +98,8 @@ namespace InformedProteomics.Test
                     if (numProteins != 0)
                     {
                         sw.Stop();
-                        var sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
-                        Console.WriteLine("Elapsed Time: {0:f4} sec", sec);
+
+                        Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
                         sw.Reset();
                         sw.Start();
                     }
@@ -186,7 +186,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestProtein[ms2ScanNum] ?? "", bestScore[ms2ScanNum]);
             }
             //sw.Stop();
-            //Console.WriteLine(@"Scoring: {0:f4} sec.", sw.ElapsedTicks / (double)Stopwatch.Frequency);
+            //Console.WriteLine(@"Scoring: {0:f4} sec.", sw.Elapsed.TotalSeconds);
         }
     }
 }

@@ -390,20 +390,37 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return Peaks[peakIndex];
         }
 
-        public void Display()
+        public void Display(int maxPointsToShow = 50)
         {
             var sb = new StringBuilder();
-            //sb.Append("--------- Spectrum -----------------\n");
+            sb.AppendLine("m/z\tIntensity");
+
+            var threshold = 1;
+            if (maxPointsToShow > 0)
+            {
+                threshold = (int)Math.Round(Peaks.Length / (double)maxPointsToShow);
+                if (threshold < 1)
+                    threshold = 1;
+            }
+
+            var index = 0;
+            var pointsShown = 0;
             foreach (var peak in Peaks)
             {
-                sb.Append(peak.Mz);
-                sb.Append("\t");
-                sb.Append(peak.Intensity);
-                sb.Append("\n");
+                if (index == 0 || index % threshold == 0)
+                {
+                    sb.Append(peak.Mz);
+                    sb.Append("\t");
+                    sb.Append(peak.Intensity);
+                    sb.AppendLine();
+                    pointsShown++;
+                }
+                index++;
             }
-            //sb.Append("--------------------------- end ---------------------------------------\n");
 
             Console.Write(sb.ToString());
+            Console.WriteLine("Displayed {0} out of {1} data points", pointsShown, Peaks.Length);
+
         }
 
         public void FilterNoise(double signalToNoiseRatio = 1.4826)

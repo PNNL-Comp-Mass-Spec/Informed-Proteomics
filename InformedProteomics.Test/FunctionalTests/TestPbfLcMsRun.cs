@@ -21,26 +21,37 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-//            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             //const string specFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
+            // const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
+
             if (!File.Exists(specFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
                 return;
             }
 
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath) as InMemoryLcMsRun;
+            const int SCAN_START = 10000;
+            const int SCAN_END = 11000;
+
+            var run = InMemoryLcMsRun.GetLcMsRunScanRange(specFilePath, SCAN_START, SCAN_END) as InMemoryLcMsRun;
 
             Console.WriteLine(@"Writing...");
             var sw = new System.Diagnostics.Stopwatch();
+
             sw.Start();
   //          const string outputFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
 //            const string outputFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             var outputFilePath = PbfLcMsRun.GetPbfFileName(specFilePath);
+            var outputFile = new FileInfo(outputFilePath);
+
+            outputFilePath = Path.Combine(outputFile.DirectoryName,
+                                          Path.GetFileNameWithoutExtension(outputFile.Name) + "_scans" + SCAN_START +
+                                          "-" + SCAN_END + "." + outputFile.Extension);
+            
             run.WriteAsPbf(outputFilePath);
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Done. {0:f4} sec", sec);
+            
+            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -49,7 +60,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string pbfFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            const string pbfFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
             if (!File.Exists(pbfFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
@@ -58,14 +69,18 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var pbfRun = new PbfLcMsRun(pbfFilePath);
 
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            if (!File.Exists(pbfFilePath))
+            var specFilePath = Path.ChangeExtension(pbfFilePath, "raw");
+            if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
                 return;
             }
 
+            Console.WriteLine(@"Loading .pbf into memory");
+
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
+
+            Console.WriteLine(@"Comparing spectra between .pbf and in-memory spectra");
 
             // spectrum comparison
             for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
@@ -78,17 +93,22 @@ namespace InformedProteomics.Test.FunctionalTests
                 {
                     var p1 = spec1.Peaks[i];
                     var p2 = spec2.Peaks[i];
+
                     Assert.True(p1.Equals(p2));
+
+                    Assert.True(Math.Abs(p1.Mz - p2.Mz) < 1e-8);
+                    Assert.True(Math.Abs(p1.Intensity - p2.Intensity) < 0.001);
                 }
             }
 
-            Console.WriteLine("Chromatogram");
+            Console.WriteLine(@"Comparing XICs");
             // chromatogram comparison
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
             var xic1 = run.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
             var xic2 = pbfRun.GetFullPrecursorIonExtractedIonChromatogram(targetMz, tolerance);
             Assert.True(xic1.Count == xic2.Count);
+
             for (var i = 0; i < xic1.Count; i++)
             {
                 if (!xic1[i].Equals(xic2[i]))
@@ -97,7 +117,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 }
                 Assert.True(xic1[i].Equals(xic2[i]));
             }
-            Console.WriteLine("Done");
+            Console.WriteLine(@"Done");
         }
 
         [Test]
@@ -234,8 +254,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 if (numPeptides == 100000) break;
             }
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+            
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -328,8 +348,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 //Assert.True(xic1.Equals(xic2));
             }
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Method 1: {0:f4} sec", sec);
+            
+            Console.WriteLine(@"Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -342,8 +362,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 rafRun.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
             }
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Method 2: {0:f4} sec", sec);
+            
+            Console.WriteLine(@"Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Console.WriteLine("Done");
         }

@@ -41,8 +41,8 @@ namespace InformedProteomics.Test
             sw.Start();
             run.ComputeMs1Features(minCharge, maxCharge, tolerance);
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Finding MS1 feature: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Finding MS1 feature: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -83,8 +83,8 @@ namespace InformedProteomics.Test
             Console.WriteLine("NumValidScans: {0}", numValidScans);
 
             sw.Stop();
-            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

@@ -36,8 +36,8 @@ namespace InformedProteomics.Test
 //            var targetDb = new FastaDatabase(dbFilePath);
 //            var decoyDb = targetDb.Decoy(enzyme);
 //            sw.Stop();
-//            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
 
 //            // Initialize IMS data
 //            //const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
@@ -52,8 +52,8 @@ namespace InformedProteomics.Test
 //            //imsData.CreatePrecursorFeaturesMultiThreads();
 //            imsData.CreatePrecursorFeatures();
 //            sw.Stop();
-//            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
 
 //            Console.Write("Creating fragment features...");
 //            Console.Out.Flush();
@@ -62,8 +62,8 @@ namespace InformedProteomics.Test
 //            //imsData.CreateFragmentFeaturesMultiThreads();
 //            imsData.CreateFragmentFeatures();
 //            sw.Stop();
-//            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
 //            Console.Out.Flush();
 
 //            // Initialize scoring
@@ -156,8 +156,8 @@ namespace InformedProteomics.Test
 //            featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1, 
 //                tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Th);
 //            sw.Stop();
-//            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Parallel: {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Parallel: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
 //            // Serial version
 //            sw.Reset();
@@ -165,8 +165,8 @@ namespace InformedProteomics.Test
 //            var imsData = new ImsDataCached(uimfFilePath, minPrecursorMz, maxPrecursorMz, 10, 1500, tolerance, tolerance);
 //            imsData.CreatePrecursorFeatures();
 //            sw.Stop();
-//            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Serial: {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Serial: {0:f4} sec", sw.Elapsed.TotalSeconds);
 //        }
 
 
@@ -232,8 +232,8 @@ namespace InformedProteomics.Test
 //            writer.Close();
 
 //            sw.Stop();
-//            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"{0:f4} sec", sec);
+
+//            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
 //        }
 
 //        [Test]
@@ -275,15 +275,15 @@ namespace InformedProteomics.Test
 //            sw.Start();
 //            imsData.CreatePrecursorFeatures();
 //            sw.Stop();
-//            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
 
 //            Console.Write("Creating fragment features...");
 //            sw.Start();
 //            imsData.CreateFragmentFeatures();
 //            sw.Stop();
-//            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-//            Console.WriteLine(@"Done. {0:f4} sec", sec);
+
+//            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
 //            Console.Out.Flush();
 
 //            // Initialize scoring

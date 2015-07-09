@@ -9,6 +9,7 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestFdrCalculation
     {
+        [Ignore]
         public void TestIcTopDown()
         {
             const string targetResultPath = @"H:\Research\Charles\TopDown\Mod_M1\SBEP_STM_001_02272012_Aragon_IcTarget.tsv";
@@ -26,6 +27,7 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(@"Done");
         }
 
+        [Ignore]
         public void MergeTargetDecoyFiles()
         {
             const string dir = @"C:\cygwin\home\kims336\Data\TopDown\raw\Cache";

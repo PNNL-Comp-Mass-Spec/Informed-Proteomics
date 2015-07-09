@@ -47,8 +47,8 @@ namespace InformedProteomics.Test.Obsolete
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             // Configure amino acid set
             //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
@@ -123,8 +123,8 @@ namespace InformedProteomics.Test.Obsolete
             sw.Stop();
             Console.WriteLine("NumProteins: {0}", numProteins);
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
-            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Ignore]
@@ -267,8 +267,8 @@ namespace InformedProteomics.Test.Obsolete
             }
 
             // sw.Stop();
-            // var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            // Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            // Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

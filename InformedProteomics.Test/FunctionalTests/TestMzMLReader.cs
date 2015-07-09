@@ -12,9 +12,9 @@ namespace InformedProteomics.Test.FunctionalTests
     internal class TestMzMLReader
     {
         [Test]
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\Online_Dig_v17_QC_Shew_Stab-02_c0-5_01_04Aug14_Alder_14-06-11.mzML", 17288)] // Centroid, Thermo/XCaliber
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.mzML", 31163)] // Profile, Thermo/XCaliber
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\QC_Shew_13_06_500ng_CID_2_9Aug14_Lynx_14-04-08.mzML", 5649)] // Centroid, Thermo/XCaliber
+        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\Online_Dig_v17_QC_Shew_Stab-02_c0-5_01_04Aug14_Alder_14-06-11.mzML", 17288)] // Centroid, Thermo/XCalibur
+        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.mzML", 31163)] // Profile, Thermo/XCalibur
+        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\QC_Shew_13_06_500ng_CID_2_9Aug14_Lynx_14-04-08.mzML", 5649)] // Centroid, Thermo/XCalibur
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\CTRL_Dam_17022011_1.mzML", 18696)] // Centroid, Waters/MassLynx, mzML 1.0.0, requires the referenceable Param Group
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\napedro_L120224_005_SW-400AQUA no background 2ul dilution 6.mzML", 78012)] // Centroid, ABI SCIex WIFF files
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\VA139IMSMS.mzML", 3145)] // Centroid, Agilent QTOF
@@ -23,7 +23,7 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestReadMzML(string filePath, int expectedSpectra)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName + " (" + Path.GetFileName(filePath) + ")");
+            TestUtils.ShowStarting(methodName, filePath);
 
             Stopwatch timer = new Stopwatch();
             timer.Start();

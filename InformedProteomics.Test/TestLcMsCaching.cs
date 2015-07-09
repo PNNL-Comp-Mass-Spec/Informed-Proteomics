@@ -101,8 +101,8 @@ namespace InformedProteomics.Test
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Reading run: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const int minPrecursorCharge = 3;
             const int maxPrecursorCharge = 30;
@@ -114,8 +114,8 @@ namespace InformedProteomics.Test
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             ISequenceFilter ms1Filter = ms1BasedFilter;
             
@@ -132,8 +132,8 @@ namespace InformedProteomics.Test
                 numComparisons += ms1Filter.GetMatchingMs2ScanNums(mass).Count();
             }
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             //const string prot =
             //    "ADVFHLGLTKAMLDGATLAIVPGDPERVKRIAELMDNATFLASHREYTSYLAYADGKPVVICSTGIGGPSTSIAVEELAQLGVNTFLRVGTTGAIQPHVNVGDVIVTQASVRLDGASLHFAPMEFPAVANFECTTAMVAACRDAGVEPHIGVTASSDTFYPGQERYDTVTGRVTRRFAGSMKEWQDMGVLNYEMESATLFTMCATQGWRAACVAGVIVNRTQQEIPDEATMKKTEVSAVSIVVAAAKKLLA";
@@ -211,8 +211,8 @@ namespace InformedProteomics.Test
             Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons / (double)(maxBinNum - minBinNum + 1));
             Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
             Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -232,8 +232,8 @@ namespace InformedProteomics.Test
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Reading run: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const int minPrecursorCharge = 3;
             const int maxPrecursorCharge = 30;
@@ -253,8 +253,8 @@ namespace InformedProteomics.Test
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, minPrecursorCharge, maxPrecursorCharge, 15, 0.5, 40);
 
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             ISequenceFilter ms1Filter = ms1BasedFilter;
 
@@ -271,8 +271,8 @@ namespace InformedProteomics.Test
                 numComparisons += ms1Filter.GetMatchingMs2ScanNums(mass).Count();
             }
             sw.Stop();
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_4PTMs.icresult";
             if (!File.Exists(resultFilePath))
@@ -374,8 +374,8 @@ namespace InformedProteomics.Test
             Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons/(double)(maxBinNum-minBinNum+1));
             Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs/(double)totalSpecs, numUnfilteredSpecs, totalSpecs);
             Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count/(double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
-            sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -426,8 +426,8 @@ namespace InformedProteomics.Test
             //    Console.WriteLine(m);
             //}
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -560,8 +560,8 @@ namespace InformedProteomics.Test
             var runCache = new ProductScorerBasedOnDeconvolutedSpectra(run);
             runCache.DeconvoluteAllProductSpectra();
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
 
@@ -650,8 +650,8 @@ namespace InformedProteomics.Test
             }
 
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

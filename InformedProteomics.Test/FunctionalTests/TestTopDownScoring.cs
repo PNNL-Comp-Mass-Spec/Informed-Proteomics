@@ -138,8 +138,8 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), ms2ScanNum, score);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -206,8 +206,8 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", protAnnotation, charge, precursorIon.GetMostAbundantIsotopeMz(), ms2ScanNum, score);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -243,8 +243,8 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine("{0}\t{1}\t{2}", sequence, ms2ScanNum, score);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]

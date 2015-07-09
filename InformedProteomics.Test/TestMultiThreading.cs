@@ -47,8 +47,8 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("NumPeptides: {0}", sum);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace InformedProteomics.Test
         public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            TestUtils.ShowStarting(methodName, dbFile);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -176,8 +176,8 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }
@@ -190,7 +190,7 @@ namespace InformedProteomics.Test
         public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            TestUtils.ShowStarting(methodName, dbFile);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -236,8 +236,8 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }
@@ -250,7 +250,7 @@ namespace InformedProteomics.Test
         public void TestSequenceEnumerationNCTerm(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            TestUtils.ShowStarting(methodName, dbFile);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -301,8 +301,8 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }
@@ -315,7 +315,7 @@ namespace InformedProteomics.Test
         public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            TestUtils.ShowStarting(methodName, dbFile);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -361,8 +361,8 @@ namespace InformedProteomics.Test
 
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"{0:f4} sec", sec);
+
+            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }

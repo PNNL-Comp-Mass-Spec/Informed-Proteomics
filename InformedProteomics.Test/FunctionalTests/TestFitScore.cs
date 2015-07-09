@@ -33,22 +33,37 @@ namespace InformedProteomics.Test.FunctionalTests
             const string protein = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
             var protComp = new AminoAcidSet().GetComposition(protein) + Composition.H2O;
             Assert.True(protComp != null);
+            Assert.True(protComp.C == 1035);
+            Assert.True(protComp.H == 1683);
+            Assert.True(protComp.N == 289);
+            Assert.True(protComp.O == 318);
+            Assert.True(protComp.P == 0);
+            Assert.True(protComp.S == 7);
+            Assert.True(Math.Abs(protComp.Mass - 23473.245267145) < 0.0000001);
+            Assert.True(protComp.NominalMass == 23461);
 
             var ion = new Ion(protComp, 20);
 //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
             var isotopomerEnvelop = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
-            Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
+            Console.WriteLine(@"MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
             var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);
             for (var i = 0; i < matchedPeaks.Length; i++)
             {
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
+                Console.WriteLine(@"{0}	{1}	{2}	{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
             }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
-            Console.WriteLine("FitScore: {0}", fitScore);
-            Console.WriteLine("Cosine: {0}", spec.GetConsineScore(ion, new Tolerance(15), 0.1));
-            Console.WriteLine("Corr: {0}", spec.GetCorrScore(ion, new Tolerance(15), 0.1));
-            //            Assert.True(fitScore < 0.15);
+            var cosine = spec.GetConsineScore(ion, new Tolerance(15), 0.1);
+            var corr = spec.GetCorrScore(ion, new Tolerance(15), 0.1);
+
+            Console.WriteLine(@"FitScore: {0}", fitScore);
+            Console.WriteLine(@"Cosine: {0}", cosine);
+            Console.WriteLine(@"Corr: {0}", corr);
+
+            Assert.True(Math.Abs(fitScore - 0.181194589537041) < 0.0001);
+            Assert.True(Math.Abs(cosine - 0.917609346566222) < 0.0001);
+            Assert.True(Math.Abs(corr - 0.808326778009839) < 0.0001);
+
         }
 
         [Test]
@@ -104,7 +119,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 }
             }
 
-            Console.WriteLine("Calculating fit scores {0} times", numTrials);
+            Console.WriteLine("Calculating fit scores {0} times", numTrials * 2);
 
             var sw = new System.Diagnostics.Stopwatch();
 
@@ -119,9 +134,41 @@ namespace InformedProteomics.Test.FunctionalTests
                 FitScoreCalculator.GetPearsonCorrelation(theoretical[trial], observed[trial]);
             }
 
+            var series1 = new double[7];
+            series1[0] = 0.2;
+            series1[1] = 0.5;
+            series1[2] = 0.8;
+            series1[3] = 0.7;
+            series1[4] = 0.6;
+            series1[5] = 0.3;
+            series1[6] = 0.05;
+
+            var series2 = new double[series1.Length];
+            double smallestFit = 1;
+            var threshold = (int)(1000000 / 10.0);
+
+            for (var iteration = 0; iteration < 1000000; iteration++)
+            {
+                for (var i = 0; i < series1.Length; i++)
+                {
+                    series2[i] = series1[i] + random.NextDouble() / 6 - (1 / 12.0);
+                }
+
+                var result = FitScoreCalculator.GetPearsonCorrelation(series1, series2);
+
+                if (iteration % threshold == 0)
+                    Console.WriteLine(@"Fit=" + result);
+
+                if (result < smallestFit)
+                    smallestFit = result;                
+            }
+
+            Console.WriteLine(@"SmallestFit=" + smallestFit);
+            Assert.IsTrue(smallestFit > 0.94);
+
             sw.Stop();
-            var sec = sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+            
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

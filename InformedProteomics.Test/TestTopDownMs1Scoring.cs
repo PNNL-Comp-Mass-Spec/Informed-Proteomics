@@ -45,8 +45,8 @@ namespace InformedProteomics.Test
             var run = LcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             // Configure amino acid set
             //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
@@ -121,8 +121,8 @@ namespace InformedProteomics.Test
             sw.Stop();
             Console.WriteLine("NumProteins: {0}", numProteins);
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
-            sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -262,8 +262,8 @@ namespace InformedProteomics.Test
             }
 
             // sw.Stop();
-            // var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
-            // Console.WriteLine(@"Elapsed Time: {0:f4} sec", sec);
+
+            // Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

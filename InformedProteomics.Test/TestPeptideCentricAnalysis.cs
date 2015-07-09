@@ -548,7 +548,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("#ValidDecoys: {0}\t{1}", numValidDecoys, numValidDecoys / (double)numDecoys);
 
             sw.Stop();
-            var sec = (double)sw.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency;
+            
             Console.WriteLine(@"TimeForPrecursorValidation {0:f4} sec", sec);
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
@@ -7,7 +8,7 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     internal class TestProteoWizardWrapper
     {
-        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
 
         [Test]
         public void TestLoadingProteoWizardWrapper()
@@ -17,8 +18,10 @@ namespace InformedProteomics.Test.FunctionalTests
 
             //try
             //{
+            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
             var reader = new ProteoWizardReader(TestRawFilePath);
             reader.ReadMassSpectrum(1);
+
             //}
             //catch (FileNotFoundException e)
             //{
