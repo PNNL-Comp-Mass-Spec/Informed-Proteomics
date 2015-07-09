@@ -73,8 +73,7 @@ namespace MSPathFinderT
         {
             foreach (var specFilePath in SpecFilePaths)
             {
-                var outputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                           Path.GetFileNameWithoutExtension(specFilePath) + ParameterFileExtension;
+                var outputFilePath = Path.Combine(OutputDir, Path.GetFileNameWithoutExtension(specFilePath) + ParameterFileExtension);
 
                 using (var writer = new StreamWriter(outputFilePath))
                 {
@@ -114,7 +113,7 @@ namespace MSPathFinderT
             DatabaseFilePath = parameters["-d"];
 
             var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
-            if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
+            
             if (!Directory.Exists(outputDir))
             {
                 if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))

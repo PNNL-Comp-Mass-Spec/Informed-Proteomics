@@ -38,7 +38,7 @@ namespace InformedProteomics.Test
                 var sample = fileName.Substring(0, 2);
                 Console.WriteLine("Processing {0}", sample);
 
-                var outputFilePath = henryResultPath + Path.DirectorySeparatorChar + "ID_" + sample + ".tsv";
+                var outputFilePath = Path.Combine(henryResultPath,  "ID_" + sample + ".tsv");
                 Console.WriteLine("Writing to {0}", outputFilePath);
                 using (var writer = new StreamWriter(outputFilePath))
                 {
@@ -193,10 +193,10 @@ namespace InformedProteomics.Test
 
             Console.WriteLine(MassSpecDataReaderFactory.RemoveExtension(rawFilePath) + "_Target.tsv");
             Console.WriteLine(Path.GetDirectoryName(rawFilePath));
-            Console.WriteLine(Path.GetDirectoryName(rawFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFilePath)+"_IcTarget.tsv");
+            Console.WriteLine(Path.Combine(Path.GetDirectoryName(rawFilePath), Path.GetFileNameWithoutExtension(rawFilePath) + "_IcTarget.tsv"));
 
             var outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2\Synocho_L1_1_IcTarget.tsv";
-            if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
+            
             if (!Directory.Exists(outputDir))
             {
                 if (!File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))

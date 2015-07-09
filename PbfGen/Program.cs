@@ -91,8 +91,7 @@ namespace PbfGen
                     PrintUsageInfo("Invalid output file directory: " + specFilePath);
                     return -1;
                 }
-
-                if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
+                
                 if (!Directory.Exists(outputDir))
                 {
                     if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
@@ -122,31 +121,29 @@ namespace PbfGen
 
                 foreach (var rawFilePath in specFilePaths)
                 {
-                    var pbfFilePath = outputDir + Path.DirectorySeparatorChar +
-                                               Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension;
+                    var pbfFilePath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension);
 
                     if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath))
                     {
                         Console.WriteLine("{0} already exists.", pbfFilePath);
+                        continue;
                     }
-                    else
+
+                    Console.WriteLine("Creating {0} from {1}", pbfFilePath, rawFilePath);
+                    IMassSpecDataReader reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
+                    var progress = new Progress<ProgressData>(p =>
                     {
-                        Console.WriteLine("Creating {0} from {1}", pbfFilePath, rawFilePath);
-                        IMassSpecDataReader reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
-                        var progress = new Progress<ProgressData>(p =>
+                        p.UpdateFrequencySeconds = 2;
+                        if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
                         {
-                            p.UpdateFrequencySeconds = 2;
-                            if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
-                            {
-                                Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
-                            }
-                        });
-                        //var run = new InMemoryLcMsRun(reader, 0, 0, progress);
-                        //Console.WriteLine();
-                        //run.WriteAsPbf(rafFilePath, progress);
-                        InMemoryLcMsRun.ConvertToPbf(rawFilePath, reader, 0, 0, pbfFilePath, progress);
-                        Console.WriteLine();
-                    }
+                            Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
+                        }
+                    });
+                    //var run = new InMemoryLcMsRun(reader, 0, 0, progress);
+                    //Console.WriteLine();
+                    //run.WriteAsPbf(rafFilePath, progress);
+                    InMemoryLcMsRun.ConvertToPbf(rawFilePath, reader, 0, 0, pbfFilePath, progress);
+                    Console.WriteLine();
                 }
 
 

@@ -24,7 +24,7 @@ namespace InformedProteomics.Backend.Database
         {
             FastaDatabase = fastaDatabase;
             var databaseFilePath = FastaDatabase.GetFastaFilePath();
-            //var databaseFilePathNoExt = Path.GetDirectoryName(databaseFilePath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(databaseFilePath);
+            //var databaseFilePathNoExt = Path.Combine(Path.GetDirectoryName(databaseFilePath), Path.GetFileNameWithoutExtension(databaseFilePath));
             //_pLcpFilePath = databaseFilePathNoExt + PermutedLongestCommonPrefixFileExtension;
             _pLcpFilePath = Path.ChangeExtension(databaseFilePath, PermutedLongestCommonPrefixFileExtension);
             var lastWriteTimeHash = FastaDatabase.GetLastWriteTimeHash();

@@ -98,8 +98,10 @@ namespace InformedProteomics.TopDown.Execution
         private void ProcessFile(string rawFile)
         {
             var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(rawFile));
-            var outTsvFilePath = outDirectory + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "." + FileExtension;
-            var outCsvFilePath = outDirectory + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "_" + FileExtension + ".csv";
+
+            var baseName = Path.GetFileNameWithoutExtension(rawFile);
+            var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
+            var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
             
             if (File.Exists(outTsvFilePath))
             {
@@ -334,8 +336,8 @@ namespace InformedProteomics.TopDown.Execution
         private void ProcessFile(string rawFile)
         {
             //var outTsvFilePath = Path.ChangeExtension(rawFile, FileExtension);
-            var outTsvFilePath = Parameters.OutputPath + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "." + FileExtension;
-            var outCsvFilePath = Parameters.OutputPath + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(rawFile) + "_" + FileExtension + ".csv";
+            var outTsvFilePath = Path.Combine(Parameters.OutputPath, Path.GetFileNameWithoutExtension(rawFile) + "." + FileExtension);
+            var outCsvFilePath = Path.Combine(Parameters.OutputPath, Path.GetFileNameWithoutExtension(rawFile) + "_" + FileExtension + ".csv");
             //var j = rawFile.LastIndexOf('.');
             //var outPath = rawFile.Substring(0, j);
             //var outCsvFilePath = string.Format("{0}_{1}.csv", outPath, FileExtension);

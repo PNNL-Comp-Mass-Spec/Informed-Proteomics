@@ -34,7 +34,7 @@ namespace InformedProteomics.Test
             {
                 var datasetName = Path.GetFileNameWithoutExtension(rawFile);
 
-                var resultFile = Path.GetDirectoryName(rawFile) + Path.DirectorySeparatorChar + datasetName + "_IcTda.tsv";
+                var resultFile = Path.Combine(Path.GetDirectoryName(rawFile), datasetName + "_IcTda.tsv");
                 var numId = new Dictionary<ActivationMethod, int>();
                 var maxMass = new Dictionary<ActivationMethod, double>();
 

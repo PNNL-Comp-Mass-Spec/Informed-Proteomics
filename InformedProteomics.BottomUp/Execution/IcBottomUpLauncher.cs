@@ -50,8 +50,7 @@ namespace InformedProteomics.BottomUp.Execution
                 OutputDir = Path.GetDirectoryName(SpecFilePath);
             }
             else
-            {
-                if (outputDir[outputDir.Length - 1] == Path.DirectorySeparatorChar) outputDir = outputDir.Remove(outputDir.Length - 1);
+            {                
                 if (!Directory.Exists(outputDir))
                 {
                     if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
@@ -138,12 +137,10 @@ namespace InformedProteomics.BottomUp.Execution
 
             //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
 
-            var targetOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + TargetFileExtension;
-            var decoyOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                       Path.GetFileNameWithoutExtension(SpecFilePath) + DecoyFileExtension;
-            var tdaOutputFilePath = OutputDir + Path.DirectorySeparatorChar +
-                                    Path.GetFileNameWithoutExtension(SpecFilePath) + TdaFileExtension;
+            var baseName = Path.GetFileNameWithoutExtension(SpecFilePath);
+            var targetOutputFilePath = Path.Combine(OutputDir, baseName + TargetFileExtension);
+            var decoyOutputFilePath = Path.Combine(OutputDir, baseName + DecoyFileExtension);
+            var tdaOutputFilePath = Path.Combine(OutputDir, baseName + TdaFileExtension);
 
             if (RunTargetDecoyAnalysis != null)
             {
