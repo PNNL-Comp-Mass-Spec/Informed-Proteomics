@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using InformedProteomics.Backend.Data.Spectrometry;
 using pwiz.CLI.analysis;
 using pwiz.CLI.cv;
@@ -53,14 +54,39 @@ namespace InformedProteomics.Backend.MassSpecData
                 //Check for the assembly names that have raised the "AssemblyResolve" event.
                 if (strAssmbName.FullName.Substring(0, strAssmbName.FullName.IndexOf(",")) == args.Name.Substring(0, args.Name.IndexOf(",")))
                 {
+                    //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
                     //Build the path of the assembly from where it has to be loaded.                
                     strTempAssmbPath = Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll");
                     break;
                 }
             }
 
-            //Load the assembly from the specified path.                    
-            var myAssembly = Assembly.LoadFrom(strTempAssmbPath);
+            //Load the assembly from the specified path.  
+            Assembly myAssembly = null;
+            try
+            {
+                myAssembly = Assembly.LoadFrom(strTempAssmbPath);
+            }
+            catch (BadImageFormatException ex)
+            {
+                Console.WriteLine("Incompatible Assembly: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("Assembly not found: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
+            catch (FileLoadException ex)
+            {
+                Console.WriteLine("Invalid Assembly: \"" + strTempAssmbPath + "\". The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.");
+                throw;
+            }
+            catch (SecurityException ex)
+            {
+                Console.WriteLine("Assembly access denied: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
 
             //Return the loaded assembly.
             return myAssembly;
