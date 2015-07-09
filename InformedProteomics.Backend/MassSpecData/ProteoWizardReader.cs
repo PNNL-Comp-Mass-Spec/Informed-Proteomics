@@ -18,6 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         public static Assembly ProteoWizardAssemblyResolver(object sender, ResolveEventArgs args)
         {
+            Console.WriteLine("Searching for ProteoWizard files...");
             // https://support.microsoft.com/en-us/kb/837908
             //This handler is called only when the common language runtime tries to bind to the assembly and fails.
             string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
@@ -65,11 +66,19 @@ namespace InformedProteomics.Backend.MassSpecData
             return myAssembly;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <remarks>To avoid assembly resolving errors, the ProteoWizardAssemblyResolver should be added as an AssemblyResolve event handler, as follows:
+        /// <code>AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;</code>
+        /// </remarks>
         public ProteoWizardReader(string filePath)
         {
             AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardAssemblyResolver;
 
             var readers = ReaderList.FullReaderList;
+            filePath = CheckForDirectoryDataset(filePath);
             readers.read(filePath, _dataFile);
             if ((new string[] {".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt"})
                 .Any(ext => filePath.ToLower().EndsWith(ext)))
@@ -210,6 +219,142 @@ namespace InformedProteomics.Backend.MassSpecData
         public void Dispose()
         {
             _dataFile.Dispose();
+        }
+
+        public static string ProteoWizardFilterString
+        {
+            get
+            {
+                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd"
+                    + "|Thermo .RAW|*.raw"
+                    + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                    + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
+                    + "|MGF[.gz]|*.mgf;*.mgf.gz"
+                    + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
+                    + "|AB Sciex .wiff|*.wiff"
+                    + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
+                    + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
+                    + "|Shimadzu lcd|*.lcd";
+            }
+        }
+
+        public static List<string> SupportedFilesFilterList
+        {
+            get
+            {
+                return new List<string>()
+                {
+                    ".raw", // Thermo (file) or Waters (folder)
+                    "_extern.inf", // Waters .raw folder content
+                    "_inlet.inf", // Waters .raw folder content
+                    "_FUNC*.DAT", // Waters .raw folder content
+                    ".d", // Agilent (folder) or Bruker (folder)
+                    "mspeak.bin", // Agilent .d folder content
+                    "msprofile.bin", // Agilent .d folder content
+                    ".yep", // Bruker
+                    ".baf", // Bruker
+                    "fid", // Bruker
+                    ".lcd", // Shimadzu
+                    ".wiff", // Waters
+                    ".mzml",
+                    ".mzml.gz",
+                    ".mzxml",
+                    ".mzxml.gz",
+                    ".mgf",
+                    ".mgf.gz",
+                };
+            }
+        }
+
+        public static List<string> SupportedDirectoryTypes
+        {
+            get
+            {
+                return new List<string>() {".d", ".raw"};
+            }
+        }
+
+        public static List<string> BrukerFiles
+        {
+            get
+            {
+                return new List<string>()
+                {
+                    ".d",
+                    "analysis.yep",
+                    "analysis.baf",
+                    "fid",
+                };
+            }
+        }
+
+        private static List<string> DirectlySupportedFilesFilterList
+        {
+            get
+            {
+                return new List<string>()
+                {
+                    ".raw", // Thermo (file) or Waters (folder)
+                    ".d", // Agilent (folder) or Bruker (folder)
+                    ".yep", // Bruker
+                    ".baf", // Bruker
+                    "fid", // Bruker
+                    ".lcd", // Shimadzu
+                    ".wiff", // Waters
+                    ".mzml",
+                    ".mzml.gz",
+                    ".mzxml",
+                    ".mzxml.gz",
+                    ".mgf",
+                    ".mgf.gz",
+                };
+            }
+        }
+
+        /// <summary>
+        /// Check the file path to see if it is to files in a directory dataset type (.raw folder, or .d folder)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns>Path to directory, if a directory, otherwise returns filePath</returns>
+        public static string CheckForDirectoryDataset(string filePath)
+        {
+            var fullFilePath = Path.GetFullPath(filePath);
+            var tempFilePath = fullFilePath.ToLower();
+
+            // If it doesn't end with .raw, but contains .raw, and the path is not an existing file or a supported ProteoWizard file type,
+            // assume that it is a Waters .raw directory.
+            if (!tempFilePath.EndsWith(".raw") && tempFilePath.Contains(".raw") &&
+                (!File.Exists(fullFilePath) ||
+                 !DirectlySupportedFilesFilterList.Any(f => tempFilePath.EndsWith(f))))
+            {
+                while (!string.IsNullOrWhiteSpace(tempFilePath) && tempFilePath.Contains(".raw"))
+                {
+                    if (tempFilePath.EndsWith(".raw") &&
+                        Directory.Exists(fullFilePath.Substring(0, tempFilePath.Length)))
+                    {
+                        return fullFilePath.Substring(0, tempFilePath.Length);
+                    }
+                    tempFilePath = Path.GetDirectoryName(tempFilePath);
+                }
+            }
+
+            tempFilePath = fullFilePath.ToLower();
+            // If it doesn't end with .d, but contains .d, and the path is not an existing file or it is a Bruker data type
+            // Assume it is a Agilent or Bruker .d dataset, and change the path to only point to the directory.
+            if ((tempFilePath.EndsWith(".d") && !Directory.Exists(fullFilePath)) || tempFilePath.Contains(".d") &&
+                (!File.Exists(fullFilePath) || BrukerFiles.Any(f => tempFilePath.EndsWith(f))))
+            {
+                while (!string.IsNullOrWhiteSpace(tempFilePath) && tempFilePath.Contains(".d"))
+                {
+                    if (tempFilePath.EndsWith(".d") &&
+                        Directory.Exists(fullFilePath.Substring(0, tempFilePath.Length)))
+                    {
+                        return fullFilePath.Substring(0, tempFilePath.Length);
+                    }
+                    tempFilePath = Path.GetDirectoryName(tempFilePath);
+                }
+            }
+            return filePath;
         }
     }
 }

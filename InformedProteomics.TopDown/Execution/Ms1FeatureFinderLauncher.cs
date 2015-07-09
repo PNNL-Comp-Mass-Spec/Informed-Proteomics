@@ -31,7 +31,8 @@ namespace InformedProteomics.TopDown.Execution
             
             var attr = File.GetAttributes(Parameters.InputPath);
 
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
+                !MassSpecDataReaderFactory.SupportedDirectoryTypes.Any(f => Parameters.InputPath.ToLower().EndsWith(f)))
             {
                 ProcessDirectory(Parameters.InputPath);
             }
@@ -67,11 +68,10 @@ namespace InformedProteomics.TopDown.Execution
         private bool MsRawFile(string specFilePath)
         {
             //return (path.EndsWith(".raw") || path.EndsWith(".mzML"));
-            var types = MassSpecDataReaderFactory.GetMassSpecDataTypeFilterList();
+            var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
-            var pbfFilePath = Path.ChangeExtension(specFilePath, "pbf");
-
-            if (File.Exists(pbfFilePath)) return false;
+            //var pbfFilePath = Path.ChangeExtension(specFilePath, "pbf");
+            //if (File.Exists(pbfFilePath)) return false;
 
             return types.Any(ext => specFilePath.ToLower().EndsWith(ext));
             /*

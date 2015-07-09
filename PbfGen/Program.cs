@@ -74,7 +74,7 @@ namespace PbfGen
                     return -1;
                 }
 
-                var types = MassSpecDataReaderFactory.GetMassSpecDataTypeFilterList();
+                var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
                 types.Remove(".pbf");
 
                 if (!Directory.Exists(specFilePath) && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
@@ -88,7 +88,7 @@ namespace PbfGen
                 outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(Path.GetFullPath(specFilePath)));
                 if (outputDir == null)
                 {
-                    PrintUsageInfo("Invalid raw file directory: " + specFilePath);
+                    PrintUsageInfo("Invalid output file directory: " + specFilePath);
                     return -1;
                 }
 
@@ -114,7 +114,11 @@ namespace PbfGen
             try
             {
 #endif
-                var specFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
+                string[] specFilePaths = new[] { specFilePath };
+                if (Directory.Exists(specFilePath) && !MassSpecDataReaderFactory.SupportedDirectoryTypes.Any(f => specFilePath.ToLower().EndsWith(f)))
+                {
+                    specFilePaths = Directory.GetFiles(specFilePath, "*.raw");
+                }
 
                 foreach (var rawFilePath in specFilePaths)
                 {
