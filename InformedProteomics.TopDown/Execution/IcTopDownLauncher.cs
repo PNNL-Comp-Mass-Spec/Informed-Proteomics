@@ -398,6 +398,9 @@ namespace InformedProteomics.TopDown.Execution
         private void SearchProgressReport(ref int numProteins, ref DateTime lastUpdate, long estimatedProteins, Stopwatch sw, IProgress<ProgressData> progress, ProgressData progData)
         {
             var tempNumProteins = Interlocked.Increment(ref numProteins) - 1;
+            if (estimatedProteins < 1)
+                estimatedProteins = 1;
+
             //lock (progress)
             //{
             progData.StatusInternal = String.Format(@"Processing, {0} proteins done, {1:#0.0}% complete, {2:f1} sec elapsed",
@@ -407,7 +410,18 @@ namespace InformedProteomics.TopDown.Execution
             progress.Report(progData.UpdatePercent(tempNumProteins / (double)estimatedProteins * 100.0));
             //}
 
-            if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= 15)
+            int secondsThreshold;
+
+            if (sw.Elapsed.TotalMinutes < 2)
+                secondsThreshold = 15;      // Every 15 seconds
+            else if (sw.Elapsed.TotalMinutes < 5)
+                secondsThreshold = 30;      // Every 30 seconds
+            else if (sw.Elapsed.TotalMinutes < 20)
+                secondsThreshold = 60;      // Every 1 minute
+            else
+                secondsThreshold = 300;     // Every 5 minutes
+
+            if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= secondsThreshold)
             {
                 lastUpdate = DateTime.UtcNow;
 
