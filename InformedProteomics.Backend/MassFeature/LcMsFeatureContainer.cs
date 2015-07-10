@@ -15,13 +15,13 @@ namespace InformedProteomics.Backend.MassFeature
             _scorer = scorer;
         }
 
+
         public const double ScoreThreshold = 0;
-        public const double CorrThreshold = 0.65;
 
         public bool Add(LcMsPeakCluster newFeature)
         {
             if (newFeature.Score < ScoreThreshold) return false;
-            if (newFeature.BestCorrelationScore < CorrThreshold) return false;
+            if (!newFeature.GoodEnougth) return false;
             
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
@@ -32,12 +32,17 @@ namespace InformedProteomics.Backend.MassFeature
                     if (coeLen / _featureList[i].ElutionLength > 0.6 && coeLen / newFeature.ElutionLength > 0.6) return false;
                 }
             }
-            
+
             foreach (var peak in newFeature.GetMajorPeaks())
+            {
                 peak.TagMajorPeakOf(newFeature);
+            }
 
             foreach (var peak in newFeature.GetMinorPeaks())
+            {
                 peak.TagMinorPeakOf(newFeature);
+            }
+                
             
             _featureList.Add(newFeature);
             return true;
@@ -63,9 +68,12 @@ namespace InformedProteomics.Backend.MassFeature
         
         private bool SimilarScore(LcMsPeakCluster f1, LcMsPeakCluster f2)
         {
-            if (f1.Score >= ScoreThreshold && f1.BestCorrelationScore > CorrThreshold 
-             && f2.Score >= ScoreThreshold && f2.BestCorrelationScore > CorrThreshold) return true;
-            //if (Math.Abs(f1.Score - f2.Score)/Math.Max(f1.Score, f2.Score) < 0.2) return true;
+            /*var maxScore = Math.Max(f1.Score, f2.Score);
+            var minScore = Math.Min(f1.Score, f2.Score);
+            if (minScore > 0 && maxScore > minScore*5) return false;*/
+            
+            if (f1.Score >= ScoreThreshold && f1.GoodEnougth
+             && f2.Score >= ScoreThreshold && f2.GoodEnougth) return true;
 
             return false;
         }
@@ -105,7 +113,14 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     f.UpdateScore(_spectra);
                     f.Score = _scorer.GetScore(f);
-                    if (f.Score > ScoreThreshold && f.BestCorrelationScore > CorrThreshold) featureSet.Add(f);
+                    if (f.Score > ScoreThreshold && f.GoodEnougth)
+                    {
+                        featureSet.Add(f);
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0}\t{1}\t{2} killed by {3}\t{4}\t{5}", f.Mass, f.MinScanNum, f.MaxScanNum, bestFeature.Mass, bestFeature.MinScanNum, bestFeature.MaxScanNum);
+                    }
                 }
             }
 

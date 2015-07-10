@@ -43,7 +43,8 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            var rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            //const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
             if (!File.Exists(rawFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
@@ -62,8 +63,8 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer);
-            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3000);
-            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3010);
+            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(10255);
+            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(10270);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
             Console.WriteLine(@"Start MS1 feature extraction.");
@@ -381,85 +382,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(dataname);
             }
         }
-        /*
-        [Test]
-        public void TestFeatureElutionProfile()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            const string idFileFolder = @"D:\MassSpecFiles\training\refined_set";
-            var rawFileLists = new string[]
-            {
-                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf"
-            };
-
-            var id = 1;
-
-            foreach (var dataset in rawFileLists)
-            {
-                var dataname = Path.GetFileNameWithoutExtension(dataset);
-                var featureList = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
-                
-                var featureResult = string.Format(@"{0}\{1}.xic.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
-                var writer = new StreamWriter(featureResult);
-                var run = PbfLcMsRun.GetLcMsRun(dataset);
-
-                var ms1ScanNums = run.GetMs1ScanVector();
-                foreach (var scan in ms1ScanNums)
-                {
-                    writer.Write(run.GetElutionTime(scan));
-                    writer.Write("\t");
-                }
-                writer.Write("\n");
-
-
-                var featureFinder = new LcMsPeakMatrix(run, 2, 60, 0);
-                var tsvParser = new TsvFileParser(featureList);
-
-                for (var i = 0; i < tsvParser.NumData; i++)
-                {
-                    //var featureDist = string.Format(@"D:\MassSpecFiles\training\{0}\{1}.txt", Path.GetFileNameWithoutExtension(dataset), i);
-                    //var distWriter = new StreamWriter(featureDist);
-
-                    var minScan = int.Parse(tsvParser.GetData("MinScan")[i]);
-                    var maxScan = int.Parse(tsvParser.GetData("MaxScan")[i]);
-                    var minCharge = int.Parse(tsvParser.GetData("MinCharge")[i]);
-                    var maxCharge = int.Parse(tsvParser.GetData("MaxCharge")[i]);
-                    var mass = double.Parse(tsvParser.GetData("Mass")[i]);
-                    var sequence = tsvParser.GetData("Sequence")[i];
-                    var composition = tsvParser.GetData("Composition")[i];
-
-                    var charge = 0.5 * (minCharge + maxCharge);
-                    var scan = 0.5 * (minScan + maxScan);
-
-                    var feature = featureFinder.GetLcMsPeakCluster(mass, (int)charge, minScan, maxScan);
-
-                    if (feature == null)
-                    {
-                        foreach (var x in ms1ScanNums)
-                        {
-                            writer.Write(0);
-                            writer.Write("\t");
-                        }
-                        writer.Write("\n");
-                        continue;
-                    }
-
-                    var xic = featureFinder.GetEntireXic(feature);
-                    foreach (var x in xic)
-                    {
-                        writer.Write(x);
-                        writer.Write("\t");                        
-                    }
-                    writer.Write("\n");
-
-                }
-                writer.Close();
-                Console.WriteLine(dataname);
-            }
-        }
-        */
+     
 
         [Test]
         public void TestFeatureFindingWithMassBinning()

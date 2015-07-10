@@ -33,6 +33,8 @@ namespace ProMex
                 var handle = Process.GetCurrentProcess().MainWindowHandle;
                 SetConsoleMode(handle, EnableExtendedFlags);
 
+                //args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "15000", "-maxMass", "18000"};
+
                 if (args.Length == 0)
                 {
                     PrintUsageInfo();

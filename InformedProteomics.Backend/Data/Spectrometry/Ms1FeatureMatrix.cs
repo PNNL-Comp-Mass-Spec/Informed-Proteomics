@@ -693,7 +693,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 SortedIndexByIntensity[rankingIndex] = (byte)i;
                 EnvelopePdf[i] = Envelope[i] / s;
 
-                if (Envelope[i] > Ms1Spectrum.RelativeSignificantIntesnityThreshold) NhighAbundantIsotopes++;
+                if (Envelope[i] > 0.7) NhighAbundantIsotopes++;
             }
 
             NhighAbundantIsotopes = Math.Min(Math.Max(NhighAbundantIsotopes, 4), Count);

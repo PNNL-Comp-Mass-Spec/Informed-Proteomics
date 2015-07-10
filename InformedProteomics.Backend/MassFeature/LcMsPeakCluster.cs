@@ -34,13 +34,13 @@ namespace InformedProteomics.Backend.MassFeature
             BestCharge = new int[2];
 
             XicCorrelationBetweenBestCharges = new double[2];
+            _initScore = false;
         }
 
         public void AddEnvelopes(int minCharge, int maxCharge, int minScanNum, int maxScanNum,
             IList<ObservedIsotopeEnvelope> envelopes)
         {
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
-            //var ms1ScanNums = Run.GetMs1ScanVector();
             var minCol = ms1ScanNumToIndex[minScanNum];
             var maxCol = ms1ScanNumToIndex[maxScanNum];
 
@@ -111,8 +111,6 @@ namespace InformedProteomics.Backend.MassFeature
                     Envelopes[charge - MinCharge][col - minCol] = env;
                 }
             }
-            //MinScanNum = ms1ScanNums[minCol];
-            //MaxScanNum = ms1ScanNums[maxCol];
             UpdateScore(ms1Spectra, false);
         }
 
@@ -147,8 +145,6 @@ namespace InformedProteomics.Backend.MassFeature
             ClearScore();
 
             var bestChargeDist = new double[]{10.0d, 10.0d};
-            var tempBestBcDist = 10.0d;
-
             // sum envelopes at each charge 
             var summedIntensity = new double[TheoreticalEnvelope.Size];
 
@@ -159,10 +155,15 @@ namespace InformedProteomics.Backend.MassFeature
                 xicLen = 13;
                 xicStartIdx = (int) Math.Floor((xicLen - nCols)*0.5);
             }
-
+            
             var xic2 = new double[2][];
             xic2[0] = new double[xicLen];
             xic2[1] = new double[xicLen];
+            var chargeXic = new double[nRows][];
+
+            var tempBestBcDist = 10.0d;
+            var repEnvelopeBcDist = 10.0d;
+            ObservedIsotopeEnvelope repEnvelope = null;
 
             for (var i = 0; i < nRows; i++)
             {
@@ -170,9 +171,11 @@ namespace InformedProteomics.Backend.MassFeature
                 var mostAbuMz = TheoreticalEnvelope.GetIsotopeMz(charge, mostAbuIdx);
                 Array.Clear(summedIntensity, 0, summedIntensity.Length);
 
+                chargeXic[i] = new double[xicLen];
+
                 var chargeIdx = (charge % 2 == 0) ? EvenCharge : OddCharge;
                 var summedMostAbuIsotopeIntensity = 0d;
-                var summedMedianIntensity = 0d;
+                var summedReferenceIntensity = 0d;
 
                 for (var j = 0; j < nCols; j++)
                 {
@@ -180,7 +183,6 @@ namespace InformedProteomics.Backend.MassFeature
                     var col = minCol + j;
                     
                     var localWin = ms1Spectra[col].GetLocalMzWindow(mostAbuMz);
-                    summedMedianIntensity += localWin.ReferenceIntensity;
 
                     if (envelope == null) continue;
                     
@@ -190,11 +192,49 @@ namespace InformedProteomics.Backend.MassFeature
                     if (mostAbuPeak != null && mostAbuPeak.Active)
                     {
                         summedMostAbuIsotopeIntensity += mostAbuPeak.Intensity;
+                        summedReferenceIntensity += localWin.HighestIntensity;
                     }
                     AbundanceDistributionAcrossCharge[chargeIdx] += envelope.Abundance;
 
                     var newBcDist = TheoreticalEnvelope.GetBhattacharyyaDistance(envelope.Peaks);
-                    if (newBcDist < 1) xic2[chargeIdx][xicStartIdx+j] += envelope.Abundance;
+                    var newCorr = TheoreticalEnvelope.GetPearsonCorrelation(envelope.Peaks);
+
+                    if (newBcDist < 0.2 || newCorr > 0.6) xic2[chargeIdx][xicStartIdx+j] += envelope.Abundance;
+                    if (newBcDist < 0.2 || newCorr > 0.6) chargeXic[i][xicStartIdx + j] = envelope.Abundance;
+                    
+                    var goodEnvelope = true;
+                    if (pValueCheck)
+                    {
+                        var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
+                        var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
+                        //goodEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
+                        goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
+                    }
+
+                    if (goodEnvelope)
+                    {
+                        if (newBcDist < BestDistanceScoreAcrossCharge[chargeIdx])
+                        {
+                            BestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
+                            if (localWin.MedianIntensity > 0)
+                                BestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
+                            else BestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                        }
+                        
+                        BestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(BestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
+
+                        if (newBcDist < repEnvelopeBcDist)
+                        {
+                            repEnvelopeBcDist = newBcDist;
+                            repEnvelope = envelope;
+                        }
+
+                        // in the initial scoring, classify major and minor envelopes
+                        if (!_initScore)
+                        {
+                            if (newBcDist < 0.07 || newCorr > 0.7) envelope.GoodEnough = true;
+                        }
+                    }
                 }
 
                 var bcDist = TheoreticalEnvelope.GetBhattacharyyaDistance(summedIntensity);
@@ -205,10 +245,9 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     BestCharge[chargeIdx] = charge;
                     bestChargeDist[chargeIdx] = bcDist;
-                    if (summedMedianIntensity > 0)
-                    {
-                        EnvelopeIntensityScoreAcrossCharge[chargeIdx] = Math.Min(1.0, 0.1*(summedMostAbuIsotopeIntensity / summedMedianIntensity));
-                    }
+                    if (summedReferenceIntensity > 0)
+                        EnvelopeIntensityScoreAcrossCharge[chargeIdx] = summedMostAbuIsotopeIntensity/summedReferenceIntensity;
+                    //if (summedMedianIntensity > 0) EnvelopeIntensityScoreAcrossCharge[chargeIdx] = Math.Min(1.0, 0.1*(summedMostAbuIsotopeIntensity / summedMedianIntensity));
                 }
 
                 if (bcDist < tempBestBcDist)
@@ -220,63 +259,18 @@ namespace InformedProteomics.Backend.MassFeature
 
             // normalize abudnace across charges
             var s = AbundanceDistributionAcrossCharge[0] + AbundanceDistributionAcrossCharge[1];
-            for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++) AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;
-
-            var rankSumPvalueThreshold = (Mass < 15000) ? 0.01 : 0.02;
-            var poissonPvalueThreshold = (Mass < 15000) ? 0.02 : 0.05;
-            
-            var xic = new double[2][];
-
-            tempBestBcDist = 10.0d;
-            ObservedIsotopeEnvelope repEnvelope = null;
-            for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++)
+            if (s > 0)
             {
-                var charge = BestCharge[chargeIdx];
-                var i = charge - MinCharge;
-                var mostAbuMz = TheoreticalEnvelope.GetIsotopeMz(charge, mostAbuIdx);
-                xic[chargeIdx] = new double[xicLen];
-
-                for (var j = 0; j < nCols; j++)
-                {
-                    var envelope = Envelopes[i][j];
-                    var col = minCol + j;
-                    if (envelope == null) continue;
-                    
-                    var localWin = ms1Spectra[col].GetLocalMzWindow(mostAbuMz);
-                    
-                    if (pValueCheck)
-                    {
-                        var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
-                        var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
-                        if (poissonPvalue > poissonPvalueThreshold || rankSumPvalue > rankSumPvalueThreshold) continue;
-                    }
-
-                    var newBcDist = TheoreticalEnvelope.GetBhattacharyyaDistance(envelope.Peaks);
-                    if (newBcDist < BestDistanceScoreAcrossCharge[chargeIdx])
-                    {
-                        BestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
-                        //bestEnvelopeAcrossCharge[chargeIdx] = envelope;
-                        if (localWin.MedianIntensity > 0)
-                            BestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
-                        else BestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
-                    }
-                    var newCorr = TheoreticalEnvelope.GetPearsonCorrelation(envelope.Peaks);
-                    BestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(BestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
-
-                    if (newBcDist < tempBestBcDist)
-                    {
-                        tempBestBcDist = newBcDist;
-                        repEnvelope = envelope;
-                    }
-
-                    if (newBcDist < 1) xic[chargeIdx][xicStartIdx+j] = envelope.Abundance;
-                }
+                for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++) AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;    
             }
             
+
             if (nCols > 1)
             {
-                XicCorrelationBetweenBestCharges[0] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(xic[0]), Smoother.Smooth(xic[1]));
-                XicCorrelationBetweenBestCharges[1] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(xic2[0]), Smoother.Smooth(xic2[1]));
+                var evenChargeIdx = BestCharge[EvenCharge] - MinCharge;
+                var oddChargeIdx = BestCharge[OddCharge] - MinCharge;
+                XicCorrelationBetweenBestCharges[0] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(chargeXic[evenChargeIdx]), Smoother.Smooth(chargeXic[oddChargeIdx]));
+                XicCorrelationBetweenBestCharges[1] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(xic2[EvenCharge]), Smoother.Smooth(xic2[OddCharge]));
             }
 
             if (repEnvelope != null)
@@ -286,6 +280,8 @@ namespace InformedProteomics.Backend.MassFeature
                 RepresentativeMz = repEnvelope.RepresentativePeak.Mz;
                 RepresentativeScanNum = repEnvelope.ScanNum;                
             }
+
+            _initScore = true;
         }
 
         public void SetChargeRange(int minCharge, int maxCharge)
@@ -363,7 +359,7 @@ namespace InformedProteomics.Backend.MassFeature
                 }
             }
         }
-
+        
         public IEnumerable<ObservedIsotopeEnvelope> EnumerateEnvelopes()
         {
             for (var i = 0; i < Envelopes.Length; i++)
@@ -380,12 +376,15 @@ namespace InformedProteomics.Backend.MassFeature
         {
             foreach (var envelope in EnumerateEnvelopes())
             {
-                for (var i = 0; i < TheoreticalEnvelope.IndexOrderByRanking.Length; i++)
+                if (!envelope.GoodEnough) continue;
+
+                for (var i = 0; i < TheoreticalEnvelope.Size; i++)
                 {
-                    var k = TheoreticalEnvelope.IndexOrderByRanking[i];
-                    if (TheoreticalEnvelope.Isotopes[k].Ratio < 0.3) yield break;
-                    var peak = envelope.Peaks[k];
-                    if (peak != null && peak.Active) yield return peak;
+                    if (TheoreticalEnvelope.Isotopes[i].Ratio > 0.3)
+                    {
+                        var peak = envelope.Peaks[i];
+                        if (peak != null && peak.Active) yield return peak;                        
+                    }
                 }
             }
         }
@@ -394,13 +393,15 @@ namespace InformedProteomics.Backend.MassFeature
         {
             foreach (var envelope in EnumerateEnvelopes())
             {
-                for (var j = TheoreticalEnvelope.Size - 1; j >= 0; j--)
+                if (envelope.GoodEnough) continue;
+
+                for (var i = 0; i < TheoreticalEnvelope.Size; i++)
                 {
-                    var k = TheoreticalEnvelope.IndexOrderByRanking[j];
-                    if (TheoreticalEnvelope.Isotopes[k].Ratio >= 0.3) yield break;
-                    
-                    var peak = envelope.Peaks[k];
-                    if (peak != null && peak.Active) yield return envelope.Peaks[k];
+                    if (TheoreticalEnvelope.Isotopes[i].Ratio <= 0.3)
+                    {
+                        var peak = envelope.Peaks[i];
+                        if (peak != null && peak.Active) yield return peak;
+                    }
                 }
             }            
         }
@@ -432,13 +433,19 @@ namespace InformedProteomics.Backend.MassFeature
             }
         }
 
+        public bool GoodEnougth
+        {
+            get
+            {
+                if (Mass > 35000) return BestCorrelationScore > 0.85;
+                if (Mass > 25000) return BestCorrelationScore > 0.8;
+                if (Mass > 15000) return BestCorrelationScore > 0.75;
+                return BestCorrelationScore > 0.7;                
+            }
+        }
 
         public readonly int DetectableMaxCharge;
         public readonly int DetectableMinCharge; 
-
-
-        //public List<ObservedIsotopeEnvelope> Envelopes { get; private set; }
-
         public ObservedIsotopeEnvelope[][] Envelopes;
         public double Score { get; internal set; }
 
@@ -462,11 +469,11 @@ namespace InformedProteomics.Backend.MassFeature
         public const int OddCharge = 1;
 
         public double BestCorrelationScore { get { return Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());  } }
-        //public double BestDistance { get { return Math.Min(BestDistanceScoreAcrossCharge.Where(d => d > 0).Min(), EnvelopeDistanceScoreAcrossCharge.Min()); } }
-        
-        internal double SummedEnvelopeBcDistCutoff = 0.1;
+        //internal double SummedEnvelopeBcDistCutoff = 0.1;
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
         internal byte Flag;
+
+        private bool _initScore;
     }
 }

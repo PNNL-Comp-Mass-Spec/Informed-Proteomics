@@ -18,12 +18,17 @@ namespace InformedProteomics.Backend.MassFeature
             Peaks = new Ms1Peak[theoreticalEnvelope.Size];
             
             Array.Copy(peaks, Peaks, theoreticalEnvelope.Size);
-            //GoodEnough = false;
+            GoodEnough = false;
         }
 
         public double BhattacharyyaDistance
         {
             get { return TheoreticalEnvelope.GetBhattacharyyaDistance(Peaks); }
+        }
+
+        public double PearsonCorrelation
+        {
+            get { return TheoreticalEnvelope.GetPearsonCorrelation(Peaks); }
         }
 
         public override Isotope GetMostAbundantIsotope()
@@ -75,5 +80,7 @@ namespace InformedProteomics.Backend.MassFeature
         public readonly int Charge;
         public readonly int ScanNum;
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
+
+        public bool GoodEnough { get; internal set; }
     }
 }

@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         public void TagMajorPeakOf(LcMsPeakCluster feature)
         {
-            if (_majorIsotopeFeatures == null) _majorTaggedFeatures = new List<LcMsPeakCluster>();
+            if (_majorTaggedFeatures == null) _majorTaggedFeatures = new List<LcMsPeakCluster>();
             _majorTaggedFeatures.Add(feature);
         }
         public void TagMinorPeakOf(LcMsPeakCluster feature)
@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         private List<LcMsPeakCluster> _minorTaggedFeatures;
         private List<LcMsPeakCluster> _majorTaggedFeatures;
-
+        
         public void TagMajorPeakOf(Ms1FeatureCluster feature)
         {
             if (_majorIsotopeFeatures == null) _majorIsotopeFeatures = new List<Ms1FeatureCluster>();

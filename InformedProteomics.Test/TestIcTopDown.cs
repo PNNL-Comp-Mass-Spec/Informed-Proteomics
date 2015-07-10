@@ -314,7 +314,7 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             // QC_Shew
-            const string specFilePath = @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf";
+            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string dbFilePath = @"D:\MSPathFinder\Fasta\ID_002216_235ACCEA.fasta";
             const string outputDir = @"D:\MassSpecFiles\training\test";
 

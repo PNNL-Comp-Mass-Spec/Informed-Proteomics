@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -11,6 +14,71 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsMap
     {
+        
+        [Test]
+        public void TestMs1Filter()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            // QC_Shew
+            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            const string ms1FtFileName = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+            const string idFilePath =  @"D:\MassSpecFiles\training\IcTda\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+
+
+            if (!File.Exists(specFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                return;
+            }
+
+            if (!File.Exists(idFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, idFilePath);
+                return;
+            }
+
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath);
+            var massTolerance = new Tolerance(10);
+
+            var ms1ftFilter = new Ms1FtFilter(run, massTolerance, ms1FtFileName);
+            var tsvReader = new TsvFileParser(idFilePath);
+
+            for (var i = 0; i < tsvReader.NumData; i++)
+            {
+                var qv = double.Parse(tsvReader.GetData("QValue")[i]);
+                if (qv > 0.01) break;
+
+                var scan = int.Parse(tsvReader.GetData("Scan")[i]);
+                var charge = int.Parse(tsvReader.GetData("Charge")[i]);
+                var mass = double.Parse(tsvReader.GetData("Mass")[i]);
+
+                if (mass > 15000) continue;
+
+                var seq = tsvReader.GetData("Sequence")[i];
+                var mod = tsvReader.GetData("Modifications")[i];
+                var nMatched = int.Parse(tsvReader.GetData("#MatchedFragments")[i]);
+
+                
+
+                var hit = false;
+                foreach (var ms2Scan in ms1ftFilter.GetMatchingMs2ScanNums(mass))
+                {
+                    if (ms2Scan == scan)
+                    {
+                        hit = true;
+                        break;
+                    }
+                }
+
+                if (!hit)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}", scan, mass, nMatched);
+                }
+            }
+        }
+        
         /*
         public void TestCalculatingNumBins()
         {

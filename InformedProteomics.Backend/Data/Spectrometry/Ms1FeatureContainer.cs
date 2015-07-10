@@ -85,11 +85,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
             }*/
             
-            foreach (var peak in newFeature.GetMajorPeaks())
-                peak.TagMajorPeakOf(newFeature);
+            foreach (var peak in newFeature.GetMajorPeaks()) peak.TagMajorPeakOf(newFeature);
 
-            foreach (var peak in newFeature.GetMinorPeaks())
-                peak.TagMinorPeakOf(newFeature);
+            foreach (var peak in newFeature.GetMinorPeaks()) peak.TagMinorPeakOf(newFeature);
             
             _featureList.Add(newFeature);
             return true;
