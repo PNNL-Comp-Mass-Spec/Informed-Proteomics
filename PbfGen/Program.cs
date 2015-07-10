@@ -68,7 +68,14 @@ namespace PbfGen
                     return -1;
                 }
 
-                if (!File.Exists(specFilePath) && !Directory.Exists(specFilePath))
+                // Check for folder-type datasets, and replace specFilePath with the directory name if it is.
+                specFilePath = MassSpecDataReaderFactory.GetDatasetName(specFilePath);
+
+                var isDirectoryDataset = MassSpecDataReaderFactory.IsADirectoryDataset(specFilePath);
+                // True if specFilePath is a directory that is NOT a supported folder-type dataset.
+                var specPathIsDirectory = Directory.Exists(specFilePath) && !isDirectoryDataset;
+
+                if (!File.Exists(specFilePath) && !specPathIsDirectory && !isDirectoryDataset)
                 {
                     PrintUsageInfo("File not found: " + specFilePath);
                     return -1;
@@ -77,7 +84,7 @@ namespace PbfGen
                 var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
                 types.Remove(".pbf");
 
-                if (!Directory.Exists(specFilePath) && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
+                if (!specPathIsDirectory && !(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any()))
                 {
                     PrintUsageInfo("Invalid file extension: (" + Path.GetExtension(specFilePath) + ") " + specFilePath);
                     return -1;
@@ -85,7 +92,7 @@ namespace PbfGen
 
                 // Must use "Path.GetFullPath" to return the absolute path when the source file is in the working directory
                 // But, it could cause problems with too-long paths.
-                outputDir = paramDic["-o"] ?? (Directory.Exists(specFilePath) ? specFilePath : Path.GetDirectoryName(Path.GetFullPath(specFilePath)));
+                outputDir = paramDic["-o"] ?? (specPathIsDirectory ? specFilePath : Path.GetDirectoryName(Path.GetFullPath(specFilePath)));
                 if (outputDir == null)
                 {
                     PrintUsageInfo("Invalid output file directory: " + specFilePath);
@@ -114,7 +121,7 @@ namespace PbfGen
             {
 #endif
                 string[] specFilePaths = new[] { specFilePath };
-                if (Directory.Exists(specFilePath) && !MassSpecDataReaderFactory.SupportedDirectoryTypes.Any(f => specFilePath.ToLower().EndsWith(f)))
+                if (Directory.Exists(specFilePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(specFilePath))
                 {
                     specFilePaths = Directory.GetFiles(specFilePath, "*.raw");
                 }

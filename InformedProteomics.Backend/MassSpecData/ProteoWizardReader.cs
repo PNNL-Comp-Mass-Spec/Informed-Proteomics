@@ -368,7 +368,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // If it doesn't end with .d, but contains .d, and the path is not an existing file or it is a Bruker data type
             // Assume it is a Agilent or Bruker .d dataset, and change the path to only point to the directory.
             if ((tempFilePath.EndsWith(".d") && !Directory.Exists(fullFilePath)) || tempFilePath.Contains(".d") &&
-                (!File.Exists(fullFilePath) || BrukerFiles.Any(f => tempFilePath.EndsWith(f))))
+                (!File.Exists(fullFilePath) || BrukerFiles.Any(f => tempFilePath.EndsWith(f)) || tempFilePath.EndsWith(".bin")))
             {
                 while (!string.IsNullOrWhiteSpace(tempFilePath) && tempFilePath.Contains(".d"))
                 {

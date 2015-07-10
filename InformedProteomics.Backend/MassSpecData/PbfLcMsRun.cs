@@ -19,22 +19,48 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="specFileName"></param>
         /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static string GetPbfFileName(string specFileName)
         {
             return MassSpecDataReaderFactory.ChangeExtension(specFileName, FileExtension);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFilePath"></param>
+        /// <param name="dataType"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, dataType, 0.0, 0.0, progress);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFilePath"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, 0.0, 0.0, progress);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFilePath"></param>
+        /// <param name="dataType"></param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
         public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
@@ -46,6 +72,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFilePath"></param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
             string specFilePath, 
             double precursorSignalToNoiseRatioThreshold, 
@@ -55,6 +90,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFilePath"></param>
+        /// <param name="specReader"></param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {

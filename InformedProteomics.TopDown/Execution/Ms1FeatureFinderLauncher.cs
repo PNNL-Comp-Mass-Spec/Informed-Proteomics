@@ -27,12 +27,15 @@ namespace InformedProteomics.TopDown.Execution
             {
                 Console.WriteLine(fe.Message);
                 return;
-            }            
+            }
+
+            // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
+            Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
             
             var attr = File.GetAttributes(Parameters.InputPath);
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
-                !MassSpecDataReaderFactory.SupportedDirectoryTypes.Any(f => Parameters.InputPath.ToLower().EndsWith(f)))
+                !MassSpecDataReaderFactory.IsADirectoryDataset(Parameters.InputPath))
             {
                 ProcessDirectory(Parameters.InputPath);
             }
@@ -61,7 +64,7 @@ namespace InformedProteomics.TopDown.Execution
             var fileEntries = Directory.GetFiles(targetDirectory);
             foreach (var fileName in fileEntries)
             {
-                if (MsRawFile(fileName) || MsPbfFile(fileName)) ProcessFile(fileName);
+                if ((MsRawFile(fileName) && !HasExistingPbfFile(fileName)) || MsPbfFile(fileName)) ProcessFile(fileName);
             }
         }
 
@@ -70,7 +73,9 @@ namespace InformedProteomics.TopDown.Execution
             //return (path.EndsWith(".raw") || path.EndsWith(".mzML"));
             var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
-            //var pbfFilePath = Path.ChangeExtension(specFilePath, "pbf");
+            // Only supposed to affect execution when running on a directory; however having this test here will affect single file execution
+            // i.e., if run with a raw file as input when a .pbf file exists for the dataset, this will return false, and kill the run erroneously.
+            //var pbfFilePath = MassSpecDataReaderFactory.ChangeExtension(specFilePath, "pbf");
             //if (File.Exists(pbfFilePath)) return false;
 
             return types.Any(ext => specFilePath.ToLower().EndsWith(ext));
@@ -87,6 +92,11 @@ namespace InformedProteomics.TopDown.Execution
             */
         }
 
+        private bool HasExistingPbfFile(string path)
+        {
+            return File.Exists(MassSpecDataReaderFactory.ChangeExtension(path, ".pbf"));
+        }
+
         private bool MsPbfFile(string path)
         {
             return path.EndsWith(".pbf");
@@ -98,8 +108,8 @@ namespace InformedProteomics.TopDown.Execution
         private void ProcessFile(string rawFile)
         {
             var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(rawFile));
-
-            var baseName = Path.GetFileNameWithoutExtension(rawFile);
+            
+            var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
             var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
             
