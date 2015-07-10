@@ -396,50 +396,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"NumBins: " + numBins);
 
             Assert.IsTrue(numBins == 16384);
-        }
-
-        [Test]
-        public void TestGeneringAllXics()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            if (!File.Exists(TestRawFilePath))
-            {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
-            }
-
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
-            //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 0.0, 0.0);
-            Assert.True(run != null);
-            var comparer = new MzComparerWithBinning(27);
-            const double minMz = 600.0; // 600.0
-            const double maxMz = 2000.0;    // 2000.0
-            var minBinNum = comparer.GetBinNumber(minMz);
-            var maxBinNum = comparer.GetBinNumber(maxMz);
-            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
-            var sw = new Stopwatch();
-            sw.Start();
-            var numBinsProcessed = 0;
-            for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
-            {
-//                if (binNum < 33880544) continue;
-//                Console.WriteLine(binNum);
-                var mzStart = comparer.GetMzStart(binNum);
-                var mzEnd = comparer.GetMzEnd(binNum);
-                //var between = 0.4*mz + 0.6*mzNext;
-                //Console.WriteLine(comparer.GetBinNumber(mz) + " " + comparer.GetBinNumber(between) + " " + comparer.GetBinNumber(mzNext));
-                //Assert.True(binNum == comparer.GetBinNumber(mzNextMinusEpsilon));
-                //run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
-                run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
-                //run.GetPrecursorExtractedIonChromatogram(mzStart, mzEnd);
-                //if(++numBinsProcessed % 1000 == 0) Console.WriteLine(numBinsProcessed);
-            }
-            sw.Stop();
-
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
-        }
+        }        
 
         [Test]
         public void TestGeneratingXicsOfAllCharges()
@@ -452,8 +409,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
                 return;
             }
-
-            //var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, MassSpecDataType.XCaliburRun, 1.4826, 0.0);
+            
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             var comparer = new MzComparerWithBinning(27);
             const string protSequence =
@@ -505,48 +461,7 @@ namespace InformedProteomics.Test
                     Console.WriteLine(xic[targetColIndex].Intensity);
             }
         }
-
-        [Test]
-        public void TestGettingXicVector()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            if (!File.Exists(TestRawFilePath))
-            {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
-            }
-
-            var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
-            var run2 = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
-            Assert.True(run1 != null && run2 != null);
-            var comparer = new MzComparerWithBinning(27);
-            const double minMz = 600.0; // 600.0
-            const double maxMz = 2000.0;    // 2000.0
-            var minBinNum = comparer.GetBinNumber(minMz);
-            var maxBinNum = comparer.GetBinNumber(maxMz);
-            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
-            var sw = new Stopwatch();
-            sw.Start();
-            for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
-            {
-                var mzStart = comparer.GetMzStart(binNum);
-                var mzEnd = comparer.GetMzEnd(binNum);
-                var vec1 = run1.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
-                var vec2 = run2.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
-                Assert.True(vec1.Length == vec2.Length);
-                for (var i = 0; i < vec1.Length; i++)
-                {
-                    Assert.True(vec1[i] == vec2[i]);
-                }
-            }
-            sw.Stop();
-
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
-            
-        }
-
+      
         [Test]
         public void TestAbpSumMs1Spectra()
         {

@@ -166,12 +166,36 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 			return GetApexScanNum();
 		}
 
-        public void Display()
+        /// <summary>
+        /// Display the chromatogram
+        /// </summary>
+        /// <param name="maxPointsToShow">Maximum number of data points to show</param>
+        /// <remarks>Set maxPoints to 0 to see all of the data points</remarks>
+        public void Display(int maxPointsToShow = 50)
         {
+            var threshold = 1;
+            if (maxPointsToShow > 0)
+            {
+                threshold = (int)Math.Round(this.Count / (double)maxPointsToShow);
+                if (threshold < 1)
+                    threshold = 1;
+            }
+
+            var index = 0;
+            var pointsShown = 0;
+
             foreach (var p in this)
             {
-                Console.WriteLine(p.ScanNum+"\t"+p.Intensity);
+                if (index == 0 || index % threshold == 0)
+                {
+                    Console.WriteLine(p.ScanNum + "\t" + p.Intensity);
+                    pointsShown++;
+                }
+
+                index++;
             }
+
+            Console.WriteLine("Displayed {0} out of {1} data points", pointsShown, this.Count);
         }
 
         // sort XicPoints and select one peak per scan

@@ -270,14 +270,14 @@ namespace InformedProteomics.Test.FunctionalTests
             var aminoAcidSet = new AminoAcidSet();
             var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
 
-            const string resultFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
+            const string resultFileName = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
             var parser = new TsvFileParser(resultFileName);
             var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var protSequences = parser.GetData("Sequence").ToArray();
             var modStrs = parser.GetData("Modifications").ToArray();
             var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
 
-            const string outputFileName = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
+            const string outputFileName = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
             using (var writer = new StreamWriter(outputFileName))
             {
                 writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tScore");
@@ -305,9 +305,10 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string targetResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
-            const string decoyResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
-            const string tdaResultPath = @"\\protoapps\UserData\Sangtae\TestData\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";
+            const string targetResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
+            const string decoyResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
+            const string tdaResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Results\Fdr\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";
+
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);

@@ -20,7 +20,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -50,7 +50,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -77,7 +77,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -151,7 +151,7 @@ namespace InformedProteomics.Test.FunctionalTests
             sw.Start();
 
             //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Databases\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);

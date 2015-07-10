@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <?IUPAC 2000 Atomic Weights of the Elements. Updated Elements H, B, C, N, O, Na, P, S, Cl, K, Ca Table 5 for probabilty best measuremnt?>
 <?We need to add average mass and check all isotope probabilities add to 1?>
 <?Average mass comes from IUPAC 2007.  () uncertanties were not included?>
@@ -11,16 +11,16 @@
 			<Name>Hydrogen</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>1</Atomicity>
-			<MzAverage>1.00794</MzAverage>
-			<MzAverageUncertainty>0.00007</MzAverageUncertainty>
+			<MassAverage>1.00794</MassAverage>
+			<MassAverageUncertainty>0.00007</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>1</IsotopeNumber>
-				<Mz>1.00782503196</Mz>
+				<Mass>1.00782503196</Mass>
 				<Probability>0.999844265</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>2</IsotopeNumber>
-				<Mz>2.01410177796</Mz>
+				<Mass>2.01410177796</Mass>
 				<Probability>0.000155745</Probability>
 			</Isotope>
 		</Element>
@@ -29,16 +29,16 @@
 			<Name>Helium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>2</Atomicity>
-			<MzAverage>4.002602</MzAverage>
-			<MzAverageUncertainty>0.000002</MzAverageUncertainty>
+			<MassAverage>4.002602</MassAverage>
+			<MassAverageUncertainty>0.000002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>3</IsotopeNumber>
-				<Mz>3.01603</Mz>
+				<Mass>3.01603</Mass>
 				<Probability>0.00000134313</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>4</IsotopeNumber>
-				<Mz>4.0026</Mz>
+				<Mass>4.0026</Mass>
 				<Probability>0.99999865713</Probability>
 			</Isotope>
 		</Element>
@@ -47,16 +47,16 @@
 			<Name>Lithium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>3</Atomicity>
-			<MzAverage>6.941</MzAverage>
-			<MzAverageUncertainty>0.002</MzAverageUncertainty>
+			<MassAverage>6.941</MassAverage>
+			<MassAverageUncertainty>0.002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>6</IsotopeNumber>
-				<Mz>6.015121</Mz>
+				<Mass>6.015121</Mass>
 				<Probability>0.075</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>7</IsotopeNumber>
-				<Mz>7.016003</Mz>
+				<Mass>7.016003</Mass>
 				<Probability>0.925</Probability>
 			</Isotope>
 		</Element>
@@ -65,11 +65,11 @@
 			<Name>Beryllium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>4</Atomicity>
-			<MzAverage>9.012182</MzAverage>
-			<MzAverageUncertainty>0.000003</MzAverageUncertainty>
+			<MassAverage>9.012182</MassAverage>
+			<MassAverageUncertainty>0.000003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>9</IsotopeNumber>
-				<Mz>9.012182</Mz>
+				<Mass>9.012182</Mass>
 				<Probability>1.0</Probability>
 			</Isotope>
 		</Element>
@@ -78,16 +78,16 @@
 			<Name>Boron</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>5</Atomicity>
-			<MzAverage>10.811</MzAverage>
-			<MzAverageUncertainty>0.007</MzAverageUncertainty>
+			<MassAverage>10.811</MassAverage>
+			<MassAverageUncertainty>0.007</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>10</IsotopeNumber>
-				<Mz>10.01293713</Mz>
+				<Mass>10.01293713</Mass>
 				<Probability>0.19822</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>11</IsotopeNumber>
-				<Mz>11.00930554</Mz>
+				<Mass>11.00930554</Mass>
 				<Probability>0.80182</Probability>
 			</Isotope>
 		</Element>
@@ -96,16 +96,16 @@
 			<Name>Carbon</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>6</Atomicity>
-			<MzAverage>12.0107</MzAverage>
-			<MzAverageUncertainty>0.0008</MzAverageUncertainty>
+			<MassAverage>12.0107</MassAverage>
+			<MassAverageUncertainty>0.0008</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>12</IsotopeNumber>
-				<Mz>12.0000000000</Mz>
+				<Mass>12.0000000000</Mass>
 				<Probability>0.98892228</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>13</IsotopeNumber>
-				<Mz>13.0033548385</Mz>
+				<Mass>13.0033548385</Mass>
 				<Probability>0.01107828</Probability>
 			</Isotope>
 		</Element>
@@ -114,16 +114,16 @@
 			<Name>Nitrogen</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>7</Atomicity>
-			<MzAverage>14.0067</MzAverage>
-			<MzAverageUncertainty>0.0002</MzAverageUncertainty>
+			<MassAverage>14.0067</MassAverage>
+			<MassAverageUncertainty>0.0002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>14</IsotopeNumber>
-				<Mz>14.003074007418</Mz>
+				<Mass>14.003074007418</Mass>
 				<Probability>0.9963374</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>15</IsotopeNumber>
-				<Mz>15.00010897312</Mz>
+				<Mass>15.00010897312</Mass>
 				<Probability>0.0036634</Probability>
 			</Isotope>
 		</Element>
@@ -132,21 +132,21 @@
 			<Name>Oxygen</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>8</Atomicity>
-			<MzAverage>15.9994</MzAverage>
-			<MzAverageUncertainty>0.0003</MzAverageUncertainty>
+			<MassAverage>15.9994</MassAverage>
+			<MassAverageUncertainty>0.0003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>16</IsotopeNumber>
-				<Mz>15.994914622325</Mz>
+				<Mass>15.994914622325</Mass>
 				<Probability>0.99762065</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>17</IsotopeNumber>
-				<Mz>16.9991315022</Mz>
+				<Mass>16.9991315022</Mass>
 				<Probability>0.00037909</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>18</IsotopeNumber>
-				<Mz>17.99916049</Mz>
+				<Mass>17.99916049</Mass>
 				<Probability>0.00200045</Probability>
 			</Isotope>
 		</Element>
@@ -155,11 +155,11 @@
 			<Name>Fluorine</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>9</Atomicity>
-			<MzAverage>18.9984032</MzAverage>
-			<MzAverageUncertainty>0.0000005</MzAverageUncertainty>
+			<MassAverage>18.9984032</MassAverage>
+			<MassAverageUncertainty>0.0000005</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>19</IsotopeNumber>
-				<Mz>18.9984</Mz>
+				<Mass>18.9984</Mass>
 				<Probability>1.0</Probability>
 			</Isotope>
 		</Element>
@@ -168,21 +168,21 @@
 			<Name>Neon</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>10</Atomicity>
-			<MzAverage>20.1797</MzAverage>
-			<MzAverageUncertainty>0.0006</MzAverageUncertainty>
+			<MassAverage>20.1797</MassAverage>
+			<MassAverageUncertainty>0.0006</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>20</IsotopeNumber>
-				<Mz>19.99244</Mz>
+				<Mass>19.99244</Mass>
 				<Probability>0.9048</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>21</IsotopeNumber>
-				<Mz>20.99384</Mz>
+				<Mass>20.99384</Mass>
 				<Probability>0.0027</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>22</IsotopeNumber>
-				<Mz>21.99138</Mz>
+				<Mass>21.99138</Mass>
 				<Probability>0.0925</Probability>
 			</Isotope>
 		</Element>
@@ -191,11 +191,11 @@
 			<Name>Sodium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>11</Atomicity>
-			<MzAverage>22.98976928</MzAverage>
-			<MzAverageUncertainty>0.00000002</MzAverageUncertainty>
+			<MassAverage>22.98976928</MassAverage>
+			<MassAverageUncertainty>0.00000002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>23</IsotopeNumber>
-				<Mz>22.9897696626</Mz>
+				<Mass>22.9897696626</Mass>
 				<Probability>1.0</Probability>
 			</Isotope>
 		</Element>
@@ -204,21 +204,21 @@
 			<Name>Magnesium</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>12</Atomicity>
-			<MzAverage>24.305</MzAverage>
-			<MzAverageUncertainty>0.006</MzAverageUncertainty>
+			<MassAverage>24.305</MassAverage>
+			<MassAverageUncertainty>0.006</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>24</IsotopeNumber>
-				<Mz>23.98504</Mz>
+				<Mass>23.98504</Mass>
 				<Probability>0.7899</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>25</IsotopeNumber>
-				<Mz>24.98584</Mz>
+				<Mass>24.98584</Mass>
 				<Probability>0.1</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>26</IsotopeNumber>
-				<Mz>25.98259</Mz>
+				<Mass>25.98259</Mass>
 				<Probability>0.1101</Probability>
 			</Isotope>
 		</Element>
@@ -227,11 +227,11 @@
 			<Name>Alumunium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>13</Atomicity>
-			<MzAverage>26.9815386</MzAverage>
-			<MzAverageUncertainty>0.0000008</MzAverageUncertainty>
+			<MassAverage>26.9815386</MassAverage>
+			<MassAverageUncertainty>0.0000008</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>27</IsotopeNumber>
-				<Mz>26.98154</Mz>
+				<Mass>26.98154</Mass>
 				<Probability>1.0</Probability>
 			</Isotope>
 		</Element>
@@ -240,21 +240,21 @@
 			<Name>Silicon</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>14</Atomicity>
-			<MzAverage>28.0855</MzAverage>
-			<MzAverageUncertainty>0.0003</MzAverageUncertainty>
+			<MassAverage>28.0855</MassAverage>
+			<MassAverageUncertainty>0.0003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>28</IsotopeNumber>
-				<Mz>27.97693</Mz>
+				<Mass>27.97693</Mass>
 				<Probability>0.9223</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>29</IsotopeNumber>
-				<Mz>28.9765</Mz>
+				<Mass>28.9765</Mass>
 				<Probability>0.0467</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>30</IsotopeNumber>
-				<Mz>29.97377</Mz>
+				<Mass>29.97377</Mass>
 				<Probability>0.031</Probability>
 			</Isotope>
 		</Element>
@@ -263,11 +263,11 @@
 			<Name>Phosphorous</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>15</Atomicity>
-			<MzAverage>30.973762</MzAverage>
-			<MzAverageUncertainty>0.000002</MzAverageUncertainty>
+			<MassAverage>30.973762</MassAverage>
+			<MassAverageUncertainty>0.000002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>31</IsotopeNumber>
-				<Mz>30.9737614927</Mz>
+				<Mass>30.9737614927</Mass>
 				<Probability>1.0</Probability>
 			</Isotope>
 		</Element>
@@ -276,26 +276,26 @@
 			<Name>Sulfur</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>16</Atomicity>
-			<MzAverage>32.065</MzAverage>
-			<MzAverageUncertainty>0.005</MzAverageUncertainty>
+			<MassAverage>32.065</MassAverage>
+			<MassAverageUncertainty>0.005</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>32</IsotopeNumber>
-				<Mz>31.9720707315</Mz>
+				<Mass>31.9720707315</Mass>
 				<Probability>0.950407488</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>33</IsotopeNumber>
-				<Mz>32.9714585415</Mz>
+				<Mass>32.9714585415</Mass>
 				<Probability>0.007486960</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>34</IsotopeNumber>
-				<Mz>33.9678668714</Mz>
+				<Mass>33.9678668714</Mass>
 				<Probability>0.041959966</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>36</IsotopeNumber>
-				<Mz>35.9670808825</Mz>
+				<Mass>35.9670808825</Mass>
 				<Probability>0.0001457989</Probability>
 			</Isotope>
 		</Element>
@@ -304,16 +304,16 @@
 			<Name>Chlorine</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>17</Atomicity>
-			<MzAverage>35.453</MzAverage>
-			<MzAverageUncertainty>0.002</MzAverageUncertainty>
+			<MassAverage>35.453</MassAverage>
+			<MassAverageUncertainty>0.002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>35</IsotopeNumber>
-				<Mz>34.968852714</Mz>
+				<Mass>34.968852714</Mass>
 				<Probability>0.7577145</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>37</IsotopeNumber>
-				<Mz>36.965902605</Mz>
+				<Mass>36.965902605</Mass>
 				<Probability>0.2422945</Probability>
 			</Isotope>
 		</Element>
@@ -322,21 +322,21 @@
 			<Name>Argon</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>18</Atomicity>
-			<MzAverage>39.948</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>39.948</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>36</IsotopeNumber>
-				<Mz>35.96754</Mz>
+				<Mass>35.96754</Mass>
 				<Probability>0.00337</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>38</IsotopeNumber>
-				<Mz>37.96273</Mz>
+				<Mass>37.96273</Mass>
 				<Probability>0.00063</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>40</IsotopeNumber>
-				<Mz>39.96238</Mz>
+				<Mass>39.96238</Mass>
 				<Probability>0.996</Probability>
 			</Isotope>
 		</Element>
@@ -345,21 +345,21 @@
 			<Name>Potassium</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>19</Atomicity>
-			<MzAverage>39.0983</MzAverage>
-			<MzAverageUncertainty>0.0001</MzAverageUncertainty>
+			<MassAverage>39.0983</MassAverage>
+			<MassAverageUncertainty>0.0001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>39</IsotopeNumber>
-				<Mz>38.96370693</Mz>
+				<Mass>38.96370693</Mass>
 				<Probability>0.9325811292</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>40</IsotopeNumber>
-				<Mz>39.9639986729</Mz>
+				<Mass>39.9639986729</Mass>
 				<Probability>0.0001167241</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>41</IsotopeNumber>
-				<Mz>40.9618259728</Mz>
+				<Mass>40.9618259728</Mass>
 				<Probability>0.0673022292</Probability>
 			</Isotope>
 		</Element>
@@ -368,36 +368,36 @@
 			<Name>Calcium</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>20</Atomicity>
-			<MzAverage>40.078</MzAverage>
-			<MzAverageUncertainty>0.004</MzAverageUncertainty>
+			<MassAverage>40.078</MassAverage>
+			<MassAverageUncertainty>0.004</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>40</IsotopeNumber>
-				<Mz>39.96259123</Mz>
+				<Mass>39.96259123</Mass>
 				<Probability>0.969416</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>42</IsotopeNumber>
-				<Mz>41.95861834</Mz>
+				<Mass>41.95861834</Mass>
 				<Probability>0.006473</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>43</IsotopeNumber>
-				<Mz>42.95876685</Mz>
+				<Mass>42.95876685</Mass>
 				<Probability>0.001352</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>44</IsotopeNumber>
-				<Mz>43.95548119</Mz>
+				<Mass>43.95548119</Mass>
 				<Probability>0.020864</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>46</IsotopeNumber>
-				<Mz>45.953692725</Mz>
+				<Mass>45.953692725</Mass>
 				<Probability>0.000041</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>48</IsotopeNumber>
-				<Mz>47.9525334</Mz>
+				<Mass>47.9525334</Mass>
 				<Probability>0.001871</Probability>
 			</Isotope>
 		</Element>
@@ -406,12 +406,12 @@
 			<Name>Scandium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>21</Atomicity>
-			<MzAverage>44.955912</MzAverage>
-			<MzAverageUncertainty>0.000006</MzAverageUncertainty>
+			<MassAverage>44.955912</MassAverage>
+			<MassAverageUncertainty>0.000006</MassAverageUncertainty>
 
 			<Isotope>
 				<IsotopeNumber>45</IsotopeNumber>
-				<Mz>44.95591</Mz>
+				<Mass>44.95591</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -420,31 +420,31 @@
 			<Name>Titanium</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>22</Atomicity>
-			<MzAverage>47.867</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>47.867</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>46</IsotopeNumber>
-				<Mz>45.95263</Mz>
+				<Mass>45.95263</Mass>
 				<Probability>0.08</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>47</IsotopeNumber>
-				<Mz>46.95176</Mz>
+				<Mass>46.95176</Mass>
 				<Probability>0.073</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>48</IsotopeNumber>
-				<Mz>47.94795</Mz>
+				<Mass>47.94795</Mass>
 				<Probability>0.738</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>49</IsotopeNumber>
-				<Mz>48.94787</Mz>
+				<Mass>48.94787</Mass>
 				<Probability>0.055</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>50</IsotopeNumber>
-				<Mz>49.94479</Mz>
+				<Mass>49.94479</Mass>
 				<Probability>0.054</Probability>
 			</Isotope>
 		</Element>
@@ -453,16 +453,16 @@
 			<Name>Vanadium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>23</Atomicity>
-			<MzAverage>50.9415</MzAverage>
-			<MzAverageUncertainty>0.0001</MzAverageUncertainty>
+			<MassAverage>50.9415</MassAverage>
+			<MassAverageUncertainty>0.0001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>50</IsotopeNumber>
-				<Mz>49.94716</Mz>
+				<Mass>49.94716</Mass>
 				<Probability>0.0025</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>51</IsotopeNumber>
-				<Mz>50.94396</Mz>
+				<Mass>50.94396</Mass>
 				<Probability>0.9975</Probability>
 			</Isotope>
 		</Element>
@@ -471,26 +471,26 @@
 			<Name>Chromium</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>24</Atomicity>
-			<MzAverage>51.9961</MzAverage>
-			<MzAverageUncertainty>0.0006</MzAverageUncertainty>
+			<MassAverage>51.9961</MassAverage>
+			<MassAverageUncertainty>0.0006</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>50</IsotopeNumber>
-				<Mz>49.94604</Mz>
+				<Mass>49.94604</Mass>
 				<Probability>0.04345</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>52</IsotopeNumber>
-				<Mz>51.94051</Mz>
+				<Mass>51.94051</Mass>
 				<Probability>0.8379</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>53</IsotopeNumber>
-				<Mz>52.94065</Mz>
+				<Mass>52.94065</Mass>
 				<Probability>0.095</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>54</IsotopeNumber>
-				<Mz>53.93888</Mz>
+				<Mass>53.93888</Mass>
 				<Probability>0.02365</Probability>
 			</Isotope>
 		</Element>
@@ -499,11 +499,11 @@
 			<Name>Manganese</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>25</Atomicity>
-			<MzAverage>54.938045</MzAverage>
-			<MzAverageUncertainty>0.000005</MzAverageUncertainty>
+			<MassAverage>54.938045</MassAverage>
+			<MassAverageUncertainty>0.000005</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>55</IsotopeNumber>
-				<Mz>54.93805</Mz>
+				<Mass>54.93805</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -512,26 +512,26 @@
 			<Name>Iron</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>26</Atomicity>
-			<MzAverage>55.845</MzAverage>
-			<MzAverageUncertainty>0.002</MzAverageUncertainty>
+			<MassAverage>55.845</MassAverage>
+			<MassAverageUncertainty>0.002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>54</IsotopeNumber>
-				<Mz>53.93961</Mz>
+				<Mass>53.93961</Mass>
 				<Probability>0.059</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>56</IsotopeNumber>
-				<Mz>55.93494</Mz>
+				<Mass>55.93494</Mass>
 				<Probability>0.9172</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>57</IsotopeNumber>
-				<Mz>56.93539</Mz>
+				<Mass>56.93539</Mass>
 				<Probability>0.021</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>58</IsotopeNumber>
-				<Mz>57.93328</Mz>
+				<Mass>57.93328</Mass>
 				<Probability>0.0028</Probability>
 			</Isotope>
 		</Element>
@@ -540,11 +540,11 @@
 			<Name>Cobalt</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>27</Atomicity>
-			<MzAverage>58.933195</MzAverage>
-			<MzAverageUncertainty>0.000005</MzAverageUncertainty>
+			<MassAverage>58.933195</MassAverage>
+			<MassAverageUncertainty>0.000005</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>59</IsotopeNumber>
-				<Mz>58.9332</Mz>
+				<Mass>58.9332</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -553,31 +553,31 @@
 			<Name>Nickel</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>28</Atomicity>
-			<MzAverage>58.6934</MzAverage>
-			<MzAverageUncertainty>0.0004</MzAverageUncertainty>
+			<MassAverage>58.6934</MassAverage>
+			<MassAverageUncertainty>0.0004</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>58</IsotopeNumber>
-				<Mz>57.93534</Mz>
+				<Mass>57.93534</Mass>
 				<Probability>0.6827</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>60</IsotopeNumber>
-				<Mz>59.93079</Mz>
+				<Mass>59.93079</Mass>
 				<Probability>0.261</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>61</IsotopeNumber>
-				<Mz>60.93106</Mz>
+				<Mass>60.93106</Mass>
 				<Probability>0.0113</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>62</IsotopeNumber>
-				<Mz>61.92834</Mz>
+				<Mass>61.92834</Mass>
 				<Probability>0.0359</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>64</IsotopeNumber>
-				<Mz>63.92797</Mz>
+				<Mass>63.92797</Mass>
 				<Probability>0.0091</Probability>
 			</Isotope>
 		</Element>
@@ -586,16 +586,16 @@
 			<Name>Copper</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>29</Atomicity>
-			<MzAverage>63.546</MzAverage>
-			<MzAverageUncertainty>0.003</MzAverageUncertainty>
+			<MassAverage>63.546</MassAverage>
+			<MassAverageUncertainty>0.003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>63</IsotopeNumber>
-				<Mz>62.9396</Mz>
+				<Mass>62.9396</Mass>
 				<Probability>0.6917</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>65</IsotopeNumber>
-				<Mz>64.9278</Mz>
+				<Mass>64.9278</Mass>
 				<Probability>0.3083</Probability>
 			</Isotope>
 		</Element>
@@ -604,31 +604,31 @@
 			<Name>Zinc</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>30</Atomicity>
-			<MzAverage>65.38</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>65.38</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>64</IsotopeNumber>
-				<Mz>63.92915</Mz>
+				<Mass>63.92915</Mass>
 				<Probability>0.486</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>66</IsotopeNumber>
-				<Mz>65.92603</Mz>
+				<Mass>65.92603</Mass>
 				<Probability>0.279</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>67</IsotopeNumber>
-				<Mz>66.92713</Mz>
+				<Mass>66.92713</Mass>
 				<Probability>0.041</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>68</IsotopeNumber>
-				<Mz>67.92484</Mz>
+				<Mass>67.92484</Mass>
 				<Probability>0.188</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>70</IsotopeNumber>
-				<Mz>69.92532</Mz>
+				<Mass>69.92532</Mass>
 				<Probability>0.006</Probability>
 			</Isotope>
 		</Element>
@@ -637,16 +637,16 @@
 			<Name>Gallium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>31</Atomicity>
-			<MzAverage>69.723</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>69.723</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>69</IsotopeNumber>
-				<Mz>68.92558</Mz>
+				<Mass>68.92558</Mass>
 				<Probability>0.60108</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>71</IsotopeNumber>
-				<Mz>70.9247</Mz>
+				<Mass>70.9247</Mass>
 				<Probability>0.39892</Probability>
 			</Isotope>
 		</Element>
@@ -655,31 +655,31 @@
 			<Name>Germanium</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>32</Atomicity>
-			<MzAverage>72.64</MzAverage>
-			<MzAverageUncertainty>0.01</MzAverageUncertainty>
+			<MassAverage>72.64</MassAverage>
+			<MassAverageUncertainty>0.01</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>70</IsotopeNumber>
-				<Mz>69.92425</Mz>
+				<Mass>69.92425</Mass>
 				<Probability>0.205</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>72</IsotopeNumber>
-				<Mz>71.92208</Mz>
+				<Mass>71.92208</Mass>
 				<Probability>0.274</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>73</IsotopeNumber>
-				<Mz>72.92346</Mz>
+				<Mass>72.92346</Mass>
 				<Probability>0.078</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>74</IsotopeNumber>
-				<Mz>73.92118</Mz>
+				<Mass>73.92118</Mass>
 				<Probability>0.365</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>76</IsotopeNumber>
-				<Mz>75.9214</Mz>
+				<Mass>75.9214</Mass>
 				<Probability>0.078</Probability>
 			</Isotope>
 		</Element>
@@ -688,11 +688,11 @@
 			<Name>Arsenic</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>33</Atomicity>
-			<MzAverage>74.9216</MzAverage>
-			<MzAverageUncertainty>0.0002</MzAverageUncertainty>
+			<MassAverage>74.9216</MassAverage>
+			<MassAverageUncertainty>0.0002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>75</IsotopeNumber>
-				<Mz>74.92159</Mz>
+				<Mass>74.92159</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -701,36 +701,36 @@
 			<Name>Selenium</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>34</Atomicity>
-			<MzAverage>78.96</MzAverage>
-			<MzAverageUncertainty>0.03</MzAverageUncertainty>
+			<MassAverage>78.96</MassAverage>
+			<MassAverageUncertainty>0.03</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>74</IsotopeNumber>
-				<Mz>73.92248</Mz>
+				<Mass>73.92248</Mass>
 				<Probability>0.009</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>76</IsotopeNumber>
-				<Mz>75.91921</Mz>
+				<Mass>75.91921</Mass>
 				<Probability>0.091</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>77</IsotopeNumber>
-				<Mz>76.91991</Mz>
+				<Mass>76.91991</Mass>
 				<Probability>0.076</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>78</IsotopeNumber>
-				<Mz>77.919</Mz>
+				<Mass>77.919</Mass>
 				<Probability>0.236</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>80</IsotopeNumber>
-				<Mz>79.91652</Mz>
+				<Mass>79.91652</Mass>
 				<Probability>0.499</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>82</IsotopeNumber>
-				<Mz>81.91669</Mz>
+				<Mass>81.91669</Mass>
 				<Probability>0.089</Probability>
 			</Isotope>
 		</Element>
@@ -739,16 +739,16 @@
 			<Name>Bromine</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>35</Atomicity>
-			<MzAverage>79.904</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>79.904</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>79</IsotopeNumber>
-				<Mz>78.91833</Mz>
+				<Mass>78.91833</Mass>
 				<Probability>0.5069</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>81</IsotopeNumber>
-				<Mz>80.91629</Mz>
+				<Mass>80.91629</Mass>
 				<Probability>0.4931</Probability>
 			</Isotope>
 		</Element>
@@ -757,36 +757,36 @@
 			<Name>Krypton</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>36</Atomicity>
-			<MzAverage>83.798</MzAverage>
-			<MzAverageUncertainty>0.002</MzAverageUncertainty>
+			<MassAverage>83.798</MassAverage>
+			<MassAverageUncertainty>0.002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>78</IsotopeNumber>
-				<Mz>77.914</Mz>
+				<Mass>77.914</Mass>
 				<Probability>0.0035</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>80</IsotopeNumber>
-				<Mz>79.91638</Mz>
+				<Mass>79.91638</Mass>
 				<Probability>0.0225</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>82</IsotopeNumber>
-				<Mz>81.91348</Mz>
+				<Mass>81.91348</Mass>
 				<Probability>0.116</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>83</IsotopeNumber>
-				<Mz>82.91414</Mz>
+				<Mass>82.91414</Mass>
 				<Probability>0.115</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>84</IsotopeNumber>
-				<Mz>83.91151</Mz>
+				<Mass>83.91151</Mass>
 				<Probability>0.57</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>86</IsotopeNumber>
-				<Mz>85.91061</Mz>
+				<Mass>85.91061</Mass>
 				<Probability>0.173</Probability>
 			</Isotope>
 		</Element>
@@ -795,16 +795,16 @@
 			<Name>Rubidium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>37</Atomicity>
-			<MzAverage>85.4678</MzAverage>
-			<MzAverageUncertainty>0.0003</MzAverageUncertainty>
+			<MassAverage>85.4678</MassAverage>
+			<MassAverageUncertainty>0.0003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>85</IsotopeNumber>
-				<Mz>84.9118</Mz>
+				<Mass>84.9118</Mass>
 				<Probability>0.7217</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>87</IsotopeNumber>
-				<Mz>86.90919</Mz>
+				<Mass>86.90919</Mass>
 				<Probability>0.2783</Probability>
 			</Isotope>
 		</Element>
@@ -813,26 +813,26 @@
 			<Name>Strontium</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>38</Atomicity>
-			<MzAverage>87.62</MzAverage>
-			<MzAverageUncertainty>0.01</MzAverageUncertainty>
+			<MassAverage>87.62</MassAverage>
+			<MassAverageUncertainty>0.01</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>84</IsotopeNumber>
-				<Mz>83.91343</Mz>
+				<Mass>83.91343</Mass>
 				<Probability>0.0056</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>86</IsotopeNumber>
-				<Mz>85.90926</Mz>
+				<Mass>85.90926</Mass>
 				<Probability>0.0986</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>87</IsotopeNumber>
-				<Mz>86.90888</Mz>
+				<Mass>86.90888</Mass>
 				<Probability>0.07</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>88</IsotopeNumber>
-				<Mz>87.90562</Mz>
+				<Mass>87.90562</Mass>
 				<Probability>0.8258</Probability>
 			</Isotope>
 		</Element>
@@ -841,11 +841,11 @@
 			<Name>Yttrium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>39</Atomicity>
-			<MzAverage>88.90585</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>88.90585</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>89</IsotopeNumber>
-				<Mz>88.90585</Mz>
+				<Mass>88.90585</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -854,31 +854,31 @@
 			<Name>Zirconium</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>40</Atomicity>
-			<MzAverage>91.224</MzAverage>
-			<MzAverageUncertainty>0.002</MzAverageUncertainty>
+			<MassAverage>91.224</MassAverage>
+			<MassAverageUncertainty>0.002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>90</IsotopeNumber>
-				<Mz>89.9047</Mz>
+				<Mass>89.9047</Mass>
 				<Probability>0.5145</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>91</IsotopeNumber>
-				<Mz>90.90565</Mz>
+				<Mass>90.90565</Mass>
 				<Probability>0.1122</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>92</IsotopeNumber>
-				<Mz>91.90504</Mz>
+				<Mass>91.90504</Mass>
 				<Probability>0.1715</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>94</IsotopeNumber>
-				<Mz>93.90631</Mz>
+				<Mass>93.90631</Mass>
 				<Probability>0.1738</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>96</IsotopeNumber>
-				<Mz>95.90827</Mz>
+				<Mass>95.90827</Mass>
 				<Probability>0.028</Probability>
 			</Isotope>
 		</Element>
@@ -887,11 +887,11 @@
 			<Name>Niobium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>41</Atomicity>
-			<MzAverage>92.90638</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>92.90638</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>93</IsotopeNumber>
-				<Mz>92.90638</Mz>
+				<Mass>92.90638</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -900,41 +900,41 @@
 			<Name>Molybdenum</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>42</Atomicity>
-			<MzAverage>95.96</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>95.96</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>92</IsotopeNumber>
-				<Mz>91.90681</Mz>
+				<Mass>91.90681</Mass>
 				<Probability>0.1484</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>94</IsotopeNumber>
-				<Mz>93.90508</Mz>
+				<Mass>93.90508</Mass>
 				<Probability>0.0925</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>95</IsotopeNumber>
-				<Mz>94.90584</Mz>
+				<Mass>94.90584</Mass>
 				<Probability>0.1592</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>96</IsotopeNumber>
-				<Mz>95.90468</Mz>
+				<Mass>95.90468</Mass>
 				<Probability>0.1668</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>97</IsotopeNumber>
-				<Mz>96.90602</Mz>
+				<Mass>96.90602</Mass>
 				<Probability>0.0955</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>98</IsotopeNumber>
-				<Mz>97.9054</Mz>
+				<Mass>97.9054</Mass>
 				<Probability>0.2413</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>100</IsotopeNumber>
-				<Mz>99.90748</Mz>
+				<Mass>99.90748</Mass>
 				<Probability>0.0963</Probability>
 			</Isotope>
 		</Element>
@@ -943,11 +943,11 @@
 			<Name>Technetium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>43</Atomicity>
-			<MzAverage>98</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>98</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>98</IsotopeNumber>
-				<Mz>98</Mz>
+				<Mass>98</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -956,41 +956,41 @@
 			<Name>Ruthenium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>44</Atomicity>
-			<MzAverage>101.07</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>101.07</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>96</IsotopeNumber>
-				<Mz>95.9076</Mz>
+				<Mass>95.9076</Mass>
 				<Probability>0.0554</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>98</IsotopeNumber>
-				<Mz>97.90529</Mz>
+				<Mass>97.90529</Mass>
 				<Probability>0.0186</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>99</IsotopeNumber>
-				<Mz>98.90594</Mz>
+				<Mass>98.90594</Mass>
 				<Probability>0.127</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>100</IsotopeNumber>
-				<Mz>99.90422</Mz>
+				<Mass>99.90422</Mass>
 				<Probability>0.126</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>101</IsotopeNumber>
-				<Mz>100.9056</Mz>
+				<Mass>100.9056</Mass>
 				<Probability>0.171</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>102</IsotopeNumber>
-				<Mz>101.9044</Mz>
+				<Mass>101.9044</Mass>
 				<Probability>0.316</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>104</IsotopeNumber>
-				<Mz>103.9054</Mz>
+				<Mass>103.9054</Mass>
 				<Probability>0.186</Probability>
 			</Isotope>
 		</Element>
@@ -999,12 +999,12 @@
 			<Name>Rhodium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>45</Atomicity>
-			<MzAverage>102.9055</MzAverage>
-			<MzAverageUncertainty>0.0002</MzAverageUncertainty>
+			<MassAverage>102.9055</MassAverage>
+			<MassAverageUncertainty>0.0002</MassAverageUncertainty>
 
 			<Isotope>
 				<IsotopeNumber>103</IsotopeNumber>
-				<Mz>102.9055</Mz>
+				<Mass>102.9055</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1013,36 +1013,36 @@
 			<Name> Palladium</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>46</Atomicity>
-			<MzAverage>106.42</MzAverage>
-			<MzAverageUncertainty>0.01</MzAverageUncertainty>
+			<MassAverage>106.42</MassAverage>
+			<MassAverageUncertainty>0.01</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>102</IsotopeNumber>
-				<Mz>101.9056</Mz>
+				<Mass>101.9056</Mass>
 				<Probability>0.0102</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>104</IsotopeNumber>
-				<Mz>103.904</Mz>
+				<Mass>103.904</Mass>
 				<Probability>0.1114</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>105</IsotopeNumber>
-				<Mz>104.9051</Mz>
+				<Mass>104.9051</Mass>
 				<Probability>0.2233</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>106</IsotopeNumber>
-				<Mz>105.9035</Mz>
+				<Mass>105.9035</Mass>
 				<Probability>0.2733</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>108</IsotopeNumber>
-				<Mz>107.9039</Mz>
+				<Mass>107.9039</Mass>
 				<Probability>0.2646</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>110</IsotopeNumber>
-				<Mz>109.9052</Mz>
+				<Mass>109.9052</Mass>
 				<Probability>0.1172</Probability>
 			</Isotope>
 		</Element>
@@ -1051,16 +1051,16 @@
 			<Name>Silver</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>47</Atomicity>
-			<MzAverage>107.8682</MzAverage>
-			<MzAverageUncertainty>0.0002</MzAverageUncertainty>
+			<MassAverage>107.8682</MassAverage>
+			<MassAverageUncertainty>0.0002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>107</IsotopeNumber>
-				<Mz>106.9051</Mz>
+				<Mass>106.9051</Mass>
 				<Probability>0.51839</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>109</IsotopeNumber>
-				<Mz>108.9048</Mz>
+				<Mass>108.9048</Mass>
 				<Probability>0.48161</Probability>
 			</Isotope>
 		</Element>
@@ -1069,46 +1069,46 @@
 			<Name>Cadmium</Name>
 			<NumIsotopes>8</NumIsotopes>
 			<Atomicity>48</Atomicity>
-			<MzAverage>112.411</MzAverage>
-			<MzAverageUncertainty>0.008</MzAverageUncertainty>
+			<MassAverage>112.411</MassAverage>
+			<MassAverageUncertainty>0.008</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>106</IsotopeNumber>
-				<Mz>105.9065</Mz>
+				<Mass>105.9065</Mass>
 				<Probability>0.0125</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>108</IsotopeNumber>
-				<Mz>107.9042</Mz>
+				<Mass>107.9042</Mass>
 				<Probability>0.0089</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>110</IsotopeNumber>
-				<Mz>109.903</Mz>
+				<Mass>109.903</Mass>
 				<Probability>0.1249</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>111</IsotopeNumber>
-				<Mz>110.9042</Mz>
+				<Mass>110.9042</Mass>
 				<Probability>0.128</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>112</IsotopeNumber>
-				<Mz>111.9028</Mz>
+				<Mass>111.9028</Mass>
 				<Probability>0.2413</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>113</IsotopeNumber>
-				<Mz>112.9044</Mz>
+				<Mass>112.9044</Mass>
 				<Probability>0.1222</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>114</IsotopeNumber>
-				<Mz>113.9034</Mz>
+				<Mass>113.9034</Mass>
 				<Probability>0.2873</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>116</IsotopeNumber>
-				<Mz>115.9048</Mz>
+				<Mass>115.9048</Mass>
 				<Probability>0.0749</Probability>
 			</Isotope>
 		</Element>
@@ -1117,16 +1117,16 @@
 			<Name>Indium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>49</Atomicity>
-			<MzAverage>114.818</MzAverage>
-			<MzAverageUncertainty>0.003</MzAverageUncertainty>
+			<MassAverage>114.818</MassAverage>
+			<MassAverageUncertainty>0.003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>113</IsotopeNumber>
-				<Mz>112.9041</Mz>
+				<Mass>112.9041</Mass>
 				<Probability>0.043</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>115</IsotopeNumber>
-				<Mz>114.9039</Mz>
+				<Mass>114.9039</Mass>
 				<Probability>0.957</Probability>
 			</Isotope>
 		</Element>
@@ -1135,56 +1135,56 @@
 			<Name>Tin</Name>
 			<NumIsotopes>10</NumIsotopes>
 			<Atomicity>50</Atomicity>
-			<MzAverage>118.71</MzAverage>
-			<MzAverageUncertainty>0.07</MzAverageUncertainty>
+			<MassAverage>118.71</MassAverage>
+			<MassAverageUncertainty>0.07</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>112</IsotopeNumber>
-				<Mz>111.9048</Mz>
+				<Mass>111.9048</Mass>
 				<Probability>0.0097</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>114</IsotopeNumber>
-				<Mz>113.9028</Mz>
+				<Mass>113.9028</Mass>
 				<Probability>0.0065</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>115</IsotopeNumber>
-				<Mz>114.9034</Mz>
+				<Mass>114.9034</Mass>
 				<Probability>0.0036</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>116</IsotopeNumber>
-				<Mz>115.9017</Mz>
+				<Mass>115.9017</Mass>
 				<Probability>0.1453</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>117</IsotopeNumber>
-				<Mz>116.903</Mz>
+				<Mass>116.903</Mass>
 				<Probability>0.0768</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>118</IsotopeNumber>
-				<Mz>117.9016</Mz>
+				<Mass>117.9016</Mass>
 				<Probability>0.2422</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>119</IsotopeNumber>
-				<Mz>118.9033</Mz>
+				<Mass>118.9033</Mass>
 				<Probability>0.0858</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>120</IsotopeNumber>
-				<Mz>119.9022</Mz>
+				<Mass>119.9022</Mass>
 				<Probability>0.3259</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>122</IsotopeNumber>
-				<Mz>121.9034</Mz>
+				<Mass>121.9034</Mass>
 				<Probability>0.0463</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>124</IsotopeNumber>
-				<Mz>123.9053</Mz>
+				<Mass>123.9053</Mass>
 				<Probability>0.0579</Probability>
 			</Isotope>
 		</Element>
@@ -1193,16 +1193,16 @@
 			<Name>Antimony</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>51</Atomicity>
-			<MzAverage>121.76</MzAverage>
-			<MzAverageUncertainty>0.01</MzAverageUncertainty>
+			<MassAverage>121.76</MassAverage>
+			<MassAverageUncertainty>0.01</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>121</IsotopeNumber>
-				<Mz>120.9038</Mz>
+				<Mass>120.9038</Mass>
 				<Probability>0.574</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>123</IsotopeNumber>
-				<Mz>122.9042</Mz>
+				<Mass>122.9042</Mass>
 				<Probability>0.426</Probability>
 			</Isotope>
 		</Element>
@@ -1211,46 +1211,46 @@
 			<Name>Tellurium</Name>
 			<NumIsotopes>8</NumIsotopes>
 			<Atomicity>52</Atomicity>
-			<MzAverage>127.6</MzAverage>
-			<MzAverageUncertainty>0.3</MzAverageUncertainty>
+			<MassAverage>127.6</MassAverage>
+			<MassAverageUncertainty>0.3</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>120</IsotopeNumber>
-				<Mz>119.904</Mz>
+				<Mass>119.904</Mass>
 				<Probability>0.00095</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>122</IsotopeNumber>
-				<Mz>121.9031</Mz>
+				<Mass>121.9031</Mass>
 				<Probability>0.0259</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>123</IsotopeNumber>
-				<Mz>122.9043</Mz>
+				<Mass>122.9043</Mass>
 				<Probability>0.00905</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>124</IsotopeNumber>
-				<Mz>123.9028</Mz>
+				<Mass>123.9028</Mass>
 				<Probability>0.0479</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>125</IsotopeNumber>
-				<Mz>124.9044</Mz>
+				<Mass>124.9044</Mass>
 				<Probability>0.0712</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>126</IsotopeNumber>
-				<Mz>125.9033</Mz>
+				<Mass>125.9033</Mass>
 				<Probability>0.1893</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>128</IsotopeNumber>
-				<Mz>127.9045</Mz>
+				<Mass>127.9045</Mass>
 				<Probability>0.317</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>130</IsotopeNumber>
-				<Mz>129.9062</Mz>
+				<Mass>129.9062</Mass>
 				<Probability>0.3387</Probability>
 			</Isotope>
 		</Element>
@@ -1259,11 +1259,11 @@
 			<Name>Iodine</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>53</Atomicity>
-			<MzAverage>126.90447</MzAverage>
-			<MzAverageUncertainty>0.00003</MzAverageUncertainty>
+			<MassAverage>126.90447</MassAverage>
+			<MassAverageUncertainty>0.00003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>127</IsotopeNumber>
-				<Mz>126.9045</Mz>
+				<Mass>126.9045</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1272,51 +1272,51 @@
 			<Name>Xenon</Name>
 			<NumIsotopes>9</NumIsotopes>
 			<Atomicity>54</Atomicity>
-			<MzAverage>131.293</MzAverage>
-			<MzAverageUncertainty>0.006</MzAverageUncertainty>
+			<MassAverage>131.293</MassAverage>
+			<MassAverageUncertainty>0.006</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>124</IsotopeNumber>
-				<Mz>123.9059</Mz>
+				<Mass>123.9059</Mass>
 				<Probability>0.001</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>126</IsotopeNumber>
-				<Mz>125.9043</Mz>
+				<Mass>125.9043</Mass>
 				<Probability>0.0009</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>128</IsotopeNumber>
-				<Mz>127.9035</Mz>
+				<Mass>127.9035</Mass>
 				<Probability>0.0191</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>129</IsotopeNumber>
-				<Mz>128.9048</Mz>
+				<Mass>128.9048</Mass>
 				<Probability>0.264</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>130</IsotopeNumber>
-				<Mz>129.9035</Mz>
+				<Mass>129.9035</Mass>
 				<Probability>0.041</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>131</IsotopeNumber>
-				<Mz>130.9051</Mz>
+				<Mass>130.9051</Mass>
 				<Probability>0.212</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>132</IsotopeNumber>
-				<Mz>131.9041</Mz>
+				<Mass>131.9041</Mass>
 				<Probability>0.269</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>134</IsotopeNumber>
-				<Mz>133.9054</Mz>
+				<Mass>133.9054</Mass>
 				<Probability>0.104</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>136</IsotopeNumber>
-				<Mz>135.9072</Mz>
+				<Mass>135.9072</Mass>
 				<Probability>0.089</Probability>
 			</Isotope>
 		</Element>
@@ -1325,11 +1325,11 @@
 			<Name>Cesium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>55</Atomicity>
-			<MzAverage>132.9054519</MzAverage>
-			<MzAverageUncertainty>0.0000002</MzAverageUncertainty>
+			<MassAverage>132.9054519</MassAverage>
+			<MassAverageUncertainty>0.0000002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>133</IsotopeNumber>
-				<Mz>132.9054</Mz>
+				<Mass>132.9054</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1338,41 +1338,41 @@
 			<Name>Barium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>56</Atomicity>
-			<MzAverage>137.327</MzAverage>
-			<MzAverageUncertainty>0.007</MzAverageUncertainty>
+			<MassAverage>137.327</MassAverage>
+			<MassAverageUncertainty>0.007</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>130</IsotopeNumber>
-				<Mz>129.9063</Mz>
+				<Mass>129.9063</Mass>
 				<Probability>0.00106</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>132</IsotopeNumber>
-				<Mz>131.905</Mz>
+				<Mass>131.905</Mass>
 				<Probability>0.00101</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>134</IsotopeNumber>
-				<Mz>133.9045</Mz>
+				<Mass>133.9045</Mass>
 				<Probability>0.0242</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>135</IsotopeNumber>
-				<Mz>134.9057</Mz>
+				<Mass>134.9057</Mass>
 				<Probability>0.06593</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>136</IsotopeNumber>
-				<Mz>135.9046</Mz>
+				<Mass>135.9046</Mass>
 				<Probability>0.0785</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>137</IsotopeNumber>
-				<Mz>136.9058</Mz>
+				<Mass>136.9058</Mass>
 				<Probability>0.1123</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>138</IsotopeNumber>
-				<Mz>137.9052</Mz>
+				<Mass>137.9052</Mass>
 				<Probability>0.717</Probability>
 			</Isotope>
 		</Element>
@@ -1381,16 +1381,16 @@
 			<Name>Lanthanum</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>57</Atomicity>
-			<MzAverage>138.90547</MzAverage>
-			<MzAverageUncertainty>0.00007</MzAverageUncertainty>
+			<MassAverage>138.90547</MassAverage>
+			<MassAverageUncertainty>0.00007</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>138</IsotopeNumber>
-				<Mz>137.9071</Mz>
+				<Mass>137.9071</Mass>
 				<Probability>0.0009</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>139</IsotopeNumber>
-				<Mz>138.9063</Mz>
+				<Mass>138.9063</Mass>
 				<Probability>0.9991</Probability>
 			</Isotope>
 		</Element>
@@ -1399,26 +1399,26 @@
 			<Name>Cerium</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>58</Atomicity>
-			<MzAverage>140.116</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>140.116</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>136</IsotopeNumber>
-				<Mz>135.9071</Mz>
+				<Mass>135.9071</Mass>
 				<Probability>0.0019</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>138</IsotopeNumber>
-				<Mz>137.906</Mz>
+				<Mass>137.906</Mass>
 				<Probability>0.0025</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>140</IsotopeNumber>
-				<Mz>139.9054</Mz>
+				<Mass>139.9054</Mass>
 				<Probability>0.8843</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>142</IsotopeNumber>
-				<Mz>141.9092</Mz>
+				<Mass>141.9092</Mass>
 				<Probability>0.1113</Probability>
 			</Isotope>
 		</Element>
@@ -1427,11 +1427,11 @@
 			<Name>Praseodymium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>59</Atomicity>
-			<MzAverage>140.90765</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>140.90765</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>141</IsotopeNumber>
-				<Mz>140.9077</Mz>
+				<Mass>140.9077</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1440,41 +1440,41 @@
 			<Name>Neodymium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>60</Atomicity>
-			<MzAverage>144.242</MzAverage>
-			<MzAverageUncertainty>0.003</MzAverageUncertainty>
+			<MassAverage>144.242</MassAverage>
+			<MassAverageUncertainty>0.003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>142</IsotopeNumber>
-				<Mz>141.9077</Mz>
+				<Mass>141.9077</Mass>
 				<Probability>0.2713</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>143</IsotopeNumber>
-				<Mz>142.9098</Mz>
+				<Mass>142.9098</Mass>
 				<Probability>0.1218</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>144</IsotopeNumber>
-				<Mz>143.9101</Mz>
+				<Mass>143.9101</Mass>
 				<Probability>0.238</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>145</IsotopeNumber>
-				<Mz>144.9126</Mz>
+				<Mass>144.9126</Mass>
 				<Probability>0.083</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>146</IsotopeNumber>
-				<Mz>145.9131</Mz>
+				<Mass>145.9131</Mass>
 				<Probability>0.1719</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>148</IsotopeNumber>
-				<Mz>147.9169</Mz>
+				<Mass>147.9169</Mass>
 				<Probability>0.0576</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>150</IsotopeNumber>
-				<Mz>149.9209</Mz>
+				<Mass>149.9209</Mass>
 				<Probability>0.0564</Probability>
 			</Isotope>
 		</Element>
@@ -1483,11 +1483,11 @@
 			<Name>Promethium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>61</Atomicity>
-			<MzAverage>145</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>145</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>145</IsotopeNumber>
-				<Mz>145</Mz>
+				<Mass>145</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1496,41 +1496,41 @@
 			<Name>Samarium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>62</Atomicity>
-			<MzAverage>150.36</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>150.36</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>144</IsotopeNumber>
-				<Mz>143.912</Mz>
+				<Mass>143.912</Mass>
 				<Probability>0.031</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>147</IsotopeNumber>
-				<Mz>146.9149</Mz>
+				<Mass>146.9149</Mass>
 				<Probability>0.15</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>148</IsotopeNumber>
-				<Mz>147.9148</Mz>
+				<Mass>147.9148</Mass>
 				<Probability>0.113</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>149</IsotopeNumber>
-				<Mz>148.9172</Mz>
+				<Mass>148.9172</Mass>
 				<Probability>0.138</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>150</IsotopeNumber>
-				<Mz>149.9173</Mz>
+				<Mass>149.9173</Mass>
 				<Probability>0.074</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>152</IsotopeNumber>
-				<Mz>151.9197</Mz>
+				<Mass>151.9197</Mass>
 				<Probability>0.267</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>154</IsotopeNumber>
-				<Mz>153.9222</Mz>
+				<Mass>153.9222</Mass>
 				<Probability>0.227</Probability>
 			</Isotope>
 		</Element>
@@ -1539,16 +1539,16 @@
 			<Name>Europium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>63</Atomicity>
-			<MzAverage>151.964</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>151.964</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>151</IsotopeNumber>
-				<Mz>150.9198</Mz>
+				<Mass>150.9198</Mass>
 				<Probability>0.478</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>153</IsotopeNumber>
-				<Mz>152.9212</Mz>
+				<Mass>152.9212</Mass>
 				<Probability>0.522</Probability>
 			</Isotope>
 		</Element>
@@ -1557,41 +1557,41 @@
 			<Name>Gadolinium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>64</Atomicity>
-			<MzAverage>157.25</MzAverage>
-			<MzAverageUncertainty>0.03</MzAverageUncertainty>
+			<MassAverage>157.25</MassAverage>
+			<MassAverageUncertainty>0.03</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>152</IsotopeNumber>
-				<Mz>151.9198</Mz>
+				<Mass>151.9198</Mass>
 				<Probability>0.002</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>154</IsotopeNumber>
-				<Mz>153.9209</Mz>
+				<Mass>153.9209</Mass>
 				<Probability>0.0218</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>155</IsotopeNumber>
-				<Mz>154.9226</Mz>
+				<Mass>154.9226</Mass>
 				<Probability>0.148</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>156</IsotopeNumber>
-				<Mz>155.9221</Mz>
+				<Mass>155.9221</Mass>
 				<Probability>0.2047</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>157</IsotopeNumber>
-				<Mz>156.924</Mz>
+				<Mass>156.924</Mass>
 				<Probability>0.1565</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>158</IsotopeNumber>
-				<Mz>157.9241</Mz>
+				<Mass>157.9241</Mass>
 				<Probability>0.2484</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>160</IsotopeNumber>
-				<Mz>159.927</Mz>
+				<Mass>159.927</Mass>
 				<Probability>0.2186</Probability>
 			</Isotope>
 		</Element>
@@ -1600,11 +1600,11 @@
 			<Name>Terbium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>65</Atomicity>
-			<MzAverage>158.92535</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>158.92535</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>159</IsotopeNumber>
-				<Mz>158.9253</Mz>
+				<Mass>158.9253</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1613,41 +1613,41 @@
 			<Name>Dysprosium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>66</Atomicity>
-			<MzAverage>162.5</MzAverage>
-			<MzAverageUncertainty>0.1</MzAverageUncertainty>
+			<MassAverage>162.5</MassAverage>
+			<MassAverageUncertainty>0.1</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>156</IsotopeNumber>
-				<Mz>155.9253</Mz>
+				<Mass>155.9253</Mass>
 				<Probability>0.0006</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>158</IsotopeNumber>
-				<Mz>157.9244</Mz>
+				<Mass>157.9244</Mass>
 				<Probability>0.001</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>160</IsotopeNumber>
-				<Mz>159.9252</Mz>
+				<Mass>159.9252</Mass>
 				<Probability>0.0234</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>161</IsotopeNumber>
-				<Mz>160.9269</Mz>
+				<Mass>160.9269</Mass>
 				<Probability>0.189</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>162</IsotopeNumber>
-				<Mz>161.9268</Mz>
+				<Mass>161.9268</Mass>
 				<Probability>0.255</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>163</IsotopeNumber>
-				<Mz>162.9287</Mz>
+				<Mass>162.9287</Mass>
 				<Probability>0.249</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>164</IsotopeNumber>
-				<Mz>163.9292</Mz>
+				<Mass>163.9292</Mass>
 				<Probability>0.282</Probability>
 			</Isotope>
 		</Element>
@@ -1656,11 +1656,11 @@
 			<Name>Holmium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>67</Atomicity>
-			<MzAverage>164.93032</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>164.93032</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>165</IsotopeNumber>
-				<Mz>164.9303</Mz>
+				<Mass>164.9303</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1669,36 +1669,36 @@
 			<Name>Erbium</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>68</Atomicity>
-			<MzAverage>167.259</MzAverage>
-			<MzAverageUncertainty>0.003</MzAverageUncertainty>
+			<MassAverage>167.259</MassAverage>
+			<MassAverageUncertainty>0.003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>162</IsotopeNumber>
-				<Mz>161.9288</Mz>
+				<Mass>161.9288</Mass>
 				<Probability>0.0014</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>164</IsotopeNumber>
-				<Mz>163.9292</Mz>
+				<Mass>163.9292</Mass>
 				<Probability>0.0161</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>166</IsotopeNumber>
-				<Mz>165.9303</Mz>
+				<Mass>165.9303</Mass>
 				<Probability>0.336</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>167</IsotopeNumber>
-				<Mz>166.9321</Mz>
+				<Mass>166.9321</Mass>
 				<Probability>0.2295</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>168</IsotopeNumber>
-				<Mz>167.9324</Mz>
+				<Mass>167.9324</Mass>
 				<Probability>0.268</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>170</IsotopeNumber>
-				<Mz>169.9355</Mz>
+				<Mass>169.9355</Mass>
 				<Probability>0.149</Probability>
 			</Isotope>
 		</Element>
@@ -1707,11 +1707,11 @@
 			<Name>Thulium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>69</Atomicity>
-			<MzAverage>168.93421</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>168.93421</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>169</IsotopeNumber>
-				<Mz>168.9342</Mz>
+				<Mass>168.9342</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -1720,41 +1720,41 @@
 			<Name>Ytterbium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>70</Atomicity>
-			<MzAverage>173.054</MzAverage>
-			<MzAverageUncertainty>0.005</MzAverageUncertainty>
+			<MassAverage>173.054</MassAverage>
+			<MassAverageUncertainty>0.005</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>168</IsotopeNumber>
-				<Mz>167.9339</Mz>
+				<Mass>167.9339</Mass>
 				<Probability>0.0013</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>170</IsotopeNumber>
-				<Mz>169.9348</Mz>
+				<Mass>169.9348</Mass>
 				<Probability>0.0305</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>171</IsotopeNumber>
-				<Mz>170.9363</Mz>
+				<Mass>170.9363</Mass>
 				<Probability>0.143</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>172</IsotopeNumber>
-				<Mz>171.9364</Mz>
+				<Mass>171.9364</Mass>
 				<Probability>0.219</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>173</IsotopeNumber>
-				<Mz>172.9382</Mz>
+				<Mass>172.9382</Mass>
 				<Probability>0.1612</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>174</IsotopeNumber>
-				<Mz>173.9389</Mz>
+				<Mass>173.9389</Mass>
 				<Probability>0.318</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>176</IsotopeNumber>
-				<Mz>175.9426</Mz>
+				<Mass>175.9426</Mass>
 				<Probability>0.127</Probability>
 			</Isotope>
 		</Element>
@@ -1763,16 +1763,16 @@
 			<Name>Lutetium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>71</Atomicity>
-			<MzAverage>174.9668</MzAverage>
-			<MzAverageUncertainty>0.0001</MzAverageUncertainty>
+			<MassAverage>174.9668</MassAverage>
+			<MassAverageUncertainty>0.0001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>175</IsotopeNumber>
-				<Mz>174.9408</Mz>
+				<Mass>174.9408</Mass>
 				<Probability>0.9741</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>176</IsotopeNumber>
-				<Mz>175.9427</Mz>
+				<Mass>175.9427</Mass>
 				<Probability>0.0259</Probability>
 			</Isotope>
 		</Element>
@@ -1781,36 +1781,36 @@
 			<Name>Hafnium</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>72</Atomicity>
-			<MzAverage>178.49</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>178.49</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>174</IsotopeNumber>
-				<Mz>173.94</Mz>
+				<Mass>173.94</Mass>
 				<Probability>0.00162</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>176</IsotopeNumber>
-				<Mz>175.9414</Mz>
+				<Mass>175.9414</Mass>
 				<Probability>0.05206</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>177</IsotopeNumber>
-				<Mz>176.9432</Mz>
+				<Mass>176.9432</Mass>
 				<Probability>0.18606</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>178</IsotopeNumber>
-				<Mz>177.9437</Mz>
+				<Mass>177.9437</Mass>
 				<Probability>0.27297</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>179</IsotopeNumber>
-				<Mz>178.9458</Mz>
+				<Mass>178.9458</Mass>
 				<Probability>0.13629</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>180</IsotopeNumber>
-				<Mz>179.9465</Mz>
+				<Mass>179.9465</Mass>
 				<Probability>0.351</Probability>
 			</Isotope>
 		</Element>
@@ -1819,16 +1819,16 @@
 			<Name>Tantalum</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>73</Atomicity>
-			<MzAverage>180.94788</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>180.94788</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>180</IsotopeNumber>
-				<Mz>179.9475</Mz>
+				<Mass>179.9475</Mass>
 				<Probability>0.00012</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>181</IsotopeNumber>
-				<Mz>180.948</Mz>
+				<Mass>180.948</Mass>
 				<Probability>0.99988</Probability>
 			</Isotope>
 		</Element>
@@ -1837,31 +1837,31 @@
 			<Name>Tungsten</Name>
 			<NumIsotopes>5</NumIsotopes>
 			<Atomicity>74</Atomicity>
-			<MzAverage>183.84</MzAverage>
-			<MzAverageUncertainty>0.01</MzAverageUncertainty>
+			<MassAverage>183.84</MassAverage>
+			<MassAverageUncertainty>0.01</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>180</IsotopeNumber>
-				<Mz>179.9467</Mz>
+				<Mass>179.9467</Mass>
 				<Probability>0.0012</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>182</IsotopeNumber>
-				<Mz>181.9482</Mz>
+				<Mass>181.9482</Mass>
 				<Probability>0.263</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>183</IsotopeNumber>
-				<Mz>182.9502</Mz>
+				<Mass>182.9502</Mass>
 				<Probability>0.1428</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>184</IsotopeNumber>
-				<Mz>183.9509</Mz>
+				<Mass>183.9509</Mass>
 				<Probability>0.307</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>186</IsotopeNumber>
-				<Mz>185.9544</Mz>
+				<Mass>185.9544</Mass>
 				<Probability>0.286</Probability>
 			</Isotope>
 		</Element>
@@ -1870,16 +1870,16 @@
 			<Name>Rhenium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>75</Atomicity>
-			<MzAverage>186.207</MzAverage>
-			<MzAverageUncertainty>0.001</MzAverageUncertainty>
+			<MassAverage>186.207</MassAverage>
+			<MassAverageUncertainty>0.001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>185</IsotopeNumber>
-				<Mz>184.953</Mz>
+				<Mass>184.953</Mass>
 				<Probability>0.374</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>187</IsotopeNumber>
-				<Mz>186.9557</Mz>
+				<Mass>186.9557</Mass>
 				<Probability>0.626</Probability>
 			</Isotope>
 		</Element>
@@ -1888,41 +1888,41 @@
 			<Name>Osmium</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>76</Atomicity>
-			<MzAverage>190.23</MzAverage>
-			<MzAverageUncertainty>0.03</MzAverageUncertainty>
+			<MassAverage>190.23</MassAverage>
+			<MassAverageUncertainty>0.03</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>184</IsotopeNumber>
-				<Mz>183.9525</Mz>
+				<Mass>183.9525</Mass>
 				<Probability>0.0002</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>186</IsotopeNumber>
-				<Mz>185.9538</Mz>
+				<Mass>185.9538</Mass>
 				<Probability>0.0158</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>187</IsotopeNumber>
-				<Mz>186.9557</Mz>
+				<Mass>186.9557</Mass>
 				<Probability>0.016</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>188</IsotopeNumber>
-				<Mz>187.9559</Mz>
+				<Mass>187.9559</Mass>
 				<Probability>0.133</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>189</IsotopeNumber>
-				<Mz>188.9581</Mz>
+				<Mass>188.9581</Mass>
 				<Probability>0.161</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>190</IsotopeNumber>
-				<Mz>189.9584</Mz>
+				<Mass>189.9584</Mass>
 				<Probability>0.264</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>192</IsotopeNumber>
-				<Mz>191.9615</Mz>
+				<Mass>191.9615</Mass>
 				<Probability>0.41</Probability>
 			</Isotope>
 		</Element>
@@ -1931,16 +1931,16 @@
 			<Name>Iridium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>77</Atomicity>
-			<MzAverage>192.217</MzAverage>
-			<MzAverageUncertainty>0.003</MzAverageUncertainty>
+			<MassAverage>192.217</MassAverage>
+			<MassAverageUncertainty>0.003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>191</IsotopeNumber>
-				<Mz>190.9606</Mz>
+				<Mass>190.9606</Mass>
 				<Probability>0.373</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>193</IsotopeNumber>
-				<Mz>192.9629</Mz>
+				<Mass>192.9629</Mass>
 				<Probability>0.627</Probability>
 			</Isotope>
 		</Element>
@@ -1949,36 +1949,36 @@
 			<Name>Platinum</Name>
 			<NumIsotopes>6</NumIsotopes>
 			<Atomicity>78</Atomicity>
-			<MzAverage>195.084</MzAverage>
-			<MzAverageUncertainty>0.009</MzAverageUncertainty>
+			<MassAverage>195.084</MassAverage>
+			<MassAverageUncertainty>0.009</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>190</IsotopeNumber>
-				<Mz>189.9599</Mz>
+				<Mass>189.9599</Mass>
 				<Probability>0.0001</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>192</IsotopeNumber>
-				<Mz>191.961</Mz>
+				<Mass>191.961</Mass>
 				<Probability>0.0079</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>194</IsotopeNumber>
-				<Mz>193.9627</Mz>
+				<Mass>193.9627</Mass>
 				<Probability>0.329</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>195</IsotopeNumber>
-				<Mz>194.9648</Mz>
+				<Mass>194.9648</Mass>
 				<Probability>0.338</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>196</IsotopeNumber>
-				<Mz>195.9649</Mz>
+				<Mass>195.9649</Mass>
 				<Probability>0.253</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>198</IsotopeNumber>
-				<Mz>197.9679</Mz>
+				<Mass>197.9679</Mass>
 				<Probability>0.072</Probability>
 			</Isotope>
 		</Element>
@@ -1987,11 +1987,11 @@
 			<Name>Gold</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>79</Atomicity>
-			<MzAverage>196.966569</MzAverage>
-			<MzAverageUncertainty>0.000004</MzAverageUncertainty>
+			<MassAverage>196.966569</MassAverage>
+			<MassAverageUncertainty>0.000004</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>197</IsotopeNumber>
-				<Mz>196.9665</Mz>
+				<Mass>196.9665</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2000,41 +2000,41 @@
 			<Name>Mercury</Name>
 			<NumIsotopes>7</NumIsotopes>
 			<Atomicity>80</Atomicity>
-			<MzAverage>200.59</MzAverage>
-			<MzAverageUncertainty>0.02</MzAverageUncertainty>
+			<MassAverage>200.59</MassAverage>
+			<MassAverageUncertainty>0.02</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>196</IsotopeNumber>
-				<Mz>195.9658</Mz>
+				<Mass>195.9658</Mass>
 				<Probability>0.0015</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>198</IsotopeNumber>
-				<Mz>197.9667</Mz>
+				<Mass>197.9667</Mass>
 				<Probability>0.1</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>199</IsotopeNumber>
-				<Mz>198.9682</Mz>
+				<Mass>198.9682</Mass>
 				<Probability>0.169</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>200</IsotopeNumber>
-				<Mz>199.9683</Mz>
+				<Mass>199.9683</Mass>
 				<Probability>0.231</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>201</IsotopeNumber>
-				<Mz>200.9703</Mz>
+				<Mass>200.9703</Mass>
 				<Probability>0.132</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>202</IsotopeNumber>
-				<Mz>201.9706</Mz>
+				<Mass>201.9706</Mass>
 				<Probability>0.298</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>204</IsotopeNumber>
-				<Mz>203.9735</Mz>
+				<Mass>203.9735</Mass>
 				<Probability>0.0685</Probability>
 			</Isotope>
 		</Element>
@@ -2043,16 +2043,16 @@
 			<Name>Thallium</Name>
 			<NumIsotopes>2</NumIsotopes>
 			<Atomicity>81</Atomicity>
-			<MzAverage>204.3833</MzAverage>
-			<MzAverageUncertainty>0.0002</MzAverageUncertainty>
+			<MassAverage>204.3833</MassAverage>
+			<MassAverageUncertainty>0.0002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>203</IsotopeNumber>
-				<Mz>202.9723</Mz>
+				<Mass>202.9723</Mass>
 				<Probability>0.29524</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>205</IsotopeNumber>
-				<Mz>204.9744</Mz>
+				<Mass>204.9744</Mass>
 				<Probability>0.70476</Probability>
 			</Isotope>
 		</Element>
@@ -2061,26 +2061,26 @@
 			<Name>Lead</Name>
 			<NumIsotopes>4</NumIsotopes>
 			<Atomicity>82</Atomicity>
-			<MzAverage>207.2</MzAverage>
-			<MzAverageUncertainty>0.1</MzAverageUncertainty>
+			<MassAverage>207.2</MassAverage>
+			<MassAverageUncertainty>0.1</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>204</IsotopeNumber>
-				<Mz>203.973</Mz>
+				<Mass>203.973</Mass>
 				<Probability>0.014</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>206</IsotopeNumber>
-				<Mz>205.9744</Mz>
+				<Mass>205.9744</Mass>
 				<Probability>0.241</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>207</IsotopeNumber>
-				<Mz>206.9759</Mz>
+				<Mass>206.9759</Mass>
 				<Probability>0.221</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>208</IsotopeNumber>
-				<Mz>207.9766</Mz>
+				<Mass>207.9766</Mass>
 				<Probability>0.524</Probability>
 			</Isotope>
 		</Element>
@@ -2089,11 +2089,11 @@
 			<Name>Bismuth</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>83</Atomicity>
-			<MzAverage>208.9804</MzAverage>
-			<MzAverageUncertainty>0.0001</MzAverageUncertainty>
+			<MassAverage>208.9804</MassAverage>
+			<MassAverageUncertainty>0.0001</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>209</IsotopeNumber>
-				<Mz>208.9804</Mz>
+				<Mass>208.9804</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2102,11 +2102,11 @@
 			<Name>Polonium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>84</Atomicity>
-			<MzAverage>209</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>209</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>209</IsotopeNumber>
-				<Mz>209</Mz>
+				<Mass>209</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2115,11 +2115,11 @@
 			<Name>Astatine</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>85</Atomicity>
-			<MzAverage>210</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>210</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>210</IsotopeNumber>
-				<Mz>210</Mz>
+				<Mass>210</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2128,11 +2128,11 @@
 			<Name>Radon</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>86</Atomicity>
-			<MzAverage>222</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>222</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>222</IsotopeNumber>
-				<Mz>222</Mz>
+				<Mass>222</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2141,11 +2141,11 @@
 			<Name>Francium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>87</Atomicity>
-			<MzAverage>223</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>223</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>223</IsotopeNumber>
-				<Mz>223</Mz>
+				<Mass>223</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2154,11 +2154,11 @@
 			<Name>Radium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>88</Atomicity>
-			<MzAverage>226.25</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>226.25</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>226</IsotopeNumber>
-				<Mz>226.025</Mz>
+				<Mass>226.025</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2167,11 +2167,11 @@
 			<Name>Actinium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>89</Atomicity>
-			<MzAverage>227.028</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>227.028</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>227</IsotopeNumber>
-				<Mz>227.028</Mz>
+				<Mass>227.028</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2180,11 +2180,11 @@
 			<Name>Thorium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>90</Atomicity>
-			<MzAverage>232.03806</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>232.03806</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>232</IsotopeNumber>
-				<Mz>232.0381</Mz>
+				<Mass>232.0381</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2193,11 +2193,11 @@
 			<Name>Protactinium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>91</Atomicity>
-			<MzAverage>231.03588</MzAverage>
-			<MzAverageUncertainty>0.00002</MzAverageUncertainty>
+			<MassAverage>231.03588</MassAverage>
+			<MassAverageUncertainty>0.00002</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>231</IsotopeNumber>
-				<Mz>231.0359</Mz>
+				<Mass>231.0359</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2206,21 +2206,21 @@
 			<Name>Uranium</Name>
 			<NumIsotopes>3</NumIsotopes>
 			<Atomicity>92</Atomicity>
-			<MzAverage>238.02891</MzAverage>
-			<MzAverageUncertainty>0.00003</MzAverageUncertainty>
+			<MassAverage>238.02891</MassAverage>
+			<MassAverageUncertainty>0.00003</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>234</IsotopeNumber>
-				<Mz>234.0409</Mz>
+				<Mass>234.0409</Mass>
 				<Probability>5.5E-05</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>235</IsotopeNumber>
-				<Mz>235.0439</Mz>
+				<Mass>235.0439</Mass>
 				<Probability>0.0072</Probability>
 			</Isotope>
 			<Isotope>
 				<IsotopeNumber>238</IsotopeNumber>
-				<Mz>238.0508</Mz>
+				<Mass>238.0508</Mass>
 				<Probability>0.992745</Probability>
 			</Isotope>
 		</Element>
@@ -2229,11 +2229,11 @@
 			<Name>Neptunium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>93</Atomicity>
-			<MzAverage>237.048</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>237.048</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>237</IsotopeNumber>
-				<Mz>237.048</Mz>
+				<Mass>237.048</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2242,11 +2242,11 @@
 			<Name>Plutonium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>94</Atomicity>
-			<MzAverage>244</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>244</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>244</IsotopeNumber>
-				<Mz>244</Mz>
+				<Mass>244</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2255,11 +2255,11 @@
 			<Name>Americium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>95</Atomicity>
-			<MzAverage>243</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>243</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>243</IsotopeNumber>
-				<Mz>243</Mz>
+				<Mass>243</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2268,11 +2268,11 @@
 			<Name>Curium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>96</Atomicity>
-			<MzAverage>247</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>247</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>247</IsotopeNumber>
-				<Mz>247</Mz>
+				<Mass>247</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2281,11 +2281,11 @@
 			<Name>Berkelium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>97</Atomicity>
-			<MzAverage>247</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>247</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>247</IsotopeNumber>
-				<Mz>247</Mz>
+				<Mass>247</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2294,11 +2294,11 @@
 			<Name>Californium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>98</Atomicity>
-			<MzAverage>251</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>251</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>251</IsotopeNumber>
-				<Mz>251</Mz>
+				<Mass>251</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2307,11 +2307,11 @@
 			<Name>Einsteinium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>99</Atomicity>
-			<MzAverage>252</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>252</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>252</IsotopeNumber>
-				<Mz>252</Mz>
+				<Mass>252</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2320,11 +2320,11 @@
 			<Name>Fermium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>100</Atomicity>
-			<MzAverage>257</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>257</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>257</IsotopeNumber>
-				<Mz>257</Mz>
+				<Mass>257</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2333,11 +2333,11 @@
 			<Name>Medelevium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>101</Atomicity>
-			<MzAverage>258</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>258</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>258</IsotopeNumber>
-				<Mz>258</Mz>
+				<Mass>258</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2346,11 +2346,11 @@
 			<Name>Nobelium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>102</Atomicity>
-			<MzAverage>259</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>259</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>259</IsotopeNumber>
-				<Mz>259</Mz>
+				<Mass>259</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2359,11 +2359,11 @@
 			<Name>Lawrencium</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>103</Atomicity>
-			<MzAverage>262</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>262</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>262</IsotopeNumber>
-				<Mz>260</Mz>
+				<Mass>260</Mass>
 				<Probability>1</Probability>
 			</Isotope>
 		</Element>
@@ -2372,11 +2372,11 @@
 			<Name>Generic</Name>
 			<NumIsotopes>1</NumIsotopes>
 			<Atomicity>104</Atomicity>
-			<MzAverage>999</MzAverage>
-			<MzAverageUncertainty>0</MzAverageUncertainty>
+			<MassAverage>999</MassAverage>
+			<MassAverageUncertainty>0</MassAverageUncertainty>
 			<Isotope>
 				<IsotopeNumber>999</IsotopeNumber>
-				<Mz>999</Mz>
+				<Mass>999</Mass>
 				<Probability>0.5</Probability>
 			</Isotope>
 		</Element>

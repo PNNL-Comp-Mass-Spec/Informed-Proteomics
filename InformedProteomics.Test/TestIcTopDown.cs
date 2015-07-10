@@ -162,9 +162,9 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             //// Salmonella
-            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\SBEP_STM_001_02272012_Aragon.raw";
-            const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002166_F86E3B2F.fasta";
-            const string outputDir = @"\\protoapps\userdata\Sangtae\TestData\Output\Mod_M2";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\SBEP_STM_001_02272012_Aragon.raw";
+            const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002166_F86E3B2F.fasta";
+            const string outputDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Results\Mod_M2";
 
             if (!File.Exists(specFilePath))
             {
@@ -258,7 +258,7 @@ namespace InformedProteomics.Test
 
             // QC_Shew
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            //const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\Databases\ID_002216_235ACCEA.fasta";
+            //const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
             //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\Test.fasta";
 
             // Jia's data

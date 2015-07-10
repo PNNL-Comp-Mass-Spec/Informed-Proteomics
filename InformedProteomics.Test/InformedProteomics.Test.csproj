@@ -75,6 +75,10 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PNNLOmics, Version=1.1.5385.41078, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
+    </Reference>
     <Reference Include="SAIS">
       <HintPath>..\lib\x64\SAIS.dll</HintPath>
     </Reference>

@@ -103,7 +103,7 @@ namespace InformedProteomics.Test
         [Test]
         [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
         [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
         //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
@@ -113,10 +113,6 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
@@ -186,7 +182,7 @@ namespace InformedProteomics.Test
         [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
         [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
         [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
-        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
+        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
         public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -195,10 +191,6 @@ namespace InformedProteomics.Test
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
             const int numCTermCleavages = 0;
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
@@ -310,7 +302,7 @@ namespace InformedProteomics.Test
         [Test]
         [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
         [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
         //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
         {
