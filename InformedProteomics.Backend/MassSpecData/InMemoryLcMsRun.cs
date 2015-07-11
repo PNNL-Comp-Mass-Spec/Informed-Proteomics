@@ -426,10 +426,39 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the spectrum of the specified scan number
         /// </summary>
         /// <param name="scanNum">scan number</param>
+        /// <param name="includePeaks">Whether to include peak data</param>
         /// <returns>spectrum</returns>
-        public override Spectrum GetSpectrum(int scanNum)
+        public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
-            Spectrum spec;
+            Spectrum spec = null;
+            // Not sure if stripping peaks out is worth it; but definitely want to return as a copy if we do.
+            //if (_scanNumSpecMap.TryGetValue(scanNum, out spec) && !includePeaks)
+            //{
+            //    ProductSpectrum pspec = null;
+            //    if ((pspec = spec as ProductSpectrum) != null)
+            //    {
+            //        var spec2 = new ProductSpectrum(new List<Peak>(), scanNum)
+            //        {
+            //            ActivationMethod = pspec.ActivationMethod,
+            //            ElutionTime = pspec.ElutionTime,
+            //            IsolationWindow = pspec.IsolationWindow,
+            //            MsLevel = pspec.MsLevel,
+            //            NativeId = pspec.NativeId,
+            //        };
+            //        spec = spec2;
+            //    }
+            //    else
+            //    {
+            //        var spec2 = new Spectrum(new List<Peak>(), scanNum)
+            //        {
+            //            ElutionTime = spec.ElutionTime,
+            //            MsLevel = spec.MsLevel,
+            //            NativeId = spec.NativeId,
+            //        };
+            //        spec = spec2;
+            //    }
+            //}
+            //return spec;
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 

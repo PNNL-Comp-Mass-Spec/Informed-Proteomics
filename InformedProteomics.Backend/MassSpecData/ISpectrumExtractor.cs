@@ -4,6 +4,6 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public interface ISpectrumExtractor
     {
-        Spectrum GetSpectrum(int scanNum);
+        Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
     }
 }

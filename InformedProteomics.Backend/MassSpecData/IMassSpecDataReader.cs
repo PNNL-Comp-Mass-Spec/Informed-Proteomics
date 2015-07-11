@@ -15,8 +15,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Returns the spectrum specified by the scan number.
         /// </summary>
         /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
         /// <returns></returns>
-        Spectrum ReadMassSpectrum(int scanNum);
+        Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true);
 
         /// <summary>
         /// The number of spectra in the file.

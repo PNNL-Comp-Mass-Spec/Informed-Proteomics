@@ -33,7 +33,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        public abstract Spectrum GetSpectrum(int scanNum);
+        public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
         public abstract Ms1Spectrum GetMs1Spectrum(int scanNum);
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
 

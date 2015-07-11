@@ -67,16 +67,22 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Reads the mass spectrum with the specified scanNum from the raw file
         /// </summary>
         /// <param name="scanNum">scan number</param>
+        /// <param name="includePeaks">whether to include peak data</param>
         /// <returns>mass spectrum</returns>
-        public Spectrum ReadMassSpectrum(int scanNum)
+        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
 
             var scanInfo = GetScanInfo(scanNum);
 
-            double[] mzArr;
-            double[] intensityArr;
-            
-            _msfileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
+            // default empty arrays, if peak data not requested.
+            double[] mzArr = new double[]{};
+            double[] intensityArr = new double[]{};
+
+            if (includePeaks)
+            {
+                _msfileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
+                
+            }
 
             var elutionTime = RtFromScanNum(scanNum);
 

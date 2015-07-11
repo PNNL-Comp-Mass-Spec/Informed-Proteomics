@@ -431,21 +431,6 @@ namespace InformedProteomics.Backend.MassSpecData
         }
         #endregion
 
-        public int NumSpectra
-        {
-            get
-            {
-                if (!_haveMetaData)
-                {
-                    var tempBool = _reduceMemoryUsage; // Set a flag to avoid reading the entire file before returning.
-                    ReadMzMl(); // Read the index and metadata so that the offsets get populated
-                    // The number of spectra is an attribute in the spectrumList tag
-                    _reduceMemoryUsage = tempBool;
-                }
-                return (int) _numSpectra;
-            }
-        }
-
         #region Constructor
         /// <summary>
         /// Initialize a MzMlReader object
@@ -514,7 +499,22 @@ namespace InformedProteomics.Backend.MassSpecData
         }
         #endregion
 
-        #region Public interface functions for reading
+        #region Public interface functions
+
+        public int NumSpectra
+        {
+            get
+            {
+                if (!_haveMetaData)
+                {
+                    var tempBool = _reduceMemoryUsage; // Set a flag to avoid reading the entire file before returning.
+                    ReadMzMl(); // Read the index and metadata so that the offsets get populated
+                    // The number of spectra is an attribute in the spectrumList tag
+                    _reduceMemoryUsage = tempBool;
+                }
+                return (int)_numSpectra;
+            }
+        }
 
         public bool TryMakeRandomAccessCapable()
         {
@@ -554,17 +554,18 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Returns a single spectrum from the file
         /// </summary>
         /// <param name="index"></param>
+        /// <param name="includePeaks"></param>
         /// <returns></returns>
         /// <remarks>If random access mode is turned on, this will respond quickly and use only as much memory as is needed to store the spectrum.
         /// If random access mode is off, this will cause the memory usage reducing mode to shut of, and all spectra will be read into memory.</remarks>
-        public Spectrum ReadMassSpectrum(int index)
+        public Spectrum ReadMassSpectrum(int index, bool includePeaks = true)
         {
             // Proper functionality when not random access
             if (!_randomAccess)
             {
-                return ReadMassSpectrumNonRandom(index);
+                return ReadMassSpectrumNonRandom(index, includePeaks);
             }
-            return ReadMassSpectrumRandom(index);
+            return ReadMassSpectrumRandom(index, includePeaks);
         }
         #endregion
 
@@ -596,7 +597,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         // Schema requirements: zero to many instances of this element
                         // Use reader.ReadSubtree() to provide an XmlReader that is only valid for the element and child nodes
-                        yield return ReadSpectrum(_xmlReaderForYield.ReadSubtree());
+                        yield return ReadSpectrum(_xmlReaderForYield.ReadSubtree(), true);
                         // "spectrum" might not have any child nodes
                         // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                         _xmlReaderForYield.Read();
@@ -625,7 +626,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Causes all spectra in the file to be loaded into memory
         /// </summary>
         /// <param name="index"></param>
-        private Spectrum ReadMassSpectrumNonRandom(long index)
+        /// <param name="includePeaks"></param>
+        private Spectrum ReadMassSpectrumNonRandom(long index, bool includePeaks = true)
         {
             if (!_allRead)
             {
@@ -651,7 +653,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             foreach (var specIndex in _spectrumOffsets.Offsets)
             {
-                yield return ReadMassSpectrumRandom(specIndex.IdNum);
+                yield return ReadMassSpectrumRandom(specIndex.IdNum, true);
             }
         }
 
@@ -659,7 +661,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read a single mass spectrum and return it.
         /// </summary>
         /// <param name="index"></param>
-        private Spectrum ReadMassSpectrumRandom(long index)
+        /// <param name="includePeaks"></param>
+        private Spectrum ReadMassSpectrumRandom(long index, bool includePeaks = true)
         {
             if (!_haveIndex || !_haveMetaData)
             {
@@ -677,7 +680,7 @@ namespace InformedProteomics.Backend.MassSpecData
             using (var reader = XmlReader.Create(_fileReader, _xSettings))
             {
                 reader.MoveToContent();
-                return ReadSpectrum(reader.ReadSubtree());
+                return ReadSpectrum(reader.ReadSubtree(), includePeaks);
             }
         }
         #endregion
@@ -1737,7 +1740,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     // Schema requirements: zero to many instances of this element
                     // Use reader.ReadSubtree() to provide an XmlReader that is only valid for the element and child nodes
-                    _spectra.Add(ReadSpectrum(reader.ReadSubtree()));
+                    _spectra.Add(ReadSpectrum(reader.ReadSubtree(), true));
                     // "spectrum" might not have any child nodes
                     // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                     reader.Read();
@@ -1757,7 +1760,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Called by ReadSpectrumList (xml hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single spectrum element</param>
-        private Spectrum ReadSpectrum(XmlReader reader)
+        /// <param name="includePeaks">Whether to read binary data arrays</param>
+        private Spectrum ReadSpectrum(XmlReader reader, bool includePeaks = true)
         {
             reader.MoveToContent();
             string index = reader.GetAttribute("index");
@@ -1904,8 +1908,15 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                     case "binaryDataArrayList":
                         // Schema requirements: zero to one instances of this element
-                        bdas.AddRange(ReadBinaryDataArrayList(reader.ReadSubtree(), defaultArraySize));
-                        reader.ReadEndElement(); // "binaryDataArrayList" must have child nodes
+                        if (includePeaks)
+                        {
+                            bdas.AddRange(ReadBinaryDataArrayList(reader.ReadSubtree(), defaultArraySize));
+                            reader.ReadEndElement(); // "binaryDataArrayList" must have child nodes
+                        }
+                        else
+                        {
+                            reader.Skip();
+                        }
                         break;
                     default:
                         reader.Skip();
@@ -1914,10 +1925,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             reader.Close();
             // Process the spectrum data
-            BinaryDataArray mzs = new BinaryDataArray();
-            BinaryDataArray intensities = new BinaryDataArray();
             ScanData scan = new ScanData();
             Spectrum spectrum;
+            BinaryDataArray mzs = new BinaryDataArray();
+            BinaryDataArray intensities = new BinaryDataArray();
             foreach (var bda in bdas)
             {
                 if (bda.ArrayType == ArrayType.m_z_array)
@@ -1930,7 +1941,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
             
-            if (!centroided)
+            if (!centroided && includePeaks)
             {
                 // Centroid spectrum
                 // ProteoWizard

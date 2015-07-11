@@ -133,9 +133,9 @@ namespace InformedProteomics.Backend.MassSpecData
             return true;
         }
 
-        public Spectrum ReadMassSpectrum(int scanIndex)
+        public Spectrum ReadMassSpectrum(int scanIndex, bool includePeaks = true)
         {
-            var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, true);
+            var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, includePeaks);
 
             var msLevel = (int)(pwizSpec.cvParam(CVID.MS_ms_level).value);
             double[] mzArray = new double[0];
@@ -208,6 +208,10 @@ namespace InformedProteomics.Backend.MassSpecData
                             charge = (int)(si.cvParam(CVID.MS_charge_state).value);
                         }
                         selectedIonMz = (double) (si.cvParam(CVID.MS_selected_ion_m_z).value);
+                    }
+                    if (thermoMonoMass == null || thermoMonoMass.Value.Equals(0))
+                    {
+                        thermoMonoMass = selectedIonMz;
                     }
                     iw = new Data.Spectrometry.IsolationWindow(target, lowOff, uppOff, thermoMonoMass, charge);
                 }
