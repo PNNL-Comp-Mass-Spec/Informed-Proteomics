@@ -151,6 +151,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 _maxMs1Mz = _reader.ReadDouble();
             }
 
+            NumSpectra = _scanNumToSpecOffset.Count;
+
             CreatePrecursorNextScanMap();
         }
 
@@ -182,11 +184,6 @@ namespace InformedProteomics.Backend.MassSpecData
         public bool TryMakeRandomAccessCapable()
         {
             return true;
-        }
-
-        public new int NumSpectra
-        {
-            get { return _scanNumToSpecOffset.Count; }
         }
 
         public override IsolationWindow GetIsolationWindow(int scanNum)
