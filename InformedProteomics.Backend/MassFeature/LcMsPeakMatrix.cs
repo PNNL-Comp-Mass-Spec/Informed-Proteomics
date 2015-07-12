@@ -438,8 +438,8 @@ namespace InformedProteomics.Backend.MassFeature
                 var poissonPvalue = seedLocalWin.GetPoissonTestPvalue(_featureMatrix[row][col].EnvelopePeaks, _theoreticalEnvelope.Size);
                 var rankSumPvalue = seedLocalWin.GetRankSumTestPvalue(_featureMatrix[row][col].EnvelopePeaks, _theoreticalEnvelope.Size);
 
-                var goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
-                //var goodEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
+                //var goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
+                var goodEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
                 if (!goodEnvelope) continue;
 
                 var chargeCheck = CorrectChargeState(seed, Ms1Spectra[col]);
@@ -512,7 +512,7 @@ namespace InformedProteomics.Backend.MassFeature
                 }
 
                 LcMsPeakCluster refinedCluster = null;
-                if (summedCorr > 0.3 || summedBcDist < 0.15)
+                if (summedCorr > 0.5 || summedBcDist < 0.15)
                 {
                     // re-update check-out map
                     SetCheckOutFlag(newCluster.MinCharge - MinScanCharge, newCluster.MaxCharge - MinScanCharge, ms1ScanNumToIndex[newCluster.MinScanNum], ms1ScanNumToIndex[newCluster.MaxScanNum], false);
@@ -1088,8 +1088,7 @@ namespace InformedProteomics.Backend.MassFeature
             var peaks = spectrum.Peaks;
             var peakStartIndex = envelope.MinMzPeak.IndexInSpectrum;
             var peakEndIndex = envelope.MaxMzPeak.IndexInSpectrum;
-            var intensityThreshold = envelope.HighestIntensity * RelativeIsotopePeakIntensityThreshold;
-            //var nPeaks = peakEndIndex - peakStartIndex + 1;
+            var intensityThreshold = envelope.HighestIntensity * 0.15;
             
             var nPeaks = 0;
             for (var i = peakStartIndex; i <= peakEndIndex; i++)
@@ -1097,12 +1096,13 @@ namespace InformedProteomics.Backend.MassFeature
                 if (peaks[i].Intensity > intensityThreshold) nPeaks++;
             }
 
-            if (nPeaks < 10) return false;
+            //if (nPeaks < 10) return false;
             if (envelope.NumberOfPeaks > nPeaks * 0.7) return true;
 
             var tolerance = new Tolerance(5);
             var threshold = nPeaks * 0.5;
-            
+            var threshold2 = envelope.NumberOfPeaks + (envelope.TheoreticalEnvelope.Size - 1) * 0.7;
+
             var mzTol = tolerance.GetToleranceAsTh(peaks[peakStartIndex].Mz);
 
             var minCheckCharge = Math.Max(envelope.Charge * 2 - 1, 4);
@@ -1110,7 +1110,6 @@ namespace InformedProteomics.Backend.MassFeature
             var maxDeltaMz = Constants.C13MinusC12 / minCheckCharge + mzTol;
             var nChargeGaps = new int[maxCheckCharge - minCheckCharge + 1];
             
-
             for (var i = peakStartIndex; i <= peakEndIndex; i++)
             {
                 if (!(peaks[i].Intensity > intensityThreshold)) continue;
@@ -1128,8 +1127,8 @@ namespace InformedProteomics.Backend.MassFeature
                         var k = (int)c - minCheckCharge;
                         nChargeGaps[k]++;
 
-                        if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > 1.25 * envelope.NumberOfPeaks)
-                            return false;
+                        //if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > 1.25 * envelope.NumberOfPeaks) return false;
+                        if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > threshold2) return false;
                     }
                 }
             }

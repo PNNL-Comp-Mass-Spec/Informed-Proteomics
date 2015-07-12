@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.MassFeature
                     }
                     else
                     {
-                        Console.WriteLine("{0}\t{1}\t{2} killed by {3}\t{4}\t{5}", f.Mass, f.MinScanNum, f.MaxScanNum, bestFeature.Mass, bestFeature.MinScanNum, bestFeature.MaxScanNum);
+                        //Console.WriteLine("{0}\t{1}\t{2} killed by {3}\t{4}\t{5}", f.Mass, f.MinScanNum, f.MaxScanNum, bestFeature.Mass, bestFeature.MinScanNum, bestFeature.MaxScanNum);
                     }
                 }
             }

@@ -63,8 +63,8 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer);
-            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(10255);
-            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(10270);
+            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3000);
+            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3003);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
             Console.WriteLine(@"Start MS1 feature extraction.");

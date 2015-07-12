@@ -165,6 +165,14 @@ namespace InformedProteomics.Backend.MassFeature
             var repEnvelopeBcDist = 10.0d;
             ObservedIsotopeEnvelope repEnvelope = null;
 
+            var repEnvelopeBcDist2 = 10.0d;
+            ObservedIsotopeEnvelope repEnvelope2 = null;
+
+
+            var tempBestDistanceScoreAcrossCharge = new double[2]{10, 10};
+            var tempBestIntensityScoreAcrossCharge = new double[2];
+            var tempBestCorrelationScoreAcrossCharge = new double[2];
+
             for (var i = 0; i < nRows; i++)
             {
                 var charge = i + MinCharge;
@@ -201,17 +209,21 @@ namespace InformedProteomics.Backend.MassFeature
 
                     if (newBcDist < 0.2 || newCorr > 0.6) xic2[chargeIdx][xicStartIdx+j] += envelope.Abundance;
                     if (newBcDist < 0.2 || newCorr > 0.6) chargeXic[i][xicStartIdx + j] = envelope.Abundance;
-                    
-                    var goodEnvelope = true;
+
+                    var levelOneEnvelope = true;
+                    var levelTwoEnvelope = true;
+
                     if (pValueCheck)
                     {
                         var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
                         var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
                         //goodEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
-                        goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
+                        //goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
+                        levelOneEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01);
+                        levelTwoEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
                     }
 
-                    if (goodEnvelope)
+                    if (levelOneEnvelope)
                     {
                         if (newBcDist < BestDistanceScoreAcrossCharge[chargeIdx])
                         {
@@ -233,6 +245,25 @@ namespace InformedProteomics.Backend.MassFeature
                         if (!_initScore)
                         {
                             if (newBcDist < 0.07 || newCorr > 0.7) envelope.GoodEnough = true;
+                        }
+                    }
+
+                    if (levelTwoEnvelope)
+                    {
+                        // without considering p-values
+                        if (newBcDist < tempBestDistanceScoreAcrossCharge[chargeIdx])
+                        {
+                            tempBestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
+                            if (localWin.MedianIntensity > 0)
+                                tempBestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
+                            else tempBestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                        }
+                        tempBestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(tempBestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
+
+                        if (newBcDist < repEnvelopeBcDist2)
+                        {
+                            repEnvelopeBcDist2 = newBcDist;
+                            repEnvelope2 = envelope;
                         }
                     }
                 }
@@ -257,13 +288,29 @@ namespace InformedProteomics.Backend.MassFeature
                 }
             }
 
+            // when good envellope is observed at only either even or odd charge...
+            if (BestCorrelationScoreAcrossCharge[0] > 0.7 && BestCorrelationScoreAcrossCharge[1] < 0.1)
+            {
+                var i = 1;    
+                BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
+                BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
+                BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
+            }
+            if (BestCorrelationScoreAcrossCharge[1] > 0.7 && BestCorrelationScoreAcrossCharge[0] < 0.1)
+            {
+                var i = 0;
+                BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
+                BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
+                BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
+            }
+
+            
             // normalize abudnace across charges
             var s = AbundanceDistributionAcrossCharge[0] + AbundanceDistributionAcrossCharge[1];
             if (s > 0)
             {
                 for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++) AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;    
             }
-            
 
             if (nCols > 1)
             {
@@ -272,6 +319,8 @@ namespace InformedProteomics.Backend.MassFeature
                 XicCorrelationBetweenBestCharges[0] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(chargeXic[evenChargeIdx]), Smoother.Smooth(chargeXic[oddChargeIdx]));
                 XicCorrelationBetweenBestCharges[1] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(xic2[EvenCharge]), Smoother.Smooth(xic2[OddCharge]));
             }
+
+            if (repEnvelope == null && repEnvelope2 != null) repEnvelope = repEnvelope2;
 
             if (repEnvelope != null)
             {
