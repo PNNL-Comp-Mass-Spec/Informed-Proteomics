@@ -416,6 +416,10 @@ namespace InformedProteomics.Backend.MassFeature
             BuildFeatureMatrix(targetMass); // should be called first
 
             var clusters = new List<LcMsPeakCluster>();
+
+            // todo : bottom up dataset??
+            if (_rows.Length < 2) return clusters;
+
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
             var tempEnvelope2 = new double[_theoreticalEnvelope.Size];
             
@@ -765,6 +769,8 @@ namespace InformedProteomics.Backend.MassFeature
                 minRow = Math.Max(minRow - 1, _rows.First());
                 maxRow = Math.Min(maxRow + 1, _rows.Last());
             }
+
+            if (minRow == maxRow) return null;
 
             for (var i = minRow; i <= maxRow; i++)
             {
