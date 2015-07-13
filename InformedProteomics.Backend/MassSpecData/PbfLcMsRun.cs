@@ -489,11 +489,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var scanNum = reader.ReadInt32();
             var msLevel = reader.ReadByte();
             var elutionTime = reader.ReadDouble();
-            List<Peak> peakList = new List<Peak>();
-            if (includePeaks)
-            {
-                peakList = ReadPeakList(reader);
-            }
 
             if (msLevel > 1)
             {
@@ -505,6 +500,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var isolationWindowTargetMz = reader.ReadDouble();
                 var isolationWindowLowerOffset = reader.ReadDouble();
                 var isolationWindowUpperOffset = reader.ReadDouble();
+                var peakList = ReadPeakList(reader, includePeaks);
                 return new ProductSpectrum(peakList, scanNum)
                 {
                     MsLevel = msLevel,
@@ -521,6 +517,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
+                var peakList = ReadPeakList(reader, includePeaks);
                 return new Spectrum(peakList, scanNum)
                 {
                     ElutionTime = elutionTime
@@ -528,10 +525,19 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private static List<Peak> ReadPeakList(BinaryReader reader)
+        private static List<Peak> ReadPeakList(BinaryReader reader, bool includePeaks = true)
         {
             var peakList = new List<Peak>();
             var numPeaks = reader.ReadInt32();
+
+            // Skip the read if peaks aren't requested
+            if (!includePeaks)
+            {
+                // first the number of peaks, then 12 bytes per peak (mz, double, 8 bytes, then intensity, single, 4 bytes)
+                reader.BaseStream.Seek(numPeaks * 12, SeekOrigin.Current);
+                return peakList;
+            }
+
             for (var i = 0; i < numPeaks; i++)
             {
                 var mz = reader.ReadDouble();
