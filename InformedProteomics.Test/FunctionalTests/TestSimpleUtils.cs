@@ -5,6 +5,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
+using PNNLOmics.Utilities;
 
 namespace InformedProteomics.Test.FunctionalTests
 {
@@ -70,6 +71,40 @@ namespace InformedProteomics.Test.FunctionalTests
             TestValue(0, 2, "0");
             TestValue(0, 3, "0");
 
+            TestValue(1, 1, "1.0");
+            TestValue(1, 3, "1.0");
+            TestValue(5, 3, "5.0");
+
+            TestValue(10, 0, "10");
+            TestValue(10, 1, "10");
+            TestValue(10, 2, "10");
+            TestValue(10, 3, "10");
+
+            TestValue(10.123, 0, "10");
+            TestValue(10.123, 1, "10.1");
+            TestValue(10.123, 2, "10.12");
+            TestValue(10.123, 3, "10.123");
+
+            TestValue(50, 0, "50");
+            TestValue(50, 2, "50");
+            TestValue(50, 4, "50");
+            
+            TestValue(50.653, 0, "51");
+            TestValue(50.653, 1, "50.7");
+            TestValue(50.653, 2, "50.65");
+            TestValue(50.653, 3, "50.653");
+            TestValue(50.653, 4, "50.653");
+
+            TestValue(50.753, 0, "51");
+            TestValue(50.753, 1, "50.8");
+            TestValue(50.753, 2, "50.75");
+            TestValue(50.753, 3, "50.753");
+            TestValue(50.753, 4, "50.753");
+
+            TestValue(110, 0, "110");
+            TestValue(110, 1, "110");
+            TestValue(110, 2, "110");
+
             TestValue(0.1, 0, "0");
             TestValue(0.1, 1, "0.1");
             TestValue(0.1, 2, "0.1");
@@ -131,7 +166,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
         private void TestValue(double value, byte digitsOfPrecision, string resultExpected)
         {
-            var result = Misc.DblToString(value, digitsOfPrecision);
+            var result = StringUtilities.DblToString(value, digitsOfPrecision);
             Console.WriteLine(@"{0,12}, digits={1,2}: {2}", value, digitsOfPrecision, result);
 
             Assert.IsTrue(string.CompareOrdinal(result, resultExpected) == 0, "Result " + result + " did not match expected result (" + resultExpected + ")");

@@ -11,6 +11,7 @@ using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
+using PNNLOmics.Utilities;
 
 namespace InformedProteomics.BottomUp.Execution
 {
@@ -365,8 +366,8 @@ namespace InformedProteomics.BottomUp.Execution
                             start, // Start
                             end, // End
                             ion.Charge, // precursorCharge
-                            Misc.DblToString(ion.GetMostAbundantIsotopeMz(), 7), // MostAbundantIsotopeMz
-                            Misc.DblToString(ion.Composition.Mass, 7),   // Mass
+                            StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 7), // MostAbundantIsotopeMz
+                            StringUtilities.DblToString(ion.Composition.Mass, 7),   // Mass
                             match.Score,
                             scores.Score    // Score (re-scored)
                             );

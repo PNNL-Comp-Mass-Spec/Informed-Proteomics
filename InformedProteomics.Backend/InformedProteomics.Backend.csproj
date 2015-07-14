@@ -85,6 +85,9 @@
     <Reference Include="MwtWinDll">
       <HintPath>..\lib\MwtWinDll.dll</HintPath>
     </Reference>
+    <Reference Include="PNNLOmics">
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
+    </Reference>
     <Reference Include="ProteinFileReader">
       <HintPath>..\lib\ProteinFileReader.dll</HintPath>
     </Reference>
