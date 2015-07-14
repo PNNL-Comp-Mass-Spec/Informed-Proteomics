@@ -374,7 +374,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var run = new InMemoryLcMsRun(reader, 1.4826, 1.4826);
             //var run = new InMemoryLcMsRun(reader, 3, 1.4826);
             var pbfFilePath = PbfLcMsRun.GetPbfFileName(specFilePath);
-            run.WriteAsPbf(pbfFilePath);
+            PbfLcMsRun.WriteAsPbf(run, pbfFilePath);
             /*
             foreach (var spec in reader.ReadAllSpectra())
             {

@@ -429,45 +429,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return xicSegment;
         }
 
+        [Obsolete("Use PbfLcMsRun.WriteSpectrum", true)]
         public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
-            // scan number: 4
-            writer.Write(spec.ScanNum);
-
-            // ms level: 1
-            writer.Write(Convert.ToByte(spec.MsLevel));
-
-            // elution time: 4
-            writer.Write(spec.ElutionTime);
-
-            var productSpec = spec as ProductSpectrum;
-            if (productSpec != null)    // product spectrum
-            {
-                var isolationWindow = productSpec.IsolationWindow;
-                // precursor mass: 8
-                writer.Write(isolationWindow.MonoisotopicMz ?? 0.0);
-                // precursor charge: 4
-                writer.Write(isolationWindow.Charge ?? 0);
-                // Activation method: 1
-                writer.Write((byte)productSpec.ActivationMethod);
-                // Isolation window target m/z: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
-                // Isolation window lower offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
-                // Isolation window uppoer offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
-            }
-            // Number of peaks: 4
-            writer.Write(spec.Peaks.Length);
-            foreach (var peak in spec.Peaks)
-            {
-                // m/z: 8
-                writer.Write(peak.Mz);
-                // intensity: 4
-                writer.Write(Convert.ToSingle(peak.Intensity));
-            }
+            PbfLcMsRun.WriteSpectrum(spec, writer);
         }
-
 
         public int GetNumUniqueIsoWindows()
         {

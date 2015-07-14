@@ -47,7 +47,7 @@ namespace InformedProteomics.Test.FunctionalTests
                                           Path.GetFileNameWithoutExtension(outputFile.Name) + "_scans" + SCAN_START +
                                           "-" + SCAN_END + "." + outputFile.Extension);
             
-            run.WriteAsPbf(outputFilePath);
+            PbfLcMsRun.WriteAsPbf(run, outputFilePath);
             
             Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }

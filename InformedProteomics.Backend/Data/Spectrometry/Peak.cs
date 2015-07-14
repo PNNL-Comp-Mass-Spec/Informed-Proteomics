@@ -240,4 +240,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly int _numShifts;
     }
 
+    public class LcMsPeak : Peak
+    {
+        public LcMsPeak(double mz, double intensity, int scanNum)
+            : base(mz, intensity)
+        {
+            ScanNum = scanNum;
+        }
+        public int ScanNum { get; private set; }
+    }
 }
