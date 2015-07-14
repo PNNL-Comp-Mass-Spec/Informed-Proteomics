@@ -149,7 +149,8 @@ namespace PbfGen
                     //var run = new InMemoryLcMsRun(reader, 0, 0, progress);
                     //Console.WriteLine();
                     //run.WriteAsPbf(rafFilePath, progress);
-                    InMemoryLcMsRun.ConvertToPbf(rawFilePath, reader, 0, 0, pbfFilePath, progress);
+                    PbfLcMsRun.ConvertToPbf(rawFilePath, reader, 0, 0, pbfFilePath, progress);
+                    //PbfLcMsRun.WriteAsPbf(reader, pbfFilePath, progress);
                     Console.WriteLine();
                 }
 

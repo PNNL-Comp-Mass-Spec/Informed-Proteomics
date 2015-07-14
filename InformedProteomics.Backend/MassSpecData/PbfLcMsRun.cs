@@ -651,7 +651,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
                 // Isolation window lower offset: 8
                 writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
-                // Isolation window uppoer offset: 8
+                // Isolation window upper offset: 8
                 writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
             }
             // Number of peaks: 4
@@ -687,7 +687,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return peakList;
         }
 
-
         public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
@@ -708,11 +707,11 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.IsPartialRange = true;
             progressData.Status = "Writing spectra data";
 
-            var scanNumToSpecOffset = new long[imlr.MaxLcScan - imlr.MinLcScan + 1];
-            var scanNumToIsolationWindow = new IsolationWindow[imlr.MaxLcScan - imlr.MinLcScan + 1];
+            var scanNumToSpecOffset = new long[imlr.NumSpectra + 1];
+            var scanNumToIsolationWindow = new IsolationWindow[imlr.NumSpectra + 1];
 
             // Spectra
-            countTotal = imlr.MaxLcScan - imlr.MinLcScan;
+            countTotal = imlr.NumSpectra;
             counter = 0;
             progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
             long countMS2Spec = 0;
@@ -871,6 +870,262 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(offsetBeginMetaInformation); // 8
             progress.Report(progressData.UpdatePercent(100.0));
             writer.Write(FileFormatId); // 4
+        }
+
+        public static void WriteAsPbf(IMassSpecDataReader msdr, string outputFilePath, IProgress<ProgressData> progress = null)
+        {
+            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
+            {
+                WriteAsPbf(msdr, writer, progress);
+            }
+        }
+
+        public static void WriteAsPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
+        {
+            long countTotal = 1;
+            long counter = 0;
+            if (progress == null)
+            {
+                progress = new Progress<ProgressData>();
+            }
+            var progressData = new ProgressData();
+            progressData.IsPartialRange = true;
+            progressData.Status = "Writing spectra data";
+
+            //var scanNumToSpecOffset = new long[msdr.NumSpectra + 1];
+            var scanNumToSpecOffset = new Dictionary<int, long>(msdr.NumSpectra + 1);
+            //var scanNumToIsolationWindow = new IsolationWindow[msdr.NumSpectra + 1];
+            var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
+
+            // Spectra
+            var ms1PeakList = new List<LcMsPeak>();
+            var ms2PeakList = new List<LcMsPeak>();
+            var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
+            var minLcScan = int.MaxValue;
+            var maxLcScan = int.MinValue;
+            countTotal = msdr.NumSpectra;
+            counter = 0;
+            progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
+            //long countMS2Spec = 0;
+            //for (var scanNum = msdr.MinLcScan; scanNum <= msdr.MaxLcScan; scanNum++)
+            foreach (var spec in msdr.ReadAllSpectra())
+            {
+                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                counter++;
+                //scanNumToSpecOffset[scanNum - msdr.MinLcScan] = writer.BaseStream.Position;
+                scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
+                //var spec = msdr.GetSpectrum(scanNum);
+                //if (spec == null) continue;
+                var productSpec = spec as ProductSpectrum;
+                //scanNumToIsolationWindow[scanNum - msdr.MinLcScan] = null;
+                scanNumToIsolationWindow[spec.ScanNum] = null;
+                if (productSpec != null)
+                {
+                    //scanNumToIsolationWindow[scanNum - msdr.MinLcScan] = productSpec.IsolationWindow;
+                    scanNumToIsolationWindow[spec.ScanNum] = productSpec.IsolationWindow;
+                    //countMS2Spec++;
+                    ms2PeakList.AddRange(productSpec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, productSpec.ScanNum)));
+                }
+                else
+                {
+                    ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
+                }
+                if (spec.ScanNum < minLcScan)
+                {
+                    minLcScan = spec.ScanNum;
+                }
+                if (maxLcScan < spec.ScanNum)
+                {
+                    maxLcScan = spec.ScanNum;
+                }
+                scanMetadata.Add(new ScanMetadata(spec.ScanNum, spec.MsLevel, spec.ElutionTime));
+                PbfLcMsRun.WriteSpectrum(spec, writer);
+            }
+
+            // Precursor ion chromatograms
+            ms1PeakList.Sort();
+            var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
+
+            //var minMzIndex = msdr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(msdr.Ms1PeakList[0].Mz) : 0;
+            //var maxMzIndex = msdr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(msdr.Ms1PeakList[msdr.Ms1PeakList.Count - 1].Mz) : -1;
+            var minMzIndex = ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(ms1PeakList[0].Mz) : 0;
+            var maxMzIndex = ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(ms1PeakList[ms1PeakList.Count - 1].Mz) : -1;
+
+            var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
+            var prevMzIndex = -1;
+            counter = 0;
+            //countTotal = msdr.Ms1PeakList.Count;
+            countTotal = ms1PeakList.Count;
+            progressData.Status = "Writing precursor chromatograms";
+            progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
+            //foreach (var peak in msdr.Ms1PeakList)
+            foreach (var peak in ms1PeakList)
+            {
+                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                counter++;
+                var mz = peak.Mz;
+                var mzIndex = GetMzBinIndex(mz);
+                if (mzIndex > prevMzIndex)
+                {
+                    chromMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
+                    prevMzIndex = mzIndex;
+                }
+                writer.Write(peak.Mz);
+                writer.Write((float)peak.Intensity);
+                writer.Write(peak.ScanNum);
+            }
+
+            // Product ion chromatograms
+            //var ms2PeakList = new List<LcMsPeak>();
+            //counter = 0;
+            //countTotal = countMS2Spec;
+            //progressData.Status = "Processing product chromatograms";
+            //progressData.StepRange(42.9 + 15.7 + (41.2 / 2)); // Approximately 41% of total file size
+            //foreach (var ms2ScanNum in msdr.GetScanNumbers(2))
+            //{
+            //    progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+            //    counter++;
+            //    var productSpec = msdr.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+            //    if (productSpec == null) continue;
+            //    foreach (var peak in productSpec.Peaks)
+            //    {
+            //        ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
+            //    }
+            //}
+            ms2PeakList.Sort();
+
+            var offsetBeginProductChromatogram = writer.BaseStream.Position;
+            counter = 0;
+            countTotal = ms2PeakList.Count;
+            progressData.Status = "Writing product chromatograms";
+            progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
+            foreach (var peak in ms2PeakList)
+            {
+                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                counter++;
+                writer.Write(peak.Mz);
+                writer.Write((float)peak.Intensity);
+                writer.Write(peak.ScanNum);
+            }
+
+            // Meta information
+            var offsetBeginMetaInformation = writer.BaseStream.Position;
+            progressData.Status = "Writing metadata";
+            progressData.IsPartialRange = false;
+            progress.Report(progressData.UpdatePercent(99.8)); // Metadata: Approximately 0.2% of total file size
+
+            var warnedInvalidScanNum = false;
+            var warnedNullScanToIsolationWindow = false;
+
+            //writer.Write(msdr.MinLcScan);
+            //writer.Write(msdr.MaxLcScan);
+            writer.Write(minLcScan);
+            writer.Write(maxLcScan);
+            scanMetadata.Sort();
+            //for (var scanNum = msdr.MinLcScan; scanNum <= msdr.MaxLcScan; scanNum++)
+            foreach (var scan in scanMetadata)
+            {
+                //var msLevel = msdr.GetMsLevel(scanNum);
+                //writer.Write(msdr.GetMsLevel(scanNum));
+                //writer.Write(msdr.GetElutionTime(scanNum));
+                var msLevel = scan.MsLevel;
+                writer.Write(scan.MsLevel);
+                writer.Write(scan.ElutionTime);
+
+                if (msLevel == 2)
+                {
+                    float minMz = 0;
+                    float maxMz = 0;
+
+                    //if (scanNum - msdr.MinLcScan < 0 || scanNum - msdr.MinLcScan >= scanNumToIsolationWindow.Length
+                    if (scan.ScanNum - minLcScan < 0 || scan.ScanNum - minLcScan >= scanNumToIsolationWindow.Count)
+                    {
+                        if (!warnedInvalidScanNum)
+                        {
+                            //Console.WriteLine("\nWriteAsPbf encountered an invalid scan number: " + scanNum + "; " +
+                            Console.WriteLine("\nWriteAsPbf encountered an invalid scan number: " + scan.ScanNum + "; " +
+                                              "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
+                            warnedInvalidScanNum = true;
+                        }
+                    }
+                    else
+                    {
+                        //if (scanNumToIsolationWindow[scanNum - msdr.MinLcScan] == null)
+                        if (scanNumToIsolationWindow[scan.ScanNum] == null)
+                        {
+                            if (!warnedNullScanToIsolationWindow)
+                            {
+                                //Console.WriteLine("\nWriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan " + scanNum + "; " +
+                                Console.WriteLine("\nWriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan " + scan.ScanNum + "; " +
+                                                  "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
+                                warnedNullScanToIsolationWindow = true;
+                            }
+                        }
+                        else
+                        {
+                            //minMz = (float)scanNumToIsolationWindow[scanNum - msdr.MinLcScan].MinMz;
+                            //maxMz = (float)scanNumToIsolationWindow[scanNum - msdr.MinLcScan].MaxMz;
+                            minMz = (float)scanNumToIsolationWindow[scan.ScanNum].MinMz;
+                            maxMz = (float)scanNumToIsolationWindow[scan.ScanNum].MaxMz;
+                        }
+                    }
+
+                    writer.Write(minMz);
+                    writer.Write(maxMz);
+                }
+                //writer.Write(scanNumToSpecOffset[scanNum - msdr.MinLcScan]);
+                writer.Write(scanNumToSpecOffset[scan.ScanNum]);
+            }
+
+            // Precursor chromatogram index
+            writer.Write(minMzIndex);   // min index
+            writer.Write(maxMzIndex);
+            progress.Report(progressData.UpdatePercent(99.9)); // Metadata: Approximately 0.2% of total file size
+
+            var prevOffset = offsetBeginMetaInformation;
+            for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
+            {
+                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram) chromMzIndexToOffset[i] = prevOffset;
+                else prevOffset = chromMzIndexToOffset[i];
+            }
+
+            foreach (var offset in chromMzIndexToOffset)
+            {
+                writer.Write(offset);
+            }
+
+            writer.Write(offsetBeginPrecursorChromatogram); // 8
+            writer.Write(offsetBeginProductChromatogram); // 8
+            writer.Write(offsetBeginMetaInformation); // 8
+            progress.Report(progressData.UpdatePercent(100.0));
+            writer.Write(FileFormatId); // 4
+        }
+
+        private class ScanMetadata : IComparable<ScanMetadata>
+        {
+            public int ScanNum { get; private set; }
+            public int MsLevel { get; private set; }
+            public double ElutionTime { get; private set; }
+
+            public ScanMetadata(int scanTime, int msLevel, double elutionTime)
+            {
+                ScanNum = scanTime;
+                MsLevel = msLevel;
+                ElutionTime = elutionTime;
+            }
+
+            public int CompareTo(ScanMetadata other)
+            {
+                if (ScanNum.CompareTo(other.ScanNum) == 0)
+                {
+                    if (MsLevel.CompareTo(other.MsLevel) == 0)
+                    {
+                        return ElutionTime.CompareTo(other.ElutionTime);
+                    }
+                    return MsLevel.CompareTo(other.MsLevel);
+                }
+                return ScanNum.CompareTo(other.ScanNum);
+            }
         }
 
         private long GetOffset(double minMz, double maxMz, long beginOffset, long endOffset)
