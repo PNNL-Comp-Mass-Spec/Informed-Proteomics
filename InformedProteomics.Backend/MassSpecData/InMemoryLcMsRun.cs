@@ -237,6 +237,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 MaxMsLevel = int.MinValue
             };
 
+            NumSpectra = massSpecDataReader.NumSpectra;
+
             progressData.IsPartialRange = true;
             progressData.MaxPercentage = 95.0;
 
