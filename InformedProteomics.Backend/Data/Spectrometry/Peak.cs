@@ -18,7 +18,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public int CompareTo(Peak other)
         {
-	        return Mz.CompareTo(other.Mz);
+            var t = this as LcMsPeak;
+            var o = other as LcMsPeak;
+            if (t != null && o != null)
+            {
+                return t.CompareTo(o);
+            }
+
+            var mzCompare = Mz.CompareTo(other.Mz);
+            if (mzCompare == 0)
+            {
+                // Only to force a stable sort
+                return Intensity.CompareTo(other.Intensity);
+            }
+            return mzCompare;
         }
 
     	public bool Equals(Peak other)
@@ -50,6 +63,27 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     	{
     		return !Equals(left, right);
     	}
+    }
+
+    public class LcMsPeak : Peak, IComparable<LcMsPeak>
+    {
+        public LcMsPeak(double mz, double intensity, int scanNum)
+            : base(mz, intensity)
+        {
+            ScanNum = scanNum;
+        }
+        public int ScanNum { get; private set; }
+
+        public int CompareTo(LcMsPeak other)
+        {
+            var mzCompare = Mz.CompareTo(other.Mz);
+            if (mzCompare == 0)
+            {
+                // Force a stable sort
+                return ScanNum.CompareTo(other.ScanNum);
+            }
+            return mzCompare;
+        }
     }
 
     /// <summary>
@@ -238,15 +272,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public readonly int NumBits;
         private readonly int _numShifts;
-    }
-
-    public class LcMsPeak : Peak
-    {
-        public LcMsPeak(double mz, double intensity, int scanNum)
-            : base(mz, intensity)
-        {
-            ScanNum = scanNum;
-        }
-        public int ScanNum { get; private set; }
     }
 }
