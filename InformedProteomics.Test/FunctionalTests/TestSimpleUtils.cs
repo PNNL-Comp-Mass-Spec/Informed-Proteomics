@@ -95,15 +95,43 @@ namespace InformedProteomics.Test.FunctionalTests
             TestValue(50.653, 3, "50.653");
             TestValue(50.653, 4, "50.653");
 
-            TestValue(50.753, 0, "51");
-            TestValue(50.753, 1, "50.8");
-            TestValue(50.753, 2, "50.75");
-            TestValue(50.753, 3, "50.753");
-            TestValue(50.753, 4, "50.753");
+            TestValue(54.753, 0, "55");
+            TestValue(54.753, 1, "54.8");
+            TestValue(54.753, 2, "54.75");
+            TestValue(54.753, 3, "54.753");
+            TestValue(54.753, 4, "54.753");
 
             TestValue(110, 0, "110");
             TestValue(110, 1, "110");
             TestValue(110, 2, "110");
+
+            TestValue(9.99999, 6, "9.99999");
+            TestValue(9.99999, 5, "9.99999");
+            TestValue(9.99999, 4, "10.0");
+            TestValue(9.99999, 2, "10.0");
+            TestValue(9.99999, 1, "10.0");
+            TestValue(9.99999, 0, "10");
+
+            TestValue(9.98765, 6, "9.98765");
+            TestValue(9.98765, 5, "9.98765");
+            TestValue(9.98765, 4, "9.9877");
+            TestValue(9.98765, 3, "9.988");
+            TestValue(9.98765, 2, "9.99");
+            TestValue(9.98765, 1, "10.0");
+
+            TestValue(5.12345, 5, "5.12345", true);
+            TestValue(50.12345, 5, "50.1235", true);
+            TestValue(500.12345, 5, "500.123", true);
+            TestValue(5000.12345, 5, "5000.12", true);
+            TestValue(50000.12345, 5, "50000.1", true);
+            TestValue(500000.12345, 5, "500000", true);
+
+            TestValue(9.98765, 3, "9.988", true);
+            TestValue(99.98765, 3, "99.99", true);
+            TestValue(998.98765, 3, "999.0", true);
+            TestValue(9987.98765, 3, "9988", true);
+            TestValue(99876.98765, 3, "99877", true);
+            TestValue(998765.98765, 3, "998766", true);
 
             TestValue(0.1, 0, "0");
             TestValue(0.1, 1, "0.1");
@@ -164,10 +192,15 @@ namespace InformedProteomics.Test.FunctionalTests
 
         }
 
-        private void TestValue(double value, byte digitsOfPrecision, string resultExpected)
+        private void TestValue(double value, byte digitsAfterDecimal, string resultExpected, bool limitDecimalsForLargeValues = false)
         {
-            var result = StringUtilities.DblToString(value, digitsOfPrecision);
-            Console.WriteLine(@"{0,12}, digits={1,2}: {2}", value, digitsOfPrecision, result);
+            var result = StringUtilities.DblToString(value, digitsAfterDecimal, limitDecimalsForLargeValues);
+            Console.Write(@"{0,12}, digits={1,2}: {2,-8}", value, digitsAfterDecimal, result);
+            
+            if (limitDecimalsForLargeValues)
+                Console.WriteLine(@" (limitDecimals=True)");
+            else
+                Console.WriteLine();
 
             Assert.IsTrue(string.CompareOrdinal(result, resultExpected) == 0, "Result " + result + " did not match expected result (" + resultExpected + ")");
         }
