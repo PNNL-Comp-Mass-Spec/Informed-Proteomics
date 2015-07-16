@@ -13,14 +13,16 @@ namespace InformedProteomics.Backend.MassFeature
             _featureList = new List<LcMsPeakCluster>();
             _spectra = ms1Spectra;
             _scorer = scorer;
+            //ScoreThreshold = likelihoodScoreThreshold;
         }
 
+        //public double ScoreThreshold { get; private set; }
 
-        public const double ScoreThreshold = 0;
+        //public const double ScoreThreshold = 0;
 
         public bool Add(LcMsPeakCluster newFeature)
         {
-            if (newFeature.Score < ScoreThreshold) return false;
+            if (newFeature.Score < _scorer.ScoreThreshold) return false;
             if (!newFeature.GoodEnougth) return false;
             
             for (var i = _featureList.Count - 1; i >= 0; i--)
@@ -71,9 +73,9 @@ namespace InformedProteomics.Backend.MassFeature
             /*var maxScore = Math.Max(f1.Score, f2.Score);
             var minScore = Math.Min(f1.Score, f2.Score);
             if (minScore > 0 && maxScore > minScore*5) return false;*/
-            
-            if (f1.Score >= ScoreThreshold && f1.GoodEnougth
-             && f2.Score >= ScoreThreshold && f2.GoodEnougth) return true;
+
+            if (f1.Score >= _scorer.ScoreThreshold && f1.GoodEnougth
+             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnougth) return true;
 
             return false;
         }
@@ -113,7 +115,7 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     f.UpdateScore(_spectra);
                     f.Score = _scorer.GetScore(f);
-                    if (f.Score > ScoreThreshold && f.GoodEnougth)
+                    if (f.Score > _scorer.ScoreThreshold && f.GoodEnougth)
                     {
                         featureSet.Add(f);
                     }

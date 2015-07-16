@@ -31,7 +31,7 @@ namespace InformedProteomics.Backend.Quantification
 
             return ms1Feature;
         }
-      
+
         public double GetMs1EvidenceScore(TargetFeature targetFeature)
         {
             SetQueryMass(targetFeature.Mass);
@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.Quantification
                     {
                         return 1 - bcDist;
                     }
-                    if (corrCoeff > 0.85)
+                    if (corrCoeff > 0.7)
                     {
                         return corrCoeff;
                     }

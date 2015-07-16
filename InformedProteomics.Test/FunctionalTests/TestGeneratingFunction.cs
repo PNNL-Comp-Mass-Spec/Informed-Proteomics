@@ -41,22 +41,26 @@ namespace InformedProteomics.Test.FunctionalTests
 
         public int[] GetSpectralVectorForTest(string rawFile, int scanNum)
         {
-            const string protSequence =
-                "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            
+            const string protSequence = "MNKSE";
+                //"MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
+            var sequence = new Sequence(protSequence, new AminoAcidSet());
+            var proteinMass = sequence.Composition.Mass;
+            var nominalProteinMass = Constants.GetBinNum(proteinMass);
+            var spectralVec = new int[nominalProteinMass + 1];
+
+            foreach (var a in sequence.GetPrefixCompositions())
+            {
+                var binIndex = Constants.GetBinNum(a.Mass);
+                spectralVec[binIndex] = 1;
+            }
+
+            /*
             const int maxCharge = 15;
             const int minCharge = 1;
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
 
-            const string annotation = "_." + protSequence + "._";
-            var seqGraph = SequenceGraph.CreateGraph(new AminoAcidSet(), AminoAcid.ProteinNTerm, protSequence,
-                AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return null;
-            seqGraph.SetSink(0);
-            var neutral = seqGraph.GetSinkSequenceCompositionWithH2O() - Composition.Hydrogen;
-            var proteinMass = neutral.Mass;
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
             var spectrum = run.GetSpectrum(scanNum);
@@ -64,16 +68,18 @@ namespace InformedProteomics.Test.FunctionalTests
             // transform spectrum to spectral vector 
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spectrum, minCharge, maxCharge,
                 isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.5, 0.5);
-            var nominalProteinMass = Constants.GetBinNumHighPrecision(proteinMass);
-            var spectralVec = new int[nominalProteinMass];
+            //var nominalProteinMass = Constants.GetBinNumHighPrecision(proteinMass);
+
 
             foreach (var peak in deconvolutedPeaks)
             {
-                var binIndex = Constants.GetBinNumHighPrecision(peak.Mass);
+                //var binIndex = Constants.GetBinNumHighPrecision(peak.Mass);
+                var binIndex = Constants.GetBinNum(peak.Mass);
                 if (binIndex >= spectralVec.Length) break;
                 spectralVec[binIndex] = 1;
             }
-
+            */
+            
             return spectralVec;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -25,7 +26,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             int minMatchedTagLength = DefaultMinMatchedTagLength,
             double maxSequenceMass = 50000.0, 
             int minProductIonCharge = 1, 
-            int maxProductIonCharge = 20): this(
+            int maxProductIonCharge = 20)
+            : this(
             run,
             null,
             tagParser,
@@ -54,6 +56,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             _run = run;
             _ms2Scorer = ms2Scorer;
             _featureFinder = new TargetMs1FeatureMatrix(run);
+
+            //_ms1FtFilter = ms1FtFilter;
             _tagParser = tagParser;
             _fastaDb = fastaDb;
             _searchableDb = new SearchableDatabase(fastaDb);
@@ -67,13 +71,23 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             MaxScan = int.MaxValue;
         }
 
-
+        public StreamWriter outWriter = null;
         public int MinScan { get; set; }
         public int MaxScan { get; set; }
 
         public void RunSearch()
         {
-            Console.WriteLine("Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStartIndex\tEndIndex\tProteinLength");
+            if (outWriter != null)
+            {
+                outWriter.WriteLine(
+                    "Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStart\tEnd\tProteinLength");
+                outWriter.Flush();
+            }
+            else
+            {
+                Console.WriteLine("Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStart\tEnd\tProteinLength");
+            }
+
             foreach (var ms2ScanNum in _tagParser.GetScanNums())
             {
                 if(ms2ScanNum >= MinScan && ms2ScanNum <= MaxScan) RunSearch(ms2ScanNum);
@@ -94,21 +108,46 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             foreach (var tagSequenceMatch in GetMatches(tags, spec, scorer))
             {
                 var tagMatch = tagSequenceMatch.TagMatch;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
-                    ms2ScanNum,
-                    tagSequenceMatch.Sequence,
-                    tagMatch.Modifications,
-                    tagMatch.Mass,
-                    tagMatch.Charge,
-                    tagMatch.Score,
-                    tagMatch.NTermScore,
-                    tagMatch.CTermScore,
-                    tagSequenceMatch.ProteinName,
-                    tagMatch.StartIndex,
-                    tagMatch.EndIndex,
-                    _fastaDb.GetProteinLength(tagSequenceMatch.ProteinName)
-                    );
+
+                if (outWriter != null)
+                {
+                    outWriter.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
+                                        ms2ScanNum,
+                                        tagSequenceMatch.Sequence,
+                                        tagMatch.Modifications,
+                                        tagMatch.Mass,
+                                        tagMatch.Charge,
+                                        tagMatch.Score,
+                                        tagMatch.NTermScore,
+                                        tagMatch.CTermScore,
+                                        tagSequenceMatch.ProteinName,
+                                        tagMatch.StartIndex,
+                                        tagMatch.EndIndex,
+                                        _fastaDb.GetProteinLength(tagSequenceMatch.ProteinName)
+                                        );
+                    outWriter.Flush();
+                    Console.WriteLine("{0} scan has been processed", spec.ScanNum);
+                }
+                else
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
+                                        ms2ScanNum,
+                                        tagSequenceMatch.Sequence,
+                                        tagMatch.Modifications,
+                                        tagMatch.Mass,
+                                        tagMatch.Charge,
+                                        tagMatch.Score,
+                                        tagMatch.NTermScore,
+                                        tagMatch.CTermScore,
+                                        tagSequenceMatch.ProteinName,
+                                        tagMatch.StartIndex,
+                                        tagMatch.EndIndex,
+                                        _fastaDb.GetProteinLength(tagSequenceMatch.ProteinName)
+                                        );                    
+                }
             }
+
+            //outWriter.Close();
         }
 
         public IList<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
@@ -213,7 +252,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly FastaDatabase _fastaDb;
         private readonly SearchableDatabase _searchableDb;
 
-        private readonly TargetMs1FeatureMatrix _featureFinder; 
+        private readonly TargetMs1FeatureMatrix _featureFinder;
+        //private readonly Ms1FtFilter _ms1FtFilter;
 
         private readonly Tolerance _tolerance;
         private readonly AminoAcidSet _aaSet;

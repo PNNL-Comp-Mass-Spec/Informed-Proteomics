@@ -34,7 +34,9 @@ namespace InformedProteomics.Backend.MassFeature
         public int ScanLength { get { return MaxScanNum - MinScanNum + 1; } }
 
         public double Abundance { get; protected set; }
-        
+
+        public double AbundanceForBestCharges { get; internal set; }
+
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }
         public int RepresentativeCharge { get; protected set; }

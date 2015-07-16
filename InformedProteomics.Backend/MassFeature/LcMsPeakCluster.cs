@@ -514,6 +514,8 @@ namespace InformedProteomics.Backend.MassFeature
 
         public readonly double[] XicCorrelationBetweenBestCharges;
 
+        
+
         public const int EvenCharge = 0;
         public const int OddCharge = 1;
 

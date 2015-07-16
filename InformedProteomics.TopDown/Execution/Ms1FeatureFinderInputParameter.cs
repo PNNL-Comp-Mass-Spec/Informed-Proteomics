@@ -17,6 +17,8 @@ namespace InformedProteomics.TopDown.Execution
         public int MaxThreads;
         public string OutputPath;
 
+        public double LikelihoodScoreThreshold;
+
         public Ms1FeatureFinderInputParameter()
         {
             MinSearchMass = 3000;
@@ -25,7 +27,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxSearchCharge = 60;
             ScoreReport = false;
             CsvOutput = true;
-
+            LikelihoodScoreThreshold = 0;
             MaxThreads = -1;
         }
 
@@ -48,6 +50,8 @@ namespace InformedProteomics.TopDown.Execution
 
             ScoreReport = Str2Bool(paramDic["-score"]);
             CsvOutput = Str2Bool(paramDic["-csv"]);
+
+            LikelihoodScoreThreshold = double.Parse(paramDic["-scoreTh"]);
         }
 
         public void Display()
@@ -61,6 +65,8 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine("MaxCharge\t{0}", MaxSearchCharge);
             
             Console.WriteLine("ScoreReport\t{0}", ScoreReport ? "Y" : "N");
+
+            Console.WriteLine("LikelihoodRatioThreshold\t{0}", LikelihoodScoreThreshold);
 
             Console.WriteLine("MaxThreads\t{0}", MaxThreads);
         }

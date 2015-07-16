@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsFeatureLikelihood
     {
-        public LcMsFeatureLikelihood(string scoreTableFolder)
+        public LcMsFeatureLikelihood(string scoreTableFolder, double likelihoodThreshold = 0)
         {
             _massBins = new double[28];
             var idx = 0;
@@ -29,10 +29,26 @@ namespace InformedProteomics.Backend.MassFeature
 
             _xicScoreTable1 = LoadTable(string.Format(@"{0}\XicCorrScore1.tsv", scoreTableFolder));
             _xicScoreTable2 = LoadTable(string.Format(@"{0}\XicCorrScore2.tsv", scoreTableFolder));
+            
+            /*
+            _distScoreTable = LikelihoodScoreData.DistScore;
+            _corrScoreTable = LikelihoodScoreData.CorrScore;
+            _intScoreTable = LikelihoodScoreData.IntScore;
+            _abuScoreTable = LikelihoodScoreData.AbuScore;
+
+            _distScoreTableSummed = LikelihoodScoreData.SummedDistScore;
+            _corrScoreTableSummed = LikelihoodScoreData.SummedCorrScore;
+            _intScoreTableSummed = LikelihoodScoreData.SummedIntScore;
+
+            _xicScoreTable1 = LikelihoodScoreData.XicCorrScore1;
+            _xicScoreTable2 = LikelihoodScoreData.XicCorrScore2;
+            */
+
+            ScoreThreshold = likelihoodThreshold;
         }
 
 
-
+        public readonly double ScoreThreshold;
         
         public double GetScore(LcMsPeakCluster feature)
         {

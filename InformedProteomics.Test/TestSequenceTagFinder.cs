@@ -102,7 +102,9 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string rawFile = @"D:\MassSpecFiles\Glyco\User_sample_test_02252015.raw";
+            //const string rawFile = @"D:\MassSpecFiles\Glyco\User_sample_test_02252015.raw";
+            //const string rawFile = @"D:\MassSpecFiles\CPTAC_Intact_CR33_5_29Jun15_Bane_15-02-01RZ.raw";
+            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
 
             if (!File.Exists(rawFile))
             {
@@ -114,13 +116,8 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 0, 0);
             var ms2ScanNums = run.GetScanNumbers(2);
             
-            //for (var i = 12700; i < 13000; i++)
-            //{
-                //var scanNum = ms2ScanNums[i];
-                var scanNum = 14075;
-
-                //if (run.GetMsLevel(scanNum) != 2) continue;
-
+            foreach(var scanNum in ms2ScanNums)
+            {
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
                 Console.WriteLine(@"ScanNum = {0}; # of Peaks = {1}", scanNum, spectrum.Peaks.Length);
@@ -135,7 +132,7 @@ namespace InformedProteomics.Test
                     n += seqTags.Length;
                 }
                 Console.WriteLine(n);
-            //}
+            }
             //var existingTags = tagFinder.ExtractExistingSequneceTags(sequence);
             //Console.Write(scanNum + "\t" + existingTags.Count);
         }    

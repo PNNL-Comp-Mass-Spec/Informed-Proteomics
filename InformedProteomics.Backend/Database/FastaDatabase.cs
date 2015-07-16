@@ -249,6 +249,14 @@ namespace InformedProteomics.Backend.Database
             return _descriptions[offsetKey];
         }
 
+        public string GetProteinDescription(string name)
+        {
+            long offset;
+            if (!_nameToOffset.TryGetValue(name, out offset)) return null;
+            var offsetKey = GetOffsetKey(offset);
+            return _descriptions[offsetKey];
+        }
+
         public int GetProteinLength(string name)
         {
             int length;

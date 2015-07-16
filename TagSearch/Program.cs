@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.TopDown.PostProcessing;
+using InformedProteomics.TopDown.TagBasedSearch;
 
-namespace ProMex
+namespace TagSearch
 {
     class Program
     {
-        public const string Name = "ProMex";
+        public const string Name = "TagSearch";
         public static string Version
         {
             get
@@ -52,15 +59,9 @@ namespace ProMex
                 {
                     {"-i", null},
                     {"-o", null},
-                    {"-minCharge", "2"},
-                    {"-maxCharge", "60"},
                     {"-minMass", "3000.0"},
                     {"-maxMass", "50000.0"},
-                    {"-score", "n"},
-                    {"-csv", "n"},
-                    {"-tmp", "n"},
-                    {"-scoreTh", "0"},
-                    {"-maxThreads", "0"},
+
                 };
 
                 for (var i = 0; i < args.Length / 2; i++)
@@ -76,8 +77,9 @@ namespace ProMex
                 }
 
                 // Parse command line parameters
+                /*
                 var inputFilePath = _paramDic["-i"];
-
+                
                 if (inputFilePath == null)
                 {
                     PrintUsageInfo("Missing required parameter -i!");
@@ -89,7 +91,7 @@ namespace ProMex
                     PrintUsageInfo("File not found: " + inputFilePath);
                     return -1;
                 }
-
+                */
             }
             catch (Exception ex)
             {
@@ -101,11 +103,15 @@ namespace ProMex
             try
             {
 #endif
-                var param = new Ms1FeatureFinderInputParameter(_paramDic);
+                //var param = new Ms1FeatureFinderInputParameter(_paramDic);
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
-                param.Display();
-                var launcher = new Ms1FeatureFinderLauncher(param);
-                launcher.Run();
+                //param.Display();
+                //var launcher = new Ms1FeatureFinderLauncher(param);
+                //launcher.Run();
+                Run();
+
+
+
 #if (!DEBUG)
             }
             catch (Exception ex)
@@ -123,6 +129,53 @@ namespace ProMex
             return 0;
         }
 
+
+        private static void Run()
+        {
+            const string dataSetPath = @"E:\Jungkap\CompRef";
+            const string fastaFilePath = @"E:\Jungkap\CompRef\ID_003278_4B4B3CB1.fasta";
+            const string modsFilePath = @"E:\Jungkap\CompRef\Mods.txt";
+
+            var fileEntries = Directory.GetFiles(dataSetPath);
+
+            var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            dataset.Sort();
+            
+            var fastaDb = new FastaDatabase(fastaFilePath);
+            var tolerance = new Tolerance(10);
+            var aaSet = new AminoAcidSet(modsFilePath);
+
+            var dataIndex = new int[3][];
+            dataIndex[0] = new int[] {0, 1, 2};
+            dataIndex[1] = new int[] { 3, 4, 5 };
+            dataIndex[2] = new int[] { 6, 7, 8 };
+
+            //for (var i = 0; i < dataset.Count; i++)
+            var setIndex = int.Parse(_paramDic["-i"]);
+            foreach(var i in dataIndex[setIndex - 1])
+            {
+                var rawFile = string.Format(@"{0}\{1}.pbf", dataSetPath, dataset[i]);
+                //var ms1File = string.Format(@"{0}\{1}.ms1ft", dataSetPath, dataset[i]);
+                var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
+                var retFile = string.Format(@"{0}\{1}_tagmatch.tsv", dataSetPath, dataset[i]);
+
+                var run = PbfLcMsRun.GetLcMsRun(rawFile);
+                const int minTagLength = 5;
+                var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
+
+                Console.WriteLine("Start processing: {0}", rawFile);
+
+                //TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+                var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
+                engine.outWriter = new StreamWriter(retFile);
+                engine.RunSearch();
+
+                engine.outWriter.Close();
+                
+                Console.WriteLine("Complete processing: {0}", rawFile);
+            }            
+        }
+
         private static void PrintUsageInfo(string message = null)
         {
             if (message != null)
@@ -137,13 +190,9 @@ namespace ProMex
                 Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
-                "\t[-o OutFolder (default : InputFolder)]\n" +
-                "\t[-minCharge MinCharge] (minimum charge state, default: 2)\n" +
-                "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
+                "\t[-d Fasta file]\n" +
                 "\t[-minMass MinMassInDa] (minimum mass in Da, default: 3000.0)\n" +
-                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
-                "\t[-score y or n (default: n)]\n" +
-                "\t[-maxThreads 0 (default: 0 (no limit))]\n"
+                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n"
                 );
 
             // Wait for 1.5 seconds
@@ -151,5 +200,5 @@ namespace ProMex
         }
 
     }
-
+    
 }

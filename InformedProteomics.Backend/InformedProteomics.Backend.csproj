@@ -166,6 +166,7 @@
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
     <Compile Include="MassFeature\IdentifiedProtein.cs" />
+    <Compile Include="MassFeature\LikelihoodScoreData.cs" />
     <Compile Include="MassFeature\INodeComparer.cs" />
     <Compile Include="MassFeature\IsotopeEnvelope.cs" />
     <Compile Include="MassFeature\LcMsEnvelopeComparer.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
     <Compile Include="MassFeature\NodeSet.cs" />
     <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
+    <Compile Include="MassFeature\PrSmContainer.cs" />
     <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />
@@ -210,6 +212,7 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
+    <Compile Include="MassFeature\ProteinSpectrumMatch.cs" />
     <Compile Include="Quantification\TargetFeature.cs" />
     <Compile Include="Quantification\TargetMs1FeatureMatrix.cs" />
     <Compile Include="SequenceTag\GraphEdge.cs" />

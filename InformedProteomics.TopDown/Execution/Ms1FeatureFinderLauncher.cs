@@ -21,7 +21,7 @@ namespace InformedProteomics.TopDown.Execution
             var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
             try
             {
-                _likelihoodScorer = new LcMsFeatureLikelihood(scoreDataPath);
+                _likelihoodScorer = new LcMsFeatureLikelihood(scoreDataPath, Parameters.LikelihoodScoreThreshold);
             }
             catch (FileNotFoundException fe)
             {
@@ -237,6 +237,7 @@ namespace InformedProteomics.TopDown.Execution
             sb.Append(string.Format("\t{0:0.0}", feature.Score));
             if (Parameters.ScoreReport)
             {
+                sb.AppendFormat("\t{0}", feature.AbundanceForBestCharges);
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.OddCharge]);
 
@@ -274,6 +275,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private static readonly string[] TsvExtraScoreHeader = new string[]
         {
+            "BestChargeAbundance",
             "BestEvenCharge", "BestOddCharge", 
             "CorrEvenCharge", "CorrOddCharge", 
             "IntensityEvenCharge", "IntensityOddCharge",

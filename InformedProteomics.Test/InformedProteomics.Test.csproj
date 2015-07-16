@@ -129,6 +129,7 @@
     <Compile Include="TestIcTopDown.cs" />
     <Compile Include="Obsolete\TestIMSScoring.cs" />
     <Compile Include="TestIprg.cs" />
+    <Compile Include="TestLcMsFeatureAlignment.cs" />
     <Compile Include="TestLcMsFeatureFind.cs" />
     <Compile Include="TestLcMsMap.cs" />
     <Compile Include="TestMisc.cs" />
@@ -148,7 +149,6 @@
     <Compile Include="TestSelectivityScore.cs" />
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestSequenceTagMatching.cs" />
-    <Compile Include="TestTagBasedSearch.cs" />
     <Compile Include="TestUtex.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />

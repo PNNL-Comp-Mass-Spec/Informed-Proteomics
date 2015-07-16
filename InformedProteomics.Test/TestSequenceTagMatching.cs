@@ -10,6 +10,7 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.PostProcessing;
+using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using NUnit.Framework;
 
@@ -57,7 +58,63 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(modsFilePath);            
 
             TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
-        }        
+        }
+
+        [Test]
+        public void TestTagBasedSearchCompRef()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string dataSetPath = @"D:\MassSpecFiles\CompRef";
+            const string fastaFilePath = @"D:\MassSpecFiles\CompRef\ID_003278_4B4B3CB1.fasta";
+            const string modsFilePath = @"D:\MassSpecFiles\CompRef\Mods.txt";
+
+            if (!Directory.Exists(dataSetPath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dataSetPath);
+                return;
+            }
+            if (!File.Exists(modsFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                return;
+            }
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
+            var fileEntries = Directory.GetFiles(dataSetPath);
+
+            var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            dataset.Sort();
+          
+            
+            var fastaDb = new FastaDatabase(fastaFilePath);
+            var tolerance = new Tolerance(10);
+            var aaSet = new AminoAcidSet(modsFilePath);
+
+            for (var i = 0; i < dataset.Count; i++)
+            {
+                var rawFile = string.Format(@"{0}\{1}.pbf", dataSetPath, dataset[i]);
+                var ms1File = string.Format(@"{0}\{1}.ms1ft", dataSetPath, dataset[i]);
+                var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
+
+                var run = PbfLcMsRun.GetLcMsRun(rawFile);
+                const int minTagLength = 5;
+                var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
+
+                Console.WriteLine("-----------------{0}--------------------", rawFile);
+
+                TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+
+                Console.WriteLine("-----------------------------------------------------------------------");
+            }
+
+        }
+
         
         
         [Test]
