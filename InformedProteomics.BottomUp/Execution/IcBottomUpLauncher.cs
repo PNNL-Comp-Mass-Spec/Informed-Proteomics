@@ -353,6 +353,10 @@ namespace InformedProteomics.BottomUp.Execution
                             Console.WriteLine(@"Null scores");
                         }
 
+                        // Note for DblToString(value, 9, true), by having "9" and "true",
+                        // values between 100 and 999 Da will have 7 digits after the decimal place, and
+                        // values between 1000 and 9999 will have 6 digits after the decimal place
+
                         writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                             scanNum,
                             match.Pre,
@@ -366,8 +370,8 @@ namespace InformedProteomics.BottomUp.Execution
                             start, // Start
                             end, // End
                             ion.Charge, // precursorCharge
-                            StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 7), // MostAbundantIsotopeMz
-                            StringUtilities.DblToString(ion.Composition.Mass, 7),   // Mass
+                            StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
+                            StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
                             match.Score,
                             scores.Score    // Score (re-scored)
                             );

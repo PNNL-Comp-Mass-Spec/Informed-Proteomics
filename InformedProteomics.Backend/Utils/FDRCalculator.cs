@@ -126,7 +126,7 @@ namespace InformedProteomics.Backend.Utils
                     ++NumPsms;
             }
 
-            _results = distinctSorted.Select((r, i) => r + "\t" + StringUtilities.DblToString(qValue[i], 8)).ToArray();
+            _results = distinctSorted.Select((r, i) => r + "\t" + StringUtilities.DblToString(qValue[i], 7)).ToArray();
 
             return true;
         }
@@ -220,7 +220,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 var columns = _results[i].Split('\t');
                 var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
-                _results[i] = _results[i] + "\t" + StringUtilities.DblToString(annotationToPepQValue[annotation], 8);
+                _results[i] = _results[i] + "\t" + StringUtilities.DblToString(annotationToPepQValue[annotation], 7);
             }
 
             return true;

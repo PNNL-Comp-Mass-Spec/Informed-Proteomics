@@ -135,19 +135,6 @@ namespace InformedProteomics.Test
             var config = reader.GetNodes("vars").First();
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
             var actStr = config.Contents["activationmethod"].ToLower();
-            ActivationMethod _act;
-            switch (actStr)
-            {
-                case "hcd":
-                    _act = ActivationMethod.HCD;
-                    break;
-                case "cid":
-                    _act = ActivationMethod.CID;
-                    break;
-                case "etd":
-                    _act = ActivationMethod.ETD;
-                    break;
-            }
 
             _combineCharges = (config.Contents.ContainsKey("combinecharges") &&
                  config.Contents["combinecharges"].ToLower() == "true");

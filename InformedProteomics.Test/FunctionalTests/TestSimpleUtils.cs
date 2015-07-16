@@ -133,6 +133,18 @@ namespace InformedProteomics.Test.FunctionalTests
             TestValue(99876.98765, 3, "99877", true);
             TestValue(998765.98765, 3, "998766", true);
 
+            TestValue(678.8032741, 9, "678.8032741", true);
+            TestValue(678.8032741, 8, "678.803274", true);
+            TestValue(678.8032741, 7, "678.80327", true);
+
+            TestValue(1017.9488123, 9, "1017.948812", true);
+            TestValue(1017.9488123, 8, "1017.94881", true);
+            TestValue(1017.9488123, 7, "1017.9488", true);
+
+            TestValue(10641.5439241, 9, "10641.54392", true);
+            TestValue(10641.5439241, 8, "10641.5439", true);
+            TestValue(10641.5439241, 7, "10641.544", true);
+
             TestValue(0.1, 0, "0");
             TestValue(0.1, 1, "0.1");
             TestValue(0.1, 2, "0.1");

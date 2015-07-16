@@ -202,19 +202,6 @@ namespace InformedProteomics.Test
             // Read program variables
             var config = reader.GetNodes("vars").First();
             var actStr = config.Contents["activationmethod"].ToLower();
-            ActivationMethod _act;
-            switch (actStr)
-            {
-                case "hcd":
-                    _act = ActivationMethod.HCD;
-                    break;
-                case "cid":
-                    _act = ActivationMethod.CID;
-                    break;
-                case "etd":
-                    _act = ActivationMethod.ETD;
-                    break;
-            }
 
             _noiseFiltration = Convert.ToDouble(config.Contents["noisefiltration"]);
             _precursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
