@@ -68,15 +68,7 @@ namespace InformedProteomics.Test
                 // load identification results
                 Console.WriteLine(dataset[i]);
 
-                var path = string.Format(@"D:\MassSpecFiles\CompRef\ProMexV1\{0}_IcTda.tsv", dataset[i]);
-                if (!File.Exists(path))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
-                    continue;
-                }
-                prsmContainer[i].AddIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsPathFinder);
-
-                path = string.Format(@"D:\MassSpecFiles\CompRef\ProMexV2\{0}_IcTarget.tsv", dataset[i]);
+                var path = string.Format(@"D:\MassSpecFiles\CompRef\ProMexV2\{0}_IcTda.tsv", dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);

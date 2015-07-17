@@ -128,18 +128,10 @@
     <Compile Include="Data\Sequence\ModificationInstance.cs" />
     <Compile Include="Data\Sequence\ShiftedSequenceGraph.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
-    <Compile Include="Data\Spectrometry\IMs1Feature.cs" />
     <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
-    <Compile Include="Data\Spectrometry\Ms1Feature.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureAlign.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureCluster.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureContainer.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureMatrix.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureResult.cs" />
-    <Compile Include="Data\Spectrometry\Ms1FeatureScore.cs" />
     <Compile Include="Data\Spectrometry\Ms1Peak.cs" />
     <Compile Include="Data\Spectrometry\Ms1Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
@@ -166,7 +158,6 @@
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
     <Compile Include="MassFeature\IdentifiedProtein.cs" />
-    <Compile Include="MassFeature\LikelihoodScoreData.cs" />
     <Compile Include="MassFeature\INodeComparer.cs" />
     <Compile Include="MassFeature\IsotopeEnvelope.cs" />
     <Compile Include="MassFeature\LcMsEnvelopeComparer.cs" />
@@ -213,8 +204,6 @@
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatch.cs" />
-    <Compile Include="Quantification\TargetFeature.cs" />
-    <Compile Include="Quantification\TargetMs1FeatureMatrix.cs" />
     <Compile Include="SequenceTag\GraphEdge.cs" />
     <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
     <Compile Include="SequenceTag\SequenceTag.cs" />
@@ -245,6 +234,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="MassFeature\ScoringData\AbuScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\CorrScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\DistScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\IntScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\SummedCorrScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\SummedDistScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\SummedIntScore.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\XicCorrScore1.tsv" />
+    <EmbeddedResource Include="MassFeature\ScoringData\XicCorrScore2.tsv" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

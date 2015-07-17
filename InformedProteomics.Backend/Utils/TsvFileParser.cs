@@ -14,7 +14,7 @@ namespace InformedProteomics.Backend.Utils
             _delimeter = delimiter;
             Parse();
         }
-
+        
         public string FileName { get; private set; }
 
         public int NumData

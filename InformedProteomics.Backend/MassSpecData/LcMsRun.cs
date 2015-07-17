@@ -138,13 +138,14 @@ namespace InformedProteomics.Backend.MassSpecData
             var summedSpec = GetSummedSpectrum(ms2ScanNums);
             return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
         }
-
+        
+        /*
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, Ms1Feature range,
             ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             return GetSummedMs2Spectrum(monoIsotopicMass, range.MinScanNum, range.MaxScanNum, range.MinCharge,
                 range.MaxCharge, activationMethod);
-        }
+        }*/
 
         /// <summary>
         /// Gets the MS level of the specified scan

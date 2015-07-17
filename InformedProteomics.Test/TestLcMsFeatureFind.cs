@@ -19,8 +19,7 @@ namespace InformedProteomics.Test
         [Test]
         public void TestIsotopeCount()
         {
-            
-            
+
             for (var m = 1000; m < 30000; m += 1000)
             {
                 var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
@@ -55,7 +54,7 @@ namespace InformedProteomics.Test
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
 
             var scoreDataPath = @"D:\MassSpecFiles\training";
-            var scorer = new LcMsFeatureLikelihood(scoreDataPath);
+            var scorer = new LcMsFeatureLikelihood();
 
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);

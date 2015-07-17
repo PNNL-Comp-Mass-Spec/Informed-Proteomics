@@ -36,6 +36,25 @@ namespace InformedProteomics.Test.FunctionalTests
 
             Console.WriteLine(spectralVector.Sum());
 
+
+            var peaks = GetMassListForTest();
+        }
+
+
+        public List<DeconvolutedPeak> GetMassListForTest()
+        {
+            var peaks = new List<DeconvolutedPeak>();
+            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
+            var sequence = new Sequence(protSequence, new AminoAcidSet());
+            var proteinMass = sequence.Composition.Mass;
+
+            foreach (var a in sequence.GetPrefixCompositions())
+            {
+                var peak = new DeconvolutedPeak(new Peak(a.Mass*0.5, 1), a.Mass, 2);
+                peaks.Add(peak);
+            }
+
+            return peaks;
         }
 
 

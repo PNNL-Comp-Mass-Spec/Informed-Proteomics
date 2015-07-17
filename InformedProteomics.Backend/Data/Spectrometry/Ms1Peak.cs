@@ -47,30 +47,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         
         private List<LcMsPeakCluster> _minorTaggedFeatures;
         private List<LcMsPeakCluster> _majorTaggedFeatures;
-        
-        public void TagMajorPeakOf(Ms1FeatureCluster feature)
-        {
-            if (_majorIsotopeFeatures == null) _majorIsotopeFeatures = new List<Ms1FeatureCluster>();
-            _majorIsotopeFeatures.Add(feature);
-        }
-        public void TagMinorPeakOf(Ms1FeatureCluster feature)
-        {
-            if (_minorIsotopeFeatures == null) _minorIsotopeFeatures = new List<Ms1FeatureCluster>();
-            _minorIsotopeFeatures.Add(feature);
-        }
-
-        public IEnumerable<Ms1FeatureCluster> GetTaggedAllFeatures()
-        {
-            if (_minorIsotopeFeatures != null) foreach (var f in _minorIsotopeFeatures) yield return f;
-            if (_majorIsotopeFeatures != null) foreach (var f in _majorIsotopeFeatures) yield return f;
-        }
-        public IEnumerable<Ms1FeatureCluster> GetTaggedMajorFeatures()
-        {
-            if (_majorIsotopeFeatures != null) foreach (var f in _majorIsotopeFeatures) yield return f;
-        }
-        
-        private List<Ms1FeatureCluster> _minorIsotopeFeatures;
-        private List<Ms1FeatureCluster> _majorIsotopeFeatures;
     }
    
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsFeatureLikelihood
     {
-        public LcMsFeatureLikelihood(string scoreTableFolder, double likelihoodThreshold = 0)
+        public LcMsFeatureLikelihood(double likelihoodThreshold = 0)
         {
             _massBins = new double[28];
             var idx = 0;
@@ -15,7 +16,20 @@ namespace InformedProteomics.Backend.MassFeature
                 _massBins[idx] = m;
                 idx++;
             }
-            
+
+            _distScoreTable = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.DistScore.tsv");
+            _corrScoreTable = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.CorrScore.tsv");
+            _intScoreTable = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.IntScore.tsv");
+
+            _distScoreTableSummed = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.SummedDistScore.tsv");
+            _corrScoreTableSummed = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.SummedCorrScore.tsv");
+            _intScoreTableSummed = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.SummedIntScore.tsv");
+
+            _abuScoreTable = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.AbuScore.tsv");
+            _xicScoreTable1 = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.XicCorrScore1.tsv");
+            _xicScoreTable2 = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.XicCorrScore2.tsv");
+
+            /*
             _distScoreTable = LoadTable(string.Format(@"{0}\DistScore.tsv", scoreTableFolder));
 
             _corrScoreTable = LoadTable(string.Format(@"{0}\CorrScore.tsv", scoreTableFolder));
@@ -29,25 +43,12 @@ namespace InformedProteomics.Backend.MassFeature
 
             _xicScoreTable1 = LoadTable(string.Format(@"{0}\XicCorrScore1.tsv", scoreTableFolder));
             _xicScoreTable2 = LoadTable(string.Format(@"{0}\XicCorrScore2.tsv", scoreTableFolder));
-            
-            /*
-            _distScoreTable = LikelihoodScoreData.DistScore;
-            _corrScoreTable = LikelihoodScoreData.CorrScore;
-            _intScoreTable = LikelihoodScoreData.IntScore;
-            _abuScoreTable = LikelihoodScoreData.AbuScore;
-
-            _distScoreTableSummed = LikelihoodScoreData.SummedDistScore;
-            _corrScoreTableSummed = LikelihoodScoreData.SummedCorrScore;
-            _intScoreTableSummed = LikelihoodScoreData.SummedIntScore;
-
-            _xicScoreTable1 = LikelihoodScoreData.XicCorrScore1;
-            _xicScoreTable2 = LikelihoodScoreData.XicCorrScore2;
             */
 
             ScoreThreshold = likelihoodThreshold;
         }
 
-
+     
         public readonly double ScoreThreshold;
         
         public double GetScore(LcMsPeakCluster feature)
@@ -98,6 +99,29 @@ namespace InformedProteomics.Backend.MassFeature
 
         private const int NumberOfBins = 1001;
 
+        private double[][] LoadTableFromResource(string resourceName)
+        {
+            //if (!File.Exists(fname)) throw new FileNotFoundException("Missing score datafile: " + fname);
+            //var parser = new TsvFileParser(fname);
+            var assembly = Assembly.GetExecutingAssembly();
+            var textStreamReader = new StreamReader(assembly.GetManifestResourceStream(resourceName));
+            var table = new double[_massBins.Length][];
+
+            for (var i = 0; i < _massBins.Length; i++)
+            {
+                table[i] = new double[NumberOfBins];
+                var line = textStreamReader.ReadLine();
+                var token = line.Split('\t');
+                for (var k = 0; k < NumberOfBins; k++)
+                {
+                    //var colData = parser.GetData(string.Format("{0}", k));
+                    //table[i][k] = double.Parse(colData[i]);
+                    table[i][k] = double.Parse(token[k]);
+                }
+            }
+            return table;
+        }
+        
         private double[][] LoadTable(string fname)
         {
             if (!File.Exists(fname)) throw new FileNotFoundException("Missing score datafile: " + fname);

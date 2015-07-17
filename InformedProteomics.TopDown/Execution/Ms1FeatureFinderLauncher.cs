@@ -18,10 +18,10 @@ namespace InformedProteomics.TopDown.Execution
 
         public void Run()
         {
-            var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
+            //var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
             try
             {
-                _likelihoodScorer = new LcMsFeatureLikelihood(scoreDataPath, Parameters.LikelihoodScoreThreshold);
+                _likelihoodScorer = new LcMsFeatureLikelihood(Parameters.LikelihoodScoreThreshold);
             }
             catch (FileNotFoundException fe)
             {

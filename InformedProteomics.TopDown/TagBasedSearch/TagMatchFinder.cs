@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Quantification;
+using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.TopDown.PostProcessing;
 
 namespace InformedProteomics.TopDown.TagBasedSearch
@@ -20,7 +20,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         public TagMatchFinder(
             ProductSpectrum spec,
             IScorer ms2Scorer,
-            TargetMs1FeatureMatrix featureFinder,
+            LcMsPeakMatrix featureFinder,
             string proteinSequence, 
             Tolerance tolerance, 
             AminoAcidSet aaSet, 
@@ -158,7 +158,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly ProductSpectrum _spec;
         private readonly IScorer _ms2Scorer;
         
-        private readonly TargetMs1FeatureMatrix _featureFinder;
+        private readonly LcMsPeakMatrix _featureFinder;
         private readonly string _proteinSequence;
 
         private readonly Tolerance _tolerance;
@@ -238,11 +238,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                 if (!spec.IsolationWindow.Contains(mostAbundantIsotopeMz)) continue;
 
-                var feature = new TargetFeature(sequenceMass, charge, spec.ScanNum);
+                //var feature = new TargetFeature(sequenceMass, charge, spec.ScanNum);
                 
                 if (_featureFinder != null)
                 {
-                    var ms1Corr = _featureFinder.GetMs1EvidenceScore(feature);
+                    var ms1Corr = _featureFinder.GetMs1EvidenceScore(sequenceMass, charge, spec.ScanNum);
                     if (ms1Corr < Ms1CorrThreshold) continue;
                 }
 

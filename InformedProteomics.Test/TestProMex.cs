@@ -8,8 +8,8 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Quantification;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
@@ -21,7 +21,7 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
-
+        /*
         [Test]
         public void CollectTrainingSet()
         {
@@ -85,49 +85,7 @@ namespace InformedProteomics.Test
                 writer.Close();
             }
         }
-        
-        [Test]
-        public void TestQuantTopDownData()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            const string rawFile = @"D:\Test\Quant\spike_in\raw\CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ.pbf";
-            if (!File.Exists(rawFile))
-            {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
-            }
-
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
-
-            //var target = new TargetFeature(8445.573787, 9, 3084);
-            var target = new TargetFeature(5588.966676, 7, 3442);
-            
-            var quantAnalyzer = new TargetMs1FeatureMatrix(run);
-
-            var ms1Feature = quantAnalyzer.FindMs1Feature(target);
-
-            Console.WriteLine("{0}-{1}", ms1Feature.MinCharge, ms1Feature.MaxCharge);
-            Console.WriteLine("{0}-{1}", ms1Feature.MinScanNum, ms1Feature.MaxScanNum);
-            Console.WriteLine("{0}", ms1Feature.Abundance);
-
-        }
-        
-        [Test]
-        public void TestQuantBottomUpData()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            for (var m = 500; m < 5000; m += 100)
-            {
-                var theoreticalEnvelope = new IsotopeList(m, 30, 0.1);    
-
-                Console.WriteLine("{0}\t{1}", m, theoreticalEnvelope.Count);
-            }
-            
-        }
+       */ 
 
         [Test]
         public void TestMs1EvidenceScore()
@@ -151,7 +109,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
             var tsvParser = new TsvFileParser(TestResultFile);
-            var featureFinder = new TargetMs1FeatureMatrix(run);
+            var featureFinder = new LcMsPeakMatrix(run);
 
             for (var i = 0; i < tsvParser.NumData; i++)
             {
@@ -160,9 +118,8 @@ namespace InformedProteomics.Test
                 var mass = double.Parse(tsvParser.GetData("Mass")[i]);
                 var qvalue = double.Parse(tsvParser.GetData("QValue")[i]);
 
-                var targetFeature = new TargetFeature(mass, charge, scan);
-                
-                var score = featureFinder.GetMs1EvidenceScore(targetFeature);
+                //var targetFeature = new TargetFeature(mass, charge, scan);
+                var score = featureFinder.GetMs1EvidenceScore(mass, scan, charge);
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", scan, mass, charge, qvalue, score);
             }   
         }
@@ -291,165 +248,6 @@ namespace InformedProteomics.Test
 
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
             Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
-        }
-
-
-        [Test]
-        public void TestAlignProMexResults()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
-            if (!Directory.Exists(featureDir))
-            {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
-                return;
-            }
-
-            var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
-
-            var fileEntries = Directory.GetFiles(featureDir);
-
-            var dataset = new List<string>();
-            foreach (string fileName in fileEntries)
-            {
-                if (fileName.EndsWith("ms1ft"))
-                {
-                    dataset.Add(Path.GetFileNameWithoutExtension(fileName));
-                }
-            }
-            dataset.Sort();
-
-            var minDatasetIndex = 0;
-            var maxDatasetIndex = dataset.Count - 1;
-
-            var rawFiles = new List<string>();
-            var ms1ftFiles = new List<string>();
-
-            for (var i = minDatasetIndex; i <= maxDatasetIndex; i++)
-            {
-                var rawFile = string.Format(@"{0}\{1}.pbf", rawDir, dataset[i]);
-                var ms1File = string.Format(@"{0}\{1}.ms1ft", featureDir, dataset[i]);
-
-                if (!File.Exists(rawFile))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
-                    continue;
-                }
-
-                if (!File.Exists(ms1File))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
-                    continue;
-                }
-
-                rawFiles.Add(rawFile);
-                ms1ftFiles.Add(ms1File);
-
-                Console.WriteLine(dataset[i]);
-            }
-
-            if (rawFiles.Count == 0)
-            {
-                Console.WriteLine(@"Warning: No files were found in method {0}", methodName);
-                return;
-            }
-
-            var align = new Ms1FeatureAlign(ms1ftFiles, rawFiles);
-            var alignedFeatureList = align.GroupFeatures();
-
-            Console.WriteLine("{0} alignments ",alignedFeatureList.Count);
-            
-            var writer = new StreamWriter(outFile);
-            writer.Write("MonoMass\tMinNet\tMaxNet");
-            for (var i = minDatasetIndex; i <= maxDatasetIndex; i++) writer.Write("\t{0}", i);
-            for (var i = minDatasetIndex; i <= maxDatasetIndex; i++) writer.Write("\t{0}_minScan", i);
-            for (var i = minDatasetIndex; i <= maxDatasetIndex; i++) writer.Write("\t{0}_maxScan", i);
-
-            writer.Write("\n");
-
-            foreach(var featureSet in alignedFeatureList)
-            {
-                writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", featureSet[0].RepresentativeMass, featureSet[0].MinNet, featureSet[0].MaxNet);
-
-                var features = new Ms1Feature[dataset.Count];
-                foreach (var f in featureSet) features[f.DataSetId] = f;
-
-                
-                var sb = new StringBuilder();
-                for (var j = minDatasetIndex; j <= maxDatasetIndex; j++)
-                {
-                    var feature = features[j];
-                    writer.Write("\t");
-                    writer.Write(feature != null ? feature.Abundance : 0d);
-                }
-
-                for (var j = minDatasetIndex; j <= maxDatasetIndex; j++)
-                {
-                    var feature = features[j];
-                    writer.Write("\t");
-                    if (feature != null) writer.Write(feature.MinScanNum);
-                    else writer.Write("");
-                }
-
-                for (var j = minDatasetIndex; j <= maxDatasetIndex; j++)
-                {
-                    var feature = features[j];
-                    writer.Write("\t");
-                    if (feature != null) writer.Write(feature.MaxScanNum);
-                    else writer.Write("");
-                }
-
-                writer.Write("\n");
-            }
-            writer.Close();
-        }
-
-        [Test]
-        public void ProMexDebug()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            for (var mass = 500; mass < 100000; mass += 500)
-            {
-                var isotopes = new IsotopeList(mass, 0.01d);
-                //var isotopes = new IsotopeList(mass, 1000, 0.1);
-
-                Console.Write(mass);
-                Console.Write("\t");
-                Console.Write(isotopes.Count);
-                Console.Write("\t");
-
-                //for (var charge = 2; charge <= 60; charge++)
-                //{
-                var charge = 10;
-
-
-                var minMz = Ion.GetIsotopeMz(mass, charge, isotopes.First().Index);
-                var maxMz = Ion.GetIsotopeMz(mass, charge, isotopes.Last().Index);
-                var ppm = ((maxMz - minMz) / minMz) * 1e6;
-
-                Console.Write(isotopes.First().Index);
-                Console.Write("\t");
-                Console.Write(isotopes.Last().Index);
-                Console.Write("\t");
-                Console.Write(minMz);
-                Console.Write("\t");
-                Console.Write(maxMz);
-                Console.Write("\t");
-                Console.Write(ppm);
-                Console.Write("\t");
-                //}
-
-
-                //foreach(var p in isotopes.EnvelopePdf) Console.Write("{0}\t", p);
-
-                Console.Write("\n");
-            }
-
         }
 
     }

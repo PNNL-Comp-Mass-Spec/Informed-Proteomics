@@ -8,6 +8,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
+using pwiz.CLI.msdata;
 
 
 namespace InformedProteomics.Backend.MassFeature
@@ -91,8 +92,8 @@ namespace InformedProteomics.Backend.MassFeature
             maxCol = range.Item4;
 
             // 3) collect envelopes
-          
-            var feature = CollectLcMsPeaks(minRow, maxRow, minCol, maxCol);
+
+            var feature = CollectLcMsPeaks(targetMass, minRow, maxRow, minCol, maxCol);
 
             if (feature == null) return null;
 
@@ -162,6 +163,66 @@ namespace InformedProteomics.Backend.MassFeature
             feature.AbundanceForBestCharges = abundance;
 
             return feature;
+        }
+
+        public double GetMs1EvidenceScore(double targetMass, int scanNum, int charge)
+        {
+            SetTargetMass(targetMass);
+            //BuildFeatureMatrix(targetMass); 
+
+            var totalElutionTime = Run.GetElutionTime(Run.MaxLcScan);
+            var elutionTime = Run.GetElutionTime(scanNum);
+            //var charge = targetFeature.Charge;
+            var ms1ScanNums = Run.GetMs1ScanVector();
+
+            var minElutionTime = elutionTime - totalElutionTime * 0.003;
+            var maxElutionTime = elutionTime + totalElutionTime * 0.003;
+
+            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
+            if (ms1ScanIndex < 0) ms1ScanIndex = ~ms1ScanIndex; // next Ms1 scan num
+
+            var bcDistances = new List<double>();
+            var correlations = new List<double>();
+            //var enelopes = new List<ObservedEnvelope>();
+            var maxSearchScans = (int)Math.Max(ms1ScanNums.Length - ms1ScanIndex + 1, ms1ScanIndex);
+
+            for (var i = 0; i <= maxSearchScans; i++)
+            {
+                for (var j = 0; j < 2; j++)
+                {
+                    if (i == 0 && j > 0) continue;
+
+                    var col = (j < 1) ? ms1ScanIndex + i : ms1ScanIndex - i;
+                    if (col >= ms1ScanNums.Length || col < 0) continue;
+                    if (Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime) continue;
+
+                    var ms1Spec = Ms1Spectra[col];
+                    var observedPeaks = ms1Spec.GetAllIsotopePeaks(targetMass, charge, _theoreticalEnvelope, new Tolerance(5));
+
+                    //if (observedPeaks.Count(p => p != null) < 3) continue;
+                    //var bcDist = obsEnv.GetBhattacharyyaDistance(TheoreticalEnvelope.EnvelopePdf);
+                    //var corrCoeff = obsEnv.GetPearsonCorrelation(TheoreticalEnvelope.Envelope);
+
+                    var bcDist = _theoreticalEnvelope.GetBhattacharyyaDistance(observedPeaks);
+                    var corrCoeff = _theoreticalEnvelope.GetPearsonCorrelation(observedPeaks);
+
+                    if (bcDist < 0.1)
+                    {
+                        return 1 - bcDist;
+                    }
+                    if (corrCoeff > 0.7)
+                    {
+                        return corrCoeff;
+                    }
+
+                    bcDistances.Add(bcDist);
+                    correlations.Add(corrCoeff);
+                    //enelopes.Add(obsEnv);
+                }
+            }
+
+            if (bcDistances.Count < 1) return 0d;
+            return correlations.Max();
         }
 
         public LcMsRun Run;
@@ -603,7 +664,7 @@ namespace InformedProteomics.Backend.MassFeature
             return new Tuple<double, double>(distCutoff, corrCutoff);
         }
         
-        private LcMsPeakCluster CollectLcMsPeaks(int minRow, int maxRow, int minCol, int maxCol)
+        private LcMsPeakCluster CollectLcMsPeaks(double targetMass, int minRow, int maxRow, int minCol, int maxCol)
         {
             var ms1ScanNums = Run.GetMs1ScanVector();
             var envelopes = new List<ObservedIsotopeEnvelope>();
@@ -612,10 +673,10 @@ namespace InformedProteomics.Backend.MassFeature
             var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
             var bcCutoff = GetSeedBcDistThreshold();
             var corrCutoff = GetSeedCorrThreshold();
-            //var simCutoff = GetDistanceCorrelationThreshold(minRow, maxRow, minCol, maxCol);
-            //var bcCutoff = Math.Max(0.04, simCutoff.Item1);
-            //var corrCutoff = Math.Min(0.7, simCutoff.Item2);
 
+            var tolerance = new Tolerance(5);
+            var massTol = tolerance.GetToleranceAsTh(targetMass);
+            
             for (var i = minRow; i <= maxRow; i++)
             {
                 for (var j = minCol; j <= maxCol; j++)
@@ -623,6 +684,8 @@ namespace InformedProteomics.Backend.MassFeature
                     if (!_featureMatrix[i][j].Exist) continue;
 
                     if (_featureMatrix[i][j].DivergenceDist > bcCutoff && _featureMatrix[i][j].CorrelationCoeff < corrCutoff) continue; // exclude outliers
+                    
+                    if (Math.Abs(_featureMatrix[i][j].AccurateMass - targetMass) > massTol) continue;
 
                     var envelope = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass, i + MinScanCharge, ms1ScanNums[j], _featureMatrix[i][j].EnvelopePeaks, _theoreticalEnvelope);
                     envelopes.Add(envelope);
