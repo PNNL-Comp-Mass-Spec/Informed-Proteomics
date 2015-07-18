@@ -233,7 +233,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -265,7 +265,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //    const int numMissedCleavages = 1;
         //    var enzyme = Enzyme.Trypsin;
 
-        //    const string dbFilePath = @"\\protoapps\UserData\Sangtae\TestData\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+        //    const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
         //    var targetDb = new FastaDatabase(dbFilePath);
 
         //    var indexedDbTarget = new IndexedDatabase(targetDb);
@@ -318,7 +318,7 @@ namespace InformedProteomics.Test.FunctionalTests
         //    var sw = new System.Diagnostics.Stopwatch();
         //    sw.Start();
 
-        //    const string dbFile = @"\\protoapps\UserData\Sangtae\TestData\BSA.fasta";
+        //    const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\BSA.fasta";
         //    var db = new FastaDatabase(dbFile);
         //    db.Decoy(Enzyme.Trypsin);
         //    sw.Stop();

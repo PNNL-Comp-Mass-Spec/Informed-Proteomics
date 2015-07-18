@@ -191,7 +191,7 @@ namespace InformedProteomics.Test
                 return;
             }
 
-            const string outFolderPath = @"\\protoapps\UserData\Sangtae\TestData\Output";
+            const string outFolderPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
             if (!Directory.Exists(outFolderPath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, outFolderPath);

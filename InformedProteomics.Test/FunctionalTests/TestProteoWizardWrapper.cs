@@ -8,7 +8,7 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     internal class TestProteoWizardWrapper
     {
-        public const string TestRawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
 
         [Test]
         public void TestLoadingProteoWizardWrapper()

@@ -18,10 +18,10 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
-            var mspDir = @"\\protoapps\UserData\Sangtae\TestData\Output\MSP";
-            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
-            var resultFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_ids.tsv";
+            var featureDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
+            var mspDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\MSP";
+            var outFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_features.tsv";
+            var resultFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_ids.tsv";
 
             if (!Directory.Exists(featureDir))
             {
@@ -149,9 +149,9 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
+            var featureDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
             //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            //var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
+            //var outFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_features.tsv";
             var dmsDir = @"\\proto-4\VOrbiETD02\2015_2";
 
             if (!Directory.Exists(featureDir))

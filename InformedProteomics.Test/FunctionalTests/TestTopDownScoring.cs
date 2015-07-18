@@ -166,7 +166,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 return;
             }
 
-            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SBEP_STM_001_02272012_Aragon.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(specFilePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
@@ -224,7 +224,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const int ms2ScanNum = 4658;
             var sequence = new Sequence("GYSIKDIIYQGEKSGVHNWQTLSGQNFYWHPDWLHIAEDLTGHKATASIQAEGTKATQNEAEQTIVKHLNKS", new AminoAcidSet());
 
-            const string specFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 
             if (!File.Exists(specFilePath))
@@ -253,7 +253,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\protoapps\UserData\Sangtae\TestData\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
 
             if (!File.Exists(rawFilePath))
             {

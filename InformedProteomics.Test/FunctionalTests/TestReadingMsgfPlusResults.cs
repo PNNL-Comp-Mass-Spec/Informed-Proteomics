@@ -18,7 +18,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
            
-            const string filePath = @"\\protoapps\UserData\Sangtae\TestData\MSGFPlusResultTMT10.tsv";
+            const string filePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSGFPlusResultTMT10.tsv";
             if (!File.Exists(filePath))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
