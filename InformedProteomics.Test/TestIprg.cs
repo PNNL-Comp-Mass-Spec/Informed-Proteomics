@@ -24,7 +24,7 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string resultFile = @"H:\Research\IPRG2015\Submissions\Submission_32080.xlsx";
+            //const string resultFile = @"H:\Research\IPRG2015\Submissions\Submission_32080.xlsx";
 
         }
 
@@ -460,7 +460,7 @@ namespace InformedProteomics.Test
             var names = new[] { "ENO1_YEAST", "ADH1_YEAST", "CYC_BOVIN", "ALBU_BOVIN" };
             var accessions = new[] { "P00924", "P00330", "P62894", "P02769" };
 
-            const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.revCat.fasta";
+            //const string databaseFilePath = dir + @"\database\E_coli_K12_uniprot_reviewed_2013-01-31.revCat.fasta";
             const string resultDir = dir + @"\10ppm_TI0_NTT1";
             if (!Directory.Exists(resultDir))
             {

@@ -28,8 +28,8 @@ namespace InformedProteomics.Test.Obsolete
             const int numNTermCleavages = 1;  // 30
             const int minLength = 7;
             const int maxLength = 1000;
-            const int minCharge = 5; // 3
-            const int maxCharge = 15; // 67
+            //const int minCharge = 5; // 3
+            //const int maxCharge = 15; // 67
             const int numMaxModsPerProtein = 0; // 6
             var precursorTolerance = new Tolerance(10);
             const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.fasta";
@@ -74,7 +74,7 @@ namespace InformedProteomics.Test.Obsolete
 
             var numProteins = 0;
             long totalProtCompositions = 0;
-            long numXics = 0;
+            //long numXics = 0;
             TopDownScorer.MaxCharge = 25;
             TopDownScorer.MinCharge = 8;
 

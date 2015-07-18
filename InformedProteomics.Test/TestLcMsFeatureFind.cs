@@ -23,7 +23,7 @@ namespace InformedProteomics.Test
             for (var m = 1000; m < 30000; m += 1000)
             {
                 var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
-                var n = 2; //Math.Ceiling(TheoreticalEnvelope.Size*0.5);
+                //var n = 2; //Math.Ceiling(TheoreticalEnvelope.Size*0.5);
 
                 var j = 0;
                 for (var i = 0; i < TheoreticalEnvelope.IndexOrderByRanking.Length; i++)
@@ -53,7 +53,7 @@ namespace InformedProteomics.Test
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
 
-            var scoreDataPath = @"D:\MassSpecFiles\training";
+            //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
 
             var stopwatch = Stopwatch.StartNew();

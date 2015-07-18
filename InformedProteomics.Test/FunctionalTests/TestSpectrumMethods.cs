@@ -27,7 +27,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 return;
             }
             
-            const int scanNum = 17338;
+            //const int scanNum = 17338;
             const double relativeIntensity = 0.1;
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
             var spec = run.GetSpectrum(17338);

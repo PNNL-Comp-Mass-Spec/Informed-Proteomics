@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     spec = ReadMassSpectrum(scanNum);
                 }
-                catch (System.Runtime.InteropServices.COMException ex)
+                catch (System.Runtime.InteropServices.COMException/* ex*/)
                 {
                     Console.WriteLine("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
                 }

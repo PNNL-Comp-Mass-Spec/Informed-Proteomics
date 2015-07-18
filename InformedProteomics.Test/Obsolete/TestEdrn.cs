@@ -29,10 +29,10 @@ namespace InformedProteomics.Test.Obsolete
             const string dir = @"H:\Research\EDRN\Ic\DIA_Replicate";
 
             const string rep1 = dir + @"\EDRN_Serum_07_DIA_1_01_13Nov13_Samwise_13-07-28_IcTda.tsv";
-            const string rep2 = dir + @"\EDRN_Serum_07_DIA_1_02_13Nov13_Samwise_13-07-28_IcTda.tsv";
-            const string rep3 = dir + @"\EDRN_Serum_07_DIA_1_03_13Nov13_Samwise_13-07-28_IcTda.tsv";
+            //const string rep2 = dir + @"\EDRN_Serum_07_DIA_1_02_13Nov13_Samwise_13-07-28_IcTda.tsv";
+            //const string rep3 = dir + @"\EDRN_Serum_07_DIA_1_03_13Nov13_Samwise_13-07-28_IcTda.tsv";
             const string rep4 = dir + @"\EDRN_Serum_07_DIA_1_04_13Nov13_Samwise_13-07-28_IcTda.tsv";
-            const string rep5 = dir + @"\EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28_IcTda.tsv";
+            //const string rep5 = dir + @"\EDRN_Serum_07_DIA_1_05_18Nov13_Samwise_13-07-28_IcTda.tsv";
 
             const string resultPath1 = rep1;
             const string resultPath2 = rep4;

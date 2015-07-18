@@ -103,10 +103,10 @@ namespace InformedProteomics.Test
                 return;
             }
 
-            const string seqStr = "IAHESDDEKGHAAK";
-            var composition = Composition.Parse("C(62) H(98) N(20) O(24) S(0)");
-            const int charge = 4;
-            const int ms2ScanNum = 12901;
+            //const string seqStr = "IAHESDDEKGHAAK";
+            //var composition = Composition.Parse("C(62) H(98) N(20) O(24) S(0)");
+            //const int charge = 4;
+            //const int ms2ScanNum = 12901;
 
             var aaSet = new AminoAcidSet();
 

@@ -266,19 +266,19 @@ namespace InformedProteomics.Test.Obsolete
             TestUtils.ShowStarting(methodName);
 
             // Fusion
-            const string fusionMsgfResult = @"D:\Research\Data\UW\Fusion\MSGFPlusResults\TI2.tsv";
+            //const string fusionMsgfResult = @"D:\Research\Data\UW\Fusion\MSGFPlusResults\TI2.tsv";
             const string fusionDdaResult = @"D:\Research\Data\UW\Fusion\DDA_Summary.tsv";
-            const string fusionDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
+            //const string fusionDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
 
             // Q-Exactive
-            const string qeDdaMsGfResult = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.tsv";
-            const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
-            const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
+            //const string qeDdaMsGfResult = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.tsv";
+            //const string qeDdaResult = @"D:\Research\Data\UW\QExactive\DDA_All_Summary.tsv";
+            //const string qeDiaResult = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
             // PE-MMR
-            const string pemmrQeDia = @"D:\Research\Data\UW\PEMMR\QE\allFDR.tsv";
+            //const string pemmrQeDia = @"D:\Research\Data\UW\PEMMR\QE\allFDR.tsv";
             const string pemmrFusionDda = @"D:\Research\Data\UW\PEMMR\Fusion\WT_D_DDA_130412065618_MX_PEMMR.tsv";
-            const string pemmrFusionDia = @"D:\Research\Data\UW\PEMMR\Fusion\WT_D_DIA_130412091220_MX_PEMMR.tsv";
+            //const string pemmrFusionDia = @"D:\Research\Data\UW\PEMMR\Fusion\WT_D_DIA_130412091220_MX_PEMMR.tsv";
 
             const string resultPath1 = pemmrFusionDda;
             const string resultPath2 = fusionDdaResult;
@@ -320,10 +320,10 @@ namespace InformedProteomics.Test.Obsolete
             TestUtils.ShowStarting(methodName);
 
             // No PE-MMR
-            const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
+            //const string noPeMmr = @"D:\Research\Data\PEMMR\iTRAQ_N33T34_10ug_100cm_300min_C2_061213.tsv";
 
             // PE-MMR Scan based FDR
-            const string scanBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_ScanFDR.tsv";
+            //const string scanBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_ScanFDR.tsv";
 
             // UMC based FDR
             const string umcBasedPeMmr = @"D:\Research\Data\PEMMR\NewSpectra\iTRAQ_N33T34_10ug_100cm_300min_C2_061213_MX_PEMMR_UMCID_UMCFDR.tsv";
@@ -525,8 +525,8 @@ namespace InformedProteomics.Test.Obsolete
             // Parameters
             const double relativeIntensityThreshold = 0.7;
             const double precursorTolerancePpm = 20;
-            const double isotopeRatioTolerance = 2;
-            const double correlationThreshold = 0.3;
+            //const double isotopeRatioTolerance = 2;
+            //const double correlationThreshold = 0.3;
             const double fdrThreshold = 0.01;
 
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
@@ -631,7 +631,7 @@ namespace InformedProteomics.Test.Obsolete
             TestUtils.ShowStarting(methodName);
 
             // Parameters
-            const double relativeIntensityThreshold = 0.7;
+            //const double relativeIntensityThreshold = 0.7;
             const double precursorTolerancePpm = 20;
 
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";

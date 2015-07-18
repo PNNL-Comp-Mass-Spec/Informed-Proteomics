@@ -242,5 +242,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

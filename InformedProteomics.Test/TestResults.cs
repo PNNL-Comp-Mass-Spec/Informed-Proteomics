@@ -123,8 +123,8 @@ namespace InformedProteomics.Test
             // DIA
             const string dir = @"H:\Research\DDAPlus\NTT2";
 
-            const string dda1 = dir + @"\20140701_yeast_DDA_01_IcTda.tsv";
-            const string dda2 = dir + @"\20140701_yeast_DDA_02_2_IcTda.tsv";
+            //const string dda1 = dir + @"\20140701_yeast_DDA_01_IcTda.tsv";
+            //const string dda2 = dir + @"\20140701_yeast_DDA_02_2_IcTda.tsv";
             const string ddaPlus1 = dir + @"\20140701_yeast_DDAp_binCharge_01_IcTda.tsv";
             const string ddaPlus2 = dir + @"\20140701_yeast_DDAp_binCharge_02_IcTda.tsv";
 

@@ -326,7 +326,7 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             var sw = new System.Diagnostics.Stopwatch();
-            double sec;
+            //double sec;
 
             // method 1
             sw.Start();

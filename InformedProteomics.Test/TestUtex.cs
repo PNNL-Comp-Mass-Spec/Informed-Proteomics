@@ -150,8 +150,8 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             var featureDir = @"\\protoapps\UserData\Sangtae\TestData\Output";
-            var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
+            //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
+            //var outFile = @"\\protoapps\UserData\Sangtae\TestData\Output\aligned_features.tsv";
             var dmsDir = @"\\proto-4\VOrbiETD02\2015_2";
 
             if (!Directory.Exists(featureDir))

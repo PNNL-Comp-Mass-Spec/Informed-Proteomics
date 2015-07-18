@@ -51,22 +51,22 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 myAssembly = Assembly.LoadFrom(strTempAssmbPath);
             }
-            catch (BadImageFormatException ex)
+            catch (BadImageFormatException)
             {
                 Console.WriteLine("Incompatible Assembly: \"" + strTempAssmbPath + "\"");
                 throw;
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("Assembly not found: \"" + strTempAssmbPath + "\"");
                 throw;
             }
-            catch (FileLoadException ex)
+            catch (FileLoadException)
             {
                 Console.WriteLine("Invalid Assembly: \"" + strTempAssmbPath + "\". The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.");
                 throw;
             }
-            catch (SecurityException ex)
+            catch (SecurityException)
             {
                 Console.WriteLine("Assembly access denied: \"" + strTempAssmbPath + "\"");
                 throw;

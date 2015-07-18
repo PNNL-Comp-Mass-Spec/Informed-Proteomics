@@ -221,7 +221,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         return true;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -241,7 +241,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
