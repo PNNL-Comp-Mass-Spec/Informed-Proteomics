@@ -121,6 +121,7 @@
     <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
     <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FunctionalTests\TestMassSpecDataReaderFactory.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestFastProteinId.cs" />
     <Compile Include="TestFeatureBasedSearch.cs" />

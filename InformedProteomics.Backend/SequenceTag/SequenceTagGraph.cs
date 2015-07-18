@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
-using System.Windows.Forms;
 
 namespace InformedProteomics.Backend.SequenceTag
 {

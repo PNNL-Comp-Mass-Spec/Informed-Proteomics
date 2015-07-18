@@ -22,25 +22,9 @@ namespace InformedProteomics.Backend.MassSpecData
             Console.WriteLine("Searching for ProteoWizard files...");
             // https://support.microsoft.com/en-us/kb/837908
             //This handler is called only when the common language runtime tries to bind to the assembly and fails.
-            string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
-            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
+            if (string.IsNullOrWhiteSpace(PwizPath))
             {
-                pwizPath = @"C:\DMS_Programs\ProteoWizard";
-            }
-            if (string.IsNullOrWhiteSpace(pwizPath))
-            {
-                var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-                if (string.IsNullOrWhiteSpace(progFiles))
-                {
-                    return null;
-                }
-                var progPwiz = Path.Combine(progFiles, "ProteoWizard");
-                if (!Directory.Exists(progPwiz))
-                {
-                    return null;
-                }
-                var posPaths = Directory.GetDirectories(progPwiz, "ProteoWizard *");
-                pwizPath = posPaths.Max(); // Try to get the "newest" folder
+                return null;
             }
 
             //Retrieve the list of referenced assemblies in an array of AssemblyName.
@@ -56,11 +40,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
                     //Build the path of the assembly from where it has to be loaded.                
-                    strTempAssmbPath = Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll");
+                    strTempAssmbPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll");
                     break;
                 }
             }
-
+            Console.WriteLine("Loading file \"" + strTempAssmbPath + "\"");
             //Load the assembly from the specified path.  
             Assembly myAssembly = null;
             try
@@ -90,6 +74,47 @@ namespace InformedProteomics.Backend.MassSpecData
 
             //Return the loaded assembly.
             return myAssembly;
+        }
+
+        /// <summary>
+        /// The path to the most recent 64-bit ProteoWizard install
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
+        /// </summary>
+        public static readonly string PwizPath;
+
+        /// <summary>
+        /// Finds the path to the most recent 64-bit ProteoWizard install
+        /// PwizPath is populated from this, but only causes a single search.
+        /// </summary>
+        /// <returns></returns>
+        public static string FindPwizPath()
+        {
+            string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
+            {
+                pwizPath = @"C:\DMS_Programs\ProteoWizard";
+            }
+            if (string.IsNullOrWhiteSpace(pwizPath))
+            {
+                var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
+                if (string.IsNullOrWhiteSpace(progFiles))
+                {
+                    return null;
+                }
+                var progPwiz = Path.Combine(progFiles, "ProteoWizard");
+                if (!Directory.Exists(progPwiz))
+                {
+                    return null;
+                }
+                var posPaths = Directory.GetDirectories(progPwiz, "ProteoWizard *");
+                pwizPath = posPaths.Max(); // Try to get the "newest" folder
+            }
+            return pwizPath;
+        }
+
+        static ProteoWizardReader()
+        {
+            PwizPath = FindPwizPath();
         }
 
         /// <summary>

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class MassSpecDataReaderFactory
+    public static class MassSpecDataReaderFactory
     {
         /// <summary>
         /// Gets the appropriate IMassSpecDataReader for the supplied path.
@@ -31,8 +32,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader = new PbfLcMsRun(filePath);
                     break;
                 case MassSpecDataType.Unknown:
-                    AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
-                    reader = new ProteoWizardReader(filePath);
+                    if (_pwizAvailable)
+                    {
+                        AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
+                        reader = new ProteoWizardReader(filePath);
+                    }
                     break;
             }
 
@@ -54,11 +58,12 @@ namespace InformedProteomics.Backend.MassSpecData
                 lower = lower.Remove(lower.Length - 1);
             }
 
-            if (lower.EndsWith(".raw"))
+            if (_thermoRawAvailable && lower.EndsWith(".raw") && !Directory.Exists(filePath))
             {
                 return MassSpecDataType.XCaliburRun;
             }
-            if (lower.EndsWith(".mzml") || lower.EndsWith(".mzml.gz"))
+            // If it is an mzML file that is gzipped, use the ProteoWizardReader, since it does random access without extracting.
+            if (lower.EndsWith(".mzml") || (lower.EndsWith(".mzml.gz") && !_pwizAvailable))
             {
                 return MassSpecDataType.MzMLFile;
             }
@@ -78,18 +83,15 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC001.DAT;*.lcd;*.pbf"
-                       + "|Thermo .RAW|*.raw"
-                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                       + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
-                       + "|MGF[.gz]|*.mgf;*.mgf.gz"
-                       + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
-                       + "|AB Sciex .wiff|*.wiff"
-                       + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
-                       + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC001.DAT"
-                       + "|Shimadzu lcd|*.lcd"
-                       + "|PBF|*.pbf"
-                    ;
+                if (_pwizAvailable)
+                {
+                    return FilterStringAll;
+                }
+                if (_thermoRawAvailable)
+                {
+                    return FilterStringBuiltIn;
+                }
+                return FilterStringNoExternalDll;
             }
         }
 
@@ -101,9 +103,17 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                var internalSupported = new List<string>() {".raw", ".mzml", ".mzml.gz", ".pbf"};
-                var pwizSupported = ProteoWizardReader.SupportedFilesFilterList;
-                return internalSupported.Concat(pwizSupported.Where(ext => !internalSupported.Contains(ext))).ToList();
+                var internalSupported = new List<string>() {".mzml", ".mzml.gz", ".pbf"};
+                if (_thermoRawAvailable)
+                {
+                    internalSupported.Add(".raw");
+                }
+                if (_pwizAvailable)
+                {
+                    var pwizSupported = ProteoWizardReader.SupportedFilesFilterList;
+                    internalSupported = internalSupported.Concat(pwizSupported.Where(ext => !internalSupported.Contains(ext))).ToList();
+                }
+                return internalSupported;
             }
         }
 
@@ -184,6 +194,101 @@ namespace InformedProteomics.Backend.MassSpecData
         public static string RemoveExtension(string filePath)
         {
             return ChangeExtension(filePath, null);
+        }
+
+        static MassSpecDataReaderFactory()
+        {
+            _pwizAvailable = IsPwizAvailable();
+            _thermoRawAvailable = IsThermoRawAvailable();
+        }
+
+        private static readonly bool _pwizAvailable;
+        private static readonly bool _thermoRawAvailable;
+
+        public static bool IsPwizAvailable()
+        {
+            // TODO: Test this on a system without ProteoWizard installed...
+            // Also, modify test to actually try loading the pwiz_bindings_cli
+            var pwizPath = ProteoWizardReader.PwizPath;
+            if (!string.IsNullOrWhiteSpace(pwizPath))
+            {
+                var pwizBindingsCLI = Path.Combine(pwizPath, "pwiz_bindings_cli.dll");
+                try
+                {
+                    var pwizCLI = Assembly.LoadFrom(pwizBindingsCLI);
+                    if (pwizCLI != null)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public static bool IsThermoRawAvailable()
+        {
+            try
+            {
+                //Assembly.Load("Interop.MSFileReaderLib"); // by name; is a COM library
+                //var type = Type.GetTypeFromCLSID(new Guid("{F0C5F3E3-4F2A-443E-A74D-0AABE3237494}"), true); // always returns a com object
+                var type = Type.GetTypeFromProgID("MSFileReader.XRawfile"); // Returns null if exact name isn't found.
+                if (type != null)
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return false;
+        }
+
+        private static string FilterStringAll
+        {
+            get
+            {
+                // differs from ProteoWizardReader filter string by the *.pbf extension
+                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.pbf"
+                       + "|Thermo .RAW|*.raw"
+                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                       + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
+                       + "|MGF[.gz]|*.mgf;*.mgf.gz"
+                       + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
+                       + "|AB Sciex .wiff|*.wiff"
+                       + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
+                       + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
+                       + "|Shimadzu lcd|*.lcd"
+                       + "|PBF|*.pbf"
+                    ;
+            }
+        }
+
+        private static string FilterStringBuiltIn
+        {
+            get
+            {
+                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.pbf"
+                       + "|Thermo .RAW|*.raw"
+                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                       + "|PBF|*.pbf"
+                    ;
+            }
+        }
+
+        private static string FilterStringNoExternalDll
+        {
+            get
+            {
+                return "All Supported|*.mzML;*.mzML.gz;*.pbf"
+                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                       + "|PBF|*.pbf"
+                    ;
+            }
         }
     }
 }
