@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using InformedProteomics.Backend.MassFeature;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
+using System.Threading.Tasks;
 
 namespace InformedProteomics.TopDown.Execution
 {
-    public class Ms1FeatureFinderLauncher
+    public class SeqTagGenerateLauncher
     {
-        public Ms1FeatureFinderLauncher(Ms1FeatureFinderInputParameter parameters = null)
-        {
-            Parameters = parameters ?? new Ms1FeatureFinderInputParameter();
-        }
-
+        
+        /*
         public void Run()
         {
             //var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -31,7 +25,7 @@ namespace InformedProteomics.TopDown.Execution
 
             // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
             Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
-            
+
             var attr = File.GetAttributes(Parameters.InputPath);
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
@@ -79,17 +73,7 @@ namespace InformedProteomics.TopDown.Execution
             //if (File.Exists(pbfFilePath)) return false;
 
             return types.Any(ext => specFilePath.ToLower().EndsWith(ext));
-            /*
-            Console.WriteLine("--------------");
-            Console.WriteLine(specFilePath);
-            Console.WriteLine(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any(x => x == true));
-            foreach (var x in types.Select(ext => specFilePath.ToLower().EndsWith(ext)))
-            {
-                Console.WriteLine(x);
-            }
-
-            Console.WriteLine("--------------");
-            */
+         
         }
 
         private bool HasExistingPbfFile(string path)
@@ -101,18 +85,18 @@ namespace InformedProteomics.TopDown.Execution
         {
             return path.EndsWith(".pbf");
         }
-        
+
         public const string FileExtension = "ms1ft";
         public readonly Ms1FeatureFinderInputParameter Parameters;
 
         private void ProcessFile(string rawFile)
         {
             var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(rawFile));
-            
+
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
             var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
-            
+
             if (File.Exists(outTsvFilePath))
             {
                 Console.WriteLine(@"ProMex output already exists: {0}", outTsvFilePath);
@@ -130,7 +114,7 @@ namespace InformedProteomics.TopDown.Execution
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
             var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer);
-            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer);
             var comparer = featureFinder.Comparer;
@@ -145,11 +129,11 @@ namespace InformedProteomics.TopDown.Execution
                 var clusters = featureFinder.FindFeatures(binNum);
                 container.Add(clusters);
 
-                if (binNum > minSearchMassBin && (binNum - minSearchMassBin)%1000 == 0)
+                if (binNum > minSearchMassBin && (binNum - minSearchMassBin) % 1000 == 0)
                 {
-                    var elapsed = (stopwatch.ElapsedMilliseconds)/1000.0d;
+                    var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
-                    var processedPercentage = ((double) processedBins/totalMassBin)*100;
+                    var processedPercentage = ((double)processedBins / totalMassBin) * 100;
                     Console.WriteLine(@"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
@@ -157,7 +141,7 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             Console.WriteLine(@"Complete MS1 feature extraction.");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
@@ -238,17 +222,12 @@ namespace InformedProteomics.TopDown.Execution
             if (Parameters.ScoreReport)
             {
                 sb.AppendFormat("\t{0}", feature.AbundanceForBestCharges);
-
-                sb.AppendFormat("\t{0}", feature.AbundanceTest1);
-                sb.AppendFormat("\t{0}", feature.AbundanceTest2);
-                sb.AppendFormat("\t{0}", feature.AbundanceTest3);
-
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.OddCharge]);
 
                 sb.AppendFormat("\t{0:0.000}", feature.BestCorrelationScoreAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.BestCorrelationScoreAcrossCharge[LcMsPeakCluster.OddCharge]);
-                
+
                 sb.AppendFormat("\t{0:0.000}", feature.BestIntensityScoreAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.BestIntensityScoreAcrossCharge[LcMsPeakCluster.OddCharge]);
 
@@ -281,11 +260,6 @@ namespace InformedProteomics.TopDown.Execution
         private static readonly string[] TsvExtraScoreHeader = new string[]
         {
             "BestChargeAbundance",
-
-            "AbundanceTest1",
-            "AbundanceTest2",
-            "AbundanceTest3",
-
             "BestEvenCharge", "BestOddCharge", 
             "CorrEvenCharge", "CorrOddCharge", 
             "IntensityEvenCharge", "IntensityOddCharge",
@@ -295,5 +269,6 @@ namespace InformedProteomics.TopDown.Execution
             "AbundanceRatioEvenCharge", "AbundanceRatioOddCharge", 
         };
 
+        */
     }
 }

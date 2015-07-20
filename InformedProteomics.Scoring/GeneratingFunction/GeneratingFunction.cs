@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
+
     public class GeneratingFunction
     {
         public GeneratingFunction(IScoringGraph graph)
@@ -9,6 +12,29 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             _graph = graph;
         }
 
+        public void ComputeGeneratingFunction()
+        {
+            throw new NotImplementedException();
+        }
+
+        public double GetSpectralProbability(int score)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public double GetSpectralEValue(int score)
+        {
+            throw new NotImplementedException();
+        }
+
+        private readonly IScoringGraph _graph;
+    }
+
+
+
+
+
+/*
         public double GetSpectralEValue(int score)
         {
             return _scoreDistribution.GetSpectralEValue(score);
@@ -74,5 +100,5 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             }
             return scoringDistribution;
         }
-    }
+*/
 }

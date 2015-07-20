@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.MassFeature
             MaxScanNum = (maxScan > 0) ? maxScan : repScanNum;
             Run = run;
         }
-        
+
         public int DataSetId { get; set; }
         public int FeatureId { get; set; }
         
@@ -37,16 +37,19 @@ namespace InformedProteomics.Backend.MassFeature
 
         public double AbundanceForBestCharges { get; internal set; }
 
+
+        public double AbundanceTest1 { get; internal set; }
+        public double AbundanceTest2 { get; internal set; }
+        public double AbundanceTest3 { get; internal set; }
+
+
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }
         public int RepresentativeCharge { get; protected set; }
         public int RepresentativeScanNum { get; protected set; }
         public double RepresentativeMz { get; protected set; }
 
-        public double MinElutionTime 
-        { 
-            get { return (Run == null) ? 0 : Run.GetElutionTime(MinScanNum); }  
-        }
+        public double MinElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MinScanNum); }  }
         public double MaxElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MaxScanNum); } }
         public double ElutionTime { get { return (Run == null) ? 0 : 0.5 * (MinElutionTime + MaxElutionTime); } }
         public double ElutionLength { get { return (Run == null) ? 0 : MaxElutionTime - MinElutionTime; } }
@@ -69,6 +72,7 @@ namespace InformedProteomics.Backend.MassFeature
             if (other.MinNet - tolNet < MaxNet || MaxNet < other.MaxNet + tolNet) return true;
             return false;
         }
+
         public bool CoElutedByScanNum(LcMsFeature other, int tolScan = 0)
         {
             tolScan++;

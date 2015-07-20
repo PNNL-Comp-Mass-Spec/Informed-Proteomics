@@ -50,9 +50,13 @@ namespace InformedProteomics.Backend.MassFeature
             var repScans = tsvReader.GetData("RepScan");
             var repMzs = tsvReader.GetData("RepMz");
 
+            var abu2 = tsvReader.GetData("BestChargeAbundance");
+
+
             for (var i = 0; i < tsvReader.NumData; i++)
             {
                 var abundance = double.Parse(abu[i]);
+                var abundance2 = (abu2 == null) ? 0 : double.Parse(abu2[i]);
                 var repMass = double.Parse(monoMass[i]);
                 var minCharge = int.Parse(minCharges[i]);
                 var maxCharge = int.Parse(maxCharges[i]);
@@ -68,6 +72,11 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     FeatureId = fid,
                     DataSetId = dataid,
+                    AbundanceForBestCharges = abundance2,
+
+                    AbundanceTest1 =  double.Parse(tsvReader.GetData("AbundanceTest1")[i]),
+                    AbundanceTest2 = double.Parse(tsvReader.GetData("AbundanceTest2")[i]),
+                    AbundanceTest3 = double.Parse(tsvReader.GetData("AbundanceTest3")[i]),
                 };
 
                 featureList.Add(feature);
@@ -88,7 +97,6 @@ namespace InformedProteomics.Backend.MassFeature
             var adjList = new List<int>[features.Count];
 
             for (var i = 0; i < features.Count; i++) adjList[i] = new List<int>();
-
             for (var i = 0; i < features.Count; i++)
             {
                 var fi = features[i];
@@ -107,35 +115,110 @@ namespace InformedProteomics.Backend.MassFeature
 
             var ret = new List<LcMsFeature[]>();
             var components = GetConnectedComponents(adjList);
-
             for (var i = 0; i < components.Count; i++)
             {
                 var component = new HashSet<int>(components[i]);
                 while (component.Count > 0)
                 {
-                    
                     var featureGroup = new LcMsFeature[CountDatasets];
                     var featureSet = GetAlignedFeatures(ref component, adjList);    
-
                     foreach (var f in featureSet) featureGroup[f.DataSetId] = f;
-
                     ret.Add(featureGroup);
                 }
-
             }
 
             return ret;
         }
 
-        private bool Alignable(LcMsFeature f1, LcMsFeature f2)
+
+        private LcMsFeature GetRepresentativeFeature(IList<LcMsFeature> features)
+        {
+            foreach (var f in features)
+            {
+                if (f == null) continue;
+                return f;
+            }
+            return null;
+        }
+
+        public void TryFillMissingFeature(List<LcMsFeature[]> alignedFeatures)
+        {
+            var featureInfoList = new List<LcMsFeature>();
+            foreach (var features in alignedFeatures)
+            {
+                var featureInfo = GetRepresentativeFeature(features);
+                featureInfoList.Add(featureInfo);
+            }
+            
+            for (var i = 0; i < alignedFeatures.Count; i++)
+            {
+                var features = alignedFeatures[i];
+                for (var j = 0; j < features.Length; j++)
+                {
+                    if (features[j] == null)
+                    {
+                        LcMsFeature altFt = null;
+
+                        for (var k = i - 1; altFt == null && k >= 0; k--)
+                        {
+                            if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
+
+                            if (alignedFeatures[k][j] != null && Alignable(featureInfoList[i], alignedFeatures[k][j], true))
+                                altFt = alignedFeatures[k][j];
+                        }
+
+                        for (var k = i + 1; altFt == null && k < alignedFeatures.Count; k++)
+                        {
+                            if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
+                            if (alignedFeatures[k][j] != null && Alignable(featureInfoList[i], alignedFeatures[k][j], true))
+                                altFt = alignedFeatures[k][j];
+                        }
+
+                        if (altFt != null)
+                        {
+                            var newOnew = new LcMsFeature(featureInfoList[i].Mass, altFt.RepresentativeCharge,
+                                altFt.RepresentativeMz, altFt.RepresentativeScanNum,
+                                altFt.Abundance, altFt.MinCharge, altFt.MaxCharge, altFt.MinScanNum, altFt.MaxScanNum,
+                                altFt.Run)
+                            {
+                                AbundanceForBestCharges = altFt.AbundanceForBestCharges,
+                                AbundanceTest1 =  altFt.AbundanceTest1,
+                                AbundanceTest2 =  altFt.AbundanceTest2,
+                                AbundanceTest3 =  altFt.AbundanceTest3,
+                            };
+
+                            alignedFeatures[i][j] = newOnew;
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool Alignable(LcMsFeature f1, LcMsFeature f2, bool oneDaltonShift = false)
         {
             if (f1.DataSetId == f2.DataSetId) return false;
 
-            var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+            if (!oneDaltonShift)
+            {
+                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;                
+            }
+            else
+            {
+                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                var massDiff = Math.Abs(f1.Mass - f2.Mass);
 
-            if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
+                if (f1.Mass > 10000 && f2.Mass > 10000)
+                {
+                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol && Math.Abs(massDiff - 2) > massTol) return false;                                    
+                }
+                else
+                {
+                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol) return false;                                
+                }
+            }
+
             if (f1.CoElutedByNet(f2, 0.001)) return true;
-
             if (NetDiff(f1, f2) < TolNet) return true;
 
             return false;

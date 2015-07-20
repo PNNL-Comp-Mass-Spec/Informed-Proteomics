@@ -20,7 +20,7 @@ namespace InformedProteomics.Test
         public void TestIsotopeCount()
         {
 
-            for (var m = 1000; m < 30000; m += 1000)
+            for (var m = 500; m < 3000; m += 100)
             {
                 var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
                 //var n = 2; //Math.Ceiling(TheoreticalEnvelope.Size*0.5);

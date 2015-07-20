@@ -14,6 +14,55 @@ namespace InformedProteomics.Test
     class TestLcMsFeatureAlignment
     {
         [Test]
+        public void TestCptac10Replicates()
+        {
+            const string ms1ftFolder = @"D:\MassSpecFiles\CPTAC_rep10\abu_test";
+            string outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
+            const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1";
+
+
+            var fileEntries = Directory.GetFiles(ms1ftFolder);
+
+            //var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            //dataset.Sort();
+            var dataset = new List<string>();
+            for (var i = 7; i <= 10; i++)
+            {
+                dataset.Add(string.Format("CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
+            }
+
+            var rawFiles = new List<string>();
+            var ms1FtFiles = new List<string>();
+            
+            foreach (string datasetName in dataset)
+            {
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, datasetName);
+                var ms1File = string.Format(@"{0}\{1}.ms1ft", ms1ftFolder, datasetName);
+
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1File))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    continue;
+                }
+
+                rawFiles.Add(rawFile);
+                ms1FtFiles.Add(ms1File);
+            }
+
+            RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
+
+        }
+
+        
+        
+        
+        [Test]
         public void TestCompRefLcMsFeatureAlign()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -175,6 +224,87 @@ namespace InformedProteomics.Test
             writer.Close();
             
         }
+
+        private void RunFeatureAlignment(List<string> ms1FtFiles, List<string> rawFiles, string outFilePath)
+        {
+
+            var align = new LcMsFeatureAlignment(ms1FtFiles, rawFiles);
+            var alignedFeatureList = align.GroupFeatures();
+
+            align.TryFillMissingFeature(alignedFeatureList);
+
+            Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
+
+            //QuantifyAgain(ref align);
+
+            var writer = new StreamWriter(outFilePath);
+            writer.Write("MonoMass\tMinElutionTime\tMaxElutionTime");
+            for (var i = 0; i < align.CountDatasets; i++)
+            {
+                var dataSetName = Path.GetFileNameWithoutExtension(ms1FtFiles[i]);
+                writer.Write("\t{0}", dataSetName);
+            }
+            
+            for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_AbuBestChg", i);
+
+            for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_AbuTest1", i);
+            for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_AbuTest2", i);
+            for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_AbuTest3", i);
+
+            //for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_Score", i);
+            //for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}_maxScan", i);
+
+            writer.Write("\n");
+            for (var i = 0; i < align.CountAlignedFeatures; i++)
+            {
+                var features = alignedFeatureList[i];
+                var minMaxNet = GetMinMaxNet(features);
+
+                writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
+
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    writer.Write(feature != null ? feature.Abundance : 0d);
+                }
+
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    if (feature != null) writer.Write(feature.AbundanceForBestCharges);
+                    else writer.Write("0");
+                }
+
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    if (feature != null) writer.Write(feature.AbundanceTest1);
+                    else writer.Write("0");
+                }
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    if (feature != null) writer.Write(feature.AbundanceTest2);
+                    else writer.Write("0");
+                }
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    if (feature != null) writer.Write(feature.AbundanceTest3);
+                    else writer.Write("0");
+                }
+
+                writer.Write("\n");
+            }
+            writer.Close();            
+        }
+
+
 
         private List<ProteinSpectrumMatch> FindProteinSpectrumMatch(PrSmContainer[] prsmContainer, LcMsFeature[] alignedFeatures)
         {

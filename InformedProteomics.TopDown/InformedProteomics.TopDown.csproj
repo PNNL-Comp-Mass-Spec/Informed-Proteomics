@@ -67,6 +67,8 @@
     <Compile Include="Execution\Ms1FeatureFinderInputParameter.cs" />
     <Compile Include="Execution\Ms1FeatureFinderLauncher.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
+    <Compile Include="TagBasedSearch\SeqTagGenerateInputParameter.cs" />
+    <Compile Include="TagBasedSearch\SeqTagGenerateLauncher.cs" />
     <Compile Include="Scoring\Ms1FtParser.cs" />
     <Compile Include="TagBasedSearch\FeatureBasedTagSearchEngine.cs" />
     <Compile Include="TagBasedSearch\ScanBasedTagSearchEngine.cs" />
