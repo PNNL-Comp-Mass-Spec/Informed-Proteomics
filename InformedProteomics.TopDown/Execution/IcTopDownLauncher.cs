@@ -271,6 +271,7 @@ namespace InformedProteomics.TopDown.Execution
             progress.Report(progData.UpdatePercent(0.0));
             if (RunTargetDecoyAnalysis == true)
             {
+                // Add "Qvalue" and "PepQValue"
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
                 if (fdrCalculator.HasError())
                 {

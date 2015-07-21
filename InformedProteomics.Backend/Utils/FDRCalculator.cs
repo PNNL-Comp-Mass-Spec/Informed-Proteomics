@@ -31,6 +31,7 @@ namespace InformedProteomics.Backend.Utils
 
             _multiplePeptidesPerScan = multiplePeptidesPerScan;
 
+            // Add "Qvalue"
             if (!CalculateQValues(targetResultFilePath, decoyResultFilePath))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
@@ -38,6 +39,7 @@ namespace InformedProteomics.Backend.Utils
                 return;
             }
 
+            // Add "PepQvalue"
             if (!CalculatePepQValues(targetResultFilePath, decoyResultFilePath))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
