@@ -343,7 +343,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             if (targetScanNum < 0) return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
-            return GetPrecursorExtractedIonChromatogram(minMz, maxMz, targetScanNum);
+            return GetPrecursorExtractedIonChromatogram(minMz, maxMz, targetScanNum, maxNumConsecutiveScansWithoutPeak);
         }
 
         /// <summary>
@@ -360,7 +360,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (GetMsLevel(targetScanNum) > 1)
                 targetScanNum = GetPrecursorScanNum(targetScanNum);
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
-            return GetTrimmedXic(xic, targetScanNum);
+            return GetTrimmedXic(xic, targetScanNum, tolerance);
         }
 
         /// <summary>
