@@ -282,7 +282,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Tuple<double, string>(fragmentScore.Item1, fragmentScore.Item2);
         }
 
-        private SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
+        protected SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
         {
             _aminoAcidSet = aminoAcidSet;
             _sequence = sequence;
@@ -432,13 +432,13 @@ namespace InformedProteomics.Backend.Data.Sequence
             // ReSharper restore PossibleInvalidOperationException
         }
 
-        private readonly int _maxSeqIndex;
+        protected readonly int _maxSeqIndex;
         private readonly AminoAcidSet _aminoAcidSet;
         private readonly ModificationParams _modificationParams;
 
         private int _index;
-        private readonly Node[][] _graph;
-        private readonly string _sequence;
+        protected readonly Node[][] _graph;
+        protected readonly string _sequence;
         private readonly AminoAcid _nTerm;
         private readonly AminoAcid[] _aminoAcidSequence;
         private readonly Composition.Composition[,] _nodeComposition;
