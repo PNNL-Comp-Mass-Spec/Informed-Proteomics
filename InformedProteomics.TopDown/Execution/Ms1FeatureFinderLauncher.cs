@@ -237,11 +237,6 @@ namespace InformedProteomics.TopDown.Execution
             sb.Append(string.Format("\t{0:0.0}", feature.Score));
             if (Parameters.ScoreReport)
             {
-                sb.AppendFormat("\t{0}", feature.AbundanceForBestCharges);
-
-                sb.AppendFormat("\t{0}", feature.AbundanceTest1);
-                sb.AppendFormat("\t{0}", feature.AbundanceTest2);
-                sb.AppendFormat("\t{0}", feature.AbundanceTest3);
 
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.OddCharge]);
@@ -280,12 +275,6 @@ namespace InformedProteomics.TopDown.Execution
 
         private static readonly string[] TsvExtraScoreHeader = new string[]
         {
-            "BestChargeAbundance",
-
-            "AbundanceTest1",
-            "AbundanceTest2",
-            "AbundanceTest3",
-
             "BestEvenCharge", "BestOddCharge", 
             "CorrEvenCharge", "CorrOddCharge", 
             "IntensityEvenCharge", "IntensityOddCharge",

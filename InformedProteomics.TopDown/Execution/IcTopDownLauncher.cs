@@ -236,6 +236,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 var targetMatches = RunSearch(targetDb, ms1Filter, null, prog);
                 WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
+                
                 sw.Stop();
 
                 Console.WriteLine(@"Target database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);

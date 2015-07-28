@@ -35,14 +35,6 @@ namespace InformedProteomics.Backend.MassFeature
 
         public double Abundance { get; protected set; }
 
-        public double AbundanceForBestCharges { get; internal set; }
-
-
-        public double AbundanceTest1 { get; internal set; }
-        public double AbundanceTest2 { get; internal set; }
-        public double AbundanceTest3 { get; internal set; }
-
-
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }
         public int RepresentativeCharge { get; protected set; }
@@ -66,10 +58,10 @@ namespace InformedProteomics.Backend.MassFeature
                 throw new LcMsRunNullException();
             }
             
-            if (MinNet - tolNet < other.MinNet || other.MinNet < MaxNet + tolNet) return true;
-            if (MinNet - tolNet < other.MaxNet || other.MaxNet < MaxNet + tolNet) return true;
-            if (other.MinNet - tolNet < MinNet || MinNet < other.MaxNet + tolNet) return true;
-            if (other.MinNet - tolNet < MaxNet || MaxNet < other.MaxNet + tolNet) return true;
+            if (MinNet - tolNet < other.MinNet && other.MinNet < MaxNet + tolNet) return true;
+            if (MinNet - tolNet < other.MaxNet && other.MaxNet < MaxNet + tolNet) return true;
+            if (other.MinNet - tolNet < MinNet && MinNet < other.MaxNet + tolNet) return true;
+            if (other.MinNet - tolNet < MaxNet && MaxNet < other.MaxNet + tolNet) return true;
             return false;
         }
 
@@ -77,10 +69,10 @@ namespace InformedProteomics.Backend.MassFeature
         {
             tolScan++;
 
-            if (MinScanNum - tolScan < other.MinScanNum || other.MinScanNum < MaxScanNum + tolScan) return true;
-            if (MinScanNum - tolScan < other.MaxScanNum || other.MaxScanNum < MaxScanNum + tolScan) return true;
-            if (other.MinScanNum - tolScan < MinScanNum || MinScanNum < other.MaxScanNum + tolScan) return true;
-            if (other.MinScanNum - tolScan < MaxScanNum || MaxScanNum < other.MaxScanNum + tolScan) return true;
+            if (MinScanNum - tolScan < other.MinScanNum && other.MinScanNum < MaxScanNum + tolScan) return true;
+            if (MinScanNum - tolScan < other.MaxScanNum && other.MaxScanNum < MaxScanNum + tolScan) return true;
+            if (other.MinScanNum - tolScan < MinScanNum && MinScanNum < other.MaxScanNum + tolScan) return true;
+            if (other.MinScanNum - tolScan < MaxScanNum && MaxScanNum < other.MaxScanNum + tolScan) return true;
             return false;
         }
 

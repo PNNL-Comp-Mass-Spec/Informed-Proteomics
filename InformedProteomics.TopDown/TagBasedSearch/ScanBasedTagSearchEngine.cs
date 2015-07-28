@@ -105,6 +105,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
             var tags = _tagParser.GetSequenceTags(ms2ScanNum);
 
+            if (outWriter != null) Console.WriteLine("[{0} scan] tag search start ", ms2ScanNum);
+
             foreach (var tagSequenceMatch in GetMatches(tags, spec, scorer))
             {
                 var tagMatch = tagSequenceMatch.TagMatch;
@@ -147,7 +149,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 }
             }
 
-            //outWriter.Close();
+            if (outWriter != null) Console.WriteLine("[{0} scan] tag search end ", ms2ScanNum);
         }
 
         public IList<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)

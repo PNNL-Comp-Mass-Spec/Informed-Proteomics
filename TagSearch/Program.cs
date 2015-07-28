@@ -132,32 +132,33 @@ namespace TagSearch
 
         private static void Run()
         {
-            const string dataSetPath = @"E:\Jungkap\CompRef";
-            const string fastaFilePath = @"E:\Jungkap\CompRef\ID_003278_4B4B3CB1.fasta";
-            const string modsFilePath = @"E:\Jungkap\CompRef\Mods.txt";
+            const string dataSetPath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
+            const string fastaFilePath = @"E:\Jungkap\UTEX\db\ID_004352_779A168F.fasta";
+            const string modsFilePath = @"E:\Jungkap\UTEX\db\Mods.txt";
+            const string seqtagFilePath = @"E:\Jungkap\UTEX";
+            var fileEntries = Directory.GetFiles(@"E:\Jungkap\UTEX");
 
-            var fileEntries = Directory.GetFiles(dataSetPath);
-
-            var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
             
             var fastaDb = new FastaDatabase(fastaFilePath);
             var tolerance = new Tolerance(10);
             var aaSet = new AminoAcidSet(modsFilePath);
 
-            var dataIndex = new int[3][];
-            dataIndex[0] = new int[] {0, 1, 2};
-            dataIndex[1] = new int[] { 3, 4, 5 };
-            dataIndex[2] = new int[] { 6, 7, 8 };
+            var dataIndex = new int[5][];
 
-            //for (var i = 0; i < dataset.Count; i++)
+            dataIndex[0] = new int[] {0, 1, 2, 3, 4, 5, 6};
+            dataIndex[1] = new int[] {7, 8, 9, 10, 11, 12, 13};
+            dataIndex[2] = new int[] {14, 15, 16, 17, 18, 19};
+            dataIndex[3] = new int[] {20, 21, 22, 23, 24, 25};
+            dataIndex[4] = new int[] {26, 27, 28, 29, 30, 31};
+
             var setIndex = int.Parse(_paramDic["-i"]);
             foreach(var i in dataIndex[setIndex - 1])
             {
                 var rawFile = string.Format(@"{0}\{1}.pbf", dataSetPath, dataset[i]);
-                //var ms1File = string.Format(@"{0}\{1}.ms1ft", dataSetPath, dataset[i]);
-                var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
-                var retFile = string.Format(@"{0}\{1}_tagmatch.tsv", dataSetPath, dataset[i]);
+                var tagFilePath = string.Format(@"{0}\{1}.seqtag", seqtagFilePath, dataset[i]);
+                var retFile = string.Format(@"{0}\{1}_tagmatch.tsv", seqtagFilePath, dataset[i]);
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
                 const int minTagLength = 5;
@@ -165,7 +166,6 @@ namespace TagSearch
 
                 Console.WriteLine("Start processing: {0}", rawFile);
 
-                //TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
                 var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
                 engine.outWriter = new StreamWriter(retFile);
                 engine.RunSearch();

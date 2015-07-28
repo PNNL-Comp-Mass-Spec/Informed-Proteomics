@@ -38,6 +38,70 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestLcMsFeatureXic()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep7_15Jan15_Bane_C2-14-08-02RZ.pbf";
+            
+            if (!File.Exists(rawFile))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
+                return;
+            }
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            var scorer = new LcMsFeatureLikelihood();
+            var featureFinder = new LcMsPeakMatrix(run, scorer);
+            var feature = featureFinder.GetLcMsPeakCluster(7015.7348, 8, 4621, 4733); // rep7 
+            //var feature = featureFinder.GetLcMsPeakCluster(7015.7348, 8, 4607, 4712); // rep9
+            
+            var ms1ScanToIndex = run.GetMs1ScanNumToIndex();
+            var minCol = ms1ScanToIndex[feature.MinScanNum];
+            var maxCol = ms1ScanToIndex[feature.MaxScanNum];
+            //var minRow = feature.MinCharge - LcMsPeakMatrix.MinScanCharge;
+            //var maxRow = feature.MaxCharge - LcMsPeakMatrix.MinScanCharge;
+            
+            Console.WriteLine("---------------------------------------------------------------");
+            for (var i = 0; i < feature.Envelopes.Length; i++)
+            {
+                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                {
+                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].PearsonCorrelation : 0);
+                    Console.Write("\t");
+                }
+                Console.Write("\n");
+            }
+            Console.WriteLine("---------------------------------------------------------------");
+            for (var i = 0; i < feature.Envelopes.Length; i++)
+            {
+                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                {
+                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].BhattacharyyaDistance : 0);
+                    Console.Write("\t");
+                }
+                Console.Write("\n");
+            }
+
+            Console.WriteLine("---------------------------------------------------------------");
+            for (var i = 0; i < feature.Envelopes.Length; i++)
+            {
+                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                {
+                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].Abundance : 0);
+                    Console.Write("\t");
+                }
+                Console.Write("\n");
+            }
+            
+            
+
+
+
+        }
+
+        [Test]
         public void TestLcMsFeatureFinder()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -45,6 +109,7 @@ namespace InformedProteomics.Test
 
             //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
+
             if (!File.Exists(rawFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
@@ -52,10 +117,8 @@ namespace InformedProteomics.Test
             }
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
-
             //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
-
             var stopwatch = Stopwatch.StartNew();
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);

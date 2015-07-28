@@ -11,7 +11,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         {
             _graph = graph;
         }
-
+/*
         public void ComputeGeneratingFunction()
         {
             throw new NotImplementedException();
@@ -28,13 +28,9 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         }
 
         private readonly IScoringGraph _graph;
-    }
-
-
-
-
-
-/*
+    
+    */
+        
         public double GetSpectralEValue(int score)
         {
             return _scoreDistribution.GetSpectralEValue(score);
@@ -100,5 +96,5 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             }
             return scoringDistribution;
         }
-*/
+    }
 }

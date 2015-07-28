@@ -11,6 +11,34 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsPeakCluster : LcMsFeature
     {
+        /*
+        public LcMsPeakCluster(LcMsRun run, double monoMass, int charge, double mz, double scanNum)
+            : base(monoMass, charge, mz, scanNum, 0)
+        {
+            Run = run;
+            TheoreticalEnvelope = observedEnvelope.TheoreticalEnvelope;
+            Flag = 0;
+
+            DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
+            DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
+
+            RepresentativeSummedEnvelop = new double[TheoreticalEnvelope.Size];
+
+            AbundanceDistributionAcrossCharge = new double[2];
+            BestCorrelationScoreAcrossCharge = new double[2];
+            BestDistanceScoreAcrossCharge = new double[2];
+            BestIntensityScoreAcrossCharge = new double[2];
+
+            EnvelopeDistanceScoreAcrossCharge = new double[2];
+            EnvelopeCorrelationScoreAcrossCharge = new double[2];
+            EnvelopeIntensityScoreAcrossCharge = new double[2];
+            BestCharge = new int[2];
+
+            XicCorrelationBetweenBestCharges = new double[2];
+            _initScore = false;
+        }*/
+        
+        
         public LcMsPeakCluster(LcMsRun run, ObservedIsotopeEnvelope observedEnvelope)
             : base(observedEnvelope.MonoMass, observedEnvelope.Charge, observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
         {
@@ -71,15 +99,12 @@ namespace InformedProteomics.Backend.MassFeature
             var ms1ScanNums = Run.GetMs1ScanVector();
             var minCol = ms1ScanNumToIndex[MinScanNum];
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
-            //var minCharge = (int)Math.Max(Math.Floor(Mass / Run.MaxMs1Mz), minScanCharge);
-            //var maxCharge = (int)Math.Min(Math.Ceiling(Mass / Run.MinMs1Mz), maxScanCharge);
             MinCharge = DetectableMinCharge;
             MaxCharge = DetectableMaxCharge;
             
             var rnd = new Random();
             var comparer = new MzComparerWithBinning(28);
             var mostAbuInternalIndex = TheoreticalEnvelope.IndexOrderByRanking[0];
-            //Clear();
 
             var nRows = MaxCharge - MinCharge + 1;
             var nCols = maxCol - minCol + 1;
@@ -217,8 +242,6 @@ namespace InformedProteomics.Backend.MassFeature
                     {
                         var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
                         var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
-                        //goodEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
-                        //goodEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01) || (rankSumPvalue < 1e-3) || (poissonPvalue < 1e-3);
                         levelOneEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01);
                         levelTwoEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
                     }
@@ -514,13 +537,10 @@ namespace InformedProteomics.Backend.MassFeature
 
         public readonly double[] XicCorrelationBetweenBestCharges;
 
-        
-
         public const int EvenCharge = 0;
         public const int OddCharge = 1;
 
         public double BestCorrelationScore { get { return Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());  } }
-        //internal double SummedEnvelopeBcDistCutoff = 0.1;
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
         internal byte Flag;
