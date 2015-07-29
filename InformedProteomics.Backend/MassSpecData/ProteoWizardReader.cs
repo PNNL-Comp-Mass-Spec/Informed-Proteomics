@@ -13,268 +13,89 @@ using Spectrum = InformedProteomics.Backend.Data.Spectrometry.Spectrum;
 namespace InformedProteomics.Backend.MassSpecData
 {
     /// <summary>
-    /// This class currently doesn't work because of an unresolved dll dependency.
+    /// ProteoWizard Reader, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers.
     /// </summary>
+    /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation.
+    /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be 
+    /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.</remarks>
     public sealed class ProteoWizardReader: IMassSpecDataReader, IDisposable
     {
-        public static Assembly ProteoWizardAssemblyResolver(object sender, ResolveEventArgs args)
-        {
-            Console.WriteLine("Searching for ProteoWizard files...");
-            // https://support.microsoft.com/en-us/kb/837908
-            //This handler is called only when the common language runtime tries to bind to the assembly and fails.
-            if (string.IsNullOrWhiteSpace(PwizPath))
-            {
-                return null;
-            }
-
-            //Retrieve the list of referenced assemblies in an array of AssemblyName.
-            string strTempAssmbPath = "";
-
-            AssemblyName[] arrReferencedAssmbNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
-
-            //Loop through the array of referenced assembly names.
-            foreach (AssemblyName strAssmbName in arrReferencedAssmbNames)
-            {
-                //Check for the assembly names that have raised the "AssemblyResolve" event.
-                if (strAssmbName.FullName.Substring(0, strAssmbName.FullName.IndexOf(",")) == args.Name.Substring(0, args.Name.IndexOf(",")))
-                {
-                    //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
-                    //Build the path of the assembly from where it has to be loaded.                
-                    strTempAssmbPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll");
-                    break;
-                }
-            }
-            Console.WriteLine("Loading file \"" + strTempAssmbPath + "\"");
-            //Load the assembly from the specified path.  
-            Assembly myAssembly = null;
-            try
-            {
-                myAssembly = Assembly.LoadFrom(strTempAssmbPath);
-            }
-            catch (BadImageFormatException)
-            {
-                Console.WriteLine("Incompatible Assembly: \"" + strTempAssmbPath + "\"");
-                throw;
-            }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("Assembly not found: \"" + strTempAssmbPath + "\"");
-                throw;
-            }
-            catch (FileLoadException)
-            {
-                Console.WriteLine("Invalid Assembly: \"" + strTempAssmbPath + "\". The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.");
-                throw;
-            }
-            catch (SecurityException)
-            {
-                Console.WriteLine("Assembly access denied: \"" + strTempAssmbPath + "\"");
-                throw;
-            }
-
-            //Return the loaded assembly.
-            return myAssembly;
-        }
+        #region Static stateful data
 
         /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
         /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
         /// </summary>
-        public static readonly string PwizPath;
+        public static string PwizPath
+        {
+            get { return ProteoWizardReaderImplementation.PwizPath; }
+        }
 
         /// <summary>
         /// Finds the path to the most recent 64-bit ProteoWizard install
         /// PwizPath is populated from this, but only causes a single search.
+        /// Paths searched, in order: "%ProteoWizard%" environment variable data, "C:\DMS_Programs\ProteoWizard", "%ProgramFiles%\ProteoWizard\(highest sorted)"
         /// </summary>
         /// <returns></returns>
         public static string FindPwizPath()
         {
-            string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
-            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
-            {
-                pwizPath = @"C:\DMS_Programs\ProteoWizard";
-            }
-            if (string.IsNullOrWhiteSpace(pwizPath))
-            {
-                var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-                if (string.IsNullOrWhiteSpace(progFiles))
-                {
-                    return null;
-                }
-                var progPwiz = Path.Combine(progFiles, "ProteoWizard");
-                if (!Directory.Exists(progPwiz))
-                {
-                    return null;
-                }
-                var posPaths = Directory.GetDirectories(progPwiz, "ProteoWizard *");
-                pwizPath = posPaths.Max(); // Try to get the "newest" folder
-            }
-            return pwizPath;
+            return ProteoWizardReaderImplementation.FindPwizPath();
         }
 
-        static ProteoWizardReader()
-        {
-            PwizPath = FindPwizPath();
-        }
+        #endregion
+
+        #region Constructor and Private member
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="filePath"></param>
-        /// <remarks>To avoid assembly resolving errors, the ProteoWizardAssemblyResolver should be added as an AssemblyResolve event handler, as follows:
-        /// <code>AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;</code>
-        /// </remarks>
         public ProteoWizardReader(string filePath)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardAssemblyResolver;
+            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReaderImplementation.ProteoWizardAssemblyResolver;
 
-            var readers = ReaderList.FullReaderList;
-            filePath = CheckForDirectoryDataset(filePath);
-            readers.read(filePath, _dataFile);
-            if ((new string[] {".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt"})
-                .Any(ext => filePath.ToLower().EndsWith(ext)))
-            {
-                Console.WriteLine("Using cwt Centroiding");
-                _filters.Add(_cwtCentroiding);
-            }
-            else
-            {
-                Console.WriteLine("Using vendor Centroiding");
-                _filters.Add(_vendorCentroiding);
-            }
-            SpectrumListFactory.wrap(_dataFile, _filters);
+            _pwizReader = new ProteoWizardReaderImplementation(filePath);
         }
+
+        private readonly ProteoWizardReaderImplementation _pwizReader;
+
+        #endregion
+
+        #region IMassSpecDataReader implementation
 
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
-            for (int i = 1; i <= NumSpectra; i++)
-            {
-                yield return ReadMassSpectrum(i);
-            }
+            return _pwizReader.ReadAllSpectra();
         }
 
         public bool TryMakeRandomAccessCapable()
         {
-            return true;
+            return _pwizReader.TryMakeRandomAccessCapable();
         }
 
         public Spectrum ReadMassSpectrum(int scanIndex, bool includePeaks = true)
         {
-            var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, includePeaks);
-
-            var msLevel = (int)(pwizSpec.cvParam(CVID.MS_ms_level).value);
-            double[] mzArray = new double[0];
-            double[] intensityArray = new double[0];
-            foreach (var bda in pwizSpec.binaryDataArrays)
-            {
-                if (bda.hasCVParam(CVID.MS_m_z_array))
-                {
-                    mzArray = bda.data.ToArray();
-                }
-                if (bda.hasCVParam(CVID.MS_intensity_array))
-                {
-                    intensityArray = bda.data.ToArray();
-                }
-            }
-            double scanTime = 0;
-            foreach (var s in pwizSpec.scanList.scans)
-            {
-                if (s.hasCVParam(CVID.MS_scan_start_time))
-                {
-                    scanTime = (double) (s.cvParam(CVID.MS_scan_start_time).value);
-                }
-            }
-            if (msLevel > 1)
-            {
-                double? thermoMonoMass = null;
-                foreach (var up in pwizSpec.userParams)
-                {
-                    if (up.name == "[Thermo Trailer Extra]Monoisotopic M/Z:")
-                    {
-                        thermoMonoMass = (double) (up.value);
-                    }
-                }
-                ActivationMethod am = ActivationMethod.Unknown;
-                Data.Spectrometry.IsolationWindow iw = null;
-                foreach (var precursor in pwizSpec.precursors)
-                {
-                    var act = precursor.activation;
-                    foreach (var param in act.cvParams)
-                    {
-                        switch (param.cvid)
-                        {
-                            case CVID.MS_collision_induced_dissociation:
-                                am = ActivationMethod.CID;
-                                break;
-                            case CVID.MS_electron_transfer_dissociation:
-                                am = ActivationMethod.ETD;
-                                break;
-                            case CVID.MS_beam_type_collision_induced_dissociation:
-                                am = ActivationMethod.HCD;
-                                break;
-                            case CVID.MS_electron_capture_dissociation:
-                                am = ActivationMethod.ECD;
-                                break;
-                            case CVID.MS_pulsed_q_dissociation:
-                                am = ActivationMethod.PQD;
-                                break;
-                        }
-                    }
-                    var piw = precursor.isolationWindow;
-                    var target = (double)(piw.cvParam(CVID.MS_isolation_window_target_m_z).value);
-                    var lowOff = (double)(piw.cvParam(CVID.MS_isolation_window_lower_offset).value);
-                    var uppOff = (double)(piw.cvParam(CVID.MS_isolation_window_upper_offset).value);
-                    int? charge = null;
-                    double selectedIonMz = 0;
-                    foreach (var si in precursor.selectedIons)
-                    {
-                        if (si.hasCVParam(CVID.MS_charge_state))
-                        {
-                            charge = (int)(si.cvParam(CVID.MS_charge_state).value);
-                        }
-                        selectedIonMz = (double) (si.cvParam(CVID.MS_selected_ion_m_z).value);
-                    }
-                    if (thermoMonoMass == null || thermoMonoMass.Value.Equals(0))
-                    {
-                        thermoMonoMass = selectedIonMz;
-                    }
-                    iw = new Data.Spectrometry.IsolationWindow(target, lowOff, uppOff, thermoMonoMass, charge);
-                }
-                return new ProductSpectrum(mzArray, intensityArray, scanIndex)
-                {
-                    NativeId = pwizSpec.id,
-                    ActivationMethod = am,
-                    IsolationWindow = iw,
-                    MsLevel = msLevel,
-                    ElutionTime = scanTime,
-                };
-            }
-            return new Spectrum(mzArray, intensityArray, scanIndex)
-            {
-                NativeId = pwizSpec.id,
-                ElutionTime = scanTime,
-            };
+            return _pwizReader.ReadMassSpectrum(scanIndex, includePeaks);
         }
 
         public void Close()
         {
-            _dataFile.Dispose();
+            _pwizReader.Dispose();
         }
 
         public int NumSpectra
         {
-            get { return _dataFile.run.spectrumList.size(); }
+            get { return _pwizReader.NumSpectra; }
         }
-
-        private readonly MSData _dataFile = new MSData();
-        private readonly string _vendorCentroiding = "peakPicking true 1-";
-        private readonly string _cwtCentroiding = "peakPicking cwt snr=1.0 peakSpace=0.1 msLevel=1-";
-        private readonly List<string> _filters = new List<string>();
 
         public void Dispose()
         {
-            _dataFile.Dispose();
+            _pwizReader.Dispose();
         }
+
+        #endregion
+
+        #region Public static utility functions (stateless)
 
         public static string ProteoWizardFilterString
         {
@@ -411,5 +232,334 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return filePath;
         }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// ProteoWizardReaderImplementation, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers.
+    /// </summary>
+    /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard. If there are DLL resolving
+    /// problems when trying to use it, add the ProteoWizardAssemblyResolver to the AppDomain.CurrentDomain.AssemblyResolve
+    /// event before first instantiating the class.</remarks>
+    internal sealed class ProteoWizardReaderImplementation : IMassSpecDataReader, IDisposable
+    {
+        #region AssemblyResolverHandler for finding ProteoWizard dlls
+
+        /// <summary>
+        /// On a missing DLL event, searches a path specified by FindPwizPath for the ProteoWizard dlls, and loads them
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static Assembly ProteoWizardAssemblyResolver(object sender, ResolveEventArgs args)
+        {
+            Console.WriteLine("Searching for ProteoWizard files...");
+            // https://support.microsoft.com/en-us/kb/837908
+            //This handler is called only when the common language runtime tries to bind to the assembly and fails.
+            if (string.IsNullOrWhiteSpace(PwizPath))
+            {
+                return null;
+            }
+
+            //Retrieve the list of referenced assemblies in an array of AssemblyName.
+            string strTempAssmbPath = "";
+
+            AssemblyName[] arrReferencedAssmbNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
+
+            //Loop through the array of referenced assembly names.
+            foreach (AssemblyName strAssmbName in arrReferencedAssmbNames)
+            {
+                //Check for the assembly names that have raised the "AssemblyResolve" event.
+                if (strAssmbName.FullName.Substring(0, strAssmbName.FullName.IndexOf(",")) == args.Name.Substring(0, args.Name.IndexOf(",")))
+                {
+                    //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
+                    //Build the path of the assembly from where it has to be loaded.                
+                    strTempAssmbPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll");
+                    break;
+                }
+            }
+            Console.WriteLine("Loading file \"" + strTempAssmbPath + "\"");
+            //Load the assembly from the specified path.  
+            Assembly myAssembly = null;
+            try
+            {
+                myAssembly = Assembly.LoadFrom(strTempAssmbPath);
+            }
+            catch (BadImageFormatException)
+            {
+                Console.WriteLine("Incompatible Assembly: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Assembly not found: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
+            catch (FileLoadException)
+            {
+                Console.WriteLine("Invalid Assembly: \"" + strTempAssmbPath + "\". The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.");
+                throw;
+            }
+            catch (SecurityException)
+            {
+                Console.WriteLine("Assembly access denied: \"" + strTempAssmbPath + "\"");
+                throw;
+            }
+
+            //Return the loaded assembly.
+            return myAssembly;
+        }
+
+        #endregion
+
+        #region Static stateful variable and populating functions
+
+        /// <summary>
+        /// The path to the most recent 64-bit ProteoWizard install
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
+        /// </summary>
+        public static readonly string PwizPath;
+
+        /// <summary>
+        /// Finds the path to the most recent 64-bit ProteoWizard install
+        /// PwizPath is populated from this, but only causes a single search.
+        /// Paths searched, in order: "%ProteoWizard%" environment variable data, "C:\DMS_Programs\ProteoWizard", "%ProgramFiles%\ProteoWizard\(highest sorted)"
+        /// </summary>
+        /// <returns></returns>
+        public static string FindPwizPath()
+        {
+            string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
+            {
+                pwizPath = @"C:\DMS_Programs\ProteoWizard";
+            }
+            if (string.IsNullOrWhiteSpace(pwizPath))
+            {
+                var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
+                if (string.IsNullOrWhiteSpace(progFiles))
+                {
+                    return null;
+                }
+                var progPwiz = Path.Combine(progFiles, "ProteoWizard");
+                if (!Directory.Exists(progPwiz))
+                {
+                    return null;
+                }
+                var posPaths = Directory.GetDirectories(progPwiz, "ProteoWizard *");
+                pwizPath = posPaths.Max(); // Try to get the "newest" folder
+            }
+            return pwizPath;
+        }
+
+        static ProteoWizardReaderImplementation()
+        {
+            PwizPath = FindPwizPath();
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <remarks>To avoid assembly resolving errors, the ProteoWizardAssemblyResolver should be added as an AssemblyResolve event handler, as follows:
+        /// <code>AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;</code>
+        /// </remarks>
+        public ProteoWizardReaderImplementation(string filePath)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardAssemblyResolver;
+
+            _filePath = ProteoWizardReader.CheckForDirectoryDataset(filePath);
+        }
+
+        #endregion
+
+        #region Private members and functions
+        
+        private readonly string _filePath;
+        private bool _loaded = false;
+        private int _numSpectra = 0;
+
+        private readonly MSData _dataFile = new MSData();
+        private readonly string _vendorCentroiding = "peakPicking true 1-";
+        private readonly string _cwtCentroiding = "peakPicking cwt snr=1.0 peakSpace=0.1 msLevel=1-";
+        private readonly List<string> _filters = new List<string>();
+        private void LoadPwizReader()
+        {
+            if (_loaded)
+            {
+                return;
+            }
+
+            var readers = ReaderList.FullReaderList;
+            readers.read(_filePath, _dataFile);
+            if ((new string[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt" })
+                .Any(ext => _filePath.ToLower().EndsWith(ext)))
+            {
+                Console.WriteLine("Using cwt Centroiding");
+                _filters.Add(_cwtCentroiding);
+            }
+            else
+            {
+                Console.WriteLine("Using vendor Centroiding");
+                _filters.Add(_vendorCentroiding);
+            }
+            SpectrumListFactory.wrap(_dataFile, _filters);
+
+            _numSpectra = _dataFile.run.spectrumList.size();
+            _loaded = true;
+        }
+
+        #endregion
+
+        #region IMassSpecDataReader implementation
+
+        public IEnumerable<Spectrum> ReadAllSpectra()
+        {
+            LoadPwizReader();
+            for (int i = 1; i <= _numSpectra; i++)
+            {
+                yield return ReadSpectrum(i);
+            }
+        }
+
+        public int NumSpectra
+        {
+            get
+            {
+                LoadPwizReader();
+                return _numSpectra;
+            }
+        }
+
+        public bool TryMakeRandomAccessCapable()
+        {
+            return true;
+        }
+
+        public Spectrum ReadMassSpectrum(int scanIndex, bool includePeaks = true)
+        {
+            LoadPwizReader();
+            return ReadSpectrum(scanIndex, includePeaks);
+        }
+
+        /// <summary>
+        /// Internal spectrum reader to eliminate excess calls to LoadPwizReader() when called from ReadAllSpectra()
+        /// </summary>
+        /// <param name="scanIndex"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        private Spectrum ReadSpectrum(int scanIndex, bool includePeaks = true)
+        {
+            var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, includePeaks);
+
+            var msLevel = (int)(pwizSpec.cvParam(CVID.MS_ms_level).value);
+            double[] mzArray = new double[0];
+            double[] intensityArray = new double[0];
+            foreach (var bda in pwizSpec.binaryDataArrays)
+            {
+                if (bda.hasCVParam(CVID.MS_m_z_array))
+                {
+                    mzArray = bda.data.ToArray();
+                }
+                if (bda.hasCVParam(CVID.MS_intensity_array))
+                {
+                    intensityArray = bda.data.ToArray();
+                }
+            }
+            double scanTime = 0;
+            foreach (var s in pwizSpec.scanList.scans)
+            {
+                if (s.hasCVParam(CVID.MS_scan_start_time))
+                {
+                    scanTime = (double)(s.cvParam(CVID.MS_scan_start_time).value);
+                }
+            }
+            if (msLevel > 1)
+            {
+                double? thermoMonoMass = null;
+                foreach (var up in pwizSpec.userParams)
+                {
+                    if (up.name == "[Thermo Trailer Extra]Monoisotopic M/Z:")
+                    {
+                        thermoMonoMass = (double)(up.value);
+                    }
+                }
+                ActivationMethod am = ActivationMethod.Unknown;
+                Data.Spectrometry.IsolationWindow iw = null;
+                foreach (var precursor in pwizSpec.precursors)
+                {
+                    var act = precursor.activation;
+                    foreach (var param in act.cvParams)
+                    {
+                        switch (param.cvid)
+                        {
+                            case CVID.MS_collision_induced_dissociation:
+                                am = ActivationMethod.CID;
+                                break;
+                            case CVID.MS_electron_transfer_dissociation:
+                                am = ActivationMethod.ETD;
+                                break;
+                            case CVID.MS_beam_type_collision_induced_dissociation:
+                                am = ActivationMethod.HCD;
+                                break;
+                            case CVID.MS_electron_capture_dissociation:
+                                am = ActivationMethod.ECD;
+                                break;
+                            case CVID.MS_pulsed_q_dissociation:
+                                am = ActivationMethod.PQD;
+                                break;
+                        }
+                    }
+                    var piw = precursor.isolationWindow;
+                    var target = (double)(piw.cvParam(CVID.MS_isolation_window_target_m_z).value);
+                    var lowOff = (double)(piw.cvParam(CVID.MS_isolation_window_lower_offset).value);
+                    var uppOff = (double)(piw.cvParam(CVID.MS_isolation_window_upper_offset).value);
+                    int? charge = null;
+                    double selectedIonMz = 0;
+                    foreach (var si in precursor.selectedIons)
+                    {
+                        if (si.hasCVParam(CVID.MS_charge_state))
+                        {
+                            charge = (int)(si.cvParam(CVID.MS_charge_state).value);
+                        }
+                        selectedIonMz = (double)(si.cvParam(CVID.MS_selected_ion_m_z).value);
+                    }
+                    if (thermoMonoMass == null || thermoMonoMass.Value.Equals(0))
+                    {
+                        thermoMonoMass = selectedIonMz;
+                    }
+                    iw = new Data.Spectrometry.IsolationWindow(target, lowOff, uppOff, thermoMonoMass, charge);
+                }
+                return new ProductSpectrum(mzArray, intensityArray, scanIndex)
+                {
+                    NativeId = pwizSpec.id,
+                    ActivationMethod = am,
+                    IsolationWindow = iw,
+                    MsLevel = msLevel,
+                    ElutionTime = scanTime,
+                };
+            }
+            return new Spectrum(mzArray, intensityArray, scanIndex)
+            {
+                NativeId = pwizSpec.id,
+                ElutionTime = scanTime,
+            };
+        }
+
+        public void Close()
+        {
+            _dataFile.Dispose();
+        }
+
+        public void Dispose()
+        {
+            _dataFile.Dispose();
+        }
+
+        #endregion
     }
 }

@@ -18,7 +18,6 @@ namespace InformedProteomics.Test.FunctionalTests
 
             //try
             //{
-            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
             var reader = new ProteoWizardReader(TestRawFilePath);
             reader.ReadMassSpectrum(1);
 

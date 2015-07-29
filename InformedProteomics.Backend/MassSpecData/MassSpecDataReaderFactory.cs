@@ -34,7 +34,6 @@ namespace InformedProteomics.Backend.MassSpecData
                 case MassSpecDataType.Unknown:
                     if (_pwizAvailable)
                     {
-                        AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
                         reader = new ProteoWizardReader(filePath);
                     }
                     break;
