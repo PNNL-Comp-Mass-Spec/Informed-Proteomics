@@ -56,6 +56,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         public int GetBinNumber(double mass)
         {
             var originalBinIndex = _mzComparer.GetBinNumber(mass);
+
+            if (originalBinIndex >= _binMap.Length) return -1;
+            
+
             if (originalBinIndex == 0 || _binMap[originalBinIndex] > 0) return _binMap[originalBinIndex];
 
             var originalBinMass = _mzComparer.GetMzAverage(originalBinIndex);

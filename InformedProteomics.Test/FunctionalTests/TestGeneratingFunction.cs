@@ -24,21 +24,57 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
             const string rawFile = @"\\protoapps\UserData\Jungkap\TrainingSet\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
+            var sequence = new Sequence(protSequence, new AminoAcidSet());
+            var proteinMass = sequence.Composition.Mass;
             const int scanNum = 5927;
-            
+            var aminoArray = AminoAcid.StandardAminoAcidArr;
+            var comparer = new ProteinMassComparerWithBinning(aminoArray);
+
+            const int maxCharge = 15;
+            const int minCharge = 1;
+            const double filteringWindowSize = 1.1;
+            const int isotopeOffsetTolerance = 2;
+            var tolerance = new Tolerance(10);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            var spectrum = run.GetSpectrum(scanNum);
+
+            var aminoProb = new double[aminoArray.Length];
+            for (var i = 0; i < aminoProb.Length; i++)
+            {
+                aminoProb[i] = 1.0d/aminoProb.Length;
+            }
+
             if (!File.Exists(rawFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
                 return;
             }
+            
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spectrum, minCharge, maxCharge,
+                isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.5, 0.5);
 
-            var spectralVector = GetSpectralVectorForTest(rawFile, scanNum);
-            var aminoAcidsArray = AminoAcid.StandardAminoAcidArr;
+            var massList = new double[deconvolutedPeaks.Count];
+            var peakScores = new int[deconvolutedPeaks.Count];
 
-            Console.WriteLine(spectralVector.Sum());
+            for (var i = 0; i < deconvolutedPeaks.Count; i++)
+            {
+                peakScores[i] = 1;
+                massList[i] = deconvolutedPeaks[i].Mass - BaseIonType.B.OffsetComposition.Mass;
+            }
 
+            var graph = new ScoringGraph(massList, peakScores, proteinMass, aminoArray, aminoProb, comparer);
+            var gf = new GeneratingFunction(comparer.GetBinNumber(proteinMass + 1000), sequence.Count*3);
 
-            var peaks = GetMassListForTest();
+            gf.ComputeGeneratingFunction(graph);
+
+            for (var score = 10; score < 25; score++)
+            {
+                var specEvalue = gf.GetSpectralEValue(score);
+
+                Console.WriteLine("{0} : {1}", score, specEvalue);
+            }
+            
         }
 
 
@@ -70,8 +106,8 @@ namespace InformedProteomics.Test.FunctionalTests
             const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
             var sequence = new Sequence(protSequence, new AminoAcidSet());
             var proteinMass = sequence.Composition.Mass;
-
             var proteinMassIndex = massComparer.GetBinNumber(proteinMass);
+
             var nEdges = 0;
             for (var i = 0; i <= proteinMassIndex; i++)
             {
@@ -79,7 +115,9 @@ namespace InformedProteomics.Test.FunctionalTests
                 foreach (var aa in aaSet)
                 {
                     var j = massComparer.GetBinNumber(nodeMass + aa.Mass);
-                    //Console.WriteLine("{0}-{1} are connected by edge", i, j);
+
+                    if (j < 0) Console.WriteLine("{0}-{1} are connected by edge", i, j);
+
                     nEdges++;
 
                 }

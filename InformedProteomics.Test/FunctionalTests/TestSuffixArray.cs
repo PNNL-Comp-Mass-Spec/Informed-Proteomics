@@ -104,7 +104,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            const string dbFile = @"D:\MSPathFinder\Fasta\test.fasta";
             if (!File.Exists(dbFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -117,9 +117,17 @@ namespace InformedProteomics.Test.FunctionalTests
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
-            var numPeptides = indexedDb
+            var peptides = indexedDb
                     .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-                        21, 300, 1, 0).LongCount();
+                        21, 300, 1, 0);
+            var numPeptides = 0;
+
+            foreach (var peptide in peptides)
+            {
+                Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
+                numPeptides++;
+            }
+
             //var numPeptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 150).LongCount();
             //var numPeptides =
             //    indexedDb.AnnotationsAndOffsets(7, 40, 2, 2, Enzyme.Trypsin).LongCount();

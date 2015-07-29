@@ -6,10 +6,10 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestAminoAcidSet
     {
-        [Ignore]
+        [Test]
         public void TestParsingManyMods()
         {
-            const string modFilePath = @"H:\Research\Lewy\MSPathFinder_Mods.txt";
+            const string modFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\Mods.txt";
             var aaSet = new AminoAcidSet(modFilePath);
             aaSet.Display();
         }

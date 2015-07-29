@@ -22,7 +22,6 @@ namespace InformedProteomics.TopDown.Scoring
             _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
         }
 
-
         public double GetPrecursorIonScore(Ion precursorIon)
         {
             return 0;
