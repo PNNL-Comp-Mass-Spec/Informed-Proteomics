@@ -31,7 +31,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             catch (FileNotFoundException fe)
             {
-                Console.WriteLine(fe.Message);
+                ShowErrorMessage(fe.Message);
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 if (!MsRawFile(Parameters.InputPath) && !MsPbfFile(Parameters.InputPath))
                 {
-                    Console.WriteLine(@"Not supported file extension");
+                    ShowErrorMessage(@"File extension not supported, " + Parameters.InputPath);
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace InformedProteomics.TopDown.Execution
 
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine(@"Cannot find input file: {0}", rawFile);
+                ShowErrorMessage(@"Cannot find input file: "+ rawFile);
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace InformedProteomics.TopDown.Execution
 
             if (run.GetMs1ScanVector().Length == 0)
             {
-                ShowErrorMessage(@"Error, data file has no MS1 spectra: " + Path.GetFileName(rawFile));
+                ShowErrorMessage(@"Data file has no MS1 spectra: " + Path.GetFileName(rawFile));
                 return;
             }
 
@@ -278,7 +278,7 @@ namespace InformedProteomics.TopDown.Execution
         private void ShowErrorMessage(string errorMessage)
         {
             Console.WriteLine(@"----------------------------------------------------------");
-            Console.WriteLine(errorMessage);
+            Console.WriteLine(@"Error: " + errorMessage);
             Console.WriteLine(@"----------------------------------------------------------");
 
         }
