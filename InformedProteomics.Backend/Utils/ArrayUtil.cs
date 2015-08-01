@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace InformedProteomics.Backend.Utils
@@ -12,8 +11,9 @@ namespace InformedProteomics.Backend.Utils
         /// Create a string to display the array values.
         /// </summary>
         /// <param name="array">The array</param>
+        /// <param name="delimiter">Delimiter character</param>
         /// <param name="format">Optional. A string to use to format each value. Must contain the colon, so something like ':0.000'</param>
-        public static string ToString<T>(T[] array, string deliminator = "\t", string format = "")
+        public static string ToString<T>(T[] array, string delimiter = "\t", string format = "")
         {
             var s = new StringBuilder();
             var formatString = "{0" + format + "}";
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 if (i < array.Length - 1)
                 {
-                    s.AppendFormat(formatString + deliminator, array[i]);
+                    s.AppendFormat(formatString + delimiter, array[i]);
                 }
                 else
                 {

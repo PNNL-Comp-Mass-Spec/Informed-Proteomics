@@ -204,9 +204,18 @@ namespace SeqTagGen
         private static string _outFolderPath;
         private static int _maxTags;
         private static Dictionary<string, string> _paramDic;
-        private static void PrintUsageInfo(string message = null)
+
+        private static void PrintUsageInfo(string errorMessage = null)
         {
-            if (message != null) Console.WriteLine("Error: " + message);
+
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                Console.WriteLine(@"----------------------------------------------------------");
+                Console.WriteLine(@"Error: " + errorMessage);
+                Console.WriteLine(@"----------------------------------------------------------");
+                Console.WriteLine();
+            }
+
             Console.WriteLine("****** {0}\t{1} ************", Name, Version);
             Console.WriteLine(
                 "Usage: " + Name + ".exe\n" +

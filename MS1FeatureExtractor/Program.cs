@@ -123,12 +123,12 @@ namespace ProMex
             return 0;
         }
 
-        private static void PrintUsageInfo(string message = null)
+        private static void PrintUsageInfo(string errorMessage = null)
         {
-            if (message != null)
+            if (!string.IsNullOrWhiteSpace(errorMessage))
             {
                 Console.WriteLine("----------------------------------------------------------");
-                Console.WriteLine("Error: " + message);
+                Console.WriteLine("Error: " + errorMessage);
                 Console.WriteLine("----------------------------------------------------------");
                 Console.WriteLine();
             }

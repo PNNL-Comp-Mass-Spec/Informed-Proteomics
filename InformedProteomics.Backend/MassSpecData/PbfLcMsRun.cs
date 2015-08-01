@@ -89,7 +89,8 @@ namespace InformedProteomics.Backend.MassSpecData
             double productSignalToNoiseRatioThreshold, 
             IProgress<ProgressData> progress = null)
         {
-            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
+            var specReader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath);
+            return GetLcMsRun(specFilePath, specReader, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
         /// <summary>
@@ -105,6 +106,10 @@ namespace InformedProteomics.Backend.MassSpecData
         public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
+            // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull (being silly)
+            if (specReader is PbfLcMsRun)
+                return (LcMsRun)specReader;
+
             var pbfFilePath = ConvertToPbf(specFilePath, specReader, precursorSignalToNoiseRatioThreshold,
                 productSignalToNoiseRatioThreshold, null, progress);
 
@@ -273,21 +278,32 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     throw new FormatException("Illegal pbf file format!");
                 }
-                _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
-                _minMs1Mz = _reader.ReadDouble();
 
-                if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
+                if (_offsetPrecursorChromatogramStart == _offsetPrecursorChromatogramEnd)
                 {
-                    throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is < 0)");
+                    // No MS1 data
+                    _minMs1Mz = 0;
+                    _maxMs1Mz = 0;
                 }
-
-                if (_offsetPrecursorChromatogramEnd - NumBytePeak >= specFile.Length)
+                else
                 {
-                    throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is past the end of the file)");
-                }
+                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
+                    _minMs1Mz = _reader.ReadDouble();
 
-                _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
-                _maxMs1Mz = _reader.ReadDouble();
+                    if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
+                    {
+                        throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is < 0)");
+                    }
+
+                    if (_offsetPrecursorChromatogramEnd - NumBytePeak >= specFile.Length)
+                    {
+                        throw new FormatException(
+                            "Corrupt pbf file (_offsetPrecursorChromatogramEnd is past the end of the file)");
+                    }
+
+                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
+                    _maxMs1Mz = _reader.ReadDouble();
+                }
             }
 
             NumSpectra = _scanNumToSpecOffset.Count;
@@ -592,6 +608,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private long[] _chromMzIndexToOffset;
         private const double MzBinSize = 1;
+
+        // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
         private const int NumBytePeak = 16;
 
         private bool ReadMetaInfo()
@@ -600,15 +618,23 @@ namespace InformedProteomics.Backend.MassSpecData
             ScanNumElutionTimeMap = new Dictionary<int, double>();
             IsolationMzBinToScanNums = new Dictionary<int, int[]>();
 
+            // Read the file format integer from the end of the file
             _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
             var fileFormatId = _reader.ReadInt32();
             if (fileFormatId != FileFormatId) return false;
 
+            // Backup 10 bytes
             _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
 
+            // Read the byte offset of the start of the precursor chromatogram
             _offsetPrecursorChromatogramStart = _reader.ReadInt64();
+
+            // Read the byte offset of the start of the product chromatogram (which is the end ofthe precursor chromatogram)
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin = _reader.ReadInt64();
+
+            // Read the byte offset of the end of the product chromatogram
             _offsetProductChromatogramEnd = _reader.ReadInt64();
+
             // Read meta information
             var offsetMetaInfo = _offsetProductChromatogramEnd;
 
@@ -893,7 +919,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 PbfLcMsRun.WriteSpectrum(spec, writer);
             }
 
-            // Precursor ion chromatograms
+            // Precursor ion chromatogram (MS1 spectra)
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
 
             var minMzIndex = imlr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(imlr.Ms1PeakList[0].Mz) : 0;
@@ -903,7 +929,10 @@ namespace InformedProteomics.Backend.MassSpecData
             var prevMzIndex = -1;
             counter = 0;
             countTotal = imlr.Ms1PeakList.Count;
-            progressData.Status = "Writing precursor chromatograms";
+
+            // All MS1 data sorted by mass, then scan number
+            // In rare instances, imlr.Ms1PeakList will be blank (no MS1 spectra); that's OK
+            progressData.Status = "Writing precursor chromatogram";
             progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
             foreach (var peak in imlr.Ms1PeakList)
             {
@@ -921,11 +950,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 writer.Write(peak.ScanNum);
             }
 
-            // Product ion chromatograms
+            // Product ion chromatogram (MSn spectra)
             var ms2PeakList = new List<LcMsPeak>();
             counter = 0;
             countTotal = countMS2Spec;
-            progressData.Status = "Processing product chromatograms";
+            progressData.Status = "Processing product ion chromatogram";
             progressData.StepRange(42.9 + 15.7 + (41.2 / 2)); // Approximately 41% of total file size
             foreach (var ms2ScanNum in imlr.GetScanNumbers(2))
             {
@@ -943,7 +972,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var offsetBeginProductChromatogram = writer.BaseStream.Position;
             counter = 0;
             countTotal = ms2PeakList.Count;
-            progressData.Status = "Writing product chromatograms";
+            progressData.Status = "Writing product ion chromatogram";
             progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
             foreach (var peak in ms2PeakList)
             {
@@ -1107,7 +1136,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 PbfLcMsRun.WriteSpectrum(spec, writer);
             }
 
-            // Precursor ion chromatograms
+            // Precursor ion chromatogram (MS1 spectra)
             ms1PeakList.Sort();
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
 
@@ -1121,7 +1150,10 @@ namespace InformedProteomics.Backend.MassSpecData
             counter = 0;
             //countTotal = msdr.Ms1PeakList.Count;
             countTotal = ms1PeakList.Count;
-            progressData.Status = "Writing precursor chromatograms";
+
+            // All MS1 data sorted by mass, then scan number
+            // In rare instances, imlr.Ms1PeakList will be blank (no MS1 spectra); that's OK
+            progressData.Status = "Writing precursor chromatogram";
             progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
             //foreach (var peak in msdr.Ms1PeakList)
             foreach (var peak in ms1PeakList)
@@ -1143,7 +1175,7 @@ namespace InformedProteomics.Backend.MassSpecData
             ms1PeakList = null;
             GC.Collect(); // Just killed all objects in ms1PeakList; free them.
 
-            // Product ion chromatograms
+            // Product ion chromatogram (MSn spectra)
             //var ms2PeakList = new List<LcMsPeak>();
             //counter = 0;
             //countTotal = countMS2Spec;
@@ -1165,7 +1197,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var offsetBeginProductChromatogram = writer.BaseStream.Position;
             counter = 0;
             countTotal = ms2PeakList.Count;
-            progressData.Status = "Writing product chromatograms";
+            progressData.Status = "Writing product ion chromatogram";
             progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
             foreach (var peak in ms2PeakList)
             {
@@ -1343,9 +1375,9 @@ namespace InformedProteomics.Backend.MassSpecData
             ms1Scans.Sort();
             ms2Scans.Sort();
 
-            // Precursor ion chromatograms
+            // Precursor ion chromatogram (MS1 spectra)
             _offsetPrecursorChromatogramStart = writer.BaseStream.Position;
-            progressData.Status = "Writing precursor chromatograms";
+            progressData.Status = "Writing precursor chromatogram";
             progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
 
             var prog = new Progress<ProgressData>(p =>
@@ -1359,10 +1391,10 @@ namespace InformedProteomics.Backend.MassSpecData
             CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, prog);
             //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
 
-            // Product ion chromatograms
+            // Product ion chromatogram (MSn spectra)
             _offsetProductChromatogramBegin = writer.BaseStream.Position;
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin;
-            progressData.Status = "Writing product chromatograms";
+            progressData.Status = "Writing product chromatogram";
             progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
 
             prog = new Progress<ProgressData>(p =>

@@ -96,9 +96,16 @@ namespace MSPathFinder
         }
 
 
-        private static void PrintUsageInfo(string message = null)
+        private static void PrintUsageInfo(string errorMessage = null)
         {
-            if (message != null) Console.WriteLine("Error: " + message);
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                Console.WriteLine(@"----------------------------------------------------------");
+                Console.WriteLine(@"Error: " + errorMessage);
+                Console.WriteLine(@"----------------------------------------------------------");
+                Console.WriteLine();
+            }
+
             Console.WriteLine(
                 Name + " " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +

@@ -276,12 +276,24 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         private int[] _ms1ScanNumToIndex;
+
+        /// <summary>
+        /// Array of length MaxLcScan where entries that are non-zero are the scan index of the given scan number
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// For example, if scan 7 is the 5th MS1 scan in the dataset, then _ms1ScanNumToIndex[7] is 4
+        /// Entries in the array that are 0 mean that MS1 scan does not map to an index
+        /// (exception: scan 1 is listed as index 0)
+        /// </remarks>
         public int[] GetMs1ScanNumToIndex()
         {
             if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
             var ms1ScanNums = GetMs1ScanVector();
             _ms1ScanNumToIndex = new int[MaxLcScan + 1];
-            for (var i = 0; i < ms1ScanNums.Length; i++) _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
+            for (var i = 0; i < ms1ScanNums.Length; i++) 
+                _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
+
             return _ms1ScanNumToIndex;
         }
 
