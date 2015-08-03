@@ -1638,6 +1638,8 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             Console.WriteLine("memoryFreeKB: " + memoryFreeKB);
             Console.WriteLine("totalKBytesInMem: " + totalKBytesInMem);
+            Console.WriteLine("NumScans: " + scansForMsLevelX.Count);
+            Console.WriteLine("NumPeaks: " + totalPeaksCount);
 
             // If memory usage will be a problem, perform a modified merge sort and read peaks as needed from the pbf file in creation
             //if (totalKBytesInMem > memoryFreeKB / 4)
@@ -1648,11 +1650,15 @@ namespace InformedProteomics.Backend.MassSpecData
                 // SortedSet overhead per item: bool, 2 refs, and the item (+ pointer to it)
                 // item size: double, double, int, so 20 bytes
                 // Perform a massive merge-sort style read/write, to minimize memory usage - set a minimum of 5
+
+                //Approximate Maximum amount of memory used for a set number of peaks:
+                //     3.5 million: 500 MB
+                //     10  million: 1.1 GB
                 int maxInMemoryPerSpec = (int) (memoryFreeKB * 1024 / 2 / scansForMsLevelX.Count / (20 + 8 + 17));
+                if (maxInMemoryPerSpec * scansForMsLevelX.Count > 10000000) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
+                    maxInMemoryPerSpec = 10000000 / scansForMsLevelX.Count;
                 if (maxInMemoryPerSpec < 5)
                     maxInMemoryPerSpec = 5;
-                if (maxInMemoryPerSpec > 1000)
-                    maxInMemoryPerSpec = 1000;
 
                 Console.WriteLine("maxInMemoryPerSpec: " + maxInMemoryPerSpec);
 
@@ -1675,7 +1681,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
 
                     progData.MaxPercentage = isMs1List ? 10 : 20;
-                    // Read in metadata, and the first 5 peaks of each scan
+                    progData.IsPartialRange = true;
+                    // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 1000)
                     foreach (var scan in scansForMsLevelX)
                     {
                         progress.Report(progData.UpdatePercent((double) count / countTotal * 100));
@@ -1686,9 +1693,10 @@ namespace InformedProteomics.Backend.MassSpecData
                         foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec))
                         {
                             peaks.Add(peak);
-                            datum.Count++;
                         }
                     }
+                    //System.Console.WriteLine("Metadata count: " + metadata.Count);
+                    //System.Console.WriteLine("Metadata values count: " + metadata.Values.Count);
 
                     if (peaksCount == 0)
                     {
@@ -1716,9 +1724,13 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     var chromMzIndexToOffset = new Dictionary<int, long>();
 
+                    var oldestPeaksGen = GC.GetGeneration(peaks.Min);
                     while (peaks.Count > 0)
                     {
+                        /*/
+                        var oldCount = peaks.Count;
                         foreach (var peak in peaks)
+                        //foreach (var peak in peaks.ToList())
                         {
                             progress.Report(progData.UpdatePercent((double) count / peaksCount * 100.0));
                             count++;
@@ -1737,28 +1749,51 @@ namespace InformedProteomics.Backend.MassSpecData
                             writer.Write(peak.ScanNum);
 
                             peaksToRemove.Add(peak);
+                            peaks.Remove(peak);
 
                             var datum = metadata[peak.ScanNum];
-                            datum.Count--;
+                            datum.ReadOne();
 
-                            if (datum.Count < 1 && datum.MorePeaksToRead)
+                            if (datum.Count < 1)
                             {
-                                break;
+                                if (datum.MorePeaksToRead)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    metadata.Remove(datum.ScanNum);
+                                }
                             }
                         }
 
+                        //System.Console.WriteLine("PeaksCount: " + peaks.Count);
+                        //System.Console.WriteLine("PeaksRemoveCount: " + peaksToRemove.Count);
+                        
                         // Get the GC Generation of the oldest item on the list...
                         var oldestGen = GC.GetGeneration(peaksToRemove.First());
+                        System.Console.WriteLine("Calling GC up to generation " + oldestGen);
                         // Remove the output peaks from the sorted set
-                        foreach (var peak in peaksToRemove)
-                        {
-                            peaks.Remove(peak);
-                        }
+                        //foreach (var peak in peaksToRemove) // O(n), n = peaksToRemove.Count
+                        //{
+                        //    peaks.Remove(peak); // O(log n), n = peaks.Count
+                        //}
 
+                        // ExceptWith() might be a better option
+                        peaks.ExceptWith(peaksToRemove); // O(n), n = peaksToRemove.Count
+
+                        // RemoveWhere() might be faster, in some circumstances, but it doesn't seem to work so well in this case.
+                        //var biggestPeakToRemove = peaks.Last();
+                        //peaks.RemoveWhere(x => x.CompareTo(biggestPeakToRemove) <= 0); // O(n), n = peaks.Count
+                        System.Console.WriteLine("OldCount: {0} NewCount: {1} Diff: {2} ToRemove: {3}", oldCount, peaks.Count, oldCount - peaks.Count, peaksToRemove.Count);
                         peaksToRemove.Clear();
                         // We have probably removed a large number of peaks from the sorted set, and many may be considered "long-running".
                         // We can call GC.Collect() to try to recover that memory, and decrease overall memory usage.
                         GC.Collect(oldestGen, GCCollectionMode.Forced, false);
+                        System.Console.WriteLine("Called garbage collector");
+
+                        //System.Console.WriteLine("Metadata count: " + metadata.Count);
+                        //System.Console.WriteLine("Metadata values count: " + metadata.Values.Count);
 
                         // add new entries back into the list from the spectra that the peaks came from
                         foreach (var datum in metadata.Values)
@@ -1768,10 +1803,58 @@ namespace InformedProteomics.Backend.MassSpecData
                                 foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count))
                                 {
                                     peaks.Add(peak);
-                                    datum.Count++;
                                 }
                             }
                         }
+                        System.Console.WriteLine("Peaks count = " + peaks.Count);
+                        /*/
+                        var peak = peaks.Min;
+                        progress.Report(progData.UpdatePercent((double) count / peaksCount * 100.0));
+                        count++;
+                        if (isMs1List)
+                        {
+                            _maxMs1Mz = peak.Mz;
+                            var mzIndex = GetMzBinIndex(peak.Mz);
+                            if (mzIndex > prevMzIndex)
+                            {
+                                chromMzIndexToOffset.Add(mzIndex - _minMzIndex, writer.BaseStream.Position);
+                                prevMzIndex = mzIndex;
+                            }
+                        }
+                        writer.Write(peak.Mz);
+                        writer.Write((float) peak.Intensity);
+                        writer.Write(peak.ScanNum);
+
+                        //peaksToRemove.Add(peak);
+                        peaks.Remove(peak);
+
+                        var datum = metadata[peak.ScanNum];
+                        datum.ReadOne();
+
+                        if (datum.Count < 1)
+                        {
+                            if (datum.MorePeaksToRead)
+                            {
+                                // Restock
+                                foreach (var newPeak in datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count))
+                                {
+                                    peaks.Add(newPeak);
+                                }
+                            }
+                            else
+                            {
+                                // Out of stock, remove from inventory.
+                                metadata.Remove(datum.ScanNum);
+                            }
+                        }
+                        if (count % 1000000 == 0) // 1 million is probably too often, but telling it to run doesn't mean it will.
+                        {
+                            //System.Console.WriteLine("Calling GC up to generation " + oldestPeaksGen);
+                            GC.Collect(oldestPeaksGen, GCCollectionMode.Forced, false); // Don't block and wait for the garbage collection, do it in the background.
+                            oldestPeaksGen = GC.GetGeneration(peaks.Min);
+                            //System.Console.WriteLine("Called garbage collector");
+                        }
+                        /**/
                     }
 
                     if (isMs1List)
@@ -1967,7 +2050,7 @@ namespace InformedProteomics.Backend.MassSpecData
             public int NumPeaks { get; private set; }
             private int _numPeaksRead;
             private long _nextPeakOffset;
-            public int Count { get; set; }
+            public int Count { get; private set; }
 
             public bool MorePeaksToRead
             {
@@ -1992,15 +2075,21 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
 
-                for (int i = 0; i < numPeaksToRead && _numPeaksRead < NumPeaks; i++, _numPeaksRead++)
+                for (int i = 0; i < numPeaksToRead && _numPeaksRead < NumPeaks; i++)
                 {
                     var mz = reader.ReadDouble();
                     var intensity = reader.ReadSingle();
                     Count++;
+                    _numPeaksRead++;
                     peaks.Add(new LcMsPeak(mz, intensity, ScanNum));
                 }
                 _nextPeakOffset = reader.BaseStream.Position;
                 return peaks;
+            }
+
+            public void ReadOne()
+            {
+                Count--;
             }
         }
 
