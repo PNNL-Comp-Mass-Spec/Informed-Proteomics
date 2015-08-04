@@ -1380,16 +1380,19 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.Status = "Writing precursor chromatogram";
             progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
 
-            var prog = new Progress<ProgressData>(p =>
+            if (ms1PeakCount > 0)
             {
-                progressData.StatusInternal = p.Status;
-                progress.Report(progressData.UpdatePercent(p.Percent));
-            });
-            //CreateAndOutputMsXChromatogram(writer, ms1Scans, ms1PeakList, true, prog);
-            //ms1PeakList.Clear();
-            //CreateAndOutputMsXChromatogram(writer, ms1Scans, null, true, prog);
-            CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, prog);
-            //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
+                var prog = new Progress<ProgressData>(p =>
+                {
+                    progressData.StatusInternal = p.Status;
+                    progress.Report(progressData.UpdatePercent(p.Percent));
+                });
+                //CreateAndOutputMsXChromatogram(writer, ms1Scans, ms1PeakList, true, prog);
+                //ms1PeakList.Clear();
+                //CreateAndOutputMsXChromatogram(writer, ms1Scans, null, true, prog);
+                CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, prog);
+                //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
+            }
 
             // Product ion chromatogram (MSn spectra)
             _offsetProductChromatogramBegin = writer.BaseStream.Position;
@@ -1397,16 +1400,19 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.Status = "Writing product chromatogram";
             progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
 
-            prog = new Progress<ProgressData>(p =>
+            if (ms2PeakCount > 0)
             {
-                progressData.StatusInternal = p.Status;
-                progress.Report(progressData.UpdatePercent(p.Percent));
-            });
-            //CreateAndOutputMsXChromatogram(writer, ms2Scans, ms2PeakList, false, prog);
-            //ms2PeakList.Clear();
-            //CreateAndOutputMsXChromatogram(writer, ms2Scans, null, false, prog);
-            CreateAndOutputMsXChromatogram_Merge(writer, ms2Scans, ms2PeakCount, false, prog);
-            //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
+                var prog = new Progress<ProgressData>(p =>
+                {
+                    progressData.StatusInternal = p.Status;
+                    progress.Report(progressData.UpdatePercent(p.Percent));
+                });
+                //CreateAndOutputMsXChromatogram(writer, ms2Scans, ms2PeakList, false, prog);
+                //ms2PeakList.Clear();
+                //CreateAndOutputMsXChromatogram(writer, ms2Scans, null, false, prog);
+                CreateAndOutputMsXChromatogram_Merge(writer, ms2Scans, ms2PeakCount, false, prog);
+                //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
+            }
 
             // Meta information
             _offsetProductChromatogramEnd = writer.BaseStream.Position;
@@ -1620,8 +1626,11 @@ namespace InformedProteomics.Backend.MassSpecData
             // List overhead per item: is array-backed, so item (+ pointer to it)
             // item size: double, double, int, so 20 bytes
             //var avgPeaksPerSpec = (double)totalPeaksCount / scansForMsLevelX.Count;
-            var totalKBytesInMem = (totalPeaksCount * (20 + 8)) / 1024;
+            // Testing: Approx. 10 peaks per KB - it underestimates on the non-low-memory implementation, but only by 2-3 peaks/KB
+            //var totalKBytesInMem = (totalPeaksCount * (20 + 8)) / 1024;
+            var totalKBytesInMem = totalPeaksCount / 10;
             double memoryFreeKB = 0;
+            double totalMemKB = 0;
             //var osVersion = Environment.OSVersion.Version;
             //if (osVersion < new Version(6, 0)) // Older than Vista
             //{
@@ -1630,20 +1639,42 @@ namespace InformedProteomics.Backend.MassSpecData
             //}
             foreach (var item in new System.Management.ManagementObjectSearcher("SELECT * FROM CIM_OperatingSystem").Get())
             {
-                memoryFreeKB += int.Parse(item["FreePhysicalMemory"].ToString());
+                memoryFreeKB += double.Parse(item["FreePhysicalMemory"].ToString());
                 //foreach (var p in item.Properties)
                 //{
                 //    Console.WriteLine("{0}: {1}", p.Name, p.Value);
                 //}
             }
+            // Get total physical memory
+            foreach (var item in new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem").Get())
+            {
+                // TotalPhysicalMemory is in Bytes, so divide by 1024
+                totalMemKB += double.Parse(item["TotalPhysicalMemory"].ToString()) / 1024.0;
+                //foreach (var p in item.Properties)
+                //{
+                //    Console.WriteLine("{0}: {1}", p.Name, p.Value);
+                //}
+            }
+
             Console.WriteLine("memoryFreeKB: " + memoryFreeKB);
             Console.WriteLine("totalKBytesInMem: " + totalKBytesInMem);
             Console.WriteLine("NumScans: " + scansForMsLevelX.Count);
             Console.WriteLine("NumPeaks: " + totalPeaksCount);
+            var memSize = totalPeaksCount * 8L; // As a long, since we don't want to suffer from integer overflow, and a long should be big enough.
+
+            // Configure a reserve amount to avoid using all physical memory, which has the cost of excessive paging
+            var quarterTotalPhysicalMemory = totalMemKB / 4;
+            // Cut the reserve down on systems with large amounts of physical memory (16GB and greater)
+            while (quarterTotalPhysicalMemory > 4194304)
+            {
+                quarterTotalPhysicalMemory = quarterTotalPhysicalMemory / 2;
+            }
+            var memFreeLessReserve = memoryFreeKB - quarterTotalPhysicalMemory;
 
             // If memory usage will be a problem, perform a modified merge sort and read peaks as needed from the pbf file in creation
+            // Also use this method if NumPeaks * 8 is greater than 2000000000 (2GB/object memory cap)
             //if (totalKBytesInMem > memoryFreeKB / 4)
-            if (totalKBytesInMem < memoryFreeKB)
+            if (memFreeLessReserve <= 0 || totalKBytesInMem > memFreeLessReserve || memSize > 2000000000)
             {
                 // Use a SortedSet, since it has O(log n) insertion, deletion, and lookup (red-black tree)
                 // The enumerator access is O(1)
@@ -1654,6 +1685,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 //Approximate Maximum amount of memory used for a set number of peaks:
                 //     3.5 million: 500 MB
                 //     10  million: 1.1 GB
+                //     79  million: 6.6 GB
                 int maxInMemoryPerSpec = (int) (memoryFreeKB * 1024 / 2 / scansForMsLevelX.Count / (20 + 8 + 17));
                 if (maxInMemoryPerSpec * scansForMsLevelX.Count > 10000000) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
                     maxInMemoryPerSpec = 10000000 / scansForMsLevelX.Count;
@@ -1680,7 +1712,8 @@ namespace InformedProteomics.Backend.MassSpecData
                                     FileShare.ReadWrite)));
                     }
 
-                    progData.MaxPercentage = isMs1List ? 10 : 20;
+                    //progData.MaxPercentage = isMs1List ? 10 : 20;
+                    progData.MaxPercentage = 5;
                     progData.IsPartialRange = true;
                     // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 1000)
                     foreach (var scan in scansForMsLevelX)
@@ -1690,7 +1723,9 @@ namespace InformedProteomics.Backend.MassSpecData
                         var datum = GetPeakMetaDataForSpectrum(scan);
                         peaksCount += datum.NumPeaks;
                         metadata.Add(datum.ScanNum, datum);
-                        foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec))
+                        //foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec))
+                        // try to minimize the startup cost - it is mitigated in the optimized version of the loop.
+                        foreach (var peak in datum.ReadPeaks(_reader, 5))
                         {
                             peaks.Add(peak);
                         }
@@ -1875,9 +1910,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
+                progData.IsPartialRange = true;
                 progData.MaxPercentage = 50;
                 // Use the passed-in count as the initial capacity, or int.MaxValue if the passed in count is too big for an int.
-                var peaksList = new List<LcMsPeak>(totalPeaksCount > int.MaxValue ? int.MaxValue : (int) totalPeaksCount);
+                var peaksList = new List<LcMsPeak>(totalPeaksCount > int.MaxValue ? int.MaxValue : (int)totalPeaksCount);
                 if (_reader == null)
                 {
                     _reader =
