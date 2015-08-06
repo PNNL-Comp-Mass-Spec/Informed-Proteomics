@@ -74,8 +74,9 @@ namespace InformedProteomics.Backend.Utils
         {
             string[] concatenated;
             int scoreIndex;
+            int rawScoreIndex;
 
-            var success = ReadTargetAndDecoy("QValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex);
+            var success = ReadTargetAndDecoy("QValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex, out rawScoreIndex);
 
             if (!success)
             {
@@ -94,7 +95,8 @@ namespace InformedProteomics.Backend.Utils
             if (!GetColumnIndex("QValues", "ProteinName", out proteinIndex))
                 return false;
     
-            var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+            var distinctSorted = concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
                 .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
                 .Select(grp => grp.First())
                 .ToArray();
@@ -138,8 +140,9 @@ namespace InformedProteomics.Backend.Utils
 
             string[] concatenated;
             int scoreIndex;
+            int rawScoreIndex;
 
-            var success = ReadTargetAndDecoy("PepQValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex);
+            var success = ReadTargetAndDecoy("PepQValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex, out rawScoreIndex);
 
             if (!success)
             {
@@ -171,13 +174,15 @@ namespace InformedProteomics.Backend.Utils
                 return false;
 
             var distinctSorted = !_multiplePeptidesPerScan ?
-                concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
                     .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
                     .Select(grp => grp.First())
                     .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
                     .Select(grp => grp.First())
                     .ToArray() :
-                concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
                     .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
                     .Select(grp => grp.First())
                     .ToArray();
@@ -247,9 +252,11 @@ namespace InformedProteomics.Backend.Utils
             string targetResultFilePath,
             string decoyResultFilePath,
             out string[] concatenated,
-            out int scoreIndex)
+            out int scoreIndex,
+            out int rawScoreIndex)
         {
             scoreIndex = -1;
+            rawScoreIndex = -1;
             concatenated = new string[0];
 
             var errorBase = "Cannot compute " + targetStatistic + "; ";
@@ -296,22 +303,25 @@ namespace InformedProteomics.Backend.Utils
                 return false;
             }
 
-            scoreIndex = _headers.IndexOf("IcScore");
+            scoreIndex = _headers.IndexOf("SpecEValue");
             if (scoreIndex < 0)
             {
-                scoreIndex = _headers.IndexOf("Score");
+                ErrorMessage = errorBase + "SpecEValue column is missing";
+                return false;
             }
-
-            if (scoreIndex < 0)
+            
+            rawScoreIndex = _headers.IndexOf("Score");
+            if (rawScoreIndex < 0)
             {
-                scoreIndex = _headers.IndexOf("#MatchedFragments");
+                rawScoreIndex = _headers.IndexOf("#MatchedFragments");
             }
 
-            if (scoreIndex < 0)
+            if (rawScoreIndex < 0)
             {
                 ErrorMessage = errorBase + "#MatchedFragments column is missing";
                 return false;
             }
+
             return true;
         }
 

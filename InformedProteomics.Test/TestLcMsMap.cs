@@ -43,6 +43,16 @@ namespace InformedProteomics.Test
             var massTolerance = new Tolerance(10);
 
             var ms1ftFilter = new Ms1FtFilter(run, massTolerance, ms1FtFileName);
+            var n = 0;
+            var ms2ScanNums = run.GetScanNumbers(2);
+            foreach (var ms2ScanNum in ms2ScanNums)
+            {
+                var matchingMass = ms1ftFilter.GetMatchingMass(ms2ScanNum);
+                n += matchingMass.Count();
+            }
+            
+            Console.WriteLine("{0} / {1}", n, ms2ScanNums.Count);
+            /*
             var tsvReader = new TsvFileParser(idFilePath);
 
             for (var i = 0; i < tsvReader.NumData; i++)
@@ -76,7 +86,7 @@ namespace InformedProteomics.Test
                 {
                     Console.WriteLine("{0}\t{1}\t{2}", scan, mass, nMatched);
                 }
-            }
+            }*/
         }
         
         /*

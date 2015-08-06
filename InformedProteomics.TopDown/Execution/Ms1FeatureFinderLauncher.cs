@@ -58,10 +58,10 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        public string GetHeaderString()
+        public static string GetHeaderString(bool scoreReport = false)
         {
             var header = ArrayUtil.ToString(TsvHeader);
-            if (Parameters.ScoreReport) header = header + "\t" + ArrayUtil.ToString(TsvExtraScoreHeader);
+            if (scoreReport) header = header + "\t" + ArrayUtil.ToString(TsvExtraScoreHeader);
             return header;
         }
 
@@ -177,7 +177,7 @@ namespace InformedProteomics.TopDown.Execution
 
             // write result files
             var tsvWriter = new StreamWriter(outTsvFilePath);
-            tsvWriter.WriteLine(GetHeaderString());
+            tsvWriter.WriteLine(GetHeaderString(Parameters.ScoreReport));
 
             StreamWriter csvWriter = null;
             if (Parameters.CsvOutput)
@@ -190,7 +190,7 @@ namespace InformedProteomics.TopDown.Execution
             foreach (var feature in container.GetFilteredFeatures(connectedFeatures))
             {
                 featureId++;
-                tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature));
+                tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature, Parameters.ScoreReport));
 
                 var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
 
@@ -221,7 +221,29 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        private string GetString(LcMsPeakCluster feature)
+        public static string GetString(LcMsFeature feature)
+        {
+            // should be called after calling UpdateScore & UpdateAbundance
+            var sb = new StringBuilder(string.Format("{0}\t{1}\t{2}\t{3}\t{4:0.0000}\t{5}\t{6}\t{7:0.0000}\t{8:0.00}",
+                                        feature.MinScanNum, feature.MaxScanNum,
+                                        feature.MinCharge, feature.MaxCharge,
+                                        feature.RepresentativeMass,
+                                        feature.RepresentativeScanNum,
+                                        feature.RepresentativeCharge,
+                                        feature.RepresentativeMz,
+                                        feature.Abundance));
+
+            sb.AppendFormat("\t{0:0.0}", feature.MinElutionTime);
+            sb.AppendFormat("\t{0:0.0}", feature.MaxElutionTime);
+            sb.AppendFormat("\t{0:0.0}", feature.ElutionLength);
+
+            sb.Append("\t");
+            sb.Append("");
+            sb.Append(string.Format("\t{0:0.0}", feature.Score));
+            return sb.ToString();
+        }
+
+        public static string GetString(LcMsPeakCluster feature, bool scoreReport = false)
         {
             // should be called after calling UpdateScore & UpdateAbundance
             var sb = new StringBuilder(string.Format("{0}\t{1}\t{2}\t{3}\t{4:0.0000}\t{5}\t{6}\t{7:0.0000}\t{8:0.00}",
@@ -247,7 +269,7 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             sb.Append(string.Format("\t{0:0.0}", feature.Score));
-            if (Parameters.ScoreReport)
+            if (scoreReport)
             {
 
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);
@@ -286,8 +308,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", 
             "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
-            "MinElutionTime", "MaxElutionTime", "ElutionLength", 
-            "Envelope", "LikelihoodRatio"
+            "MinElutionTime", "MaxElutionTime", "ElutionLength", "Envelope", "LikelihoodRatio"
         };
 
         private static readonly string[] TsvExtraScoreHeader = new string[]

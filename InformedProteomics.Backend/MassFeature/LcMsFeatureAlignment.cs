@@ -11,28 +11,43 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsFeatureAlignment
     {
-        public LcMsFeatureAlignment(IList<string> featureFileList, IList<string> rawFileList, double massTolerancePpm = 5)
+        public LcMsFeatureAlignment(ILcMsFeatureComparer featureCompare)
         {
-            _tolerance = new Tolerance(massTolerancePpm);
+            _featureSetList = new Dictionary<int, List<LcMsFeature>>();
+            _featureList = new List<LcMsFeature>();
+            RawFileList = new List<string>();
+            _featureCompare = featureCompare;
+        }
 
-            FeatureFileList = featureFileList;
+        private readonly ILcMsFeatureComparer _featureCompare;
+        public LcMsFeatureAlignment(IList<string> featureFileList, IList<string> rawFileList, ILcMsFeatureComparer featureCompare)
+        {
             RawFileList = rawFileList;
-
             _featureSetList = new Dictionary<int, List<LcMsFeature>>();
             _featureList = new List<LcMsFeature>();
 
-            for (var i = 0; i < FeatureFileList.Count; i++)
+            for (var i = 0; i < featureFileList.Count; i++)
             {
-                var features = LoadProMexResult(RawFileList[i], FeatureFileList[i], i);
+                var features = LoadProMexResult(RawFileList[i], featureFileList[i], i);
                 features.Sort(new FeatureMassComparer());
                 _featureSetList.Add(i, features);
                 _featureList.AddRange(features);
             }
             _featureList.Sort(new FeatureMassComparer());
-            
+
+            _featureCompare = featureCompare;
         }
         
-        public static List<LcMsFeature> LoadProMexResult(string rawFilePath, string featureFilePath, int dataid = 0)
+        public void AddDataSet(int dataId, List<LcMsFeature> features, string rawFilePath)
+        {
+            RawFileList.Add(rawFilePath);
+            features.Sort(new FeatureMassComparer());
+            _featureSetList.Add(dataId, features);
+            _featureList.AddRange(features);
+            _featureList.Sort(new FeatureMassComparer());        
+        }
+        
+        public static List<LcMsFeature> LoadProMexResult(string rawFilePath, string featureFilePath, int dataid)
         {
             var featureList = new List<LcMsFeature>();
             var tsvReader = new TsvFileParser(featureFilePath);
@@ -209,6 +224,10 @@ namespace InformedProteomics.Backend.MassFeature
             }
             return null;
         }
+        
+        public int CountDatasets { get { return RawFileList.Count; } }
+
+        public int CountAlignedFeatures { get { return (_alignedFeatures == null) ? 0 : _alignedFeatures.Count; } }
 
         public void TryFillMissingFeature(List<LcMsFeature[]> alignedFeatures)
         {
@@ -232,14 +251,14 @@ namespace InformedProteomics.Backend.MassFeature
                         {
                             if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
 
-                            if (alignedFeatures[k][j] != null && Alignable(featureInfoList[i], alignedFeatures[k][j], true))
+                            if (alignedFeatures[k][j] != null && _featureCompare.Match(featureInfoList[i], alignedFeatures[k][j]))
                                 altFt = alignedFeatures[k][j];
                         }
 
                         for (var k = i + 1; altFt == null && k < alignedFeatures.Count; k++)
                         {
                             if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
-                            if (alignedFeatures[k][j] != null && Alignable(featureInfoList[i], alignedFeatures[k][j], true))
+                            if (alignedFeatures[k][j] != null && _featureCompare.Match(featureInfoList[i], alignedFeatures[k][j]))
                                 altFt = alignedFeatures[k][j];
                         }
 
@@ -271,7 +290,7 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     var fj = features[j];
                     if (fj.Mass - fi.Mass > 1.5) break;
-                    if (Alignable(fi, fj))
+                    if (_featureCompare.Match(fi, fj))
                     {
                         adjList[i].Add(j);
                         adjList[j].Add(i);
@@ -295,46 +314,10 @@ namespace InformedProteomics.Backend.MassFeature
 
             return ret;
         }
-        
-        private bool Alignable(LcMsFeature f1, LcMsFeature f2, bool oneDaltonShift = false)
-        {
-            if (f1.DataSetId == f2.DataSetId) return false;
 
-            // tolerant in mass dimension?
-            if (!oneDaltonShift)
-            {
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
-                if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;                
-            }
-            else
-            {
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
-                var massDiff = Math.Abs(f1.Mass - f2.Mass);
-
-                if (f1.Mass > 10000 && f2.Mass > 10000)
-                {
-                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol && Math.Abs(massDiff - 2) > massTol) return false;                                    
-                }
-                else
-                {
-                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol) return false;                                
-                }
-            }
-
-            // tolerant in elution time dimension?
-
-            var lenDiff = Math.Abs(f1.NetLength - f2.NetLength)/Math.Min(f1.NetLength, f2.NetLength);
-            if (lenDiff > 0.5) return false;
-                
-            if (f1.CoElutedByNet(f2, 0.001)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
-            //if (NetDiff(f1, f2) < TolNet) return true;
-            return false;
-        }
-
-        
         private List<LcMsFeature> GetAlignedFeatures(ref HashSet<int> component, List<int>[] adjList)
         {
-            var nDataSet = FeatureFileList.Count;
+            var nDataSet = RawFileList.Count;
             
             // find seed node
             var minScoreNode = 0;
@@ -463,10 +446,6 @@ namespace InformedProteomics.Backend.MassFeature
         }
 
 
-        public int CountDatasets { get { return RawFileList.Count;  } }
-
-        public int CountAlignedFeatures { get { return (_alignedFeatures == null) ? 0 : _alignedFeatures.Count; } }
-
         private double NetDiff(LcMsFeature f1, LcMsFeature f2)
         {
             var n1 = Math.Abs(f1.Net - f2.Net);
@@ -478,10 +457,7 @@ namespace InformedProteomics.Backend.MassFeature
         private const double TolNet = 0.003;
         private readonly Dictionary<int, List<LcMsFeature>> _featureSetList;
         private readonly List<LcMsFeature> _featureList;
-        
-        public readonly IList<string> FeatureFileList;
         public readonly IList<string> RawFileList;
-
         private readonly Tolerance _tolerance;
 
         private class FeatureMassComparer : IComparer<LcMsFeature>

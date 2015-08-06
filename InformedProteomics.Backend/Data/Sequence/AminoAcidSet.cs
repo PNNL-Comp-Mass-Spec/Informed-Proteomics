@@ -233,6 +233,40 @@ namespace InformedProteomics.Backend.Data.Sequence
             }            
         }
 
+        public Composition.Composition[] GetUniqueCompositions()
+        {
+            //var aaList = AminoAcid.StandardAminoAcidArr.ToList();
+            var uniqueCompositionList = new List<Composition.Composition>();
+            var tempModTable = new List<Composition.Composition>[AminoAcid.StandardAminoAcidArr.Length];
+            for (var i = 0; i < AminoAcid.StandardAminoAcidArr.Length; i++)
+            {
+                tempModTable[i] = new List<Composition.Composition>();
+                uniqueCompositionList.Add(AminoAcid.StandardAminoAcidArr[i].Composition);
+            }
+
+            foreach (var location in AllSequenceLocations)
+            {
+                //var keys = _locationSpecificResidueMap[location].Keys.ToArray();
+                for(var i =0; i < AminoAcid.StandardAminoAcidArr.Length; i++)
+                {
+                    var residue = AminoAcid.StandardAminoAcidArr[i].Residue;
+                    var aa = GetAminoAcid(residue, location);
+
+                    foreach (var modIndex in GetModificationIndices(residue, location))
+                    {
+                        var mAa = new ModifiedAminoAcid(aa, _modificationParams.GetModification(modIndex));
+                        if (tempModTable[i].Contains(mAa.Composition)) continue;
+                        tempModTable[i].Add(mAa.Composition);
+                        uniqueCompositionList.Add(mAa.Composition);
+                        //aaList.Add(mAa);
+                    }
+                    //Console.WriteLine();
+                }
+            }
+
+            return uniqueCompositionList.ToArray();
+        }
+
         public static AminoAcidSet GetStandardAminoAcidSet()
         {
             return _standardAminoAcidSet ?? (_standardAminoAcidSet = new AminoAcidSet());

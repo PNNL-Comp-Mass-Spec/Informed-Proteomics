@@ -5,11 +5,11 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class NodeSet<T> : List<T>
     {
-        public IList<NodeSet<T>> ConnnectedComponents(INodeComparer<T> comparer)
+        public List<List<T>> ConnnectedComponents(INodeComparer<T> comparer)
         {
             SetAdjacentList(comparer);
 
-            var componentSet = new List<NodeSet<T>>();
+            var componentSet = new List<List<T>>();
             var visited = new bool[Count];
             for (var i = 0; i < Count; i++)
             {

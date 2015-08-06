@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
             Spectrum spec, int minCharge, int maxCharge, 
             int isotopeOffsetTolerance, double filteringWindowSize,
-            Tolerance tolerance, double corrScoreThreshold, double bcDistThreshold = 1.0)
+            Tolerance tolerance, double corrScoreThreshold)
         {
             var peaks = spec.Peaks;
 
@@ -90,12 +90,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             var observedPeak = observedPeaks[i];
                             observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
                         }
+
                         var corr = FitScoreCalculator.GetPearsonCorrelation(envelop, observedIntensities);
-                        if (corr < corrScoreThreshold) continue;
-                        
                         var bcDist = FitScoreCalculator.GetBhattacharyyaDistance(envelop, observedIntensities);
-                        if (bcDist > bcDistThreshold) continue;
-                        
+
+                        if (corr < corrScoreThreshold && bcDist > 0.05) continue;
 
                         // monoIsotopeMass is valid
                         monoIsotopePeakList.Add(new DeconvolutedPeak(peak, monoIsotopeMass, charge));

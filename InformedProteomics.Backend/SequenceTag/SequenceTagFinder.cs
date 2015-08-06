@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.SequenceTag
             _minTagLength = minTagLength;
 
             _spectrum = spec;
-            _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.5, 0.5);
+            _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.7);
             //Console.WriteLine("[{0}] # of mz peaks = {1}, # of ms peaks = {2}", _spectrum.ScanNum, _spectrum.Peaks.Length, _deconvolutedPeaks.Count);
             //if (_deconvolutedPeaks.Count > 1000) _deconvolutedPeaks = Deconvoluter.FilterOut(_deconvolutedPeaks, 101, 20);
 

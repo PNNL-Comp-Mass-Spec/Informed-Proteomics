@@ -344,7 +344,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const int searchMode = 1;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            const int searchMode = 2;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
             bool? tda = true;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
@@ -410,6 +410,9 @@ namespace InformedProteomics.Test
                     tda,
                     searchMode
                     );
+
+            //topDownLauncher.ForceParallel = true;
+            //topDownLauncher.MaxNumThreads = -1;
 
             topDownLauncher.RunSearch(0.7);
             //topDownLauncher.RunIntactProteinSearch();

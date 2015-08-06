@@ -22,11 +22,15 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         public void AddEValueDist(ScoreDistribution otherDistribution, int deltaScore, double weight)
         {
             if (otherDistribution == null) return;
-            for (var index = Math.Max(otherDistribution.MinScore, MinScore - deltaScore);
-                index < otherDistribution.MaxScore;
-                index++)
+            
+            
+            for (var index = Math.Max(otherDistribution.MinScore, MinScore - deltaScore); index < otherDistribution.MaxScore; index++)
             {
+                
                 var delEValue = otherDistribution._eValueDistribution[index - otherDistribution.MinScore]*weight;
+
+
+
                 _eValueDistribution[index + deltaScore - MinScore] += delEValue;
             }
         }

@@ -165,6 +165,7 @@
     <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
     <Compile Include="MassFeature\NodeSet.cs" />
     <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
+    <Compile Include="MassFeature\ProteinSpectrumMatchAlignment.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatchMap.cs" />
     <Compile Include="MassFeature\PrSmContainer.cs" />
     <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />

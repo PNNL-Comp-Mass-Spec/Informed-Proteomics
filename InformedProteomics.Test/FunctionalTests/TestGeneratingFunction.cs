@@ -1,17 +1,25 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Scoring.GeneratingFunction;
+using InformedProteomics.Scoring.TopDown;
+using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
+using PNNLOmics.Data;
+using Peak = InformedProteomics.Backend.Data.Spectrometry.Peak;
 
 namespace InformedProteomics.Test.FunctionalTests
 {
@@ -23,13 +31,31 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-            const string rawFile = @"\\protoapps\UserData\Jungkap\TrainingSet\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            var sequence = new Sequence(protSequence, new AminoAcidSet());
-            var proteinMass = sequence.Composition.Mass;
-            const int scanNum = 5927;
-            var aminoArray = AminoAcid.StandardAminoAcidArr;
-            var comparer = new ProteinMassComparerWithBinning(aminoArray);
+            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            
+            const int scanNum = 6745;
+            const string protSequence = "EKQRPDFIYPQGSMLMHSPLVLNKADMYGFFLKGKLANLQRSIDNTLNQVAGSAMYFKVLSPYVLTTFTQIEKAYSDYPTDRAKGWIQETDIITWVMVGRQDNSSSTKISHVYFQPLHIWVNDAMALINGRELFGYPKYLCEYTMPAAGQPLTRLSLAAKSFLHFSPDTELAMHPLLEVNCNAKPEAQLSTVEAITQTWKLFKEQTDFIPELDKLGEEQLFHLLFKPAIDQVFLKQFPDASGQKAVYQAITASPAKVNKVHSVALLENDFVATLFDNASFPLKDTLGVELGEQHVLLPYHVNFDFEVPPGEVLVDNSEIKKQKIAILGGGVAAMTAACYLTDKPGWQNQYEIDIYQLGWRIGGKGASGRNAAMGQRIEEHGLHIWFGFYQNAFALMRKAYEELDRPAQAPLATFLDAFKPHHFIVLQEEINGRSVSWPI";
+            const string modStr = "Acetyl 0,Oxidation 55,Dehydro 141,Dehydro 181";
+
+            
+            // Configure amino acid set
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
+
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                oxM,
+                acetylN
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            var sequence = Sequence.CreateSequence(protSequence, modStr, aaSet);
+            var proteinMass = sequence.Mass;
+
+            Console.WriteLine("Mass = {0}", proteinMass);
+            
 
             const int maxCharge = 15;
             const int minCharge = 1;
@@ -37,183 +63,63 @@ namespace InformedProteomics.Test.FunctionalTests
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
-            var spectrum = run.GetSpectrum(scanNum);
-
-            var aminoProb = new double[aminoArray.Length];
-            for (var i = 0; i < aminoProb.Length; i++)
-            {
-                aminoProb[i] = 1.0d/aminoProb.Length;
-            }
+            var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
             if (!File.Exists(rawFile))
             {
                 Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
                 return;
             }
-            
+
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spectrum, minCharge, maxCharge,
-                isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.5, 0.5);
+                isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
 
-            var massList = new double[deconvolutedPeaks.Count];
-            var peakScores = new int[deconvolutedPeaks.Count];
-
-            for (var i = 0; i < deconvolutedPeaks.Count; i++)
+            var peakList = deconvolutedPeaks.Select(dp => new Peak(dp.Mass, dp.Intensity)).ToArray();
+            var productSpec = new ProductSpectrum(peakList, spectrum.ScanNum)
             {
-                peakScores[i] = 1;
-                massList[i] = deconvolutedPeaks[i].Mass - BaseIonType.B.OffsetComposition.Mass;
-            }
+                MsLevel = spectrum.MsLevel,
+                ActivationMethod = spectrum.ActivationMethod,
+                IsolationWindow = spectrum.IsolationWindow
+            };
 
-            var graph = new ScoringGraph(massList, peakScores, proteinMass, aminoArray, aminoProb, comparer);
-            var gf = new GeneratingFunction(comparer.GetBinNumber(proteinMass + 1000), sequence.Count*3);
+            var comparer = new FilteredProteinMassBinning(aaSet, 50000, 27);
+            Console.WriteLine("{0}\t{1}",comparer.NumberOfBins, comparer.GetBinNumber(proteinMass));
+            var graphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
 
+            Console.WriteLine(proteinMass);
+            var stopwatch = Stopwatch.StartNew();
+            var graph = graphFactory.CreateScoringGraph(productSpec, proteinMass);
+            Console.WriteLine(@"graph generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            
+            stopwatch.Restart();
+            var gf = new GeneratingFunction(comparer.NumberOfBins);
             gf.ComputeGeneratingFunction(graph);
-
-            for (var score = 10; score < 25; score++)
+            Console.WriteLine(@"computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            for (var score = 1; score <= gf.MaximumScore; score++)
             {
                 var specEvalue = gf.GetSpectralEValue(score);
-
-                Console.WriteLine("{0} : {1}", score, specEvalue);
-            }
-            
-        }
-
-
-        public List<DeconvolutedPeak> GetMassListForTest()
-        {
-            var peaks = new List<DeconvolutedPeak>();
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            var sequence = new Sequence(protSequence, new AminoAcidSet());
-            var proteinMass = sequence.Composition.Mass;
-
-            foreach (var a in sequence.GetPrefixCompositions())
-            {
-                var peak = new DeconvolutedPeak(new Peak(a.Mass*0.5, 1), a.Mass, 2);
-                peaks.Add(peak);
+                Console.WriteLine("{0} : {1}", score, specEvalue);                                
             }
 
-            return peaks;
+
         }
-
-
+        /*
         [Test]
-        public void TestEffectiveMassBinning()
+        public void TestRescoring()
         {
-            var aaSet = AminoAcid.StandardAminoAcidArr;
-            var massComparer = new ProteinMassComparerWithBinning(aaSet);
+            //const string specFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            const string sequence = "SGWYELSKSSNDQFKFVLKAGNGEVILTSELYTGKSGAMNGIESVQTNSPIEARYAKEVAKNDKPYFNLKAANHQIIGTSQMYSSTA";
+            const int scanNum = 4084;
+            const int charge = 7;
+            var aaSet = new AminoAcidSet();
+            var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
-
-            //Console.WriteLine(massComparer.GetBinNumber(50000));
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            var sequence = new Sequence(protSequence, new AminoAcidSet());
-            var proteinMass = sequence.Composition.Mass;
-            var proteinMassIndex = massComparer.GetBinNumber(proteinMass);
-
-            var nEdges = 0;
-            for (var i = 0; i <= proteinMassIndex; i++)
-            {
-                var nodeMass = massComparer.GetMass(i);
-                foreach (var aa in aaSet)
-                {
-                    var j = massComparer.GetBinNumber(nodeMass + aa.Mass);
-
-                    if (j < 0) Console.WriteLine("{0}-{1} are connected by edge", i, j);
-
-                    nEdges++;
-
-                }
-            }
-            Console.WriteLine(@"# of nodes = {0}, # of edges = {1}", proteinMassIndex + 1, nEdges);
-            
-            /*
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            
-            var sequence = new Sequence(protSequence, new AminoAcidSet());
-            var proteinMass = sequence.Composition.Mass;
-
-            proteinMass = 20000;
-            
-            var comparer = new MzComparerWithBinning();
-            var maxBinIndex = comparer.GetBinNumber(proteinMass);
-            var minBinIndex = comparer.GetBinNumber(0);
-            var nBins = maxBinIndex + 1;
-
-            var aaSet = AminoAcid.StandardAminoAcidArr;
-            var bins = new byte[nBins];
-            bins[0] = 1;
-
-            for (var i = minBinIndex; i < maxBinIndex; i++)
-            {
-                var mass = comparer.GetMzAverage(i);
-                var minMass = comparer.GetMzStart(i);
-                var maxMass = comparer.GetMzEnd(i);
-
-                if (bins[i] == 1)
-                {
-                    foreach (var aa in aaSet)
-                    {
-                        //var j = comparer.GetBinNumber(mass + aa.Mass);
-
-                        for (var j = comparer.GetBinNumber(minMass + aa.Mass);
-                            j <= comparer.GetBinNumber(maxMass + aa.Mass);
-                            j++)
-                        {
-                            if (j > maxBinIndex) continue;
-                            if (bins[j] == 0) bins[j] = 1;                            
-                        }
-                    }
-                }
-            }
-            Console.WriteLine("{0} -> {1}", nBins, bins.Count(b => b == 1));*/
-        }
-
-
-        public int[] GetSpectralVectorForTest(string rawFile, int scanNum)
-        {
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            //const string rawFile = @"\\protoapps\UserData\Jungkap\TrainingSet\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            //const int scanNum = 5927;
-
-            var sequence = new Sequence(protSequence, new AminoAcidSet());
-            var proteinMass = sequence.Composition.Mass;
-            
-            var nominalProteinMass = Constants.GetBinNum(proteinMass);
-            var spectralVec = new int[nominalProteinMass + 1];
-
-            foreach (var a in sequence.GetPrefixCompositions())
-            {
-                var binIndex = Constants.GetBinNum(a.Mass);
-                spectralVec[binIndex] = 1;
-            }
-            
-            
-            const int maxCharge = 15;
-            const int minCharge = 1;
-            const double filteringWindowSize = 1.1;
-            const int isotopeOffsetTolerance = 2;
-            var tolerance = new Tolerance(10);
-
-
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
-            var spectrum = run.GetSpectrum(scanNum);
-
-            // transform spectrum to spectral vector 
-            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spectrum, minCharge, maxCharge,
-                isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.5, 0.5);
-            //var nominalProteinMass = Constants.GetBinNumHighPrecision(proteinMass);
-
-
-            foreach (var peak in deconvolutedPeaks)
-            {
-                //var binIndex = Constants.GetBinNumHighPrecision(peak.Mass);
-                var binIndex = Constants.GetBinNum(peak.Mass);
-                if (binIndex >= spectralVec.Length) break;
-                spectralVec[binIndex] = 1;
-            }
-
-            
-            return spectralVec;
-        }
-
+            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
+            var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
+            var scores = informedScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, composition, charge, scanNum);
+            Console.WriteLine(scores);
+        }*/
     }
 
 

@@ -65,6 +65,8 @@ namespace InformedProteomics.TopDown.Scoring
             var ms2Score = scoreAndModifications.Item1;
             var modifications = scoreAndModifications.Item2;
 
+            return new IcScores(ms2Score, modifications);
+            /*
             var ion = new Ion(composition, charge);
 
             // IsotopeCorrPrevMs1
@@ -96,6 +98,7 @@ namespace InformedProteomics.TopDown.Scoring
             var corrPlusOneCharge = xicPlusOneCharge.Count >= 3 ? xicThisPeak.GetCorrelation(xicPlusOneCharge) : 0;
 
             return new IcScores(ms2Score, isotopeCorrPrevMs1, isotopeCorrNextMs1, corrMostAbundantPlusOneIsotope, corrMinusOneCharge, corrPlusOneCharge, modifications);
+             */
         }
 
         //public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int minCharge, int maxCharge, int minScanNum, int maxScanNum)
@@ -172,6 +175,33 @@ namespace InformedProteomics.TopDown.Scoring
 
     public class IcScores
     {
+        public IcScores(double ms2Score, string modifications)
+        {
+            Ms2Score = ms2Score;
+            Modifications = modifications;
+        }
+
+        public double Ms2Score { get; private set; }
+        public string Modifications { get; private set; }
+        
+        public override string ToString()
+        {
+            return string.Join("\t",
+                new[]
+                {
+                    Ms2Score
+                });
+        }
+
+        public static string GetScoreNames()
+        {
+            return "Ms2Score";
+        }
+    }
+
+    /*
+    public class IcScores
+    {
         public IcScores(
             double ms2Score, 
             double isotopeCorrPrevMs1, double isotopeCorrNextMs1, 
@@ -212,7 +242,7 @@ namespace InformedProteomics.TopDown.Scoring
                 "Ms2Score\tIsotopeCorrPrevMs1\tIsotopeCorrNextMs1\tCorrMostAbundantPlusOneIsotope\tChargeCorrMinusOne\tChargeCorrPlusOne";
         }
     }
-
+    */
     //public IcScores GetScores(Sequence sequence, int charge, int ms2ScanNum)
     //{
     //    var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;

@@ -7,6 +7,5 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         int GetNodeScore(int nodeIndex);
         IEnumerable<ScoringGraphEdge> GetEdges(int nodeIndex);
         int GetNumNodes();
-        
     }
 }

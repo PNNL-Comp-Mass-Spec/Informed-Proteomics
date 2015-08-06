@@ -1,4 +1,5 @@
-﻿using InformedProteomics.Backend.Data.Sequence;
+﻿using System;
+using InformedProteomics.Backend.Data.Sequence;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests

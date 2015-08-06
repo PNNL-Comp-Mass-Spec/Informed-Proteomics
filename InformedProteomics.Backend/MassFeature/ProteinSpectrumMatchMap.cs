@@ -17,59 +17,37 @@ namespace InformedProteomics.Backend.MassFeature
         {
             DataId = dataid;
             DataDesc = dataDesc;
-
-            _ms2ScanNums = run.GetScanNumbers(2).ToArray();
-            _prsmArray = new ProteinSpectrumMatch[_ms2ScanNums.Last() + 1];
             Run = run;
-            _massComparerWithBinning = new MzComparerWithBinning(29); // 4ppm
+            _scanNumToMatchMap = new Dictionary<int, ProteinSpectrumMatch>();
         }
 
-        public void AddIdentificationResult(string path, ProteinSpectrumMatch.SearchTool tool)
+        public void LoadIdentificationResult(string path, ProteinSpectrumMatch.SearchTool tool, int maxPrsm = int.MaxValue)
         {
             List<ProteinSpectrumMatch> prsmList = null;
 
             if (tool == ProteinSpectrumMatch.SearchTool.MsAlign)
-                prsmList = ReadMsAlignResult(path);
+                prsmList = ReadMsAlignResult(path, maxPrsm);
             else if (tool == ProteinSpectrumMatch.SearchTool.MsPathFinder)
-                prsmList = ReadMsPathFinderResult(path);
+                prsmList = ReadMsPathFinderResult(path, maxPrsm);
 
             if (prsmList == null) return;
 
+            ProteinSpectrumMatches = prsmList;
+            _scanNumToMatchMap.Clear();
+
             foreach (var prsm in prsmList)
             {
-                if (_prsmArray[prsm.ScanNum] == null) _prsmArray[prsm.ScanNum] = prsm;
+                if (_scanNumToMatchMap.ContainsKey(prsm.ScanNum))
+                {
+                    if (_scanNumToMatchMap[prsm.ScanNum].Score < prsm.Score) _scanNumToMatchMap[prsm.ScanNum] = prsm;
+                }
                 else
                 {
-                    if (_prsmArray[prsm.ScanNum].Score < prsm.Score) _prsmArray[prsm.ScanNum] = prsm;
+                    _scanNumToMatchMap.Add(prsm.ScanNum, prsm);    
                 }
             }
         }
-        /*
-        public List<ProteinSpectrumMatch> FindByFeature(LcMsFeature feature, Tolerance tolerance)
-        {
-            return FindByFeature(feature.Mass, feature.MinScanNum, feature.MaxScanNum, tolerance);
-        }
-
-        public List<ProteinSpectrumMatch> FindByFeature(double mass, int minScanNum, int maxScanNum, Tolerance tolerance)
-        {
-            var massTol = tolerance.GetToleranceAsTh(mass);
-            var ret = new List<ProteinSpectrumMatch>();
-
-            for (var scanNum = minScanNum + 1; scanNum < maxScanNum; scanNum++)
-            {
-                List<ProteinSpectrumMatch> prsmList;
-                if (_scanToPrSMs.TryGetValue(scanNum, out prsmList))
-                {
-                    foreach (var prsm in prsmList)
-                    {
-                        var massDiff = Math.Abs(prsm.Mass - mass);
-                        if (massDiff < massTol) ret.Add(prsm);
-                    }
-                }
-            }
-            return ret;
-        }
-        */
+        
         public ProteinSpectrumMatch FindByFeature(LcMsFeature feature, Tolerance tolerance)
         {
             return FindByFeature(feature.Mass, feature.MinScanNum, feature.MaxScanNum, tolerance);
@@ -99,25 +77,25 @@ namespace InformedProteomics.Backend.MassFeature
 
         public ProteinSpectrumMatch FindByFeature(double mass, int minScanNum, int maxScanNum, Tolerance tolerance)
         {
-            var massTol = tolerance.GetToleranceAsTh(mass);
-            var massBin = _massComparerWithBinning.GetBinNumber(mass);
+            var massComparerWithBinning = new MzComparerWithBinning(29); // 4ppm
+            var massBin = massComparerWithBinning.GetBinNumber(mass);
             ProteinSpectrumMatch ret = null;
             for (var scanNum = minScanNum + 1; scanNum < maxScanNum; scanNum++)
             {
-                if (_prsmArray[scanNum] == null) continue;
-                if (Math.Abs(massBin - _massComparerWithBinning.GetBinNumber(_prsmArray[scanNum].Mass)) <= 1)
+                if (_scanNumToMatchMap[scanNum] == null) continue;
+                if (Math.Abs(massBin - massComparerWithBinning.GetBinNumber(_scanNumToMatchMap[scanNum].Mass)) <= 1)
                 {
-                    if (ret == null) ret = _prsmArray[scanNum];
+                    if (ret == null) ret = _scanNumToMatchMap[scanNum];
                     else
                     {
-                        if (ret.Score < _prsmArray[scanNum].Score) ret = _prsmArray[scanNum];
+                        if (ret.Score < _scanNumToMatchMap[scanNum].Score) ret = _scanNumToMatchMap[scanNum];
                     }
                 }
             }
             return ret;
         }
 
-        public List<ProteinSpectrumMatch> ReadMsAlignResult(string msAlignResultTablePath)
+        public List<ProteinSpectrumMatch> ReadMsAlignResult(string msAlignResultTablePath, int maxPrsm)
         {
             var parser = new TsvFileParser(msAlignResultTablePath);
             var prsmList = new List<ProteinSpectrumMatch>();
@@ -126,29 +104,32 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 var sequence = parser.GetData("Peptide")[i];
                 var scanNum = int.Parse(parser.GetData("Scan(s)")[i]);
-                var mass = double.Parse(parser.GetData("Adjusted_precursor_mass")[i]);
+                var mass = double.Parse(parser.GetData("Precursor_mass")[i]);
                 var protName = parser.GetData("Protein_name")[i];
                 var firstResId = int.Parse(parser.GetData("First_residue")[i]);
                 var lastResId = int.Parse(parser.GetData("Last_residue")[i]);
                 var score = double.Parse(parser.GetData("#matched_fragment_ions")[i]);
                 var sequenceText = parser.GetData("Peptide")[i];
+                var charge = int.Parse(parser.GetData("Charge")[i]);
 
                 var fdr = Double.Parse(parser.GetData("FDR")[i]);
                 if (fdr > FdrCutoff) continue;
 
-                var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, protName, firstResId, lastResId, score)
+                var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, firstResId, lastResId, score)
                 {
                     SequenceText = sequenceText,
                     SearchToolType = ProteinSpectrumMatch.SearchTool.MsAlign,
                 };
 
                 prsmList.Add(prsm);
+
+                if (prsmList.Count >= maxPrsm) break;
             }
 
             return prsmList;
         }
 
-        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath)
+        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath, int maxPrsm)
         {
             var parser = new TsvFileParser(msPathFinderResultPath);
             var prsmList = new List<ProteinSpectrumMatch>();
@@ -164,6 +145,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var mass = double.Parse(parser.GetData("Mass")[i]);
                 var protName = parser.GetData("ProteinName")[i];
                 var protDesc = parser.GetData("ProteinDesc")[i];
+                var charge = int.Parse(parser.GetData("Charge")[i]);
                 //var protDesc = _fastaDb.GetProteinDescription(protName);
                 if (protDesc != null) protName = protName + " " + protDesc;
 
@@ -181,14 +163,15 @@ namespace InformedProteomics.Backend.MassFeature
                 //var seqKeyPair = SetModifications(sequence, mod);
                 var sequenceText = GetSequenceText(sequence, mod);
 
-                var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, protName, firstResId, lastResId, score)
+                var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, firstResId, lastResId, score)
                 {
                     SequenceText = sequenceText,
                     SearchToolType = ProteinSpectrumMatch.SearchTool.MsPathFinder,
                 };
 
                 prsmList.Add(prsm);
-
+                
+                if (prsmList.Count >= maxPrsm) break;
             }
 
             return prsmList;
@@ -196,54 +179,42 @@ namespace InformedProteomics.Backend.MassFeature
 
         public int CountIdentifiedScans()
         {
-            return _prsmArray.Count(prsm => prsm != null);
+            return _scanNumToMatchMap.Count;
         }
 
         public int CountIdentifiedUniqueProteoforms()
         {
+            if (ProteinSpectrumMatches == null) return 0;
             var uniqueSeq = new HashSet<string>();
-            foreach (var prsm in _prsmArray.Where(p => p != null))
-            {
-                uniqueSeq.Add(prsm.SequenceText);
-            }
+            foreach (var prsm in ProteinSpectrumMatches) uniqueSeq.Add(prsm.SequenceText);
             return uniqueSeq.Count;
         }
 
         public int CountIdentifiedProteins()
         {
-            var uniqueStr = new HashSet<string>();
-            foreach (var prsm in _prsmArray.Where(p => p != null))
-            {
-                uniqueStr.Add(prsm.ProteinName);
-            }
-            return uniqueStr.Count;
+            if (ProteinSpectrumMatches == null) return 0;
+            var uniqueSeq = new HashSet<string>();
+            foreach (var prsm in ProteinSpectrumMatches) uniqueSeq.Add(prsm.ProteinName);
+            return uniqueSeq.Count;
         }
 
+        public List<ProteinSpectrumMatch> ProteinSpectrumMatches { get; private set; }
+        
         public readonly LcMsRun Run;
         public int DataId { get; private set; }
         public string DataDesc { get; private set; }
         public const double FdrCutoff = 0.01;
+        private readonly Dictionary<int, ProteinSpectrumMatch> _scanNumToMatchMap;
         
-        //private readonly Dictionary<int, Dictionary<int, ProteinSpectrumMatch>> _scanMassToPrSM;
-
-        private readonly ProteinSpectrumMatch[] _prsmArray;
-        private readonly int[] _ms2ScanNums;
-
-        private readonly MzComparerWithBinning _massComparerWithBinning;
-
-
         private static string GetSequenceText(string cleanSequence, string modifications)
         {
             var sequenceText = cleanSequence;
             var parsedModifications = ParseModifications(modifications);
-            // Add modifications to sequence
-            //parsedModifications.Sort(new CompareModByHighestPosition());   // sort in reverse order for insertion
             foreach (var mod in parsedModifications.OrderByDescending(m => m.Item1))
             {
                 var modLabel = string.Format("[{0}]", mod.Item2);
                 sequenceText = sequenceText.Insert(mod.Item1, modLabel);
             }
-
             return sequenceText;
         }
 
@@ -269,8 +240,6 @@ namespace InformedProteomics.Backend.MassFeature
             }
             return parsedMods;
         }
-
-
 
     }
 }

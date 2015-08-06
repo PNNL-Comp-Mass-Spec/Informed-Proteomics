@@ -276,8 +276,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             maxScore[0][0] = new Tuple<double, string>(0.0, "");
             nodeScore[_index][_sinkModIndex] = 0.0;
 
-            var fragmentScore = GetFragmentScoreAndModifications(_index, _sinkModIndex, scorer, nodeScore,
-                maxScore);
+            var fragmentScore = GetFragmentScoreAndModifications(_index, _sinkModIndex, scorer, nodeScore, maxScore);
 
             return new Tuple<double, string>(fragmentScore.Item1, fragmentScore.Item2);
         }

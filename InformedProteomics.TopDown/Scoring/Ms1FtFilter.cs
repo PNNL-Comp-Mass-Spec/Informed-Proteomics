@@ -23,6 +23,11 @@ namespace InformedProteomics.TopDown.Scoring
             return _lcMsChargeMap.GetMatchingMs2ScanNums(sequenceMass);
         }
 
+        public IEnumerable<double> GetMatchingMass(int ms2Scan)
+        {
+            return _lcMsChargeMap.GetMatchingMass(ms2Scan);
+        }
+
         private void Read(string ms1FtFileName)
         {
             var ftFileParser = new TsvFileParser(ms1FtFileName);

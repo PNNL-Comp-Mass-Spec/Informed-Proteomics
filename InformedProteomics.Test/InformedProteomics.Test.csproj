@@ -97,6 +97,7 @@
     <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
     <Compile Include="FunctionalTests\TestGeneratingFunction.cs" />
     <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
+    <Compile Include="FunctionalTests\TestProteinMassBining.cs" />
     <Compile Include="FunctionalTests\TestReadingProMex.cs" />
     <Compile Include="FunctionalTests\TestSpectrumMethods.cs" />
     <Compile Include="FunctionalTests\TestTopDownConsole.cs" />

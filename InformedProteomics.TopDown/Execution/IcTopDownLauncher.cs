@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
@@ -10,7 +11,10 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.GeneratingFunction;
+using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
+using PNNLOmics.Data;
 using PNNLOmics.Utilities;
 
 namespace InformedProteomics.TopDown.Execution
@@ -43,7 +47,7 @@ namespace InformedProteomics.TopDown.Execution
             int searchMode = 1,
             string featureFilePath = null,
             IEnumerable<int> scanNumbers = null,
-            int numMatchesPerSpectrum = 1
+            int numMatchesPerSpectrum = 3
             )
         {
             ErrorMessage = string.Empty;
@@ -104,7 +108,9 @@ namespace InformedProteomics.TopDown.Execution
         public int SearchMode { get; private set; } 
 
         private LcMsRun _run;
-        private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
+        //private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
+        private DeconvolutedSpectrumScorer _ms2ScorerFactory2;
+        private IMassBinning _massBinComparer;
         private InformedTopDownScorer _topDownScorer;
 
         public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
@@ -199,11 +205,21 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-            _ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
+            /*_ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
                 _run,
                 MinProductIonCharge, MaxProductIonCharge,
                 ProductIonTolerance
                 );
+            */
+
+            _massBinComparer = new FilteredProteinMassBinning(AminoAcidSet, MaxSequenceMass);
+            _ms2ScorerFactory2 = new DeconvolutedSpectrumScorer(
+                            _run,
+                            _massBinComparer,
+                            AminoAcidSet,
+                            MinProductIonCharge, MaxProductIonCharge,
+                            ProductIonTolerance
+                            );
 
             progData.StepRange(25.0);
             progData.Status = "Reading Fasta File";
@@ -222,6 +238,7 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(60.0);
             progData.Status = "Running Target search";
             progress.Report(progData.UpdatePercent(0.0));
+            
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
@@ -235,16 +252,22 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Searching the target database");
                 sw.Start();
                 var targetMatches = RunSearch(targetDb, ms1Filter, null, prog);
-                WriteResultsToFile(targetMatches, targetOutputFilePath, targetDb);
-                
-                sw.Stop();
-
                 Console.WriteLine(@"Target database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+
+                // calculate spectral e-value usign generating function
+                sw.Reset();
+                Console.WriteLine(@"Calculating spectral E-values for target-spectrum matches");
+                sw.Start();
+                var bestTargetMatches = RunGeneratingFunction(targetMatches);
+                WriteResultsToFile(bestTargetMatches, targetOutputFilePath, targetDb);
+                sw.Stop();
+                Console.WriteLine(@"Target-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
             }
 
             progData.StepRange(95.0);
             progData.Status = "Running Decoy search";
             progress.Report(progData.UpdatePercent(0.0));
+
             if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
             {
                 // Decoy database
@@ -254,17 +277,21 @@ namespace InformedProteomics.TopDown.Execution
 
                 Console.Write(@"Reading the decoy database...");
                 decoyDb.Read();
-
                 Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
                 var decoyMatches = RunSearch(decoyDb, ms1Filter, null, prog);
-                WriteResultsToFile(decoyMatches, decoyOutputFilePath, decoyDb);
-                sw.Stop();
-
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                
+                // calculate spectral e-value usign generating function
+                sw.Reset();
+                Console.WriteLine(@"Calculating spectral E-values for decoy-spectrum matches");
+                sw.Start();
+                var bestDecoyMatches = RunGeneratingFunction(decoyMatches);
+                WriteResultsToFile(bestDecoyMatches, decoyOutputFilePath, decoyDb);
+                sw.Stop();
+                Console.WriteLine(@"Decoy-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
             }
 
             progData.StepRange(100.0);
@@ -353,7 +380,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
                 // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
-                int coreCount = 0;
+                var coreCount = 0;
                 try
                 {
                     foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
@@ -365,14 +392,14 @@ namespace InformedProteomics.TopDown.Execution
                 catch (Exception)
                 {
                     // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
-                    coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
+                    coreCount = (int)(Math.Ceiling(Environment.ProcessorCount / 2.0));
                 }
 
                 if (threads <= 0 || threads > coreCount)
                 {
                     threads = coreCount;
                 }
-
+                
                 var pfeOptions = new ParallelOptions();
                 pfeOptions.MaxDegreeOfParallelism = threads;
                 pfeOptions.CancellationToken = cancellationToken != null ? cancellationToken.Value : CancellationToken.None;
@@ -380,7 +407,7 @@ namespace InformedProteomics.TopDown.Execution
                 Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
                 {
                     SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
-                    SearchForMatches(annotationAndOffset, db, sequenceFilter, matches, maxNumNTermCleavages);
+                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
                 });
             }
             else
@@ -391,9 +418,8 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         return matches;
                     }
-
                     SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
-                    SearchForMatches(annotationAndOffset, db, sequenceFilter, matches, maxNumNTermCleavages);
+                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
                 }
             }
             progData.StatusInternal = string.Empty;
@@ -438,7 +464,8 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, FastaDatabase db,
+        private const int ScoreLowerBound = 3;
+        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, 
             ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages)
         {
             var annotation = annotationAndOffset.Annotation;
@@ -476,9 +503,9 @@ namespace InformedProteomics.TopDown.Execution
                             (int)
                                 Math.Round(sequenceMass /
                                            (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
-                        var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
+                        var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
-                        if (score <= 3) continue;
+                        if (score <= ScoreLowerBound) continue;
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
                         var sequence = protSequence.Substring(numNTermCleavages);
@@ -499,14 +526,20 @@ namespace InformedProteomics.TopDown.Execution
                             else // already exists
                             {
                                 var existingMatches = matches[ms2ScanNum];
-                                if (existingMatches.Count < NumMatchesPerSpectrum) existingMatches.Add(prsm);
+                                var maxScore = existingMatches.Max.Score;
+                                if (existingMatches.Count < NumMatchesPerSpectrum && maxScore*0.7 < prsm.Score)
+                                {
+                                    existingMatches.Add(prsm);
+                                    existingMatches.RemoveWhere(mt => mt.Score < maxScore*0.7);
+                                }
                                 else
                                 {
                                     var minScore = existingMatches.Min.Score;
                                     if (score > minScore)
                                     {
                                         existingMatches.Add(prsm);
-                                        existingMatches.Remove(existingMatches.Min);
+                                        existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
+                                        //existingMatches.Remove(existingMatches.Min);
                                     }
                                 }
                             }
@@ -516,6 +549,176 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
+        private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        {
+            //const double massToleranceForGf = 10000;
+            if (progress == null)
+            {
+                progress = new Progress<ProgressData>();
+            }
+            var progData = new ProgressData();
+            progData.Status = "Calculating spectral E-values for matches";
+            var sw = new Stopwatch();
+
+            // Rescore and Estimate #proteins for GF calculation
+            long estimatedProteins = 0;
+            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            {
+                if (matches[scanNum] == null) continue;
+
+                var highestScore = 0d;
+                foreach (var match in matches[scanNum])
+                {
+                    var sequence = match.Sequence;
+                    var ion = match.Ion;
+
+                    // Re-scoring
+                    var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, ion.Composition, ion.Charge, scanNum);
+                    match.Score = scores.Ms2Score;
+                    match.ModificationText = scores.Modifications;
+                    highestScore = Math.Max(highestScore, scores.Ms2Score);
+                }
+
+                matches[scanNum].RemoveWhere(m => m.Score <= ScoreLowerBound || m.Score < highestScore*0.8);
+                estimatedProteins += matches[scanNum].Count;
+            }
+
+            Console.WriteLine(@"Estimated matched proteins: " + estimatedProteins);
+
+            var numProteins = 0;
+            var lastUpdate = DateTime.MinValue; // Force original update of 0%
+            sw.Reset();
+            sw.Start();
+            var finalMatches = new DatabaseSequenceSpectrumMatch[matches.Length];
+
+            var scanNums = new List<int>();
+            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+                if (matches[scanNum] != null) scanNums.Add(scanNum);
+                
+
+
+            if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+            {
+                var threads = MaxNumThreads;
+                var coreCount = 0;
+                try
+                {
+                    foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
+                    {
+                        coreCount += int.Parse(item["NumberOfCores"].ToString());
+                    }
+                    //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
+                }
+                catch (Exception)
+                {
+                    // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
+                    coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
+                }
+
+                if (threads <= 0 || threads > coreCount)
+                {
+                    threads = coreCount;
+                }
+
+                var pfeOptions = new ParallelOptions();
+                pfeOptions.MaxDegreeOfParallelism = threads;
+                pfeOptions.CancellationToken = cancellationToken != null ? cancellationToken.Value : CancellationToken.None;
+
+                Parallel.ForEach(scanNums, pfeOptions, scanNum =>
+                {
+                    var gf = new GeneratingFunction(_massBinComparer.NumberOfBins);
+                    foreach (var match in matches[scanNum])
+                    {
+                        var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
+                        gf.ComputeGeneratingFunction(graph);
+                        match.SpecEvalue = gf.GetSpectralEValue((int)match.Score);
+
+                        if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
+                        {
+                            finalMatches[scanNum] = match;
+                        }
+                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                    }
+                });
+            }
+            else
+            {
+                var gf = new GeneratingFunction(_massBinComparer.NumberOfBins);
+                foreach (var scanNum in scanNums)
+                {
+                    if (matches[scanNum] == null) continue;
+
+                    foreach (var match in matches[scanNum])
+                    {
+                        var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
+                        gf.ComputeGeneratingFunction(graph);
+                        match.SpecEvalue = gf.GetSpectralEValue((int)match.Score);
+
+                        if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
+                        {
+                            finalMatches[scanNum] = match;
+                        }
+                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                    }
+                }
+            }
+            progData.StatusInternal = string.Empty;
+            progress.Report(progData.UpdatePercent(100.0));
+
+
+            return finalMatches;
+        }
+
+        private void WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
+        {
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                writer.WriteLine("Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
+                                 "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\t#MatchedFragments\tSpecEValue\tEValue"
+                    );
+                for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+                {
+                    var match = matches[scanNum];
+                    if (match == null) continue;
+
+                    var sequence = match.Sequence;
+                    var offset = match.Offset;
+                    var start = database.GetOneBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
+                    var end = start + sequence.Length - 1;
+                    var proteinName = database.GetProteinName(match.Offset);
+                    var protLength = database.GetProteinLength(proteinName);
+                    var ion = match.Ion;
+
+                    //var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, ion.Composition, ion.Charge, scanNum);
+
+                    // Note for DblToString(value, 9, true), by having "9" and "true",
+                    // values between 100 and 999 Da will have 7 digits after the decimal place, and
+                    // values between 1000 and 9999 will have 6 digits after the decimal place
+                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}",
+                        scanNum,
+                        match.Pre, // Pre
+                        sequence, // Sequence
+                        match.Post, // Post
+                        match.ModificationText, // Modifications
+                        ion.Composition, // Composition
+                        proteinName, // ProteinName
+                        database.GetProteinDescription(match.Offset), // ProteinDescription
+                        protLength, // ProteinLength
+                        start, // Start
+                        end, // End
+                        ion.Charge, // precursorCharge
+                        StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
+                        StringUtilities.DblToString(ion.Composition.Mass, 9, true), // Mass
+                        match.Score, // Score (re-scored)
+                        match.SpecEvalue,
+                        match.SpecEvalue*database.GetNumEntries()
+                        );
+
+                }
+            }
+        }
+
+        /*
         private void WriteResultsToFile(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)
         {
             using (var writer = new StreamWriter(outputFilePath))
@@ -563,6 +766,6 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
             }
-        }
+        }*/
     }
 }

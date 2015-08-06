@@ -92,7 +92,6 @@ namespace InformedProteomics.Backend.MassFeature
 
             if (feature == null) return null;
 
-
             feature.UpdateScore(Ms1Spectra);
 
             if (_scorer != null) feature.Score = _scorer.GetScore(feature);
@@ -675,13 +674,16 @@ namespace InformedProteomics.Backend.MassFeature
             return cluster;
         }
 
-        public LcMsFeature CollectLcMsPeaksWithNoise(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, int targetMinCharge, int targetMaxCharge)
+        public LcMsPeakCluster CollectLcMsPeaksWithNoise(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, int targetMinCharge, int targetMaxCharge)
         {
             var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
 
             if (Run.GetMsLevel(targetMinScanNum) > 1) targetMinScanNum = Run.GetPrevScanNum(targetMinScanNum, 1);
             if (Run.GetMsLevel(targetMaxScanNum) > 1) targetMaxScanNum = Run.GetNextScanNum(targetMaxScanNum, 1);
+
+            //if (targetMinCharge < MinScanCharge) targetMinCharge = _rows.First() + MinScanCharge;
+            //if (targetMaxCharge < MinScanCharge) targetMaxCharge = _rows.Last() + MinScanCharge;
 
             //var row = Math.Max(Math.Min(targetCharge - MinScanCharge, MaxScanCharge - MinScanCharge), 0);
             var minCol = ms1ScanNumToIndex[targetMinScanNum];
@@ -736,8 +738,10 @@ namespace InformedProteomics.Backend.MassFeature
             var repScanNum = ms1ScanNums[minCol];
             var repMz = 0;
 
-            var cluster = new LcMsFeature(targetMass, targetCharge, repMz, repScanNum, abundance, minRow + MinScanCharge,
-                maxRow + MinScanCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol], Run);
+            //var cluster = new LcMsFeature(targetMass, targetCharge, repMz, repScanNum, abundance, minRow + MinScanCharge, maxRow + MinScanCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol], Run);
+            var cluster = new LcMsPeakCluster(Run, _theoreticalEnvelope, targetMass, targetCharge, repMz, repScanNum, abundance);
+            cluster.AddEnvelopes(minRow + MinScanCharge, maxRow + MinScanCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol]);
+            cluster.Score = -999d;
 
             return cluster;
         }

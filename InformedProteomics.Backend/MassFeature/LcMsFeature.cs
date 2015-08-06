@@ -35,6 +35,8 @@ namespace InformedProteomics.Backend.MassFeature
 
         public double Abundance { get; protected set; }
 
+        public double Score { get; internal set; }
+
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }
         public int RepresentativeCharge { get; protected set; }
@@ -67,7 +69,7 @@ namespace InformedProteomics.Backend.MassFeature
 
         public bool CoElutedByScanNum(LcMsFeature other, int tolScan = 0)
         {
-            tolScan++;
+            if (tolScan == 0) tolScan++;
 
             if (MinScanNum - tolScan < other.MinScanNum && other.MinScanNum < MaxScanNum + tolScan) return true;
             if (MinScanNum - tolScan < other.MaxScanNum && other.MaxScanNum < MaxScanNum + tolScan) return true;
@@ -75,8 +77,10 @@ namespace InformedProteomics.Backend.MassFeature
             if (other.MinScanNum - tolScan < MaxScanNum && MaxScanNum < other.MaxScanNum + tolScan) return true;
             return false;
         }
-
+        
         public LcMsRun Run { get; protected set; }
+
+        public ProteinSpectrumMatchSet ProteinSpectrumMatches { get; set; }
 
         [Serializable]
         public class LcMsRunNullException : Exception { }

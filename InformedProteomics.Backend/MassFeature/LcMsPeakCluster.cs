@@ -11,39 +11,16 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsPeakCluster : LcMsFeature
     {
-        /*
-        public LcMsPeakCluster(LcMsRun run, double monoMass, int charge, double mz, double scanNum)
-            : base(monoMass, charge, mz, scanNum, 0)
-        {
-            Run = run;
-            TheoreticalEnvelope = observedEnvelope.TheoreticalEnvelope;
-            Flag = 0;
-
-            DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
-            DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
-
-            RepresentativeSummedEnvelop = new double[TheoreticalEnvelope.Size];
-
-            AbundanceDistributionAcrossCharge = new double[2];
-            BestCorrelationScoreAcrossCharge = new double[2];
-            BestDistanceScoreAcrossCharge = new double[2];
-            BestIntensityScoreAcrossCharge = new double[2];
-
-            EnvelopeDistanceScoreAcrossCharge = new double[2];
-            EnvelopeCorrelationScoreAcrossCharge = new double[2];
-            EnvelopeIntensityScoreAcrossCharge = new double[2];
-            BestCharge = new int[2];
-
-            XicCorrelationBetweenBestCharges = new double[2];
-            _initScore = false;
-        }*/
-        
-        
         public LcMsPeakCluster(LcMsRun run, ObservedIsotopeEnvelope observedEnvelope)
-            : base(observedEnvelope.MonoMass, observedEnvelope.Charge, observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
+            : this(run, observedEnvelope.TheoreticalEnvelope, observedEnvelope.MonoMass, observedEnvelope.Charge, observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
+        {
+        }
+
+        public LcMsPeakCluster(LcMsRun run, TheoreticalIsotopeEnvelope theoreticalIsotopeEnvelope, double mass, int charge, double repMz, int repScanNum, double abundance)
+            : base(mass, charge, repMz, repScanNum, abundance)
         {
             Run = run;
-            TheoreticalEnvelope = observedEnvelope.TheoreticalEnvelope;
+            TheoreticalEnvelope = theoreticalIsotopeEnvelope;
             Flag = 0;
 
             DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
@@ -65,8 +42,9 @@ namespace InformedProteomics.Backend.MassFeature
             _initScore = false;
         }
 
+
         public void AddEnvelopes(int minCharge, int maxCharge, int minScanNum, int maxScanNum,
-            IList<ObservedIsotopeEnvelope> envelopes)
+            IList<ObservedIsotopeEnvelope> envelopes = null)
         {
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var minCol = ms1ScanNumToIndex[minScanNum];
@@ -82,7 +60,9 @@ namespace InformedProteomics.Backend.MassFeature
 
             Envelopes = new ObservedIsotopeEnvelope[nRows][];
             for(var i = 0; i < nRows; i++) Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
-            
+
+            if (envelopes == null) return;
+
             foreach (var envelope in envelopes)
             {
                 var i = envelope.Charge - MinCharge;
@@ -362,6 +342,13 @@ namespace InformedProteomics.Backend.MassFeature
             MaxCharge = MaxCharge;
         }
 
+        // only temporary use (will be removed)
+        public void ExpandScanRange(int minScan, int maxScan)
+        {
+            MinScanNum = Math.Min(minScan, MinScanNum);
+            MaxScanNum = Math.Max(maxScan, MaxScanNum);
+        }
+
         public void SetAbundance(double abu)
         {
             Abundance = abu;
@@ -519,7 +506,7 @@ namespace InformedProteomics.Backend.MassFeature
         public readonly int DetectableMaxCharge;
         public readonly int DetectableMinCharge; 
         public ObservedIsotopeEnvelope[][] Envelopes;
-        public double Score { get; internal set; }
+        
 
         public readonly int[] BestCharge;
 
@@ -543,7 +530,7 @@ namespace InformedProteomics.Backend.MassFeature
         public double BestCorrelationScore { get { return Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());  } }
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
-        internal byte Flag;
+        public byte Flag;
 
         private bool _initScore;
     }
