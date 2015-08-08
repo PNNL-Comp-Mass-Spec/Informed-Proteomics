@@ -74,6 +74,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
         public int ScanNum { get; private set; }
 
+        public LcMsPeak ReplaceData(double mz, double intensity, int scanNum)
+        {
+            Mz = mz;
+            Intensity = intensity;
+            ScanNum = scanNum;
+            return this;
+        }
+
         public int CompareTo(LcMsPeak other)
         {
             var mzCompare = Mz.CompareTo(other.Mz);

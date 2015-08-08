@@ -442,12 +442,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return xicSegment;
         }
 
-        [Obsolete("Use PbfLcMsRun.WriteSpectrum", true)]
-        public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
-        {
-            PbfLcMsRun.WriteSpectrum(spec, writer);
-        }
-
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
