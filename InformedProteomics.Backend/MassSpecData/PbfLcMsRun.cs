@@ -32,47 +32,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// 
         /// </summary>
         /// <param name="specFilePath"></param>
-        /// <param name="dataType"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
-        [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType, IProgress<ProgressData> progress = null)
-        {
-            return GetLcMsRun(specFilePath, dataType, 0.0, 0.0, progress);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, 0.0, 0.0, progress);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="specFilePath"></param>
-        /// <param name="dataType"></param>
-        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
-        /// <param name="productSignalToNoiseRatioThreshold"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
-        [ObsoleteAttribute("Remove MassSpecDataType -> now uses MassSpecDataReaderFactory", true)]
-        public static LcMsRun GetLcMsRun(string specFilePath, MassSpecDataType dataType,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, IProgress<ProgressData> progress = null)
-        {
-            //var pbfFilePath = InMemoryLcMsRun.ConvertToPbf(specFilePath, dataType, precursorSignalToNoiseRatioThreshold,
-            //    productSignalToNoiseRatioThreshold, null, progress);
-            //
-            //return new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
-            return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
         /// <summary>
@@ -111,10 +76,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (specReader is PbfLcMsRun)
                 return (LcMsRun)specReader;
 
-            var pbfFilePath = ConvertToPbf(specFilePath, specReader, precursorSignalToNoiseRatioThreshold,
-                productSignalToNoiseRatioThreshold, null, progress);
-
-            return new PbfLcMsRun(pbfFilePath, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold);
+            return new PbfLcMsRun(specFilePath, specReader, "", precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
         /// <summary>
@@ -127,6 +89,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="progress"></param>
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
+        [Obsolete("Use GetLcMsRun() for an optimized pbf creation process", false)]
         public static string ConvertToPbf(string specFilePath, double precursorSignalToNoiseRatioThreshold,
             double productSignalToNoiseRatioThreshold, string pbfFilePath = null, IProgress<ProgressData> progress = null)
         {
@@ -145,6 +108,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="progress">Progress data, as a percentage</param>
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
+        [Obsolete("Use GetLcMsRun() for an optimized pbf creation process", false)]
         public static string ConvertToPbf(string specFilePath, IMassSpecDataReader specReader,
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
             IProgress<ProgressData> progress = null)
@@ -808,7 +772,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        public static new void WriteSpectrum(Spectrum spec, BinaryWriter writer)
+        public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
             writer.Write(spec.ScanNum);
@@ -876,6 +840,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return peakList;
         }
 
+        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
@@ -884,6 +849,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             long countTotal = 1;
@@ -1064,249 +1030,6 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(FileFormatId); // 4
         }
 
-        public static void WriteAsPbf(IMassSpecDataReader msdr, string outputFilePath, IProgress<ProgressData> progress = null)
-        {
-            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
-            {
-                WriteAsPbf(msdr, writer, progress);
-            }
-        }
-
-        public static void WriteAsPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
-        {
-            long countTotal = 1;
-            long counter = 0;
-            if (progress == null)
-            {
-                progress = new Progress<ProgressData>();
-            }
-            var progressData = new ProgressData();
-            progressData.IsPartialRange = true;
-            progressData.Status = "Writing spectra data";
-
-            //var scanNumToSpecOffset = new long[msdr.NumSpectra + 1];
-            var scanNumToSpecOffset = new Dictionary<int, long>(msdr.NumSpectra + 1);
-            //var scanNumToIsolationWindow = new IsolationWindow[msdr.NumSpectra + 1];
-            var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
-            var ms1Scans = new List<int>();
-            var ms2Scans = new List<int>();
-
-            // Spectra
-            var ms1PeakList = new List<LcMsPeak>();
-            var ms2PeakList = new List<LcMsPeak>();
-            var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
-            var minLcScan = int.MaxValue;
-            var maxLcScan = int.MinValue;
-            countTotal = msdr.NumSpectra;
-            counter = 0;
-            progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
-            //long countMS2Spec = 0;
-            //for (var scanNum = msdr.MinLcScan; scanNum <= msdr.MaxLcScan; scanNum++)
-            foreach (var spec in msdr.ReadAllSpectra())
-            {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
-                counter++;
-                //scanNumToSpecOffset[scanNum - msdr.MinLcScan] = writer.BaseStream.Position;
-                scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
-                //var spec = msdr.GetSpectrum(scanNum);
-                //if (spec == null) continue;
-                var productSpec = spec as ProductSpectrum;
-                //scanNumToIsolationWindow[scanNum - msdr.MinLcScan] = null;
-                scanNumToIsolationWindow[spec.ScanNum] = null;
-                if (productSpec != null)
-                {
-                    //scanNumToIsolationWindow[scanNum - msdr.MinLcScan] = productSpec.IsolationWindow;
-                    scanNumToIsolationWindow[spec.ScanNum] = productSpec.IsolationWindow;
-                    //countMS2Spec++;
-                    ms2Scans.Add(productSpec.ScanNum);
-                    ms2PeakList.AddRange(productSpec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, productSpec.ScanNum)));
-                }
-                else
-                {
-                    ms1Scans.Add(spec.ScanNum);
-                    ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
-                }
-                if (spec.ScanNum < minLcScan)
-                {
-                    minLcScan = spec.ScanNum;
-                }
-                if (maxLcScan < spec.ScanNum)
-                {
-                    maxLcScan = spec.ScanNum;
-                }
-                scanMetadata.Add(new ScanMetadata(spec.ScanNum, spec.MsLevel, spec.ElutionTime));
-                PbfLcMsRun.WriteSpectrum(spec, writer);
-            }
-
-            // Precursor ion chromatogram (MS1 spectra)
-            ms1PeakList.Sort();
-            var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
-
-            //var minMzIndex = msdr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(msdr.Ms1PeakList[0].Mz) : 0;
-            //var maxMzIndex = msdr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(msdr.Ms1PeakList[msdr.Ms1PeakList.Count - 1].Mz) : -1;
-            var minMzIndex = ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(ms1PeakList[0].Mz) : 0;
-            var maxMzIndex = ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(ms1PeakList[ms1PeakList.Count - 1].Mz) : -1;
-
-            var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
-            var prevMzIndex = -1;
-            counter = 0;
-            //countTotal = msdr.Ms1PeakList.Count;
-            countTotal = ms1PeakList.Count;
-
-            // All MS1 data sorted by mass, then scan number
-            // In rare instances, imlr.Ms1PeakList will be blank (no MS1 spectra); that's OK
-            progressData.Status = "Writing precursor chromatogram";
-            progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
-            //foreach (var peak in msdr.Ms1PeakList)
-            foreach (var peak in ms1PeakList)
-            {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
-                counter++;
-                var mz = peak.Mz;
-                var mzIndex = GetMzBinIndex(mz);
-                if (mzIndex > prevMzIndex)
-                {
-                    chromMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
-                    prevMzIndex = mzIndex;
-                }
-                writer.Write(peak.Mz);
-                writer.Write((float)peak.Intensity);
-                writer.Write(peak.ScanNum);
-            }
-            ms1PeakList.Clear();
-            ms1PeakList = null;
-            GC.Collect(); // Just killed all objects in ms1PeakList; free them.
-
-            // Product ion chromatogram (MSn spectra)
-            //var ms2PeakList = new List<LcMsPeak>();
-            //counter = 0;
-            //countTotal = countMS2Spec;
-            //progressData.Status = "Processing product chromatograms";
-            //progressData.StepRange(42.9 + 15.7 + (41.2 / 2)); // Approximately 41% of total file size
-            //foreach (var ms2ScanNum in msdr.GetScanNumbers(2))
-            //{
-            //    progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
-            //    counter++;
-            //    var productSpec = msdr.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            //    if (productSpec == null) continue;
-            //    foreach (var peak in productSpec.Peaks)
-            //    {
-            //        ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
-            //    }
-            //}
-            ms2PeakList.Sort();
-
-            var offsetBeginProductChromatogram = writer.BaseStream.Position;
-            counter = 0;
-            countTotal = ms2PeakList.Count;
-            progressData.Status = "Writing product ion chromatogram";
-            progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
-            foreach (var peak in ms2PeakList)
-            {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
-                counter++;
-                writer.Write(peak.Mz);
-                writer.Write((float)peak.Intensity);
-                writer.Write(peak.ScanNum);
-            }
-
-            ms2PeakList.Clear();
-            ms2PeakList = null;
-            GC.Collect(); // Just killed all objects in ms2PeakList; free them.
-
-            // Meta information
-            var offsetBeginMetaInformation = writer.BaseStream.Position;
-            progressData.Status = "Writing metadata";
-            progressData.IsPartialRange = false;
-            progress.Report(progressData.UpdatePercent(99.8)); // Metadata: Approximately 0.2% of total file size
-
-            var warnedInvalidScanNum = false;
-            var warnedNullScanToIsolationWindow = false;
-
-            //writer.Write(msdr.MinLcScan);
-            //writer.Write(msdr.MaxLcScan);
-            writer.Write(minLcScan);
-            writer.Write(maxLcScan);
-            scanMetadata.Sort();
-            //for (var scanNum = msdr.MinLcScan; scanNum <= msdr.MaxLcScan; scanNum++)
-            foreach (var scan in scanMetadata)
-            {
-                //var msLevel = msdr.GetMsLevel(scanNum);
-                //writer.Write(msdr.GetMsLevel(scanNum));
-                //writer.Write(msdr.GetElutionTime(scanNum));
-                var msLevel = scan.MsLevel;
-                writer.Write(scan.MsLevel);
-                writer.Write(scan.ElutionTime);
-
-                if (msLevel == 2)
-                {
-                    float minMz = 0;
-                    float maxMz = 0;
-
-                    //if (scanNum - msdr.MinLcScan < 0 || scanNum - msdr.MinLcScan >= scanNumToIsolationWindow.Length
-                    if (scan.ScanNum - minLcScan < 0 || scan.ScanNum - minLcScan >= scanNumToIsolationWindow.Count)
-                    {
-                        if (!warnedInvalidScanNum)
-                        {
-                            //Console.WriteLine("\nWriteAsPbf encountered an invalid scan number: " + scanNum + "; " +
-                            Console.WriteLine("\nWriteAsPbf encountered an invalid scan number: " + scan.ScanNum + "; " +
-                                              "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
-                            warnedInvalidScanNum = true;
-                        }
-                    }
-                    else
-                    {
-                        //if (scanNumToIsolationWindow[scanNum - msdr.MinLcScan] == null)
-                        if (scanNumToIsolationWindow[scan.ScanNum] == null)
-                        {
-                            if (!warnedNullScanToIsolationWindow)
-                            {
-                                //Console.WriteLine("\nWriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan " + scanNum + "; " +
-                                Console.WriteLine("\nWriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan " + scan.ScanNum + "; " +
-                                                  "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown");
-                                warnedNullScanToIsolationWindow = true;
-                            }
-                        }
-                        else
-                        {
-                            //minMz = (float)scanNumToIsolationWindow[scanNum - msdr.MinLcScan].MinMz;
-                            //maxMz = (float)scanNumToIsolationWindow[scanNum - msdr.MinLcScan].MaxMz;
-                            minMz = (float)scanNumToIsolationWindow[scan.ScanNum].MinMz;
-                            maxMz = (float)scanNumToIsolationWindow[scan.ScanNum].MaxMz;
-                        }
-                    }
-
-                    writer.Write(minMz);
-                    writer.Write(maxMz);
-                }
-                //writer.Write(scanNumToSpecOffset[scanNum - msdr.MinLcScan]);
-                writer.Write(scanNumToSpecOffset[scan.ScanNum]);
-            }
-
-            // Precursor chromatogram index
-            writer.Write(minMzIndex);   // min index
-            writer.Write(maxMzIndex);
-            progress.Report(progressData.UpdatePercent(99.9)); // Metadata: Approximately 0.2% of total file size
-
-            var prevOffset = offsetBeginMetaInformation;
-            for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
-            {
-                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram) chromMzIndexToOffset[i] = prevOffset;
-                else prevOffset = chromMzIndexToOffset[i];
-            }
-
-            foreach (var offset in chromMzIndexToOffset)
-            {
-                writer.Write(offset);
-            }
-
-            writer.Write(offsetBeginPrecursorChromatogram); // 8
-            writer.Write(offsetBeginProductChromatogram); // 8
-            writer.Write(offsetBeginMetaInformation); // 8
-            progress.Report(progressData.UpdatePercent(100.0));
-            writer.Write(FileFormatId); // 4
-        }
-
         private void WriteToPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             ScanNumToMsLevel = new Dictionary<int, int>(msdr.NumSpectra + 1);
@@ -1334,8 +1057,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var ms2Scans = new List<int>();
 
             // Spectra
-            //var ms1PeakList = new List<LcMsPeak>();
-            //var ms2PeakList = new List<LcMsPeak>();
             long ms1PeakCount = 0;
             long ms2PeakCount = 0;
             var maxMs1Mz = double.MinValue;
@@ -1426,11 +1147,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     progressData.StatusInternal = p.Status;
                     progress.Report(progressData.UpdatePercent(p.Percent));
                 });
-                //CreateAndOutputMsXChromatogram(writer, ms1Scans, ms1PeakList, true, prog);
-                //ms1PeakList.Clear();
-                //CreateAndOutputMsXChromatogram(writer, ms1Scans, null, true, prog);
                 CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, minMs1Mz, maxMs1Mz, prog);
-                //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
             }
 
             // Product ion chromatogram (MSn spectra)
@@ -1446,11 +1163,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     progressData.StatusInternal = p.Status;
                     progress.Report(progressData.UpdatePercent(p.Percent));
                 });
-                //CreateAndOutputMsXChromatogram(writer, ms2Scans, ms2PeakList, false, prog);
-                //ms2PeakList.Clear();
-                //CreateAndOutputMsXChromatogram(writer, ms2Scans, null, false, prog);
                 CreateAndOutputMsXChromatogram_Merge(writer, ms2Scans, ms2PeakCount, false, minMs2Mz, maxMs2Mz, prog);
-                //GC.Collect(); // We just killed a large number of objects when that function went out of scope.
             }
 
             // Meta information
@@ -1574,83 +1287,7 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(offsetBeginMetaInformation); // 8
             progress.Report(progressData.UpdatePercent(100.0));
             writer.Write(FileFormatId); // 4
-        }
 
-        private void CreateAndOutputMsXChromatogram(BinaryWriter writer, List<int> scansForMsLevelX, List<LcMsPeak> peaksList, bool isMs1List, IProgress<ProgressData> progress)
-        {
-            // Other thought for a slower, but really low-memory chromatogram creator:
-            //   Make sure peaks are sorted ascending when written, and then jump through all spectra, performing a massive merge sort on the peaks and outputting the lowest spectra
-            var progData = new ProgressData();
-            bool peaksListNull = false;
-            var count = 0;
-            var countTotal = scansForMsLevelX.Count;
-            if (peaksList == null || peaksList.Count == 0)
-            {
-                peaksListNull = true;
-                progData.MaxPercentage = 50;
-                peaksList = new List<LcMsPeak>();
-                if (_reader == null)
-                {
-                    _reader = new BinaryReader(new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
-                }
-                count = 0;
-                progData.Status = "Reading MSn peaks for product chromatogram";
-                if (isMs1List)
-                {
-                    progData.Status = "Reading MS1 peaks for precursor chromatogram";
-                }
-                foreach (var scan in scansForMsLevelX)
-                {
-                    progress.Report(progData.UpdatePercent((double)count / countTotal * 100));
-                    count++;
-                    peaksList.AddRange(GetPeaksForSpectrum(scan));
-                }
-                progData.StepRange(100);
-            }
-            peaksList.Sort();
-
-            if (isMs1List)
-            {
-                _minMs1Mz = peaksList.First().Mz;
-                _maxMs1Mz = peaksList.Last().Mz;
-
-                _minMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(peaksList[0].Mz) : 0;
-                _maxMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(peaksList[peaksList.Count - 1].Mz) : -1;
-
-                _chromMzIndexToOffset = new long[_maxMzIndex - _minMzIndex + 2];
-            }
-
-            count = 0;
-            countTotal = peaksList.Count;
-            var prevMzIndex = -1;
-            progData.Status = "Writing product chromatogram";
-            if (isMs1List)
-            {
-                progData.Status = "Writing precursor chromatogram";
-            }
-            foreach (var peak in peaksList)
-            {
-                progress.Report(progData.UpdatePercent((double)count / countTotal * 100.0));
-                count++;
-                if (isMs1List)
-                {
-                    var mzIndex = GetMzBinIndex(peak.Mz);
-                    if (mzIndex > prevMzIndex)
-                    {
-                        _chromMzIndexToOffset[mzIndex - _minMzIndex] = writer.BaseStream.Position;
-                        prevMzIndex = mzIndex;
-                    }
-                }
-                writer.Write(peak.Mz);
-                writer.Write((float)peak.Intensity);
-                writer.Write(peak.ScanNum);
-            }
-            if (peaksListNull)
-            {
-                peaksList.Clear();
-                peaksList = null;
-                GC.Collect(); // We just killed a large number of objects by clearing the peaksList...
-            }
         }
 
         private int CalculateMaxSpecsInMem(double memFreeKB, int scansCount)
@@ -1660,7 +1297,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //     10  million: 1.1 GB
             //     79  million: 6.6 GB
             const int max = 25000000;
-            int maxInMemoryPerSpec = (int)(memFreeKB * 1024 / 2 / scansCount / (20 + 8 + 17));
+            int maxInMemoryPerSpec = (int)(memFreeKB * 1024 / 2 / scansCount / (20 + 8));
             if (maxInMemoryPerSpec * scansCount > max) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
                 maxInMemoryPerSpec = max / scansCount;
             if (maxInMemoryPerSpec < 5)
@@ -1710,11 +1347,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 //}
             }
 
-            Console.WriteLine("memoryFreeKB: " + memoryFreeKB);
-            Console.WriteLine("totalKBytesInMem: " + totalKBytesInMem);
-            Console.WriteLine("NumScans: " + scansForMsLevelX.Count);
-            Console.WriteLine("NumPeaks: " + totalPeaksCount);
-            var memSize = totalPeaksCount * 8L; // As a long, since we don't want to suffer from integer overflow, and a long should be big enough.
+            //Console.WriteLine("memoryFreeKB: " + memoryFreeKB);
+            //Console.WriteLine("totalKBytesInMem: " + totalKBytesInMem);
+            //Console.WriteLine("NumScans: " + scansForMsLevelX.Count);
+            //Console.WriteLine("NumPeaks: " + totalPeaksCount);
 
             // Configure a reserve amount to avoid using all physical memory, which has the cost of excessive paging
             var quarterTotalPhysicalMemory = totalMemKB / 4;
@@ -1725,224 +1361,79 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             var memFreeLessReserve = memoryFreeKB - quarterTotalPhysicalMemory;
 
-            // If memory usage will be a problem, perform a modified merge sort and read peaks as needed from the pbf file in creation
-            // Also use this method if NumPeaks * 8 is greater than 2000000000 (2GB/object memory cap)
-            //if (memFreeLessReserve <= 0 || totalKBytesInMem > memFreeLessReserve/* || memSize > 2000000000*/)
-            if (true)
+            // Use a custom split-list implementation: Reduce the number of items to sort each time
+            // The enumerator access is O(1)
+            // 8 byte (pointer) overhead per item, plus ~30 bytes per list (number of lists is numSpectra / 1,000,000 + 2)
+            // item size: double, double, int, so 20 bytes
+            // Perform a massive merge-sort style read/write, to minimize memory usage - set a minimum of 5
+            int maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, scansForMsLevelX.Count);
+
+            //Console.WriteLine("maxInMemoryPerSpec: " + maxInMemoryPerSpec);
+
+            progData.Status = "Writing product chromatogram";
+            if (isMs1List)
             {
-                // Use a SortedSet, since it has O(log n) insertion, deletion, and lookup (red-black tree)
-                // The enumerator access is O(1)
-                // SortedSet overhead per item: bool, 2 refs, and the item (+ pointer to it)
-                // item size: double, double, int, so 20 bytes
-                // Perform a massive merge-sort style read/write, to minimize memory usage - set a minimum of 5
-
-                //Approximate Maximum amount of memory used for a set number of peaks:
-                //     3.5 million: 500 MB
-                //     10  million: 1.1 GB
-                //     79  million: 6.6 GB
-                //int maxInMemoryPerSpec = (int) (memoryFreeKB * 1024 / 2 / scansForMsLevelX.Count / (20 + 8 + 17));
-                //if (maxInMemoryPerSpec * scansForMsLevelX.Count > 10000000) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
-                //    maxInMemoryPerSpec = 10000000 / scansForMsLevelX.Count;
-                //if (maxInMemoryPerSpec < 5)
-                //    maxInMemoryPerSpec = 5;
-                int maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, scansForMsLevelX.Count);
-
-                Console.WriteLine("maxInMemoryPerSpec: " + maxInMemoryPerSpec);
-
-                progData.Status = "Writing product chromatogram";
-                if (isMs1List)
+                progData.Status = "Writing precursor chromatogram";
+            }
+            var peaks = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
+            var peaksCount = 0;
+            var metadata = new Dictionary<int, ScanPeakMetaData>(scansForMsLevelX.Count);
+            lock (_filelock)
+            {
+                if (_reader == null)
                 {
-                    progData.Status = "Writing precursor chromatogram";
+                    _reader =
+                        new BinaryReader(
+                            new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
+                                FileShare.ReadWrite)));
                 }
-                //var peaks = new SortedSet<LcMsPeak>();
-                var peaks = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
-                //var peaks = new List<LcMsPeak>(1000100);
-                var peaksCount = 0;
-                var metadata = new Dictionary<int, ScanPeakMetaData>(scansForMsLevelX.Count);
-                lock (_filelock)
+
+                progData.MaxPercentage = 5;
+                progData.IsPartialRange = true;
+                // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 25000000 / numSpectra)
+                foreach (var scan in scansForMsLevelX)
                 {
-                    if (_reader == null)
-                    {
-                        _reader =
-                            new BinaryReader(
-                                new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
-                                    FileShare.ReadWrite)));
-                    }
+                    progress.Report(progData.UpdatePercent((double) count / countTotal * 100));
+                    count++;
+                    var datum = GetPeakMetaDataForSpectrum(scan);
+                    peaksCount += datum.NumPeaks;
+                    metadata.Add(datum.ScanNum, datum);
+                    peaks.AddRange(datum.ReadPeaks(_reader, maxInMemoryPerSpec));
+                }
 
-                    //long peaksReadCount = 0;
-
-                    //progData.MaxPercentage = isMs1List ? 10 : 20;
-                    progData.MaxPercentage = 5;
-                    progData.IsPartialRange = true;
-                    // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 1000)
-                    foreach (var scan in scansForMsLevelX)
-                    {
-                        progress.Report(progData.UpdatePercent((double) count / countTotal * 100));
-                        count++;
-                        var datum = GetPeakMetaDataForSpectrum(scan);
-                        peaksCount += datum.NumPeaks;
-                        metadata.Add(datum.ScanNum, datum);
-                        //foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec))
-                        // try to minimize the startup cost - it is mitigated in the optimized version of the loop.
-                        //foreach (var peak in datum.ReadPeaks(_reader, 5))
-                        //{
-                        //    peaks.Add(peak);
-                        //}
-                        peaks.AddRange(datum.ReadPeaks(_reader, 5));
-                        //peaksReadCount += datum.Count;
-                    }
-                    //System.Console.WriteLine("Metadata count: " + metadata.Count);
-                    //System.Console.WriteLine("Metadata values count: " + metadata.Values.Count);
-
-                    if (peaksCount == 0)
-                    {
-                        if (isMs1List)
-                        {
-                            _minMs1Mz = int.MaxValue;
-                            _maxMs1Mz = int.MinValue;
-
-                            _minMzIndex = 0;
-                            _maxMzIndex = -1;
-                            _chromMzIndexToOffset = new long[0];
-                        }
-                        return;
-                    }
-
-                    progData.StepRange(100);
-                    progress.Report(progData.UpdatePercent(0));
-                    var peaksToRemove = new List<LcMsPeak>();
-                    count = 0;
-                    prevMzIndex = -1;
+                if (peaksCount == 0)
+                {
                     if (isMs1List)
                     {
-                        //_minMs1Mz = peaks.Min.Mz;
-                        _minMs1Mz = minMz;
-                        _minMzIndex = GetMzBinIndex(_minMs1Mz);
-                        _maxMs1Mz = maxMz;
-                        _maxMzIndex = GetMzBinIndex(_maxMs1Mz);
+                        _minMs1Mz = int.MaxValue;
+                        _maxMs1Mz = int.MinValue;
+
+                        _minMzIndex = 0;
+                        _maxMzIndex = -1;
+                        _chromMzIndexToOffset = new long[0];
                     }
-                    var chromMzIndexToOffset = new Dictionary<int, long>(_maxMzIndex - _minMzIndex);
+                    return;
+                }
 
-                    //var oldestPeaksGen = GC.GetGeneration(peaks.Min);
-                    var peaksEnum = peaks.GetReusableEnumerator();
-                    //var peaksEnum = peaks.GetEnumerator();
-                    while (peaks.Count > 0)
-                    //while (peaksEnum.MoveNext())
+                progData.StepRange(100);
+                progress.Report(progData.UpdatePercent(0));
+                var peaksToRemove = new List<LcMsPeak>();
+                count = 0;
+                prevMzIndex = -1;
+                if (isMs1List)
+                {
+                    _minMs1Mz = minMz;
+                    _minMzIndex = GetMzBinIndex(_minMs1Mz);
+                    _maxMs1Mz = maxMz;
+                    _maxMzIndex = GetMzBinIndex(_maxMs1Mz);
+                }
+                var chromMzIndexToOffset = new Dictionary<int, long>(_maxMzIndex - _minMzIndex);
+
+                var peaksEnum = peaks.GetReusableEnumerator();
+                while (peaks.Count > 0)
+                {
+                    while (peaksEnum.MoveNext())
                     {
-                        /**/
-                        //int safetyCounter = 0;
-                        //var oldCount = peaks.Count;
-                        //foreach (var peak in peaks)
-                        while (peaksEnum.MoveNext())
-                        //foreach (var peak in peaks.ToList())
-                        {
-                            var peak = peaksEnum.Current;
-                            progress.Report(progData.UpdatePercent((double) count / peaksCount * 100.0));
-                            count++;
-                            //safetyCounter++;
-                            if (isMs1List)
-                            {
-                                _maxMs1Mz = peak.Mz;
-                                var mzIndex = GetMzBinIndex(peak.Mz);
-                                if (mzIndex > prevMzIndex)
-                                {
-                                    chromMzIndexToOffset.Add(mzIndex - _minMzIndex, writer.BaseStream.Position);
-                                    prevMzIndex = mzIndex;
-                                }
-                            }
-                            writer.Write(peak.Mz);
-                            writer.Write((float) peak.Intensity);
-                            writer.Write(peak.ScanNum);
-
-                            peaksToRemove.Add(peak);
-                            //peaks.Remove(peak);
-
-                            var datum = metadata[peak.ScanNum];
-                            datum.ReadOne();
-
-                            if (datum.Count < 1)
-                            {
-                                if (datum.MorePeaksToRead)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    metadata.Remove(datum.ScanNum);
-                                    var numDead = datum.NumPeaks < maxInMemoryPerSpec ? datum.NumPeaks : maxInMemoryPerSpec;
-                                    if (numDead >= peaksToRemove.Count - 500)
-                                    {
-                                        peaksToRemove.Clear();
-                                    }
-                                    else
-                                    {
-                                        peaksToRemove.RemoveRange(peaksToRemove.Count - numDead - 1, numDead);
-                                    }
-                                }
-                            }
-                            //if (peaks.Count < 5 && count + 10 < totalPeaksCount)
-                            //{
-                            //    break;
-                            //}
-                        }
-                        maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, metadata.Count);
-
-                        //System.Console.WriteLine("PeaksCount: " + peaks.Count);
-                        //System.Console.WriteLine("PeaksRemoveCount: " + peaksToRemove.Count);
-                        
-                        // Get the GC Generation of the oldest item on the list...
-                        //var oldestGen = GC.GetGeneration(peaksToRemove.First());
-                        //System.Console.WriteLine("Calling GC up to generation " + oldestGen);
-                        // Remove the output peaks from the sorted set
-                        //foreach (var peak in peaksToRemove) // O(n), n = peaksToRemove.Count
-                        //{
-                        //    peaks.Remove(peak); // O(log n), n = peaks.Count
-                        //}
-
-                        // ExceptWith() might be a better option
-                        //peaks.ExceptWith(peaksToRemove); // O(n), n = peaksToRemove.Count
-
-                        // RemoveWhere() might be faster, in some circumstances, but it doesn't seem to work so well in this case.
-                        //var biggestPeakToRemove = peaks.Last();
-                        //peaks.RemoveWhere(x => x.CompareTo(biggestPeakToRemove) <= 0); // O(n), n = peaks.Count
-                        //System.Console.WriteLine("OldCount: {0} NewCount: {1} Diff: {2} ToRemove: {3}", oldCount, peaks.Count, oldCount - peaks.Count, peaksToRemove.Count);
-                        //peaksToRemove.Clear();
-                        // We have probably removed a large number of peaks from the sorted set, and many may be considered "long-running".
-                        // We can call GC.Collect() to try to recover that memory, and decrease overall memory usage.
-                        //GC.Collect(oldestGen, GCCollectionMode.Forced, false);
-                        //System.Console.WriteLine("Called garbage collector");
-
-                        //System.Console.WriteLine("Metadata count: " + metadata.Count);
-                        //System.Console.WriteLine("Metadata values count: " + metadata.Values.Count);
-
-                        //var prevCount = peaks.Count;
-                        //var totalAdded = 0;
-                        // add new entries back into the list from the spectra that the peaks came from
-                        foreach (var datum in metadata.Values)
-                        {
-                            if (datum.Count < maxInMemoryPerSpec && datum.MorePeaksToRead)
-                            {
-                                //foreach (var peak in datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count))
-                                //{
-                                //    peaks.Add(peak);
-                                //}
-                                //var prevSpecCount = datum.Count;
-                                peaks.AddRange(datum.ReadPeaksReuse(_reader, maxInMemoryPerSpec - datum.Count, peaksToRemove));
-                                //peaksReadCount += datum.Count - prevSpecCount;
-                                //totalAdded += datum.Count - prevSpecCount;
-                            }
-                        }
-                        //var postCount = peaks.Count;
-                        //System.Console.WriteLine();
-                        //System.Console.WriteLine("Peaks Written: {0, 12} FinalCount: {1, 12} Remaining Spec: {2, 7}, Total Written: {3, 12}", safetyCounter, prevCount, metadata.Count, count);
-                        //System.Console.WriteLine("Peaks Read:    {0, 12} NewCount:   {1, 12} MaxInMemory:    {2, 7}, Total Peaks:   {3, 12}", totalAdded, postCount, maxInMemoryPerSpec, totalPeaksCount);
-                        //System.Console.WriteLine("Difference Check:                       {0, 12}                          Total Read:    {1, 12}", prevCount - safetyCounter + totalAdded, peaksReadCount);
-                        //peaks.Sort();
-                        peaksEnum = peaks.GetReusableEnumerator();
-                        //peaksEnum = peaks.GetEnumerator();
-                        //System.Console.WriteLine("Peaks count = " + peaks.Count);
-                        /*/
-                        //var peak = peaks.Min;
                         var peak = peaksEnum.Current;
                         progress.Report(progData.UpdatePercent((double) count / peaksCount * 100.0));
                         count++;
@@ -1961,7 +1452,6 @@ namespace InformedProteomics.Backend.MassSpecData
                         writer.Write(peak.ScanNum);
 
                         peaksToRemove.Add(peak);
-                        //peaks.Remove(peak);
 
                         var datum = metadata[peak.ScanNum];
                         datum.ReadOne();
@@ -1970,32 +1460,10 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             if (datum.MorePeaksToRead)
                             {
-                                // Restock
-                                //foreach (var newPeak in datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count))
-                                //{
-                                //    var p = newPeak;
-                                //    if (peaksToRemove.Count > 0)
-                                //    {
-                                //        var lastRemoved = peaksToRemove.Count - 1;
-                                //        p = peaksToRemove[lastRemoved].CopyDataFrom(newPeak);
-                                //        peaksToRemove.RemoveAt(lastRemoved);
-                                //    }
-                                //    peaks.Add(p);
-                                //}
-                                //foreach (var newPeak in datum.ReadPeaksReuse(_reader, maxInMemoryPerSpec - datum.Count, peaksToRemove))
-                                //{
-                                //    peaks.Add(newPeak);
-                                //}
-                                peaks.AddRange(datum.ReadPeaksReuse(_reader, maxInMemoryPerSpec - datum.Count, peaksToRemove));
-                                //foreach (var newPeak in datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count))
-                                //{
-                                //    peaks.Add(newPeak);
-                                //}
-                                peaksEnum = peaks.GetReusableEnumerator();
+                                break;
                             }
                             else
                             {
-                                // Out of stock, remove from inventory.
                                 metadata.Remove(datum.ScanNum);
                                 var numDead = datum.NumPeaks < maxInMemoryPerSpec ? datum.NumPeaks : maxInMemoryPerSpec;
                                 if (numDead >= peaksToRemove.Count - 500)
@@ -2006,152 +1474,43 @@ namespace InformedProteomics.Backend.MassSpecData
                                 {
                                     peaksToRemove.RemoveRange(peaksToRemove.Count - numDead - 1, numDead);
                                 }
-                                //var c = peaksToRemove.Capacity - numDead;
-                                //var c2 = 0;
-                                //for (int i = peaksToRemove.Count - 1; i >= 0 && c2 < numDead; i--, c2++)
-                                //{
-                                //    peaksToRemove.RemoveAt(i);
-                                //}
-                                // Changing the capacity is expensive (array copy)
-                                //peaksToRemove.Capacity = c > 1000 ? c : 1000;
                             }
                         }
-                        //if (count % 1000000 == 0) // 1 million is probably too often, but telling it to run doesn't mean it will.
-                        //{
-                        //    //System.Console.WriteLine("Calling GC up to generation " + oldestPeaksGen);
-                        //    GC.Collect(oldestPeaksGen, GCCollectionMode.Forced, false); // Don't block and wait for the garbage collection, do it in the background.
-                        //    //GC.Collect(oldestPeaksGen, GCCollectionMode.Optimized, false); // Don't block and wait for the garbage collection, do it in the background.
-                        //    oldestPeaksGen = GC.GetGeneration(peaks.Min);
-                        //    //System.Console.WriteLine("Called garbage collector");
-                        //}
-                        /**/
                     }
+                    maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, metadata.Count);
 
-                    if (isMs1List)
+                    // add new entries back into the list from the spectra that the peaks came from
+                    foreach (var datum in metadata.Values)
                     {
-                        //_minMzIndex = GetMzBinIndex(_minMs1Mz);
-                        //_maxMzIndex = GetMzBinIndex(_maxMs1Mz);
-
-                        _chromMzIndexToOffset = new long[_maxMzIndex - _minMzIndex + 2];
-                        for (int i = 0; i < _chromMzIndexToOffset.Length; i++)
+                        if (datum.Count < maxInMemoryPerSpec && datum.MorePeaksToRead)
                         {
-                            if (chromMzIndexToOffset.ContainsKey(i))
-                            {
-                                _chromMzIndexToOffset[i] = chromMzIndexToOffset[i];
-                            }
+                            peaks.AddRange(datum.ReadPeaksReuse(_reader, maxInMemoryPerSpec - datum.Count, peaksToRemove));
                         }
                     }
-                }
-            }
-            else
-            {
-                progData.IsPartialRange = true;
-                progData.MaxPercentage = 50;
-                // Use the passed-in count as the initial capacity, or int.MaxValue if the passed in count is too big for an int.
-                //var peaksList = new List<LcMsPeak>(totalPeaksCount > int.MaxValue ? int.MaxValue : (int)totalPeaksCount);
-                var peaksList = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
-                if (_reader == null)
-                {
-                    _reader =
-                        new BinaryReader(
-                            new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
-                                FileShare.ReadWrite)));
-                }
-                count = 0;
-                progData.Status = "Reading MSn peaks for product chromatogram";
-                if (isMs1List)
-                {
-                    progData.Status = "Reading MS1 peaks for precursor chromatogram";
-                }
-                foreach (var scan in scansForMsLevelX)
-                {
-                    progress.Report(progData.UpdatePercent((double) count / countTotal * 100));
-                    count++;
-                    peaksList.AddRange(GetPeaksForSpectrum(scan));
-                }
-                progData.StepRange(100);
 
-                peaksList.Sort();
+                    peaksEnum = peaks.GetReusableEnumerator();
+                }
 
                 if (isMs1List)
                 {
-                    //_minMs1Mz = peaksList.First().Mz;
-                    //_maxMs1Mz = peaksList.Last().Mz;
-                    //_minMs1Mz = peaksList.Min().Mz;
-                    //_maxMs1Mz = peaksList.Max().Mz;
-                    _minMs1Mz = minMz;
-                    _maxMs1Mz = maxMz;
-
-                    //_minMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(peaksList[0].Mz) : 0;
-                    //_maxMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(peaksList[peaksList.Count - 1].Mz) : -1;
-                    _minMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(_minMs1Mz) : 0;
-                    _maxMzIndex = peaksList.Any() ? PbfLcMsRun.GetMzBinIndex(_maxMs1Mz) : -1;
-
                     _chromMzIndexToOffset = new long[_maxMzIndex - _minMzIndex + 2];
-                }
-
-                count = 0;
-                countTotal = peaksList.Count;
-                prevMzIndex = -1;
-                progData.Status = "Writing product chromatogram";
-                if (isMs1List)
-                {
-                    progData.Status = "Writing precursor chromatogram";
-                }
-                //var optPeaksList = new Queue<LcMsPeak>(peaksList);
-                //peaksList.Clear();
-                //peaksList = null;
-                // convert the list to a queue to avoid holding onto the whole block of memory for the entire time.
-                //NaiveLcMsPeakLinkedList naiveList = new NaiveLcMsPeakLinkedList();
-                //foreach (var peak in peaksList)
-                //{
-                //    naiveList.AddLast(peak);
-                //}
-
-                //peaksList.Clear();
-                //peaksList = null;
-
-                foreach (var peak in peaksList)
-                //while (optPeaksList.Count > 0)
-                //for (int i = 0; i < peaksList.Count; i++)
-                //while (naiveList.IsValid)
-                {
-                    //var peak = optPeaksList.Dequeue();
-                    //var peak = naiveList.RemoveFirst();
-                    //var peak = peaksList[i];
-                    //peaksList[i] = null; // remove the reference - this is only because we want to make sure memory usage doesn't climb during the chromatogram writing.
-                    //if (count % 1000000 == 0)
-                    //{
-                    //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false); // Don't block and wait for the garbage collection, do it in the background.
-                    //}
-                    progress.Report(progData.UpdatePercent((double) count / countTotal * 100.0));
-                    count++;
-                    if (isMs1List)
+                    for (int i = 0; i < _chromMzIndexToOffset.Length; i++)
                     {
-                        var mzIndex = GetMzBinIndex(peak.Mz);
-                        if (mzIndex > prevMzIndex)
+                        if (chromMzIndexToOffset.ContainsKey(i))
                         {
-                            _chromMzIndexToOffset[mzIndex - _minMzIndex] = writer.BaseStream.Position;
-                            prevMzIndex = mzIndex;
+                            _chromMzIndexToOffset[i] = chromMzIndexToOffset[i];
                         }
                     }
-                    writer.Write(peak.Mz);
-                    writer.Write((float) peak.Intensity);
-                    writer.Write(peak.ScanNum);
                 }
-                //peaksList.Clear(); // Make sure to clear out the list.
-                //optPeaksList.Clear();
-            }
             }
 
             GC.Collect(); // We just killed a large number of objects when the list of peaks went out of scope.
         }
 
-        private class SplitLcMsPeakLists: IEnumerable<LcMsPeak>
+        private class SplitLcMsPeakLists
         {
             private readonly List<List<LcMsPeak>> _lists;
             private readonly List<bool> _sorted;
-            //private readonly List<bool> _spent;
             private int _mod = 0;
             private double _mzMod = 0;
             private const int Divisor = 1000000;
@@ -2167,12 +1526,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 _mzMod = (_maxMz - _minMz) / (_mod - 1);
                 _lists = new List<List<LcMsPeak>>(_mod + 2);
                 _sorted = new List<bool>(_mod + 2);
-                //_spent = new List<bool>(_mod + 2);
                 for (int i = 0; i <= _mod + 1; i++)
                 {
                     _lists.Add(new List<LcMsPeak>(1000));
                     _sorted.Add(false);
-                    //_spent.Add(false);
                 }
             }
 
@@ -2182,6 +1539,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     return;
                 }
+                RemoveEnumerated();
                 var list = (int)((peak.Mz - _minMz) / _mzMod);
                 if (list < 0)
                 {
@@ -2197,6 +1555,14 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             public void AddRange(IEnumerable<LcMsPeak> peaks)
+            {
+                foreach (var peak in peaks)
+                {
+                    Add(peak);
+                }
+            }
+
+            private void RemoveEnumerated()
             {
                 if (_enumerated > 0)
                 {
@@ -2219,22 +1585,6 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                     }
                 }
-                foreach (var peak in peaks)
-                {
-                    Add(peak);
-                }
-            }
-
-            public void Sort()
-            {
-                if (!_isSorted)
-                {
-                    for (int i = 0; i < _lists.Count; i++)
-                    {
-                        SortList(i);
-                    }
-                    _isSorted = true;
-                }
             }
 
             private void SortList(int index)
@@ -2254,47 +1604,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            public LcMsPeak Min()
-            {
-                Sort();
-                return _lists[0][0];
-            }
-
-            public LcMsPeak Max()
-            {
-                Sort();
-                var i = _lists.Count - 1;
-                var l = _lists[i];
-                return l[l.Count - 1];
-            }
-
-            public IEnumerator<LcMsPeak> GetEnumerator()
-            {
-                Sort();
-                for (var i = 0; i < _lists.Count; i++)
-                {
-                    if (_lists[i].Count > 0)
-                    {
-                        foreach (var peak in _lists[i])
-                        {
-                            yield return peak;
-                        }
-                        _lists[i].Clear();
-                        _lists[i] = new List<LcMsPeak>();
-                        //if ((i + 1) % 100 == 0)
-                        //{
-                        //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false);
-                        //}
-                    }
-                }
-                _lists.Clear();
-            }
-
             private long _enumerated = 0;
 
             public IEnumerator<LcMsPeak> GetReusableEnumerator()
             {
-                //Sort();
                 for (var i = 0; i < _lists.Count; i++)
                 {
                     if (_lists[i].Count > 0)
@@ -2305,64 +1618,11 @@ namespace InformedProteomics.Backend.MassSpecData
                             _enumerated++;
                             yield return peak;
                         }
-                        //if (_spent[i])
-                        //{
-                        //    System.Console.WriteLine("Double-Jumping Lists[{0}]!!!", i);
-                        //}
-                        //_spent[i] = true;
                         _enumerated -= _lists[i].Count; // prevent creep
                         _lists[i].Clear();
                         _lists[i] = new List<LcMsPeak>(10);
-                        //if ((i + 1) % 100 == 0)
-                        //{
-                        //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false);
-                        //}
                     }
                 }
-                //_lists.Clear();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
-            }
-        }
-
-        private class NaiveLcMsPeakLinkedList
-        {
-            private NaiveLcMsPeakLinkedListNode _head = null;
-            private NaiveLcMsPeakLinkedListNode _last = null;
-
-            public LcMsPeak RemoveFirst()
-            {
-                var peak = _head.Peak;
-                _head = _head.Next;
-                return peak;
-            }
-
-            public bool IsValid { get { return _head != null; } }
-
-            public void AddLast(LcMsPeak peak)
-            {
-                if (_head == null)
-                {
-                    _head = new NaiveLcMsPeakLinkedListNode(peak);
-                    _last = _head;
-                    return;
-                }
-                _last.Next = new NaiveLcMsPeakLinkedListNode(peak);
-                _last = _last.Next;
-            }
-
-            private class NaiveLcMsPeakLinkedListNode
-            {
-                public NaiveLcMsPeakLinkedListNode(LcMsPeak peak)
-                {
-                    Peak = peak;
-                    Next = null;
-                }
-                public LcMsPeak Peak { get; set; }
-                public NaiveLcMsPeakLinkedListNode Next { get; set; }
             }
         }
 
@@ -2492,10 +1752,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             public IEnumerable<LcMsPeak> ReadPeaks(BinaryReader reader, int numPeaksToRead)
             {
-                //var peaks = new List<LcMsPeak>();
                 if (_numPeaksRead >= NumPeaks)
                 {
-                    //return peaks;
                     yield return null;
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
@@ -2506,19 +1764,15 @@ namespace InformedProteomics.Backend.MassSpecData
                     var intensity = reader.ReadSingle();
                     Count++;
                     _numPeaksRead++;
-                    //peaks.Add(new LcMsPeak(mz, intensity, ScanNum));
                     yield return new LcMsPeak(mz, intensity, ScanNum);
                 }
                 _nextPeakOffset = reader.BaseStream.Position;
-                //return peaks;
             }
 
             public IEnumerable<LcMsPeak> ReadPeaksReuse(BinaryReader reader, int numPeaksToRead, List<LcMsPeak> peakStock)
             {
-                //var peaks = new List<LcMsPeak>();
                 if (_numPeaksRead >= NumPeaks)
                 {
-                    //return peaks;
                     yield return null;
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
@@ -2529,8 +1783,6 @@ namespace InformedProteomics.Backend.MassSpecData
                     var intensity = reader.ReadSingle();
                     Count++;
                     _numPeaksRead++;
-                    //peaks.Add(new LcMsPeak(mz, intensity, ScanNum));
-                    //yield return new LcMsPeak(mz, intensity, ScanNum);
                     var lastIndex = peakStock.Count - 1;
                     if (lastIndex >= 0)
                     {
@@ -2545,7 +1797,6 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 }
                 _nextPeakOffset = reader.BaseStream.Position;
-                //return peaks;
             }
 
             public void ReadOne()
