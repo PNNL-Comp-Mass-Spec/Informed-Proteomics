@@ -470,6 +470,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, includePeaks);
 
             var msLevel = (int)(pwizSpec.cvParam(CVID.MS_ms_level).value);
+            var tic = (double)(pwizSpec.cvParam(CVID.MS_total_ion_current).value);
             double[] mzArray = new double[0];
             double[] intensityArray = new double[0];
             foreach (var bda in pwizSpec.binaryDataArrays)
@@ -550,6 +551,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return new ProductSpectrum(mzArray, intensityArray, scanIndex)
                 {
                     NativeId = pwizSpec.id,
+                    TotalIonCurrent = tic,
                     ActivationMethod = am,
                     IsolationWindow = iw,
                     MsLevel = msLevel,
@@ -559,7 +561,9 @@ namespace InformedProteomics.Backend.MassSpecData
             return new Spectrum(mzArray, intensityArray, scanIndex)
             {
                 NativeId = pwizSpec.id,
+                TotalIonCurrent = tic,
                 ElutionTime = scanTime,
+                MsLevel = msLevel,
             };
         }
 

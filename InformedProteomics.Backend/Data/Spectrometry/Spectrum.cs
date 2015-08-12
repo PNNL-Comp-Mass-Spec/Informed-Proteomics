@@ -34,6 +34,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
 		public string NativeId { get; set; }
 
+        public double TotalIonCurrent { get; set; }
+
         public int MsLevel
         {
             get { return _msLevel; }

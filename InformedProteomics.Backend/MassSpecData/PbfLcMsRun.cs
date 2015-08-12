@@ -11,7 +11,14 @@ namespace InformedProteomics.Backend.MassSpecData
     public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
     {
         // This constant should be incremented by 1 if the binary file format is changed
-        public const int FileFormatId = 150604;
+        public const int FileFormatId = 150605;
+        private const int EarliestSupportedFileFormatId = 150604;
+
+        /** File format id history
+         * 150604: Earliest supported, has all data needed by InformedProteomics projects
+         * 150605: Added Total Ion Current and Native ID fields to spectrum output.
+         * 
+         */
 
         public const string FileExtension = ".pbf";
 
@@ -135,6 +142,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 });
             }
 
+            bool isCurrent;
             if (string.IsNullOrWhiteSpace(pbfFilePath))
             {
                 // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
@@ -147,13 +155,13 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 tempPath = Path.Combine(Path.GetTempPath(), fileName);
                 // Return the temp path if the pbf file of proper format already exists in the temp directory
-                if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath))
+                if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent)
                 {
                     return tempPath;
                 }
             }
 
-            if (!File.Exists(pbfPath) || !PbfLcMsRun.CheckFileFormatVersion(pbfPath))
+            if (!File.Exists(pbfPath) || !(PbfLcMsRun.CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent))
             {
                 if (specReader == null)
                 {
@@ -175,7 +183,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     //var fileName = Path.GetFileName(pbfFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw; // invalid path?
                     //var tempPath = Path.Combine(Path.GetTempPath(), fileName);
-                    if (!File.Exists(tempPath) || !PbfLcMsRun.CheckFileFormatVersion(tempPath))
+                    if (!File.Exists(tempPath) || !(PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent))
                         PbfLcMsRun.WriteAsPbf(run, tempPath, prog);
                     pbfPath = tempPath;
                 }
@@ -202,13 +210,14 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             tempPath = Path.Combine(Path.GetTempPath(), fileName);
-            if (File.Exists(pbfPath) && PbfLcMsRun.CheckFileFormatVersion(pbfPath))
+            bool isCurrent;
+            if (File.Exists(pbfPath) && PbfLcMsRun.CheckFileFormatVersion(pbfPath, out isCurrent))
             {
                 return pbfPath;
             }
 
             // Return the temp path if the pbf file of proper format already exists in the temp directory
-            if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath))
+            if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent))
             {
                 return tempPath;
             }
@@ -285,7 +294,8 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 pbfPath = pbfFileName;
             }
-            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath))
+            bool isCurrent;
+            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent)
             {
                 // Use regular construction
                 if (!specFileName.EndsWith(FileExtension))
@@ -375,6 +385,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public string PbfFilePath { get; private set; }
         private string _rawFilePath;
+        private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
+        private const int _nativeIdLength = 50;
 
         #region IMassSpecDataReader implementation
 
@@ -393,8 +405,9 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumToSpecOffset.OrderBy(e => e.Key).Select(e => ReadSpectrum(e.Value));
         }
 
-        public static bool CheckFileFormatVersion(string filePath)
+        public static bool CheckFileFormatVersion(string filePath, out bool isCurrent)
         {
+            isCurrent = false;
             var pbfFile = new FileInfo(filePath);
             if (!pbfFile.Exists || pbfFile.Length < sizeof(int))
                 return false;
@@ -405,8 +418,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 fs.Seek(-1 * sizeof(int), SeekOrigin.End);
 
                 var fileFormatId = reader.ReadInt32();
-                if (fileFormatId != FileFormatId)
+                if (fileFormatId > FileFormatId && fileFormatId < EarliestSupportedFileFormatId)
                     return false;
+                if (fileFormatId == FileFormatId)
+                    isCurrent = true;
             }
             return true;
         }
@@ -585,8 +600,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Read the file format integer from the end of the file
             _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
-            var fileFormatId = _reader.ReadInt32();
-            if (fileFormatId != FileFormatId) return false;
+            _fileFormatId = _reader.ReadInt32();
+            if (_fileFormatId > FileFormatId || _fileFormatId < EarliestSupportedFileFormatId)
+                return false;
 
             // Backup 10 bytes
             _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
@@ -689,7 +705,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof (int)))
                 {
-                    var spec = ReadSpectrum(_reader, includePeaks);
+                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks);
                     return spec;
                 }
                 return null;
@@ -731,12 +747,26 @@ namespace InformedProteomics.Backend.MassSpecData
                 isolationWindowUpperOffset, precursorMass, precursorCharge);
         }
 
-        private static Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
+        // Must reflect all changes to WriteSpectrum
+        private static Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
         {
             var scanNum = reader.ReadInt32();
+            string nativeId = String.Empty;
+            if (fileFormatId > 150604)
+            {
+                var c = new char[_nativeIdLength];
+                reader.Read(c, 0, _nativeIdLength);
+                nativeId = (new string(c)).Trim();
+            }
             var msLevel = reader.ReadByte();
             var elutionTime = reader.ReadDouble();
+            double tic = -1;
+            if (fileFormatId > 150604)
+            {
+                tic = reader.ReadSingle();
+            }
 
+            double calcTic;
             if (msLevel > 1)
             {
                 double? precursorMass = reader.ReadDouble();
@@ -747,11 +777,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 var isolationWindowTargetMz = reader.ReadDouble();
                 var isolationWindowLowerOffset = reader.ReadDouble();
                 var isolationWindowUpperOffset = reader.ReadDouble();
-                var peakList = ReadPeakList(reader, includePeaks);
+                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
+                if (tic < 0)
+                {
+                    tic = calcTic;
+                }
                 return new ProductSpectrum(peakList, scanNum)
                 {
                     MsLevel = msLevel,
                     ElutionTime = elutionTime,
+                    NativeId = nativeId,
+                    TotalIonCurrent = tic,
                     ActivationMethod = activationMethod,
                     IsolationWindow = new IsolationWindow(
                         isolationWindowTargetMz,
@@ -764,24 +800,39 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                var peakList = ReadPeakList(reader, includePeaks);
+                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
+                if (tic < 0)
+                {
+                    tic = calcTic;
+                }
                 return new Spectrum(peakList, scanNum)
                 {
-                    ElutionTime = elutionTime
+                    MsLevel = msLevel,
+                    ElutionTime = elutionTime,
+                    NativeId = nativeId,
+                    TotalIonCurrent = tic,
                 };
             }
         }
 
+        // All changes made here must be duplicated to ReadSpectrum() and to GetPeakMetadataForSpectrum()
         public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
             writer.Write(spec.ScanNum);
+
+            // NativeID: 50
+            // pad or truncate to keep in limit (may have to change in future...)
+            writer.Write(spec.NativeId.PadRight(_nativeIdLength).ToCharArray(0, _nativeIdLength), 0, _nativeIdLength);
 
             // ms level: 1
             writer.Write(Convert.ToByte(spec.MsLevel));
 
             // elution time: 4
             writer.Write(spec.ElutionTime);
+
+            // Total Ion Current: 4
+            writer.Write(Convert.ToSingle(spec.TotalIonCurrent));
 
             var productSpec = spec as ProductSpectrum;
             if (productSpec != null)    // product spectrum
@@ -818,16 +869,32 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private static List<Peak> ReadPeakList(BinaryReader reader, bool includePeaks = true)
+        private static List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
         {
             var peakList = new List<Peak>();
             var numPeaks = reader.ReadInt32();
+            // Only used if fileFormatId < 150605
+            tic = 0;
 
             // Skip the read if peaks aren't requested
             if (!includePeaks)
             {
                 // first the number of peaks, then 12 bytes per peak (mz, double, 8 bytes, then intensity, single, 4 bytes)
-                reader.BaseStream.Seek(numPeaks * 12, SeekOrigin.Current);
+                if (fileFormatId < 150605)
+                {
+                    // Read for calculating the tic
+                    for (var i = 0; i < numPeaks; i++)
+                    {
+                        // skip 8 bytes from the mz
+                        reader.ReadDouble();
+                        // add up the intensities
+                        tic += reader.ReadSingle();
+                    }
+                }
+                else
+                {
+                    reader.BaseStream.Seek(numPeaks * 12, SeekOrigin.Current);
+                }
                 return peakList;
             }
 
@@ -835,6 +902,8 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var mz = reader.ReadDouble();
                 var intensity = reader.ReadSingle();
+                // Only used if fileFormatId < 150605
+                tic += intensity;
                 peakList.Add(new Peak(mz, intensity));
             }
             return peakList;
@@ -1626,47 +1695,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private List<LcMsPeak> GetPeaksForSpectrum(int scanNum)
-        {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
-            {
-                // Empty list won't cause exception, but null will.
-                return new List<LcMsPeak>();
-            }
-
-            var peakList = new List<LcMsPeak>();
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-                var rScanNum = _reader.ReadInt32();
-                var msLevel = _reader.ReadByte();
-                var elutionTime = _reader.ReadDouble();
-
-                if (msLevel > 1)
-                {
-                    _reader.BaseStream.Seek(8 + 4 + 1 + 8 + 8 + 8, SeekOrigin.Current);
-                    //double? precursorMass = _reader.ReadDouble();
-                    //int? precursorCharge = _reader.ReadInt32();
-                    //var activationMethod = (ActivationMethod) _reader.ReadByte();
-                    //var isolationWindowTargetMz = _reader.ReadDouble();
-                    //var isolationWindowLowerOffset = _reader.ReadDouble();
-                    //var isolationWindowUpperOffset = _reader.ReadDouble();
-                }
-
-                var numPeaks = _reader.ReadInt32();
-
-                for (var i = 0; i < numPeaks; i++)
-                {
-                    var mz = _reader.ReadDouble();
-                    var intensity = _reader.ReadSingle();
-                    peakList.Add(new LcMsPeak(mz, intensity, rScanNum));
-                }
-            }
-            return peakList;
-        }
-
+        // Must reflect all changes to WriteSpectrum
         private ScanPeakMetaData GetPeakMetaDataForSpectrum(int scanNum)
         {
             long offset;
@@ -1681,8 +1710,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
 
                 var rScanNum = _reader.ReadInt32();
+                // skip nativeId
+                _reader.BaseStream.Seek(_nativeIdLength, SeekOrigin.Current);
                 var msLevel = _reader.ReadByte();
                 var elutionTime = _reader.ReadDouble();
+                var tic = _reader.ReadSingle();
 
                 if (msLevel > 1)
                 {

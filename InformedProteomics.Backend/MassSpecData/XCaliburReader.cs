@@ -85,6 +85,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var elutionTime = RtFromScanNum(scanNum);
+            var nativeId = "controllerType=0 controllerNumber=1 scan=" + scanNum;
 
             // Call scanInfo.MSLevel in order to update dictionary _msLevel
             var msLevel = ReadMsLevel(scanNum);
@@ -92,7 +93,9 @@ namespace InformedProteomics.Backend.MassSpecData
             if (msLevel == 1)
                 return new Spectrum(mzArr, intensityArr, scanNum)
                 {
-                    ElutionTime = elutionTime
+                    ElutionTime = elutionTime,
+                    TotalIonCurrent = scanInfo.TotalIonCurrent,
+                    NativeId = nativeId,
                 };
 
             var isolationWindow = ReadPrecursorInfo(scanNum);
@@ -101,6 +104,8 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 MsLevel = scanInfo.MSLevel,
                 ElutionTime = elutionTime,
+                TotalIonCurrent = scanInfo.TotalIonCurrent,
+                NativeId = nativeId,
                 ActivationMethod = GetActivationMethod(scanNum),
                 IsolationWindow = isolationWindow
             };

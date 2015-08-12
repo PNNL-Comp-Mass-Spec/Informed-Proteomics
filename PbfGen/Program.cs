@@ -130,7 +130,8 @@ namespace PbfGen
                 {
                     var pbfFilePath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtension);
 
-                    if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath))
+                    bool isCurrent;
+                    if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out isCurrent) && isCurrent)
                     {
                         Console.WriteLine("{0} already exists.", pbfFilePath);
                         continue;

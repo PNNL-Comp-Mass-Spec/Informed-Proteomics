@@ -1797,6 +1797,7 @@ namespace InformedProteomics.Backend.MassSpecData
             bool is_ms_ms = false;
             int msLevel = 0;
             bool centroided = false;
+            double tic = 0;
             List<Precursor> precursors = new List<Precursor>();
             List<ScanData> scans = new List<ScanData>();
             List<BinaryDataArray> bdas = new List<BinaryDataArray>();
@@ -1879,6 +1880,10 @@ namespace InformedProteomics.Backend.MassSpecData
                             case "MS:1000580":
                                 // name="MSn spectrum"
                                 is_ms_ms = true;
+                                break;
+                            case "MS:1000285":
+                                // name="total ion current"
+                                tic = Convert.ToDouble(reader.GetAttribute("value"));
                                 break;
                         }
                         reader.Read(); // Consume the cvParam element (no child nodes)
@@ -2001,6 +2006,7 @@ namespace InformedProteomics.Backend.MassSpecData
             spectrum.MsLevel = msLevel;
             spectrum.ElutionTime = scan.StartTime;
             spectrum.NativeId = nativeId;
+            spectrum.TotalIonCurrent = tic;
             
             return spectrum;
         }
