@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +9,8 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
     {
+        public const string FileExtension = ".pbf";
+
         // This constant should be incremented by 1 if the binary file format is changed
         public const int FileFormatId = 150605;
         private const int EarliestSupportedFileFormatId = 150604;
@@ -19,8 +20,6 @@ namespace InformedProteomics.Backend.MassSpecData
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
          * 
          */
-
-        public const string FileExtension = ".pbf";
 
         #region Public static functions
 
@@ -383,10 +382,43 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #endregion
 
+        #region Member Variables
+
         public string PbfFilePath { get; private set; }
         private string _rawFilePath;
         private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
-        private const int _nativeIdLength = 50;
+        private const int NativeIdLength = 50;
+
+        private readonly object _filelock = new object();
+        private BinaryReader _reader;
+
+        private readonly double _precursorSignalToNoiseRatioThreshold;
+        private readonly double _productSignalToNoiseRatioThreshold;
+
+        private double _minMs1Mz;
+        private double _maxMs1Mz;
+
+        private long _offsetPrecursorChromatogramStart;
+        private long _offsetPrecursorChromatogramEnd;   // exclusive
+        private long _offsetProductChromatogramBegin;
+        private long _offsetProductChromatogramEnd;
+        //private long _offsetMetaInfo;
+
+        //        private Dictionary<int, int> _scanNumToMsLevel;
+        //        private Dictionary<int, double> _scanNumElutionTimeMap;
+        //        private Dictionary<int, int[]> _isolationMzBinToScanNums;
+
+        private Dictionary<int, long> _scanNumToSpecOffset;
+        private int _minMzIndex;
+        private int _maxMzIndex;
+
+        private long[] _chromMzIndexToOffset;
+        private const double MzBinSize = 1;
+
+        // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
+        private const int NumBytePeak = 16;
+
+        #endregion
 
         #region IMassSpecDataReader implementation
 
@@ -433,7 +465,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #endregion
 
-        #region LcMsRun Public functions
+        #region LcMsRun Public function overrides
 
         public override double MinMs1Mz
         {
@@ -563,34 +595,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #endregion
 
-        private readonly object _filelock = new object();
-        private BinaryReader _reader;
-
-        private readonly double _precursorSignalToNoiseRatioThreshold;
-        private readonly double _productSignalToNoiseRatioThreshold;
-
-        private double _minMs1Mz;
-        private double _maxMs1Mz;
-
-        private long _offsetPrecursorChromatogramStart;
-        private long _offsetPrecursorChromatogramEnd;   // exclusive
-        private long _offsetProductChromatogramBegin;
-        private long _offsetProductChromatogramEnd;
-        //private long _offsetMetaInfo;
-
-//        private Dictionary<int, int> _scanNumToMsLevel;
-//        private Dictionary<int, double> _scanNumElutionTimeMap;
-//        private Dictionary<int, int[]> _isolationMzBinToScanNums;
-
-        private Dictionary<int, long> _scanNumToSpecOffset;
-        private int _minMzIndex;
-        private int _maxMzIndex;
-
-        private long[] _chromMzIndexToOffset;
-        private const double MzBinSize = 1;
-
-        // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
-        private const int NumBytePeak = 16;
+        #region Metadata reading
 
         private bool ReadMetaInfo()
         {
@@ -693,24 +698,9 @@ namespace InformedProteomics.Backend.MassSpecData
             return true;
         }
 
-        public static int GetMzBinIndex(double mz)
-        {
-            return (int) (mz / MzBinSize);
-        }
+        #endregion
 
-        private Spectrum ReadSpectrum(long offset, bool includePeaks = true)
-        {
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof (int)))
-                {
-                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks);
-                    return spec;
-                }
-                return null;
-            }
-        }
+        #region IsolationWindow reading
 
         private IsolationWindow ReadIsolationWindow(long offset)
         {
@@ -747,6 +737,24 @@ namespace InformedProteomics.Backend.MassSpecData
                 isolationWindowUpperOffset, precursorMass, precursorCharge);
         }
 
+        #endregion
+
+        #region Read/Write Spectrum
+
+        private Spectrum ReadSpectrum(long offset, bool includePeaks = true)
+        {
+            lock (_filelock)
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks);
+                    return spec;
+                }
+                return null;
+            }
+        }
+
         // Must reflect all changes to WriteSpectrum
         private static Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
         {
@@ -754,8 +762,8 @@ namespace InformedProteomics.Backend.MassSpecData
             string nativeId = String.Empty;
             if (fileFormatId > 150604)
             {
-                var c = new char[_nativeIdLength];
-                reader.Read(c, 0, _nativeIdLength);
+                var c = new char[NativeIdLength];
+                reader.Read(c, 0, NativeIdLength);
                 nativeId = (new string(c)).Trim();
             }
             var msLevel = reader.ReadByte();
@@ -823,7 +831,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // NativeID: 50
             // pad or truncate to keep in limit (may have to change in future...)
-            writer.Write(spec.NativeId.PadRight(_nativeIdLength).ToCharArray(0, _nativeIdLength), 0, _nativeIdLength);
+            writer.Write(spec.NativeId.PadRight(NativeIdLength).ToCharArray(0, NativeIdLength), 0, NativeIdLength);
 
             // ms level: 1
             writer.Write(Convert.ToByte(spec.MsLevel));
@@ -869,6 +877,43 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        // Must reflect all changes to WriteSpectrum
+        private ScanPeakMetaData GetPeakMetaDataForSpectrum(int scanNum)
+        {
+            long offset;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
+            {
+                return null;
+            }
+
+            ScanPeakMetaData data;
+            lock (_filelock)
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+                var rScanNum = _reader.ReadInt32();
+                // skip nativeId
+                _reader.BaseStream.Seek(NativeIdLength, SeekOrigin.Current);
+                var msLevel = _reader.ReadByte();
+                var elutionTime = _reader.ReadDouble();
+                var tic = _reader.ReadSingle();
+
+                if (msLevel > 1)
+                {
+                    _reader.BaseStream.Seek(8 + 4 + 1 + 8 + 8 + 8, SeekOrigin.Current);
+                    //double? precursorMass = _reader.ReadDouble();
+                    //int? precursorCharge = _reader.ReadInt32();
+                    //var activationMethod = (ActivationMethod) _reader.ReadByte();
+                    //var isolationWindowTargetMz = _reader.ReadDouble();
+                    //var isolationWindowLowerOffset = _reader.ReadDouble();
+                    //var isolationWindowUpperOffset = _reader.ReadDouble();
+                }
+
+                data = new ScanPeakMetaData(rScanNum, _reader);
+            }
+            return data;
+        }
+
         private static List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
         {
             var peakList = new List<Peak>();
@@ -908,6 +953,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return peakList;
         }
+
+        #endregion
+
+        #region WriteAsPbf (obsolete)
 
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
@@ -1098,6 +1147,10 @@ namespace InformedProteomics.Backend.MassSpecData
             progress.Report(progressData.UpdatePercent(100.0));
             writer.Write(FileFormatId); // 4
         }
+
+        #endregion
+
+        #region Pbf Creation
 
         private void WriteToPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
@@ -1695,43 +1748,6 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        // Must reflect all changes to WriteSpectrum
-        private ScanPeakMetaData GetPeakMetaDataForSpectrum(int scanNum)
-        {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
-            {
-                return null;
-            }
-
-            ScanPeakMetaData data;
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-                var rScanNum = _reader.ReadInt32();
-                // skip nativeId
-                _reader.BaseStream.Seek(_nativeIdLength, SeekOrigin.Current);
-                var msLevel = _reader.ReadByte();
-                var elutionTime = _reader.ReadDouble();
-                var tic = _reader.ReadSingle();
-
-                if (msLevel > 1)
-                {
-                    _reader.BaseStream.Seek(8 + 4 + 1 + 8 + 8 + 8, SeekOrigin.Current);
-                    //double? precursorMass = _reader.ReadDouble();
-                    //int? precursorCharge = _reader.ReadInt32();
-                    //var activationMethod = (ActivationMethod) _reader.ReadByte();
-                    //var isolationWindowTargetMz = _reader.ReadDouble();
-                    //var isolationWindowLowerOffset = _reader.ReadDouble();
-                    //var isolationWindowUpperOffset = _reader.ReadDouble();
-                }
-
-                data = new ScanPeakMetaData(rScanNum, _reader);
-            }
-            return data;
-        }
-
         private class ScanMetadata : IComparable<ScanMetadata>
         {
             public int ScanNum { get; private set; }
@@ -1837,6 +1853,15 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        #endregion
+
+        #region XIC reading functions
+
+        public static int GetMzBinIndex(double mz)
+        {
+            return (int)(mz / MzBinSize);
+        }
+
         private long GetOffset(double minMz, double maxMz, long beginOffset, long endOffset)
         {
             var minOffset = beginOffset;
@@ -1872,6 +1897,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return Xic.GetSelectedXic(xic);
         }
 
+        // Must reflect any changes made in the chromatogram creation
         private Xic GetXicPointsWithin(double minMz, double maxMz, long beginOffset, long endOffset,
             long targetOffset)
         {
@@ -1908,5 +1934,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             return xic;
         }
+
+        #endregion
     }
 }
