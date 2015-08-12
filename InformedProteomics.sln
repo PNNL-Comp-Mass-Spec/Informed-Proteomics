@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeqTagGen", "SeqTagGen\SeqT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagSearch", "TagSearch\TagSearch.csproj", "{1E295BAA-2375-49B5-8AF9-90FA1C4F8D68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Graphics", "InformedProteomics.Graphics\InformedProteomics.Graphics.csproj", "{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -268,6 +270,18 @@ Global
 		{1E295BAA-2375-49B5-8AF9-90FA1C4F8D68}.Release|Win32.ActiveCfg = Release|Any CPU
 		{1E295BAA-2375-49B5-8AF9-90FA1C4F8D68}.Release|x64.ActiveCfg = Release|x64
 		{1E295BAA-2375-49B5-8AF9-90FA1C4F8D68}.Release|x64.Build.0 = Release|x64
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Win32.ActiveCfg = Release|Any CPU
+		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

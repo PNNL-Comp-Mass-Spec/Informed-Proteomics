@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
+
 
 namespace InformedProteomics.TopDown.Execution
 {
+    
     public class Ms1FeatureFinderLauncher
     {
         private LcMsFeatureLikelihood _likelihoodScorer;
@@ -20,8 +21,10 @@ namespace InformedProteomics.TopDown.Execution
         public Ms1FeatureFinderLauncher(Ms1FeatureFinderInputParameter parameters = null)
         {
             Parameters = parameters ?? new Ms1FeatureFinderInputParameter();
+            //_plotter = (Parameters.FeatureMapImage) ? new LcMsFeatureMapPlot() : null;
         }
 
+        //private LcMsFeatureMapPlot _plotter;
         public void Run()
         {
             //var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -60,8 +63,8 @@ namespace InformedProteomics.TopDown.Execution
 
         public static string GetHeaderString(bool scoreReport = false)
         {
-            var header = ArrayUtil.ToString(TsvHeader);
-            if (scoreReport) header = header + "\t" + ArrayUtil.ToString(TsvExtraScoreHeader);
+            var header = string.Join("\t", TsvHeader);
+            if (scoreReport) header = header + "\t" + string.Join("\t", TsvExtraScoreHeader);
             return header;
         }
 
@@ -118,6 +121,7 @@ namespace InformedProteomics.TopDown.Execution
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
             var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
+            var outImgFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
             
             if (File.Exists(outTsvFilePath))
             {
@@ -219,6 +223,17 @@ namespace InformedProteomics.TopDown.Execution
                 csvWriter.Close();
                 Console.WriteLine(@" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
             }
+
+            if (Parameters.FeatureMapImage)
+            {
+                Console.WriteLine(@"Start feature map image generation");
+                stopwatch.Restart();
+                //_plotter.PlotLcMsFeatureMap(outTsvFilePath, outImgFilePath, baseName, string.Format("{0}", Math.Ceiling(run.GetElutionTime(run.MaxLcScan))));
+                stopwatch.Stop();
+                Console.WriteLine(@"Complete feature map image generation");
+                Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+                Console.WriteLine(@" - Feature map image output: {0}", outImgFilePath);
+            }
         }
 
         public static string GetString(LcMsFeature feature)
@@ -268,7 +283,7 @@ namespace InformedProteomics.TopDown.Execution
                 sb.AppendFormat("{0},{1:0.000}", feature.TheoreticalEnvelope.Isotopes[i].Index, intensity[i] / maxIntensity);
             }
 
-            sb.Append(string.Format("\t{0:0.0}", feature.Score));
+            sb.Append(string.Format("\t{0:0.0000}", feature.Score));
             if (scoreReport)
             {
 

@@ -12,7 +12,8 @@ namespace InformedProteomics.Backend.MassFeature
     public class LcMsPeakCluster : LcMsFeature
     {
         public LcMsPeakCluster(LcMsRun run, ObservedIsotopeEnvelope observedEnvelope)
-            : this(run, observedEnvelope.TheoreticalEnvelope, observedEnvelope.MonoMass, observedEnvelope.Charge, observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
+            : this(run, observedEnvelope.TheoreticalEnvelope, observedEnvelope.MonoMass, observedEnvelope.Charge, 
+            observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
         {
         }
 
@@ -25,6 +26,8 @@ namespace InformedProteomics.Backend.MassFeature
 
             DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
             DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
+            
+            if (mass > 2000) DetectableMinCharge = Math.Max(DetectableMinCharge, 2);
 
             RepresentativeSummedEnvelop = new double[TheoreticalEnvelope.Size];
 
@@ -173,8 +176,7 @@ namespace InformedProteomics.Backend.MassFeature
             var repEnvelopeBcDist2 = 10.0d;
             ObservedIsotopeEnvelope repEnvelope2 = null;
 
-
-            var tempBestDistanceScoreAcrossCharge = new double[2]{10, 10};
+            var tempBestDistanceScoreAcrossCharge = new double[2]{ 10, 10 };
             var tempBestIntensityScoreAcrossCharge = new double[2];
             var tempBestCorrelationScoreAcrossCharge = new double[2];
 
@@ -212,8 +214,13 @@ namespace InformedProteomics.Backend.MassFeature
                     var newBcDist = TheoreticalEnvelope.GetBhattacharyyaDistance(envelope.Peaks);
                     var newCorr = TheoreticalEnvelope.GetPearsonCorrelation(envelope.Peaks);
 
-                    if (newBcDist < 0.2 || newCorr > 0.6) xic2[chargeIdx][xicStartIdx+j] += envelope.Abundance;
-                    if (newBcDist < 0.2 || newCorr > 0.6) chargeXic[i][xicStartIdx + j] = envelope.Abundance;
+                    var goodEnvelope = (newBcDist < 0.07 || newCorr > 0.7);
+
+                    if (goodEnvelope)
+                    {
+                        xic2[chargeIdx][xicStartIdx + j] += envelope.Abundance;
+                        chargeXic[i][xicStartIdx + j] = envelope.Abundance;
+                    }
 
                     var levelOneEnvelope = true;
                     var levelTwoEnvelope = true;
@@ -223,7 +230,7 @@ namespace InformedProteomics.Backend.MassFeature
                         var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
                         var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
                         levelOneEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01);
-                        levelTwoEnvelope = (rankSumPvalue < 0.01 || poissonPvalue < 0.01);
+                        //levelTwoEnvelope = (rankSumPvalue < 0.05 || poissonPvalue < 0.05);
                     }
 
                     if (levelOneEnvelope)
@@ -245,15 +252,11 @@ namespace InformedProteomics.Backend.MassFeature
                         }
 
                         // in the initial scoring, classify major and minor envelopes
-                        if (!_initScore)
-                        {
-                            if (newBcDist < 0.07 || newCorr > 0.7) envelope.GoodEnough = true;
-                        }
+                        if (!_initScore && goodEnvelope) envelope.GoodEnough = true;
                     }
 
                     if (levelTwoEnvelope)
                     {
-                        // without considering p-values
                         if (newBcDist < tempBestDistanceScoreAcrossCharge[chargeIdx])
                         {
                             tempBestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
@@ -292,21 +295,21 @@ namespace InformedProteomics.Backend.MassFeature
             }
 
             // when good envellope is observed at only either even or odd charge...
-            if (BestCorrelationScoreAcrossCharge[0] > 0.7 && BestCorrelationScoreAcrossCharge[1] < 0.1)
+            if (BestCorrelationScoreAcrossCharge[0] > 0.7 && BestCorrelationScoreAcrossCharge[1] < 0.5)
             {
-                var i = 1;    
-                BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
-                BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
-                BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
-            }
-            if (BestCorrelationScoreAcrossCharge[1] > 0.7 && BestCorrelationScoreAcrossCharge[0] < 0.1)
-            {
-                var i = 0;
+                const int i = 1;    
                 BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
                 BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
                 BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
             }
 
+            if (BestCorrelationScoreAcrossCharge[1] > 0.7 && BestCorrelationScoreAcrossCharge[0] < 0.5)
+            {
+                const int i = 0;
+                BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
+                BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
+                BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
+            }
             
             // normalize abudnace across charges
             var s = AbundanceDistributionAcrossCharge[0] + AbundanceDistributionAcrossCharge[1];
@@ -506,10 +509,8 @@ namespace InformedProteomics.Backend.MassFeature
         public readonly int DetectableMaxCharge;
         public readonly int DetectableMinCharge; 
         public ObservedIsotopeEnvelope[][] Envelopes;
-        
 
         public readonly int[] BestCharge;
-
         public readonly double[] RepresentativeSummedEnvelop;
         
         public readonly double[] EnvelopeDistanceScoreAcrossCharge;

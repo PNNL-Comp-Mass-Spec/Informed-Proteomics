@@ -150,7 +150,6 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
-    <Compile Include="MassFeature\IdentifiedProtein.cs" />
     <Compile Include="MassFeature\INodeComparer.cs" />
     <Compile Include="MassFeature\IsotopeEnvelope.cs" />
     <Compile Include="MassFeature\LcMsEnvelopeComparer.cs" />
@@ -167,7 +166,7 @@
     <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatchAlignment.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatchMap.cs" />
-    <Compile Include="MassFeature\PrSmContainer.cs" />
+    <Compile Include="MassFeature\ProteinSpectrumMatchReader.cs" />
     <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />

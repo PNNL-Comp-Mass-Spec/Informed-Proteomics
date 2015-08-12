@@ -99,6 +99,61 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestCompRef()
+        {
+            string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned_features_new.tsv";
+
+            var fileEntries = Directory.GetFiles(@"\\protoapps\UserData\Jungkap\CompRef\CR32");
+
+            var rawFiles = new List<string>();
+            var ms1FtFiles = new List<string>();
+
+            foreach (var ms1File in fileEntries.Where(f => f.EndsWith(".ms1ft")))
+            {
+                var rawFile = Path.ChangeExtension(ms1File, "pbf");
+
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1File))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    continue;
+                }
+
+                rawFiles.Add(rawFile);
+                ms1FtFiles.Add(ms1File);
+            }
+
+            fileEntries = Directory.GetFiles(@"\\protoapps\UserData\Jungkap\CompRef\CR33");
+            foreach (var ms1File in fileEntries.Where(f => f.EndsWith(".ms1ft")))
+            {
+                var rawFile = Path.ChangeExtension(ms1File, "pbf");
+
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1File))
+                {
+                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    continue;
+                }
+
+                rawFiles.Add(rawFile);
+                ms1FtFiles.Add(ms1File);
+            }
+
+            RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
+        }
+
+
+        [Test]
         public void TestTempCompRefLcMsFeatureAlign()
         {
             const string dataFolder = @"D:\MassSpecFiles\CompRef";
@@ -193,185 +248,6 @@ namespace InformedProteomics.Test
 
         }
 
-        [Test]
-        public void TestUtexLcMsFeatureAlign()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            const string ms1ftFolder = @"D:\MassSpecFiles\UTEX\ms1ft_small";
-
-            const string quantOutFile = @"D:\MassSpecFiles\UTEX\features_promex_small.tsv";
-            const string mspOutFile = @"D:\MassSpecFiles\UTEX\features_msp_small.tsv";
-            const string msaOutFile = @"D:\MassSpecFiles\UTEX\features_msa_small.tsv";
-            
-            if (!Directory.Exists(rawFolder))
-            {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, rawFolder);
-                return;
-            }
-
-            var fileEntries = Directory.GetFiles(ms1ftFolder);
-
-            var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
-            dataset.Sort();
-
-            var rawFiles = new List<string>();
-            var ms1FtFiles = new List<string>();
-            //var prsmContainer = new PrSmContainer[dataset.Count];
-
-            var mspMap = new ProteinSpectrumMathMap[dataset.Count];
-            var msaMap = new ProteinSpectrumMathMap[dataset.Count];
-
-            for (var i = 0; i < dataset.Count; i++)
-            {
-                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
-                var ms1File = string.Format(@"{0}\{1}.ms1ft", ms1ftFolder, dataset[i]);
-
-                if (!File.Exists(rawFile))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
-                    continue;
-                }
-
-                if (!File.Exists(ms1File))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
-                    continue;
-                }
-
-                var run = PbfLcMsRun.GetLcMsRun(rawFile);
-                rawFiles.Add(rawFile);
-                ms1FtFiles.Add(ms1File);
-                //prsmContainer[i] = new PrSmContainer(i, dataset[i]);
-                mspMap[i] = new ProteinSpectrumMathMap(run, i, dataset[i]);
-                msaMap[i] = new ProteinSpectrumMathMap(run, i, dataset[i]);
-
-                // load identification results
-                Console.WriteLine(dataset[i]);
-
-                var path = string.Format(@"D:\MassSpecFiles\UTEX\MSPF\{0}_IcTda.tsv", dataset[i]);
-                if (!File.Exists(path))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
-                    continue;
-                }
-                mspMap[i].LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsPathFinder);
-                Console.WriteLine("\t[MSP] Total prsm = {0}, total unique proteins = {1}", mspMap[i].CountIdentifiedScans(), mspMap[i].CountIdentifiedUniqueProteoforms());
-
-                path = string.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_MSAlign_ResultTable.txt", dataset[i]);
-                if (!File.Exists(path))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
-                    continue;
-                }
-                msaMap[i].LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
-                Console.WriteLine("\t[MSA] Total prsm = {0}, total unique proteins = {1}", msaMap[i].CountIdentifiedScans(), msaMap[i].CountIdentifiedUniqueProteoforms());
-                
-            }
-
-            if (rawFiles.Count == 0)
-            {
-                Console.WriteLine(@"Warning: No files were found in method {0}", methodName);
-                return;
-            }
-
-            var align = new LcMsFeatureAlignment(ms1FtFiles, rawFiles, new LcMsFeatureDefaultComparer(new Tolerance(10)));
-            align.AlignFeatures();
-            Console.WriteLine("{0} alignments ", align.CountAlignedFeatures);
-
-            //align.RefineAbundance();
-            var alignedFeatureList = align.GetAlignedFeatures();
-
-            var writer = new StreamWriter(quantOutFile);
-
-            var mspWriter = new StreamWriter(mspOutFile);
-            var msaWriter = new StreamWriter(msaOutFile);
-            
-            writer.Write("MonoMass\tMinElutionTime\tMaxElutionTime");
-            for (var i = 0; i < align.CountDatasets; i++) writer.Write("\t{0}", dataset[i]);
-
-            mspWriter.Write("FeatureID");
-            msaWriter.Write("FeatureID");
-            for (var i = 0; i < align.CountDatasets; i++)
-            {
-                mspWriter.Write("\tProteinName_{0}", i);
-                mspWriter.Write("\tSequence_{0}", i);
-                mspWriter.Write("\tScore_{0}", i);
-                mspWriter.Write("\tScanNum_{0}", i);
-
-                msaWriter.Write("\tProteinName_{0}", i);
-                msaWriter.Write("\tSequence_{0}", i);
-                msaWriter.Write("\tScore_{0}", i);
-                msaWriter.Write("\tScanNum_{0}", i);
-            }
-            writer.Write("\n");
-            msaWriter.Write("\n");
-            mspWriter.Write("\n");
-
-            for (var i = 0; i < align.CountAlignedFeatures; i++)
-            {
-                var features = alignedFeatureList[i];
-                var minMaxNet = GetMinMaxNet(features);
-                writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
-                
-                mspWriter.Write(i + 1);
-                msaWriter.Write(i + 1);
-
-                for (var j = 0; j < align.CountDatasets; j++)
-                {
-                    var feature = features[j];
-                    writer.Write("\t");
-                    writer.Write(feature != null ? feature.Abundance : 0d);
-
-                    ProteinSpectrumMatch prsm = null;
-                    if (feature != null)
-                    {
-                        prsm = mspMap[j].FindByFeature(feature, new Tolerance(10));
-                    }
-                    else
-                    {
-                        prsm = mspMap[j].FindByFeature(minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4, new Tolerance(10));
-                    }
-                    mspWriter.Write("\t");
-                    mspWriter.Write((prsm != null) ? prsm.ProteinName : "");
-                    mspWriter.Write("\t");
-                    mspWriter.Write((prsm != null) ? prsm.SequenceText : "");
-                    mspWriter.Write("\t");
-                    mspWriter.Write((prsm != null) ? ""+prsm.Score : "N/A");
-                    mspWriter.Write("\t");
-                    mspWriter.Write((prsm != null) ? "" + prsm.ScanNum : "N/A");
-
-                    prsm = null;
-                    if (feature != null)
-                    {
-                        prsm = msaMap[j].FindByFeature(feature, new Tolerance(10));
-                    }
-                    else
-                    {
-                        prsm = msaMap[j].FindByFeature(minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4, new Tolerance(10));
-                    }
-                    msaWriter.Write("\t");
-                    msaWriter.Write((prsm  != null) ? prsm.ProteinName : "");
-                    msaWriter.Write("\t");
-                    msaWriter.Write((prsm  != null) ? prsm.SequenceText : "");
-                    msaWriter.Write("\t");
-                    msaWriter.Write((prsm != null) ? "" + prsm.Score : "N/A");
-                    msaWriter.Write("\t");
-                    msaWriter.Write((prsm != null) ? "" + prsm.ScanNum : "N/A");
-                }
-
-                mspWriter.Write("\n");
-                msaWriter.Write("\n");
-                writer.Write("\n");
-            }
-            writer.Close();
-            mspWriter.Close();
-            msaWriter.Close();
-        }
-    
-
         private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath)
         {
             var alignedFeatureList = align.GetAlignedFeatures();
@@ -383,6 +259,13 @@ namespace InformedProteomics.Test
                 var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
                 writer.Write("\t{0}", dataSetName);
             }
+
+            for (var i = 0; i < align.CountDatasets; i++)
+            {
+                //var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
+                writer.Write("\t{0}_Score", i);
+            }
+
             writer.Write("\n");
             for (var i = 0; i < align.CountAlignedFeatures; i++)
             {
@@ -396,6 +279,13 @@ namespace InformedProteomics.Test
                     var feature = features[j];
                     writer.Write("\t");
                     writer.Write(feature != null ? feature.Abundance : 0d);
+                }
+
+                for (var j = 0; j < align.CountDatasets; j++)
+                {
+                    var feature = features[j];
+                    writer.Write("\t");
+                    writer.Write(feature != null ? feature.Score : 0d);
                 }
 
                 writer.Write("\n");
@@ -408,7 +298,7 @@ namespace InformedProteomics.Test
             var align = new LcMsFeatureAlignment(ms1FtFiles, rawFiles, new LcMsFeatureDefaultComparer(new Tolerance(10)));
             align.AlignFeatures();
             Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
-            var tempOutPath = outFilePath + ".bak";
+            var tempOutPath = outFilePath + ".tmp";
             OutputAlignmentResult(align, tempOutPath);
             
             align.RefineAbundance();

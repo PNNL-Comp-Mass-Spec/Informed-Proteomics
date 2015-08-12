@@ -8,6 +8,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace ProMex
 {
+    
     class Program
     {
         public const string Name = "ProMex";
@@ -52,13 +53,13 @@ namespace ProMex
                 {
                     {"-i", null},
                     {"-o", null},
-                    {"-minCharge", "2"},
+                    {"-minCharge", "1"},
                     {"-maxCharge", "60"},
-                    {"-minMass", "3000.0"},
+                    {"-minMass", "600.0"},
                     {"-maxMass", "50000.0"},
                     {"-score", "n"},
                     {"-csv", "n"},
-                    {"-tmp", "n"},
+                    {"-featureMap", "y"},
                     {"-scoreTh", "0"},
                     {"-maxThreads", "0"},
                 };
@@ -138,10 +139,11 @@ namespace ProMex
                 "Usage: " + Name + ".exe\n" +
                 "\t[-i InputFolder or InputFile]\n" +
                 "\t[-o OutFolder (default : InputFolder)]\n" +
-                "\t[-minCharge MinCharge] (minimum charge state, default: 2)\n" +
+                "\t[-minCharge MinCharge] (minimum charge state, default: 1)\n" +
                 "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
-                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 3000.0)\n" +
+                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 600.0)\n" +
                 "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
+                "\t[-featureMap y or n (default: y)]\n" +
                 "\t[-score y or n (default: n)]\n" +
                 "\t[-maxThreads 0 (default: 0 (no limit))]\n"
                 );

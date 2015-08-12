@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Scoring.GeneratingFunction;
@@ -16,11 +17,17 @@ namespace InformedProteomics.Test.FunctionalTests
         public void TestProteinMassComparerWithBinning()
         {
             var aaSet = AminoAcid.StandardAminoAcidArr;
-            var comparer = new ProteinMassBinning(50, 50001, true);
+            
 
             var comparer2 = new FilteredProteinMassBinning(aaSet.Select(aa => aa.Composition),  50001);
 
-            
+            for (var i = 9999d; i < 10010; i++)
+            {
+                Console.WriteLine("{0}, {1}",i, comparer2.GetBinNumber(i));
+            }
+
+            //var comparer = new ProteinMassBinning(50, 50001, true);
+            /*
             Console.WriteLine(Constants.GetBinNumHighPrecision(50000));
             Console.WriteLine(comparer.NumberOfBins);
             Console.WriteLine(comparer2.NumberOfBins);
@@ -42,7 +49,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 var binNum2 = comparer2.GetBinNumber(mass);
 
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", i, mass, binNum, binNum1, binNum2);
-            }
+            }*/
         }
 
         [Test]

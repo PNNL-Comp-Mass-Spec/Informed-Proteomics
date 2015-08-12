@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -28,7 +29,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             for (var i = 0; i < featureFileList.Count; i++)
             {
-                var features = LoadProMexResult(RawFileList[i], featureFileList[i], i);
+                var features = LoadProMexResult(featureFileList[i], RawFileList[i], i);
                 features.Sort(new FeatureMassComparer());
                 _featureSetList.Add(i, features);
                 _featureList.AddRange(features);
@@ -46,12 +47,12 @@ namespace InformedProteomics.Backend.MassFeature
             _featureList.AddRange(features);
             _featureList.Sort(new FeatureMassComparer());        
         }
-        
-        public static List<LcMsFeature> LoadProMexResult(string rawFilePath, string featureFilePath, int dataid)
+     
+        public static List<LcMsFeature> LoadProMexResult(string featureFilePath, string rawFilePath = null, int dataid = 0)
         {
             var featureList = new List<LcMsFeature>();
             var tsvReader = new TsvFileParser(featureFilePath);
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            var run = (rawFilePath == null || !File.Exists(rawFilePath)) ? null : PbfLcMsRun.GetLcMsRun(rawFilePath);
             var featureIds = tsvReader.GetData("FeatureID");
 
             var minScans = tsvReader.GetData("MinScan");
@@ -66,6 +67,10 @@ namespace InformedProteomics.Backend.MassFeature
             var repScans = tsvReader.GetData("RepScan");
             var repMzs = tsvReader.GetData("RepMz");
 
+            var scores = tsvReader.GetData("LikelihoodRatio");
+            var minElutionTime = tsvReader.GetData("MinElutionTime");
+            var maxElutionTime = tsvReader.GetData("MaxElutionTime");
+
             for (var i = 0; i < tsvReader.NumData; i++)
             {
                 var abundance = double.Parse(abu[i]);
@@ -78,11 +83,15 @@ namespace InformedProteomics.Backend.MassFeature
                 var repCharge = int.Parse(repCharges[i]);
                 var repMz = double.Parse(repMzs[i]);
                 var repScanNum = int.Parse(repScans[i]);
+                var score = double.Parse(scores[i]);
+                var minEt = double.Parse(minElutionTime[i]);
+                var maxEt = double.Parse(maxElutionTime[i]);
                 
-                var feature = new LcMsFeature(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, run)
+                var feature = new LcMsFeature(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, minEt, maxEt, run)
                 {
                     FeatureId = fid,
                     DataSetId = dataid,
+                    Score = score,
                 };
 
                 featureList.Add(feature);
@@ -109,10 +118,12 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 var run = PbfLcMsRun.GetLcMsRun(RawFileList[i]);
                 var ms1ScanNums = run.GetMs1ScanVector();
-                var featureFinder = new LcMsPeakMatrix(run);
+                var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
 
                 for (var j = 0; j < CountAlignedFeatures; j++)
                 {
+                    //if (_alignedFeatures[j][i] != null) continue;
+
                     var mass = 0d;
                     var charge = 0;
                     var minScanNum = -1;
@@ -149,16 +160,14 @@ namespace InformedProteomics.Backend.MassFeature
                         minScanNum = _alignedFeatures[j][i].MinScanNum;
                         maxScanNum = _alignedFeatures[j][i].MaxScanNum;
                     }
-
+                    
                     var feature = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
-                    if (feature == null)
+                    if (feature == null || feature.Score < -10)
                     {
-                        _alignedFeatures[j][i] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
+                        feature = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
                     }
-                    else
-                    {
-                        _alignedFeatures[j][i] = feature;    
-                    }
+                    
+                    _alignedFeatures[j][i] = feature;    
                 }
                 Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
@@ -267,6 +276,7 @@ namespace InformedProteomics.Backend.MassFeature
                             var newOnew = new LcMsFeature(featureInfoList[i].Mass, altFt.RepresentativeCharge,
                                 altFt.RepresentativeMz, altFt.RepresentativeScanNum,
                                 altFt.Abundance, altFt.MinCharge, altFt.MaxCharge, altFt.MinScanNum, altFt.MaxScanNum,
+                                altFt.MinElutionTime, altFt.MaxElutionTime,
                                 altFt.Run);
 
                             alignedFeatures[i][j] = newOnew;

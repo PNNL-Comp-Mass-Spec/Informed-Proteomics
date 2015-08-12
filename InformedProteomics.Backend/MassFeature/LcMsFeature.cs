@@ -6,21 +6,32 @@ namespace InformedProteomics.Backend.MassFeature
     public class LcMsFeature
     {
         public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance,
-                          int minCharge = -1, int maxCharge = -1, int minScan = -1, int maxScan = -1,
-                          LcMsRun run = null)
+            int minCharge = 0, int maxCharge = 0, int minScan = 0, int maxScan = 0,
+            double minElution = 0, double maxElution = 0, LcMsRun run = null)
         {
             Abundance = abundance;
             RepresentativeMass = repMass;
             RepresentativeCharge = repCharge;
             RepresentativeMz = repMz;
             RepresentativeScanNum = repScanNum;
-            
+
             MinCharge = (minCharge > 0) ? minCharge : repCharge;
             MaxCharge = (maxCharge > 0) ? maxCharge : repCharge;
             MinScanNum = (minScan > 0) ? minScan : repScanNum;
             MaxScanNum = (maxScan > 0) ? maxScan : repScanNum;
+
+            _minElution = minElution;
+            _maxElution = maxElution;
             Run = run;
         }
+        /*
+        public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance,
+                          int minCharge = -1, int maxCharge = -1, int minScan = -1, int maxScan = -1,
+                          LcMsRun run = null)
+            : this(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, 0, 0)
+        {
+            Run = run;
+        }*/
 
         public int DataSetId { get; set; }
         public int FeatureId { get; set; }
@@ -43,10 +54,10 @@ namespace InformedProteomics.Backend.MassFeature
         public int RepresentativeScanNum { get; protected set; }
         public double RepresentativeMz { get; protected set; }
 
-        public double MinElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MinScanNum); }  }
-        public double MaxElutionTime { get { return (Run == null) ? 0 : Run.GetElutionTime(MaxScanNum); } }
-        public double ElutionTime { get { return (Run == null) ? 0 : 0.5 * (MinElutionTime + MaxElutionTime); } }
-        public double ElutionLength { get { return (Run == null) ? 0 : MaxElutionTime - MinElutionTime; } }
+        public double MinElutionTime { get { return (Run == null) ? _minElution : Run.GetElutionTime(MinScanNum); } }
+        public double MaxElutionTime { get { return (Run == null) ? _maxElution : Run.GetElutionTime(MaxScanNum); } }
+        public double ElutionTime { get { return 0.5*(MinElutionTime + MaxElutionTime); } }
+        public double ElutionLength { get { return MaxElutionTime - MinElutionTime; } }
 
         public double MaxNet { get { return (Run == null) ? 0 : MaxElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double MinNet { get { return (Run == null) ? 0 : MinElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
@@ -79,11 +90,13 @@ namespace InformedProteomics.Backend.MassFeature
         }
         
         public LcMsRun Run { get; protected set; }
-
         public ProteinSpectrumMatchSet ProteinSpectrumMatches { get; set; }
 
         [Serializable]
         public class LcMsRunNullException : Exception { }
+
+        private readonly double _minElution;
+        private readonly double _maxElution;
 
     }
 }

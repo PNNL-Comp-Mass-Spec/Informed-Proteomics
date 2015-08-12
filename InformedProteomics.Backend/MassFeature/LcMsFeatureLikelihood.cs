@@ -9,9 +9,9 @@ namespace InformedProteomics.Backend.MassFeature
     {
         public LcMsFeatureLikelihood(double likelihoodThreshold = 0)
         {
-            _massBins = new double[28];
+            _massBins = new double[30];
             var idx = 0;
-            for (var m = 3000; m <= 30000; m += 1000)
+            for (var m = 800; m <= 30000; m += 1000)
             {
                 _massBins[idx] = m;
                 idx++;
