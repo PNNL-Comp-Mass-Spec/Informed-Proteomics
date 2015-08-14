@@ -12,6 +12,7 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
+using ProMex;
 
 namespace InformedProteomics.Test
 {
@@ -160,11 +161,11 @@ namespace InformedProteomics.Test
                         }
                     }
                 }
-                
+
                 // now output results!!                
                 var ms1ftFilePath = String.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftFilePath);
-                writer.WriteLine(Ms1FeatureFinderLauncher.GetHeaderString());
+                writer.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
 
                 for (var j = 0; j < featureList.Count; j++)
                 {
@@ -177,7 +178,7 @@ namespace InformedProteomics.Test
                     f1.ExpandScanRange(minScanNum, maxScanNum);
                     
                     writer.Write("{0}\t", j+1);
-                    writer.WriteLine(Ms1FeatureFinderLauncher.GetString(f1));
+                    writer.WriteLine(LcMsFeatureFinderLauncher.GetString(f1));
                 }
                 writer.Close();
 
@@ -279,7 +280,7 @@ namespace InformedProteomics.Test
             {
                 var ms1ftPath = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_aligned.ms1ft", dataset[i]);
                 var writer = new StreamWriter(ms1ftPath);
-                writer.Write(Ms1FeatureFinderLauncher.GetHeaderString());
+                writer.Write(LcMsFeatureFinderLauncher.GetHeaderString());
                 writer.WriteLine("\tIdedMs2ScanNums");
 
                 for (var j = 0; j < alignedFeatureList.Count; j++)
@@ -294,7 +295,7 @@ namespace InformedProteomics.Test
                     }
                     else
                     {
-                        writer.Write(Ms1FeatureFinderLauncher.GetString(alignedFeatureList[j][i]));
+                        writer.Write(LcMsFeatureFinderLauncher.GetString(alignedFeatureList[j][i]));
                         writer.Write("\t");
 
                         if (alignedFeatureList[j][i].ProteinSpectrumMatches == null)

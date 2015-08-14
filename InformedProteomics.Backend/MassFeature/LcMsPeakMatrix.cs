@@ -64,8 +64,9 @@ namespace InformedProteomics.Backend.MassFeature
         {
             if (!featureMatrixCreated) BuildFeatureMatrix(targetMass); // should be called first
 
+            if (_rows.Length < 2 || _cols.Length < 1) return null;
+
             // 1) set initial elution period for initial sampling
-            var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
 
             if (Run.GetMsLevel(targetMinScanNum) > 1) targetMinScanNum = Run.GetPrevScanNum(targetMinScanNum, 1);
@@ -90,17 +91,57 @@ namespace InformedProteomics.Backend.MassFeature
 
             if (feature == null) return null;
 
+            // 4) scoring
             feature.UpdateScore(Ms1Spectra);
-
             if (_scorer != null) feature.Score = _scorer.GetScore(feature);
             else feature.Score = 0d;
-            
-            // 4) determine abundance
+           
+            // 5) determine abundance
+            SetAbundanceByAUC(ref feature);
+           
+            return feature;
+        }
+
+        public LcMsPeakCluster GetLcMsPeakCluster(double targetMass, int minCharge, int maxCharge, int minScanNum, int maxScanNum)
+        {
+            SetTargetMass(targetMass);
+            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+
+            var minCol = ms1ScanNumToIndex[minScanNum];
+            var maxCol = ms1ScanNumToIndex[maxScanNum];
+            var minRow = minCharge - MinScanCharge;
+            var maxRow = maxCharge - MinScanCharge;
+
+            // 3) collect envelopes
+            var feature = CollectLcMsPeaks(targetMass, minRow, maxRow, minCol, maxCol, true);
+
+            if (feature == null) return null;
+
+            // 4) scoring
+            feature.UpdateScore(Ms1Spectra);
+            if (_scorer != null) feature.Score = _scorer.GetScore(feature);
+            else feature.Score = 0d;
+
+            // 5) determine abundance
+            SetAbundanceByAUC(ref feature);
+
+            return feature;
+        }
+        
+        public void SetAbundanceByAUC(ref LcMsPeakCluster feature)
+        {
+            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+            var ms1ScanNums = Run.GetMs1ScanVector();
+
+            var minCol = ms1ScanNumToIndex[feature.MinScanNum];
+            var maxCol = ms1ScanNumToIndex[feature.MaxScanNum];
+            var minRow = feature.MinCharge - MinScanCharge;
+            var maxRow = feature.MaxCharge - MinScanCharge;
+
             var simCutoff = GetDistanceCorrelationThreshold(minRow, maxRow, minCol, maxCol);
             var bcCutoff = Math.Max(0.07, simCutoff.Item1);
             var corrCutoff = Math.Min(0.7, simCutoff.Item2);
-            //const double bcCutoff = 0.07;
-            //const double corrCutoff = 0.7;
+
             Array.Clear(_xic, 0, _xic.Length);
             foreach (var envelope in feature.EnumerateEnvelopes())
             {
@@ -110,23 +151,32 @@ namespace InformedProteomics.Backend.MassFeature
                 _xic[envCol] += envelope.Abundance;
             }
 
+            
             var smoothedXic = Smoother.Smooth(_xic);
-            var abundance = 0d;
+            var abuList = new List<double>();
+            
+            var apexScanNum = feature.MinScanNum;
+            var apexIntensity = 0d;
+
             for (var k = 0; k < smoothedXic.Length - 1; k++)
             {
                 var centerIntensity = 0.5 * (Math.Max(0, smoothedXic[k]) + Math.Max(0, smoothedXic[k + 1]));
 
                 if (!(centerIntensity > 0)) continue;
                 var timeInterval = Run.GetElutionTime(ms1ScanNums[k + 1]) - Run.GetElutionTime(ms1ScanNums[k]);
-
-                abundance += centerIntensity * timeInterval;
+                var abu = centerIntensity*timeInterval;
+                abuList.Add(abu);
+                //abundance += centerIntensity * timeInterval;
+                if (ms1ScanNums[k] >= feature.MinScanNum && ms1ScanNums[k] <= feature.MaxScanNum && apexIntensity < abu)
+                {
+                    apexIntensity = abu;
+                    apexScanNum = ms1ScanNums[k];
+                }
             }
-            feature.SetAbundance(abundance);
-
-            return feature;
+            
+            feature.SetAbundance(abuList.Sum(), apexScanNum, apexIntensity, abuList.Median());
         }
-
-
+        
         public double GetMs1EvidenceScore(double targetMass, int scanNum, int charge)
         {
             SetTargetMass(targetMass);
@@ -479,7 +529,7 @@ namespace InformedProteomics.Backend.MassFeature
             var clusters = new List<LcMsPeakCluster>();
 
             // todo : bottom up dataset??
-            if (_rows.Length < 2) return clusters;
+            if (_rows.Length < 2 || _cols.Length < 1) return clusters;
 
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
             var tempEnvelope2 = new double[_theoreticalEnvelope.Size];
@@ -599,7 +649,7 @@ namespace InformedProteomics.Backend.MassFeature
             for(var i = minRow; i <= maxRow; i++)
                 for (var j = minCol; j <= maxCol; j++) _featureMatrix[i][j].CheckedOutFlag = flag;
         }
-
+        
         private Tuple<double, double> GetDistanceCorrelationThreshold(int minRow, int maxRow, int minCol, int maxCol)
         {
             var distList = new List<double>();
@@ -622,7 +672,7 @@ namespace InformedProteomics.Backend.MassFeature
             return new Tuple<double, double>(distCutoff, corrCutoff);
         }
 
-        private LcMsPeakCluster CollectLcMsPeaks(double targetMass, int minRow, int maxRow, int minCol, int maxCol)
+        private LcMsPeakCluster CollectLcMsPeaks(double targetMass, int minRow, int maxRow, int minCol, int maxCol, bool reCollectAllPeaks = false)
         {
             var ms1ScanNums = Run.GetMs1ScanVector();
             var envelopes = new List<ObservedIsotopeEnvelope>();
@@ -640,7 +690,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 for (var j = minCol; j <= maxCol; j++)
                 {
-                    if (!_featureMatrix[i][j].Exist || Math.Abs(_featureMatrix[i][j].AccurateMass - targetMass) > massTol)
+                    if (reCollectAllPeaks || !_featureMatrix[i][j].Exist || Math.Abs(_featureMatrix[i][j].AccurateMass - targetMass) > massTol)
                     {
                         var peaks = Ms1Spectra[j].GetAllIsotopePeaks(targetMass, i + MinScanCharge, _theoreticalEnvelope, tolerance);
 
@@ -795,6 +845,8 @@ namespace InformedProteomics.Backend.MassFeature
             Array.Clear(_distProfileAcrossCharge, 0, _distProfileAcrossCharge.Length);
             Array.Clear(_corrProfileAcrossCharge, 0, _corrProfileAcrossCharge.Length);
             Array.Clear(_intensityAcrossCharge, 0, _intensityAcrossCharge.Length);
+
+            if (_rows.Length < 2 || _cols.Length < 1) return null;
 
             // expand seed min/max col when the period is too short            
             var elutionSamplingPeriod = Math.Max(Math.Min(Run.GetElutionTime(Run.MaxLcScan) * 0.003, 5.0), 0.5);
@@ -966,13 +1018,16 @@ namespace InformedProteomics.Backend.MassFeature
             for (var j = elutionStartColByTwoSigma - 1; j >= minCol; j--)
             {
                 if (smoothedXic[j] < threeSigIntensity) break;
-                if (Run.GetElutionTime(ms1ScanNums[apexCol]) - Run.GetElutionTime(ms1ScanNums[j]) > 3 * oneSigPeriod) break;
-
+                if (Run.GetElutionTime(ms1ScanNums[apexCol]) - Run.GetElutionTime(ms1ScanNums[j]) > 4 * oneSigPeriod) break;
                 var needBreak = true;
-                for (var k = j; k >= j - 3; k--)
+                for (var k = j - 1; k >= j - 3; k--)
                 {
                     if (k < 0) break;
-                    if (smoothedXic[k] < smoothedXic[k + 1]) needBreak = false;
+                    if (smoothedXic[j] * 1.25 < smoothedXic[k])
+                    {
+                        needBreak = false;
+                        break;
+                    }
                 }
                 if (needBreak) break;
                     
@@ -1006,7 +1061,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 var elutionLen = Run.GetElutionTime(ms1ScanNums[j]) - Run.GetElutionTime(ms1ScanNums[apexCol]);
 
-                if (elutionLen > 3 && elutionLen > 5 * oneSigPeriod)
+                if (elutionLen > 3 && elutionLen > 8 * oneSigPeriod)
                 {
                     break;
                 }
@@ -1035,7 +1090,7 @@ namespace InformedProteomics.Backend.MassFeature
         private double[] GetSummedEnvelopeAtCharge(double targetMass, int row, int minCol, int maxCol)
         {
             const int maxScanSkips = 2;
-            const double goodEnoughBcDistance = 0.04;
+            const double goodEnoughBcDistance = 0.07;
             const double goodEnoughCorrCoeff = 0.7;
             var summedEnvelope = new double[_theoreticalEnvelope.Size];
             var seedCol = -1;

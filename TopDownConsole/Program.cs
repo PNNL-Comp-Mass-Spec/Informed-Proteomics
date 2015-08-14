@@ -70,7 +70,6 @@ namespace MSPathFinderT
                     {"-minMass", "3000.0"},
                     {"-maxMass", "50000.0"},
                     {"-feature", null},
-                    {"-minProb", "0.1"},
                     {"-threads", "0"},
                 };
 

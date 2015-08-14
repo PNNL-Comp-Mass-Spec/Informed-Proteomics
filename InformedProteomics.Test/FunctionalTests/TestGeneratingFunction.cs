@@ -82,7 +82,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 IsolationWindow = spectrum.IsolationWindow
             };
 
-            var comparer = new FilteredProteinMassBinning(aaSet, 50000, 27);
+            var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
             Console.WriteLine("{0}\t{1}",comparer.NumberOfBins, comparer.GetBinNumber(proteinMass));
             var graphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using InformedProteomics.TopDown.Execution;
+//using InformedProteomics.TopDown.Execution;
 using InformedProteomics.Backend.Utils;
 
 namespace ProMex
@@ -55,7 +55,7 @@ namespace ProMex
                     {"-o", null},
                     {"-minCharge", "1"},
                     {"-maxCharge", "60"},
-                    {"-minMass", "600.0"},
+                    {"-minMass", "800.0"},
                     {"-maxMass", "50000.0"},
                     {"-score", "n"},
                     {"-csv", "n"},
@@ -102,10 +102,10 @@ namespace ProMex
             try
             {
 #endif
-                var param = new Ms1FeatureFinderInputParameter(_paramDic);
+                var param = new LcMsFeatureFinderInputParameter(_paramDic);
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
                 param.Display();
-                var launcher = new Ms1FeatureFinderLauncher(param);
+                var launcher = new LcMsFeatureFinderLauncher(param);
                 launcher.Run();
 #if (!DEBUG)
             }

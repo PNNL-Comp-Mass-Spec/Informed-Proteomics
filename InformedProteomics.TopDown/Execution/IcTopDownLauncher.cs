@@ -14,8 +14,8 @@ using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
-using PNNLOmics.Data;
 using PNNLOmics.Utilities;
+using ProMex;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -160,18 +160,18 @@ namespace InformedProteomics.TopDown.Execution
             if (string.IsNullOrWhiteSpace(FeatureFilePath))
             {
                 // Checks whether SpecFileName.ms1ft exists
-                var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, Ms1FeatureFinderLauncher.FileExtension);
+                var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, LcMsFeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
                     Console.Write(@"Running ProMex...");
                     sw.Start();
-                    var param = new Ms1FeatureFinderInputParameter
+                    var param = new LcMsFeatureFinderInputParameter
                     {
                         InputPath = SpecFilePath,
                         MinSearchCharge = MinPrecursorIonCharge,
                         MaxSearchCharge = MaxPrecursorIonCharge
                     };
-                    var featureFinder = new Ms1FeatureFinderLauncher(param);
+                    var featureFinder = new LcMsFeatureFinderLauncher(param);
                     featureFinder.Run();
                 }
                 sw.Reset();
@@ -594,10 +594,9 @@ namespace InformedProteomics.TopDown.Execution
             var scanNums = new List<int>();
             for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
                 if (matches[scanNum] != null) scanNums.Add(scanNum);
-                
 
-
-            if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+            //if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+            if (true)
             {
                 var threads = MaxNumThreads;
                 var coreCount = 0;

@@ -20,6 +20,16 @@ namespace InformedProteomics.Test
         public void TestIsotopeCount()
         {
 
+
+            var threads = 10;
+
+            var ms2Scans = Enumerable.Range(1, 7892).ToList();
+            var nScansPerThread = (int)ms2Scans.Count/threads;
+
+
+
+            Math.Ceiling((double) ms2Scans.Count/(double) nScansPerThread);
+
             for (var m = 500; m < 3000; m += 100)
             {
                 var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
@@ -108,7 +118,9 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
+            //const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
+
+            const string rawFile = @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf";
 
             if (!File.Exists(rawFile))
             {
@@ -127,8 +139,8 @@ namespace InformedProteomics.Test
                 (stopwatch.ElapsedMilliseconds)/1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer);
-            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3000);
-            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3400);
+            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3670.93);
+            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3670.93);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
             Console.WriteLine(@"Start MS1 feature extraction.");

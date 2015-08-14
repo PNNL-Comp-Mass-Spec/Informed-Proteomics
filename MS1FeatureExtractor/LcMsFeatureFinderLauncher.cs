@@ -6,11 +6,9 @@ using System.Text;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 
-
-namespace InformedProteomics.TopDown.Execution
+namespace ProMex
 {
-    
-    public class Ms1FeatureFinderLauncher
+    public class LcMsFeatureFinderLauncher
     {
         private LcMsFeatureLikelihood _likelihoodScorer;
 
@@ -18,9 +16,9 @@ namespace InformedProteomics.TopDown.Execution
         /// Constructor
         /// </summary>
         /// <param name="parameters"></param>
-        public Ms1FeatureFinderLauncher(Ms1FeatureFinderInputParameter parameters = null)
+        public LcMsFeatureFinderLauncher(LcMsFeatureFinderInputParameter parameters = null)
         {
-            Parameters = parameters ?? new Ms1FeatureFinderInputParameter();
+            Parameters = parameters ?? new LcMsFeatureFinderInputParameter();
             //_plotter = (Parameters.FeatureMapImage) ? new LcMsFeatureMapPlot() : null;
         }
 
@@ -40,7 +38,7 @@ namespace InformedProteomics.TopDown.Execution
 
             // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
             Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
-            
+
             var attr = File.GetAttributes(Parameters.InputPath);
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
@@ -110,19 +108,19 @@ namespace InformedProteomics.TopDown.Execution
         {
             return path.EndsWith(".pbf");
         }
-        
+
         public const string FileExtension = "ms1ft";
-        public readonly Ms1FeatureFinderInputParameter Parameters;
+        public readonly LcMsFeatureFinderInputParameter Parameters;
 
         private void ProcessFile(string rawFile)
         {
             var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(rawFile));
-            
+
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
             var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
             var outImgFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
-            
+
             if (File.Exists(outTsvFilePath))
             {
                 Console.WriteLine(@"ProMex output already exists: {0}", outTsvFilePath);
@@ -131,7 +129,7 @@ namespace InformedProteomics.TopDown.Execution
 
             if (!File.Exists(rawFile))
             {
-                ShowErrorMessage(@"Cannot find input file: "+ rawFile);
+                ShowErrorMessage(@"Cannot find input file: " + rawFile);
                 return;
             }
 
@@ -140,7 +138,7 @@ namespace InformedProteomics.TopDown.Execution
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
             var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer);
-            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             if (run.GetMs1ScanVector().Length == 0)
             {
@@ -161,11 +159,11 @@ namespace InformedProteomics.TopDown.Execution
                 var clusters = featureFinder.FindFeatures(binNum);
                 container.Add(clusters);
 
-                if (binNum > minSearchMassBin && (binNum - minSearchMassBin)%1000 == 0)
+                if (binNum > minSearchMassBin && (binNum - minSearchMassBin) % 1000 == 0)
                 {
-                    var elapsed = (stopwatch.ElapsedMilliseconds)/1000.0d;
+                    var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
-                    var processedPercentage = ((double) processedBins/totalMassBin)*100;
+                    var processedPercentage = ((double)processedBins / totalMassBin) * 100;
                     Console.WriteLine(@"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
@@ -173,7 +171,7 @@ namespace InformedProteomics.TopDown.Execution
             }
 
             Console.WriteLine(@"Complete MS1 feature extraction.");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
@@ -286,13 +284,12 @@ namespace InformedProteomics.TopDown.Execution
             sb.Append(string.Format("\t{0:0.0000}", feature.Score));
             if (scoreReport)
             {
-
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.OddCharge]);
 
                 sb.AppendFormat("\t{0:0.000}", feature.BestCorrelationScoreAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.BestCorrelationScoreAcrossCharge[LcMsPeakCluster.OddCharge]);
-                
+
                 sb.AppendFormat("\t{0:0.000}", feature.BestIntensityScoreAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.BestIntensityScoreAcrossCharge[LcMsPeakCluster.OddCharge]);
 
@@ -307,6 +304,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 sb.AppendFormat("\t{0:0.000}", feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.OddCharge]);
+
             }
 
             return sb.ToString();

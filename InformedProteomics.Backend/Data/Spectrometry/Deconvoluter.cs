@@ -70,12 +70,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                     for (var isotopeIndex = mostAbundantIsotopeIndex - isotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex + isotopeOffsetTolerance; isotopeIndex++)
                     {
-                        //if (
-                        //    hasToSkip[
-                        //        charge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance])
-                        //    continue;
-
-                        //var monoIsotopeMass = (peakMz - Constants.Proton) * charge - isotopeIndex * Constants.C13MinusC12;
                         var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
                         var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
                         var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope,
@@ -97,7 +91,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         if (corr < corrScoreThreshold && bcDist > 0.05) continue;
 
                         // monoIsotopeMass is valid
-                        monoIsotopePeakList.Add(new DeconvolutedPeak(peak, monoIsotopeMass, charge));
+                        monoIsotopePeakList.Add(new DeconvolutedPeak(monoIsotopeMass, charge, observedPeaks, envelop));
                         //foreach (var factorCharge in SimpleMath.GetFactors(charge))
                         //{
                         //    if (factorCharge < minCharge) continue;

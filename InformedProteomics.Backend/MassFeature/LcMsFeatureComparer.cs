@@ -46,8 +46,11 @@ namespace InformedProteomics.Backend.MassFeature
                 }
             }
 
+            var coeLen = f1.CoElutionNetLength(f2);
+            if (coeLen > f1.NetLength * 0.8 || coeLen > f2.NetLength * 0.8) return true;
+
             // tolerant in elution time dimension?
-            var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Min(f1.NetLength, f2.NetLength);
+            var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Max(f1.NetLength, f2.NetLength);
             if (lenDiff > 0.5) return false;
 
             if (f1.CoElutedByNet(f2, 0.001)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec

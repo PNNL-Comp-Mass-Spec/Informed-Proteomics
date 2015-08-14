@@ -1,25 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class DeconvolutedPeak: IComparable<DeconvolutedPeak>
     {
-        public DeconvolutedPeak(Peak mzPeak, double mass, int charge)
+        public DeconvolutedPeak(double mass, int charge, Peak[] isotopePeaks = null, double[] envelop = null, double relativeThreshold = 0.3)
         {
             Mass = mass;
-            //Intensity = intensity;
             Charge = charge;
-            MzPeak = mzPeak;
+            Intensity = 0d;
+            IsotopePeaks = new HashSet<Peak>();
+
+            if (isotopePeaks != null)
+            {
+                for(var i = 0; i < isotopePeaks.Length; i++)
+                {
+                    if (isotopePeaks[i] == null) continue;
+                    Intensity += isotopePeaks[i].Intensity;
+                    if (envelop[i] > relativeThreshold) IsotopePeaks.Add(isotopePeaks[i]);
+                }
+            }
         }
 
         public double Mass { get; private set; }
-        //public double Intensity { get; private set; }
-        public double Intensity { get { return MzPeak != null ? MzPeak.Intensity : 0; } }
-        public double Mz { get { return MzPeak.Mz;  } }
+        
+        //public double Intensity { get { return MzPeak != null ? MzPeak.Intensity : 0; } }
+        //public double Mz { get { return MzPeak.Mz;  } }
+        //public Peak MzPeak { get; private set; }
+        public double Intensity { get; private set; }
+
+        public bool PeakShare(DeconvolutedPeak other)
+        {
+            return IsotopePeaks.Any(peak => other.IsotopePeaks.Contains(peak));
+        }
+
+        internal readonly HashSet<Peak> IsotopePeaks;
         public int Charge { get; private set; }
-        public Peak MzPeak { get; private set; }
 
         public int CompareTo(DeconvolutedPeak other)
         {

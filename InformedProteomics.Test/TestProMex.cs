@@ -14,6 +14,7 @@ using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
+using ProMex;
 
 
 namespace InformedProteomics.Test
@@ -445,8 +446,8 @@ namespace InformedProteomics.Test
             const double minScanMass = 3000;
             const double maxScanMass = 5000;
             const int maxThreads = 10;
-            
-            var param = new Ms1FeatureFinderInputParameter
+
+            var param = new LcMsFeatureFinderInputParameter()
             {
                 InputPath = specFilePath,
                 OutputPath = outFolderPath,
@@ -458,7 +459,7 @@ namespace InformedProteomics.Test
                 ScoreReport = false,
                 MaxThreads = maxThreads
             };
-            var featureFinder = new Ms1FeatureFinderLauncher(param);
+            var featureFinder = new LcMsFeatureFinderLauncher(param);
             featureFinder.Run();
         }
 

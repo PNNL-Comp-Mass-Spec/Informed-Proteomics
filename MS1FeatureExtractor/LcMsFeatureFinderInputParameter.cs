@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace InformedProteomics.TopDown.Execution
+namespace ProMex
 {
-    public class Ms1FeatureFinderInputParameter
+    public class LcMsFeatureFinderInputParameter
     {
         public double MinSearchMass;
         public double MaxSearchMass;
@@ -21,7 +21,7 @@ namespace InformedProteomics.TopDown.Execution
 
         public double LikelihoodScoreThreshold;
 
-        public Ms1FeatureFinderInputParameter()
+        public LcMsFeatureFinderInputParameter()
         {
             MinSearchMass = 600;
             MaxSearchMass = 50000;
@@ -33,7 +33,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxThreads = -1;
         }
 
-        public Ms1FeatureFinderInputParameter(Dictionary<string, string> paramDic)
+        public LcMsFeatureFinderInputParameter(Dictionary<string, string> paramDic)
         {
             Parse(paramDic);
         }
@@ -42,7 +42,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             MinSearchMass = Math.Max(double.Parse(paramDic["-minMass"]), 600);
             MaxSearchMass = Math.Min(double.Parse(paramDic["-maxMass"]), 100000);
-            
+
             MinSearchCharge = (int)Math.Max(double.Parse(paramDic["-minCharge"]), 1);
             MaxSearchCharge = (int)Math.Min(double.Parse(paramDic["-maxCharge"]), 60);
             InputPath = paramDic["-i"];
@@ -69,7 +69,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine("MaxCharge\t{0}", MaxSearchCharge);
 
             Console.WriteLine("FeatureMap\t{0}", FeatureMapImage ? "Y" : "N");
-            
+
             Console.WriteLine("ScoreReport\t{0}", ScoreReport ? "Y" : "N");
 
             Console.WriteLine("LikelihoodRatioThreshold\t{0}", LikelihoodScoreThreshold);

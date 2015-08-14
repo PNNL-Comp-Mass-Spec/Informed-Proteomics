@@ -64,8 +64,6 @@
   <ItemGroup>
     <Compile Include="Execution\IcRescorer.cs" />
     <Compile Include="Execution\IcTopDownLauncher.cs" />
-    <Compile Include="Execution\Ms1FeatureFinderInputParameter.cs" />
-    <Compile Include="Execution\Ms1FeatureFinderLauncher.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
     <Compile Include="Scoring\DeconvolutedSpectrumScorer.cs" />
     <Compile Include="TagBasedSearch\SeqTagGenerateInputParameter.cs" />
@@ -108,9 +106,10 @@
       <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
       <Name>InformedProteomics.Scoring</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Quantitation\" />
+    <ProjectReference Include="..\MS1FeatureExtractor\ProMex.csproj">
+      <Project>{1586b333-5f3c-4e33-abb9-6767eac8fcd1}</Project>
+      <Name>ProMex</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

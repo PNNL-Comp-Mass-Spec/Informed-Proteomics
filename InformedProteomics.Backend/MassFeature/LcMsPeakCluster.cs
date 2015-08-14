@@ -352,9 +352,12 @@ namespace InformedProteomics.Backend.MassFeature
             MaxScanNum = Math.Max(maxScan, MaxScanNum);
         }
 
-        public void SetAbundance(double abu)
+        public void SetAbundance(double abu, int apexScanNum, double apexIntensity, double medianIntensity)
         {
             Abundance = abu;
+            ApexScanNum = apexScanNum;
+            ApexIntensity = apexIntensity;
+            MedianIntensity = medianIntensity;
         }
 
         internal void Expand(ObservedIsotopeEnvelope envelope)
@@ -376,22 +379,7 @@ namespace InformedProteomics.Backend.MassFeature
                 MinCharge = envelope.Charge;
             }            
         }
-        
-        public double CoElutionLength(LcMsPeakCluster other)
-        {
-            if (other.MaxScanNum >= MinScanNum && other.MaxScanNum <= MaxScanNum)
-            {
-                return (other.MaxElutionTime - Math.Max(MinElutionTime, other.MinElutionTime));
-            }
-
-            if (MaxScanNum >= other.MinScanNum && MaxScanNum <= other.MaxScanNum)
-            {
-                return (MaxElutionTime - Math.Max(other.MinElutionTime, MinElutionTime));
-            }
-            
-            return 0d;
-        }
-        
+   
         public void ExpandElutionRange()
         {
             // considering DDA instrument
@@ -505,6 +493,10 @@ namespace InformedProteomics.Backend.MassFeature
                 return BestCorrelationScore > 0.7;                
             }
         }
+        public double ApexElutionTime { get { return Run.GetElutionTime(ApexScanNum); } }
+        public int ApexScanNum { get; protected set; }
+        public double ApexIntensity { get; protected set; }
+        public double MedianIntensity { get; protected set; }
 
         public readonly int DetectableMaxCharge;
         public readonly int DetectableMinCharge; 
@@ -532,7 +524,7 @@ namespace InformedProteomics.Backend.MassFeature
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
         public byte Flag;
-
+        
         private bool _initScore;
     }
 }

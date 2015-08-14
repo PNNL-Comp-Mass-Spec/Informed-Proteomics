@@ -11,7 +11,9 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
+using ProMex;
 
 namespace InformedProteomics.Test
 {
@@ -20,13 +22,27 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptidomics()
         {
-            const string ms1ftFolder = @"D:\MassSpecFiles\Peptidome";
-            const string rawFolder = @"\\protoapps\UserData\Jungkap\peptidome";
+//            const string ms1ftFolder = @"D:\MassSpecFiles\Peptidome";
+            //const string rawFolder = @"\\protoapps\UserData\Jungkap\peptidome";
+            //const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Histone";
+            //const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_3";
+            const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Lewy\ms1ft";
+            const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3";
             string outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
-
             var fileEntries = Directory.GetFiles(ms1ftFolder);
             var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
+            /*var dataset = new String[]
+            {
+                "MZ20150729FG_WT1",
+                "MZ20150729FG_WT2a",
+                "MZ20150725FG_WT1",
+                "MZ20150725FG_WT2a",
+                "MZ20150729FG_MT1",
+                "MZ20150729FG_MT2",
+                "MZ20150725FG_MT1",
+                "MZ20150725FG_MT2"
+            };*/
             //var dataset = new List<string>();
             //for (var i = 1; i <= 10; i++) dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
 
@@ -101,53 +117,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestCompRef()
         {
-            string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned_features_new.tsv";
+            const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features.tsv";
+            const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\CompRef\ms1ft";
+            const string rawFolder = @"\\protoapps\UserData\Jungkap\CompRef\raw";
 
-            var fileEntries = Directory.GetFiles(@"\\protoapps\UserData\Jungkap\CompRef\CR32");
+            var fileEntries = Directory.GetFiles(ms1ftFolder);
+            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft")).ToList();
 
-            var rawFiles = new List<string>();
-            var ms1FtFiles = new List<string>();
-
-            foreach (var ms1File in fileEntries.Where(f => f.EndsWith(".ms1ft")))
-            {
-                var rawFile = Path.ChangeExtension(ms1File, "pbf");
-
-                if (!File.Exists(rawFile))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
-                    continue;
-                }
-
-                if (!File.Exists(ms1File))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
-                    continue;
-                }
-
-                rawFiles.Add(rawFile);
-                ms1FtFiles.Add(ms1File);
-            }
-
-            fileEntries = Directory.GetFiles(@"\\protoapps\UserData\Jungkap\CompRef\CR33");
-            foreach (var ms1File in fileEntries.Where(f => f.EndsWith(".ms1ft")))
-            {
-                var rawFile = Path.ChangeExtension(ms1File, "pbf");
-
-                if (!File.Exists(rawFile))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
-                    continue;
-                }
-
-                if (!File.Exists(ms1File))
-                {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
-                    continue;
-                }
-
-                rawFiles.Add(rawFile);
-                ms1FtFiles.Add(ms1File);
-            }
+            fileEntries = Directory.GetFiles(rawFolder);
+            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf")).ToList();
 
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }
@@ -248,7 +226,7 @@ namespace InformedProteomics.Test
 
         }
 
-        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath)
+        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, bool isTemp = true)
         {
             var alignedFeatureList = align.GetAlignedFeatures();
 
@@ -290,7 +268,28 @@ namespace InformedProteomics.Test
 
                 writer.Write("\n");
             }
-            writer.Close();               
+            writer.Close();
+
+            if (isTemp) return;
+
+            var outDirectory = Path.GetDirectoryName(Path.GetFullPath(outFilePath));
+            for (var i = 0; i < align.CountDatasets; i++)
+            {
+                var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
+                //writer.Write("\t{0}", dataSetName);
+                // now output results!!                
+                var ms1ftFilePath = String.Format(@"{0}\{1}.aligned.ms1ft", outDirectory, dataSetName);
+                var writer2 = new StreamWriter(ms1ftFilePath);
+                writer2.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
+
+                for (var j = 0; j < align.CountAlignedFeatures; j++)
+                {
+                    var f1 = alignedFeatureList[j][i];
+                    writer2.Write("{0}\t", j + 1);
+                    writer2.WriteLine(LcMsFeatureFinderLauncher.GetString(f1));
+                }
+                writer2.Close();
+            }
         }
 
         private void RunFeatureAlignment(List<string> ms1FtFiles, List<string> rawFiles, string outFilePath)
@@ -299,10 +298,10 @@ namespace InformedProteomics.Test
             align.AlignFeatures();
             Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
             var tempOutPath = outFilePath + ".tmp";
-            OutputAlignmentResult(align, tempOutPath);
+            OutputAlignmentResult(align, tempOutPath, true);
             
             align.RefineAbundance();
-            OutputAlignmentResult(align, outFilePath);
+            OutputAlignmentResult(align, outFilePath, false);
             //align.TryFillMissingFeature(alignedFeatureList);
         }
 
@@ -333,9 +332,11 @@ namespace InformedProteomics.Test
         {
             //var minNet = 1.0d;
             //var maxNet = 0d;
-            var minElutionTime = double.MaxValue;
-            var maxElutionTime = 0d;
+            //var minElutionTime = double.MaxValue;
+            //var maxElutionTime = 0d;
             var massList = new List<double>();
+            var minElutionList = new List<double>();
+            var maxElutionList = new List<double>();
 
             var charge = 0;
             foreach (var f in features)
@@ -343,13 +344,17 @@ namespace InformedProteomics.Test
                 if (f == null) continue;
                 //minNet = Math.Min(minNet, f.MinNet);
                 //maxNet = Math.Max(maxNet, f.MaxNet);
-                minElutionTime = Math.Min(minElutionTime, f.MinElutionTime);
-                maxElutionTime = Math.Max(maxElutionTime, f.MaxElutionTime);
+                //minElutionTime = Math.Min(minElutionTime, f.MinElutionTime);
+                //maxElutionTime = Math.Max(maxElutionTime, f.MaxElutionTime);
+                minElutionList.Add(f.MinElutionTime);
+                maxElutionList.Add(f.MaxElutionTime);
                 massList.Add(f.Mass);
                 charge = f.RepresentativeCharge;
             }
             massList.Sort();
             var mass = massList[(int)(massList.Count * 0.5)];
+            var minElutionTime = minElutionList[(int)(massList.Count * 0.5)];
+            var maxElutionTime = maxElutionList[(int)(massList.Count * 0.5)];
 
             //return new Tuple<double, int, double, double>(mass, charge, minNet, maxNet);
             return new Tuple<double, int, double, double>(mass, charge, minElutionTime, maxElutionTime);

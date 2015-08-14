@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.MassFeature
     
     public class LcMsFeatureContainer
     {
-        internal class FeatureComparer : INodeComparer<LcMsPeakCluster>
+        internal class PostFeatureComparer : INodeComparer<LcMsPeakCluster>
         {
             private readonly Tolerance _tolerance = new Tolerance(10);
             public bool SameCluster(LcMsPeakCluster f1, LcMsPeakCluster f2)
@@ -18,10 +18,28 @@ namespace InformedProteomics.Backend.MassFeature
                 var massTh = _tolerance.GetToleranceAsTh(f1.RepresentativeMass);
                 var massDiff = Math.Abs(f1.RepresentativeMass - f2.RepresentativeMass);
                 if (massDiff > massTh) return false;
-
                 var coeLen = f1.CoElutionLength(f2);
-                if (coeLen > f2.ElutionLength*0.7 || coeLen > f1.ElutionLength*0.7) return true;
+                
+                if (coeLen > f2.ElutionLength*0.5 || coeLen > f1.ElutionLength*0.5) return true; // significantly overlapped features
 
+                if (f1.CoElutedByNet(f2, 0.003)) // close in elution time
+                {
+                    
+                    // two differnt hills
+                    if (Math.Abs(f1.ApexElutionTime - f2.ApexElutionTime) > 1.0d &&
+                        f1.ApexIntensity/f1.MedianIntensity > 2 &&
+                        f2.ApexIntensity/f2.MedianIntensity > 2) return false;
+                    
+                    // otherwise, they are fragmentized features, which
+                    return true;
+                }
+                /*
+                if (f1.MaxElutionTime < f2.MinElutionTime && f2.MinElutionTime - f1.MaxElutionTime < 0.5)
+                    return true;
+
+                if (f2.MaxElutionTime < f1.MinElutionTime && f1.MinElutionTime - f2.MaxElutionTime < 0.5)
+                    return true;
+                */
                 return false;
             }
         }
@@ -79,48 +97,40 @@ namespace InformedProteomics.Backend.MassFeature
                 var newList = RemoveOverlappedFeatures(featureSet);
                 filteredFeatures.AddRange(newList);
             }
-            
-            return PostFiltering(filteredFeatures, new FeatureComparer());
-            //return filteredFeatures;
-            //return filteredFeatures.OrderBy(f => f.RepresentativeMass);
-            //return PostFiltering(filteredFeatures);
+
+            return filteredFeatures;
+            //return PostFiltering(filteredFeatures, new PostFeatureComparer());
         }
-        
-        private IEnumerable<LcMsPeakCluster> PostFiltering(List<LcMsPeakCluster> features, INodeComparer<LcMsPeakCluster> featureComparer)
+
+        private IEnumerable<LcMsPeakCluster> MergeFeatures(List<LcMsPeakCluster> features, INodeComparer<LcMsPeakCluster> featureComparer, LcMsPeakMatrix featureFinder)
         {
-            var postFilteredSet = new List<LcMsPeakCluster>();
             var featureSet = new NodeSet<LcMsPeakCluster>();
             featureSet.AddRange(features);
             var connectedFeatureSet = featureSet.ConnnectedComponents(featureComparer);
-
+            //return connectedFeatureSet;
+            
+            var postFilteredSet = new List<LcMsPeakCluster>();
             foreach (var fSet in connectedFeatureSet)
             {
-                LcMsPeakCluster selectedFeature = null;
                 if (fSet.Count == 1)
                 {
-                    selectedFeature = fSet[0];
+                    postFilteredSet.Add(fSet[0]);
                 }
                 else
                 {
-                    var maxScore = double.MinValue;
+                    var maxScan = fSet.Max(f => f.MaxScanNum);
+                    var minScan = fSet.Min(f => f.MinScanNum);
+                    var maxCharge = fSet.Max(f => f.MaxCharge);
+                    var minCharge = fSet.Min(f => f.MinCharge);
                     
-                    foreach (var f in fSet)
-                    {
-                        if (f.Score > maxScore)
-                        {
-                            maxScore = f.Score;
-                            selectedFeature = f;
-                        }
-                    }
-                    /*var maxScan = fSet.Max(f => f.MaxScanNum);
-                    var minScan = fSet.Max(f => f.MaxScanNum);
                     var mass = fSet.Select(f => f.Mass).Median();
-                    var charge = fSet[0].RepresentativeCharge;
-                    featureFinder.GetLcMsPeakCluster(mass, charge, minScan, maxScan);*/
+                    var score = fSet.Max(f => f.Score);
+                    var newFeature = featureFinder.GetLcMsPeakCluster(mass, minCharge, maxCharge, minScan, maxScan);
+                    if (newFeature.Score < score) newFeature.Score = score;
+                    postFilteredSet.Add(newFeature);
                 }
-                if (selectedFeature != null) postFilteredSet.Add(selectedFeature);
+                //if (selectedFeature != null) postFilteredSet.Add(selectedFeature);
             }
-
             return postFilteredSet.OrderBy(f => f.RepresentativeMass);
         }
 

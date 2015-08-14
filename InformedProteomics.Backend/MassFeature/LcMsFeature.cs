@@ -24,15 +24,7 @@ namespace InformedProteomics.Backend.MassFeature
             _maxElution = maxElution;
             Run = run;
         }
-        /*
-        public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance,
-                          int minCharge = -1, int maxCharge = -1, int minScan = -1, int maxScan = -1,
-                          LcMsRun run = null)
-            : this(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, 0, 0)
-        {
-            Run = run;
-        }*/
-
+       
         public int DataSetId { get; set; }
         public int FeatureId { get; set; }
         
@@ -45,8 +37,7 @@ namespace InformedProteomics.Backend.MassFeature
         public int ScanLength { get { return MaxScanNum - MinScanNum + 1; } }
 
         public double Abundance { get; protected set; }
-
-        public double Score { get; internal set; }
+        public double Score { get; set; }
 
         public double Mass { get { return RepresentativeMass;  } }
         public double RepresentativeMass { get; protected set; }
@@ -63,6 +54,47 @@ namespace InformedProteomics.Backend.MassFeature
         public double MinNet { get { return (Run == null) ? 0 : MinElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double NetLength { get { return (Run == null) ? 0 : MaxNet - MinNet; } }
         public double Net { get { return (Run == null) ? 0 : 0.5 * (MinNet + MaxNet); } }
+        
+
+        public double CoElutionLength(LcMsFeature other)
+        {
+            if (other.MaxScanNum >= MinScanNum && other.MaxScanNum <= MaxScanNum)
+            {
+                return (other.MaxElutionTime - Math.Max(MinElutionTime, other.MinElutionTime));
+            }
+
+            if (MaxScanNum >= other.MinScanNum && MaxScanNum <= other.MaxScanNum)
+            {
+                return (MaxElutionTime - Math.Max(other.MinElutionTime, MinElutionTime));
+            }
+
+            return 0d;
+        }
+
+
+        public double CoElutionNetLength(LcMsFeature other)
+        {
+            if (other.MaxNet >= MinNet && other.MaxNet<= MaxNet)
+            {
+                return (other.MaxNet - Math.Max(MinNet, other.MinNet));
+            }
+
+            if (MaxNet >= other.MinNet && MaxNet <= other.MaxNet)
+            {
+                return (MaxNet - Math.Max(other.MinNet, MinNet));
+            }
+
+            return 0d;
+        }
+
+        public bool CoElutedByTime(LcMsFeature other, double tolTime = 0d)
+        {
+            if (MinElutionTime - tolTime < other.MinElutionTime && other.MinElutionTime < MaxElutionTime + tolTime) return true;
+            if (MinElutionTime - tolTime < other.MaxElutionTime && other.MaxElutionTime < MaxElutionTime + tolTime) return true;
+            if (other.MinElutionTime - tolTime < MinElutionTime && MinElutionTime < other.MaxElutionTime + tolTime) return true;
+            if (other.MinElutionTime - tolTime < MaxElutionTime && MaxElutionTime < other.MaxElutionTime + tolTime) return true;
+            return false;
+        }
         
         public bool CoElutedByNet(LcMsFeature other, double tolNet = 0d)
         {
