@@ -147,7 +147,7 @@ namespace PbfGen
                             Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
                         }
                     });
-                    var run = new PbfLcMsRun(rawFilePath, null, pbfFilePath, 0, 0, progress);
+                    var run = new PbfLcMsRun(rawFilePath, reader, pbfFilePath, 0, 0, progress);
                     Console.WriteLine();
                 }
 
