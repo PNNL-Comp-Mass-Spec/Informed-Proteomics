@@ -191,7 +191,7 @@ namespace InformedProteomics.Backend.SequenceTag
             if (e != null) EdgeList.Push(e);
             NodeVisitFlag[node] = true;
             
-            bool flag = false;
+            var flag = false;
             foreach(var edge in OutEdges(node))
             {
                 //if (!NodeVisitFlag[edge.Node2])

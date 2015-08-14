@@ -164,11 +164,12 @@ namespace SeqTagGen
                     if (tag.Count >= 6 || (nTags < _maxTags && _maxTags > 0))
                     {
                         double[] rmse;
-                        var tagStrSet = tag.GetTagStrings(out rmse);
-                        for(var t = 0; t < tagStrSet.Length; t++)
+                        //var tagStrSet = tag.GetTagStrings(out rmse);
+                        //for(var t = 0; t < tagStrSet.Length; t++)
+                        foreach (var tagStr in tag.GetTagStrings())
                         {
-                            tmpWriter.WriteLine("{0}\t{1}\t1\t{2}\t{3}\t{4}", scanNum, tagStrSet[t], flankingMass, tag.Score, rmse[t]);
-                            tmpWriter.WriteLine("{0}\t{1}\t0\t{2}\t{3}\t{4}", scanNum, SequenceTag.Reverse(tagStrSet[t]), flankingMass, tag.Score, rmse[t]);
+                            tmpWriter.WriteLine("{0}\t{1}\t1\t{2}\t{3}\t{4}", scanNum, tagStr, flankingMass, tag.Score, 0);
+                            tmpWriter.WriteLine("{0}\t{1}\t0\t{2}\t{3}\t{4}", scanNum, SequenceTag.Reverse(tagStr), flankingMass, tag.Score, 0);
                         }    
                     }
                 }

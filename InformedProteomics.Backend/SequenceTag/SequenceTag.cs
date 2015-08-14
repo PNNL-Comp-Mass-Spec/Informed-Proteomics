@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.SequenceTag
 {
@@ -11,7 +13,11 @@ namespace InformedProteomics.Backend.SequenceTag
         public double Score;
         public double TotalMass { get; private set; }
         public double FrankingMass { get; private set; }
-        public SequenceTag(IEnumerable<SequenceTagGraphEdge> edges)
+        private readonly IList<DeconvolutedPeak> _peaks;
+        private readonly Tolerance _tolerance;
+        public HashSet<string> TagStrings;
+
+        public SequenceTag(IEnumerable<SequenceTagGraphEdge> edges, IList<DeconvolutedPeak> peaks, Tolerance tolerance)
             : base(edges)
         {
             var nominalMassArray = new byte[Count];
@@ -22,6 +28,10 @@ namespace InformedProteomics.Backend.SequenceTag
             }
             HashString = BitConverter.ToString(nominalMassArray);
             Score = 0;
+            _peaks = peaks;
+            //TagStrings = null;
+            _tolerance = tolerance;
+            GetTagStrings();
         }
 
         public bool Equals(SequenceTag other)
@@ -48,29 +58,44 @@ namespace InformedProteomics.Backend.SequenceTag
             return Equals((SequenceTag)obj);
         }
 
-        public string[] GetTagStrings(out double[] rmse)
+        public void Merge(HashSet<string> tagStrings)
         {
-            var listOfAminoAcids = new List<List<KeyValuePair<double, char>>>(Count);
+            //if (TagStrings == null) return;
+            foreach (var str in tagStrings) TagStrings.Add(str);
+        }
+
+        public HashSet<string> GetTagStrings()
+        {
+            if (TagStrings != null) return TagStrings;
+
+            var listOfAminoAcids = new List<List<AminoAcid>>(Count);
 
             for (var j = 0; j < Count; j++)
             {
-                var temp = this[j].AminoAcidList.Select(aa => new KeyValuePair<double, char>(aa.Value, aa.Key.Residue)).ToList();
-                listOfAminoAcids.Add(temp);
+                listOfAminoAcids.Add(this[j].AminoAcidList);
             }
 
             var indexArray = new int[Count];
             var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
-            var result = new string[totalCombinations];
-            rmse = new double[totalCombinations];
+            TagStrings = new HashSet<string>();
+            //var result = new string[totalCombinations];
+            //var rmse = new double[totalCombinations];
+            var massTh = _tolerance.GetToleranceAsTh(_peaks[this[0].Node1].Mass);
 
-            for (var e = 0; e < totalCombinations; e ++)
+            for (var e = 0; e < totalCombinations; e++)
             {
                 var sb = new StringBuilder();
+                var mass = 0d;
                 for (var i = 0; i < indexArray.Length; i++)
                 {
-                    sb.Append(listOfAminoAcids[i][indexArray[i]].Value);
-                    rmse[e] += listOfAminoAcids[i][indexArray[i]].Key * listOfAminoAcids[i][indexArray[i]].Key;
+                    sb.Append(listOfAminoAcids[i][indexArray[i]].Residue);
+                    mass += listOfAminoAcids[i][indexArray[i]].Mass;
                 }
+
+                var massGap = _peaks[this[indexArray.Length- 1].Node2].Mass - _peaks[this[0].Node1].Mass;
+                var massError = Math.Abs(massGap - mass);
+
+                if (massError < massTh) TagStrings.Add(sb.ToString());
 
                 //increase indexArray
                 for (var i = indexArray.Length - 1; i >= 0; i--)
@@ -85,16 +110,83 @@ namespace InformedProteomics.Backend.SequenceTag
                         break;
                     }
                 }
+                //result[e] = sb.ToString();
+                //rmse[e] = Math.Sqrt(rmse[e] / Count);
+            }
+            return TagStrings;
+        }
+        /*
+        public IList<string> GetTagStrings_old(Tolerance tolerance)
+        {
+            if (_tagString != null) return _tagString;
+            
+            //var listOfAminoAcids = new List<List<KeyValuePair<double, char>>>(Count);
+            var listOfAminoAcids = new List<List<AminoAcid>>(Count);
+            //var tolerance = new Tolerance(10);
 
+            for (var j = 0; j < Count; j++)
+            {
+                //var temp = this[j].AminoAcidList.Select(aa => new KeyValuePair<double, char>(aa.Value, aa.Key.Residue)).ToList();
+                listOfAminoAcids.Add(this[j].AminoAcidList);
+            }
 
+            var indexArray = new int[Count];
+            var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
+            var result = new string[totalCombinations];
+            var rmse = new double[totalCombinations];
+            var massTh = tolerance.GetToleranceAsTh(_peaks[this[0].Node1].Mass);
+
+            for (var e = 0; e < totalCombinations; e ++)
+            {
+                var sb = new StringBuilder();
+                var mass = 0d;
+                var bad = false;
+                for (var i = 0; i < indexArray.Length; i++)
+                {
+                    sb.Append(listOfAminoAcids[i][indexArray[i]].Residue);
+                    //rmse[e] += listOfAminoAcids[i][indexArray[i]].Key * listOfAminoAcids[i][indexArray[i]].Key;
+
+                    mass += listOfAminoAcids[i][indexArray[i]].Mass;
+                    var massGap = _peaks[this[i].Node2].Mass - _peaks[this[0].Node1].Mass;
+
+                    var massError = Math.Abs(massGap - mass);
+                    if (massError > massTh)
+                    {
+                        bad = true;
+                        break;
+                    }
+                    rmse[e] = massError;
+                }
+
+                if (bad) rmse[e] = 10;
+
+                //increase indexArray
+                for (var i = indexArray.Length - 1; i >= 0; i--)
+                {
+                    if (indexArray[i] == listOfAminoAcids[i].Count - 1) //reached the last item
+                    {
+                        indexArray[i] = 0;
+                    }
+                    else
+                    {
+                        indexArray[i]++;
+                        break;
+                    }
+                }
                 result[e] = sb.ToString();
-                rmse[e] = Math.Sqrt(rmse[e] / Count);
+                //rmse[e] = Math.Sqrt(rmse[e] / Count);
             }
 
             Array.Sort(rmse, result);
-            return result;
-        }
 
+            _tagString = new List<string>();
+            for (var e = 0; e < totalCombinations; e++)
+            {
+                if (rmse[e] < 1) _tagString.Add(result[e]); 
+            }
+            return _tagString;
+        }
+        */
         public static string Reverse(string s)
         {
             char[] charArray = s.ToCharArray();
