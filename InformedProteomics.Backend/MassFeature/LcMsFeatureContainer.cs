@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Statistics;
 
@@ -10,55 +11,20 @@ namespace InformedProteomics.Backend.MassFeature
     
     public class LcMsFeatureContainer
     {
-        internal class PostFeatureComparer : INodeComparer<LcMsPeakCluster>
-        {
-            private readonly Tolerance _tolerance = new Tolerance(10);
-            public bool SameCluster(LcMsPeakCluster f1, LcMsPeakCluster f2)
-            {
-                var massTh = _tolerance.GetToleranceAsTh(f1.RepresentativeMass);
-                var massDiff = Math.Abs(f1.RepresentativeMass - f2.RepresentativeMass);
-                if (massDiff > massTh) return false;
-                var coeLen = f1.CoElutionLength(f2);
-                
-                if (coeLen > f2.ElutionLength*0.5 || coeLen > f1.ElutionLength*0.5) return true; // significantly overlapped features
-
-                if (f1.CoElutedByNet(f2, 0.003)) // close in elution time
-                {
-                    
-                    // two differnt hills
-                    if (Math.Abs(f1.ApexElutionTime - f2.ApexElutionTime) > 1.0d &&
-                        f1.ApexIntensity/f1.MedianIntensity > 2 &&
-                        f2.ApexIntensity/f2.MedianIntensity > 2) return false;
-                    
-                    // otherwise, they are fragmentized features, which
-                    return true;
-                }
-                /*
-                if (f1.MaxElutionTime < f2.MinElutionTime && f2.MinElutionTime - f1.MaxElutionTime < 0.5)
-                    return true;
-
-                if (f2.MaxElutionTime < f1.MinElutionTime && f1.MinElutionTime - f2.MaxElutionTime < 0.5)
-                    return true;
-                */
-                return false;
-            }
-        }
-
-
-        public LcMsFeatureContainer(List<Ms1Spectrum> ms1Spectra, LcMsFeatureLikelihood scorer)
+        public LcMsFeatureContainer(List<Ms1Spectrum> ms1Spectra, LcMsFeatureLikelihood scorer, INodeComparer<LcMsPeakCluster> mergeComparer)
         {
             _featureList = new List<LcMsPeakCluster>();
             _spectra = ms1Spectra;
             _scorer = scorer;
+            _mergeComparer = mergeComparer;
+
         }
         
         public bool Add(LcMsPeakCluster newFeature)
         {
             if (newFeature.Score < _scorer.ScoreThreshold) return false;
             if (!newFeature.GoodEnougth) return false;
-            //var tolerance = new Tolerance(4);
-            //var binNum = _comparer.GetBinNumber(newFeature.RepresentativeMass);
-            //var massTol = tolerance.GetToleranceAsTh(newFeature.RepresentativeMass);
+
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
                 var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
@@ -66,10 +32,10 @@ namespace InformedProteomics.Backend.MassFeature
                 if (massDiff < 1e-4)
                 {
                     var coeLen = _featureList[i].CoElutionLength(newFeature);
-                    if (coeLen > _featureList[i].ElutionLength*0.8 || coeLen > newFeature.ElutionLength*0.8) return false;
+                    if (coeLen > _featureList[i].ElutionLength * 0.7 || coeLen > newFeature.ElutionLength * 0.7) return false;
                 }
             }
-            
+            /*
             foreach (var peak in newFeature.GetMajorPeaks())
             {
                 peak.TagMajorPeakOf(newFeature);
@@ -79,8 +45,9 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 peak.TagMinorPeakOf(newFeature);
             }
-            
+            */
             _featureList.Add(newFeature);
+
             return true;
         }
 
@@ -89,7 +56,41 @@ namespace InformedProteomics.Backend.MassFeature
             foreach(var f in features) Add(f);
         }
 
-        public IEnumerable<LcMsPeakCluster> GetFilteredFeatures(IList<SortedSet<LcMsPeakCluster>> connectedFeatureList)
+        public IEnumerable<LcMsPeakCluster> GetFilteredFeatures(LcMsPeakMatrix featureFinder)
+        {
+            var mergedFeatures = MergeFeatures(featureFinder, _featureList);
+            SetFeatureList(mergedFeatures);
+            var connectedFeatures = GetAllConnectedFeatures();
+            var filteredFeatures = GetFilteredFeatures(connectedFeatures);
+            return filteredFeatures.OrderBy(f => f.RepresentativeMass);
+
+            /*
+            var connectedFeatures = GetAllConnectedFeatures();
+            var filteredFeatures = GetFilteredFeatures(connectedFeatures);
+            var mergedFeatures = MergeFeatures(featureFinder, filteredFeatures);
+            return mergedFeatures.OrderBy(f => f.RepresentativeMass);
+            */
+        }
+
+        private void SetFeatureList(IEnumerable<LcMsPeakCluster> features)
+        {
+            _featureList.Clear();
+            _featureList.AddRange(features);
+
+            foreach (var newFeature in _featureList)
+            {
+                foreach (var peak in newFeature.GetMajorPeaks())
+                {
+                    peak.TagMajorPeakOf(newFeature);
+                }
+                foreach (var peak in newFeature.GetMinorPeaks())
+                {
+                    peak.TagMinorPeakOf(newFeature);
+                }                
+            }
+        }
+
+        private List<LcMsPeakCluster> GetFilteredFeatures(IList<SortedSet<LcMsPeakCluster>> connectedFeatureList)
         {
             var filteredFeatures = new List<LcMsPeakCluster>();
             foreach (var featureSet in connectedFeatureList)
@@ -97,24 +98,40 @@ namespace InformedProteomics.Backend.MassFeature
                 var newList = RemoveOverlappedFeatures(featureSet);
                 filteredFeatures.AddRange(newList);
             }
-
             return filteredFeatures;
-            //return PostFiltering(filteredFeatures, new PostFeatureComparer());
         }
 
-        private IEnumerable<LcMsPeakCluster> MergeFeatures(List<LcMsPeakCluster> features, INodeComparer<LcMsPeakCluster> featureComparer, LcMsPeakMatrix featureFinder)
+        private IList<SortedSet<LcMsPeakCluster>> GetAllConnectedFeatures()
         {
+            var ret = new List<SortedSet<LcMsPeakCluster>>();
+            var startIndex = 0;
+            while (true)
+            {
+                var featureSet = GetConnectedFeatures(ref startIndex);
+                if (featureSet.Count < 1) break;
+                ret.Add(featureSet);
+            }
+            //stopwatch.Stop(); stopwatch.Reset();
+            //var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
+            //Console.WriteLine("# of generated connected components = {0};  Elapsed Time = {1:0.000} sec", ret.Count, elapsed);
+            return ret;
+        }
+      
+
+        private List<LcMsPeakCluster> MergeFeatures(LcMsPeakMatrix featureFinder, List<LcMsPeakCluster> features)
+        {
+            //foreach (var f in _featureList) f.ActivateAllPeaks();
             var featureSet = new NodeSet<LcMsPeakCluster>();
             featureSet.AddRange(features);
-            var connectedFeatureSet = featureSet.ConnnectedComponents(featureComparer);
-            //return connectedFeatureSet;
             
-            var postFilteredSet = new List<LcMsPeakCluster>();
+            var connectedFeatureSet = featureSet.ConnnectedComponents(_mergeComparer);
+            var mergedFeatures = new List<LcMsPeakCluster>();
+            
             foreach (var fSet in connectedFeatureSet)
             {
                 if (fSet.Count == 1)
                 {
-                    postFilteredSet.Add(fSet[0]);
+                    mergedFeatures.Add(fSet[0]);
                 }
                 else
                 {
@@ -122,65 +139,39 @@ namespace InformedProteomics.Backend.MassFeature
                     var minScan = fSet.Min(f => f.MinScanNum);
                     var maxCharge = fSet.Max(f => f.MaxCharge);
                     var minCharge = fSet.Min(f => f.MinCharge);
-                    
-                    var mass = fSet.Select(f => f.Mass).Median();
-                    var score = fSet.Max(f => f.Score);
-                    var newFeature = featureFinder.GetLcMsPeakCluster(mass, minCharge, maxCharge, minScan, maxScan);
-                    if (newFeature.Score < score) newFeature.Score = score;
-                    postFilteredSet.Add(newFeature);
+                    var maxScore = double.MinValue;//fSet.Max(f => f.Score);
+                    LcMsPeakCluster maxScoredClusterOriginal = null;
+                    LcMsPeakCluster maxScoredCluster = null;
+                    foreach (var f in fSet)
+                    {
+                        var newFeature = featureFinder.GetLcMsPeakCluster(f.RepresentativeMass, minCharge, maxCharge, minScan, maxScan);
+                        if (newFeature != null && (maxScoredCluster == null || newFeature.Score > maxScoredCluster.Score)) maxScoredCluster = newFeature;    
+
+                        if (f.Score > maxScore)
+                        {
+                            maxScoredClusterOriginal = f;
+                            maxScore = f.Score;
+                        }
+                    }
+                    var feature = featureFinder.GetLcMsPeakCluster(fSet.Select(f => f.Mass).Mean(), minCharge, maxCharge, minScan, maxScan);
+                    if (feature != null && (maxScoredCluster == null || feature.Score > maxScoredCluster.Score))
+                    {
+                        maxScoredCluster = feature;
+                    }
+                    //Console.WriteLine("------------- Merge -----------------");
+                    //foreach (var f in fSet) Console.WriteLine("*\t{0}\t{1}\t{2}\t{3}", f.RepresentativeMass, f.MinScanNum, f.MaxScanNum, f.Score);
+                    //Console.WriteLine("**\t{0}\t{1}\t{2}\t{3}", maxScoredCluster.RepresentativeMass, maxScoredCluster.MinScanNum, maxScoredCluster.MaxScanNum, maxScoredCluster.Score);
+                    if (maxScoredCluster == null) maxScoredCluster = maxScoredClusterOriginal;
+                    if (maxScoredCluster.Score < maxScore) maxScoredCluster.Score = maxScore;
+                    mergedFeatures.Add(maxScoredCluster);
                 }
                 //if (selectedFeature != null) postFilteredSet.Add(selectedFeature);
             }
-            return postFilteredSet.OrderBy(f => f.RepresentativeMass);
+            //return postFilteredSet.OrderBy(f => f.RepresentativeMass);
+
+            return mergedFeatures;
         }
 
-        /*
-        private IEnumerable<LcMsPeakCluster> PostFiltering(List<LcMsPeakCluster> features)
-        {
-            var orderedFeatures = features.OrderBy(f => f.RepresentativeMass).ToList();
-            var postFiltered = new List<LcMsPeakCluster>();
-            var tolerance = new Tolerance(16);
-
-            foreach (var f in orderedFeatures) f.Flag = 0;
-
-            for (var i = 0; i < orderedFeatures.Count; i++)
-            {
-                var f1 = orderedFeatures[i];
-
-                if (f1.Flag == 2) continue;
-
-                var massTh = tolerance.GetToleranceAsTh(f1.RepresentativeMass);
-
-                //var isOkay = true;
-                for (var j = i + 1; j < orderedFeatures.Count; j++)
-                {
-                    var f2 = orderedFeatures[j];
-
-                    if (f2.Flag == 2) continue;
-
-                    var massDiff = Math.Abs(f1.RepresentativeMass - f2.RepresentativeMass);
-                    if (massDiff > massTh) break;
-
-                    var coeLen = f1.CoElutionLength(f2);
-                    if (coeLen > f2.ElutionLength*0.7 || coeLen > f1.ElutionLength*0.7)
-                    {
-                        if (f1.Score < f2.Score)
-                        {
-                            f1.Flag = 2;
-                            break;
-                        }
-                        else
-                        {
-                            f1.Flag = 1;
-                            f2.Flag = 2;
-                        }
-                    }
-                }
-
-                if (f1.Flag == 0) f1.Flag = 1;
-            }
-        }*/
-        
         private bool SimilarScore(LcMsPeakCluster f1, LcMsPeakCluster f2)
         {
             /*var maxScore = Math.Max(f1.Score, f2.Score);
@@ -242,22 +233,7 @@ namespace InformedProteomics.Backend.MassFeature
             return outFeatures;
         }
 
-        public IList<SortedSet<LcMsPeakCluster>> GetAllConnectedFeatures()
-        {
-            var ret = new List<SortedSet<LcMsPeakCluster>>();
-            var startIndex = 0;
-            while (true)
-            {
-                var featureSet = GetConnectedFeatures(ref startIndex);
-                if (featureSet.Count < 1) break;
-                ret.Add(featureSet);
-            }
-            //stopwatch.Stop(); stopwatch.Reset();
-            //var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
-            //Console.WriteLine("# of generated connected components = {0};  Elapsed Time = {1:0.000} sec", ret.Count, elapsed);
-            return ret;
-        }
-
+     
         private SortedSet<LcMsPeakCluster> GetConnectedFeatures(ref int startIndex)
         {
             var neighbors = new Queue<LcMsPeakCluster>();
@@ -269,7 +245,7 @@ namespace InformedProteomics.Backend.MassFeature
                 break;
             }
 
-            var featureSet = new SortedSet<LcMsPeakCluster>(new LcMsFeatureComparer());
+            var featureSet = new SortedSet<LcMsPeakCluster>(new LcMsFeatureScoreComparer());
             while (true)
             {
                 if (neighbors.Count < 1) break;
@@ -288,13 +264,16 @@ namespace InformedProteomics.Backend.MassFeature
 
             return featureSet;
         }
+        public int NumberOfFeatures { get { return _featureList.Count; } }
 
         private readonly LcMsFeatureLikelihood _scorer;
-        private readonly List<LcMsPeakCluster> _featureList;
-        private readonly List<Ms1Spectrum> _spectra;
-        public int NumberOfFeatures { get { return _featureList.Count;  } }
         
-        private class LcMsFeatureComparer : IComparer<LcMsPeakCluster>
+        private readonly List<LcMsPeakCluster> _featureList;
+
+        private readonly List<Ms1Spectrum> _spectra;
+        private readonly INodeComparer<LcMsPeakCluster> _mergeComparer;
+        
+        private class LcMsFeatureScoreComparer : IComparer<LcMsPeakCluster>
         {
             public int Compare(LcMsPeakCluster x, LcMsPeakCluster y)
             {

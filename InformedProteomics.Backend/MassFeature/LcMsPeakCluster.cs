@@ -24,11 +24,9 @@ namespace InformedProteomics.Backend.MassFeature
             TheoreticalEnvelope = theoreticalIsotopeEnvelope;
             Flag = 0;
 
-            DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
-            DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
-            
-            if (mass > 2000) DetectableMinCharge = Math.Max(DetectableMinCharge, 2);
-
+            //DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
+            //DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
+            //if (mass > 2000) DetectableMinCharge = Math.Max(DetectableMinCharge, 2);
             RepresentativeSummedEnvelop = new double[TheoreticalEnvelope.Size];
 
             AbundanceDistributionAcrossCharge = new double[2];
@@ -76,14 +74,14 @@ namespace InformedProteomics.Backend.MassFeature
             }
         }
 
-        public void UpdateWithDecoyScore(List<Ms1Spectrum> ms1Spectra)
+        public void UpdateWithDecoyScore(List<Ms1Spectrum> ms1Spectra, int targetMinCharge, int targetMaxCharge)
         {
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var ms1ScanNums = Run.GetMs1ScanVector();
             var minCol = ms1ScanNumToIndex[MinScanNum];
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
-            MinCharge = DetectableMinCharge;
-            MaxCharge = DetectableMaxCharge;
+            MinCharge = targetMinCharge;
+            MaxCharge = targetMaxCharge;
             
             var rnd = new Random();
             var comparer = new MzComparerWithBinning(28);
@@ -94,8 +92,8 @@ namespace InformedProteomics.Backend.MassFeature
 
             Envelopes = new ObservedIsotopeEnvelope[nRows][];
             for (var i = 0; i < nRows; i++) Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
-            
-            for (var charge = DetectableMinCharge; charge <= DetectableMaxCharge; charge++)
+
+            for (var charge = targetMinCharge; charge <= targetMaxCharge; charge++)
             {
                 var mostAbuMz = TheoreticalEnvelope.GetIsotopeMz(charge, mostAbuInternalIndex);
                 if (Run.MaxMs1Mz < mostAbuMz || mostAbuMz < Run.MinMs1Mz) continue;
@@ -156,13 +154,14 @@ namespace InformedProteomics.Backend.MassFeature
             // sum envelopes at each charge 
             var summedIntensity = new double[TheoreticalEnvelope.Size];
 
-            var xicLen = nCols;
-            var xicStartIdx = 0;
+            var xicLen = nCols + 18;
+            var xicStartIdx = 9;
+            /*
             if (nCols < 13)
             {
                 xicLen = 13;
                 xicStartIdx = (int) Math.Floor((xicLen - nCols)*0.5);
-            }
+            }*/
             
             var xic2 = new double[2][];
             xic2[0] = new double[xicLen];
@@ -352,12 +351,12 @@ namespace InformedProteomics.Backend.MassFeature
             MaxScanNum = Math.Max(maxScan, MaxScanNum);
         }
 
-        public void SetAbundance(double abu, int apexScanNum, double apexIntensity, double medianIntensity)
+        public void SetAbundance(double abu, int apexScanNum, double apexIntensity, double boundaryIntensity)
         {
             Abundance = abu;
             ApexScanNum = apexScanNum;
             ApexIntensity = apexIntensity;
-            MedianIntensity = medianIntensity;
+            BoundaryIntensity = boundaryIntensity;
         }
 
         internal void Expand(ObservedIsotopeEnvelope envelope)
@@ -456,6 +455,17 @@ namespace InformedProteomics.Backend.MassFeature
             }            
         }
 
+        public void ActivateAllPeaks()
+        {
+            foreach (var env in EnumerateEnvelopes())
+            {
+                foreach (var peak in env.Peaks)
+                {
+                    if (peak != null) peak.Activate();
+                }
+            }
+        }
+
         public void InActivateMajorPeaks()
         {
             foreach (var peak in GetMajorPeaks()) peak.InActivate();
@@ -496,10 +506,10 @@ namespace InformedProteomics.Backend.MassFeature
         public double ApexElutionTime { get { return Run.GetElutionTime(ApexScanNum); } }
         public int ApexScanNum { get; protected set; }
         public double ApexIntensity { get; protected set; }
-        public double MedianIntensity { get; protected set; }
+        public double BoundaryIntensity { get; protected set; }
 
-        public readonly int DetectableMaxCharge;
-        public readonly int DetectableMinCharge; 
+        //public readonly int DetectableMaxCharge;
+        //public readonly int DetectableMinCharge; 
         public ObservedIsotopeEnvelope[][] Envelopes;
 
         public readonly int[] BestCharge;

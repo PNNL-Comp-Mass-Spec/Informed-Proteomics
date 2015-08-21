@@ -27,6 +27,35 @@ namespace InformedProteomics.Test.FunctionalTests
     public class TestGeneratingFunction
     {
         [Test]
+        public void Test()
+        {
+            var massList = AminoAcid.StandardAminoAcidArr.Select(aa => aa.Mass).ToList();
+            var MaxMass = 50000;
+            var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(MaxMass));
+            fineNodes[0] = true;
+            
+            var effectiveBinCounter = 0;
+            for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
+            {
+                if (!fineNodes[fineBinIdx]) continue;
+
+                var fineNodeMass = fineBinIdx/Constants.RescalingConstantHighPrecision;
+                foreach (var m in massList)
+                {
+                    var validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + m);
+                    if (validFineNodeIndex >= fineNodes.Length) break;
+                    fineNodes[validFineNodeIndex] = true;
+                }
+            }
+
+            Console.WriteLine(fineNodes.Length);
+            var n = 0;
+            for(var i = 0; i < fineNodes.Length; i++) if (fineNodes[i]) n++;
+            Console.WriteLine(n);
+
+        }
+        
+        [Test]
         public void TestGetScoreDistribution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

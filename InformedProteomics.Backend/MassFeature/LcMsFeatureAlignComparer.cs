@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.MassFeature
 {
-    public interface ILcMsFeatureComparer
+    public class LcMsFeatureAlignComparer : INodeComparer<LcMsFeature>
     {
-        bool Match(LcMsFeature f1, LcMsFeature f2);
-    }
-
-    public class LcMsFeatureDefaultComparer : ILcMsFeatureComparer
-    {
-        public LcMsFeatureDefaultComparer(Tolerance tolerance, bool oneDaltonShift = false)
+        public LcMsFeatureAlignComparer(Tolerance tolerance, bool oneDaltonShift = false)
         {
             _oneDaltonShift = oneDaltonShift;
             _tolerance = tolerance;
@@ -22,7 +14,7 @@ namespace InformedProteomics.Backend.MassFeature
         private readonly bool _oneDaltonShift;
         private readonly Tolerance _tolerance;
 
-        public bool Match(LcMsFeature f1, LcMsFeature f2)
+        public bool SameCluster(LcMsFeature f1, LcMsFeature f2)
         {
             if (f1.DataSetId == f2.DataSetId) return false;
             // tolerant in mass dimension?
@@ -45,25 +37,18 @@ namespace InformedProteomics.Backend.MassFeature
                     if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol) return false;
                 }
             }
-
+            /*
             var coeLen = f1.CoElutionNetLength(f2);
-            if (coeLen > f1.NetLength * 0.8 || coeLen > f2.NetLength * 0.8) return true;
+            if (coeLen > f1.NetLength * 0.25 || coeLen > f2.NetLength * 0.25) return true;
 
             // tolerant in elution time dimension?
             var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Max(f1.NetLength, f2.NetLength);
-            if (lenDiff > 0.5) return false;
-
-            if (f1.CoElutedByNet(f2, 0.001)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
+            if (lenDiff > 0.8) return false;
+            */
+            if (f1.CoElutedByNet(f2, 0.01)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
             //if (NetDiff(f1, f2) < TolNet) return true;
             return false;
         }
     }
 
-    public class LcMsFeatureComparer : ILcMsFeatureComparer
-    {
-        public bool Match(LcMsFeature f1, LcMsFeature f2)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

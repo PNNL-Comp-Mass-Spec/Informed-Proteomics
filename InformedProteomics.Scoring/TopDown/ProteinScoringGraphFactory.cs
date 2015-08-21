@@ -30,7 +30,19 @@ namespace InformedProteomics.Scoring.TopDown
 
             _adjList = new List<ScoringGraphEdge>[_comparer.NumberOfBins];
             for (var i = 0; i < _comparer.NumberOfBins; i++) _adjList[i] = new List<ScoringGraphEdge>();
-
+            
+            for (var i = 0; i < _comparer.NumberOfBins; i++)
+            {
+                var mi = _comparer.GetMass(i);
+                var fineNodeMass = mi;
+                for (var a = 0; a < aminoAcid.Length; a++)
+                {
+                    var j = _comparer.GetBinNumber(fineNodeMass + aminoAcid[a].Mass);
+                    if (j < 0 || j >= _comparer.NumberOfBins) continue;
+                    _adjList[j].Add(new ScoringGraphEdge(i, EdgeScore, aminoAcidProb[a]));
+                }
+            }
+            /*
             var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(_comparer.MaxMass));
             var tempChk = new BitArray(_comparer.NumberOfBins);
             for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
@@ -46,7 +58,7 @@ namespace InformedProteomics.Scoring.TopDown
                     if (j < 0 || j >= _comparer.NumberOfBins) continue;
                     _adjList[j].Add(new ScoringGraphEdge(i, EdgeScore, aminoAcidProb[a]));
                 }
-            }
+            }*/
         }
 
         public IScoringGraph CreateScoringGraph(ProductSpectrum deconvSpectrum, double proteinMass)

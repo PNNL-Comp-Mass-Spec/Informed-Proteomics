@@ -150,14 +150,15 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
+    <Compile Include="MassFeature\LcMsFeatureAlignComparer.cs" />
     <Compile Include="MassFeature\INodeComparer.cs" />
     <Compile Include="MassFeature\IsotopeEnvelope.cs" />
     <Compile Include="MassFeature\LcMsEnvelopeComparer.cs" />
     <Compile Include="MassFeature\LcMsFeature.cs" />
     <Compile Include="MassFeature\LcMsFeatureAlignment.cs" />
-    <Compile Include="MassFeature\LcMsFeatureComparer.cs" />
     <Compile Include="MassFeature\LcMsFeatureContainer.cs" />
     <Compile Include="MassFeature\LcMsFeatureLikelihood.cs" />
+    <Compile Include="MassFeature\LcMsFeatureMergeComparer.cs" />
     <Compile Include="MassFeature\LcMsFeatureTrain.cs" />
     <Compile Include="MassFeature\LcMsPeakCluster.cs" />
     <Compile Include="MassFeature\LcMsPeakScorer.cs" />

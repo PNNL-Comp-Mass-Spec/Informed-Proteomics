@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Graphics;
 
 namespace ProMex
 {
@@ -146,8 +149,11 @@ namespace ProMex
                 return;
             }
 
-            var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer);
+
             var comparer = featureFinder.Comparer;
+
+            var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
+            
             var minSearchMassBin = comparer.GetBinNumber(Parameters.MinSearchMass);
             var maxSearchMassBin = comparer.GetBinNumber(Parameters.MaxSearchMass);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
@@ -175,7 +181,7 @@ namespace ProMex
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
-            var connectedFeatures = container.GetAllConnectedFeatures();
+            
 
             // write result files
             var tsvWriter = new StreamWriter(outTsvFilePath);
@@ -187,9 +193,10 @@ namespace ProMex
                 csvWriter = new StreamWriter(outCsvFilePath);
                 csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
             }
-
+            
+            var filteredFeatures = container.GetFilteredFeatures(featureFinder);
             var featureId = 0;
-            foreach (var feature in container.GetFilteredFeatures(connectedFeatures))
+            foreach (var feature in filteredFeatures)
             {
                 featureId++;
                 tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature, Parameters.ScoreReport));
@@ -224,15 +231,19 @@ namespace ProMex
 
             if (Parameters.FeatureMapImage)
             {
-                Console.WriteLine(@"Start feature map image generation");
-                stopwatch.Restart();
+                //Console.WriteLine(@"Start feature map image generation");
+                //stopwatch.Restart();
                 //_plotter.PlotLcMsFeatureMap(outTsvFilePath, outImgFilePath, baseName, string.Format("{0}", Math.Ceiling(run.GetElutionTime(run.MaxLcScan))));
-                stopwatch.Stop();
-                Console.WriteLine(@"Complete feature map image generation");
-                Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+                var map = new LcMsFeatureMap(outTsvFilePath, 0, run.GetElutionTime(run.MaxLcScan) + 5, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
+                map.SaveImage(outImgFilePath);
+                //stopwatch.Stop();
+                //Console.WriteLine(@"Complete feature map image generation");
+                //Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
                 Console.WriteLine(@" - Feature map image output: {0}", outImgFilePath);
             }
         }
+
+
 
         public static string GetString(LcMsFeature feature)
         {
@@ -268,9 +279,12 @@ namespace ProMex
                                         feature.RepresentativeMz,
                                         feature.Abundance));
 
-            sb.AppendFormat("\t{0:0.0}", feature.MinElutionTime);
-            sb.AppendFormat("\t{0:0.0}", feature.MaxElutionTime);
-            sb.AppendFormat("\t{0:0.0}", feature.ElutionLength);
+            sb.AppendFormat("\t{0:0}", feature.ApexScanNum);
+            sb.AppendFormat("\t{0:0.00}", feature.ApexIntensity);
+
+            sb.AppendFormat("\t{0:0.000}", feature.MinElutionTime);
+            sb.AppendFormat("\t{0:0.000}", feature.MaxElutionTime);
+            sb.AppendFormat("\t{0:0.000}", feature.ElutionLength);
 
             sb.Append("\t");
             var intensity = feature.RepresentativeSummedEnvelop;
@@ -321,6 +335,7 @@ namespace ProMex
         {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", 
             "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
+            "ApexScanNum", "ApexIntensity",
             "MinElutionTime", "MaxElutionTime", "ElutionLength", "Envelope", "LikelihoodRatio"
         };
 

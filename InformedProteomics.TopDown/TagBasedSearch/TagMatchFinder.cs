@@ -242,7 +242,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 
                 if (_featureFinder != null)
                 {
-                    var ms1Corr = _featureFinder.GetMs1EvidenceScore(sequenceMass, charge, spec.ScanNum);
+                    var ms1Corr = _featureFinder.GetMs1EvidenceScore(spec.ScanNum, sequenceMass, charge);
                     if (ms1Corr < Ms1CorrThreshold) continue;
                 }
 

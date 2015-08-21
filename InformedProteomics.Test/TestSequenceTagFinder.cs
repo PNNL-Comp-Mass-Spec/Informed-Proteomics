@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using DeconTools.Backend.Core;
+using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -53,6 +56,8 @@ namespace InformedProteomics.Test
             //foreach(var scanNum in targetScans)
             {
                 var scanNum = Int32.Parse(ms2ScanNumbers[i]);
+
+                if (scanNum != 4672) continue;
                 
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
@@ -66,14 +71,38 @@ namespace InformedProteomics.Test
                 var tagFinder = new SequenceTagFinder(spectrum, tolerance);
                 var nTags = 0;
                 var nHit = 0;
-                foreach (var tag in tagFinder.FindSequenceTags())
+
+                var seqOjb = Sequence.CreateSequence(seqStr, modStr, new AminoAcidSet());
+                var compWithoutH2O = seqOjb.Composition - Composition.H2O;
+
+                Console.WriteLine(compWithoutH2O.Mass);
+
+                foreach (var seqTagStr in tagFinder.GetAllSequenceTagString())
                 {
-                    foreach (var tagStr in tag.GetTagStrings())
+                    if (seqStr.Contains(seqTagStr.Sequence)) //|| seqStr.Contains(Reverse(tagStr)))
                     {
-                        if (seqStr.Contains(tagStr) || seqStr.Contains(Reverse(tagStr))) nHit++;
-                        nTags++;
+
+                        var idx = seqStr.IndexOf(seqTagStr.Sequence);
+
+                        //seqStr.Substring(0, idx)
+                        var comp2 = seqOjb.GetComposition(0, idx);
+
+                        Console.Write(comp2.Mass);
+                        Console.Write("\t");
+
+                        Console.Write(seqTagStr.FlankingMass);
+                        Console.Write("\t");
+                        Console.Write(seqTagStr.Sequence);
+                        Console.Write("\t");
+                        Console.Write(seqTagStr.IsPrefix);
+                        Console.WriteLine("");
+
+                        nHit++;
                     }
+                    nTags++;                    
                 }
+
+                
                 nSpec++;
                 if (nHit > 0) nHitSpec++;
 

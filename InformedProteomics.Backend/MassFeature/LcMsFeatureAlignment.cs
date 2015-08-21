@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsFeatureAlignment
     {
-        public LcMsFeatureAlignment(ILcMsFeatureComparer featureCompare)
+        public LcMsFeatureAlignment(INodeComparer<LcMsFeature> featureCompare)
         {
             _featureSetList = new Dictionary<int, List<LcMsFeature>>();
             _featureList = new List<LcMsFeature>();
@@ -20,8 +20,8 @@ namespace InformedProteomics.Backend.MassFeature
             _featureCompare = featureCompare;
         }
 
-        private readonly ILcMsFeatureComparer _featureCompare;
-        public LcMsFeatureAlignment(IList<string> featureFileList, IList<string> rawFileList, ILcMsFeatureComparer featureCompare)
+        private readonly INodeComparer<LcMsFeature> _featureCompare;
+        public LcMsFeatureAlignment(IList<string> featureFileList, IList<string> rawFileList, INodeComparer<LcMsFeature> featureCompare)
         {
             RawFileList = rawFileList;
             _featureSetList = new Dictionary<int, List<LcMsFeature>>();
@@ -122,7 +122,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 for (var j = 0; j < CountAlignedFeatures; j++)
                 {
-                    //if (_alignedFeatures[j][i] != null) continue;
+                    if (_alignedFeatures[j][i] != null) continue;
 
                     var mass = 0d;
                     var charge = 0;
@@ -260,14 +260,14 @@ namespace InformedProteomics.Backend.MassFeature
                         {
                             if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
 
-                            if (alignedFeatures[k][j] != null && _featureCompare.Match(featureInfoList[i], alignedFeatures[k][j]))
+                            if (alignedFeatures[k][j] != null && _featureCompare.SameCluster(featureInfoList[i], alignedFeatures[k][j]))
                                 altFt = alignedFeatures[k][j];
                         }
 
                         for (var k = i + 1; altFt == null && k < alignedFeatures.Count; k++)
                         {
                             if (Math.Abs(featureInfoList[k].Mass - featureInfoList[i].Mass) > 2.5) break;
-                            if (alignedFeatures[k][j] != null && _featureCompare.Match(featureInfoList[i], alignedFeatures[k][j]))
+                            if (alignedFeatures[k][j] != null && _featureCompare.SameCluster(featureInfoList[i], alignedFeatures[k][j]))
                                 altFt = alignedFeatures[k][j];
                         }
 
@@ -300,7 +300,7 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     var fj = features[j];
                     if (fj.Mass - fi.Mass > 1.5) break;
-                    if (_featureCompare.Match(fi, fj))
+                    if (_featureCompare.SameCluster(fi, fj))
                     {
                         adjList[i].Add(j);
                         adjList[j].Add(i);
@@ -371,13 +371,21 @@ namespace InformedProteomics.Backend.MassFeature
                     minScoreNode = idx1;
                 }
             }
-
+            
             var chkDataset = new bool[nDataSet];
-            //var nodeSet = new HashSet<int>();
+            
+
+            var centroid = _featureList[minScoreNode];
+            
+            //for(var i = 0; i < nDataSet; i++) linkedIdx[i] = -1;
+            //linkedIdx[centroid.DataSetId] = minScoreNode;
+            //score[centroid.DataSetId] = 0;
+            //Array.Clear(linkedIdx, 0, linkedIdx.Length);
+            //Array.Clear(score, 0, score.Length);
+            chkDataset[centroid.DataSetId] = true;
             var nodeSet = new List<int>();
             nodeSet.Add(minScoreNode);
-            chkDataset[_featureList[minScoreNode].DataSetId] = true;
-
+          
             // clustering
             while (true)
             {
@@ -386,15 +394,15 @@ namespace InformedProteomics.Backend.MassFeature
 
                 foreach (var idx1 in nodeSet)
                 {
-                    var f1 = _featureList[idx1];
-                    
+                    //var f1 = _featureList[idx1];
                     foreach(var idx2 in component)
                     {
                         if (idx1 == idx2 || !adjList[idx1].Contains(idx2)) continue;
                         var f2 = _featureList[idx2];
+                        
                         if (chkDataset[f2.DataSetId]) continue;
-                        var netDiff = NetDiff(f1, f2);
 
+                        var netDiff = NetDiff(centroid, f2);
                         if (minScoreNode < 0 || netDiff < minScore)
                         {
                             minScore = netDiff;
@@ -411,7 +419,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 if (nodeSet.Count == component.Count) break;
             }
-
+            
             var alignedFeatures = new List<LcMsFeature>(nodeSet.Select(idx => _featureList[idx]));
             component.ExceptWith(nodeSet);
 
@@ -459,9 +467,10 @@ namespace InformedProteomics.Backend.MassFeature
         private double NetDiff(LcMsFeature f1, LcMsFeature f2)
         {
             var n1 = Math.Abs(f1.Net - f2.Net);
-            var n2 = Math.Abs(f1.MinNet - f2.MinNet);
-            var n3 = Math.Abs(f1.MaxNet - f2.MaxNet);
-            return Math.Min(Math.Min(n1, n2), n3);
+            return n1;
+            //var n2 = Math.Abs(f1.MinNet - f2.MinNet);
+            //var n3 = Math.Abs(f1.MaxNet - f2.MaxNet);
+            //return Math.Min(Math.Min(n1, n2), n3);
         }
 
         private const double TolNet = 0.003;

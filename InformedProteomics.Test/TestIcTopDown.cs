@@ -356,11 +356,11 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             const int minSequenceLength = 21; // 7
-            const int maxSequenceLength = 300; // 1000
+            const int maxSequenceLength = 500; // 1000
             const int minPrecursorIonCharge = 2; // 3
-            const int maxPrecursorIonCharge = 30; // 67
+            const int maxPrecursorIonCharge = 60; // 67
             const int minProductIonCharge = 1; // 1
-            const int maxProductIonCharge = 15; // 15
+            const int maxProductIonCharge = 20; // 15
             const double minSequenceMass = 3000.0;
             const double maxSequenceMass = 50000.0;
 

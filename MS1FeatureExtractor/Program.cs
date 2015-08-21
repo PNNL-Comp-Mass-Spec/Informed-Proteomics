@@ -27,6 +27,7 @@ namespace ProMex
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
+        [STAThread]
         static int Main(string[] args)
         {
             try
@@ -55,12 +56,12 @@ namespace ProMex
                     {"-o", null},
                     {"-minCharge", "1"},
                     {"-maxCharge", "60"},
-                    {"-minMass", "800.0"},
+                    {"-minMass", "2000.0"},
                     {"-maxMass", "50000.0"},
                     {"-score", "n"},
                     {"-csv", "n"},
                     {"-featureMap", "y"},
-                    {"-scoreTh", "0"},
+                    {"-scoreTh", "-30"},
                     {"-maxThreads", "0"},
                 };
 

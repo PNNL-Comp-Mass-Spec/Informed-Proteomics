@@ -10,10 +10,12 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
+//using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 
 namespace InformedProteomics.Test
 {
@@ -144,7 +146,7 @@ namespace InformedProteomics.Test
                 break;
             }
         }
-
+        
         [Test]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
@@ -159,12 +161,15 @@ namespace InformedProteomics.Test
 
             const int scanNum = 2;
             // Parse sequence tags
-            const string tagFileName = dataSet + ".seqtag"; //"_MinLength3.seqtag"; //Path.ChangeExtension(dataSet, ".seqtag");
+            //const string tagFileName = dataSet + ".seqtag"; //"_MinLength3.seqtag"; //Path.ChangeExtension(dataSet, ".seqtag");
+
+            const string rawFilePath = "";
+
             const string fastaFilePath = @"H:\Research\Lewy\ID_004858_0EE8CF61.fasta";
 
-            if (!File.Exists(tagFileName))
+            if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tagFileName);
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
                 return;
             }
 
@@ -176,9 +181,13 @@ namespace InformedProteomics.Test
 
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
-            var tagParser = new SequenceTagParser(tagFileName, minTagLength);
+            //var tagParser = new SequenceTagParser(tagFileName, minTagLength);
+            //var tags = tagParser.GetSequenceTags(scanNum);
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
+            var tagFinder = new SequenceTagFinder(spec, new Tolerance(5));
+            var tags = tagFinder.GetAllSequenceTagString();
 
-            var tags = tagParser.GetSequenceTags(scanNum);
             var proteinsToTags = new Dictionary<string, IList<MatchedTag>>();
 
             foreach (var tag in tags)
@@ -393,7 +402,7 @@ namespace InformedProteomics.Test
 
                 // Find MS2 scans
 //                var numMs2Scans = 0;
-                var tags = new List<SequenceTag>();
+                var tags = new List<SequenceTagString>();
                 var hasMs2 = false;
                 for (var scanNum = minScan[i]; scanNum <= maxScan[i]; scanNum++)
                 {

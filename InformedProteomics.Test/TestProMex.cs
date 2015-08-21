@@ -11,6 +11,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Graphics;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
@@ -233,10 +234,10 @@ namespace InformedProteomics.Test
 
                         OutputEnvelopPeakStat(id, refinedFeature, targetStatWriter);
 
-                        refinedFeature.UpdateWithDecoyScore(featureFinder.Ms1Spectra);
+                        var chargeRange = featureFinder.GetDetectableMinMaxCharge(refinedFeature.RepresentativeMass, run.MinMs1Mz, run.MaxMs1Mz);
+                        refinedFeature.UpdateWithDecoyScore(featureFinder.Ms1Spectra, chargeRange.Item1, chargeRange.Item2);
                         OutputEnvelopPeakStat(id, refinedFeature, decoyStatWriter);
                         id++;
-
                     }
                     else
                     {
@@ -360,7 +361,7 @@ namespace InformedProteomics.Test
                 var qvalue = double.Parse(tsvParser.GetData("QValue")[i]);
 
                 //var targetFeature = new TargetFeature(mass, charge, scan);
-                var score = featureFinder.GetMs1EvidenceScore(mass, scan, charge);
+                var score = featureFinder.GetMs1EvidenceScore(scan, mass, charge);
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", scan, mass, charge, qvalue, score);
             }   
         }
@@ -461,6 +462,21 @@ namespace InformedProteomics.Test
             };
             var featureFinder = new LcMsFeatureFinderLauncher(param);
             featureFinder.Run();
+        }
+
+        [Test]
+        [STAThread]
+        public void TestFeatureMapGeneration()
+        {
+            Console.WriteLine("Testing Working");
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string testFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+            const string outputFile = @"D:\MassSpecFiles\training\raw\";
+
+            var map = new LcMsFeatureMap(testFile, 0, 185, 2000, 50000);
+            map.SaveImage(outputFile + "test.png");
         }
 
         [Test]

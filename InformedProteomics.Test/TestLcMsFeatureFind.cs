@@ -53,7 +53,8 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep7_15Jan15_Bane_C2-14-08-02RZ.pbf";
+            const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf";
+            //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             
             if (!File.Exists(rawFile))
             {
@@ -64,8 +65,11 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
             var scorer = new LcMsFeatureLikelihood();
             var featureFinder = new LcMsPeakMatrix(run, scorer);
-            var feature = featureFinder.GetLcMsPeakCluster(7015.7348, 8, 4621, 4733); // rep7 
-            //var feature = featureFinder.GetLcMsPeakCluster(7015.7348, 8, 4607, 4712); // rep9
+            var feature = featureFinder.GetLcMsPeakCluster(2388.278, 4, 3774, 3907);
+
+            //feature = featureFinder.GetLcMsPeakCluster(8151.3706, 7, 13, 4201, 4266);
+
+            //feature = featureFinder.GetLcMsPeakCluster(8151.41789, 7, 13, 2861, 2941);
             
             var ms1ScanToIndex = run.GetMs1ScanNumToIndex();
             var minCol = ms1ScanToIndex[feature.MinScanNum];
@@ -119,8 +123,8 @@ namespace InformedProteomics.Test
 
             //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             //const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
-
-            const string rawFile = @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf";
+            //const string rawFile = @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf";
+            const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_3\MZ20150729FG_WT1.pbf";
 
             if (!File.Exists(rawFile))
             {
@@ -138,9 +142,9 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                 (stopwatch.ElapsedMilliseconds)/1000.0d);
 
-            var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer);
-            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(3670.93);
-            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(3670.93);
+            var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
+            var minSearchMassBin = featureFinder.Comparer.GetBinNumber(14138.7);
+            var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(14138.7);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
             Console.WriteLine(@"Start MS1 feature extraction.");
@@ -169,7 +173,7 @@ namespace InformedProteomics.Test
 
             // write result files
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
-            var connectedFeatures = container.GetAllConnectedFeatures();
+            
 
             stopwatch.Stop();
 
@@ -179,13 +183,12 @@ namespace InformedProteomics.Test
             //var oriResult = new List<Ms1FeatureCluster>();
             //var quantResult = new List<Ms1Feature>();
 
-
             var featureId = 0;
             var ms1ScanNums = run.GetMs1ScanVector();
             //tsvWriter.WriteLine(GetHeaderString() + "\tQMinScanNum\tQMaxScanNum\tQMinCharge\tQMaxCharge\tQAbundance");
-
-            //foreach (var cluster in container.GetFilteredFeatures(connectedFeatures))
-            foreach (var feature in container.GetFilteredFeatures(connectedFeatures))
+            
+            var filteredFeatures = container.GetFilteredFeatures(featureFinder);
+            foreach (var feature in filteredFeatures)
             {
                 Console.Write(featureId);
                 Console.Write("\t");

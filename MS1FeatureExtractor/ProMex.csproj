@@ -67,6 +67,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,6 +89,10 @@
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
       <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Graphics\InformedProteomics.Graphics.csproj">
+      <Project>{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}</Project>
+      <Name>InformedProteomics.Graphics</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

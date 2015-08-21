@@ -34,25 +34,36 @@ namespace InformedProteomics.Backend.SequenceTag
             _spectrum = spec;
             _deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(_spectrum, MinCharge, MaxCharge, IsotopeOffsetTolerance, FilteringWindowSize, _tolerance, 0.7);
 
-            //Console.WriteLine("[{0}] # of mz peaks = {1}, # of ms peaks = {2}", _spectrum.ScanNum, _spectrum.Peaks.Length, _deconvolutedPeaks.Count);
-            //if (_deconvolutedPeaks.Count > 1000) _deconvolutedPeaks = Deconvoluter.FilterOut(_deconvolutedPeaks, 101, 20);
-
             SetNodeCount(_deconvolutedPeaks.Count);
             CollectSequenceTagGraphEdges();
 
             _candidateSet = new Dictionary<string, SequenceTag>();
-
-            //_minIndexList = new List<int>();
-            //_maxIndexList = new List<int>();
-            //_minMassList = new List<double>();
-            //_maxMassList = new List<double>();
-            //_rankingList = new List<int[]>();
-            //MaxTagLen = 8;
-
             NumberOfProcessedPaths = 0;
             MaxNumberOfProcessedPaths = 1024;
         }
-        
+
+        public IList<SequenceTagString> GetAllSequenceTagString()
+        {
+            var ret = new List<SequenceTagString>();
+            foreach (var tag in FindSequenceTags())
+            {
+                var flankingMass = DeconvolutedPeaks[tag[0].Node1].Mass;
+                foreach (var tagStr in tag.GetTagStrings())
+                {
+                    //tmpWriter.WriteLine("{0}\t{1}\t1\t{2}\t{3}\t{4}", scanNum, tagStr, flankingMass, tag.Score, 0);
+                    //tmpWriter.WriteLine("{0}\t{1}\t0\t{2}\t{3}\t{4}", scanNum, SequenceTag.Reverse(tagStr), flankingMass, tag.Score, 0);
+                    for (var k = 0; k < 2; k++)
+                    {
+                        //if (k == 0) yield return new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass);
+                        //else yield return new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass);    
+                        if (k == 0) ret.Add(new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod));
+                        else ret.Add(new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod));
+                    }
+                }
+            }
+            return ret;
+        }
+
         public IEnumerable<SequenceTag> FindSequenceTags()
         {
             var componentSet = ConnnectedComponents();
@@ -179,100 +190,6 @@ namespace InformedProteomics.Backend.SequenceTag
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
         }
-        /*
-        private readonly List<double> _minMassList;
-        private readonly List<double> _maxMassList;
-        private readonly List<int> _minIndexList;
-        private readonly List<int> _maxIndexList;
-        private readonly List<int[]> _rankingList;
-        private double GetRankSumScore(SequenceTag seqTag)
-        {
-            var newRanking = true;
-            var node1 = seqTag.First().Node1;
-            var node2 = seqTag.Last().Node2;
-            var massBuf = seqTag.TotalMass*0.1;
-            //const double massBuf = 100d;
-
-            var minMass = _deconvolutedPeaks[node1].Mass - massBuf;
-            var maxMass = _deconvolutedPeaks[node2].Mass + massBuf;
-
-            var minIndex = 0;
-            var maxIndex = 0;
-            int[] rankings = null;
-
-            for (var i = 0; i < _minMassList.Count; i++)
-            {
-                if (Math.Abs(_minMassList[i] - minMass) < massBuf && Math.Abs(maxMass - _maxMassList[i]) < massBuf)
-                {
-                    newRanking = false;
-                    minIndex = _minIndexList[i];
-                    maxIndex = _maxIndexList[i];
-                    rankings = _rankingList[i];
-                    break;
-                }
-            }
-
-            if (newRanking)
-            {
-                minIndex =_deconvolutedPeaks.BinarySearch(new DeconvolutedPeak(minMass, 0));
-                if (minIndex < 0) minIndex = ~minIndex;
-
-                maxIndex = _deconvolutedPeaks.BinarySearch(new DeconvolutedPeak(maxMass, 0));
-                if (maxIndex < 0) maxIndex = ~maxIndex;
-            
-                var intensities = new List<double>();
-                for (var i = minIndex; i < maxIndex; i++)
-                {
-                    intensities.Add(_deconvolutedPeaks[i].Intensity);
-                }
-
-                rankings = ArrayUtil.GetRankings(intensities);
-                _minIndexList.Add(minIndex);
-                _maxIndexList.Add(maxIndex);
-                _minMassList.Add(minMass);
-                _maxMassList.Add(maxMass);
-                _rankingList.Add(rankings);                
-            }
-
-            var rankSum = 0d;
-            var nMatchedPeaks = 0;
-            foreach (var edge in seqTag)
-            {
-                if (edge.Node1 == node1 && edge.Node1 >= minIndex && edge.Node1 < maxIndex)
-                {
-                    nMatchedPeaks++;
-                    rankSum += rankings[edge.Node1 - minIndex];
-                }
-
-                if (edge.Node2 >= minIndex && edge.Node2 < maxIndex)
-                {
-                    rankSum += rankings[edge.Node2 - minIndex];
-                    nMatchedPeaks++;
-                }
-            }
-
-            var pvalue = FitScoreCalculator.GetRankSumPvalue(maxIndex - minIndex + 1, nMatchedPeaks, rankSum);
-
-            return pvalue;
-        }
-
-        private double GetHyperGeometricScore(IEnumerable<SequenceTagGraphEdge> seqTag)
-        {
-            var sequenceTagGraphEdges = seqTag as IList<SequenceTagGraphEdge> ?? seqTag.ToList();
-            var node1 = sequenceTagGraphEdges.First().Node1;
-            var node2 = sequenceTagGraphEdges.Last().Node2;
-
-            var massRange = _deconvolutedPeaks[node2].Mass - _deconvolutedPeaks[node1].Mass;
-            var nObservedPeaks = node2 - node1 + 1;
-            var nPossiblePeaks = (int)Math.Round(massRange / 0.01);
-
-            var k1 = sequenceTagGraphEdges.Count + 1;
-            var n1 = k1 * 2;
-
-            var pvalue = FitScoreCalculator.GetHyperGeometricPvalue(nPossiblePeaks, nObservedPeaks, n1, k1);
-            if (pvalue > 0) return -Math.Log(pvalue, 2);
-            return 50;
-        }*/
 
         public List<IdentifiedSequenceTag> ExtractExistingSequneceTags(Sequence sequence, int minTagLength = 5)
         {

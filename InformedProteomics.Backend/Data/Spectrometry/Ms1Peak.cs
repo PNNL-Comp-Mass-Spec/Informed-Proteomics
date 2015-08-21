@@ -19,6 +19,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             Active = false;
         }
+
+        public void Activate()
+        {
+            Active = true;
+        }
         
         public void TagMajorPeakOf(LcMsPeakCluster feature)
         {

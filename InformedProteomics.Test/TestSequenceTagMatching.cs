@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.PostProcessing;
@@ -19,6 +20,57 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestSequenceTagMatching
     {
+
+
+        [Test]
+        public void TestSearchWithTagGeneration()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+
+            if (!File.Exists(rawFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                return;
+            }
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            const string fastaFilePath = @"D:\MSPathFinder\Fasta\ID_002216_235ACCEA.fasta";
+            //const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_004973_9BA6912F.fasta";
+            if (!File.Exists(fastaFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                return;
+            }
+
+            var fastaDb = new FastaDatabase(fastaFilePath);
+            var tolerance = new Tolerance(10);
+            var modsFilePath = @"D:\MSPathFinder\Fasta\Mods.txt";
+
+            if (!File.Exists(modsFilePath))
+            {
+                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                return;
+            }
+
+            var aaSet = new AminoAcidSet(modsFilePath);
+
+            //TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
+            var tagSearchEngine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)),  new LcMsPeakMatrix(run),  fastaDb, tolerance,aaSet);
+
+            var matchedTags = tagSearchEngine.RunSearch(4672);
+            foreach (var match in matchedTags)
+            {
+                Console.Write(match.Sequence);
+                Console.WriteLine("\t{0}\t{1}\t{2}", match.TagMatch.StartIndex, match.TagMatch.EndIndex, match.TagMatch.Mass);
+            }
+
+
+        }
+        
+        
         [Test]
         public void TestTagBasedSearchForLewy()
         {
@@ -36,7 +88,7 @@ namespace InformedProteomics.Test
 
             const int minTagLength = 4;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
-            var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
+            //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
             const string fastaFilePath = @"D:\MassSpecFiles\Lewy\a4_human.fasta";
             if (!File.Exists(fastaFilePath))
@@ -57,7 +109,7 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet(modsFilePath);            
 
-            TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+            TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
 
         [Test]
@@ -104,11 +156,11 @@ namespace InformedProteomics.Test
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
                 const int minTagLength = 5;
-                var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
+                //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
                 Console.WriteLine("-----------------{0}--------------------", rawFile);
 
-                TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+                TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
 
                 Console.WriteLine("-----------------------------------------------------------------------");
             }
@@ -141,7 +193,7 @@ namespace InformedProteomics.Test
 
             const int minTagLength = 5;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
-            var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
+            //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
             const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_003836_DA9CC1E4.fasta";
             //const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_004973_9BA6912F.fasta";
@@ -166,13 +218,13 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet(modsFilePath);
 
-            TestTagBasedSearch(run, tagParser, fastaDb, tolerance, aaSet);
+            TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
 
-        private void TestTagBasedSearch(LcMsRun run, SequenceTagParser tagParser,
+        private void TestTagBasedSearch(LcMsRun run, 
             FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
         {
-            var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
+            var engine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)), new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
 //            engine.MinScan = 3400;
 //            engine.MaxScan = 3900;
             engine.RunSearch();

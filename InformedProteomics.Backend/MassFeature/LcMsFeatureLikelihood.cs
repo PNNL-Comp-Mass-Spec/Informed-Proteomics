@@ -29,22 +29,6 @@ namespace InformedProteomics.Backend.MassFeature
             _xicScoreTable1 = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.XicCorrScore1.tsv");
             _xicScoreTable2 = LoadTableFromResource("InformedProteomics.Backend.MassFeature.ScoringData.XicCorrScore2.tsv");
 
-            /*
-            _distScoreTable = LoadTable(string.Format(@"{0}\DistScore.tsv", scoreTableFolder));
-
-            _corrScoreTable = LoadTable(string.Format(@"{0}\CorrScore.tsv", scoreTableFolder));
-            _intScoreTable = LoadTable(string.Format(@"{0}\IntScore.tsv", scoreTableFolder));
-
-            _distScoreTableSummed = LoadTable(string.Format(@"{0}\SummedDistScore.tsv", scoreTableFolder));
-            _corrScoreTableSummed = LoadTable(string.Format(@"{0}\SummedCorrScore.tsv", scoreTableFolder));
-            _intScoreTableSummed = LoadTable(string.Format(@"{0}\SummedIntScore.tsv", scoreTableFolder));
-
-            _abuScoreTable = LoadTable(string.Format(@"{0}\AbuScore.tsv", scoreTableFolder));
-
-            _xicScoreTable1 = LoadTable(string.Format(@"{0}\XicCorrScore1.tsv", scoreTableFolder));
-            _xicScoreTable2 = LoadTable(string.Format(@"{0}\XicCorrScore2.tsv", scoreTableFolder));
-            */
-
             ScoreThreshold = likelihoodThreshold;
         }
 

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.Backend.Utils;
@@ -162,15 +163,15 @@ namespace TagSearch
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
                 const int minTagLength = 5;
-                var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
+                //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
                 Console.WriteLine("Start processing: {0}", rawFile);
-
-                var engine = new ScanBasedTagSearchEngine(run, tagParser, fastaDb, tolerance, aaSet);
-                engine.outWriter = new StreamWriter(retFile);
+                var tagGen = new SequenceTagGenerator(run, new Tolerance(8));
+                var engine = new ScanBasedTagSearchEngine(run, tagGen, new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
+                
                 engine.RunSearch();
 
-                engine.outWriter.Close();
+                
                 
                 Console.WriteLine("Complete processing: {0}", rawFile);
             }            

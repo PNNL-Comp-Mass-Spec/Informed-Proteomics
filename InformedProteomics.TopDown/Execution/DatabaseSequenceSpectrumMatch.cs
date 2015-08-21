@@ -8,7 +8,7 @@ namespace InformedProteomics.TopDown.Execution
     public class DatabaseSequenceSpectrumMatch: IComparable<DatabaseSequenceSpectrumMatch>
     {
         public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset, 
-            int numNTermCleavages, ModificationCombination modifications, Ion ion, double score, double ms1Corr = 0.0, double specEvalue = 0.0)
+            int numNTermCleavages, ModificationCombination modifications, Ion ion, double score, double specEvalue = 0.0)
         {
             Sequence = sequence;
             Pre = pre == FastaDatabase.Delimiter ? '-' : pre;
@@ -19,7 +19,6 @@ namespace InformedProteomics.TopDown.Execution
             Modifications = modifications;
             Ion = ion;
             Score = score;
-            Ms1Corr = ms1Corr;
             SpecEvalue = specEvalue;
         }
 
@@ -31,7 +30,6 @@ namespace InformedProteomics.TopDown.Execution
         public int NumNTermCleavages { get; private set; }
         public ModificationCombination Modifications { get; private set; }
         public Ion Ion { get; private set; }
-        public double Ms1Corr { get; private set; }
 
         public double Score { get; internal set; }
         public double SpecEvalue { get; internal set; }

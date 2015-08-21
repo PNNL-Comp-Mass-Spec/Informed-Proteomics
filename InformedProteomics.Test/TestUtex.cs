@@ -316,14 +316,14 @@ namespace InformedProteomics.Test
             
         }
 
-        internal class UtexFeatureComparer : ILcMsFeatureComparer
+        internal class UtexFeatureComparer : INodeComparer<LcMsFeature>
         {
             public UtexFeatureComparer(Tolerance tolerance = null)
             {
                 _tolerance = tolerance ?? new Tolerance(10);
             }
 
-            public new bool Match(LcMsFeature f1, LcMsFeature f2)
+            public new bool SameCluster(LcMsFeature f1, LcMsFeature f2)
             {
                 if (f1.DataSetId == f2.DataSetId) return false;
                 // tolerant in mass dimension?
