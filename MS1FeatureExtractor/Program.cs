@@ -61,7 +61,7 @@ namespace ProMex
                     {"-score", "n"},
                     {"-csv", "n"},
                     {"-featureMap", "y"},
-                    {"-scoreTh", "-30"},
+                    {"-scoreTh", "-20"},
                     {"-maxThreads", "0"},
                 };
 
