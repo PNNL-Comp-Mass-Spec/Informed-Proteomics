@@ -18,7 +18,6 @@ using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using PNNLOmics.Utilities;
-using ProMex;
 
 namespace InformedProteomics.TopDown.Execution
 {

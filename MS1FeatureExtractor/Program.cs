@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-//using InformedProteomics.TopDown.Execution;
+using InformedProteomics.TopDown.Execution;
 using InformedProteomics.Backend.Utils;
 
 namespace ProMex
@@ -61,7 +61,7 @@ namespace ProMex
                     {"-score", "n"},
                     {"-csv", "n"},
                     {"-featureMap", "y"},
-                    {"-scoreTh", "-20"},
+                    {"-scoreTh", "-10"},
                     {"-maxThreads", "0"},
                 };
 

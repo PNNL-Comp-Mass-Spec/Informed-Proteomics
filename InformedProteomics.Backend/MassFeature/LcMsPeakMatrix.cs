@@ -753,6 +753,8 @@ namespace InformedProteomics.Backend.MassFeature
 
         public LcMsPeakCluster CollectLcMsPeaksWithNoise(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, int targetMinCharge, int targetMaxCharge)
         {
+            SetTargetMass(targetMass);
+
             var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
 

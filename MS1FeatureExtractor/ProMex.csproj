@@ -76,8 +76,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LcMsFeatureFinderInputParameter.cs" />
-    <Compile Include="LcMsFeatureFinderLauncher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TsvFileReader.cs" />
@@ -90,9 +88,9 @@
       <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
       <Name>InformedProteomics.Backend</Name>
     </ProjectReference>
-    <ProjectReference Include="..\InformedProteomics.Graphics\InformedProteomics.Graphics.csproj">
-      <Project>{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}</Project>
-      <Name>InformedProteomics.Graphics</Name>
+    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
+      <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
+      <Name>InformedProteomics.TopDown</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

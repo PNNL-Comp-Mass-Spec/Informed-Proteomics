@@ -9,11 +9,11 @@ using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Graphics;
 
-namespace ProMex
+namespace InformedProteomics.TopDown.Execution
 {
     public class LcMsFeatureFinderLauncher
     {
-        private LcMsFeatureLikelihood _likelihoodScorer;
+        private readonly LcMsFeatureLikelihood _likelihoodScorer;
 
         /// <summary>
         /// Constructor
@@ -22,13 +22,6 @@ namespace ProMex
         public LcMsFeatureFinderLauncher(LcMsFeatureFinderInputParameter parameters = null)
         {
             Parameters = parameters ?? new LcMsFeatureFinderInputParameter();
-            //_plotter = (Parameters.FeatureMapImage) ? new LcMsFeatureMapPlot() : null;
-        }
-
-        //private LcMsFeatureMapPlot _plotter;
-        public void Run()
-        {
-            //var scoreDataPath = AppDomain.CurrentDomain.BaseDirectory;
             try
             {
                 _likelihoodScorer = new LcMsFeatureLikelihood(Parameters.LikelihoodScoreThreshold);
@@ -37,8 +30,11 @@ namespace ProMex
             {
                 ShowErrorMessage(fe.Message);
                 return;
-            }
+            }            
+        }
 
+        public void Run()
+        {
             // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
             Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
 
@@ -151,9 +147,7 @@ namespace ProMex
 
 
             var comparer = featureFinder.Comparer;
-
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
-            
             var minSearchMassBin = comparer.GetBinNumber(Parameters.MinSearchMass);
             var maxSearchMassBin = comparer.GetBinNumber(Parameters.MaxSearchMass);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;

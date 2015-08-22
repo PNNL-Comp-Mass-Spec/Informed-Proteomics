@@ -5,20 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
-using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
-using PNNLOmics.Data;
 using Peak = InformedProteomics.Backend.Data.Spectrometry.Peak;
 
 namespace InformedProteomics.Test.FunctionalTests
@@ -26,46 +20,22 @@ namespace InformedProteomics.Test.FunctionalTests
     [TestFixture]
     public class TestGeneratingFunction
     {
-        [Test]
-        public void Test()
-        {
-            var massList = AminoAcid.StandardAminoAcidArr.Select(aa => aa.Mass).ToList();
-            var MaxMass = 50000;
-            var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(MaxMass));
-            fineNodes[0] = true;
-            
-            var effectiveBinCounter = 0;
-            for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
-            {
-                if (!fineNodes[fineBinIdx]) continue;
-
-                var fineNodeMass = fineBinIdx/Constants.RescalingConstantHighPrecision;
-                foreach (var m in massList)
-                {
-                    var validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + m);
-                    if (validFineNodeIndex >= fineNodes.Length) break;
-                    fineNodes[validFineNodeIndex] = true;
-                }
-            }
-
-            Console.WriteLine(fineNodes.Length);
-            var n = 0;
-            for(var i = 0; i < fineNodes.Length; i++) if (fineNodes[i]) n++;
-            Console.WriteLine(n);
-
-        }
         
         [Test]
         public void TestGetScoreDistribution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            
-            const int scanNum = 6745;
-            const string protSequence = "EKQRPDFIYPQGSMLMHSPLVLNKADMYGFFLKGKLANLQRSIDNTLNQVAGSAMYFKVLSPYVLTTFTQIEKAYSDYPTDRAKGWIQETDIITWVMVGRQDNSSSTKISHVYFQPLHIWVNDAMALINGRELFGYPKYLCEYTMPAAGQPLTRLSLAAKSFLHFSPDTELAMHPLLEVNCNAKPEAQLSTVEAITQTWKLFKEQTDFIPELDKLGEEQLFHLLFKPAIDQVFLKQFPDASGQKAVYQAITASPAKVNKVHSVALLENDFVATLFDNASFPLKDTLGVELGEQHVLLPYHVNFDFEVPPGEVLVDNSEIKKQKIAILGGGVAAMTAACYLTDKPGWQNQYEIDIYQLGWRIGGKGASGRNAAMGQRIEEHGLHIWFGFYQNAFALMRKAYEELDRPAQAPLATFLDAFKPHHFIVLQEEINGRSVSWPI";
-            const string modStr = "Acetyl 0,Oxidation 55,Dehydro 141,Dehydro 181";
+            //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            const string rawFile = @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf";
 
+            const int scanNum = 46475;
+            //const string protSequence = "EKQRPDFIYPQGSMLMHSPLVLNKADMYGFFLKGKLANLQRSIDNTLNQVAGSAMYFKVLSPYVLTTFTQIEKAYSDYPTDRAKGWIQETDIITWVMVGRQDNSSSTKISHVYFQPLHIWVNDAMALINGRELFGYPKYLCEYTMPAAGQPLTRLSLAAKSFLHFSPDTELAMHPLLEVNCNAKPEAQLSTVEAITQTWKLFKEQTDFIPELDKLGEEQLFHLLFKPAIDQVFLKQFPDASGQKAVYQAITASPAKVNKVHSVALLENDFVATLFDNASFPLKDTLGVELGEQHVLLPYHVNFDFEVPPGEVLVDNSEIKKQKIAILGGGVAAMTAACYLTDKPGWQNQYEIDIYQLGWRIGGKGASGRNAAMGQRIEEHGLHIWFGFYQNAFALMRKAYEELDRPAQAPLATFLDAFKPHHFIVLQEEINGRSVSWPI";
+            //const string modStr = "Acetyl 0,Oxidation 55,Dehydro 141,Dehydro 181";
+            const string protSequence =
+                "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
+            
+            const string modStr = "";
             
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);

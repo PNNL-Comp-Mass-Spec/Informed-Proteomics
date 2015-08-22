@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace ProMex
+namespace InformedProteomics.TopDown.Execution
 {
     public class LcMsFeatureFinderInputParameter
     {
