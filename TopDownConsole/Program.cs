@@ -168,10 +168,14 @@ namespace MSPathFinderT
                 Console.WriteLine("Exception while processing: " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
                 errorCode = -Math.Abs(ex.Message.GetHashCode());
+
+                System.Threading.Thread.Sleep(1500);
+
                 if (errorCode == 0)
                     return -1;
                 else
                     return errorCode;
+
             }            
 #endif
 

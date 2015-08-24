@@ -267,7 +267,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Tag-based searching the target database");
                 sw.Start();
                 RunTagBasedSearch(targetMatches, targetDb, null, prog);
-                Console.WriteLine(@"Target database tag-baesd search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                Console.WriteLine(@"Target database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
                 
                 sw.Reset();
                 Console.WriteLine(@"Searching the target database");
@@ -306,7 +306,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Tag-based searching the decoy database");
                 sw.Start();
                 RunTagBasedSearch(decoyMatches, decoyDb, null, prog);
-                Console.WriteLine(@"Target database tag-baesd search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                Console.WriteLine(@"Target database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");

@@ -105,102 +105,158 @@ namespace MSPathFinderT
         {
 
             var message = CheckIsValid(parameters);
-            if (message != null) 
+            if (message != null)
                 return message;
 
-            var specFilePath = parameters["-s"];
-            SpecFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
+            try
+            {
+                var specFilePath = parameters["-s"];
+                SpecFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception parsing the file path for parameter -s: " + ex.Message);
+                throw;
+            }
+
             DatabaseFilePath = parameters["-d"];
 
-            var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
-            
-            if (!Directory.Exists(outputDir))
+            try
             {
-                if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
+                var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
+
+                if (!Directory.Exists(outputDir))
                 {
-                    return "OutputDir is not a directory: " + outputDir;
+                    if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
+                    {
+                        return "OutputDir is not a directory: " + outputDir;
+                    }
+                    Directory.CreateDirectory(outputDir);
                 }
-                Directory.CreateDirectory(outputDir);
+                OutputDir = outputDir;
             }
-            OutputDir = outputDir;
-
-            var modFilePath = parameters["-mod"];
-            if (modFilePath != null)
+            catch (Exception ex)
             {
-                var parser = new ModFileParser(modFilePath);
-                _searchModifications = parser.SearchModifications;
-                _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
-
-                if (_searchModifications == null) 
-                    return "Error while parsing " + modFilePath;
-
-                AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
+                Console.WriteLine("Exception validating the path for parameter -o: " + ex.Message);
+                throw;
             }
-            else
+
+            try
             {
-                AminoAcidSet = new AminoAcidSet();
-                _searchModifications = new SearchModification[0];
+                var modFilePath = parameters["-mod"];
+
+                if (modFilePath != null)
+                {
+                    var parser = new ModFileParser(modFilePath);
+                    _searchModifications = parser.SearchModifications;
+                    _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
+
+                    if (_searchModifications == null)
+                        return "Error while parsing " + modFilePath;
+
+                    AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
+                }
+                else
+                {
+                    AminoAcidSet = new AminoAcidSet();
+                    _searchModifications = new SearchModification[0];
+                }
             }
-
-            FeatureFilePath = parameters["-feature"];
-
-            SearchMode = Convert.ToInt32(parameters["-m"]);
-            if (SearchMode < 0 || SearchMode > 2)
+            catch (Exception ex)
             {
-                return "Invalid value (" + SearchMode + ") for parameter -m";
+                Console.WriteLine("Exception parsing the path for parameter -mod: " + ex.Message);
+                throw;
             }
 
-            PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
-            ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
-
-            var tdaVal = Convert.ToInt32(parameters["-tda"]);
-            if (tdaVal != 0 && tdaVal != 1 && tdaVal != -1)
+            var currentParameter = string.Empty;
+           
+            try
             {
-                return "Invalid value (" + tdaVal + ") for parameter -tda";
+                currentParameter = "-feature";
+                FeatureFilePath = parameters["-feature"];
+
+                currentParameter = "-m";
+                SearchMode = Convert.ToInt32(parameters["-m"]);
+                if (SearchMode < 0 || SearchMode > 2)
+                {
+                    return "Invalid value (" + SearchMode + ") for parameter -m";
+                }
+
+                currentParameter = "-t";
+                PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
+                
+                currentParameter = "-f";
+                ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
+
+                currentParameter = "-tda";
+                var tdaVal = Convert.ToInt32(parameters["-tda"]);
+                if (tdaVal != 0 && tdaVal != 1 && tdaVal != -1)
+                {
+                    return "Invalid value (" + tdaVal + ") for parameter -tda";
+                }
+
+                if (tdaVal == 1)
+                    Tda = true;
+                else if
+                    (tdaVal == -1) Tda = null;
+                else
+                    Tda = false;
+
+                currentParameter = "-minLength";
+                MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
+
+                currentParameter = "-maxLength";
+                MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);
+                if (MinSequenceLength > MaxSequenceLength)
+                {
+                    return "MinSequenceLength (" + MinSequenceLength + ") is larger than MaxSequenceLength (" + MaxSequenceLength + ")!";
+                }
+
+                currentParameter = "-feature";
+                MinPrecursorIonCharge = Convert.ToInt32(parameters["-minCharge"]);
+
+                currentParameter = "-feature";
+                MaxPrecursorIonCharge = Convert.ToInt32(parameters["-maxCharge"]);
+                if (MinSequenceLength > MaxSequenceLength)
+                {
+                    return "MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!";
+                }
+
+                currentParameter = "-minFragCharge";
+                MinProductIonCharge = Convert.ToInt32(parameters["-minFragCharge"]);
+
+                currentParameter = "-maxFragCharge";
+                MaxProductIonCharge = Convert.ToInt32(parameters["-maxFragCharge"]);
+                if (MinSequenceLength > MaxSequenceLength)
+                {
+                    return "MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!";
+                }
+
+                currentParameter = "-minMass";
+                MinSequenceMass = Convert.ToDouble(parameters["-minMass"]);
+
+                currentParameter = "-maxMass";
+                MaxSequenceMass = Convert.ToDouble(parameters["-maxMass"]);
+                if (MinSequenceMass > MaxSequenceMass)
+                {
+                    return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
+                }
+
+                currentParameter = "-threads";
+                MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
+                if (MaxNumThreads < 0)
+                {
+                    ForceParallel = true;
+                    MaxNumThreads = -MaxNumThreads;
+                }
+
             }
-
-            if (tdaVal == 1) 
-                Tda = true;
-            else if 
-                (tdaVal == -1) Tda = null;
-            else 
-                Tda = false;
-
-            MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
-            MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);
-            if (MinSequenceLength > MaxSequenceLength)
+            catch (Exception ex)
             {
-                return "MinSequenceLength (" + MinSequenceLength + ") is larger than MaxSequenceLength (" + MaxSequenceLength + ")!";
+                Console.WriteLine("Exception parsing parameter '" + currentParameter + "': " + ex.Message);
+                throw;
             }
 
-            MinPrecursorIonCharge = Convert.ToInt32(parameters["-minCharge"]);
-            MaxPrecursorIonCharge = Convert.ToInt32(parameters["-maxCharge"]);
-            if (MinSequenceLength > MaxSequenceLength)
-            {
-                return "MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!";
-            }
-
-            MinProductIonCharge = Convert.ToInt32(parameters["-minFragCharge"]);
-            MaxProductIonCharge = Convert.ToInt32(parameters["-maxFragCharge"]);
-            if (MinSequenceLength > MaxSequenceLength)
-            {
-                return "MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!";
-            }
-
-            MinSequenceMass = Convert.ToDouble(parameters["-minMass"]);
-            MaxSequenceMass = Convert.ToDouble(parameters["-maxMass"]);
-            if (MinSequenceMass > MaxSequenceMass)
-            {
-                return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
-            }
-
-            MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
-            if (MaxNumThreads < 0)
-            {
-                ForceParallel = true;
-                MaxNumThreads = -MaxNumThreads;
-            }
-            
             return null;
         }
 
@@ -210,78 +266,95 @@ namespace MSPathFinderT
             {
                 var key = keyValuePair.Key;
                 var value = keyValuePair.Value;
-                if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" && keyValuePair.Key != "-feature")
-                {
-                    return "Missing required parameter " + key;
-                }
 
-                if (key.Equals("-s"))
+                try
                 {
-                    if (value == null)
-                    {
-                        return "Missing parameter " + key;
-                    }
-                    if (!File.Exists(value) && !Directory.Exists(value))
-                    {
-                        return "File not found: " + value;
-                    }
-                    if (Directory.Exists(value)) continue;
-                    var extension = Path.GetExtension(value);
-                    if (!Path.GetExtension(value).ToLower().Equals(".raw") && 
-                        !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
-                    {
-                        return "Invalid extension for the parameter " + key + " (" + extension + ")";
-                    }
-                }
-                else if(key.Equals("-d"))
-                {
-                    if (value == null)
+                    if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" &&
+                        keyValuePair.Key != "-feature")
                     {
                         return "Missing required parameter " + key;
                     }
-                    if (!File.Exists(value))
+
+                    if (key.Equals("-s"))
                     {
-                        return "File not found: " + value;
+                        if (value == null)
+                        {
+                            return "Missing parameter " + key;
+                        }
+                        if (!File.Exists(value) && !Directory.Exists(value))
+                        {
+                            return "File not found: " + value;
+                        }
+                        if (Directory.Exists(value)) continue;
+                        var extension = Path.GetExtension(value);
+                        if (!Path.GetExtension(value).ToLower().Equals(".raw") &&
+                            !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
+                        {
+                            return "Invalid extension for the parameter " + key + " (" + extension + ")";
+                        }
                     }
-                    var extension = Path.GetExtension(value).ToLower();
-                    if (!extension.Equals(".fa") && 
-                        !extension.Equals(".fasta"))
+                    else if (key.Equals("-d"))
                     {
-                        return "Invalid extension for the parameter " + key + " (" + extension + ")";
+                        if (value == null)
+                        {
+                            return "Missing required parameter " + key;
+                        }
+                        if (!File.Exists(value))
+                        {
+                            return "File not found: " + value;
+                        }
+                        var extension = Path.GetExtension(value).ToLower();
+                        if (!extension.Equals(".fa") &&
+                            !extension.Equals(".fasta"))
+                        {
+                            return "Invalid extension for the parameter " + key + " (" + extension + ")";
+                        }
                     }
+                    else if (key.Equals("-o"))
+                    {
+
+                    }
+                    else if (key.Equals("-mod"))
+                    {
+                        if (value != null && !File.Exists(value))
+                        {
+                            return "File not found: " + value;
+                        }
+                    }
+                    else if (key.Equals("-feature"))
+                    {
+                        if (value != null && !File.Exists(value))
+                        {
+                            return "File not found: " + value;
+                        }
+                        if (value != null &&
+                            !Path.GetExtension(value).ToLower().Equals(".csv") &&
+                            !Path.GetExtension(value).ToLower().Equals(".ms1ft") &&
+                            !Path.GetExtension(value).ToLower().Equals(".msalign"))
+                        {
+                            return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")";
+                        }
+                    }
+                    else
+                    {
+                        double num;
+                        if (!double.TryParse(value, out num))
+                        {
+                            return "Invalid value (" + value + ") for the parameter " + key;
+                        }
+                    }
+
                 }
-                else if (key.Equals("-o"))
+                catch (Exception)
                 {
-                    
-                }
-                else if (key.Equals("-mod"))
-                {
-                    if (value != null && !File.Exists(value))
-                    {
-                        return "File not found: " + value;
-                    }
-                }
-                else if (key.Equals("-feature"))
-                {
-                    if (value != null && !File.Exists(value))
-                    {
-                        return "File not found: " + value;
-                    }
-                    if (value != null && 
-                        !Path.GetExtension(value).ToLower().Equals(".csv") && 
-                        !Path.GetExtension(value).ToLower().Equals(".ms1ft") &&
-                        !Path.GetExtension(value).ToLower().Equals(".msalign"))
-                    {
-                        return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")";
-                    }
-                }
-                else
-                {
-                    double num;
-                    if (!double.TryParse(value, out num))
-                    {
-                        return "Invalid value (" + value + ") for the parameter " + key;
-                    }
+                    if (string.IsNullOrEmpty(key))
+                        key = "?UnknownKey?";
+
+                    if (string.IsNullOrEmpty(value))
+                        value = string.Empty;
+
+                    Console.WriteLine("Error parsing parameter '" + key + "' with value '" + value + "'");
+                    throw;
                 }
             }
 
