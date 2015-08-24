@@ -268,7 +268,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 RunTagBasedSearch(targetMatches, targetDb, null, prog);
                 Console.WriteLine(@"Target database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-                
+
                 sw.Reset();
                 Console.WriteLine(@"Searching the target database");
                 sw.Start();
@@ -411,13 +411,13 @@ namespace InformedProteomics.TopDown.Execution
             {
                 var pfeOptions = new ParallelOptions();
                 pfeOptions.MaxDegreeOfParallelism = GetMaxThreads();
+
                 pfeOptions.CancellationToken = cancellationToken != null
                     ? cancellationToken.Value
                     : CancellationToken.None;
 
                 Parallel.ForEach(_tagMs2ScanNum, pfeOptions, ms2ScanNum =>
                 {
-                    
                     var tagSeqMatches = _tagSearchEngine.RunSearch(ms2ScanNum);
                     var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                     var prsmList = new List<DatabaseSequenceSpectrumMatch>();
@@ -433,7 +433,6 @@ namespace InformedProteomics.TopDown.Execution
 
                         var seqObj = Sequence.CreateSequence(sequence, tagSequenceMatch.TagMatch.Modifications, AminoAcidSet);
                         var precursorIon = new Ion(seqObj.Composition + Composition.H2O, charge);
-                        //var precursorIon = new Ion(new CompositionWithDeltaMass(sequenceMass), charge);
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, tagSequenceMatch.Pre, tagSequenceMatch.Post,
                             ms2ScanNum, (long)offset, numNTermCleavages,
                             null,

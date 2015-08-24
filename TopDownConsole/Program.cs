@@ -27,7 +27,6 @@ namespace MSPathFinderT
 
         public static int Main(string[] args)
         {
-
             var errorCode = 0;
 
 #if (!DEBUG)

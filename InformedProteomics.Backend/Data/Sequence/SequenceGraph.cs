@@ -140,7 +140,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 for (var modIndex = 0; modIndex < _graph[seqIndex].Length; modIndex++)
                 {
-                    _nodeComposition[seqIndex, modIndex] = null;
+                    _nodeComposition[seqIndex][modIndex] = null;
                 }
             }
 
@@ -226,7 +226,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             _sinkSequenceComposition = GetComposition(_index, modIndex);
             _sinkSequenceCompositionWithH2O = _sinkSequenceComposition + Composition.Composition.H2O;
             //_sinkSequenceCompositionWithH2O.ComputeApproximateIsotopomerEnvelop();
-            _compNodeComposition = new Composition.Composition[_maxSeqIndex, _modificationParams.NumModificationCombinations];
+            //_compNodeComposition = new Composition.Composition[_maxSeqIndex, _modificationParams.NumModificationCombinations];
+            foreach (var t in _compNodeComposition) Array.Clear(t, 0, t.Length);
         }
 
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
@@ -236,9 +237,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private Composition.Composition _sinkSequenceComposition;
         private Composition.Composition _sinkSequenceCompositionWithH2O;
-        //private int _sinkSeqIndex;
         private int _sinkModIndex;
-        private Composition.Composition[,] _compNodeComposition;
+        private readonly Composition.Composition[][] _compNodeComposition;
 
         public double GetFragmentScore(IScorer scorer)
         {
@@ -262,10 +262,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         public Tuple<double, string> GetFragmentScoreAndModifications(IScorer scorer)
         {
 //            var precursorIon = new Ion(_sinkSequenceCompositionWithH2O, charge);
-
             // Get 
 //            var precursorIonScore = scorer.GetPrecursorIonScore(precursorIon);
-
             var nodeScore = new double?[_maxSeqIndex][];
             var maxScore = new Tuple<double, string>[_maxSeqIndex][];
             for (var si = 0; si < _maxSeqIndex; si++)
@@ -302,7 +300,14 @@ namespace InformedProteomics.Backend.Data.Sequence
             _graph = new Node[_maxSeqIndex][];
             _graph[0] = new[] { new Node(0) };
 
-            _nodeComposition = new Composition.Composition[_maxSeqIndex, _modificationParams.NumModificationCombinations];
+            _nodeComposition = new Composition.Composition[_maxSeqIndex][]; //, _modificationParams.NumModificationCombinations];
+            _compNodeComposition = new Composition.Composition[_maxSeqIndex][]; //, _modificationParams.NumModificationCombinations];
+
+            for (var i = 0; i < _maxSeqIndex; i++)
+            {
+                _compNodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
+                _nodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
+            }
 
             NumNTermCleavages = 0;
             IsValid = true;
@@ -389,24 +394,24 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
-            if (_nodeComposition[seqIndex, modIndex] == null)
+            if (_nodeComposition[seqIndex][modIndex] == null)
             {
                 var node = _graph[seqIndex][modIndex];
-                _nodeComposition[seqIndex, modIndex] = _suffixComposition[seqIndex] +
+                _nodeComposition[seqIndex][modIndex] = _suffixComposition[seqIndex] +
                                   _modificationParams.GetModificationCombination(node.ModificationCombinationIndex)
                                                      .Composition;
             }
-            return _nodeComposition[seqIndex, modIndex];
+            return _nodeComposition[seqIndex][modIndex];
         }
 
         protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
-            if (_compNodeComposition[seqIndex, modIndex] == null)
+            if (_compNodeComposition[seqIndex][modIndex] == null)
             {
                 var nodeComposition = GetComposition(seqIndex, modIndex);
-                _compNodeComposition[seqIndex, modIndex] = _sinkSequenceComposition - nodeComposition;
+                _compNodeComposition[seqIndex][modIndex] = _sinkSequenceComposition - nodeComposition;
             }
-            return _compNodeComposition[seqIndex, modIndex];
+            return _compNodeComposition[seqIndex][modIndex];
         }
 
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
@@ -440,8 +445,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         protected readonly string _sequence;
         private readonly AminoAcid _nTerm;
         private readonly AminoAcid[] _aminoAcidSequence;
-        private readonly Composition.Composition[,] _nodeComposition;
-
+        private readonly Composition.Composition[][] _nodeComposition;
         private readonly Composition.Composition[] _suffixComposition;
 
         private void SetNTerminalAminoAcid(AminoAcid nTerm)

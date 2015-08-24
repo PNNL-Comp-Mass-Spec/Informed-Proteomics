@@ -40,7 +40,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             if(matchedTag.NTermFlankingMass != null && matchedTag.CTermFlankingMass != null) return FindMatchesWithFeatureMass(matchedTag);
             if(matchedTag.NTermFlankingMass != null) return FindMatchesForwardAndBackward(matchedTag);
             if(matchedTag.CTermFlankingMass != null) return FindMatchesBackwardAndForward(matchedTag);
-            return new TagMatch[0];
+            return Enumerable.Empty<TagMatch>();
         }
 
         private IEnumerable<TagMatch> FindMatchesWithFeatureMass(MatchedTag matchedTag)
