@@ -118,7 +118,6 @@ namespace MSPathFinderT
                     parameters.Tda,
                     parameters.SearchMode,
                     parameters.FeatureFilePath
-                    //,parameters.FeatureMinProbability
                     );
 
                 topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;

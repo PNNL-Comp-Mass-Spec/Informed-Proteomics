@@ -64,17 +64,21 @@ namespace InformedProteomics.TopDown.Scoring
         {
             IScorer scorer;
             if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
-
             scorer = GetScorer(scanNum);
             if (scorer == null) return null;
-            return _ms2Scorer[scanNum] = scorer;
+
+            lock (_ms2Scorer)
+            {
+                _ms2Scorer.Add(scanNum, scorer);
+            }
+            return scorer;
         }
 
         public void DeconvoluteAllProductSpectra()
         {
             foreach (var scanNum in _run.GetScanNumbers(2))
             {
-                GetScorer(scanNum);
+                GetMs2Scorer(scanNum);
             }
         }
 
