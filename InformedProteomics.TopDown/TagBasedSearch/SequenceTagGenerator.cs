@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -33,14 +34,23 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             if (spec == null) return;
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
-            _ms2ScanToTagMap[ms2ScanNum] = tagFinder.GetAllSequenceTagString();            
+
+            var tags = tagFinder.GetAllSequenceTagString();
+            lock (_ms2ScanToTagMap)
+            {
+                _ms2ScanToTagMap[ms2ScanNum] = tags;
+            }
         }
         
         public IList<SequenceTagString> GetAllSequenceTagString(int ms2ScanNum)
         {
             IList<SequenceTagString> tags;
 
-            if (_ms2ScanToTagMap.TryGetValue(ms2ScanNum, out tags)) return tags;
+            lock (_ms2ScanToTagMap)
+            {
+                if (_ms2ScanToTagMap.TryGetValue(ms2ScanNum, out tags)) 
+                    return tags;
+            }
 
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             if (spec == null) return new List<SequenceTagString>();

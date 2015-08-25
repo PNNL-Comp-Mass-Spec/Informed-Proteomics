@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Biology;
@@ -18,15 +17,19 @@ namespace InformedProteomics.Backend.SequenceTag
             _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToArray();
             _aminoAcidsArray = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
             _tolerance = tolerance;
-          
-            if (_aminoAcidsArray.Length - 1 > Byte.MaxValue) throw new Exception("Too many amino acid types");
+
+            if (_aminoAcidsArray.Length - 1 > Byte.MaxValue) 
+                throw new Exception("Too many amino acid types");
 
             _maxAminoAcidMass = 0d;
             _minAminoAcidMass = 10E4;
-            foreach(var aa in _aminoAcidsArray)
+            foreach (var aa in _aminoAcidsArray)
             {
-                if (aa.Composition.Mass > _maxAminoAcidMass) _maxAminoAcidMass = aa.Composition.Mass;
-                if (aa.Composition.Mass < _minAminoAcidMass) _minAminoAcidMass = aa.Composition.Mass;
+                if (aa.Composition.Mass > _maxAminoAcidMass) 
+                    _maxAminoAcidMass = aa.Composition.Mass;
+                
+                if (aa.Composition.Mass < _minAminoAcidMass) 
+                    _minAminoAcidMass = aa.Composition.Mass;
 
             }
             _minTagLength = minTagLength;
@@ -56,8 +59,10 @@ namespace InformedProteomics.Backend.SequenceTag
                     {
                         //if (k == 0) yield return new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass);
                         //else yield return new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass);    
-                        if (k == 0) ret.Add(new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod));
-                        else ret.Add(new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod));
+                        if (k == 0)
+                            ret.Add(new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod));
+                        else
+                            ret.Add(new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod));
                     }
                 }
             }
@@ -72,9 +77,10 @@ namespace InformedProteomics.Backend.SequenceTag
             foreach (var comp in componentSet)
             {
                 if (comp.Count < _minTagLength) continue;
+
                 startNodeSet.AddRange(comp);
             }
-            
+
             foreach (var node in startNodeSet)
             {
                 NumberOfProcessedPaths = 0;
@@ -88,7 +94,7 @@ namespace InformedProteomics.Backend.SequenceTag
                 if (_candidateSet.Count > 32767) break;
 
             }
-            
+
             var candidateList = _candidateSet.Values.ToList();
             candidateList.Sort();
             return candidateList;
@@ -123,11 +129,11 @@ namespace InformedProteomics.Backend.SequenceTag
                 {
                     if (_deconvolutedPeaks[i].PeakShare(_deconvolutedPeaks[j])) continue;
                     //if (Math.Abs(_deconvolutedPeaks[j].Charge - _deconvolutedPeaks[i].Charge) > 1) continue;
-                    
+
                     var massGap = _deconvolutedPeaks[j].Mass - _deconvolutedPeaks[i].Mass;
                     var maxMassGap = massGap + massTh;
                     var minMassGap = massGap - massTh;
-                    
+
                     var peakGap = new SequenceTagGraphEdge(i, j, massGap);
                     if (minMassGap > _maxAminoAcidMass) break;
                     if (maxMassGap < _minAminoAcidMass) continue;
@@ -159,14 +165,16 @@ namespace InformedProteomics.Backend.SequenceTag
         protected override bool ProcessPath(IEnumerable<SequenceTagGraphEdge> edges)
         {
             var edgeList = edges.ToList();
-            if (edgeList.Count < _minTagLength) return true;
-            var tag = new SequenceTag(edges, _deconvolutedPeaks, _tolerance);
-            
+            if (edgeList.Count < _minTagLength)
+                return true;
+
+            var tag = new SequenceTag(edgeList, _deconvolutedPeaks, _tolerance);
+
             //tag.Score = GetRankSumScore(tag);
             //if (tag.Score > 0.05) return true;
             //tag.Score = tag.GetTagStrings(_tolerance).Count;
             NumberOfProcessedPaths++;
-            
+
             if (_candidateSet.ContainsKey(tag.HashString))
             {
                 //if (_candidateSet[tag.HashString].Score < tag.Score) _candidateSet[tag.HashString] = tag;
@@ -177,13 +185,14 @@ namespace InformedProteomics.Backend.SequenceTag
                 _candidateSet.Add(tag.HashString, tag);
                 NumberOfAddedPaths++;
             }
-            
+
             //if (NumberOfProcessedPaths > 100 && NumberOfProcessedPaths*0.3 > NumberOfAddedPaths) StopFindPath = true;
-            if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths) StopFindPath = true;
+            if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths) 
+                StopFindPath = true;
 
             return true;
         }
-        
+
         private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         static SequenceTagFinder()
         {
@@ -201,12 +210,12 @@ namespace InformedProteomics.Backend.SequenceTag
             var bIonTypes = new List<IonType>(); // list of ion types
             var yIonTypes = new List<IonType>();
 
-            int index = 0; // cleavage index 
+            var index = 0; // cleavage index 
             foreach (var c in cleavages)
             {
                 foreach (var ionType in _ionTypes)
                 {
-                    Ion ion = null;
+                    Ion ion;
                     if (ionType.IsPrefixIon)
                         ion = ionType.GetIon(c.PrefixComposition);
                     else
@@ -286,6 +295,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return tags;
         }
 
-            
+
     }
 }

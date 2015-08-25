@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
@@ -334,7 +332,7 @@ namespace InformedProteomics.Backend.MassFeature
             }
         }
 
-        private List<LcMsFeature[]> _alignedFeatures = null;
+        private List<LcMsFeature[]> _alignedFeatures;
         private List<LcMsFeature[]> GroupFeatures(List<LcMsFeature> features)
         {
             var adjList = new List<int>[features.Count];
@@ -431,9 +429,11 @@ namespace InformedProteomics.Backend.MassFeature
             //Array.Clear(linkedIdx, 0, linkedIdx.Length);
             //Array.Clear(score, 0, score.Length);
             chkDataset[centroid.DataSetId] = true;
-            var nodeSet = new List<int>();
-            nodeSet.Add(minScoreNode);
-          
+            var nodeSet = new List<int>
+            {
+                minScoreNode
+            };
+
             // clustering
             while (true)
             {
@@ -525,7 +525,6 @@ namespace InformedProteomics.Backend.MassFeature
         private readonly Dictionary<int, List<LcMsFeature>> _featureSetList;
         private readonly List<LcMsFeature> _featureList;
         public readonly IList<string> RawFileList;
-        private readonly Tolerance _tolerance;
 
         private class FeatureMassComparer : IComparer<LcMsFeature>
         {

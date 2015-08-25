@@ -111,7 +111,7 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 if (!xic1[i].Equals(xic2[i]))
                 {
-                    Console.WriteLine("{0} {1} {2}", i, xic1[i], xic2[i]);
+                    Console.WriteLine(@"{0} {1} {2}", i, xic1[i], xic2[i]);
                 }
                 Assert.True(xic1[i].Equals(xic2[i]));
             }
@@ -184,7 +184,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var pbfRun = new PbfLcMsRun(rafFilePath);
 
-            Console.WriteLine("Chromatogram");
+            Console.WriteLine(@"Chromatogram");
             // chromatogram comparison
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
@@ -193,7 +193,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const int MAX_POINTS = 50;
             xic.Display(MAX_POINTS);
 
-            Console.WriteLine("Done");
+            Console.WriteLine(@"Done");
         }
 
         [Test]
@@ -287,7 +287,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var xic2 = rafRun.GetFullProductExtractedIonChromatogram(productIonMz, tolerance, precursorIonMz);
 //            xic2.Display();
             Assert.True(xic1.Equals(xic2));
-            Console.WriteLine("Done");
+            Console.WriteLine(@"Done");
         }
 
         [Test]
@@ -358,7 +358,7 @@ namespace InformedProteomics.Test.FunctionalTests
             
             Console.WriteLine(@"Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
-            Console.WriteLine("Done");
+            Console.WriteLine(@"Done");
         }
 
         [Test]
@@ -429,7 +429,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const double maxMz = 2000.0;    // 2000.0
             var minBinNum = comparer.GetBinNumber(minMz);
             var maxBinNum = comparer.GetBinNumber(maxMz);
-            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
+            Console.WriteLine(@"NumBins: " + (maxBinNum - minBinNum));
 
             var warnCount = 0;
 
