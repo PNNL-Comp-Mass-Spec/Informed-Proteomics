@@ -107,7 +107,7 @@ namespace InformedProteomics.TopDown.Execution
         // 0: all internal sequences, 
         // 1: #NCleavages <= Max OR Cleavages <= Max (Default)
         // 2: 1: #NCleavages <= Max AND Cleavages <= Max
-        public int SearchMode { get; private set; } 
+        public int SearchMode { get; private set; }
 
         private LcMsRun _run;
         //private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
@@ -116,7 +116,7 @@ namespace InformedProteomics.TopDown.Execution
         private InformedTopDownScorer _topDownScorer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
 
-        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
+        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             // Get the Normalized spec file/folder path
             SpecFilePath = MassSpecDataReaderFactory.NormalizeDatasetPath(SpecFilePath);
@@ -201,7 +201,7 @@ namespace InformedProteomics.TopDown.Execution
 
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-            
+
             // sequence tag-based search 
             /*_ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
                             _run,
@@ -240,9 +240,9 @@ namespace InformedProteomics.TopDown.Execution
                             _ms2ScorerFactory2,
                             ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
                             MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);
-            
 
-//            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
+
+            //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
             var targetOutputFilePath = Path.Combine(OutputDir, specFileName + TargetFileNameEnding);
             var decoyOutputFilePath = Path.Combine(OutputDir, specFileName + DecoyFileNameEnding);
@@ -251,7 +251,7 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(60.0);
             progData.Status = "Running Target search";
             progress.Report(progData.UpdatePercent(0.0));
-            
+
             if (RunTargetDecoyAnalysis != null)
             {
                 sw.Reset();
@@ -274,7 +274,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 RunSearch(targetMatches, targetDb, ms1Filter, null, prog);
                 Console.WriteLine(@"Target database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-                
+
                 // calculate spectral e-value usign generating function
                 sw.Reset();
                 Console.WriteLine(@"Calculating spectral E-values for target-spectrum matches");
@@ -292,7 +292,7 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
             {
                 // Decoy database
-                sw.Reset();                
+                sw.Reset();
                 sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
 
@@ -313,7 +313,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 RunSearch(decoyMatches, decoyDb, ms1Filter, null, prog);
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-                
+
                 // calculate spectral e-value usign generating function
                 sw.Reset();
                 Console.WriteLine(@"Calculating spectral E-values for decoy-spectrum matches");
@@ -337,7 +337,7 @@ namespace InformedProteomics.TopDown.Execution
                     Console.WriteLine(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
                     return false;
                 }
-                
+
                 fdrCalculator.WriteTo(tdaOutputFilePath);
             }
             progress.Report(progData.UpdatePercent(100.0));
@@ -349,7 +349,7 @@ namespace InformedProteomics.TopDown.Execution
             return true;
         }
 
-        private int[] _tagMs2ScanNum; 
+        private int[] _tagMs2ScanNum;
 
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins, CancellationToken? cancellationToken = null)
         {
@@ -391,7 +391,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 progress = new Progress<ProgressData>();
             }
-            
+
             _tagSearchEngine.SetDatabase(db);
             //var ms2ScanNums = _run.GetScanNumbers(2);
             var progData = new ProgressData();
@@ -467,7 +467,7 @@ namespace InformedProteomics.TopDown.Execution
                             }
                         }
                     }
-                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");                        
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");
                 });
             }
             else
@@ -535,7 +535,7 @@ namespace InformedProteomics.TopDown.Execution
             progress.Report(progData.UpdatePercent(100.0));
         }
 
-        private void RunSearch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken=null, IProgress<ProgressData> progress = null)
+        private void RunSearch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             if (progress == null)
             {
@@ -547,7 +547,7 @@ namespace InformedProteomics.TopDown.Execution
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
             Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
-            
+
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
 
@@ -631,7 +631,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private const int ScoreLowerBound = 3;
-        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, 
+        private void SearchForMatches(AnnotationAndOffset annotationAndOffset,
             ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages)
         {
             var annotation = annotationAndOffset.Annotation;
@@ -693,10 +693,10 @@ namespace InformedProteomics.TopDown.Execution
                             {
                                 var existingMatches = matches[ms2ScanNum];
                                 var maxScore = existingMatches.Max.Score;
-                                if (existingMatches.Count < NumMatchesPerSpectrum && maxScore*0.7 < prsm.Score)
+                                if (existingMatches.Count < NumMatchesPerSpectrum && maxScore * 0.7 < prsm.Score)
                                 {
                                     existingMatches.Add(prsm);
-                                    existingMatches.RemoveWhere(mt => mt.Score < maxScore*0.7);
+                                    existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
                                 }
                                 else
                                 {
@@ -726,7 +726,7 @@ namespace InformedProteomics.TopDown.Execution
                 6254, 6289, 6280, 6284, 6282, 6248, 6249, 6287, 6303, 6264
             };*/
 
-            
+
             if (progress == null)
             {
                 progress = new Progress<ProgressData>();
@@ -758,7 +758,7 @@ namespace InformedProteomics.TopDown.Execution
                     SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");
                 });
             }
-            
+
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
             Console.WriteLine(@"Generated sequence tags: " + sequenceTagGen.NumberOfGeneratedTags());
@@ -796,7 +796,7 @@ namespace InformedProteomics.TopDown.Execution
                     highestScore = Math.Max(highestScore, scores.Ms2Score);
                 }
 
-                matches[scanNum].RemoveWhere(m => m.Score <= ScoreLowerBound || m.Score < highestScore*0.8);
+                matches[scanNum].RemoveWhere(m => m.Score <= ScoreLowerBound || m.Score < highestScore * 0.8);
                 estimatedProteins += matches[scanNum].Count;
             }
 
@@ -874,7 +874,8 @@ namespace InformedProteomics.TopDown.Execution
                 for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
                 {
                     var match = matches[scanNum];
-                    if (match == null) continue;
+                    if (match == null)
+                        continue;
 
                     var sequence = match.Sequence;
                     var offset = match.Offset;
@@ -884,6 +885,8 @@ namespace InformedProteomics.TopDown.Execution
                     var protLength = database.GetProteinLength(proteinName);
                     var ion = match.Ion;
 
+                    var proteinDescription = database.GetProteinDescription(match.Offset);
+
                     //var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, ion.Composition, ion.Charge, scanNum);
 
                     // Note for DblToString(value, 9, true), by having "9" and "true",
@@ -891,22 +894,22 @@ namespace InformedProteomics.TopDown.Execution
                     // values between 1000 and 9999 will have 6 digits after the decimal place
                     writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}",
                         scanNum,
-                        match.Pre, // Pre
-                        sequence, // Sequence
-                        match.Post, // Post
-                        match.ModificationText, // Modifications
-                        ion.Composition, // Composition
-                        proteinName, // ProteinName
-                        database.GetProteinDescription(match.Offset), // ProteinDescription
-                        protLength, // ProteinLength
-                        start, // Start
-                        end, // End
-                        ion.Charge, // precursorCharge
+                        match.Pre,                 // Pre
+                        sequence,                  // Sequence
+                        match.Post,                // Post
+                        match.ModificationText,    // Modifications
+                        ion.Composition,           // Composition
+                        proteinName,               // ProteinName
+                        proteinDescription,        // ProteinDescription
+                        protLength,                // ProteinLength
+                        start,                     // Start position in protein
+                        end,                       // End position in protein
+                        ion.Charge,                // precursorCharge
                         StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
-                        StringUtilities.DblToString(ion.Composition.Mass, 9, true), // Mass
-                        match.Score, // Score (re-scored)
-                        match.SpecEvalue,
-                        match.SpecEvalue*database.GetNumEntries()
+                        StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
+                        StringUtilities.DblToString(match.Score, 4),                          // Score (Number of matched fragments)
+                        StringUtilities.DblToString(match.SpecEvalue, 6, true, 0.001),                             // EValue; will be displayed using scientific notation if the value is less than 0.001
+                        StringUtilities.DblToString(match.SpecEvalue * database.GetNumEntries(), 6, true, 0.001)   // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
                         );
 
                 }
