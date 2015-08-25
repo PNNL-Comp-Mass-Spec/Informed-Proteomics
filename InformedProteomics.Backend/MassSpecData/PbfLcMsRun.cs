@@ -549,48 +549,12 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramStart, _offsetPrecursorChromatogramEnd, targetOffset);
             if (!xic.Any()) return xic;
             xic.Sort();
-            return Xic.GetSelectedXic(xic);
+            return Xic.GetSelectedXic(xic); // TODO: This was already called in GetXic()...
         }
 
         public override Ms1Spectrum GetMs1Spectrum(int scanNum)
         {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
-
-            var ms1ScanNums = GetMs1ScanVector();
-            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
-            if (ms1ScanIndex < 0) return null;
-
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
-                {
-                    var ms1ScanNum = _reader.ReadInt32();
-                    var msLevel = _reader.ReadByte();
-                    var elutionTime = _reader.ReadDouble();
-                    var numPeaks = _reader.ReadInt32();
-
-                    // load peaks
-                    var peaks = new Ms1Peak[numPeaks];
-                    for (var i = 0; i < numPeaks; i++)
-                    {
-                        var mz = _reader.ReadDouble();
-                        var intensity = _reader.ReadSingle();
-                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = (ushort)ms1ScanIndex };
-                    }
-
-                    // Create Ms1Spectrum
-                    var ms1Spec = new Ms1Spectrum(scanNum, ms1ScanIndex, peaks)
-                    {
-                        ElutionTime = elutionTime,
-                        MsLevel = msLevel
-                    };
-
-                    return ms1Spec;
-                }
-                return null;
-            }
+            return ReadMs1Spectrum(scanNum);
         }
 
         #endregion
@@ -823,7 +787,64 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        // All changes made here must be duplicated to ReadSpectrum() and to GetPeakMetadataForSpectrum()
+        // Must reflect all changes to WriteSpectrum
+        // TODO: Should be able to combine this with the standard ReadSpectrum(), and reduce maintenance load
+        private Ms1Spectrum ReadMs1Spectrum(int scanNum)
+        {
+            long offset;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
+
+            var ms1ScanNums = GetMs1ScanVector();
+            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
+            if (ms1ScanIndex < 0) return null;
+
+            lock (_filelock)
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var ms1ScanNum = _reader.ReadInt32();
+                    string nativeId = String.Empty;
+                    if (_fileFormatId > 150604)
+                    {
+                        var c = new char[NativeIdLength];
+                        _reader.Read(c, 0, NativeIdLength);
+                        nativeId = (new string(c)).Trim();
+                    }
+                    var msLevel = _reader.ReadByte();
+                    var elutionTime = _reader.ReadDouble();
+                    double tic = -1;
+                    if (_fileFormatId > 150604)
+                    {
+                        tic = _reader.ReadSingle();
+                    }
+                    var numPeaks = _reader.ReadInt32();
+
+                    // load peaks
+                    var peaks = new Ms1Peak[numPeaks];
+                    for (var i = 0; i < numPeaks; i++)
+                    {
+                        var mz = _reader.ReadDouble();
+                        var intensity = _reader.ReadSingle();
+                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = (ushort)ms1ScanIndex };
+                    }
+
+                    // Create Ms1Spectrum
+                    var ms1Spec = new Ms1Spectrum(scanNum, ms1ScanIndex, peaks)
+                    {
+                        ElutionTime = elutionTime,
+                        MsLevel = msLevel,
+                        NativeId = nativeId,
+                        TotalIonCurrent = tic,
+                    };
+
+                    return ms1Spec;
+                }
+                return null;
+            }
+        }
+
+        // All changes made here must be duplicated to ReadSpectrum(), ReadMs1Spectrum(), and GetPeakMetadataForSpectrum()
         public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4

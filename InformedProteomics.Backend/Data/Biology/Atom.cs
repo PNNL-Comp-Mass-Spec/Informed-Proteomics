@@ -27,6 +27,7 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public static readonly Atom[] AtomArr =
             {
+                // Use Unimod values
                 new Atom("H", H, 1, "Hydrogen"),
                 new Atom("2H", 2.014101779, 2, "Deuterium"),
                 new Atom("D", 2.014101779, 2, "Deuterium"),
@@ -35,8 +36,8 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("13C", Constants.C13, 13, "Carbon13"),
                 new Atom("N", N, 14, "Nitrogen"),
                 new Atom("15N", 15.00010897, 15, "Nitrogen15"),
-                new Atom("O", O, 16, "Oxigen"),
-                new Atom("18O", 17.9991603, 18, "Oxigen"),
+                new Atom("O", O, 16, "Oxygen"),
+                new Atom("18O", 17.9991603, 18, "Oxygen18"),
                 new Atom("F", 18.99840322, 19, "Fluorine"),
                 new Atom("Na", 22.9897677, 23, "Sodium"),
                 new Atom("P", 30.973762, 31, "Phosphorous"),
@@ -55,6 +56,12 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("I", 126.904473, 127, "Iodine"),
                 new Atom("Au", 196.966543, 197, "Gold"),
                 new Atom("Hg", 201.970617, 202, "Mercury"),
+                new Atom("B", 11.00930554, 11, "Boron"),
+                new Atom("As", 74.92159, 75, "Arsenic"),
+                new Atom("Mg",  23.985043, 24, "Magnesium"),
+
+                // Compounds
+                // TODO: Move to somewhere more appropriate
                 new Atom("Hex", 162.052824, 162, "Hexose"),
                 new Atom("HexNAc", 203.079373, 203, "N-Acetylhexosamine"),
                 new Atom("dHex", 146.057909, 146, "Fucose"),
@@ -62,9 +69,6 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("NeuGc", 307.090331, 307, "N-glycoyl neuraminic acid"),
                 new Atom("Hep", 192.063388, 192, "Heptose"),
                 new Atom("Pent", 132.042257, 85, "Pentose"),
-                new Atom("B", 11.00930554, 11, "Boron"),
-                new Atom("As", 74.92159, 75, "Arsenic"),
-                new Atom("Mg",  23.985043, 24, "Magnesium")
             };
 
         public const double C = 12.0;
