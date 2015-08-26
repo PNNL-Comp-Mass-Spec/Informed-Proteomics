@@ -424,6 +424,7 @@ namespace InformedProteomics.TopDown.Execution
 
                     var seqObj = Sequence.CreateSequence(sequence, tagSequenceMatch.TagMatch.Modifications, AminoAcidSet);
                     var precursorIon = new Ion(seqObj.Composition + Composition.H2O, tagSequenceMatch.TagMatch.Charge);
+
                     var prsm = new DatabaseSequenceSpectrumMatch(sequence, tagSequenceMatch.Pre, tagSequenceMatch.Post,
                                                                  ms2ScanNum, (long)offset, numNTermCleavages,
                                                                  null,
@@ -460,6 +461,8 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");
             });
+
+            Console.WriteLine(@"Collected candidate matches: {0}", GetNumberOfMatches(matches));
 
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
@@ -518,6 +521,8 @@ namespace InformedProteomics.TopDown.Execution
                     SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
                 }
             }
+            
+            Console.WriteLine(@"Collected candidate matches: {0}", GetNumberOfMatches(matches));
 
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
@@ -773,20 +778,21 @@ namespace InformedProteomics.TopDown.Execution
 
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
-
-
             return finalMatches;
         }
 
         private int GetNumberOfMatches(SortedSet<DatabaseSequenceSpectrumMatch>[] matches)
         {
-            var estimatedProteins = 0;
-            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            var nMatches = 0;
+            lock (matches)
             {
-                if (matches[scanNum] == null) continue;
-                estimatedProteins += matches[scanNum].Count;
+                for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+                {
+                    if (matches[scanNum] == null) continue;
+                    nMatches += matches[scanNum].Count;
+                }
             }
-            return estimatedProteins;
+            return nMatches;
         }
 
         private void WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
