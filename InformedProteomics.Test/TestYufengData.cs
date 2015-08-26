@@ -425,6 +425,7 @@ namespace InformedProteomics.Test
             const bool SHOW_ALL_SCANS = false;
             var targetColIndex = 0;
 
+            #pragma warning disable 0162
             if (SHOW_ALL_SCANS)           
                 Console.WriteLine("Charge\t" + string.Join("\t", run.GetScanNumbers(1)));
             else
@@ -439,6 +440,7 @@ namespace InformedProteomics.Test
                 }
 
             }
+            #pragma warning restore 0162
 
             const int minCharge = 2;
             const int maxCharge = 60;
@@ -454,11 +456,12 @@ namespace InformedProteomics.Test
                 var xic = run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
                 Console.Write(charge+"\t");
 
-                
+                #pragma warning disable 0162
                 if (SHOW_ALL_SCANS)
                     Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
                 else
                     Console.WriteLine(xic[targetColIndex].Intensity);
+                #pragma warning restore 0162
             }
         }
       

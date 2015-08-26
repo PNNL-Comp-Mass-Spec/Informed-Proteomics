@@ -368,13 +368,9 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
             Console.WriteLine(@"Test start");
-            //var reader = new BrukerReader(specFilePath);
-            var reader = new MzMLReader(specFilePath);
 
-            var run = new InMemoryLcMsRun(reader, 1.4826, 1.4826);
-            //var run = new InMemoryLcMsRun(reader, 3, 1.4826);
-            var pbfFilePath = PbfLcMsRun.GetPbfFileName(specFilePath);
-            PbfLcMsRun.WriteAsPbf(run, pbfFilePath);
+            var pbf = new PbfLcMsRun(specFilePath, null, null, 1.4826, 1.4826);
+            //var pbf = new PbfLcMsRun(specFilePath, null, null, 3, 1.4826);
             /*
             foreach (var spec in reader.ReadAllSpectra())
             {

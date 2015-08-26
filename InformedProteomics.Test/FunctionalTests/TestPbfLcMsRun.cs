@@ -30,24 +30,13 @@ namespace InformedProteomics.Test.FunctionalTests
                 return;
             }
 
-            const int SCAN_START = 10000;
-            const int SCAN_END = 11000;
-
-            var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestRawFilePath, SCAN_START, SCAN_END) as InMemoryLcMsRun;
-
             Console.WriteLine(@"Writing...");
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
   
             var outputFilePath = PbfLcMsRun.GetPbfFileName(TestRawFilePath);
-            var outputFile = new FileInfo(outputFilePath);
-
-            outputFilePath = Path.Combine(outputFile.DirectoryName,
-                                          Path.GetFileNameWithoutExtension(outputFile.Name) + "_scans" + SCAN_START +
-                                          "-" + SCAN_END + "." + outputFile.Extension);
-            
-            PbfLcMsRun.WriteAsPbf(run, outputFilePath);
+            var pbf = new PbfLcMsRun(TestRawFilePath, null, outputFilePath);
             
             Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }

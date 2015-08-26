@@ -1,9 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SequenceTag;
 

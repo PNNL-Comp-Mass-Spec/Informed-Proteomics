@@ -1657,7 +1657,6 @@ namespace InformedProteomics.Backend.MassSpecData
             private int _mod = 0;
             private double _mzMod = 0;
             private const int Divisor = 1000000;
-            private bool _isSorted = false;
             private double _minMz;
             private double _maxMz;
 
@@ -1693,7 +1692,6 @@ namespace InformedProteomics.Backend.MassSpecData
                     list = _mod + 1;
                 }
                 _lists[list].Add(peak);
-                _isSorted = false;
                 _sorted[list] = false;
             }
 
