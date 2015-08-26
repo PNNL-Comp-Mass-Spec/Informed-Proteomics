@@ -474,7 +474,7 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
                 SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");
-            });    
+            });
 
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
@@ -774,10 +774,14 @@ namespace InformedProteomics.TopDown.Execution
                     gf.ComputeGeneratingFunction(graph);
                     match.SpecEvalue = gf.GetSpectralEValue((int)match.Score);
 
-                    if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
+                    lock (finalMatches)
                     {
-                        finalMatches[scanNum] = match;
+                        if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
+                        {
+                            finalMatches[scanNum] = match;
+                        }
                     }
+
                     SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
                 }
             });
