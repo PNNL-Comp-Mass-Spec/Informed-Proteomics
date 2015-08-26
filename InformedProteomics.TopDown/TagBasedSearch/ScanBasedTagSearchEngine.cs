@@ -34,9 +34,9 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         {
             _run = run;
             _featureFinder = featureFinder;
-            //_tagParser = tagParser;
-            _fastaDb = fastaDb;
+            
             _searchableDb = new SearchableDatabase(fastaDb);
+
             _tolerance = tolerance;
             _aaSet = aaSet;
             _minMatchedTagLength = minMatchedTagLength;
@@ -59,12 +59,12 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         
         //private readonly Dictionary<int, IList<SequenceTagString>> _ms2ScanToTagMap;
 
-        public void SetDatabase(FastaDatabase db)
+        public void SetDatabase(FastaDatabase fastaDb)
         {
-            _fastaDb = db;
+            _searchableDb = new SearchableDatabase(fastaDb);
         }
 
-        public FastaDatabase DB { get { return _fastaDb;  } }
+        public FastaDatabase FastaDatabase { get { return _searchableDb.FastaDatabase; } }
         public IEnumerable<TagSequenceMatch> RunSearch(int ms2ScanNum)
         {
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -101,7 +101,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                                                                tagSequenceMatch.ProteinName,
                                                                tagMatch.StartIndex,
                                                                tagMatch.EndIndex,
-                                                               _fastaDb.GetProteinLength(tagSequenceMatch.ProteinName)
+                                                               FastaDatabase.GetProteinLength(tagSequenceMatch.ProteinName)
                                                                );                               
                     }
                 }
@@ -139,7 +139,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         //var n = (match.EndIndex - match.StartIndex - 1)*2;
                         //var lambda = numMatches / n;
                         //var pValue = 1 - Poisson.CDF(lambda, numMatches);
-                        //var pScore = (pValue > 0) ? -Math.Log(pValue, 2) : 50.0;
+                        //var pScore = (pValue > 0) ? - Math.Log(pValue, 2) : 50.0;
 
                         //if (numMatches < 10) break;
                         if (numMatches < 5) break;
@@ -163,14 +163,13 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 Sequence = sequence;
                 ProteinName = proteinName;
                 TagMatch = tagMatch;
-
                 Pre = pre;
                 Post = post;
             }
 
             public char Pre { get; private set; }
             public char Post { get; private set; }
-
+            
             public string Sequence { get; private set; }
             public string ProteinName { get; private set; }
             public TagMatch TagMatch { get; private set; }
@@ -216,8 +215,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly ILcMsRun _run;
         //private readonly ProductScorerBasedOnDeconvolutedSpectra _ms2Scorer;
         //private readonly SequenceTagParser _tagParser;
-        private FastaDatabase _fastaDb;
-        private readonly SearchableDatabase _searchableDb;
+        private SearchableDatabase _searchableDb;
 
         private readonly LcMsPeakMatrix _featureFinder;
         //private readonly Ms1FtFilter _ms1FtFilter;

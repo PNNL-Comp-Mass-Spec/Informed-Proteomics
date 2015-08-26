@@ -45,6 +45,8 @@ namespace InformedProteomics.TopDown.Scoring
             _ms2Scorer = new Dictionary<int, IScorer>();
             _comparer = comparer;
             _scoringGraphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
+
+            DeconvoluteAllProductSpectra();
         }
 
         private readonly IMassBinning _comparer;
@@ -59,26 +61,26 @@ namespace InformedProteomics.TopDown.Scoring
             var deconvScorer = GetMs2Scorer(scanNum) as DeconvScorer;
             return _scoringGraphFactory.CreateScoringGraph(deconvScorer.DeconvolutedProductSpectrum, precursorMass);
         }
-
+        
         public IScorer GetMs2Scorer(int scanNum)
         {
             IScorer scorer;
-            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
+            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;    
+            /*
             scorer = GetScorer(scanNum);
             if (scorer == null) return null;
-
-            lock (_ms2Scorer)
-            {
-                _ms2Scorer.Add(scanNum, scorer);
-            }
-            return scorer;
+            _ms2Scorer.Add(scanNum, scorer);    
+            */
+            return null;
         }
 
-        public void DeconvoluteAllProductSpectra()
+        private void DeconvoluteAllProductSpectra()
         {
             foreach (var scanNum in _run.GetScanNumbers(2))
             {
-                GetMs2Scorer(scanNum);
+                var scorer = GetScorer(scanNum);
+                if (scorer == null) continue;
+                _ms2Scorer.Add(scanNum, scorer);
             }
         }
 

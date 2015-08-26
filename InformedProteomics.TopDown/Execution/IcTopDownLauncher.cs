@@ -210,17 +210,16 @@ namespace InformedProteomics.TopDown.Execution
                             );
             */
             _massBinComparer = new FilteredProteinMassBinning(AminoAcidSet, MaxSequenceMass);
-            _ms2ScorerFactory2 = new DeconvolutedSpectrumScorer(
-                            _run,
-                            _massBinComparer,
-                            AminoAcidSet,
-                            MinProductIonCharge, MaxProductIonCharge,
-                            ProductIonTolerance
-                            );
+            _ms2ScorerFactory2 = new DeconvolutedSpectrumScorer(_run, _massBinComparer, AminoAcidSet,
+                                                               MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
 
             progData.StepRange(25.0);
             progData.Status = "Reading Fasta File";
             progress.Report(progData.UpdatePercent(100.0)); // Output 25.0%
+
+            // Target database
+            var targetDb = new FastaDatabase(DatabaseFilePath);
+            targetDb.Read();
 
 
             // Generate sequence tags for all MS/MS spectra
@@ -232,15 +231,10 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-            // Target database
-            var targetDb = new FastaDatabase(DatabaseFilePath);
-            targetDb.Read();
-
             _tagSearchEngine = new ScanBasedTagSearchEngine(_run, seqTagGen, new LcMsPeakMatrix(_run, ms1Filter), targetDb, ProductIonTolerance, AminoAcidSet,
                             _ms2ScorerFactory2,
                             ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
                             MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);
-
 
             //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
@@ -418,27 +412,18 @@ namespace InformedProteomics.TopDown.Execution
             Parallel.ForEach(_tagMs2ScanNum, pfeOptions, ms2ScanNum =>
             {
                 var tagSeqMatches = _tagSearchEngine.RunSearch(ms2ScanNum);
-                var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                 var prsmList = new List<DatabaseSequenceSpectrumMatch>();
 
                 foreach (var tagSequenceMatch in tagSeqMatches)
                 {
-                    if (spec == null)
-                    {
-                        break;
-                    }
-
-                    var offset = _tagSearchEngine.DB.GetOffset(tagSequenceMatch.ProteinName);
+                    var offset = _tagSearchEngine.FastaDatabase.GetOffset(tagSequenceMatch.ProteinName);
                     if (offset == null) continue;
 
                     var sequence = tagSequenceMatch.Sequence;
                     var numNTermCleavages = tagSequenceMatch.TagMatch.StartIndex;
-                    var sequenceMass = tagSequenceMatch.TagMatch.Mass;
-
-                    var charge = (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
 
                     var seqObj = Sequence.CreateSequence(sequence, tagSequenceMatch.TagMatch.Modifications, AminoAcidSet);
-                    var precursorIon = new Ion(seqObj.Composition + Composition.H2O, charge);
+                    var precursorIon = new Ion(seqObj.Composition + Composition.H2O, tagSequenceMatch.TagMatch.Charge);
                     var prsm = new DatabaseSequenceSpectrumMatch(sequence, tagSequenceMatch.Pre, tagSequenceMatch.Post,
                                                                  ms2ScanNum, (long)offset, numNTermCleavages,
                                                                  null,
@@ -791,6 +776,17 @@ namespace InformedProteomics.TopDown.Execution
 
 
             return finalMatches;
+        }
+
+        private int GetNumberOfMatches(SortedSet<DatabaseSequenceSpectrumMatch>[] matches)
+        {
+            var estimatedProteins = 0;
+            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            {
+                if (matches[scanNum] == null) continue;
+                estimatedProteins += matches[scanNum].Count;
+            }
+            return estimatedProteins;
         }
 
         private void WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)

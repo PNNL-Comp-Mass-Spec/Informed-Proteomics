@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SequenceTag;
 
@@ -15,6 +16,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         {
             _run = run;
             _tolerance = tolerance;
+
             _minTagLen = minTagLength;
             _maxTagLen = maxTagLength;
             _aminoAcids = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
@@ -36,6 +38,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
 
             var tags = tagFinder.GetAllSequenceTagString();
+          
             lock (_ms2ScanToTagMap)
             {
                 _ms2ScanToTagMap[ms2ScanNum] = tags;
@@ -48,19 +51,20 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
             lock (_ms2ScanToTagMap)
             {
-                if (_ms2ScanToTagMap.TryGetValue(ms2ScanNum, out tags)) 
+                if (_ms2ScanToTagMap.TryGetValue(ms2ScanNum, out tags))
+                {
                     return tags;
+                }
             }
 
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             if (spec == null) return new List<SequenceTagString>();
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
-
             tags = tagFinder.GetAllSequenceTagString();
 
             lock (_ms2ScanToTagMap)
             {
-                _ms2ScanToTagMap.Add(ms2ScanNum, tags);
+                _ms2ScanToTagMap[ms2ScanNum] = tags;
             }
 
             return tags;
@@ -83,5 +87,6 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly int _minTagLen;
         private readonly int _maxTagLen;
         private readonly Dictionary<int, IList<SequenceTagString>> _ms2ScanToTagMap;
+        
     }
 }
