@@ -521,7 +521,7 @@ namespace InformedProteomics.TopDown.Execution
                     SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
                 }
             }
-            
+
             Console.WriteLine(@"Collected candidate matches: {0}", GetNumberOfMatches(matches));
 
             progData.StatusInternal = string.Empty;
@@ -537,15 +537,12 @@ namespace InformedProteomics.TopDown.Execution
             if (estimatedProteins < 1)
                 estimatedProteins = 1;
 
-            //lock (progress)
-            //{
-            progData.StatusInternal = String.Format(@"Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
+            progData.StatusInternal = string.Format(@"Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
                     tempNumProteins,
                     itemName,
                     tempNumProteins / (double)estimatedProteins * 100.0,
                     sw.Elapsed.TotalSeconds);
             progress.Report(progData.UpdatePercent(tempNumProteins / (double)estimatedProteins * 100.0));
-            //}
 
             int secondsThreshold;
 
@@ -706,6 +703,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 progress = new Progress<ProgressData>();
             }
+
             var progData = new ProgressData
             {
                 Status = "Calculating spectral E-values for matches"
@@ -757,22 +755,48 @@ namespace InformedProteomics.TopDown.Execution
 
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             {
-                var gf = new GeneratingFunction(_massBinComparer.NumberOfBins);
-                foreach (var match in matches[scanNum])
+                var currentTask = "?";
+
+                try
                 {
-                    var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
-                    gf.ComputeGeneratingFunction(graph);
-                    match.SpecEvalue = gf.GetSpectralEValue((int)match.Score);
 
-                    lock (finalMatches)
+                    currentTask = "Initializing a new GeneratingFunction with NumberOfBins = " +
+                                  _massBinComparer.NumberOfBins;
+
+                    var gf = new GeneratingFunction(_massBinComparer.NumberOfBins);
+
+                    foreach (var match in matches[scanNum])
                     {
-                        if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
-                        {
-                            finalMatches[scanNum] = match;
-                        }
-                    }
+                        var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
+                        currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
+                        var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
 
-                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                        currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
+                        gf.ComputeGeneratingFunction(graph);
+
+                        currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
+                        match.SpecEvalue = gf.GetSpectralEValue((int)match.Score);
+
+                        currentTask = "Locking finalMatches " + currentIteration;
+                        lock (finalMatches)
+                        {
+                            currentTask = "Comparing new SpecEvalue to stored SpecEvalue " + currentIteration;
+                            if (finalMatches[scanNum] == null || finalMatches[scanNum].SpecEvalue > match.SpecEvalue)
+                            {
+                                currentTask = "Updating stored SpecEvalue " + currentIteration;
+                                finalMatches[scanNum] = match;
+                            }
+                        }
+
+                        currentTask = "Reporting progress " + currentIteration;
+                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errMsg = string.Format("Exception while {0}: {1}", currentTask, ex.Message);
+                    Console.WriteLine(errMsg);
+                    throw new Exception(errMsg, ex);
                 }
             });
 
