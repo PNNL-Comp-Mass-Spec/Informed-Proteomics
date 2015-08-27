@@ -647,7 +647,7 @@ namespace InformedProteomics.Test
             var featureDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
             //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
             //var outFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_features.tsv";
-            var dmsDir = @"\\proto-4\VOrbiETD02\2015_2";
+            var dmsDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\ProMex";
 
             if (!Directory.Exists(featureDir))
             {
@@ -672,6 +672,11 @@ namespace InformedProteomics.Test
             {
                 var dname = String.Format(@"{0}\{1}", dmsDir, data);
                 var destFname = String.Format(@"{0}\MSP\{1}.zip", featureDir, data);
+
+                if (File.Exists(destFname))
+                {
+                    File.Delete(destFname);
+                }
 
                 var directories = Directory.GetDirectories(dname);
                 //Console.WriteLine(dname);

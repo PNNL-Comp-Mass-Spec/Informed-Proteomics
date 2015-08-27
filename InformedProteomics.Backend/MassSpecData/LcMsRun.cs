@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
@@ -32,6 +31,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 return IsDiaOrNull ?? (bool)(IsDiaOrNull = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia);
             }
         }
+
+        #region Spectra and scan operations
 
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
         public abstract Ms1Spectrum GetMs1Spectrum(int scanNum);
@@ -147,6 +148,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 range.MaxCharge, activationMethod);
         }*/
 
+        #endregion
+
+        #region Detail data by scan number
+
         /// <summary>
         /// Gets the MS level of the specified scan
         /// </summary>
@@ -163,6 +168,10 @@ namespace InformedProteomics.Backend.MassSpecData
             double elutionTime;
             return ScanNumElutionTimeMap.TryGetValue(scanNum, out elutionTime) ? elutionTime : 0.0;
         }
+
+        #endregion
+
+        #region Scan numbers
 
         /// <summary>
         /// Gets the precursor scan number
@@ -232,6 +241,38 @@ namespace InformedProteomics.Backend.MassSpecData
             return scanNumbers;
         }
 
+        private int[] _ms1ScanVector;
+        public int[] GetMs1ScanVector()
+        {
+            return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
+        }
+
+        private int[] _ms1ScanNumToIndex;
+
+        /// <summary>
+        /// Array of length MaxLcScan where entries that are non-zero are the scan index of the given scan number
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// For example, if scan 7 is the 5th MS1 scan in the dataset, then _ms1ScanNumToIndex[7] is 4
+        /// Entries in the array that are 0 mean that MS1 scan does not map to an index
+        /// (exception: scan 1 is listed as index 0)
+        /// </remarks>
+        public int[] GetMs1ScanNumToIndex()
+        {
+            if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
+            var ms1ScanNums = GetMs1ScanVector();
+            _ms1ScanNumToIndex = new int[MaxLcScan + 1];
+            for (var i = 0; i < ms1ScanNums.Length; i++) 
+                _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
+
+            return _ms1ScanNumToIndex;
+        }
+
+        #endregion
+
+        #region Precursor XICs
+
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)
         /// XicPoint is created for every MS1 scan.
@@ -269,34 +310,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
-        private int[] _ms1ScanVector;
-        public int[] GetMs1ScanVector()
-        {
-            return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
-        }
-
-        private int[] _ms1ScanNumToIndex;
-
-        /// <summary>
-        /// Array of length MaxLcScan where entries that are non-zero are the scan index of the given scan number
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// For example, if scan 7 is the 5th MS1 scan in the dataset, then _ms1ScanNumToIndex[7] is 4
-        /// Entries in the array that are 0 mean that MS1 scan does not map to an index
-        /// (exception: scan 1 is listed as index 0)
-        /// </remarks>
-        public int[] GetMs1ScanNumToIndex()
-        {
-            if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
-            var ms1ScanNums = GetMs1ScanVector();
-            _ms1ScanNumToIndex = new int[MaxLcScan + 1];
-            for (var i = 0; i < ms1ScanNums.Length; i++) 
-                _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
-
-            return _ms1ScanNumToIndex;
-        }
-
         public double[] GetFullPrecursorIonExtractedIonChromatogramVector(double minMz, double maxMz)
         {
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -306,23 +319,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var intVector = GetMs1ScanVector().Select(s => xicIntensityVector[s - MinLcScan]).ToArray();
             return intVector;
         }
-
-        /// <summary>
-        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
-        /// </summary>
-        /// <param name="mz">target m/z</param>
-        /// <param name="tolerance">tolerance</param>
-        /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
-        /// <returns>XIC as an Xic object</returns>
-        public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
-        {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
-            var minMz = mz - tolTh;
-            var maxMz = mz + tolTh;
-            return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
-        }
-
-        public abstract Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz);
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)
@@ -339,6 +335,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         public abstract Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz);
+
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
@@ -374,6 +371,39 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
             return GetTrimmedXic(xic, targetScanNum, tolerance);
         }
+
+        /// <summary>
+        /// Returns all precursor peaks between minMz and maxMz, including multiple peaks per scan
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
+        public abstract Xic GetPrecursorChromatogramRange(double minMz, double maxMz);
+
+        #endregion
+
+        #region Product XICs
+
+        /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
+        /// </summary>
+        /// <param name="mz">target m/z</param>
+        /// <param name="tolerance">tolerance</param>
+        /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
+        /// <returns>XIC as an Xic object</returns>
+        public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
+        {
+            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var minMz = mz - tolTh;
+            var maxMz = mz + tolTh;
+            return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
+        }
+
+        public abstract Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz);
+
+        #endregion
+
+        #region XIC general
 
         /// <summary>
         /// Get a segment of Xic containing the targetScanNum
@@ -442,6 +472,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return xicSegment;
         }
 
+        #endregion
+
+        #region Isolation Windows
+
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
@@ -465,6 +499,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return minWidth;
         }
+
+        #endregion
+
+        #region Fragmentation spectra scan numbers
 
         /// <summary>
         /// Gets scan numbers of the fragmentation spectra whose isolation window contains the precursor ion specified
@@ -498,6 +536,10 @@ namespace InformedProteomics.Backend.MassSpecData
         //        where productSpec.IsolationWindow.Contains(precursorMz)
         //        select ms2ScanNum;
         //}
+
+        #endregion
+
+        #region Protected members and functions
 
         // Fields to be defined in a child
         protected Dictionary<int, int[]> IsolationMzBinToScanNums;
@@ -569,5 +611,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 nextMsLevel = msLevel;
             }
         }
+
+        #endregion
     }
 }

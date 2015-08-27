@@ -383,6 +383,17 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Returns all precursor peaks between minMz and maxMz, including multiple peaks per scan
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
+        public override Xic GetPrecursorChromatogramRange(double minMz, double maxMz)
+        {
+            return GetChromatogramRange(minMz, maxMz, Ms1PeakList);
+        }
+
+        /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS2 spectra)
         /// </summary>
         /// <param name="minMz">min m/z</param>
@@ -506,6 +517,13 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetXicPointsWithin(minMz, maxMz, peakList);
             xic.Sort();
             return Xic.GetSelectedXic(xic);
+        }
+
+        private static Xic GetChromatogramRange(double minMz, double maxMz, List<LcMsPeak> peakList)
+        {
+            var xic = GetXicPointsWithin(minMz, maxMz, peakList);
+            xic.Sort();
+            return xic;
         }
 
         private readonly List<LcMsPeak> _ms1PeakList;

@@ -493,6 +493,13 @@ namespace InformedProteomics.Backend.MassSpecData
             return !_scanNumToSpecOffset.TryGetValue(scanNum, out offset) ? null : ReadIsolationWindow(offset);
         }
 
+        /// <summary>
+        /// Returns a xic for the chosen range that covers the entire run.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <param name="precursorMz"></param>
+        /// <returns></returns>
         public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
         {
             var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBegin, _offsetProductChromatogramEnd);
@@ -522,6 +529,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return newXic;
         }
 
+        /// <summary>
+        /// Returns selected peaks between minMz and maxMz. The biggest peak per scan is selected.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
         public override Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
             var minBinIndex = GetMzBinIndex(minMz);
@@ -550,6 +563,42 @@ namespace InformedProteomics.Backend.MassSpecData
             if (!xic.Any()) return xic;
             xic.Sort();
             return Xic.GetSelectedXic(xic); // TODO: This was already called in GetXic()...
+        }
+
+        /// <summary>
+        /// Returns all peaks between minMz and maxMz, including multiple peaks per scan
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
+        public override Xic GetPrecursorChromatogramRange(double minMz, double maxMz)
+        {
+            var minBinIndex = GetMzBinIndex(minMz);
+            var maxBinIndex = GetMzBinIndex(maxMz);
+
+            long targetOffset;
+            if (minBinIndex == maxBinIndex)
+            {
+                if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
+                var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
+                if (offset < _offsetPrecursorChromatogramStart) return new Xic();
+
+                // binary search
+                var beginOffset = offset;
+                var endOffset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex + 1];
+                targetOffset = GetOffset(minMz, maxMz, beginOffset, endOffset);
+            }
+            else
+            {
+                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
+                targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
+            }
+
+            if (targetOffset < _offsetPrecursorChromatogramStart) return new Xic();
+            var xic = GetChromatogramRange(minMz, maxMz, _offsetPrecursorChromatogramStart, _offsetPrecursorChromatogramEnd, targetOffset);
+            if (!xic.Any()) return xic;
+            xic.Sort();
+            return xic;
         }
 
         public override Ms1Spectrum GetMs1Spectrum(int scanNum)
@@ -1914,6 +1963,15 @@ namespace InformedProteomics.Backend.MassSpecData
 
             xic.Sort();
             return Xic.GetSelectedXic(xic);
+        }
+
+        // beginOffset: inclusive, endOffset: exclusive
+        private Xic GetChromatogramRange(double minMz, double maxMz, long beginOffset, long endOffset, long targetOffset)
+        {
+            var xic = GetXicPointsWithin(minMz, maxMz, beginOffset, endOffset, targetOffset);
+            if (!xic.Any()) return xic;
+
+            return xic;
         }
 
         // Must reflect any changes made in the chromatogram creation
