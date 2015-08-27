@@ -102,17 +102,14 @@
     <Compile Include="FunctionalTests\TestSpectrumMethods.cs" />
     <Compile Include="FunctionalTests\TestTopDownConsole.cs" />
     <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
-    <Compile Include="FunctionalTests\TestMzMLReader.cs" />
     <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
     <Compile Include="FunctionalTests\TestFitScore.cs" />
     <Compile Include="FunctionalTests\TestIcTopDownResults.cs" />
     <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
-    <Compile Include="FunctionalTests\TestLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />
     <Compile Include="FunctionalTests\TestPbfLcMsRun.cs" />
     <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
     <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
-    <Compile Include="FunctionalTests\TestSimpleUtils.cs" />
     <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
     <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -133,9 +130,7 @@
     <Compile Include="TestMultiThreading.cs" />
     <Compile Include="TestOffsetFrequency.cs" />
     <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
-    <Compile Include="FunctionalTests\TestProteoWizardWrapper.cs" />
     <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
-    <Compile Include="FunctionalTests\TestSuffixArray.cs" />
     <Compile Include="TestLcMsCaching.cs" />
     <Compile Include="TestProMex.cs" />
     <Compile Include="TestRankProbability.cs" />
@@ -148,6 +143,11 @@
     <Compile Include="TestUtex.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
+    <Compile Include="UnitTests\TestLcMsRun.cs" />
+    <Compile Include="UnitTests\TestMzMLReader.cs" />
+    <Compile Include="UnitTests\TestProteoWizardWrapper.cs" />
+    <Compile Include="UnitTests\TestSimpleUtils.cs" />
+    <Compile Include="UnitTests\TestSuffixArray.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

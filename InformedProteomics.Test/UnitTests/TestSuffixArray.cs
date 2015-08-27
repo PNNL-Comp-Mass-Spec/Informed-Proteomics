@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Database;
 using NUnit.Framework;
 
-namespace InformedProteomics.Test.FunctionalTests
+namespace InformedProteomics.Test.UnitTests
 {
     [TestFixture]
     public class TestSuffixArray

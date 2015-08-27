@@ -7,6 +7,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Test.UnitTests;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test.FunctionalTests

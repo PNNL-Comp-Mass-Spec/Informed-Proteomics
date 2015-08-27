@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
-namespace InformedProteomics.Test.FunctionalTests
+namespace InformedProteomics.Test.UnitTests
 {
     [TestFixture]
     internal class TestMzMLReader

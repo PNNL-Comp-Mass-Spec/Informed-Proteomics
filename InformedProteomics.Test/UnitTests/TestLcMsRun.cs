@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using NUnit.Framework;
 
-namespace InformedProteomics.Test.FunctionalTests
+namespace InformedProteomics.Test.UnitTests
 {
     [TestFixture]
     public class TestLcMsRun

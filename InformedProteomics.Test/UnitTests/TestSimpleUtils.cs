@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
 using PNNLOmics.Utilities;
 
-namespace InformedProteomics.Test.FunctionalTests
+namespace InformedProteomics.Test.UnitTests
 {
     [TestFixture]
     public class TestSimpleUtils
