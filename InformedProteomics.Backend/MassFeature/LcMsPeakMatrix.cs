@@ -1374,9 +1374,21 @@ namespace InformedProteomics.Backend.MassFeature
                     var deltaMz = peaks[j].Mz - peaks[i].Mz;
 
                     if (deltaMz > maxDeltaMz) break;
+
+                    if (Math.Abs(deltaMz - mzTol) < float.Epsilon)
+                    {
+                        // Peaks are too close together; continue 
+                        continue;
+                    }
+
                     for (var c = Math.Round(1 / (deltaMz + mzTol)); c <= Math.Round(1 / (deltaMz - mzTol)); c++)
                     {
-                        if (c < minCheckCharge || c > maxCheckCharge) continue;
+                        if (c < minCheckCharge)
+                            continue;
+
+                        if (c > maxCheckCharge)
+                            break;
+
                         var k = (int)c - minCheckCharge;
                         nChargeGaps[k]++;
 
