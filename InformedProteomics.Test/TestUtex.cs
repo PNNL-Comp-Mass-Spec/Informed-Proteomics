@@ -28,7 +28,8 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            const string promexOutFolder = @"D:\MassSpecFiles\UTEX\MSA";
+            const string promexOutFolder = @"D:\MassSpecFiles\UTEX\MSAlign";
+            const string msAlignResultFolder = @"D:\MassSpecFiles\UTEX\MSAlign";
 
             if (!Directory.Exists(rawFolder))
             {
@@ -57,7 +58,7 @@ namespace InformedProteomics.Test
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-                var path = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_MSAlign_ResultTable.txt", dataset[i]);
+                var path = String.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
@@ -143,7 +144,7 @@ namespace InformedProteomics.Test
 
                         var prsm2 = featureToPrsm[k];
                         if (Math.Abs(f1.Mass - f2.Mass) > tolerance.GetToleranceAsTh(f1.Mass)) continue;
-                        if (!f1.CoElutedByNet(f2, 0.01)) continue;
+                        if (!f1.CoElutedByNet(f2, 0.005)) continue;
                         if (!prsm1.ShareProteinId(prsm2)) continue;
 
                         // let us merge!!
@@ -193,7 +194,8 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            const string promexOutFolder = @"D:\MassSpecFiles\UTEX\MSA";
+            const string promexOutFolder = @"D:\MassSpecFiles\UTEX\MSAlign";
+            const string msAlignResultFolder = @"D:\MassSpecFiles\UTEX\MSAlign";
 
             if (!Directory.Exists(rawFolder))
             {
@@ -224,14 +226,14 @@ namespace InformedProteomics.Test
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-                var path = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_MSAlign_ResultTable.txt", dataset[i]);
+                var path = String.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
                     continue;
                 }
 
-                var ms1ftPath = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}.ms1ft", dataset[i]);
+                var ms1ftPath = String.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 if (!File.Exists(ms1ftPath))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1ftPath);
@@ -278,7 +280,7 @@ namespace InformedProteomics.Test
             var alignedFeatureList = align.GetAlignedFeatures();
             for (var i = 0; i < nDataset; i++)
             {
-                var ms1ftPath = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_aligned.ms1ft", dataset[i]);
+                var ms1ftPath = String.Format(@"{0}\{1}_aligned.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftPath);
                 writer.Write(LcMsFeatureFinderLauncher.GetHeaderString());
                 writer.WriteLine("\tIdedMs2ScanNums");
