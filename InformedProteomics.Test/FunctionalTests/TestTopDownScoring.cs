@@ -27,8 +27,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -47,8 +46,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt";            
             if (!File.Exists(filePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var scoringModel = new LikelihoodScoringModel(filePath);
@@ -66,8 +64,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_Filtration_2.txt";
             if (!File.Exists(filePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var scoringModel = new LikelihoodScoringModel(filePath);
@@ -92,18 +89,13 @@ namespace InformedProteomics.Test.FunctionalTests
 
             // Create a sequence graph
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
-            if (seqGraph == null)
-            {
-                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
-                return;
-            }
+            Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
             const string specFilePath = @"\\protoapps\UserData\Jungkap\Joshua\testData\SBEP_STM_001_02272012_Aragon.raw";
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
@@ -160,17 +152,12 @@ namespace InformedProteomics.Test.FunctionalTests
 
             // Create a sequence graph
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
-            if (seqGraph == null)
-            {
-                Console.WriteLine("Invalid sequence: {0}", protAnnotation);
-                return;
-            }
+            Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
@@ -229,8 +216,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
@@ -257,8 +243,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);

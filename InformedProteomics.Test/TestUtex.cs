@@ -33,8 +33,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(rawFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, rawFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
             var nDataset = 32;
@@ -199,8 +198,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(rawFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, rawFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
             var nDataset =32;
@@ -215,6 +213,7 @@ namespace InformedProteomics.Test
             var ftComparer = new UtexFeatureComparer(tolerance);
             var align = new LcMsFeatureAlignment(ftComparer);
             var prsmReader = new ProteinSpectrumMatchReader(0.01);
+            var validCount = 0;
 
             for (var i = 0; i < dataset.Length; i++)
             {
@@ -239,7 +238,9 @@ namespace InformedProteomics.Test
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1ftPath);
                     continue;
                 }
-                
+
+                validCount++;
+
                 //var map = new ProteinSpectrumMathMap(run, i, dataset[i]);
                 //map.LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
                 var prsmList = prsmReader.LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
@@ -272,6 +273,10 @@ namespace InformedProteomics.Test
                 align.AddDataSet(i, features, rawFile);
             }
 
+            if (validCount == 0)
+            {
+                Assert.Ignore("No files found!");
+            }
 
             align.AlignFeatures();
             Console.WriteLine("{0} alignments ", align.CountAlignedFeatures);
@@ -450,8 +455,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(rawFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, rawFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
             var nDataset = 32;
@@ -520,14 +524,12 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(featureDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, featureDir);
             }
 
             if (!Directory.Exists(mspDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, mspDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, mspDir);
             }
 
             var dataset = GetDataList(featureDir);
@@ -651,8 +653,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(featureDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, featureDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, featureDir);
             }
 
             var fileEntries = Directory.GetFiles(featureDir);

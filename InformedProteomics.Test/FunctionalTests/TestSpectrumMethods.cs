@@ -23,8 +23,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string specFilePath = @"H:\Research\GlycoTopDown\raw\User_sample_test_02252015.raw";
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
             
             //const int scanNum = 17338;

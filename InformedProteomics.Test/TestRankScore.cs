@@ -49,8 +49,7 @@ namespace InformedProteomics.Test
             const string filePath = @"\\protoapps\UserData\Wilkins\DIA\DIA.txt";
             if (!File.Exists(filePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, filePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var rankScorer = new RankScore(filePath);
@@ -81,14 +80,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dataFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dataFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dataFile);
             }
 
             if (!File.Exists(tsvFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, tsvFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tsvFile);
             }
 
             var parser = new TsvFileParser(tsvFile);

@@ -215,8 +215,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(modFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, modFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modFilePath);
             }
             
             var modFileParser = new ModFileParser(modFilePath);

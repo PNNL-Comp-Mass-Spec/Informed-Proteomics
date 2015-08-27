@@ -66,8 +66,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spectrum, minCharge, maxCharge,

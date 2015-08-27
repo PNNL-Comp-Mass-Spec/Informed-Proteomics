@@ -23,8 +23,7 @@ namespace InformedProteomics.Test
             const string configurationFile = @"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini";
             if (!File.Exists(configurationFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, configurationFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configurationFile);
             }
             
             var config = new TrainerConfiguration(configurationFile);

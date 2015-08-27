@@ -22,8 +22,7 @@ namespace InformedProteomics.Test
             const string resultFolder = @"H:\Research\Anil\Oct28";
             if (!Directory.Exists(resultFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultFolder);
             }
 
             var actMethods = new[] { ActivationMethod.CID, ActivationMethod.ETD, ActivationMethod.HCD };
@@ -83,8 +82,7 @@ namespace InformedProteomics.Test
             const string path = @"H:\Research\Jarret\20mz\NTT2\Q_2014_0523_12_0_amol_uL_20mz";
             if (!File.Exists(path))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, path);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, path);
             }
 
             //const string path = @"H:\Research\Jarret\DDA\NoMod_NTT2\Q_2014_0523_1_0_amol_uL_DDA";
@@ -93,14 +91,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(targetResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, targetResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, targetResultPath);
             }
 
             if (!File.Exists(decoyResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, decoyResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, decoyResultPath);
             }
 
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);         
@@ -133,14 +129,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(resultPath1))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath1);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath1);
             }
 
             if (!File.Exists(resultPath2))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath2);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath2);
             }
 
             var result1 = new TsvFileParser(resultPath1);
@@ -165,8 +159,7 @@ namespace InformedProteomics.Test
             const string icrToolsPath = @"H:\Research\Yufeng\TopDownYufeng\ICRTools\yufeng_column_test2_Isos.csv";
             if (!File.Exists(icrToolsPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, icrToolsPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, icrToolsPath);
             }
 
             const double fitScoreThreshold = 0.15;
@@ -184,8 +177,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"H:\Research\Yufeng\TopDownYufeng\M1_V31\yufeng_column_test2_IcTda.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var parser = new TsvFileParser(resultFilePath);

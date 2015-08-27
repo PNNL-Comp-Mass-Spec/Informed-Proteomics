@@ -58,8 +58,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(rawFileDir))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since folder not found: " + rawFileDir);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since folder not found: " + rawFileDir);
             }
 
             foreach (var rawFilePath in Directory.GetFiles(rawFileDir, "*.raw"))
@@ -444,8 +443,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             int numPeptides = 0;
@@ -650,8 +648,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
@@ -674,8 +671,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             // init

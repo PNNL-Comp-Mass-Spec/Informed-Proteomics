@@ -27,8 +27,7 @@ namespace InformedProteomics.Test
             const string pfResultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             if (!File.Exists(pfResultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pfResultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pfResultFilePath);
             }
 
             var tsvReader = new TsvFileParser(pfResultFilePath);
@@ -68,15 +67,13 @@ namespace InformedProteomics.Test
             const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";
             if (!File.Exists(isosFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, isosFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, isosFilePath);
             }
 
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -95,8 +92,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -143,8 +139,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var tsvReader = new TsvFileParser(resultFilePath);
@@ -226,8 +221,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -277,8 +271,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_4PTMs.icresult";
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var tsvReader = new TsvFileParser(resultFilePath);
@@ -406,8 +399,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -441,15 +433,13 @@ namespace InformedProteomics.Test
                 @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
                 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -544,8 +534,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -591,15 +580,13 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             const string resultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30";
             if (!File.Exists(resultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath);
             }
 
             foreach (var resultFilePath in Directory.GetFiles(resultPath, "*.tsv"))

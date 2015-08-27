@@ -23,8 +23,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestLcMsRun.TestTopDownRawFilePathCid))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestLcMsRun.TestTopDownRawFilePathCid, 5743, 5743);
@@ -75,8 +74,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestLcMsRun.TestTopDownRawFilePathEtd))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestLcMsRun.TestTopDownRawFilePathCid);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(TestLcMsRun.TestTopDownRawFilePathEtd, 810, 810);

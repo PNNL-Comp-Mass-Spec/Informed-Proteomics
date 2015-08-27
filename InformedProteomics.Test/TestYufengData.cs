@@ -32,8 +32,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -126,8 +125,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath);
@@ -194,8 +192,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             const int minScanNum = 46454;   // 635.43
@@ -220,8 +217,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             const int minScanNum = 46454;
@@ -243,8 +239,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 1.4826, 1.4826) as PbfLcMsRun;
@@ -272,8 +267,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
@@ -318,8 +312,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             const string protSequence =
@@ -406,8 +399,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
             
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
@@ -475,8 +467,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + specFilePath);
             }
 
             const int minScanNum = 5657;
@@ -518,8 +509,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + specFilePath);
             }
 
             const int minScanNum = 1289;

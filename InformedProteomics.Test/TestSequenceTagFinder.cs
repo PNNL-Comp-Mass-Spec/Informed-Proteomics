@@ -32,14 +32,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFile);
             }
 
             if (!File.Exists(TestResultFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestResultFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestResultFile);
             }
 
             //const int MaxTags = 100000;
@@ -131,8 +129,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             //var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 1.4826, 1.4826);

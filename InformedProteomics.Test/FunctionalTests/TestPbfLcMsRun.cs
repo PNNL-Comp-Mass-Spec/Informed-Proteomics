@@ -26,8 +26,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             Console.WriteLine(@"Writing...");
@@ -50,8 +49,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string pbfFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
             if (!File.Exists(pbfFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
             }
 
             var pbfRun = new PbfLcMsRun(pbfFilePath);
@@ -59,8 +57,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var specFilePath = Path.ChangeExtension(pbfFilePath, "raw");
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             Console.WriteLine(@"Loading .pbf into memory");
@@ -146,8 +143,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
                 if (!File.Exists(srcFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, srcFile);
-                    return;
+                    Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, srcFile);
                 }
 
                 //var destFile = string.Format(@"D:\MassSpecFiles\Lewy\Lewy_intact_{0}.ms1ft", id);
@@ -167,8 +163,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string rafFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
             if (!File.Exists(rafFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var pbfRun = new PbfLcMsRun(rafFilePath);
@@ -194,8 +189,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             if (!File.Exists(rafFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -205,8 +199,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -252,8 +245,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
@@ -262,8 +254,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
-                return;
+                Assert.Ignore(@"Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -287,8 +278,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
@@ -297,8 +287,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
-                return;
+                Assert.Ignore(@"Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -358,8 +347,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
@@ -405,8 +393,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
 
             var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
@@ -488,8 +475,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rafFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -506,8 +492,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var args = new[] { "-s", TestRawFilePath };

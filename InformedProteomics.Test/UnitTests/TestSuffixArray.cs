@@ -23,8 +23,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -53,8 +52,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -80,8 +78,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -107,8 +104,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"D:\MSPathFinder\Fasta\test.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
 //            const string dbFile = @"C:\cygwin\home\kims336\Data\QCShew\ID_003456_9B916A8B.fasta";
@@ -162,8 +158,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -244,8 +239,7 @@ namespace InformedProteomics.Test.UnitTests
             const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Short.fasta";
             if (!File.Exists(dbFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);

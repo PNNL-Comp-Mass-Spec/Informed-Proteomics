@@ -34,8 +34,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(idFileFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
 
 
@@ -103,8 +102,7 @@ namespace InformedProteomics.Test
             const string idFileFolder = @"D:\MassSpecFiles\training\FilteredIdResult";
             if (!Directory.Exists(idFileFolder))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
             
             var tolerance = new Tolerance(10);
@@ -338,15 +336,13 @@ namespace InformedProteomics.Test
             const string TestRawFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01.pbf";
             if (!File.Exists(TestRawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestRawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFile);
             }
 
             const string TestResultFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01_IcTda.tsv";
             if (!File.Exists(TestResultFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, TestResultFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestResultFile);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
@@ -375,8 +371,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             // const string ms1ftFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
@@ -429,15 +424,13 @@ namespace InformedProteomics.Test
             const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const string outFolderPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
             if (!Directory.Exists(outFolderPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
             }
 
             //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
@@ -488,8 +481,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
@@ -497,8 +489,7 @@ namespace InformedProteomics.Test
             const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             if (!File.Exists(ms1FtPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, ms1FtPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, ms1FtPath);
             }
 
             var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath);

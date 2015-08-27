@@ -43,8 +43,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(configFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, configFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configFilePath);
             }
 
             InitTest(new ConfigFileReader(configFilePath));

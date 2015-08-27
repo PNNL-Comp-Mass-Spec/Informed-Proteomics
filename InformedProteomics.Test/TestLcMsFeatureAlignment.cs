@@ -68,6 +68,11 @@ namespace InformedProteomics.Test
                 ms1FtFiles.Add(ms1File);
             }
 
+            if (rawFiles.Count == 0)
+            {
+                Assert.Ignore("No files found.");
+            }
+
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }
         
@@ -107,6 +112,11 @@ namespace InformedProteomics.Test
 
                 rawFiles.Add(rawFile);
                 ms1FtFiles.Add(ms1File);
+            }
+
+            if (rawFiles.Count == 0)
+            {
+                Assert.Ignore("No files found.");
             }
 
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);

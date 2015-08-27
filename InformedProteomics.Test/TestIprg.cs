@@ -39,8 +39,7 @@ namespace InformedProteomics.Test
             const string databaseFilePath = dir + @"\database\yeast6proteaprotein.fasta";
             if (!File.Exists(databaseFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
             }
 
             var database = new FastaDatabase(databaseFilePath);
@@ -49,8 +48,7 @@ namespace InformedProteomics.Test
             const string jobFilePath = dir + @"\Jobs.tsv";
             if (!File.Exists(jobFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, jobFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, jobFilePath);
             }
 
             var jobParser = new TsvFileParser(jobFilePath);
@@ -132,8 +130,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(resultFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             const string outputFilePath = dir + @"\AMT_Peptides_NA.tsv";
@@ -157,8 +154,7 @@ namespace InformedProteomics.Test
             const string databaseFilePath = @"H:\Research\IPRG2015\database\yeast6proteaprotein.fasta";
             if (!File.Exists(databaseFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
             }
 
             var database = new FastaDatabase(databaseFilePath);
@@ -167,8 +163,7 @@ namespace InformedProteomics.Test
             const string resultPath = @"H:\Research\IPRG2015\AMT_Peptides_NA.tsv";
             if (!File.Exists(resultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath);
             }
 
             const string outputFilePath = @"H:\Research\IPRG2015\AMT_Peptides.tsv";
@@ -202,8 +197,7 @@ namespace InformedProteomics.Test
             const string databaseFilePath = @"H:\Research\IPRG2015\Henry_results\iPRG2015.TargDecoy.fasta";
             if (!File.Exists(databaseFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
             }
 
             var database = new FastaDatabase(databaseFilePath);
@@ -225,8 +219,7 @@ namespace InformedProteomics.Test
             const string resultPath = @"H:\Research\IPRG2015\Henry_results\ProteinNames.txt";
             if (!File.Exists(resultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, resultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath);
             }
 
             foreach (var line in File.ReadLines(resultPath))
@@ -260,8 +253,7 @@ namespace InformedProteomics.Test
             const string dir = @"H:\Research\IPRG2015\Magnus";
             if (!Directory.Exists(dir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, dir);
             }
 
             const double qValueThreshold = 0.01;
@@ -271,8 +263,7 @@ namespace InformedProteomics.Test
             const string resultDir = dir + @"\beforeRefinery20ppm";
                 if (!Directory.Exists(resultDir))
                 {
-                    Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
-                    return;
+                    Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultDir);
                 }
 
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
@@ -317,8 +308,7 @@ namespace InformedProteomics.Test
             const string databaseFilePath = dir + @"\database\iPRG2015.fasta";
             if (!File.Exists(databaseFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
             }
 
             var database = new FastaDatabase(databaseFilePath);
@@ -359,8 +349,7 @@ namespace InformedProteomics.Test
             const string dir = @"H:\Research\IPRG2015";
             if (!Directory.Exists(dir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, dir);
             }
 
             const double qValueThreshold = 0.01;
@@ -370,8 +359,7 @@ namespace InformedProteomics.Test
             const string resultDir = dir + @"\NTT1";
             if (!Directory.Exists(resultDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultDir);
             }
 
             var msgfResultFiles = Directory.GetFiles(resultDir, "*.tsv").ToArray();
@@ -452,8 +440,7 @@ namespace InformedProteomics.Test
             const string dir = @"D:\Research\Data\IPRG2014";
             if (!Directory.Exists(dir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, dir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, dir);
             }
 
             const double qValueThreshold = 0.01;
@@ -464,8 +451,7 @@ namespace InformedProteomics.Test
             const string resultDir = dir + @"\10ppm_TI0_NTT1";
             if (!Directory.Exists(resultDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, resultDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultDir);
             }
 
             Console.WriteLine("Run\tTotal PSM\t" + string.Join("\t", names));
@@ -526,8 +512,7 @@ namespace InformedProteomics.Test
             const string databaseFilePath = @"D:\Research\Data\IPRG2014\database\SpikedInPeptides.fasta";
             if (!File.Exists(databaseFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, databaseFilePath);
             }
 
             var database = new FastaDatabase(databaseFilePath);

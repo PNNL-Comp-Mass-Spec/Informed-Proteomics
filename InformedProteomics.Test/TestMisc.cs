@@ -27,8 +27,7 @@ namespace InformedProteomics.Test
             const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
             if (!Directory.Exists(henryResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
             }
 
             foreach (var resultFile in Directory.GetFiles(henryResultPath, "*_FDR.tsv"))
@@ -62,8 +61,7 @@ namespace InformedProteomics.Test
             const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
             if (!Directory.Exists(henryResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, henryResultPath);
             }
 
             var aaSet = new AminoAcidSet();
@@ -103,8 +101,7 @@ namespace InformedProteomics.Test
             const string skylineFilePath = @"H:\Research\IPRG2015\MySkyline\TransitionResults.csv";
             if (!File.Exists(skylineFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, skylineFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, skylineFilePath);
             }
 
             var skylineTable = new TsvFileParser(skylineFilePath, ',');
@@ -187,8 +184,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             Console.WriteLine(MassSpecDataReaderFactory.RemoveExtension(rawFilePath) + "_Target.tsv");

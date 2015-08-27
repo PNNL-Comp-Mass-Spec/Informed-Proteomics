@@ -21,8 +21,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(rawFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);

@@ -26,8 +26,7 @@ namespace InformedProteomics.Test
             const string specFileDir = @"D:\Research\Data\ChaoChao\WHIM\raw";
             if (!Directory.Exists(specFileDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, specFileDir);
             }
 
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*.raw"))
@@ -44,15 +43,13 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const string dbFilePath = @"D:\Research\Data\ChaoChao\database\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             const string outputDir = @"D:\Research\Data\ChaoChao\Ic\";
@@ -116,8 +113,7 @@ namespace InformedProteomics.Test
             const string specFileDir = @"H:\Research\EDRN\RawFiles\DIA";
             if (!Directory.Exists(specFileDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, specFileDir);
             }
 
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DIA*.raw"))
@@ -134,8 +130,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const string dbFilePath = @"H:\Research\EDRN\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
@@ -143,8 +138,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -178,8 +172,7 @@ namespace InformedProteomics.Test
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
             if (!Directory.Exists(specFileDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, specFileDir);
             }
 
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DIA*.raw"))
@@ -198,8 +191,7 @@ namespace InformedProteomics.Test
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
             if (!Directory.Exists(specFileDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, specFileDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, specFileDir);
             }
 
             foreach (var specFilePath in Directory.GetFiles(specFileDir, "*DDA*.raw"))
@@ -217,8 +209,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const string dbFilePath = @"D:\Research\Data\UW\QExactive\M_musculus_Uniprot_withContam.fasta";
@@ -226,8 +217,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -265,14 +255,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             // Configure amino acid set
@@ -310,14 +298,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set

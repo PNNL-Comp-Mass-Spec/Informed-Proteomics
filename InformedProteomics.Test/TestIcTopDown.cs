@@ -40,14 +40,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -104,14 +102,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -168,20 +164,17 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             if (!Directory.Exists(outputDir))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, outputDir);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outputDir);
             }
 
             // Configure amino acid set
@@ -217,14 +210,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -268,14 +259,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -320,14 +309,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -442,8 +429,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const int ms2ScanNum = 19011;
@@ -464,11 +450,7 @@ namespace InformedProteomics.Test
             var ms2Scorer = new ProductScorerBasedOnDeconvolutedSpectra(run, 1, 15);
             ms2Scorer.GetScorer(ms2ScanNum);
             var scorer = ms2Scorer.GetMs2Scorer(ms2ScanNum);
-            if (scorer == null)
-            {
-                Console.WriteLine("Scorer is null!");
-                return;
-            }
+            Assert.NotNull(scorer, "Scorer is null!");
 
             for (var i = 0; i < graph.GetNumProteoforms(); i++)
             {
@@ -498,14 +480,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(msAlignResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, msAlignResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, msAlignResultPath);
             }
 
             var tolerance = new Tolerance(10.0);
@@ -530,14 +510,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, specFilePath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(icResultPath))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, icResultPath);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, icResultPath);
             }
 
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);

@@ -58,8 +58,7 @@ namespace InformedProteomics.Test
             
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
@@ -128,8 +127,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since file not found: {1}", methodName, rawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");

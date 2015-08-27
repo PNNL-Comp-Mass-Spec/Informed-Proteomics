@@ -88,8 +88,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             if (!File.Exists(RawFile))
             {
-                Console.WriteLine(@"Warning: Skipping test {0} since folder not found: {1}", methodName, RawFile);
-                return;
+                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, RawFile);
             }
 
             var spectrumMatchList = InitTest();
