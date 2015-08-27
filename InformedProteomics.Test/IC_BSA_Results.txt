@@ -1,1 +1,0 @@
-Peptide	PrecursorMz	PrecursorCharge	LCBegin	LCEnd	IMSBegin	IMSEnd	ApexLC	ApexIMS	SumIntensities	NumPoints	Score	IsDecoy

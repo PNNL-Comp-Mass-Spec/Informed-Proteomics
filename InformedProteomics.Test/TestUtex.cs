@@ -323,7 +323,7 @@ namespace InformedProteomics.Test
                 _tolerance = tolerance ?? new Tolerance(10);
             }
 
-            public new bool SameCluster(LcMsFeature f1, LcMsFeature f2)
+            public bool SameCluster(LcMsFeature f1, LcMsFeature f2)
             {
                 if (f1.DataSetId == f2.DataSetId) return false;
                 // tolerant in mass dimension?
