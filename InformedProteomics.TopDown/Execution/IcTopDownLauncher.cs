@@ -38,10 +38,10 @@ namespace InformedProteomics.TopDown.Execution
             int maxNumNTermCleavages = 1,
             int maxNumCTermCleavages = 0,
             int minPrecursorIonCharge = 2,
-            int maxPrecursorIonCharge = 30,
+            int maxPrecursorIonCharge = 60,
             int minProductIonCharge = 1,
             int maxProductIonCharge = 20,
-            double minSequenceMass = 2500.0,
+            double minSequenceMass = 2000.0,
             double maxSequenceMass = 50000.0,
             double precursorIonTolerancePpm = 10,
             double productIonTolerancePpm = 10,
@@ -160,13 +160,18 @@ namespace InformedProteomics.TopDown.Execution
                 var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, LcMsFeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
-                    Console.Write(@"Running ProMex...");
+                    Console.WriteLine(@"Running ProMex...");
                     sw.Start();
                     var param = new LcMsFeatureFinderInputParameter
                     {
                         InputPath = SpecFilePath,
+                        MinSearchMass = MinSequenceMass,
+                        MaxSearchMass = MaxSequenceMass,
                         MinSearchCharge = MinPrecursorIonCharge,
-                        MaxSearchCharge = MaxPrecursorIonCharge
+                        MaxSearchCharge = MaxPrecursorIonCharge,
+                        CsvOutput = false,
+                        ScoreReport = false,
+                        LikelihoodScoreThreshold = -10
                     };
                     var featureFinder = new LcMsFeatureFinderLauncher(param);
                     featureFinder.Run();
@@ -174,7 +179,7 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 sw.Start();
                 Console.Write(@"Reading ProMex results...");
-                ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath);
+                ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, ms1FtFilePath, -10);
             }
             else
             {
@@ -189,7 +194,7 @@ namespace InformedProteomics.TopDown.Execution
                 else if (extension.ToLower().Equals(".ms1ft"))
                 {
                     Console.Write(@"Reading ProMex results...");
-                    ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath);
+                    ms1Filter = new Ms1FtFilter(_run, PrecursorIonTolerance, FeatureFilePath, -10);
                 }
                 else if (extension.ToLower().Equals(".msalign"))
                 {
