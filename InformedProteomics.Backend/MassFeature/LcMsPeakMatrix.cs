@@ -38,7 +38,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 var ms1Spec = run.GetMs1Spectrum(ms1ScanNums[i]);
                 Ms1Spectra.Add(ms1Spec);
-                _ms1PeakList.AddRange((Ms1Peak[])ms1Spec.Peaks);
+                foreach (var peak in ms1Spec.Peaks) _ms1PeakList.Add(peak as Ms1Peak);
             }
             _ms1PeakList.Sort();
 

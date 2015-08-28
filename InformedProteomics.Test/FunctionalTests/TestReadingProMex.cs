@@ -16,9 +16,9 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-
-            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
-
+            
+            const string rawFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2014_3\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+ 
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -26,10 +26,10 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const string promexFileName = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.ms1ft";
+            const string promexFileName = @"\\Proto-5\VOrbiETD02\2014_3\QC_Shew_Intact_26Sep14_Bane_C2Column3\MSP201508271107_Auto1226713\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             Console.Write("Reading ProMex results...");
             var ms1Filter = new Ms1FtFilter(run, new Tolerance(10), promexFileName);
-            Console.WriteLine(string.Join(",", ms1Filter.GetMatchingMs2ScanNums(10266.03)));
+            Console.WriteLine(string.Join(",", ms1Filter.GetMatchingMs2ScanNums(3016.6583)));
         }
     }
 }

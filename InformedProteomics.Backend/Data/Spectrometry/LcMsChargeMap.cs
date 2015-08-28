@@ -14,14 +14,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public LcMsChargeMap(LcMsRun run, Tolerance tolerance, int maxNumMs2ScansPerMass = MaxNumMs2ScansPerFeature)
         {
             _run = run;
-            _scanToIsolationWindow = new Dictionary<int, IsolationWindow>();
             _maxNumMs2ScansPerMass = maxNumMs2ScansPerMass;
-
+            /*_scanToIsolationWindow = new Dictionary<int, IsolationWindow>();
             foreach(var ms2ScanNum in _run.GetScanNumbers(2))
             {
                 var isoWindow = _run.GetIsolationWindow(ms2ScanNum);
                 if(isoWindow != null) _scanToIsolationWindow.Add(ms2ScanNum, isoWindow);
-            }
+            }*/
 
             _tolerance = tolerance;
             _map = new Dictionary<int, BitArray>();
@@ -79,30 +78,37 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _sequenceMassBinToScanNumsMap.Add(massBin, ms2ScanList.ToArray());
             }
             // Console.WriteLine("#MS/MS matches per sequence: {0}", numScans / (float)(maxMassBin - minMassBin + 1));
-            _scanToIsolationWindow = null;
+            //_scanToIsolationWindow = null;
         }
 
+        
         public void SetMatches(double monoIsotopicMass, int minScanNum, int maxScanNum, int repScanNum, int minCharge, int maxCharge)
         {
             if (minScanNum < _run.MinLcScan) minScanNum = _run.MinLcScan;
             if (maxScanNum > _run.MaxLcScan) maxScanNum = _run.MaxLcScan;
             if (repScanNum < minScanNum && repScanNum > maxScanNum) return;
 
-            // determine bit array
-            var bitArray = new BitArray(_run.MaxLcScan - _run.MinLcScan + 1);
+            
 
             //var registeredMs2Scans = new SortedList<double, int>();
             var registeredMs2Scans = new List<KeyValuePair<double, int>>();
-
             var repRt = _run.GetElutionTime(repScanNum);
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
+                if (_run.GetMsLevel(scanNum) == 2)
+                {
+                    var rt = _run.GetElutionTime(scanNum);
+                    registeredMs2Scans.Add(new KeyValuePair<double, int>(Math.Abs(rt - repRt), scanNum));                    
+                }
+                /*
                 IsolationWindow isolationWindow;
                 if (_scanToIsolationWindow.TryGetValue(scanNum, out isolationWindow))
                 {
                     var isolationWindowTargetMz = isolationWindow.IsolationWindowTargetMz;
                     var charge = (int)Math.Round(monoIsotopicMass / isolationWindowTargetMz);
+                    
                     if (charge < minCharge || charge > maxCharge) continue;
+
                     var mz = Ion.GetIsotopeMz(monoIsotopicMass, charge,
                         Averagine.GetIsotopomerEnvelope(monoIsotopicMass).MostAbundantIsotopeIndex);
                     if (isolationWindow.Contains(mz))
@@ -112,9 +118,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         registeredMs2Scans.Add(new KeyValuePair<double, int>(Math.Abs(rt - repRt), scanNum));
                     }
                 }
+                */
             }
 
-            //foreach (var e in registeredMs2Scans.Take(_maxNumMs2ScansPerMass))
+            // determine bit array
+            var bitArray = new BitArray(_run.MaxLcScan - _run.MinLcScan + 1);
+            
             foreach (var e in registeredMs2Scans.OrderBy(x => x.Key).Take(_maxNumMs2ScansPerMass))
             {
                 var scanNum = e.Value;
@@ -122,7 +131,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             var deltaMass = _tolerance.GetToleranceAsDa(monoIsotopicMass, 1);
-
             var minBinNum = GetBinNumber(monoIsotopicMass - deltaMass);
             var maxBinNum = GetBinNumber(monoIsotopicMass + deltaMass);
 
@@ -150,7 +158,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly Tolerance _tolerance;
         private readonly int _maxNumMs2ScansPerMass;
 
-        private Dictionary<int, IsolationWindow> _scanToIsolationWindow;
+        //private Dictionary<int, IsolationWindow> _scanToIsolationWindow;
         private readonly Dictionary<int, IEnumerable<int>> _sequenceMassBinToScanNumsMap;
 
         private readonly Dictionary<int, List<int>> _scanNumToMassBin;

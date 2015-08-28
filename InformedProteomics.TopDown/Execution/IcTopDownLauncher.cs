@@ -34,14 +34,14 @@ namespace InformedProteomics.TopDown.Execution
             string outputDir,
             AminoAcidSet aaSet,
             int minSequenceLength = 21,
-            int maxSequenceLength = 300,
+            int maxSequenceLength = 500,
             int maxNumNTermCleavages = 1,
             int maxNumCTermCleavages = 0,
             int minPrecursorIonCharge = 2,
             int maxPrecursorIonCharge = 30,
             int minProductIonCharge = 1,
-            int maxProductIonCharge = 15,
-            double minSequenceMass = 3000.0,
+            int maxProductIonCharge = 20,
+            double minSequenceMass = 2500.0,
             double maxSequenceMass = 50000.0,
             double precursorIonTolerancePpm = 10,
             double productIonTolerancePpm = 10,
@@ -731,7 +731,7 @@ namespace InformedProteomics.TopDown.Execution
                     highestScore = Math.Max(highestScore, scores.Ms2Score);
                 }
 
-                matches[scanNum].RemoveWhere(m => m.Score <= ScoreLowerBound || m.Score < highestScore * 0.8);
+                matches[scanNum].RemoveWhere(m => m.Score <= ScoreLowerBound || m.Score < highestScore * 0.7);
                 estimatedProteins += matches[scanNum].Count;
             }
 

@@ -55,7 +55,7 @@ namespace InformedProteomics.Test
             {
                 var scanNum = Int32.Parse(ms2ScanNumbers[i]);
 
-                if (scanNum != 4672) continue;
+                //if (scanNum != 4672) continue;
                 
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
@@ -73,17 +73,17 @@ namespace InformedProteomics.Test
                 var seqOjb = Sequence.CreateSequence(seqStr, modStr, new AminoAcidSet());
                 var compWithoutH2O = seqOjb.Composition - Composition.H2O;
 
-                Console.WriteLine(compWithoutH2O.Mass);
+                //Console.WriteLine(compWithoutH2O.Mass);
 
                 foreach (var seqTagStr in tagFinder.GetAllSequenceTagString())
                 {
                     if (seqStr.Contains(seqTagStr.Sequence)) //|| seqStr.Contains(Reverse(tagStr)))
                     {
 
-                        var idx = seqStr.IndexOf(seqTagStr.Sequence);
+                        //var idx = seqStr.IndexOf(seqTagStr.Sequence);
 
                         //seqStr.Substring(0, idx)
-                        var comp2 = seqOjb.GetComposition(0, idx);
+                        /*var comp2 = seqOjb.GetComposition(0, idx);
 
                         Console.Write(comp2.Mass);
                         Console.Write("\t");
@@ -94,12 +94,11 @@ namespace InformedProteomics.Test
                         Console.Write("\t");
                         Console.Write(seqTagStr.IsPrefix);
                         Console.WriteLine("");
-
-                        nHit++;
+                        */
+                        if (seqStr.Contains(seqTagStr.Sequence)) nHit++;
                     }
                     nTags++;                    
                 }
-
                 
                 nSpec++;
                 if (nHit > 0) nHitSpec++;
@@ -117,43 +116,6 @@ namespace InformedProteomics.Test
             return new string(charArray);
         }
         
-        [Test]
-        public void TestSequenceTagGlycoData()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
-
-            //const string rawFile = @"D:\MassSpecFiles\Glyco\User_sample_test_02252015.raw";
-            //const string rawFile = @"D:\MassSpecFiles\CPTAC_Intact_CR33_5_29Jun15_Bane_15-02-01RZ.raw";
-            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-
-            if (!File.Exists(rawFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
-            }
-
-            //var run = PbfLcMsRun.GetLcMsRun(rawFile, rawFile.EndsWith(".mzML") ? MassSpecDataType.MzMLFile : MassSpecDataType.XCaliburRun, 1.4826, 1.4826);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile, 0, 0);
-            var ms2ScanNums = run.GetScanNumbers(2);
-            
-            foreach(var scanNum in ms2ScanNums)
-            {
-                var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
-
-                Console.WriteLine(@"ScanNum = {0}; # of Peaks = {1}", scanNum, spectrum.Peaks.Length);
-                Console.WriteLine(@"{0}", spectrum.ActivationMethod != ActivationMethod.ETD ? "ETD" : "HCD");
-                var tolerance = new Tolerance(5);
-                var tagFinder = new SequenceTagFinder(spectrum, tolerance);
-                var n = 0;
-                foreach (var tag in tagFinder.FindSequenceTags())
-                {
-                    var seqTags = tag.GetTagStrings();
-                    n += seqTags.Count;
-                }
-                Console.WriteLine(n);
-            }
-            //var existingTags = tagFinder.ExtractExistingSequneceTags(sequence);
-            //Console.Write(scanNum + "\t" + existingTags.Count);
-        }    
+        
     }
 }
