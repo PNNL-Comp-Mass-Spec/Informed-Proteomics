@@ -359,7 +359,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var ms1ScanNums = GetMs1ScanVector();
             var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
             if (ms1ScanIndex < 0) return null;
-            return new Ms1Spectrum(scanNum, (ushort)ms1ScanIndex, spec.Peaks);
+            return new Ms1Spectrum(scanNum, ms1ScanIndex, spec.Peaks);
         }
 
         public override IsolationWindow GetIsolationWindow(int scanNum)

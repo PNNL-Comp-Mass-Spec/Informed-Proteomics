@@ -13,8 +13,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Intensity = intensity;
         }
 
+        public Peak() { } // For use in generics
+
         public double Mz { get; protected set; }
         public double Intensity { get; protected set; }
+
+        // For setting values in generics
+        internal void SetMzAndIntensity(double mz, double intensity)
+        {
+            Mz = mz;
+            Intensity = intensity;
+        }
 
         public int CompareTo(Peak other)
         {

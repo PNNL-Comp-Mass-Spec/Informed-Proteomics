@@ -14,7 +14,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             IndexInSpectrum = indexInSpec;
             Active = true;
         }
-        
+
+        public Ms1Peak() { } // For use in generics
+
+        // For setting values in generics
+        internal void SetMzIntensityIndices(double mz, double intensity, int indexInSpec, ushort ms1SpecIndex)
+        {
+            SetMzAndIntensity(mz, intensity);
+            IndexInSpectrum = indexInSpec;
+            Ms1SpecIndex = ms1SpecIndex;
+        }
+
         public void InActivate()
         {
             Active = false;

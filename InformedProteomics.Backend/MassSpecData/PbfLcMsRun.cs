@@ -490,7 +490,15 @@ namespace InformedProteomics.Backend.MassSpecData
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             long offset;
-            return !_scanNumToSpecOffset.TryGetValue(scanNum, out offset) ? null : ReadIsolationWindow(offset);
+            if (_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
+            {
+                var spec = ReadSpectrum(offset, false) as ProductSpectrum;
+                if (spec != null)
+                {
+                    return spec.IsolationWindow;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -603,7 +611,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public override Ms1Spectrum GetMs1Spectrum(int scanNum)
         {
-            return ReadMs1Spectrum(scanNum);
+            long offset;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
+
+            var ms1ScanNums = GetMs1ScanVector();
+            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
+            if (ms1ScanIndex < 0) return null;
+
+            return ReadSpectrum(offset, true, ms1ScanIndex) as Ms1Spectrum;
         }
 
         #endregion
@@ -715,14 +730,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Read/Write Spectrum
 
-        private Spectrum ReadSpectrum(long offset, bool includePeaks = true)
+        private Spectrum ReadSpectrum(long offset, bool includePeaks = true, int specIndex = -1)
         {
             lock (_filelock)
             {
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
                 {
-                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks);
+                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks, specIndex);
                     return spec;
                 }
                 return null;
@@ -730,7 +745,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // Must reflect all changes to WriteSpectrum
-        private static Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
+        private static Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true, int specIndex = -1)
         {
             var scanNum = reader.ReadInt32();
             string nativeId = String.Empty;
@@ -759,7 +774,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var isolationWindowTargetMz = reader.ReadDouble();
                 var isolationWindowLowerOffset = reader.ReadDouble();
                 var isolationWindowUpperOffset = reader.ReadDouble();
-                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
+                var peakList = ReadPeakList<Peak>(reader, fileFormatId, out calcTic, includePeaks);
                 if (tic < 0)
                 {
                     tic = calcTic;
@@ -782,123 +797,41 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
-                if (tic < 0)
+                // specIndex should only be set by GetMs1Spectrum, and should otherwise be negative
+                if (specIndex >= 0)
                 {
-                    tic = calcTic;
-                }
-                return new Spectrum(peakList, scanNum)
-                {
-                    MsLevel = msLevel,
-                    ElutionTime = elutionTime,
-                    NativeId = nativeId,
-                    TotalIonCurrent = tic,
-                };
-            }
-        }
-
-        // Must reflect all changes to WriteSpectrum
-        // TODO: Should be able to combine this with the standard ReadSpectrum(), and reduce maintenance load
-        private Ms1Spectrum ReadMs1Spectrum(int scanNum)
-        {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
-
-            var ms1ScanNums = GetMs1ScanVector();
-            var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
-            if (ms1ScanIndex < 0) return null;
-
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
-                {
-                    var ms1ScanNum = _reader.ReadInt32();
-                    string nativeId = String.Empty;
-                    if (_fileFormatId > 150604)
+                    var peakList = ReadPeakList<Ms1Peak>(reader, fileFormatId, out calcTic, includePeaks, (ushort)specIndex);
+                    if (tic < 0)
                     {
-                        var c = new char[NativeIdLength];
-                        _reader.Read(c, 0, NativeIdLength);
-                        nativeId = (new string(c)).Trim();
+                        tic = calcTic;
                     }
-                    var msLevel = _reader.ReadByte();
-                    var elutionTime = _reader.ReadDouble();
-                    double tic = -1;
-                    if (_fileFormatId > 150604)
+                    return new Ms1Spectrum(scanNum, specIndex, peakList.ToArray())
                     {
-                        tic = _reader.ReadSingle();
-                    }
-                    var numPeaks = _reader.ReadInt32();
-
-                    // load peaks
-                    var peaks = new Ms1Peak[numPeaks];
-                    for (var i = 0; i < numPeaks; i++)
-                    {
-                        var mz = _reader.ReadDouble();
-                        var intensity = _reader.ReadSingle();
-                        peaks[i] = new Ms1Peak(mz, intensity, i) { Ms1SpecIndex = (ushort)ms1ScanIndex };
-                    }
-
-                    // Create Ms1Spectrum
-                    var ms1Spec = new Ms1Spectrum(scanNum, ms1ScanIndex, peaks)
-                    {
-                        ElutionTime = elutionTime,
                         MsLevel = msLevel,
+                        ElutionTime = elutionTime,
                         NativeId = nativeId,
                         TotalIonCurrent = tic,
                     };
-
-                    return ms1Spec;
                 }
-                return null;
-            }
-        }
-
-        private IsolationWindow ReadIsolationWindow(long offset)
-        {
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                else
                 {
-                    var isolationWindow = ReadIsolationWindow(_reader, _fileFormatId);
-                    return isolationWindow;
+                    var peakList = ReadPeakList<Peak>(reader, fileFormatId, out calcTic, includePeaks);
+                    if (tic < 0)
+                    {
+                        tic = calcTic;
+                    }
+                    return new Spectrum(peakList, scanNum)
+                    {
+                        MsLevel = msLevel,
+                        ElutionTime = elutionTime,
+                        NativeId = nativeId,
+                        TotalIonCurrent = tic,
+                    };
                 }
-                return null;
             }
         }
 
-        // Must reflect any changes in WriteSpectrum()
-        private static IsolationWindow ReadIsolationWindow(BinaryReader reader, int fileFormatId)
-        {
-            reader.ReadInt32(); // ScanNum
-            if (fileFormatId > 150604)
-            {
-                reader.BaseStream.Seek(NativeIdLength, SeekOrigin.Current); // NativeId
-            }
-            var msLevel = reader.ReadByte();
-            reader.ReadDouble();  // Elution time
-            if (fileFormatId > 150604)
-            {
-                reader.ReadSingle();
-            }
-
-            if (msLevel <= 1) return null;
-
-            double? precursorMass = reader.ReadDouble();
-            if (precursorMass == 0.0) precursorMass = null;
-            int? precursorCharge = reader.ReadInt32();
-            if (precursorCharge == 0) precursorCharge = null;
-            reader.ReadByte();  // Activation Method
-            var isolationWindowTargetMz = reader.ReadDouble();
-            var isolationWindowLowerOffset = reader.ReadDouble();
-            var isolationWindowUpperOffset = reader.ReadDouble();
-
-            return new IsolationWindow(isolationWindowTargetMz, isolationWindowLowerOffset,
-                isolationWindowUpperOffset, precursorMass, precursorCharge);
-        }
-
-        // All changes made here must be duplicated to ReadSpectrum(), ReadMs1Spectrum(), GetPeakMetadataForSpectrum(), and ReadIsolationWindow(BinaryReader)
+        // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
         public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
@@ -989,9 +922,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return data;
         }
 
-        private static List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
+        private static List<T> ReadPeakList<T>(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true, ushort specIndex = 0)
+            where T: Peak, new() // only allow Peak and derived classes, but requires public parameterless constructor
         {
-            var peakList = new List<Peak>();
+            var peakList = new List<T>();
             var numPeaks = reader.ReadInt32();
             // Only used if fileFormatId < 150605
             tic = 0;
@@ -1024,7 +958,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 var intensity = reader.ReadSingle();
                 // Only used if fileFormatId < 150605
                 tic += intensity;
-                peakList.Add(new Peak(mz, intensity));
+                var peak = new T();
+                var ms1Peak = peak as Ms1Peak;
+                if (ms1Peak != null)
+                {
+                    ms1Peak.SetMzIntensityIndices(mz, intensity, i, specIndex);
+                }
+                else
+                {
+                    peak.SetMzAndIntensity(mz, intensity);
+                }
+                peakList.Add(peak);
             }
             return peakList;
         }

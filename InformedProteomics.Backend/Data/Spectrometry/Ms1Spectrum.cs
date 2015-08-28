@@ -26,18 +26,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public Ms1Spectrum(int scanNum, int index, Ms1Peak[] peaks) : base(scanNum)
         {
             Index = index;
-            Peaks = peaks;
+            Peaks = new Peak[peaks.Length];
+            peaks.CopyTo(Peaks, 0);
             MedianIntensity = Peaks.Select(p => p.Intensity).Median();
             PreArrangeLocalMzWindows();
         }
 
-        public Ms1Spectrum(int scanNum, ushort index, Peak[] peaks) : base(scanNum)
+        public Ms1Spectrum(int scanNum, int index, Peak[] peaks) : base(scanNum)
         {
             Index = index;
             MsLevel = 1;
-            Peaks = new Ms1Peak[peaks.Length];
+            Peaks = new Peak[peaks.Length];
+            var sIndex = (ushort) index;
             for (var i = 0; i < Peaks.Length; i++)
-                Peaks[i] = new Ms1Peak(peaks[i].Mz, peaks[i].Intensity, i) {Ms1SpecIndex = index};
+                Peaks[i] = new Ms1Peak(peaks[i].Mz, peaks[i].Intensity, i) {Ms1SpecIndex = sIndex};
             MedianIntensity = Peaks.Select(p => p.Intensity).Median();
             PreArrangeLocalMzWindows();
         }
