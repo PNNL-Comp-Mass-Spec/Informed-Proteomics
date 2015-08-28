@@ -713,45 +713,6 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #endregion
 
-        #region IsolationWindow reading
-
-        private IsolationWindow ReadIsolationWindow(long offset)
-        {
-            lock (_filelock)
-            {
-                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
-                {
-                    var isolationWindow = ReadIsolationWindow(_reader);
-                    return isolationWindow;
-                }
-                return null;
-            }
-        }
-
-        private static IsolationWindow ReadIsolationWindow(BinaryReader reader)
-        {
-            reader.ReadInt32(); // ScanNum
-            var msLevel = reader.ReadByte();
-            reader.ReadDouble();  // Elution time
-
-            if (msLevel <= 1) return null;
-
-            double? precursorMass = reader.ReadDouble();
-            if (precursorMass == 0.0) precursorMass = null;
-            int? precursorCharge = reader.ReadInt32();
-            if (precursorCharge == 0) precursorCharge = null;
-            reader.ReadByte();  // Activation Method
-            var isolationWindowTargetMz = reader.ReadDouble();
-            var isolationWindowLowerOffset = reader.ReadDouble();
-            var isolationWindowUpperOffset = reader.ReadDouble();
-
-            return new IsolationWindow(isolationWindowTargetMz, isolationWindowLowerOffset,
-                isolationWindowUpperOffset, precursorMass, precursorCharge);
-        }
-
-        #endregion
-
         #region Read/Write Spectrum
 
         private Spectrum ReadSpectrum(long offset, bool includePeaks = true)
@@ -893,7 +854,51 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        // All changes made here must be duplicated to ReadSpectrum(), ReadMs1Spectrum(), and GetPeakMetadataForSpectrum()
+        private IsolationWindow ReadIsolationWindow(long offset)
+        {
+            lock (_filelock)
+            {
+                _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
+                {
+                    var isolationWindow = ReadIsolationWindow(_reader, _fileFormatId);
+                    return isolationWindow;
+                }
+                return null;
+            }
+        }
+
+        // Must reflect any changes in WriteSpectrum()
+        private static IsolationWindow ReadIsolationWindow(BinaryReader reader, int fileFormatId)
+        {
+            reader.ReadInt32(); // ScanNum
+            if (fileFormatId > 150604)
+            {
+                reader.BaseStream.Seek(NativeIdLength, SeekOrigin.Current); // NativeId
+            }
+            var msLevel = reader.ReadByte();
+            reader.ReadDouble();  // Elution time
+            if (fileFormatId > 150604)
+            {
+                reader.ReadSingle();
+            }
+
+            if (msLevel <= 1) return null;
+
+            double? precursorMass = reader.ReadDouble();
+            if (precursorMass == 0.0) precursorMass = null;
+            int? precursorCharge = reader.ReadInt32();
+            if (precursorCharge == 0) precursorCharge = null;
+            reader.ReadByte();  // Activation Method
+            var isolationWindowTargetMz = reader.ReadDouble();
+            var isolationWindowLowerOffset = reader.ReadDouble();
+            var isolationWindowUpperOffset = reader.ReadDouble();
+
+            return new IsolationWindow(isolationWindowTargetMz, isolationWindowLowerOffset,
+                isolationWindowUpperOffset, precursorMass, precursorCharge);
+        }
+
+        // All changes made here must be duplicated to ReadSpectrum(), ReadMs1Spectrum(), GetPeakMetadataForSpectrum(), and ReadIsolationWindow(BinaryReader)
         public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
