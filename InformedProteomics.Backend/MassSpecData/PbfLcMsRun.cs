@@ -763,6 +763,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 tic = reader.ReadSingle();
             }
 
+            Spectrum spec;
+
             double calcTic;
             if (msLevel > 1)
             {
@@ -779,12 +781,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     tic = calcTic;
                 }
-                return new ProductSpectrum(peakList, scanNum)
+                spec =  new ProductSpectrum(peakList, scanNum)
                 {
-                    MsLevel = msLevel,
-                    ElutionTime = elutionTime,
-                    NativeId = nativeId,
-                    TotalIonCurrent = tic,
                     ActivationMethod = activationMethod,
                     IsolationWindow = new IsolationWindow(
                         isolationWindowTargetMz,
@@ -805,13 +803,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         tic = calcTic;
                     }
-                    return new Ms1Spectrum(scanNum, specIndex, peakList.ToArray())
-                    {
-                        MsLevel = msLevel,
-                        ElutionTime = elutionTime,
-                        NativeId = nativeId,
-                        TotalIonCurrent = tic,
-                    };
+                    spec = new Ms1Spectrum(scanNum, specIndex, peakList.ToArray());
                 }
                 else
                 {
@@ -820,15 +812,14 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         tic = calcTic;
                     }
-                    return new Spectrum(peakList, scanNum)
-                    {
-                        MsLevel = msLevel,
-                        ElutionTime = elutionTime,
-                        NativeId = nativeId,
-                        TotalIonCurrent = tic,
-                    };
+                    spec = new Spectrum(peakList, scanNum);
                 }
             }
+            spec.MsLevel = msLevel;
+            spec.ElutionTime = elutionTime;
+            spec.NativeId = nativeId;
+            spec.TotalIonCurrent = tic;
+            return spec;
         }
 
         // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
@@ -1290,6 +1281,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 });
                 CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, minMs1Mz, maxMs1Mz, prog);
             }
+            else
+            {
+                // Initialize this to an empty, zero-length array to prevent null reference exceptions
+                _chromMzIndexToOffset = new long[0];
+            }
 
             // Product ion chromatogram (MSn spectra)
             _offsetProductChromatogramBegin = writer.BaseStream.Position;
@@ -1408,20 +1404,23 @@ namespace InformedProteomics.Backend.MassSpecData
             progress.Report(progressData.UpdatePercent(99.9)); // Metadata: Approximately 0.2% of total file size
 
             var prevOffset = offsetBeginMetaInformation;
-            for (var i = _chromMzIndexToOffset.Length - 2; i >= 0; i--)
+            if (ms1PeakCount > 0)
             {
-                if (_chromMzIndexToOffset[i] < _offsetPrecursorChromatogramStart)
-                    _chromMzIndexToOffset[i] = prevOffset;
-                else
-                    prevOffset = _chromMzIndexToOffset[i];
-            }
+                for (var i = _chromMzIndexToOffset.Length - 2; i >= 0; i--)
+                {
+                    if (_chromMzIndexToOffset[i] < _offsetPrecursorChromatogramStart)
+                        _chromMzIndexToOffset[i] = prevOffset;
+                    else
+                        prevOffset = _chromMzIndexToOffset[i];
+                }
 
-            foreach (var offset in _chromMzIndexToOffset.Take(_chromMzIndexToOffset.Length - 1))
-            {
-                writer.Write(offset);
-            }
+                foreach (var offset in _chromMzIndexToOffset.Take(_chromMzIndexToOffset.Length - 1))
+                {
+                    writer.Write(offset);
+                }
 
-            _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
+                _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
+            }
 
             writer.Write(_offsetPrecursorChromatogramStart); // 8
             writer.Write(_offsetProductChromatogramBegin); // 8
