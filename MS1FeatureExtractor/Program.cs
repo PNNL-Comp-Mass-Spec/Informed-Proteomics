@@ -146,7 +146,7 @@ namespace ProMex
                 "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
                 "\t[-featureMap y or n (default: y)]\n" +
                 "\t[-score y or n (default: n)]\n" +
-                "\t[-maxThreads 0 (default: 0 (no limit))]\n"
+                "\t[-maxThreads 0 (default: 0 (automatic set))]\n"
                 );
 
             // Wait for 1.5 seconds

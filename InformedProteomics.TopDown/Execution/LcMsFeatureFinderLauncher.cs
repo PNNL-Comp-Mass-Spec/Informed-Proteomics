@@ -136,7 +136,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-            var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer);
+            var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer, 1, 60, Parameters.MaxThreads);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             if (run.GetMs1ScanVector().Length == 0)
@@ -144,7 +144,6 @@ namespace InformedProteomics.TopDown.Execution
                 ShowErrorMessage(@"Data file has no MS1 spectra: " + Path.GetFileName(rawFile));
                 return;
             }
-
 
             var comparer = featureFinder.Comparer;
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer, new LcMsFeatureMergeComparer(new Tolerance(10)));

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -30,7 +30,7 @@ namespace InformedProteomics.TopDown.Execution
             ScoreReport = false;
             CsvOutput = true;
             LikelihoodScoreThreshold = 0;
-            MaxThreads = -1;
+            MaxThreads = 0;
         }
 
         public LcMsFeatureFinderInputParameter(Dictionary<string, string> paramDic)
@@ -49,6 +49,7 @@ namespace InformedProteomics.TopDown.Execution
             OutputPath = paramDic["-o"];
             //OutputPath = (OutputPath == null) ? Path.GetDirectoryName(Path.GetFullPath(InputPath)) : Path.GetDirectoryName(OutputPath);
             MaxThreads = Int32.Parse(paramDic["-maxThreads"]);
+            MaxThreads = GetOptimalMaxThreads(MaxThreads);
 
             ScoreReport = Str2Bool(paramDic["-score"]);
             CsvOutput = Str2Bool(paramDic["-csv"]);
@@ -80,6 +81,17 @@ namespace InformedProteomics.TopDown.Execution
         private static bool Str2Bool(string value)
         {
             return (value.Equals("y") || value.Equals("Y"));
+        }
+
+        private int GetOptimalMaxThreads(int userMaxThreads)
+        {
+            var threads = userMaxThreads;
+
+            if (threads <= 0 || threads > ParallelizationUtils.NumPhysicalCores)
+            {
+                threads = ParallelizationUtils.NumPhysicalCores;
+            }
+            return threads;
         }
     }
 }
