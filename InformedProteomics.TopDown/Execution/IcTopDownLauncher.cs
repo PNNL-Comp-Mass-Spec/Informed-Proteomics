@@ -788,6 +788,12 @@ namespace InformedProteomics.TopDown.Execution
             return nMatches;
         }
 
+        private double ExcelMinValue(double val)
+        {
+            const double minExcelValue = 9.99E-308;
+            return Math.Max(val, minExcelValue);
+        }
+
         private void WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
         {
             using (var writer = new StreamWriter(outputFilePath))
@@ -832,8 +838,8 @@ namespace InformedProteomics.TopDown.Execution
                         StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
                         StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
                         StringUtilities.DblToString(match.Score, 4),                          // Score (Number of matched fragments)
-                        StringUtilities.DblToString(match.SpecEvalue, 6, true, 0.001),                             // EValue; will be displayed using scientific notation if the value is less than 0.001
-                        StringUtilities.DblToString(match.SpecEvalue * database.GetNumEntries(), 6, true, 0.001)   // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
+                        StringUtilities.DblToString(ExcelMinValue(match.SpecEvalue), 6, true, 0.001),                             // EValue; will be displayed using scientific notation if the value is less than 0.001
+                        StringUtilities.DblToString(ExcelMinValue(match.SpecEvalue * database.GetNumEntries()), 6, true, 0.001)   // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
                         );
 
                 }
