@@ -57,7 +57,7 @@ namespace InformedProteomics.Test.UnitTests
 
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
-            foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 20))
+            foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 13))
             {
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
@@ -83,7 +83,7 @@ namespace InformedProteomics.Test.UnitTests
 
             var db = new FastaDatabase(dbFile);
             var indexedDb = new IndexedDatabase(db);
-            foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(10, 300, 3))
+            foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(100, 300, 3))
             {
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
@@ -101,7 +101,7 @@ namespace InformedProteomics.Test.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"D:\MSPathFinder\Fasta\test.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
@@ -115,7 +115,7 @@ namespace InformedProteomics.Test.UnitTests
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
             var peptides = indexedDb
                     .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-                        21, 300, 1, 0);
+                        100, 300, 1, 0);
             var numPeptides = 0;
 
             foreach (var peptide in peptides)
@@ -236,7 +236,7 @@ namespace InformedProteomics.Test.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Short.fasta";
+            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
             if (!File.Exists(dbFile))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);

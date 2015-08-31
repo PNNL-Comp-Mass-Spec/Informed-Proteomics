@@ -182,14 +182,14 @@ namespace InformedProteomics.Test.UnitTests
             // Console.WriteLine("{0}, {1}", spec.Peaks[500].Mz, spec.Peaks[500].Intensity);
             // Console.WriteLine("{0}, {1}", spec.Peaks[1000].Mz, spec.Peaks[1000].Intensity);
 
-            Assert.IsTrue(Math.Abs(spec.Peaks[50].Mz - 414.754989296165) < 0.0001, "Invalid m/z for peak at index 50");
-            Assert.IsTrue(Math.Abs(spec.Peaks[50].Intensity - 4190.87255859375) < 0.01, "Invalid intensity for peak at index 50");
+            Assert.IsTrue(Math.Abs(spec.Peaks[50].Mz - 414.75503540039062) < 0.0001, "Invalid m/z for peak at index 50");
+            Assert.IsTrue(Math.Abs(spec.Peaks[50].Intensity - 1071.5673828125) < 0.01, "Invalid intensity for peak at index 50");
 
-            Assert.IsTrue(Math.Abs(spec.Peaks[500].Mz - 578.130392409857) < 0.0001, "Invalid m/z for peak at index 500");
-            Assert.IsTrue(Math.Abs(spec.Peaks[500].Intensity - 2136.54516601563) < 0.01, "Invalid intensity for peak at index 500");
+            Assert.IsTrue(Math.Abs(spec.Peaks[500].Mz - 578.1298828125) < 0.0001, "Invalid m/z for peak at index 500");
+            Assert.IsTrue(Math.Abs(spec.Peaks[500].Intensity - 573.02374267578125) < 0.01, "Invalid intensity for peak at index 500");
 
-            Assert.IsTrue(Math.Abs(spec.Peaks[1000].Mz - 974.177312382841) < 0.0001, "Invalid m/z for peak at index 1000");
-            Assert.IsTrue(Math.Abs(spec.Peaks[1000].Intensity - 2707.73486328125) < 0.01, "Invalid intensity for peak at index 1000");
+            Assert.IsTrue(Math.Abs(spec.Peaks[1000].Mz - 974.17694091796875) < 0.0001, "Invalid m/z for peak at index 1000");
+            Assert.IsTrue(Math.Abs(spec.Peaks[1000].Intensity - 678.13824462890625) < 0.01, "Invalid intensity for peak at index 1000");
 
         }
 
@@ -309,7 +309,7 @@ namespace InformedProteomics.Test.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string rawFilePath = @"H:\Research\Corrupted\YS_Shew_testHCD_CID.raw";
+            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Corrupted\YS_Shew_testHCD_CID.raw";
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -379,7 +379,7 @@ namespace InformedProteomics.Test.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string specFilePath = @"H:\Research\Jared\2015-05-06_Carbonic_HCD_854_50AVG.raw";
+            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\2015-05-06_Carbonic_HCD_854_50AVG.raw";
             if (!File.Exists(specFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
