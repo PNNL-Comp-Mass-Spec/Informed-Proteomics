@@ -392,7 +392,7 @@ namespace InformedProteomics.Test
 
                 // Find MS2 scans
 //                var numMs2Scans = 0;
-                var tags = new List<SequenceTagString>();
+                var tags = new List<SequenceTag>();
                 var hasMs2 = false;
                 for (var scanNum = minScan[i]; scanNum <= maxScan[i]; scanNum++)
                 {

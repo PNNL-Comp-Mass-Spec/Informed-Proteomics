@@ -12,10 +12,9 @@ namespace InformedProteomics.TopDown.Scoring
         public Ms1FtFilter(LcMsRun run, Tolerance massTolerance, string ms1FtFileName, double minLikelihoodRatio = 0)
         {
             _lcMsChargeMap = new LcMsChargeMap(run, massTolerance);
+            _minLikelihoodRatio = minLikelihoodRatio;
 
             Read(ms1FtFileName);
-
-            _minLikelihoodRatio = minLikelihoodRatio;
         }
 
         private readonly LcMsChargeMap _lcMsChargeMap;

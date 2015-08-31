@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using DeconTools.Backend.Core;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -40,6 +41,18 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestResultFile);
             }
 
+            // Configure amino acid set
+            
+            var aminoAcidList = new List<AminoAcid>();
+            foreach (var aa in AminoAcid.StandardAminoAcidArr)
+            {
+                aminoAcidList.Add(aa);
+                aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Acetylation));
+                aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Oxidation));
+
+            }
+
+
             //const int MaxTags = 100000;
             var tsvParser = new TsvFileParser(TestResultFile);
             var headerList = tsvParser.GetHeaders();
@@ -66,7 +79,7 @@ namespace InformedProteomics.Test
                 var seqStr = tsvData["Sequence"].ElementAt(tsvIndex).Trim();
                 var modStr = tsvData["Modifications"].ElementAt(tsvIndex).Trim();
                 var tolerance = new Tolerance(5);
-                var tagFinder = new SequenceTagFinder(spectrum, tolerance);
+                var tagFinder = new SequenceTagFinder(spectrum, tolerance, 5, 8, aminoAcidList.ToArray());
                 var nTags = 0;
                 var nHit = 0;
 

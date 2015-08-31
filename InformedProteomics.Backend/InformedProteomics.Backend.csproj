@@ -205,7 +205,7 @@
     <Compile Include="SequenceTag\SequenceTagFinder.cs" />
     <Compile Include="SequenceTag\SequenceTagGraph.cs" />
     <Compile Include="SequenceTag\SequenceTagGraphEdge.cs" />
-    <Compile Include="SequenceTag\SequenceTagString.cs" />
+    <Compile Include="SequenceTag\SequenceTagIndexFinder.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />

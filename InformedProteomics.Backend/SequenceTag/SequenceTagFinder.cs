@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
+using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Biology;
@@ -42,36 +43,17 @@ namespace InformedProteomics.Backend.SequenceTag
             SetNodeCount(_deconvolutedPeaks.Count);
             CollectSequenceTagGraphEdges();
 
-            //_candidateSet = new Dictionary<string, SequenceTag>();
-            _seqTagSet = new HashSet<SequenceTagString>();
+            _seqTagSet = new HashSet<SequenceTag>();
             NumberOfProcessedPaths = 0;
             MaxNumberOfProcessedPaths = 1024;
         }
 
-        public IList<SequenceTagString> GetAllSequenceTagString()
+        public IList<SequenceTag> GetAllSequenceTagString()
         {
-            /*
-            var ret = new List<SequenceTagString>();
-            foreach (var tag in FindSequenceTags())
-            {
-                var flankingMass = DeconvolutedPeaks[tag[0].Node1].Mass;
-                foreach (var tagStr in tag.GetTagStrings())
-                {
-                    for (var k = 0; k < 2; k++)
-                    {
-                        if (k == 0)
-                            ret.Add(new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod));
-                        else
-                            ret.Add(new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod));
-                    }
-                }
-            }
-            return ret;*/
-
             return FindSequenceTags().ToList();
         }
 
-        public IEnumerable<SequenceTagString> FindSequenceTags()
+        public IEnumerable<SequenceTag> FindSequenceTags()
         {
             var componentSet = ConnnectedComponents();
             //Console.WriteLine("\t# of nodes = {0}, # of edges = {1}, # of components = {2}", GetNodeCount(), GetEdgeCount(), componentSet.Count);
@@ -94,7 +76,6 @@ namespace InformedProteomics.Backend.SequenceTag
                 FindPaths(node);
 
                 //if (_candidateSet.Count > 32767) break;
-
                 if (_seqTagSet.Count > 32767) break;
 
             }
@@ -106,7 +87,7 @@ namespace InformedProteomics.Backend.SequenceTag
             return _seqTagSet;
         }
 
-        public List<DeconvolutedPeak> DeconvolutedPeaks { get { return _deconvolutedPeaks; } }
+        //public List<DeconvolutedPeak> DeconvolutedPeaks { get { return _deconvolutedPeaks; } }
 
         private readonly List<DeconvolutedPeak> _deconvolutedPeaks;
         private readonly double _maxAminoAcidMass;
@@ -123,13 +104,17 @@ namespace InformedProteomics.Backend.SequenceTag
         private readonly IonType[] _ionTypes;
         private readonly int _minTagLength;
         private readonly ProductSpectrum _spectrum;
-        //private readonly Dictionary<string, SequenceTag> _candidateSet;
+        private readonly HashSet<SequenceTag> _seqTagSet;
 
-        private readonly HashSet<SequenceTagString> _seqTagSet;
+        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
+        static SequenceTagFinder()
+        {
+            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
+            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+        }
 
         private void CollectSequenceTagGraphEdges()
         {
-            //var edgeSet = new NodeSet<SequenceTagGraphEdge>();
             for (var i = 0; i < _deconvolutedPeaks.Count; i++)
             {
                 var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[i].Mass);
@@ -152,12 +137,8 @@ namespace InformedProteomics.Backend.SequenceTag
                         if (minMassGap < aa.Composition.Mass && aa.Composition.Mass < maxMassGap) peakGap.AddMatchedAminoAcid(aa, massError);
                     }
                     if (peakGap.AminoAcidList.Count > 0) AddEdge(peakGap);
-                    //if (peakGap.AminoAcidList.Count > 0) edgeSet.Add(peakGap);
                 }
             }
-
-            //var edgeComparer = new SequenceTagGraphEdgeComparer(_deconvolutedPeaks, _tolerance);
-            //var clusteredEdges = edgeSet.ConnnectedComponents(edgeComparer);
         }
        
         protected override bool AlreadyUsedPeak(int node)
@@ -179,42 +160,29 @@ namespace InformedProteomics.Backend.SequenceTag
             var edgeList = edges.ToList();
             if (edgeList.Count < _minTagLength)
                 return true;
-
-            var tag = new SequenceTag(edgeList, _deconvolutedPeaks, _tolerance);
-
-            //tag.Score = GetRankSumScore(tag);
-            //if (tag.Score > 0.05) return true;
-            //tag.Score = tag.GetTagStrings(_tolerance).Count;
+            
             NumberOfProcessedPaths++;
-
+            
             var added = false;
+            /*var tag = new SequenceTag(edgeList, _deconvolutedPeaks, _tolerance);
             foreach (var tagStr in GetSequenceTagStrings(tag))
             {
                 if (_seqTagSet.Add(tagStr)) added = true; 
+            }*/
+            foreach (var seqTag in EnumerateAllSequenceTags(edgeList))
+            {
+                if (_seqTagSet.Add(seqTag)) added = true; 
             }
+
             if (added) NumberOfAddedPaths++;
 
-            /*
-            if (_candidateSet.ContainsKey(tag.HashString))
-            {
-                //if (_candidateSet[tag.HashString].Score < tag.Score) _candidateSet[tag.HashString] = tag;
-                _candidateSet[tag.HashString].Merge(tag.GetTagStrings());
-            }
-            else
-            {
-                _candidateSet.Add(tag.HashString, tag);
-                NumberOfAddedPaths++;
-            }
-            */
-
-            //if (NumberOfProcessedPaths > 100 && NumberOfProcessedPaths*0.3 > NumberOfAddedPaths) StopFindPath = true;
             if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths) 
                 StopFindPath = true;
 
             return true;
         }
-
-        private IEnumerable<SequenceTagString> GetSequenceTagStrings(SequenceTag tag)
+        /*
+        private IEnumerable<SequenceTag> GetSequenceTagStrings(SequenceTag tag)
         {
             var flankingMass = _deconvolutedPeaks[tag[0].Node1].Mass;
             foreach (var tagStr in tag.GetTagStrings())
@@ -222,21 +190,77 @@ namespace InformedProteomics.Backend.SequenceTag
                 for (var k = 0; k < 2; k++)
                 {
                     if (k == 0)
-                        yield return new SequenceTagString(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod);
+                        yield return new SequenceTag(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod);
                     else
-                        yield return new SequenceTagString(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod);
+                        yield return new SequenceTag(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod);
                 }
     
             }
-        }
+        }*/
 
-        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
-        static SequenceTagFinder()
+        private IEnumerable<SequenceTag> EnumerateAllSequenceTags(List<SequenceTagGraphEdge> edges)
         {
-            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
-            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+            var tagLength = edges.Count;
+            var listOfAminoAcids = new List<List<AminoAcid>>(tagLength);
+
+            for (var j = 0; j < tagLength; j++)
+            {
+                listOfAminoAcids.Add(edges[j].AminoAcidList);
+            }
+
+            var indexArray = new int[tagLength];
+            var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
+            //TagStrings = new HashSet<string>();
+            
+            var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[edges[0].Node1].Mass);
+            var flankingMass = _deconvolutedPeaks[edges[0].Node1].Mass;
+
+            for (var e = 0; e < totalCombinations; e++)
+            {
+                var sb = new StringBuilder();
+                var mass = 0d;
+                for (var i = 0; i < indexArray.Length; i++)
+                {
+                    sb.Append(listOfAminoAcids[i][indexArray[i]].Residue);
+                    mass += listOfAminoAcids[i][indexArray[i]].Mass;
+                }
+
+                var massGap = _deconvolutedPeaks[edges[indexArray.Length - 1].Node2].Mass - _deconvolutedPeaks[edges[0].Node1].Mass;
+                var massError = Math.Abs(massGap - mass);
+
+                if (massError < massTh)
+                {
+                    //TagStrings.Add(sb.ToString());
+                    var tagStr = sb.ToString();
+                    yield return new SequenceTag(_spectrum.ScanNum, tagStr, true, flankingMass, _spectrum.ActivationMethod);
+                    yield return new SequenceTag(_spectrum.ScanNum, Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod);
+                }
+
+                //increase indexArray
+                for (var i = indexArray.Length - 1; i >= 0; i--)
+                {
+                    if (indexArray[i] == listOfAminoAcids[i].Count - 1) //reached the last item
+                    {
+                        indexArray[i] = 0;
+                    }
+                    else
+                    {
+                        indexArray[i]++;
+                        break;
+                    }
+                }
+            }
+            //return TagStrings;
         }
 
+        public static string Reverse(string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        /*
         public List<IdentifiedSequenceTag> ExtractExistingSequneceTags(Sequence sequence, int minTagLength = 5)
         {
             var cleavages = sequence.GetInternalCleavages();
@@ -331,28 +355,6 @@ namespace InformedProteomics.Backend.SequenceTag
 
             return tags;
         }
-        /*
-               internal class SequenceTagGraphEdgeComparer : INodeComparer<SequenceTagGraphEdge>
-               {
-                   internal SequenceTagGraphEdgeComparer(List<DeconvolutedPeak> deconvolutedPeaks, Tolerance tolerance)
-                   {
-                       _deconvolutedPeaks = deconvolutedPeaks;
-                       _tolerance = tolerance;
-                   }
-
-                   public bool SameCluster(SequenceTagGraphEdge edge1, SequenceTagGraphEdge edge2)
-                   {
-                       var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[edge1.Node1].Mass);
-                       if (Math.Abs(edge1.Mass - edge2.Mass) > massTh) return false;
-                       var startNodeMassDiff = Math.Abs(_deconvolutedPeaks[edge1.Node1].Mass - _deconvolutedPeaks[edge2.Node1].Mass);
-                       if (startNodeMassDiff > massTh && Math.Abs(startNodeMassDiff - 1) > massTh) return false;
-                       return true;
-                   }
-
-                   private List<DeconvolutedPeak> _deconvolutedPeaks;
-                   private Tolerance _tolerance;
-               }
-               */
-
+        */
     }
 }

@@ -28,13 +28,13 @@ namespace MSPathFinderT
         public double MaxSequenceMass { get; set; }
         public string FeatureFilePath { get; set; }
         public int MaxNumThreads { get; set; }
-        public bool ForceParallel { get; set; }
-
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
 
         public void Display()
         {
+            Console.WriteLine("MaxThreads: " + MaxNumThreads);
+            
             foreach (var specFilePath in SpecFilePaths)
             {
                 Console.WriteLine("SpectrumFilePath: " + specFilePath);
@@ -244,12 +244,7 @@ namespace MSPathFinderT
 
                 currentParameter = "-threads";
                 MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
-                if (MaxNumThreads < 0)
-                {
-                    ForceParallel = true;
-                    MaxNumThreads = -MaxNumThreads;
-                }
-
+                MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
             }
             catch (Exception ex)
             {
@@ -314,6 +309,13 @@ namespace MSPathFinderT
                     {
 
                     }
+                    else if (key.Equals("-threads"))
+                    {
+                        if (value == null || Int32.Parse(value) < 0)
+                        {
+                            return "Invalid number of maximum threads " + value;
+                        }
+                    }
                     else if (key.Equals("-mod"))
                     {
                         if (value != null && !File.Exists(value))
@@ -359,6 +361,31 @@ namespace MSPathFinderT
             }
 
             return null;
+        }
+
+        private int GetOptimalMaxThreads(int userMaxThreads)
+        {
+            var threads = userMaxThreads;
+            var coreCount = 0;
+            try
+            {
+                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
+                {
+                    coreCount += int.Parse(item["NumberOfCores"].ToString());
+                }
+                //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
+            }
+            catch (Exception)
+            {
+                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
+                coreCount = (int)(Math.Ceiling(Environment.ProcessorCount / 2.0));
+            }
+
+            if (threads <= 0 || threads > coreCount)
+            {
+                threads = coreCount;
+            }
+            return threads;
         }
     }
 }

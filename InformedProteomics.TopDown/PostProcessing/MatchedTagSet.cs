@@ -135,11 +135,11 @@ namespace InformedProteomics.TopDown.PostProcessing
 
     public class MatchedTag
     {
-        public MatchedTag(SequenceTagString tag, int startIndex): this(tag, startIndex, null)
+        public MatchedTag(SequenceTag tag, int startIndex): this(tag, startIndex, null)
         {
         }
 
-        public MatchedTag(SequenceTagString tag, int startIndex, double? featureMass)
+        public MatchedTag(SequenceTag tag, int startIndex, double? featureMass)
         {
             StartIndex = startIndex;
             EndIndex = startIndex + tag.Sequence.Length;

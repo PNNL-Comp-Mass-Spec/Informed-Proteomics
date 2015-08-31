@@ -18,7 +18,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             _minTagLen = minTagLength;
             _maxTagLen = maxTagLength;
             _aminoAcids = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
-            _ms2ScanToTagMap = new Dictionary<int, IList<SequenceTagString>>();
+            _ms2ScanToTagMap = new Dictionary<int, IList<SequenceTag>>();
         }
 
         public void SearchAllSpectra()
@@ -42,10 +42,10 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 _ms2ScanToTagMap[ms2ScanNum] = tags;
             }
         }
-        
-        public IList<SequenceTagString> GetAllSequenceTagString(int ms2ScanNum)
+
+        public IList<SequenceTag> GetAllSequenceTagString(int ms2ScanNum)
         {
-            IList<SequenceTagString> tags;
+            IList<SequenceTag> tags;
 
             lock (_ms2ScanToTagMap)
             {
@@ -56,7 +56,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             }
 
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            if (spec == null) return new List<SequenceTagString>();
+            if (spec == null) return new List<SequenceTag>();
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
             tags = tagFinder.GetAllSequenceTagString();
 
@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly Tolerance _tolerance;
         private readonly int _minTagLen;
         private readonly int _maxTagLen;
-        private readonly Dictionary<int, IList<SequenceTagString>> _ms2ScanToTagMap;
+        private readonly Dictionary<int, IList<SequenceTag>> _ms2ScanToTagMap;
         
     }
 }

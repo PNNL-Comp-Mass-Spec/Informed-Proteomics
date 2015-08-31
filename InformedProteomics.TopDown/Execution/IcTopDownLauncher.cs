@@ -48,6 +48,7 @@ namespace InformedProteomics.TopDown.Execution
             bool? runTargetDecoyAnalysis = true,
             int searchMode = 1,
             string featureFilePath = null,
+            int maxThreads = 0,
             IEnumerable<int> scanNumbers = null,
             int numMatchesPerSpectrum = 3
             )
@@ -76,8 +77,7 @@ namespace InformedProteomics.TopDown.Execution
             SearchMode = searchMode;
             ScanNumbers = scanNumbers;
             NumMatchesPerSpectrum = numMatchesPerSpectrum;
-            MaxNumThreads = 0;
-            ForceParallel = false;
+            MaxNumThreads = maxThreads;
         }
 
         public string ErrorMessage { get; private set; }
@@ -101,8 +101,7 @@ namespace InformedProteomics.TopDown.Execution
         public bool? RunTargetDecoyAnalysis { get; private set; }    // true: target and decoy, false: target only, null: decoy only
         public IEnumerable<int> ScanNumbers { get; private set; }
         public int NumMatchesPerSpectrum { get; private set; }
-        public int MaxNumThreads { get; set; }
-        public bool ForceParallel { get; set; }
+        public int MaxNumThreads { get; private set; }
 
         // 0: all internal sequences, 
         // 1: #NCleavages <= Max OR Cleavages <= Max (Default)
@@ -207,16 +206,25 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-            // sequence tag-based search 
-            /*_ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(
-                            _run,
-                            MinProductIonCharge, MaxProductIonCharge,
-                            ProductIonTolerance
-                            );
-            */
+
+            // pre-generate deconvoluted spectra for scoring
             _massBinComparer = new FilteredProteinMassBinning(AminoAcidSet, MaxSequenceMass);
             _ms2ScorerFactory2 = new DeconvolutedSpectrumScorer(_run, _massBinComparer, AminoAcidSet,
                                                                MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
+            sw.Reset();
+            Console.WriteLine(@"Generating deconvoluted spectra for MS/MS spectra...");
+            sw.Start();
+            var pfeOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxNumThreads,
+                CancellationToken = cancellationToken ?? CancellationToken.None
+            };
+            Parallel.ForEach(_run.GetScanNumbers(2), pfeOptions, ms2ScanNum =>
+            {
+                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum);
+            });
+            sw.Stop();
+            Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
             progData.StepRange(25.0);
             progData.Status = "Reading Fasta File";
@@ -226,8 +234,8 @@ namespace InformedProteomics.TopDown.Execution
             var targetDb = new FastaDatabase(DatabaseFilePath);
             targetDb.Read();
 
-
             // Generate sequence tags for all MS/MS spectra
+
             sw.Reset();
             Console.WriteLine(@"Generating sequence tags for MS/MS spectra...");
             sw.Start();
@@ -241,7 +249,6 @@ namespace InformedProteomics.TopDown.Execution
                             ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
                             MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);
 
-            //            string dirName = OutputDir ?? Path.GetDirectoryName(SpecFilePath);
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
             var targetOutputFilePath = Path.Combine(OutputDir, specFileName + TargetFileNameEnding);
             var decoyOutputFilePath = Path.Combine(OutputDir, specFileName + DecoyFileNameEnding);
@@ -305,7 +312,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Tag-based searching the decoy database");
                 sw.Start();
                 RunTagBasedSearch(decoyMatches, decoyDb, null, prog);
-                Console.WriteLine(@"Target database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");
@@ -358,19 +365,12 @@ namespace InformedProteomics.TopDown.Execution
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (SearchMode == 0)
             {
-                if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
-                {
-                    annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(MinSequenceLength, MaxSequenceLength, MaxNumThreads, cancellationToken);
-                }
-                else
-                {
-                    annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-                }
+                //annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
+                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(MinSequenceLength, MaxSequenceLength, MaxNumThreads, cancellationToken);
             }
             else if (SearchMode == 2)
             {
-                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(MinSequenceLength,
-                    MaxSequenceLength, MaxNumCTermCleavages);
+                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength, MaxNumCTermCleavages);
             }
             else
             {
@@ -410,15 +410,14 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = GetMaxThreads(),
+                MaxDegreeOfParallelism = MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
             Parallel.ForEach(_tagMs2ScanNum, pfeOptions, ms2ScanNum =>
             {
                 var tagSeqMatches = _tagSearchEngine.RunSearch(ms2ScanNum);
-                var prsmList = new List<DatabaseSequenceSpectrumMatch>();
-
+                //var prsmList = new List<DatabaseSequenceSpectrumMatch>();
                 foreach (var tagSequenceMatch in tagSeqMatches)
                 {
                     var offset = _tagSearchEngine.FastaDatabase.GetOffset(tagSequenceMatch.ProteinName);
@@ -437,33 +436,10 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         ModificationText = tagSequenceMatch.TagMatch.Modifications,
                     };
-                    prsmList.Add(prsm);
+
+                    AddMatch(matches, ms2ScanNum, prsm);    
                 }
 
-                if (prsmList.Count > 0)
-                {
-                    if (matches[ms2ScanNum] == null) matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch>() { prsmList[0] };
-                    for (var j = 1; j < prsmList.Count; j++)
-                    {
-                        var prsm = prsmList[j];
-                        var existingMatches = matches[ms2ScanNum];
-                        var maxScore = existingMatches.Max.Score;
-                        if (existingMatches.Count < NumMatchesPerSpectrum && maxScore * 0.7 < prsm.Score)
-                        {
-                            existingMatches.Add(prsm);
-                            existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
-                        }
-                        else
-                        {
-                            var minScore = existingMatches.Min.Score;
-                            if (prsm.Score > minScore)
-                            {
-                                existingMatches.Add(prsm);
-                                existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
-                            }
-                        }
-                    }
-                }
                 SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData, "spectra");
             });
 
@@ -494,45 +470,29 @@ namespace InformedProteomics.TopDown.Execution
 
             sw.Reset();
             sw.Start();
-
-            //var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan+1];
+            var pfeOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxNumThreads,
+                CancellationToken = cancellationToken ?? CancellationToken.None
+            };
 
             var maxNumNTermCleavages = SearchMode == 2 ? MaxNumNTermCleavages : 0;
-
-            if (ForceParallel || (SearchMode == 0 && MaxNumThreads != 1))
+            //foreach (var annotationAndOffset in annotationsAndOffsets)
+            Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
             {
-                var pfeOptions = new ParallelOptions
+                if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
                 {
-                    MaxDegreeOfParallelism = GetMaxThreads(),
-                    CancellationToken = cancellationToken ?? CancellationToken.None
-                };
-
-                Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
-                {
-                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
-                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
-                });
-            }
-            else
-            {
-                foreach (var annotationAndOffset in annotationsAndOffsets)
-                {
-                    if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
-                    {
-                        //return matches;
-                        return;
-                    }
-                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
-                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages);
+                    //return matches;
+                    return;
                 }
-            }
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progress, progData);
+                SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages, cancellationToken);
+            });
 
             Console.WriteLine(@"Collected candidate matches: {0}", GetNumberOfMatches(matches));
 
             progData.StatusInternal = string.Empty;
             progress.Report(progData.UpdatePercent(100.0));
-            //return matches;
-            return;
         }
 
         private void SearchProgressReport(ref int numProteins, ref DateTime lastUpdate, long estimatedProteins, Stopwatch sw, IProgress<ProgressData> progress, ProgressData progData, string itemName = "proteins")
@@ -574,15 +534,18 @@ namespace InformedProteomics.TopDown.Execution
 
         private const int ScoreLowerBound = 3;
         private void SearchForMatches(AnnotationAndOffset annotationAndOffset,
-            ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages)
+            ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages, CancellationToken? cancellationToken = null)
         {
+            var pfeOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxNumThreads,
+                CancellationToken = cancellationToken ?? CancellationToken.None
+            };
+
             var annotation = annotationAndOffset.Annotation;
             var offset = annotationAndOffset.Offset;
-
             //var protein = db.GetProteinName(offset);
-
             var protSequence = annotation.Substring(2, annotation.Length - 4);
-
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
                 AminoAcid.ProteinCTerm);
 
@@ -598,23 +561,23 @@ namespace InformedProteomics.TopDown.Execution
                     seqGraph.SetSink(modIndex);
                     var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                     var sequenceMass = protCompositionWithH2O.Mass;
-                    var modCombinations = modCombs[modIndex];
 
+                    if (sequenceMass < MinSequenceMass || sequenceMass > MaxSequenceMass) continue;
+
+                    var modCombinations = modCombs[modIndex];
                     var ms2ScanNums = this.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
 
-                    foreach (var ms2ScanNum in ms2ScanNums)
+                    Parallel.ForEach(ms2ScanNums, pfeOptions, ms2ScanNum =>
                     {
-                        if (ms2ScanNum > _run.MaxLcScan) continue;
+                        if (ms2ScanNum > _run.MaxLcScan) return;
 
-                        var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                        if (spec == null) continue;
-                        var charge =
-                            (int)
-                                Math.Round(sequenceMass /
-                                           (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                         var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
-                        if (score <= ScoreLowerBound) continue;
+                        if (score <= ScoreLowerBound) return;
+
+                        var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
+                        if (spec == null) return;
+                        var charge = (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
                         var sequence = protSequence.Substring(numNTermCleavages);
@@ -625,35 +588,38 @@ namespace InformedProteomics.TopDown.Execution
                             numNTermCleavages,
                             modCombinations, precursorIon, score);
 
-                        // Lock necessary for parallel search
-                        lock (matches)
-                        {
-                            if (matches[ms2ScanNum] == null)
-                            {
-                                matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> { prsm };
-                            }
-                            else // already exists
-                            {
-                                var existingMatches = matches[ms2ScanNum];
-                                var maxScore = existingMatches.Max.Score;
-                                if (existingMatches.Count < NumMatchesPerSpectrum && maxScore * 0.7 < prsm.Score)
-                                {
-                                    existingMatches.Add(prsm);
-                                    existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
-                                }
-                                else
-                                {
-                                    var minScore = existingMatches.Min.Score;
-                                    if (score > minScore)
-                                    {
-                                        existingMatches.Add(prsm);
-                                        existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
-                                        //existingMatches.Remove(existingMatches.Min);
-                                    }
-                                }
-                            }
-                        }
+                        AddMatch(matches, ms2ScanNum, prsm);
+                    });
+                }
+            }
+        }
+
+        private void AddMatch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int ms2ScanNum, DatabaseSequenceSpectrumMatch prsm)
+        {
+            lock (matches)
+            {
+                if (matches[ms2ScanNum] == null)
+                {
+                    matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> {prsm};
+                }
+                else // already exists
+                {
+                    var existingMatches = matches[ms2ScanNum];
+                    var maxScore = existingMatches.Max.Score;
+                    if (existingMatches.Count < NumMatchesPerSpectrum && maxScore * 0.6 < prsm.Score)
+                    {
+                        existingMatches.Add(prsm);
+                        existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.6);
                     }
+                    else
+                    {
+                        var minScore = existingMatches.Min.Score;
+                        if (prsm.Score > minScore)
+                        {
+                            existingMatches.Add(prsm);
+                            existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.6);
+                        }
+                    }                              
                 }
             }
         }
@@ -684,7 +650,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = GetMaxThreads(),
+                MaxDegreeOfParallelism = MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -754,17 +720,15 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = GetMaxThreads(),
+                MaxDegreeOfParallelism = MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             {
                 var currentTask = "?";
-
                 try
                 {
-
                     currentTask = "Initializing a new GeneratingFunction with NumberOfBins = " +
                                   _massBinComparer.NumberOfBins;
 
@@ -874,31 +838,6 @@ namespace InformedProteomics.TopDown.Execution
 
                 }
             }
-        }
-
-        private int GetMaxThreads()
-        {
-            var threads = MaxNumThreads;
-            var coreCount = 0;
-            try
-            {
-                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
-                {
-                    coreCount += int.Parse(item["NumberOfCores"].ToString());
-                }
-                //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
-            }
-            catch (Exception)
-            {
-                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
-                coreCount = (int)(Math.Ceiling(Environment.ProcessorCount / 2.0));
-            }
-
-            if (threads <= 0 || threads > coreCount)
-            {
-                threads = coreCount;
-            }
-            return threads;
         }
     }
 }

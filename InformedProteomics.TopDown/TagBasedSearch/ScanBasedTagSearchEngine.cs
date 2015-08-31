@@ -108,7 +108,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             }
         }
 
-        private IList<TagSequenceMatch> GetMatches(IEnumerable<SequenceTagString> tags, ProductSpectrum spec, IScorer scorer)
+        private IList<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
         {
             // Match tags against the database
             var proteinsToTags = GetProteinToMatchedTagsMap(tags, _searchableDb, _aaSet, _tolerance, _tolerance);
@@ -176,7 +176,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         }
 
         public static Dictionary<string, MatchedTagSet> GetProteinToMatchedTagsMap(
-            IEnumerable<SequenceTagString> tags, 
+            IEnumerable<SequenceTag> tags, 
             SearchableDatabase searchableDb, 
             AminoAcidSet aaSet, 
             Tolerance tolerance,

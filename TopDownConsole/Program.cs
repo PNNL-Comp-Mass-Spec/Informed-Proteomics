@@ -117,12 +117,10 @@ namespace MSPathFinderT
                     parameters.ProductIonTolerancePpm,
                     parameters.Tda,
                     parameters.SearchMode,
-                    parameters.FeatureFilePath
+                    parameters.FeatureFilePath,
+                    parameters.MaxNumThreads
                     );
-
-                topDownLauncher.MaxNumThreads = parameters.MaxNumThreads;
-                topDownLauncher.ForceParallel = parameters.ForceParallel;
-
+                
                 var success = topDownLauncher.RunSearch();
 
                 if (success)
@@ -211,7 +209,8 @@ namespace MSPathFinderT
                 "\t[-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 20)\n" +
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
-                "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n"
+                "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n" +
+                "\t[-threads MaxNumThreads] (maximum number of threads, default: 0 automatic setting)\n"
                 );
 
             // Wait for 1.5 seconds
