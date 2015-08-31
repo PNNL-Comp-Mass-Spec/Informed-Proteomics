@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
 
 namespace MSPathFinderT
 {
@@ -366,24 +367,10 @@ namespace MSPathFinderT
         private int GetOptimalMaxThreads(int userMaxThreads)
         {
             var threads = userMaxThreads;
-            var coreCount = 0;
-            try
-            {
-                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
-                {
-                    coreCount += int.Parse(item["NumberOfCores"].ToString());
-                }
-                //Console.WriteLine(@"Number Of Cores: {0}", coreCount);
-            }
-            catch (Exception)
-            {
-                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
-                coreCount = (int)(Math.Ceiling(Environment.ProcessorCount / 2.0));
-            }
 
-            if (threads <= 0 || threads > coreCount)
+            if (threads <= 0 || threads > ParallelizationUtils.NumPhysicalCores)
             {
-                threads = coreCount;
+                threads = ParallelizationUtils.NumPhysicalCores;
             }
             return threads;
         }

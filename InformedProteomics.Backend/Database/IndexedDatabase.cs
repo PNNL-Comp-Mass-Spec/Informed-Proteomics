@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Utils;
 using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
@@ -468,24 +469,9 @@ namespace InformedProteomics.Backend.Database
 
             // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
             // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
-            int coreCount = 0;
-            try
+            if (threads <= 0 || threads > ParallelizationUtils.NumPhysicalCores)
             {
-                foreach (var item in new System.Management.ManagementObjectSearcher("Select NumberOfCores from Win32_Processor").Get())
-                {
-                    coreCount += int.Parse(item["NumberOfCores"].ToString());
-                }
-                //Console.WriteLine("Number Of Cores: {0}", coreCount);
-            }
-            catch (Exception)
-            {
-                // Use the logical processor count, divided by 2 to avoid the greater performance penalty of over-threading.
-                coreCount = (int)(Math.Ceiling(System.Environment.ProcessorCount / 2.0));
-            }
-
-            if (threads <= 0 || threads > coreCount)
-            {
-                threads = coreCount;
+                threads = ParallelizationUtils.NumPhysicalCores;
             }
             //int prevThreads, prevPorts;
             //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);

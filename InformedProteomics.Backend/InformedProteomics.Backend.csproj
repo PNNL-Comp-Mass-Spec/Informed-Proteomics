@@ -217,6 +217,7 @@
     <Compile Include="Utils\ListUtil.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\OtsuThreshold.cs" />
+    <Compile Include="Utils\ParallelizationUtils.cs" />
     <Compile Include="Utils\PeakListUtils.cs" />
     <Compile Include="Utils\ProgressData.cs" />
     <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
