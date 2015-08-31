@@ -9,10 +9,10 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.SequenceTag
 {
-    public class LongestSequence
+    public class SequenceTagIndexFinder
     {
 
-        public LongestSequence(Tolerance tolerance, int minCharge, int maxCharge)
+        public SequenceTagIndexFinder(Tolerance tolerance, int minCharge, int maxCharge)
         {
             _tolerance = tolerance;
             _minCharge = minCharge;
@@ -191,7 +191,7 @@ namespace InformedProteomics.Backend.SequenceTag
             return true;
         }
 
-        static LongestSequence()
+        static SequenceTagIndexFinder()
         {
             BaseIonTypesCid = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesEtd = new[] { BaseIonType.C, BaseIonType.Z };
