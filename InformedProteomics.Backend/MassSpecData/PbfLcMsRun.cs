@@ -252,7 +252,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     throw new FormatException("Illegal pbf file format!");
                 }
 
-                if (_offsetPrecursorChromatogramStart == _offsetPrecursorChromatogramEnd)
+                if (_offsetPrecursorChromatogramBegin == _offsetPrecursorChromatogramEnd)
                 {
                     // No MS1 data
                     _minMs1Mz = 0;
@@ -260,7 +260,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 else
                 {
-                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
+                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramBegin, SeekOrigin.Begin);
                     _minMs1Mz = _reader.ReadDouble();
 
                     if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
@@ -324,7 +324,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         throw new FormatException("Illegal pbf file format!");
                     }
-                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramStart, SeekOrigin.Begin);
+                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramBegin, SeekOrigin.Begin);
                     _minMs1Mz = _reader.ReadDouble();
 
                     if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
@@ -398,7 +398,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private double _minMs1Mz;
         private double _maxMs1Mz;
 
-        private long _offsetPrecursorChromatogramStart;
+        private long _offsetPrecursorChromatogramBegin;
         private long _offsetPrecursorChromatogramEnd;   // exclusive
         private long _offsetProductChromatogramBegin;
         private long _offsetProductChromatogramEnd;
@@ -417,6 +417,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
         private const int NumBytePeak = 16;
+
+        private List<XicPoint> _precursorChromatogramCache = new List<XicPoint>();
 
         #endregion
 
@@ -545,6 +547,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
+            if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
+            {
+                var xicl = new Xic();
+                xicl.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
+                return Xic.GetSelectedXic(xicl);
+            }
+
             var minBinIndex = GetMzBinIndex(minMz);
             var maxBinIndex = GetMzBinIndex(maxMz);
 
@@ -553,7 +562,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if (offset < _offsetPrecursorChromatogramStart) return new Xic();
+                if (offset < _offsetPrecursorChromatogramBegin) return new Xic();
 
                 // binary search
                 var beginOffset = offset;
@@ -566,11 +575,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if (targetOffset < _offsetPrecursorChromatogramStart) return new Xic();
-            var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramStart, _offsetPrecursorChromatogramEnd, targetOffset);
-            if (!xic.Any()) return xic;
-            xic.Sort();
-            return Xic.GetSelectedXic(xic); // TODO: This was already called in GetXic()...
+            if (targetOffset < _offsetPrecursorChromatogramBegin) return new Xic();
+            var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramBegin, _offsetPrecursorChromatogramEnd, targetOffset);
+            //if (!xic.Any()) return xic;
+            return xic;
         }
 
         /// <summary>
@@ -581,6 +589,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override Xic GetPrecursorChromatogramRange(double minMz, double maxMz)
         {
+            if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
+            {
+                var xicl = new Xic();
+                xicl.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
+                return xicl;
+            }
+
             var minBinIndex = GetMzBinIndex(minMz);
             var maxBinIndex = GetMzBinIndex(maxMz);
 
@@ -589,7 +604,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if (offset < _offsetPrecursorChromatogramStart) return new Xic();
+                if (offset < _offsetPrecursorChromatogramBegin) return new Xic();
 
                 // binary search
                 var beginOffset = offset;
@@ -602,8 +617,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if (targetOffset < _offsetPrecursorChromatogramStart) return new Xic();
-            var xic = GetChromatogramRange(minMz, maxMz, _offsetPrecursorChromatogramStart, _offsetPrecursorChromatogramEnd, targetOffset);
+            if (targetOffset < _offsetPrecursorChromatogramBegin) return new Xic();
+            var xic = GetChromatogramRange(minMz, maxMz, _offsetPrecursorChromatogramBegin, _offsetPrecursorChromatogramEnd, targetOffset);
             if (!xic.Any()) return xic;
             xic.Sort();
             return xic;
@@ -641,7 +656,7 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
 
             // Read the byte offset of the start of the precursor chromatogram
-            _offsetPrecursorChromatogramStart = _reader.ReadInt64();
+            _offsetPrecursorChromatogramBegin = _reader.ReadInt64();
 
             // Read the byte offset of the start of the product chromatogram (which is the end ofthe precursor chromatogram)
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin = _reader.ReadInt64();
@@ -1261,7 +1276,7 @@ namespace InformedProteomics.Backend.MassSpecData
             ms2Scans.Sort();
 
             // Precursor ion chromatogram (MS1 spectra)
-            _offsetPrecursorChromatogramStart = writer.BaseStream.Position;
+            _offsetPrecursorChromatogramBegin = writer.BaseStream.Position;
 
             if (ms1PeakCount > 0)
             {
@@ -1408,7 +1423,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 for (var i = _chromMzIndexToOffset.Length - 2; i >= 0; i--)
                 {
-                    if (_chromMzIndexToOffset[i] < _offsetPrecursorChromatogramStart)
+                    if (_chromMzIndexToOffset[i] < _offsetPrecursorChromatogramBegin)
                         _chromMzIndexToOffset[i] = prevOffset;
                     else
                         prevOffset = _chromMzIndexToOffset[i];
@@ -1422,7 +1437,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
             }
 
-            writer.Write(_offsetPrecursorChromatogramStart); // 8
+            writer.Write(_offsetPrecursorChromatogramBegin); // 8
             writer.Write(_offsetProductChromatogramBegin); // 8
             writer.Write(offsetBeginMetaInformation); // 8
             progress.Report(progressData.UpdatePercent(100.0));
@@ -1909,7 +1924,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetXicPointsWithin(minMz, maxMz, beginOffset, endOffset, targetOffset);
             if (!xic.Any()) return xic;
 
-            xic.Sort();
             return Xic.GetSelectedXic(xic);
         }
 
@@ -1928,8 +1942,41 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var xic = new Xic();
             var curOffset = targetOffset - NumBytePeak;
+            var cacheHigher = false;
+            var cacheLower = false;
+            if (endOffset <= _offsetPrecursorChromatogramEnd)
+            {
+                cacheHigher = HigherPrecursorChromatogramCacheSize >= 20;
+                cacheLower = LowerPrecursorChromatogramCacheSize >= 20;
+                _precursorChromatogramCache.Clear();
+                if (cacheHigher)
+                {
+                    if (endOffset < targetOffset + HigherPrecursorChromatogramCacheSize * NumBytePeak)
+                    {
+                        endOffset = targetOffset + HigherPrecursorChromatogramCacheSize * NumBytePeak;
+                    }
+                    if (endOffset > _offsetPrecursorChromatogramEnd)
+                    {
+                        endOffset = _offsetPrecursorChromatogramEnd;
+                    }
+                }
+                if (cacheLower)
+                {
+                    if (beginOffset > targetOffset - LowerPrecursorChromatogramCacheSize * NumBytePeak)
+                    {
+                        beginOffset = targetOffset - LowerPrecursorChromatogramCacheSize * NumBytePeak;
+                    }
+                    if (beginOffset < _offsetPrecursorChromatogramBegin)
+                    {
+                        beginOffset = _offsetPrecursorChromatogramBegin;
+                    }
+                }
+            }
+            var doCache = cacheLower || cacheHigher;
+
             lock (_filelock)
             {
+                var cacheCount = 0;
                 // go down
                 while (curOffset >= beginOffset)
                 {
@@ -1937,11 +1984,27 @@ namespace InformedProteomics.Backend.MassSpecData
                     var mz = _reader.ReadDouble();
                     var intensity = _reader.ReadSingle();
                     var scanNum = _reader.ReadInt32();
-                    if (mz < minMz) break;
-                    xic.Add(new XicPoint(scanNum, mz, intensity));
+                    if (mz < minMz)
+                    {
+                        if (!cacheLower || cacheCount >= LowerPrecursorChromatogramCacheSize)
+                        {
+                            break;
+                        }
+                        _precursorChromatogramCache.Add(new XicPoint(scanNum, mz, intensity));
+                        cacheCount++;
+                    }
+                    else
+                    {
+                        xic.Add(new XicPoint(scanNum, mz, intensity));
+                        if (doCache)
+                        {
+                            _precursorChromatogramCache.Add(new XicPoint(scanNum, mz, intensity));
+                        }
+                    }
                     curOffset -= NumBytePeak;
                 }
 
+                cacheCount = 0;
                 // go up
                 curOffset = targetOffset;
                 while (curOffset < endOffset)
@@ -1950,12 +2013,28 @@ namespace InformedProteomics.Backend.MassSpecData
                     var mz = _reader.ReadDouble();
                     var intensity = _reader.ReadSingle();
                     var scanNum = _reader.ReadInt32();
-                    if (mz > maxMz) break;
-                    xic.Add(new XicPoint(scanNum, mz, intensity));
-                    _reader.BaseStream.Seek(NumBytePeak, SeekOrigin.Current);
+                    if (mz > maxMz)
+                    {
+                        if (!cacheHigher || cacheCount >= HigherPrecursorChromatogramCacheSize)
+                        {
+                            break;
+                        }
+                        _precursorChromatogramCache.Add(new XicPoint(scanNum, mz, intensity));
+                        cacheCount++;
+                    }
+                    else
+                    {
+                        xic.Add(new XicPoint(scanNum, mz, intensity));
+                        if (doCache)
+                        {
+                            _precursorChromatogramCache.Add(new XicPoint(scanNum, mz, intensity));
+                        }
+                    }
                     curOffset += NumBytePeak;
-                }                
+                }
             }
+
+            _precursorChromatogramCache.Sort((x,y) => x.Mz.CompareTo(y.Mz));
 
             return xic;
         }

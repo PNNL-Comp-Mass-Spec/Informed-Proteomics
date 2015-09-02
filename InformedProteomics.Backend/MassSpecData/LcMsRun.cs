@@ -32,6 +32,15 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Default values for configuration properties
+        /// </summary>
+        protected LcMsRun()
+        {
+            HigherPrecursorChromatogramCacheSize = 0;
+            LowerPrecursorChromatogramCacheSize = 0;
+        }
+
         #region Spectra and scan operations
 
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
@@ -272,6 +281,20 @@ namespace InformedProteomics.Backend.MassSpecData
         #endregion
 
         #region Precursor XICs
+
+        /// <summary>
+        /// Number of extra precursor chromatogram points to cache on the higher-m/z side of a requested XIC
+        /// </summary>
+        /// <remarks>This will be ignored for any size less than 20 (i.e., no caching on the higher-m/z side will occur)
+        /// This property is specifically designed for use in getting large numbers of XICs that are very close in m/z; a high value will cause degraded performance when reading XICs at random</remarks>
+        public int HigherPrecursorChromatogramCacheSize { get; set; }
+
+        /// <summary>
+        /// Number of extra precursor chromatogram points to cache on the lower-m/z side of a requested XIC
+        /// </summary>
+        /// <remarks>This will be ignored for any size less than 20 (i.e., no caching on the lower-m/z side will occur)
+        /// This property is specifically designed for use in getting large numbers of XICs that are very close in m/z; a high value will cause degraded performance when reading XICs at random</remarks>
+        public int LowerPrecursorChromatogramCacheSize { get; set; }
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z (using only MS1 spectra)

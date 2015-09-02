@@ -495,7 +495,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = peakList[i];
                 if (peak.Mz <= minMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak));
                 --i;
             }
 
@@ -505,7 +505,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var peak = peakList[i];
                 if (peak.Mz >= maxMz) break;
-                xic.Add(new XicPoint(peak.ScanNum, peak.Mz, peak.Intensity));
+                xic.Add(new XicPoint(peak));
                 ++i;
             }
 

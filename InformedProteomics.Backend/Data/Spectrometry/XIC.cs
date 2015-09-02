@@ -202,6 +202,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public static Xic GetSelectedXic(Xic xic)
         {
             if (xic.Count == 0) return xic;
+            xic.Sort(); // Need to guarantee a sorted Xic
 
             // select one best peak for each scan
             var newXic = new Xic();

@@ -11,6 +11,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Intensity = intensity;
         }
 
+        public XicPoint(LcMsPeak peak)
+        {
+            ScanNum = peak.ScanNum;
+            Mz = peak.Mz;
+            Intensity = peak.Intensity;
+        }
+
         public int ScanNum { get; private set; }
         public double Mz { get; private set; }
         public double Intensity { get; private set; }
