@@ -2004,6 +2004,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     curOffset -= NumBytePeak;
                 }
 
+                if (doCache && curOffset < _offsetPrecursorChromatogramBegin)
+                {
+                    _precursorChromatogramCache.Add(new XicPoint(int.MinValue, double.NegativeInfinity, 0));
+                }
+
                 cacheCount = 0;
                 // go up
                 curOffset = targetOffset;
@@ -2031,6 +2036,11 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                     }
                     curOffset += NumBytePeak;
+                }
+
+                if (doCache && curOffset >= _offsetPrecursorChromatogramEnd)
+                {
+                    _precursorChromatogramCache.Add(new XicPoint(int.MaxValue, double.PositiveInfinity, 0));
                 }
             }
 
