@@ -65,6 +65,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetForwardMatches(matchedTag, forwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
+                    if (mass > _maxSequenceMass) continue;
+
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
                     var tagMatch = new TagMatch(
@@ -102,6 +104,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetBackwardMatches(matchedTag, backwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
+                    if (mass > _maxSequenceMass) continue;
+
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
                     var tagMatch = new TagMatch(
@@ -139,6 +143,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetForwardMatches(matchedTag, forwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
+                    if (mass > _maxSequenceMass) continue;
+
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
                     var tagMatch = new TagMatch(

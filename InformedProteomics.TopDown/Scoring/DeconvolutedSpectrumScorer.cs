@@ -58,6 +58,8 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass)
         {
+            if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass) return null;
+
             var deconvScorer = GetMs2Scorer(scanNum) as DeconvScorer;
             return _scoringGraphFactory.CreateScoringGraph(deconvScorer.DeconvolutedProductSpectrum, precursorMass);
         }

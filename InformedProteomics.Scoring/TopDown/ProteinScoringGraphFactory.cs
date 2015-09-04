@@ -42,40 +42,12 @@ namespace InformedProteomics.Scoring.TopDown
                     _adjList[j].Add(new ScoringGraphEdge(i, EdgeScore, aminoAcidProb[a]));
                 }
             }
-            /*
-            var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(_comparer.MaxMass));
-            var tempChk = new BitArray(_comparer.NumberOfBins);
-            for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
-            {
-                var fineNodeMass = fineBinIdx / Constants.RescalingConstantHighPrecision;
-                var i = _comparer.GetBinNumber(fineNodeMass);
-            
-                if (i < 0 || tempChk[i]) continue;
-                tempChk[i] = true;
-                for (var a = 0; a < aminoAcid.Length; a++)
-                {
-                    var j = _comparer.GetBinNumber(fineNodeMass + aminoAcid[a].Mass);
-                    if (j < 0 || j >= _comparer.NumberOfBins) continue;
-                    _adjList[j].Add(new ScoringGraphEdge(i, EdgeScore, aminoAcidProb[a]));
-                }
-            }*/
         }
 
         public IScoringGraph CreateScoringGraph(ProductSpectrum deconvSpectrum, double proteinMass)
         {
-            //var numNodes = _comparer.GetBinNumber(proteinMass) + 1;
-            /*
-            var adjList = new ScoringGraphEdge[numNodes][];
-            for(var i = 0; i < numNodes; i++)
-            {
-                var edges = _adjList[i];
-                adjList[i] = new ScoringGraphEdge[edges.Count];
-                for (var j = 0; j < edges.Count; j++)
-                {
-                    adjList[i][j] = new ScoringGraphEdge(edges[j].Item1, EdgeScore, edges[j].Item2.Probability);
-                }
-            }
-            */
+            if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
+            
             var nodeScores = (deconvSpectrum != null)
                 ? GetNodeScores(deconvSpectrum, proteinMass)
                 : new int[_comparer.GetBinNumber(proteinMass) + 1];

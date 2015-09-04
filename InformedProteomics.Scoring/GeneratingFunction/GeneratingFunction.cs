@@ -24,6 +24,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public double[] GetSpectralEValueDistribution()
         {
+            if (_graph == null) return null;
+            
             var lasNodeIndex = _graph.GetNumNodes() - 1;
             var lastRow = _eValueTable[lasNodeIndex];
             var maxScore = _maxScoreAtNode[lasNodeIndex];
@@ -35,6 +37,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public double GetSpectralEValue(double[] evalueDist, int score)
         {
+            if (_graph == null) return double.MaxValue;
+
             var spectralEValue = 0d;
             for (var col = score; col < evalueDist.Length; col++)
             {
@@ -46,6 +50,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public double GetSpectralEValue(int score)
         {
+            if (_graph == null) return double.MaxValue;
+
             var spectralEValue = 0d;
             var lasNodeIndex = _graph.GetNumNodes() - 1;
             var lastRow = _eValueTable[lasNodeIndex];
@@ -61,8 +67,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         public void ComputeGeneratingFunction(IScoringGraph graph)
         {
             _graph = graph;
-            InitTable();
+            
+            if (graph == null) return;
 
+            InitTable();
             for (var curNodeIndex = 1; curNodeIndex < _graph.GetNumNodes(); curNodeIndex++)
             {
                 var curNodeScore = _graph.GetNodeScore(curNodeIndex);

@@ -738,7 +738,9 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
+                        
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
+                        if (graph == null) continue;
 
                         currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
                         gf.ComputeGeneratingFunction(graph);
