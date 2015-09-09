@@ -464,11 +464,11 @@ namespace InformedProteomics.Test
             Console.WriteLine("Testing Working");
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-
+            const string rawFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string testFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             const string outputFile = @"D:\MassSpecFiles\training\raw\";
 
-            var map = new LcMsFeatureMap(testFile, 0, 185, 2000, 50000);
+            var map = new LcMsFeatureMap(PbfLcMsRun.GetLcMsRun(rawFile), testFile, 2000, 50000);
             map.SaveImage(outputFile + "test.png");
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using InformedProteomics.Backend.MassFeature;
+using InformedProteomics.Backend.MassSpecData;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -18,9 +19,11 @@ namespace InformedProteomics.Graphics
 {
     public class LcMsFeatureMap
     {
-        public LcMsFeatureMap(IEnumerable<LcMsFeature> features, string title, double minTime, double maxTime, double minMass, double maxMass)
+        public LcMsFeatureMap(LcMsRun run, IEnumerable<LcMsFeature> features, string title, double minMass, double maxMass)
         {
             _features = features;
+            var minTime = Math.Max(run.GetElutionTime(run.MinLcScan) - 5, 0);
+            var maxTime = run.GetElutionTime(run.MaxLcScan) + 5;
             // Initialize x and y axes.
             //var minMass = _features.Min(f => f.Mass);
             //var maxMass = _features.Max(f => f.Mass);
@@ -49,8 +52,8 @@ namespace InformedProteomics.Graphics
             _featureMap.Annotations.Add(annotation);
         }
 
-        public LcMsFeatureMap(string ms1FtPath, double minTime, double maxTime, double minMass, double maxMass)
-            : this(LcMsFeatureAlignment.LoadProMexResult(ms1FtPath), Path.GetFileNameWithoutExtension(ms1FtPath), minTime, maxTime, minMass, maxMass)
+        public LcMsFeatureMap(LcMsRun run, string ms1FtPath, double minMass, double maxMass)
+            : this(run, LcMsFeatureAlignment.LoadProMexResult(0, ms1FtPath, run), Path.GetFileNameWithoutExtension(ms1FtPath), minMass, maxMass)
         {
 
         }

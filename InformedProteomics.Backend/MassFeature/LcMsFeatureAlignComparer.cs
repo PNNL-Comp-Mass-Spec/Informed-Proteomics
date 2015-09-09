@@ -45,7 +45,10 @@ namespace InformedProteomics.Backend.MassFeature
             var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Max(f1.NetLength, f2.NetLength);
             if (lenDiff > 0.8) return false;
             */
+            //if (f1.CoElutedByNet(f2, 0.01)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
+
             if (f1.CoElutedByNet(f2, 0.01)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
+
             //if (NetDiff(f1, f2) < TolNet) return true;
             return false;
         }

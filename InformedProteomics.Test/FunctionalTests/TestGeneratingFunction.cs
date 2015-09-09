@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -26,14 +27,14 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-            //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string rawFile = @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf";
+            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            //const string rawFile = @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf";
 
-            const int scanNum = 46475;
-            //const string protSequence = "EKQRPDFIYPQGSMLMHSPLVLNKADMYGFFLKGKLANLQRSIDNTLNQVAGSAMYFKVLSPYVLTTFTQIEKAYSDYPTDRAKGWIQETDIITWVMVGRQDNSSSTKISHVYFQPLHIWVNDAMALINGRELFGYPKYLCEYTMPAAGQPLTRLSLAAKSFLHFSPDTELAMHPLLEVNCNAKPEAQLSTVEAITQTWKLFKEQTDFIPELDKLGEEQLFHLLFKPAIDQVFLKQFPDASGQKAVYQAITASPAKVNKVHSVALLENDFVATLFDNASFPLKDTLGVELGEQHVLLPYHVNFDFEVPPGEVLVDNSEIKKQKIAILGGGVAAMTAACYLTDKPGWQNQYEIDIYQLGWRIGGKGASGRNAAMGQRIEEHGLHIWFGFYQNAFALMRKAYEELDRPAQAPLATFLDAFKPHHFIVLQEEINGRSVSWPI";
-            //const string modStr = "Acetyl 0,Oxidation 55,Dehydro 141,Dehydro 181";
-            const string protSequence =
-                "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
+            const int scanNum = 5109;
+            const string protSequence = "ENIAVVDMGAVFEQLPQREQIMQSLKSEFGDRMSEVQKMQEEMRSLMEKQQRDGALMNDTQKTELVRKMEALKSEYQLKGKALDEDLRRRQGEEQNKLLVKVQKAINTIAEKEKYDLVLQRGAVIYVKPNADISGKVVEALSKGK";
+            
+            //const string protSequence =
+            //    "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             
             const string modStr = "";
             
@@ -51,12 +52,12 @@ namespace InformedProteomics.Test.FunctionalTests
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var sequence = Sequence.CreateSequence(protSequence, modStr, aaSet);
-            var proteinMass = sequence.Mass;
+            var proteinMass = sequence.Mass + Composition.H2O.Mass;
 
             Console.WriteLine("Mass = {0}", proteinMass);
             
 
-            const int maxCharge = 15;
+            const int maxCharge = 20;
             const int minCharge = 1;
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
@@ -80,18 +81,23 @@ namespace InformedProteomics.Test.FunctionalTests
                 IsolationWindow = spectrum.IsolationWindow
             };
 
-            var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
+            //var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
+            //var comparer = new ProteinMassBinning(50, 50000);
+            var comparer = new TestMassBin();
             Console.WriteLine("{0}\t{1}",comparer.NumberOfBins, comparer.GetBinNumber(proteinMass));
             var graphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
 
             Console.WriteLine(proteinMass);
             var stopwatch = Stopwatch.StartNew();
             var graph = graphFactory.CreateScoringGraph(productSpec, proteinMass);
+            stopwatch.Stop();
             Console.WriteLine(@"graph generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             
-            stopwatch.Restart();
+            stopwatch.Reset();
+            stopwatch.Start();
             var gf = new GeneratingFunction(comparer.NumberOfBins);
             gf.ComputeGeneratingFunction(graph);
+            stopwatch.Stop();
             Console.WriteLine(@"computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             for (var score = 1; score <= gf.MaximumScore; score++)
             {
@@ -100,6 +106,44 @@ namespace InformedProteomics.Test.FunctionalTests
             }
 
 
+        }
+
+        internal class TestMassBin : IMassBinning
+        {
+            internal TestMassBin()
+            {
+                MaxMass = 17000;
+                MinMass = 0;
+                NumberOfBins = GetBinNumber(MaxMass) - GetBinNumber(MinMass) + 1;
+                Filtered = false;
+            }
+            
+            public int GetBinNumber(double mass)
+            {
+                return Constants.GetBinNumHighPrecision(mass);
+            }
+
+            public double GetMass(int binNumber)
+            {
+                //throw new NotImplementedException();
+                return binNumber/Constants.RescalingConstantHighPrecision;
+            }
+
+            public double GetMassStart(int binNumber)
+            {
+                return 0.5*(GetMass(binNumber - 1) + GetMass(binNumber));
+
+            }
+
+            public double GetMassEnd(int binNumber)
+            {
+                return 0.5 * (GetMass(binNumber + 1) + GetMass(binNumber));
+            }
+
+            public double MaxMass { get; private set; }
+            public double MinMass { get; private set; }
+            public int NumberOfBins { get; private set; }
+            public bool Filtered { get; private set; }
         }
         /*
         [Test]

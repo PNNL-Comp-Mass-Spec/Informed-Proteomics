@@ -22,17 +22,15 @@ namespace InformedProteomics.Test
         [Test]
         public void TestPeptidomics()
         {
-//            const string ms1ftFolder = @"D:\MassSpecFiles\Peptidome";
-            //const string rawFolder = @"\\protoapps\UserData\Jungkap\peptidome";
-            const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Histone";
-            const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_3";
-            //const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Lewy\ms1ft";
-            //const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3";
-            string outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
+            const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Quant";
+            const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
+            string outFilePath = string.Format(@"{0}\aligned_features2.tsv", ms1ftFolder);
+            
             var fileEntries = Directory.GetFiles(ms1ftFolder);
-            //var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
-            //dataset.Sort();
-            var dataset = new String[]
+            
+            var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            dataset.Sort();
+            /*var dataset = new String[]
             {
                 "MZ20150729FG_WT1",
                 "MZ20150729FG_WT2a",
@@ -42,7 +40,8 @@ namespace InformedProteomics.Test
                 "MZ20150729FG_MT2",
                 "MZ20150725FG_MT1",
                 "MZ20150725FG_MT2"
-            };
+            };*/
+
             //var dataset = new List<string>();
             //for (var i = 1; i <= 10; i++) dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
             var rawFiles = new List<string>();
@@ -125,9 +124,25 @@ namespace InformedProteomics.Test
         [Test]
         public void TestCompRef()
         {
-            const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features.tsv";
+            const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features_requant.tsv";
             const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\CompRef\ms1ft";
             const string rawFolder = @"\\protoapps\UserData\Jungkap\CompRef\raw";
+
+            var fileEntries = Directory.GetFiles(ms1ftFolder);
+            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft")).ToList();
+
+            fileEntries = Directory.GetFiles(rawFolder);
+            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf")).ToList();
+
+            RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
+        }
+
+        [Test]
+        public void TestIMER()
+        {
+            const string outFilePath = @"D:\MassSpecFiles\IMER\aligned_features.tsv";
+            const string ms1ftFolder = @"D:\MassSpecFiles\IMER";
+            const string rawFolder = @"D:\MassSpecFiles\IMER";
 
             var fileEntries = Directory.GetFiles(ms1ftFolder);
             var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft")).ToList();
@@ -234,7 +249,7 @@ namespace InformedProteomics.Test
 
         }
 
-        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, bool isTemp = true)
+        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, List<string> rawFiles, bool isTemp = true)
         {
             var alignedFeatureList = align.GetAlignedFeatures();
 
@@ -242,7 +257,7 @@ namespace InformedProteomics.Test
             writer.Write("MonoMass\tMinElutionTime\tMaxElutionTime");
             for (var i = 0; i < align.CountDatasets; i++)
             {
-                var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
+                var dataSetName = Path.GetFileNameWithoutExtension(rawFiles[i]);
                 writer.Write("\t{0}", dataSetName);
             }
 
@@ -252,12 +267,12 @@ namespace InformedProteomics.Test
                 writer.Write("\t{0}_Score", i);
             }
 
-
+            /*
             for (var i = 0; i < align.CountDatasets; i++)
             {
                 //var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
                 writer.Write("\t{0}_Net", i);
-            }
+            }*/
 
             writer.Write("\n");
             for (var i = 0; i < align.CountAlignedFeatures; i++)
@@ -273,14 +288,14 @@ namespace InformedProteomics.Test
                     writer.Write("\t");
                     writer.Write(feature != null ? feature.Abundance : 0d);
                 }
-                /*
+                
                 for (var j = 0; j < align.CountDatasets; j++)
                 {
                     var feature = features[j];
                     writer.Write("\t");
                     writer.Write(feature != null ? feature.Score : 0d);
-                }*/
-
+                }
+                /*
                 for (var j = 0; j < align.CountDatasets; j++)
                 {
                     var feature = features[j];
@@ -295,7 +310,7 @@ namespace InformedProteomics.Test
                     writer.Write("\t");
                     if (feature != null) writer.Write("{0:0.00000}", feature.MaxNet);
                     else writer.Write(0);
-                }
+                }*/
 
                 writer.Write("\n");
             }
@@ -306,7 +321,7 @@ namespace InformedProteomics.Test
             var outDirectory = Path.GetDirectoryName(Path.GetFullPath(outFilePath));
             for (var i = 0; i < align.CountDatasets; i++)
             {
-                var dataSetName = Path.GetFileNameWithoutExtension(align.RawFileList[i]);
+                var dataSetName = Path.GetFileNameWithoutExtension(rawFiles[i]);
                 //writer.Write("\t{0}", dataSetName);
                 // now output results!!                
                 var ms1ftFilePath = String.Format(@"{0}\{1}.aligned.ms1ft", outDirectory, dataSetName);
@@ -325,15 +340,19 @@ namespace InformedProteomics.Test
 
         private void RunFeatureAlignment(List<string> ms1FtFiles, List<string> rawFiles, string outFilePath)
         {
-            var align = new LcMsFeatureAlignment(ms1FtFiles, rawFiles, new LcMsFeatureAlignComparer(new Tolerance(10)));
+            var runList = new List<LcMsRun>();
+
+            foreach(var rawFile in rawFiles)
+                runList.Add(new PbfLcMsRun(rawFile));
+
+            var align = new LcMsFeatureAlignment(ms1FtFiles, runList, new LcMsFeatureAlignComparer(new Tolerance(10)));
             align.AlignFeatures();
             Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
             var tempOutPath = outFilePath + ".tmp";
-            OutputAlignmentResult(align, tempOutPath, true);
+            OutputAlignmentResult(align, tempOutPath, rawFiles, true);
             
             align.RefineAbundance();
-            OutputAlignmentResult(align, outFilePath, false);
-            //align.TryFillMissingFeature(alignedFeatureList);
+            OutputAlignmentResult(align, outFilePath, rawFiles, false);
         }
 
 

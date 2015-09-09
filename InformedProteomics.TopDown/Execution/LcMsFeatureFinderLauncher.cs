@@ -227,7 +227,7 @@ namespace InformedProteomics.TopDown.Execution
                 //Console.WriteLine(@"Start feature map image generation");
                 //stopwatch.Restart();
                 //_plotter.PlotLcMsFeatureMap(outTsvFilePath, outImgFilePath, baseName, string.Format("{0}", Math.Ceiling(run.GetElutionTime(run.MaxLcScan))));
-                var map = new LcMsFeatureMap(outTsvFilePath, 0, run.GetElutionTime(run.MaxLcScan) + 5, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
+                var map = new LcMsFeatureMap(run, outTsvFilePath, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
                 map.SaveImage(outImgFilePath);
                 //stopwatch.Stop();
                 //Console.WriteLine(@"Complete feature map image generation");
@@ -250,6 +250,9 @@ namespace InformedProteomics.TopDown.Execution
                                         feature.RepresentativeMz,
                                         feature.Abundance));
 
+            sb.AppendFormat("\t{0:0}", 0);
+            sb.AppendFormat("\t{0:0.00}", 0);
+            
             sb.AppendFormat("\t{0:0.0}", feature.MinElutionTime);
             sb.AppendFormat("\t{0:0.0}", feature.MaxElutionTime);
             sb.AppendFormat("\t{0:0.0}", feature.ElutionLength);
@@ -324,7 +327,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine(@"----------------------------------------------------------");
 
         }
-        private static readonly string[] TsvHeader = new string[]
+        public static readonly string[] TsvHeader = new string[]
         {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", 
             "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
@@ -332,7 +335,7 @@ namespace InformedProteomics.TopDown.Execution
             "MinElutionTime", "MaxElutionTime", "ElutionLength", "Envelope", "LikelihoodRatio"
         };
 
-        private static readonly string[] TsvExtraScoreHeader = new string[]
+        public static readonly string[] TsvExtraScoreHeader = new string[]
         {
             "BestEvenCharge", "BestOddCharge", 
             "CorrEvenCharge", "CorrOddCharge", 

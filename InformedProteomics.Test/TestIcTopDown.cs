@@ -19,10 +19,24 @@ namespace InformedProteomics.Test
     [TestFixture]
     internal class TestIcTopDown
     {
+        [Test]
         public void TestForManyMods()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
+            
+            const string dbFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta";
+            var indexedDb = new IndexedDatabase(new FastaDatabase(dbFilePath));
+            indexedDb.Read();
+          
+            var nProt = indexedDb.EstimateTotalPeptides(1, 21, 300, 1, 0);
+            Console.WriteLine(nProt);
+
+            nProt = indexedDb.EstimateTotalPeptides(1, 21, 400, 1, 0);
+            Console.WriteLine(nProt);
+
+            nProt = indexedDb.EstimateTotalPeptides(1, 21, 500, 1, 0);
+            Console.WriteLine(nProt);
 
             Console.WriteLine(@"Test not implemented: " + methodName);
         }

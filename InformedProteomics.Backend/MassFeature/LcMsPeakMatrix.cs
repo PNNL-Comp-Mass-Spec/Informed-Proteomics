@@ -282,7 +282,7 @@ namespace InformedProteomics.Backend.MassFeature
 
         private readonly int _maxThreadCount;
         private static List<Ms1Peak> _ms1PeakList;
-        protected const int MaxEnvelopeLength = 30;
+        public const int MaxEnvelopeLength = 30;
 
         private readonly double[] _distProfileAcrossCharge;
         private readonly double[] _corrProfileAcrossCharge;
@@ -826,7 +826,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             var cluster = new LcMsPeakCluster(Run, _theoreticalEnvelope, targetMass, targetCharge, repMz, repScanNum, abundance);
             cluster.AddEnvelopes(minRow + _targetMinCharge, maxRow + _targetMinCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol]);
-            cluster.Score = -999d;
+            cluster.Score = float.MinValue;
 
             return cluster;
         }

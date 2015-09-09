@@ -5,9 +5,16 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsFeature
     {
+        public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance)
+            : this(repMass, repCharge, repMz, repScanNum, abundance, 
+            repCharge, repCharge, repScanNum, repScanNum, 0, 0)
+        {
+            
+        }
+        
         public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance,
-            int minCharge = 0, int maxCharge = 0, int minScan = 0, int maxScan = 0,
-            double minElution = 0, double maxElution = 0, LcMsRun run = null)
+            int minCharge, int maxCharge, int minScan, int maxScan,
+            double minElution, double maxElution, double minNet = 0, double maxNet = 0)
         {
             Abundance = abundance;
             RepresentativeMass = repMass;
@@ -20,9 +27,11 @@ namespace InformedProteomics.Backend.MassFeature
             MinScanNum = (minScan > 0) ? minScan : repScanNum;
             MaxScanNum = (maxScan > 0) ? maxScan : repScanNum;
 
-            _minElution = minElution;
-            _maxElution = maxElution;
-            Run = run;
+            MinElutionTime = minElution;
+            MaxElutionTime = maxElution;
+            
+            MaxNet = maxNet;
+            MinNet = minNet;
         }
        
         public int DataSetId { get; set; }
@@ -45,16 +54,32 @@ namespace InformedProteomics.Backend.MassFeature
         public int RepresentativeScanNum { get; protected set; }
         public double RepresentativeMz { get; protected set; }
 
+        public virtual double MinElutionTime { get; private set; }
+        public virtual double MaxElutionTime { get; private set; }
+        public double ElutionTime { get { return 0.5 * (MinElutionTime + MaxElutionTime); } }
+        public double ElutionLength { get { return MaxElutionTime - MinElutionTime; } }
+
+        /*
         public double MinElutionTime { get { return (Run == null) ? _minElution : Run.GetElutionTime(MinScanNum); } }
         public double MaxElutionTime { get { return (Run == null) ? _maxElution : Run.GetElutionTime(MaxScanNum); } }
         public double ElutionTime { get { return 0.5*(MinElutionTime + MaxElutionTime); } }
         public double ElutionLength { get { return MaxElutionTime - MinElutionTime; } }
-
+        
         public double MaxNet { get { return (Run == null) ? 0 : MaxElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double MinNet { get { return (Run == null) ? 0 : MinElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double NetLength { get { return (Run == null) ? 0 : MaxNet - MinNet; } }
         public double Net { get { return (Run == null) ? 0 : 0.5 * (MinNet + MaxNet); } }
-        
+        */
+        public virtual double MaxNet { get; private set; }
+        public virtual double MinNet { get; private set; }
+        public double NetLength { get { return MaxNet - MinNet; } }
+        public double Net { get { return 0.5 * (MinNet + MaxNet); } }
+
+        public void SetNet(int minNet, int maxNet)
+        {
+            MaxNet = maxNet;
+            MinNet = minNet;
+        }
 
         public double CoElutionLength(LcMsFeature other)
         {
@@ -98,11 +123,6 @@ namespace InformedProteomics.Backend.MassFeature
         
         public bool CoElutedByNet(LcMsFeature other, double tolNet = 0d)
         {
-            if (Run == null || other.Run == null)
-            {
-                throw new LcMsRunNullException();
-            }
-            
             if (MinNet - tolNet < other.MinNet && other.MinNet < MaxNet + tolNet) return true;
             if (MinNet - tolNet < other.MaxNet && other.MaxNet < MaxNet + tolNet) return true;
             if (other.MinNet - tolNet < MinNet && MinNet < other.MaxNet + tolNet) return true;
@@ -121,14 +141,13 @@ namespace InformedProteomics.Backend.MassFeature
             return false;
         }
         
-        public LcMsRun Run { get; protected set; }
+        //public LcMsRun Run { get; protected set; }
         public ProteinSpectrumMatchSet ProteinSpectrumMatches { get; set; }
 
         [Serializable]
         public class LcMsRunNullException : Exception { }
-
-        private readonly double _minElution;
-        private readonly double _maxElution;
+        //private readonly double _minElution;
+        //private readonly double _maxElution;
 
     }
 }

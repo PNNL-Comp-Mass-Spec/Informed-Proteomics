@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.SequenceTag
 {
@@ -117,6 +118,15 @@ namespace InformedProteomics.Backend.SequenceTag
 
         private bool FindIon(Ion ion, Tolerance tolerance, double relativeIntensityThreshold, out int baseIsotopePeakIndex, out int nIsotopes, out int nMatchedIsotopes)
         {
+
+            var corrScore = _spectrum.GetCorrScore(ion, tolerance, relativeIntensityThreshold);
+
+            ///isotopePeaks
+            /// 
+            //FitScoreCalculator.GetPearsonCorrelation()
+            
+
+            
             //matchedPeakIndex = new List<int>();
             var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();

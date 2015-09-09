@@ -5,6 +5,7 @@ using System.Linq;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
+using pwiz.CLI.msdata;
 
 namespace InformedProteomics.Backend.MassFeature
 {
@@ -14,43 +15,46 @@ namespace InformedProteomics.Backend.MassFeature
         {
             _featureSetList = new Dictionary<int, List<LcMsFeature>>();
             _featureList = new List<LcMsFeature>();
-            RawFileList = new List<string>();
+            _runList = new List<LcMsRun>();
             _featureCompare = featureCompare;
         }
 
-        private readonly INodeComparer<LcMsFeature> _featureCompare;
-        public LcMsFeatureAlignment(IList<string> featureFileList, IList<string> rawFileList, INodeComparer<LcMsFeature> featureCompare)
+        public LcMsFeatureAlignment(IList<string> featureFileList, IEnumerable<LcMsRun> runList, INodeComparer<LcMsFeature> featureCompare) 
+            : this(featureCompare)
         {
-            RawFileList = rawFileList;
-            _featureSetList = new Dictionary<int, List<LcMsFeature>>();
-            _featureList = new List<LcMsFeature>();
-
+            _runList.AddRange(runList);
             for (var i = 0; i < featureFileList.Count; i++)
             {
-                var features = LoadProMexResult(featureFileList[i], RawFileList[i], i);
+                var features = LoadProMexResult(i, featureFileList[i], _runList[i]);
                 features.Sort(new FeatureMassComparer());
                 _featureSetList.Add(i, features);
                 _featureList.AddRange(features);
             }
             _featureList.Sort(new FeatureMassComparer());
-
-            _featureCompare = featureCompare;
         }
         
-        public void AddDataSet(int dataId, List<LcMsFeature> features, string rawFilePath)
+        public void AddDataSet(int dataId, List<LcMsFeature> features, LcMsRun run)
         {
-            RawFileList.Add(rawFilePath);
+            //RawFileList.Add(rawFilePath);
+            _runList.Add(run);
             features.Sort(new FeatureMassComparer());
             _featureSetList.Add(dataId, features);
             _featureList.AddRange(features);
             _featureList.Sort(new FeatureMassComparer());        
         }
-     
-        public static List<LcMsFeature> LoadProMexResult(string featureFilePath, string rawFilePath = null, int dataid = 0)
+        
+        /*
+        public static List<LcMsFeature> LoadProMexResult(string featureFilePath)
+        {
+            return LoadProMexResult(0, featureFilePath);
+        }
+        */
+
+        public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run)
         {
             var featureList = new List<LcMsFeature>();
             var tsvReader = new TsvFileParser(featureFilePath);
-            var run = (rawFilePath == null || !File.Exists(rawFilePath)) ? null : PbfLcMsRun.GetLcMsRun(rawFilePath);
+            //var run = (rawFilePath == null || !File.Exists(rawFilePath)) ? null : PbfLcMsRun.GetLcMsRun(rawFilePath);
             var featureIds = tsvReader.GetData("FeatureID");
 
             var minScans = tsvReader.GetData("MinScan");
@@ -64,11 +68,11 @@ namespace InformedProteomics.Backend.MassFeature
             var repCharges = tsvReader.GetData("RepCharge");
             var repScans = tsvReader.GetData("RepScan");
             var repMzs = tsvReader.GetData("RepMz");
-
+            
             var scores = tsvReader.GetData("LikelihoodRatio");
             var minElutionTime = tsvReader.GetData("MinElutionTime");
             var maxElutionTime = tsvReader.GetData("MaxElutionTime");
-
+            
             for (var i = 0; i < tsvReader.NumData; i++)
             {
                 var abundance = double.Parse(abu[i]);
@@ -84,11 +88,12 @@ namespace InformedProteomics.Backend.MassFeature
                 var score = double.Parse(scores[i]);
                 var minEt = double.Parse(minElutionTime[i]);
                 var maxEt = double.Parse(maxElutionTime[i]);
-                
-                var feature = new LcMsFeature(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, minEt, maxEt, run)
+                var minNet = minEt/run.GetElutionTime(run.MaxLcScan);
+                var maxNet = maxEt / run.GetElutionTime(run.MaxLcScan);
+                var feature = new LcMsFeature(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, minEt, maxEt, minNet, maxNet)
                 {
                     FeatureId = fid,
-                    DataSetId = dataid,
+                    DataSetId = dataId,
                     Score = score,
                 };
 
@@ -107,14 +112,14 @@ namespace InformedProteomics.Backend.MassFeature
         {
             return _alignedFeatures;
         }
-
-        public void RefineAbundance()
+        
+        public void RefineAbundance(double scoreThreshold = -30)
         {
             if (_alignedFeatures == null) return;
 
             for (var i = 0; i < CountDatasets; i++)
             {
-                var run = PbfLcMsRun.GetLcMsRun(RawFileList[i]);
+                var run = _runList[i];
                 var ms1ScanNums = run.GetMs1ScanVector();
                 var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
 
@@ -127,163 +132,42 @@ namespace InformedProteomics.Backend.MassFeature
                     var minScanNum = -1;
                     var maxScanNum = ms1ScanNums.Last();
                     var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
+                    mass = repFt.Mass;
+                    charge = repFt.Charge;
+                    var minNet = repFt.MinNet;
+                    var maxNet = repFt.MaxNet;
 
-                
-                        mass = repFt.Mass;
-                        charge = repFt.Charge;
-                        var minNet = repFt.MinNet;
-                        var maxNet = repFt.MaxNet;
-
-                        for (var k = 0; k < ms1ScanNums.Length; k++)
-                        {
-                            var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
-                            if (net > minNet && minScanNum < 0)
-                            {
-                                minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
-                            }
-
-                            if (net > maxNet)
-                            {
-                                maxScanNum = ms1ScanNums[k];
-                                break;
-                            }
-                        }
-                        if (minScanNum < 0) minScanNum = 0;
-                        _alignedFeatures[j][i] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
-                }
-                Console.WriteLine("{0} has been processed...", RawFileList[i]);
-            }
-        }
-
-        /*
-        public void RefineAbundance()
-        {
-            if (_alignedFeatures == null) return;
-
-            for (var i = 0; i < CountDatasets; i++)
-            {
-                var run = PbfLcMsRun.GetLcMsRun(RawFileList[i]);
-                var ms1ScanNums = run.GetMs1ScanVector();
-                var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
-
-                for (var j = 0; j < CountAlignedFeatures; j++)
-                {
-                    if (_alignedFeatures[j][i] != null) continue;
-
-                    var mass = 0d;
-                    var charge = 0;
-                    var minScanNum = -1;
-                    var maxScanNum = ms1ScanNums.Last();
-                    var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
-
-                    if (_alignedFeatures[j][i] == null)
+                    for (var k = 0; k < ms1ScanNums.Length; k++)
                     {
-                        mass = repFt.Mass;
-                        charge = repFt.Charge;
-                        var minNet = repFt.MinNet;
-                        var maxNet = repFt.MaxNet;
-
-                        for (var k = 0; k < ms1ScanNums.Length; k++)
+                        var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
+                        if (net > minNet && minScanNum < 0)
                         {
-                            var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
-                            if (net > minNet && minScanNum < 0)
-                            {
-                                minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
-                            }
-
-                            if (net > maxNet)
-                            {
-                                maxScanNum = ms1ScanNums[k];
-                                break;
-                            }
+                            minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
                         }
-                        if (minScanNum < 0) minScanNum = 0;
+
+                        if (net > maxNet)
+                        {
+                            maxScanNum = ms1ScanNums[k];
+                            break;
+                        }
                     }
+                    
+                    if (minScanNum < 0) minScanNum = 0;
+                    var ft = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
+
+                    if (ft == null || ft.Score < scoreThreshold)
+                        _alignedFeatures[j][i] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum,
+                            maxScanNum, repFt.MinCharge, repFt.MaxCharge);
                     else
-                    {
-                        mass = _alignedFeatures[j][i].Mass;
-                        charge = _alignedFeatures[j][i].RepresentativeCharge;
-                        minScanNum = _alignedFeatures[j][i].MinScanNum;
-                        maxScanNum = _alignedFeatures[j][i].MaxScanNum;
-                    }
-                    
-                    var feature = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
-                    if (feature == null || feature.Score < -10)
-                    {
-                        feature = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
-                    }
-                    
-                    _alignedFeatures[j][i] = feature;    
+                        _alignedFeatures[j][i] = ft;
                 }
-                Console.WriteLine("{0} has been processed...", RawFileList[i]);
+                //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
-        }
-        */
-        private class RepFeatureInfo
-        {
-            internal double Mass;
-            internal int Charge;
-            internal double MinNet;
-            internal double MaxNet;
-            internal int MinCharge;
-            internal int MaxCharge;
-        }
-
-        private RepFeatureInfo GetRepFeatureInfo(LcMsFeature[] features)
-        {
-            //var minElutionTime = double.MaxValue;
-            //var maxElutionTime = 0d;
-            var minNet = 1.0d;
-            var maxNet = 0d;
-            var massList = new List<double>();
-            var chargeList = new List<double>();
-
-            var minCharge = int.MaxValue;
-            var maxCharge = -1;
-            
-            foreach (var f in features)
-            {
-                if (f == null) continue;
-                minNet = Math.Min(minNet, f.MinNet);
-                maxNet = Math.Max(maxNet, f.MaxNet);
-                minCharge = Math.Min(minCharge, f.MinCharge);
-                maxCharge = Math.Max(maxCharge, f.MaxCharge);
-                //minElutionTime = Math.Min(minElutionTime, f.MinElutionTime);
-                //maxElutionTime = Math.Max(maxElutionTime, f.MaxElutionTime);
-                massList.Add(f.Mass);
-                chargeList.Add(f.RepresentativeCharge);
-            }
-            
-            var mass = massList.Median();
-            var charge = (int) chargeList.Median();
-
-            var ret = new RepFeatureInfo()
-            {
-                Mass = mass,
-                Charge = charge,
-                MinNet = minNet,
-                MaxNet = maxNet,
-                MinCharge = minCharge,
-                MaxCharge = maxCharge,
-            };
-            return ret;
-        }
-
-
-        private LcMsFeature GetRepresentativeFeature(IList<LcMsFeature> features)
-        {
-            foreach (var f in features)
-            {
-                if (f == null) continue;
-                return f;
-            }
-            return null;
         }
         
-        public int CountDatasets { get { return RawFileList.Count; } }
-
+        public int CountDatasets { get { return _runList.Count; } }
         public int CountAlignedFeatures { get { return (_alignedFeatures == null) ? 0 : _alignedFeatures.Count; } }
-
+        /*
         public void TryFillMissingFeature(List<LcMsFeature[]> alignedFeatures)
         {
             var featureInfoList = new List<LcMsFeature>();
@@ -322,14 +206,138 @@ namespace InformedProteomics.Backend.MassFeature
                             var newOnew = new LcMsFeature(featureInfoList[i].Mass, altFt.RepresentativeCharge,
                                 altFt.RepresentativeMz, altFt.RepresentativeScanNum,
                                 altFt.Abundance, altFt.MinCharge, altFt.MaxCharge, altFt.MinScanNum, altFt.MaxScanNum,
-                                altFt.MinElutionTime, altFt.MaxElutionTime,
-                                altFt.Run);
+                                altFt.MinElutionTime, altFt.MaxElutionTime, );
 
                             alignedFeatures[i][j] = newOnew;
                         }
                     }
                 }
             }
+        }*/
+
+
+        /*
+        public void RefineAbundance()
+        {
+            if (_alignedFeatures == null) return;
+
+            for (var i = 0; i < CountDatasets; i++)
+            {
+                var run = PbfLcMsRun.GetLcMsRun(RawFileList[i]);
+                var ms1ScanNums = run.GetMs1ScanVector();
+                var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
+
+                for (var j = 0; j < CountAlignedFeatures; j++)
+                {
+                    //if (_alignedFeatures[j][i] != null) continue;
+                    var mass = 0d;
+                    var charge = 0;
+                    var minScanNum = -1;
+                    var maxScanNum = ms1ScanNums.Last();
+                    var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
+
+                    if (_alignedFeatures[j][i] == null)
+                    {
+                        mass = repFt.Mass;
+                        charge = repFt.Charge;
+                        var minNet = repFt.MinNet;
+                        var maxNet = repFt.MaxNet;
+
+                        for (var k = 0; k < ms1ScanNums.Length; k++)
+                        {
+                            var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
+                            if (net > minNet && minScanNum < 0)
+                            {
+                                minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
+                            }
+
+                            if (net > maxNet)
+                            {
+                                maxScanNum = ms1ScanNums[k];
+                                break;
+                            }
+                        }
+                        if (minScanNum < 0) minScanNum = 0;
+                    }
+                    else
+                    {
+                        mass = _alignedFeatures[j][i].Mass;
+                        charge = _alignedFeatures[j][i].RepresentativeCharge;
+                        minScanNum = _alignedFeatures[j][i].MinScanNum;
+                        maxScanNum = _alignedFeatures[j][i].MaxScanNum;
+                    }
+                    
+                    var feature = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
+                    //if (feature == null || feature.Score < -10)
+                    if (feature == null)
+                    {
+                        feature = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
+                    }
+                    _alignedFeatures[j][i] = feature;    
+                }
+                Console.WriteLine("{0} has been processed...", RawFileList[i]);
+            }
+        }
+        */
+        private class RepFeatureInfo
+        {
+            internal double Mass;
+            internal int Charge;
+            internal double MinNet;
+            internal double MaxNet;
+            internal int MinCharge;
+            internal int MaxCharge;
+        }
+
+        private RepFeatureInfo GetRepFeatureInfo(LcMsFeature[] features)
+        {
+            //var minElutionTime = double.MaxValue;
+            //var maxElutionTime = 0d;
+            var minNet = 1.0d;
+            var maxNet = 0d;
+            var massList = new List<double>();
+            var chargeList = new List<double>();
+
+            var minCharge = int.MaxValue;
+            var maxCharge = -1;
+
+            foreach (var f in features)
+            {
+                if (f == null) continue;
+                minNet = Math.Min(minNet, f.MinNet);
+                maxNet = Math.Max(maxNet, f.MaxNet);
+                minCharge = Math.Min(minCharge, f.MinCharge);
+                maxCharge = Math.Max(maxCharge, f.MaxCharge);
+                //minElutionTime = Math.Min(minElutionTime, f.MinElutionTime);
+                //maxElutionTime = Math.Max(maxElutionTime, f.MaxElutionTime);
+                massList.Add(f.Mass);
+                chargeList.Add(f.RepresentativeCharge);
+            }
+
+            var mass = massList.Median();
+            var charge = (int)chargeList.Median();
+
+            var ret = new RepFeatureInfo()
+            {
+                Mass = mass,
+                Charge = charge,
+                MinNet = minNet,
+                MaxNet = maxNet,
+                MinCharge = minCharge,
+                MaxCharge = maxCharge,
+            };
+            return ret;
+        }
+
+
+        private LcMsFeature GetRepresentativeFeature(IList<LcMsFeature> features)
+        {
+            foreach (var f in features)
+            {
+                if (f == null) continue;
+                return f;
+            }
+            return null;
         }
 
         private List<LcMsFeature[]> _alignedFeatures;
@@ -373,7 +381,7 @@ namespace InformedProteomics.Backend.MassFeature
 
         private List<LcMsFeature> GetAlignedFeatures(ref HashSet<int> component, List<int>[] adjList)
         {
-            var nDataSet = RawFileList.Count;
+            var nDataSet = CountDatasets;
             
             // find seed node
             var minScoreNode = 0;
@@ -524,7 +532,9 @@ namespace InformedProteomics.Backend.MassFeature
         private const double TolNet = 0.003;
         private readonly Dictionary<int, List<LcMsFeature>> _featureSetList;
         private readonly List<LcMsFeature> _featureList;
-        public readonly IList<string> RawFileList;
+        private readonly List<LcMsRun> _runList;
+        //public readonly IList<string> RawFileList;
+        private readonly INodeComparer<LcMsFeature> _featureCompare;
 
         private class FeatureMassComparer : IComparer<LcMsFeature>
         {

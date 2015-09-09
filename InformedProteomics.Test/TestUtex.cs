@@ -254,7 +254,7 @@ namespace InformedProteomics.Test
                 }
 
 
-                var features = LcMsFeatureAlignment.LoadProMexResult(ms1ftPath, rawFile, i);
+                var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1ftPath, run);
                 
                 // tag features by PrSMs
                 for(var j = 0; j < features.Count; j++)
@@ -270,7 +270,7 @@ namespace InformedProteomics.Test
                     }
                 }
 
-                align.AddDataSet(i, features, rawFile);
+                align.AddDataSet(i, features, run);
             }
 
             if (validCount == 0)

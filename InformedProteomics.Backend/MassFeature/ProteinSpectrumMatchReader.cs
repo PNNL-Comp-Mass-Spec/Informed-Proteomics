@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassFeature
     {
         public readonly double FdrCutoff;
 
-        public ProteinSpectrumMatchReader(double fdrCutoff)
+        public ProteinSpectrumMatchReader(double fdrCutoff = 0.01)
         {
             FdrCutoff = fdrCutoff;
         }
@@ -139,7 +139,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 var firstResId = int.Parse(parser.GetData("Start")[i]);
                 var lastResId = int.Parse(parser.GetData("End")[i]);
-                var score = int.Parse(scoreColumn[i]);
+                var score = double.Parse(scoreColumn[i]);
                 var mod = parser.GetData("Modifications")[i];
 
                 if (qValColumn != null)

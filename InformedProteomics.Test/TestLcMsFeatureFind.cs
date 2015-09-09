@@ -4,10 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.TopDown;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -20,31 +24,31 @@ namespace InformedProteomics.Test
         public void TestIsotopeCount()
         {
 
-
-            var threads = 10;
-
-            var ms2Scans = Enumerable.Range(1, 7892).ToList();
-            var nScansPerThread = (int)ms2Scans.Count/threads;
-
-
-
-            Math.Ceiling((double) ms2Scans.Count/(double) nScansPerThread);
-
-            for (var m = 500; m < 3000; m += 100)
+            var mzComparer = new ProteinMassBinning(28);
+            var proteinMassBinning = new FilteredProteinMassBinning(AminoAcidSet.GetStandardAminoAcidSet(), 50000, 28);
+            var aaList = AminoAcid.StandardAminoAcidArr;
+            var rnd = new Random();
+            var m = 0d;
+            for (var i = 0; i < 100000; i++)
             {
-                var TheoreticalEnvelope = new TheoreticalIsotopeEnvelope(m, 30);
-                //var n = 2; //Math.Ceiling(TheoreticalEnvelope.Size*0.5);
+                var j = rnd.Next(aaList.Length);
+                m += aaList[j].Mass;
 
-                var j = 0;
-                for (var i = 0; i < TheoreticalEnvelope.IndexOrderByRanking.Length; i++)
-                {
-                    var k = TheoreticalEnvelope.IndexOrderByRanking[i];
-                    if (TheoreticalEnvelope.Isotopes[k].Ratio < 0.3) break;
-                    j++;
-                }
-                Console.WriteLine("{0}\t{1}\t{2}", m, j, TheoreticalEnvelope.Size);
-
+                if (m > 50000) break;
+                
+                Console.Write(m);
+                Console.Write("\t");
+                Console.Write(Constants.GetBinNum(m));
+                Console.Write("\t");
+                Console.Write(Constants.GetBinNumHighPrecision(m));
+                Console.Write("\t");
+                Console.Write(mzComparer.GetBinNumber(m));
+                Console.Write("\t");
+                Console.Write(proteinMassBinning.GetBinNumber(m));
+                Console.Write("\n");
             }
+
+
         }
 
         [Test]

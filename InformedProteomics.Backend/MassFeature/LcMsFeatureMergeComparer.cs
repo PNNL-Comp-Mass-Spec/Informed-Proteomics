@@ -26,7 +26,7 @@ namespace InformedProteomics.Backend.MassFeature
         }
         private readonly Tolerance _tolerance;
     }
-
+    /*
     public class LcMsProteoformMergeCompare : INodeComparer<LcMsPeakCluster>
     {
         public LcMsProteoformMergeCompare(Tolerance tolerance)
@@ -66,6 +66,6 @@ namespace InformedProteomics.Backend.MassFeature
             return false;
         }
         private readonly Tolerance _tolerance;
-    }
+    }*/
 
 }

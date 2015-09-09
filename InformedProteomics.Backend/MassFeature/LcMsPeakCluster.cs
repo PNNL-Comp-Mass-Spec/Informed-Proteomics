@@ -20,13 +20,9 @@ namespace InformedProteomics.Backend.MassFeature
         public LcMsPeakCluster(LcMsRun run, TheoreticalIsotopeEnvelope theoreticalIsotopeEnvelope, double mass, int charge, double repMz, int repScanNum, double abundance)
             : base(mass, charge, repMz, repScanNum, abundance)
         {
-            Run = run;
+            _run = run;
             TheoreticalEnvelope = theoreticalIsotopeEnvelope;
             Flag = 0;
-
-            //DetectableMaxCharge = (int)Math.Min(Math.Floor(Mass / Run.MinMs1Mz), LcMsPeakMatrix.MaxScanCharge);
-            //DetectableMinCharge = (int)Math.Max(Math.Ceiling(Mass / Run.MaxMs1Mz), LcMsPeakMatrix.MinScanCharge);
-            //if (mass > 2000) DetectableMinCharge = Math.Max(DetectableMinCharge, 2);
             RepresentativeSummedEnvelop = new double[TheoreticalEnvelope.Size];
 
             AbundanceDistributionAcrossCharge = new double[2];
@@ -47,7 +43,7 @@ namespace InformedProteomics.Backend.MassFeature
         public void AddEnvelopes(int minCharge, int maxCharge, int minScanNum, int maxScanNum,
             IList<ObservedIsotopeEnvelope> envelopes = null)
         {
-            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+            var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
             var minCol = ms1ScanNumToIndex[minScanNum];
             var maxCol = ms1ScanNumToIndex[maxScanNum];
 
@@ -76,8 +72,8 @@ namespace InformedProteomics.Backend.MassFeature
 
         public void UpdateWithDecoyScore(List<Ms1Spectrum> ms1Spectra, int targetMinCharge, int targetMaxCharge)
         {
-            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
-            var ms1ScanNums = Run.GetMs1ScanVector();
+            var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
+            var ms1ScanNums = _run.GetMs1ScanVector();
             var minCol = ms1ScanNumToIndex[MinScanNum];
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
             MinCharge = targetMinCharge;
@@ -96,7 +92,7 @@ namespace InformedProteomics.Backend.MassFeature
             for (var charge = targetMinCharge; charge <= targetMaxCharge; charge++)
             {
                 var mostAbuMz = TheoreticalEnvelope.GetIsotopeMz(charge, mostAbuInternalIndex);
-                if (Run.MaxMs1Mz < mostAbuMz || mostAbuMz < Run.MinMs1Mz) continue;
+                if (_run.MaxMs1Mz < mostAbuMz || mostAbuMz < _run.MinMs1Mz) continue;
 
                 for (var col = minCol; col <= maxCol; col++)
                 {
@@ -142,7 +138,7 @@ namespace InformedProteomics.Backend.MassFeature
         public void UpdateScore(List<Ms1Spectrum> ms1Spectra, bool pValueCheck = true)
         {
             var nRows = MaxCharge - MinCharge + 1;
-            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+            var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
             var minCol = ms1ScanNumToIndex[MinScanNum];
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
             var nCols = maxCol - minCol + 1;
@@ -382,10 +378,10 @@ namespace InformedProteomics.Backend.MassFeature
         public void ExpandElutionRange()
         {
             // considering DDA instrument
-            if (Run.MaxMsLevel > 1 && NetLength < 0.01)
+            if (_run.MaxMsLevel > 1 && NetLength < 0.01)
             {
-                var ms1ScanNums = Run.GetMs1ScanVector();
-                var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+                var ms1ScanNums = _run.GetMs1ScanVector();
+                var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
 
                 var minCol = ms1ScanNumToIndex[MinScanNum];
                 var maxCol = ms1ScanNumToIndex[MaxScanNum];
@@ -503,10 +499,30 @@ namespace InformedProteomics.Backend.MassFeature
                 return BestCorrelationScore > 0.7;                
             }
         }
-        public double ApexElutionTime { get { return Run.GetElutionTime(ApexScanNum); } }
+        public double ApexElutionTime { get { return _run.GetElutionTime(ApexScanNum); } }
         public int ApexScanNum { get; protected set; }
         public double ApexIntensity { get; protected set; }
         public double BoundaryIntensity { get; protected set; }
+
+        public override double MaxElutionTime
+        {
+            get { return _run.GetElutionTime(MaxScanNum); }
+        }
+
+        public override double MinElutionTime
+        {
+            get { return _run.GetElutionTime(MinScanNum); }
+        }
+
+        public override double MaxNet
+        {
+            get { return MaxElutionTime/_run.GetElutionTime(_run.MaxLcScan); }
+        }
+
+        public override double MinNet
+        {
+            get { return MinElutionTime / _run.GetElutionTime(_run.MaxLcScan); }
+        }
 
         //public readonly int DetectableMaxCharge;
         //public readonly int DetectableMinCharge; 
@@ -534,7 +550,8 @@ namespace InformedProteomics.Backend.MassFeature
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
         public byte Flag;
-        
+
+        private readonly LcMsRun _run;
         private bool _initScore;
     }
 }
