@@ -121,7 +121,7 @@ namespace InformedProteomics.Test
                 var tol = new Tolerance(10);
                 var sequenceFinder = new SequenceTagIndexFinder(tol, 1, 10);
                 var results = sequenceFinder.GetLongestSequence(spectrum, sequence);
-                resultLine += String.Format("{0},{1},{2},{3},{4},{5},{6},\n", scanNum, matchedFrags, seqStr, results.Item1, results.Item2,results.Item3,results.Item4);
+                resultLine += String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},\n", scanNum, matchedFrags, seqStr, results.Item1, results.Item2,results.Item3,results.Item4,results.Item5,results.Item6);
             }
             return resultLine;
         }
