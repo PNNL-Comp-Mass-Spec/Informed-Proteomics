@@ -139,8 +139,7 @@ namespace InformedProteomics.TopDown.Execution
 
             Console.Write(@"Reading raw file...");
             progData.Status = "Reading spectra file";
-            progData.IsPartialRange = true;
-            progData.MaxPercentage = 10.0;
+            progData.StepRange(10.0);
             sw.Start();
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, 0, 0, prog);
             _topDownScorer = new InformedTopDownScorer(_run, AminoAcidSet, MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance, corrThreshold);

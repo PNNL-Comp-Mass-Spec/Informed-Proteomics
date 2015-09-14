@@ -21,6 +21,10 @@ namespace InformedProteomics.Backend.Utils
             private set { _percent = value; }
         }
 
+        /// <summary>
+        /// If the progress reporting will be blocked into ranges
+        /// Setting this to "true" will reset MinPercentage and MaxPercentage to 0.
+        /// </summary>
         public bool IsPartialRange { get; set; }
 
         /// <summary>
@@ -83,8 +87,20 @@ namespace InformedProteomics.Backend.Utils
         /// Change to a new range block
         /// </summary>
         /// <param name="newMaxPercentage">New max percent for range, must be greater than current max percent.</param>
+        /// <remarks>Will set IsPartialRange to true</remarks>
+        /// <remarks>If current max percent is 100, the new max percent can be any value between 0 and 100</remarks>
         public void StepRange(double newMaxPercentage)
         {
+            if (!IsPartialRange)
+            {
+                IsPartialRange = true;
+
+                _minPercentage = 0;
+                if (_maxPercentage >= 100.0)
+                {
+                    _maxPercentage = 0;
+                }
+            }
             CheckSetMinMaxRange(_maxPercentage, newMaxPercentage);
         }
 

@@ -130,8 +130,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             Progress<ProgressData> prog = new Progress<ProgressData>();
             var progData = new ProgressData(progress);
-            progData.IsPartialRange = true;
-            progData.MaxPercentage = 75.0;
+            progData.StepRange(75.0);
             if (progress != null)
             {
                 prog = new Progress<ProgressData>(p =>
@@ -998,7 +997,6 @@ namespace InformedProteomics.Backend.MassSpecData
             long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
-            progressData.IsPartialRange = true;
             progressData.Status = "Writing spectra data";
 
             var scanNumToSpecOffset = new long[imlr.NumSpectra + 1];
@@ -1007,7 +1005,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Spectra
             countTotal = imlr.NumSpectra;
             counter = 0;
-            progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
+            progressData.StepRange(42.9); // SpecData: Approximately 43% of total file size
             long countMS2Spec = 0;
             for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
             {
@@ -1188,7 +1186,6 @@ namespace InformedProteomics.Backend.MassSpecData
             long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
-            progressData.IsPartialRange = true;
             progressData.Status = "Writing spectra data";
 
             var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
@@ -1205,7 +1202,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
             countTotal = msdr.NumSpectra;
             counter = 0;
-            progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
+            progressData.StepRange(42.9); // SpecData: Approximately 43% of total file size
             foreach (var spec in msdr.ReadAllSpectra())
             {
                 progressData.Report(counter, countTotal);
@@ -1535,8 +1532,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 FileShare.ReadWrite)));
                 }
 
-                progData.MaxPercentage = 5;
-                progData.IsPartialRange = true;
+                progData.StepRange(5);
                 // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 25000000 / numSpectra)
                 foreach (var scan in scansForMsLevelX)
                 {

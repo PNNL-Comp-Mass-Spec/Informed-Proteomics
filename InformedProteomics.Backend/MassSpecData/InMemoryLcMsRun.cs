@@ -188,8 +188,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             NumSpectra = massSpecDataReader.NumSpectra;
 
-            progressData.IsPartialRange = true;
-            progressData.MaxPercentage = 95.0;
+            progressData.StepRange(95.0);
 
             if (scanStart > 0 && scanEnd >= scanStart)
             {
