@@ -129,7 +129,7 @@ namespace InformedProteomics.Backend.MassSpecData
             string tempPath = String.Empty;
 
             Progress<ProgressData> prog = new Progress<ProgressData>();
-            var progData = new ProgressData();
+            var progData = new ProgressData(progress);
             progData.IsPartialRange = true;
             progData.MaxPercentage = 75.0;
             if (progress != null)
@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 prog = new Progress<ProgressData>(p =>
                 {
                     progData.Status = p.Status;
-                    progress.Report(progData.UpdatePercent(p.Percent));
+                    progData.Report(p.Percent);
                 });
             }
 
@@ -997,11 +997,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             long countTotal = 1;
             long counter = 0;
-            if (progress == null)
-            {
-                progress = new Progress<ProgressData>();
-            }
-            var progressData = new ProgressData();
+            var progressData = new ProgressData(progress);
             progressData.IsPartialRange = true;
             progressData.Status = "Writing spectra data";
 
@@ -1015,7 +1011,7 @@ namespace InformedProteomics.Backend.MassSpecData
             long countMS2Spec = 0;
             for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
             {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                progressData.Report(counter, countTotal);
                 counter++;
                 scanNumToSpecOffset[scanNum - imlr.MinLcScan] = writer.BaseStream.Position;
                 var spec = imlr.GetSpectrum(scanNum);
@@ -1047,7 +1043,7 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
             foreach (var peak in imlr.Ms1PeakList)
             {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                progressData.Report(counter, countTotal);
                 counter++;
                 var mz = peak.Mz;
                 var mzIndex = GetMzBinIndex(mz);
@@ -1069,7 +1065,7 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.StepRange(42.9 + 15.7 + (41.2 / 2)); // Approximately 41% of total file size
             foreach (var ms2ScanNum in imlr.GetScanNumbers(2))
             {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                progressData.Report(counter, countTotal);
                 counter++;
                 var productSpec = imlr.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                 if (productSpec == null) continue;
@@ -1087,7 +1083,7 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
             foreach (var peak in ms2PeakList)
             {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                progressData.Report(counter, countTotal);
                 counter++;
                 writer.Write(peak.Mz);
                 writer.Write((float)peak.Intensity);
@@ -1098,7 +1094,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var offsetBeginMetaInformation = writer.BaseStream.Position;
             progressData.Status = "Writing metadata";
             progressData.IsPartialRange = false;
-            progress.Report(progressData.UpdatePercent(99.8)); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.8); // Metadata: Approximately 0.2% of total file size
 
             var warnedInvalidScanNum = false;
             var warnedNullScanToIsolationWindow = false;
@@ -1152,7 +1148,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor chromatogram index
             writer.Write(minMzIndex);   // min index
             writer.Write(maxMzIndex);
-            progress.Report(progressData.UpdatePercent(99.9)); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.9); // Metadata: Approximately 0.2% of total file size
 
             var prevOffset = offsetBeginMetaInformation;
             for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
@@ -1169,7 +1165,7 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(offsetBeginPrecursorChromatogram); // 8
             writer.Write(offsetBeginProductChromatogram); // 8
             writer.Write(offsetBeginMetaInformation); // 8
-            progress.Report(progressData.UpdatePercent(100.0));
+            progressData.Report(100.0);
             writer.Write(FileFormatId); // 4
         }
 
@@ -1191,11 +1187,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             long countTotal = 1;
             long counter = 0;
-            if (progress == null)
-            {
-                progress = new Progress<ProgressData>();
-            }
-            var progressData = new ProgressData();
+            var progressData = new ProgressData(progress);
             progressData.IsPartialRange = true;
             progressData.Status = "Writing spectra data";
 
@@ -1216,7 +1208,7 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.MaxPercentage = 42.9; // SpecData: Approximately 43% of total file size
             foreach (var spec in msdr.ReadAllSpectra())
             {
-                progress.Report(progressData.UpdatePercent((double)counter / countTotal * 100.0));
+                progressData.Report(counter, countTotal);
                 counter++;
                 // Store offset, and write spectrum now
                 _scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
@@ -1292,7 +1284,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var prog = new Progress<ProgressData>(p =>
                 {
                     progressData.StatusInternal = p.Status;
-                    progress.Report(progressData.UpdatePercent(p.Percent));
+                    progressData.Report(p.Percent);
                 });
                 CreateAndOutputMsXChromatogram_Merge(writer, ms1Scans, ms1PeakCount, true, minMs1Mz, maxMs1Mz, prog);
             }
@@ -1313,7 +1305,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var prog = new Progress<ProgressData>(p =>
                 {
                     progressData.StatusInternal = p.Status;
-                    progress.Report(progressData.UpdatePercent(p.Percent));
+                    progressData.Report(p.Percent);
                 });
                 CreateAndOutputMsXChromatogram_Merge(writer, ms2Scans, ms2PeakCount, false, minMs2Mz, maxMs2Mz, prog);
             }
@@ -1323,7 +1315,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var offsetBeginMetaInformation = _offsetProductChromatogramEnd;
             progressData.Status = "Writing metadata";
             progressData.IsPartialRange = false;
-            progress.Report(progressData.UpdatePercent(99.8)); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.8); // Metadata: Approximately 0.2% of total file size
 
             var warnedInvalidScanNum = false;
             var warnedNullScanToIsolationWindow = false;
@@ -1416,7 +1408,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor chromatogram index
             writer.Write(_minMzIndex);   // min index
             writer.Write(_maxMzIndex);
-            progress.Report(progressData.UpdatePercent(99.9)); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.9); // Metadata: Approximately 0.2% of total file size
 
             var prevOffset = offsetBeginMetaInformation;
             if (ms1PeakCount > 0)
@@ -1440,7 +1432,7 @@ namespace InformedProteomics.Backend.MassSpecData
             writer.Write(_offsetPrecursorChromatogramBegin); // 8
             writer.Write(_offsetProductChromatogramBegin); // 8
             writer.Write(offsetBeginMetaInformation); // 8
-            progress.Report(progressData.UpdatePercent(100.0));
+            progressData.Report(100.0);
             writer.Write(FileFormatId); // 4
 
         }
@@ -1464,7 +1456,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             // Other thought for a slower, but really low-memory chromatogram creator:
             //   Make sure peaks are sorted ascending when written, and then jump through all spectra, performing a massive merge sort on the peaks and outputting the lowest spectra
-            var progData = new ProgressData();
+            var progData = new ProgressData(progress);
             var count = 0;
             var countTotal = scansForMsLevelX.Count;
             var prevMzIndex = -1;
@@ -1548,7 +1540,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 25000000 / numSpectra)
                 foreach (var scan in scansForMsLevelX)
                 {
-                    progress.Report(progData.UpdatePercent((double) count / countTotal * 100));
+                    progData.Report(count, countTotal);
                     count++;
                     var datum = GetPeakMetaDataForSpectrum(scan);
                     peaksCount += datum.NumPeaks;
@@ -1571,7 +1563,6 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
 
                 progData.StepRange(100);
-                progress.Report(progData.UpdatePercent(0));
                 var peaksToRemove = new List<LcMsPeak>();
                 count = 0;
                 prevMzIndex = -1;
@@ -1590,7 +1581,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     while (peaksEnum.MoveNext())
                     {
                         var peak = peaksEnum.Current;
-                        progress.Report(progData.UpdatePercent((double) count / peaksCount * 100.0));
+                        progData.Report(count, peaksCount);
                         count++;
                         if (isMs1List)
                         {

@@ -169,11 +169,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Read all spectra
 
-            if (progress == null)
-            {
-                progress = new Progress<ProgressData>();
-            }
-            var progressData = new ProgressData
+            var progressData = new ProgressData(progress)
             {
                 Status = "Reading spectra from file"
             };
@@ -200,20 +196,22 @@ namespace InformedProteomics.Backend.MassSpecData
                 for (var scanNum = scanStart; scanNum <= scanEnd; scanNum++)
                 {
                     var spec = massSpecDataReader.ReadMassSpectrum(scanNum);
-                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec, progress, progressData);
+                    progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
+                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
                 }
             }
             else
             {
                 foreach (var spec in massSpecDataReader.ReadAllSpectra())
                 {
-                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec, progress, progressData);
+                    progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
+                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
                 }
             }
                         
             progressData.Status = "Processing Isolation Bins";
             progressData.IsPartialRange = false;
-            progress.Report(progressData.UpdatePercent(95.1));
+            progressData.Report(95.1);
 
             foreach (var entry in isolationMzBinToScanNums)
             {
@@ -226,7 +224,8 @@ namespace InformedProteomics.Backend.MassSpecData
             _ms1PeakList.Sort();
             //_ms2PeakList.Sort();
 
-            progress.Report(progressData.UpdatePercent(99.5));
+            progressData.Report(99.5);
+
             // Read MS levels and precursor information
 
             MinLcScan = trackingInfo.MinScanNum;
@@ -243,20 +242,17 @@ namespace InformedProteomics.Backend.MassSpecData
             //    precursorMap[msLevel] = 0;
             //    nextScanMap[msLevel] = MaxLcScan + 1;
             //}
-            //progress.Report(progressData.UpdatePercent(99.8));
+            //progressData.Report(99.8);
 
-            progress.Report(progressData.UpdatePercent(100.0));
+            progressData.Report(100.0);
             CreatePrecursorNextScanMap();
         }
 
         private void HandleSpectrum(
             ref SpectrumTrackingInfo trackingInfo,
             Dictionary<int, List<int>> isolationMzBinToScanNums,
-            Spectrum spec, 
-            IProgress<ProgressData> progress, 
-            ProgressData progressData)
+            Spectrum spec)
         {
-            progress.Report(progressData.UpdatePercent(trackingInfo.SpecRead / (double)trackingInfo.NumSpectra * 100.0));
             trackingInfo.SpecRead += 1;
 
             //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
