@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.Utils
                 }
                 return _percent;
             }
-            set { _percent = value; }
+            private set { _percent = value; }
         }
 
         public bool IsPartialRange { get; set; }
@@ -93,6 +93,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 _maxPercentage = 100;
             }
+            _percent = 0;
         }
 
         public ProgressData UpdatePercent(double pct)
