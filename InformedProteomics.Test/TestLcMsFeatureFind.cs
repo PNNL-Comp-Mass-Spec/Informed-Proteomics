@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
@@ -19,11 +20,23 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsFeatureFind
     {
-
         [Test]
         public void TestIsotopeCount()
         {
+            
+            for (var m = 100; m < 10000; m+=100)
+            {
+                var envelope = Averagine.GetIsotopomerEnvelope(m);
 
+                var n = 0;
+                foreach (var e in envelope.Envolope)
+                {
+                    if (e > 0.3) n++;
+                }
+                Console.WriteLine("{0}: {1}/{2}", m, n, envelope.Envolope.Length);
+            }
+
+            /*
             var mzComparer = new ProteinMassBinning(28);
             var proteinMassBinning = new FilteredProteinMassBinning(AminoAcidSet.GetStandardAminoAcidSet(), 50000, 28);
             var aaList = AminoAcid.StandardAminoAcidArr;
@@ -47,7 +60,7 @@ namespace InformedProteomics.Test
                 Console.Write(proteinMassBinning.GetBinNumber(m));
                 Console.Write("\n");
             }
-
+            */
 
         }
 

@@ -16,10 +16,7 @@ namespace InformedProteomics.Test.FunctionalTests
         [Test]
         public void TestProteinMassComparerWithBinning()
         {
-            var aaSet = AminoAcid.StandardAminoAcidArr;
-            
-
-            var comparer2 = new FilteredProteinMassBinning(aaSet.Select(aa => aa.Composition),  50001);
+            var comparer2 = new FilteredProteinMassBinning(new AminoAcidSet(),  50001);
 
             for (var i = 9999d; i < 10010; i++)
             {

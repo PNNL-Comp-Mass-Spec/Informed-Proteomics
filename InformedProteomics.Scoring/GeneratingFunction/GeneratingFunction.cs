@@ -1,15 +1,135 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
     public class GeneratingFunction
     {
-        public GeneratingFunction(int maxPossibleNodes)
+        
+        
+        public GeneratingFunction(IScoringGraph graph)
+        {
+            _graph = graph;
+            /*
+            _maxAchievableScore = new int[_graph.GetNumNodes()];
+            for (var i = _graph.GetNumNodes() - 1; i >= 0; i--)
+            {
+                var s = _graph.GetNodeScore(i);
+                if (s > 0) _maxAchievableScore[i] = s;
+                if (i < _graph.GetNumNodes() - 1) _maxAchievableScore[i] += _maxAchievableScore[i + 1];
+            }*/
+        }
+
+        public double GetSpectralEValue(double score)
+        {
+            return _scoreDistribution.GetSpectralEValue(score);
+        }
+
+        public double GetSpectralEValue(int score)
+        {
+            return _scoreDistribution.GetSpectralEValue(score);
+        }
+
+        public ScoreDistribution GetScoreDistribution()
+        {
+            return _scoreDistribution;
+        }
+        //private int _targetScore;
+        //private readonly int[] _maxAchievableScore;
+
+        public void ComputeGeneratingFunction()//int targetScore = 0)
+        {
+            //_targetScore = targetScore;
+            var gfTable = new ScoreDistribution[_graph.GetNumNodes()];
+            // Source
+            var sourceDist = new ScoreDistribution(0, 1);
+            sourceDist.SetEValue(0, 1);
+            gfTable[0] = sourceDist;
+
+            // All the other nodes
+            for (var nodeIndex = 1; nodeIndex < _graph.GetNumNodes(); nodeIndex++)
+            {
+                gfTable[nodeIndex] = GetScoreDistribution(nodeIndex, gfTable);
+            }
+
+            // Sink
+            // TODO: adjusting the distribution depending on neighboring amino acid (e.g. R.PEPTIDEK. vs A.PEPTIDEK)
+            _scoreDistribution = gfTable[gfTable.Length - 1];
+        }
+
+        public int MaximumScore
+        {
+            get { return _scoreDistribution.MaxScore; }
+        }
+
+        private IScoringGraph _graph;
+        private ScoreDistribution _scoreDistribution;
+
+        private ScoreDistribution GetScoreDistribution(int nodeIndex, ScoreDistribution[] gfTable)
+        {
+            var curNodeScore = _graph.GetNodeScore(nodeIndex);
+
+            // determine MinScore and MaxScore
+            var maxScore = (double) int.MinValue;
+            var minScore = (double) int.MaxValue;
+
+            var hasValidEdge = false;
+            foreach (var edge in _graph.GetEdges(nodeIndex))
+            {
+                var prevNodeIndex = edge.PrevNodeIndex;
+                var prevScoreDistribution = gfTable[prevNodeIndex];
+                if (prevScoreDistribution == null) continue;
+                var combinedScore = curNodeScore + _graph.GetEdgeScore(prevNodeIndex, nodeIndex);
+
+                if (prevScoreDistribution.MaxScore + combinedScore > maxScore)
+                {
+                    maxScore = prevScoreDistribution.MaxScore + combinedScore;
+                }
+                if (prevScoreDistribution.MinScore + combinedScore < minScore)
+                {
+                    minScore = prevScoreDistribution.MinScore + combinedScore;
+                }
+                hasValidEdge = true;
+            }
+
+            if (!hasValidEdge) return null; //new ScoreDistribution(0, 1);
+            
+            // considering Target score for fast computing.....max 2 times faster but not useful at this point Scoredistriubtion 
+            //minScore = Math.Max(_targetScore - _maxAchievableScore[nodeIndex], minScore);
+
+            // Compute scoring distribution for the current node
+            var scoringDistribution = new ScoreDistribution((int)Math.Floor(minScore), (int)Math.Ceiling(maxScore));
+
+            foreach (var edge in _graph.GetEdges(nodeIndex))
+            {
+                var prevScoreDistribution = gfTable[edge.PrevNodeIndex];
+                if (prevScoreDistribution == null) continue;
+                var combinedScore = curNodeScore + _graph.GetEdgeScore(edge.PrevNodeIndex, nodeIndex);
+                scoringDistribution.AddEValueDist(prevScoreDistribution, (int)Math.Round(combinedScore), edge.Weight);
+            }
+            return scoringDistribution;
+        }
+    }
+    /*
+    public class GeneratingFunction2
+    {
+        private readonly double[][] _eValueTable;
+        private readonly int[] _minScoreAtNode;
+        private readonly int[] _maxScoreAtNode;
+        private bool _tableInit;
+        private IScoringGraph _graph;
+        
+        public GeneratingFunction2(int maxPossibleNodes)
         {
             _eValueTable = new double[maxPossibleNodes][];
             _maxScoreAtNode = new int[maxPossibleNodes];
             _minScoreAtNode = new int[maxPossibleNodes];
-            _eValueTable[0] = new double[1] { 1 }; // initialization for DP
+            _eValueTable[0] = new double[1] {1}; // initialization for DP
+
+            for (var i = 1; i < _eValueTable.Length; i++) _eValueTable[i] = new double[50];
+
             _tableInit = true;
         }
 
@@ -25,11 +145,13 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         public double[] GetSpectralEValueDistribution()
         {
             if (_graph == null) return null;
-            
+
             var lasNodeIndex = _graph.GetNumNodes() - 1;
             var lastRow = _eValueTable[lasNodeIndex];
             var maxScore = _maxScoreAtNode[lasNodeIndex];
-            var evalueDist = new double[maxScore + 1];
+            var minScore = _minScoreAtNode[lasNodeIndex];
+
+            var evalueDist = new double[maxScore - minScore + 1];
             Array.Copy(lastRow, evalueDist, evalueDist.Length);
 
             return evalueDist;
@@ -63,12 +185,12 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
             return spectralEValue;
         }
-        
+
         public void ComputeGeneratingFunction(IScoringGraph graph)
-        {
-            _graph = graph;
-            
+        {                        
             if (graph == null) return;
+
+            _graph = graph;
 
             InitTable();
             for (var curNodeIndex = 1; curNodeIndex < _graph.GetNumNodes(); curNodeIndex++)
@@ -88,25 +210,28 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                     hasValidEdge = true;
                 }
 
-                _minScoreAtNode[curNodeIndex] = (hasValidEdge) ? minScore : 0;
-                _maxScoreAtNode[curNodeIndex] = (hasValidEdge) ? maxScore : 1;
+                if (!hasValidEdge) continue;
+                
+                _minScoreAtNode[curNodeIndex] = minScore;
+                _maxScoreAtNode[curNodeIndex] = maxScore;
 
-                _eValueTable[curNodeIndex] = new double[(hasValidEdge) ? maxScore + 1 : 2];
+                if (_eValueTable[curNodeIndex].Length < maxScore - minScore + 1) _eValueTable[curNodeIndex] = new double[maxScore - minScore + 1];
+                
                 var curNodeEvalues = _eValueTable[curNodeIndex];
-
-
                 foreach (var edge in _graph.GetEdges(curNodeIndex))
                 {
                     var prevNodeIndex = edge.PrevNodeIndex;
                     var combinedScore = curNodeScore + edge.Score;
 
                     var prevNodeEvalues = _eValueTable[prevNodeIndex];
-                    var effectiveMinScoreAtNode = Math.Max(_minScoreAtNode[prevNodeIndex] + combinedScore, _minScoreAtNode[curNodeIndex]);
+                    var prevNodeMinScore = _minScoreAtNode[prevNodeIndex];
+
+                    var effectiveMinScoreAtNode = Math.Max(prevNodeMinScore + combinedScore, _minScoreAtNode[curNodeIndex]);
                     var effectiveMaxScoreAtNode = _maxScoreAtNode[prevNodeIndex] + combinedScore;
 
                     for (var score = effectiveMinScoreAtNode; score <= effectiveMaxScoreAtNode; score++)
                     {
-                        curNodeEvalues[score] += prevNodeEvalues[score - combinedScore] * edge.Weight;
+                        curNodeEvalues[score - minScore] += prevNodeEvalues[score - combinedScore - prevNodeMinScore] * edge.Weight;
                     }
                 }
             }
@@ -117,99 +242,13 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         private void InitTable()
         {
             if (_tableInit) return;
-            Array.Clear(_eValueTable, 1, _eValueTable.Length - 1);
+            //Array.Clear(_eValueTable, 1, _eValueTable.Length - 1);
+            for (var i = 1; i < _eValueTable.Length; i++) Array.Clear(_eValueTable[i], 0, _eValueTable[i].Length);
+
             Array.Clear(_minScoreAtNode, 0, _minScoreAtNode.Length);
             Array.Clear(_maxScoreAtNode, 0, _maxScoreAtNode.Length);
             _tableInit = true;
         }
-        
-        private readonly double[][] _eValueTable;
-        private readonly int[] _minScoreAtNode;
-        private readonly int[] _maxScoreAtNode;
-        private bool _tableInit;
-        private IScoringGraph _graph;
-    }
+    }*/
 
-    /* 
-     * Sangtae's implementation
-    public class GeneratingFunction
-    {
-        public GeneratingFunction(IScoringGraph graph)
-        {
-            _graph = graph;
-        }        
-        
-        public double GetSpectralEValue(int score)
-        {
-            return _scoreDistribution.GetSpectralEValue(score);
-        }
-
-        public void ComputeGeneratingFunction()
-        {
-            var gfTable = new ScoreDistribution[_graph.GetNumNodes()];
-            // Source
-            var sourceDist = new ScoreDistribution(0, 1);
-            sourceDist.SetEValue(0, 1);
-            gfTable[0] = sourceDist;
-
-            // All the other nodes
-            for (var nodeIndex = 1; nodeIndex < _graph.GetNumNodes(); nodeIndex++)
-            {
-                gfTable[nodeIndex] = GetScoreDistribution(nodeIndex, gfTable);
-            }
-
-            // Sink
-            // TODO: adjusting the distribution depending on neighboring amino acid (e.g. R.PEPTIDEK. vs A.PEPTIDEK)
-
-            _scoreDistribution = gfTable[gfTable.Length - 1];
-        }
-
-        
-        private IScoringGraph _graph;
-        private ScoreDistribution _scoreDistribution;
-
-        private ScoreDistribution GetScoreDistribution(int nodeIndex, ScoreDistribution[] gfTable)
-        {
-            var curNodeScore = _graph.GetNodeScore(nodeIndex);
-
-            // determine MinScore and MaxScore
-            var maxScore = int.MinValue;
-            var minScore = int.MaxValue;
-
-            var validEdges = new List<ScoringGraphEdge>();
-
-            foreach (var edge in _graph.GetEdges(nodeIndex))
-            {
-                var prevNodeIndex = edge.PrevNodeIndex;
-                var prevScoreDistribution = gfTable[prevNodeIndex];
-                if (prevScoreDistribution == null) continue;
-                var combinedScore = curNodeScore + edge.Score;
-                if (prevScoreDistribution.MaxScore + combinedScore > maxScore)
-                {
-                    maxScore = prevScoreDistribution.MaxScore + combinedScore;
-                }
-                if (prevScoreDistribution.MinScore + combinedScore < minScore)
-                {
-                    minScore = prevScoreDistribution.MinScore + combinedScore;
-                }
-                validEdges.Add(edge);
-            }
-
-            if (validEdges.Count < 1) return new ScoreDistribution(0, 1);
-
-            //if (nodeIndex % 1000 == 0) Console.WriteLine("{0}\t{1}\t{2}",nodeIndex, minScore, maxScore);
-
-            // Compute scoring distribution for the current node
-            var scoringDistribution = new ScoreDistribution(minScore, maxScore);
-            foreach (var edge in validEdges)
-            {
-                var prevScoreDistribution = gfTable[edge.PrevNodeIndex];
-                if (prevScoreDistribution == null) continue;
-                var combinedScore = curNodeScore + edge.Score;
-                scoringDistribution.AddEValueDist(prevScoreDistribution, combinedScore, edge.Weight);
-            }
-            return scoringDistribution;
-        }
-    }    
-    */
 }

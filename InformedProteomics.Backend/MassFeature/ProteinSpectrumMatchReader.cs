@@ -61,6 +61,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var score = double.Parse(parser.GetData("#matched_fragment_ions")[i]);
                 var sequenceText = parser.GetData("Peptide")[i];
                 var charge = int.Parse(parser.GetData("Charge")[i]);
+                var evalue = double.Parse(parser.GetData("E-value")[i]);
 
                 var fdr = Double.Parse(parser.GetData("FDR")[i]);
                 if (fdr > FdrCutoff) continue;
@@ -68,6 +69,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsAlign)
                 {
                     SequenceText = sequenceText,
+                    SpectralEvalue = evalue,
                 };
 
                 prsmList.Add(prsm);
@@ -120,13 +122,15 @@ namespace InformedProteomics.Backend.MassFeature
         }
 
 
-        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath, int maxPrsm)
+        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath, int maxPrsm, double minScore = 3, double maxScore = int.MaxValue)
         {
             var parser = new TsvFileParser(msPathFinderResultPath);
             var prsmList = new List<ProteinSpectrumMatch>();
 
             var scoreColumn = parser.GetData("#MatchedFragments") ?? parser.GetData("Score");
             var qValColumn = parser.GetData("QValue");
+
+            var evalueColumn = parser.GetData("SpecEValue");
 
             for (var i = 0; i < parser.NumData; i++)
             {
@@ -141,6 +145,13 @@ namespace InformedProteomics.Backend.MassFeature
                 var lastResId = int.Parse(parser.GetData("End")[i]);
                 var score = double.Parse(scoreColumn[i]);
                 var mod = parser.GetData("Modifications")[i];
+                var evalue = (evalueColumn != null) ? double.Parse(parser.GetData("SpecEValue")[i]) : 0;
+                
+                var pre = parser.GetData("Pre")[i];
+                var post = parser.GetData("Post")[i];
+                var proteinLen = int.Parse(parser.GetData("ProteinLength")[i]);
+
+                if (score < minScore || score > maxScore) continue;
 
                 if (qValColumn != null)
                 {
@@ -154,6 +165,10 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     SequenceText = sequenceText,
                     Modifications = mod,
+                    Pre = pre,
+                    Post = post,
+                    ProteinLength = proteinLen,
+                    SpectralEvalue = evalue,
                 };
 
                 prsmList.Add(prsm);

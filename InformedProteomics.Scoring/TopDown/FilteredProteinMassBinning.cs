@@ -3,40 +3,34 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Data.Enum;
 
 namespace InformedProteomics.Scoring.TopDown
 {
     public class FilteredProteinMassBinning : IMassBinning
     {
-        public FilteredProteinMassBinning(IEnumerable<AminoAcid> aaArray, double maxProteinMass = 50000, int numBits = 27)
-            : this(aaArray.Select(a => a.Mass).ToArray(), maxProteinMass, numBits)
-        {
-            
-        }
-        
-        public FilteredProteinMassBinning(IEnumerable<Composition> compositions, double maxProteinMass = 50000, int numBits = 27)
-            : this(GetUniqueMass(compositions), maxProteinMass, numBits)
-        {
-
-        }
-
         public FilteredProteinMassBinning(AminoAcidSet aaSet, double maxProteinMass = 50000, int numBits = 27)
-            : this(GetUniqueMass(aaSet), maxProteinMass, numBits)
         {
+            _aminoAcidSet = aaSet;
+            var terminalModifications = GetTerminalModifications(aaSet);
+            var extendedAminoAcidArray = GetExtendedAminoAcidArray(aaSet);
 
-        }
-        
-        public FilteredProteinMassBinning(double[] massList, double maxProteinMass = 50000, int numBits = 27)
-        {
-            Array.Sort(massList);
             MaxMass = maxProteinMass;
-            MinMass = massList[0];
+            MinMass = MaxMass;
+            foreach (var aa in extendedAminoAcidArray)
+            {
+                if (aa.Mass < MinMass) MinMass = aa.Mass;
+                foreach (var mod in terminalModifications)
+                {
+                    var modAa = new ModifiedAminoAcid(aa, mod);
+                    if (modAa.Mass < MinMass) MinMass = modAa.Mass;
+                }
+            }
 
             _mzComparer = new MzComparerWithBinning(numBits);
-            
+
             _minMzBinIndex = _mzComparer.GetBinNumber(MinMass);
             _maxMzBinIndex = _mzComparer.GetBinNumber(MaxMass);
 
@@ -44,22 +38,41 @@ namespace InformedProteomics.Scoring.TopDown
             _mzBinToFilteredBinMap = new int[numberOfMzBins];
             for (var i = 0; i < numberOfMzBins; i++) _mzBinToFilteredBinMap[i] = -1;
 
-            var tempMap            = new int[numberOfMzBins];
+            var tempMap = new int[numberOfMzBins];
             var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(MaxMass));
             fineNodes[0] = true;
-            
+
             var effectiveBinCounter = 0;
             for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
             {
                 if (!fineNodes[fineBinIdx]) continue;
 
                 var fineNodeMass = fineBinIdx / Constants.RescalingConstantHighPrecision;
-                foreach (var m in massList)
+
+                foreach (var aa in extendedAminoAcidArray)
+                {
+                    var validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + aa.Mass);
+                    if (validFineNodeIndex >= fineNodes.Length) break;
+                    fineNodes[validFineNodeIndex] = true;
+
+                    if (fineBinIdx == 0 && !(aa is ModifiedAminoAcid)) // include terminal modifications 
+                    {
+                        foreach (var terminalMod in terminalModifications)
+                        {
+                            var modifiedAa = new ModifiedAminoAcid(aa, terminalMod);
+                            validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + modifiedAa.Mass);
+                            if (validFineNodeIndex >= fineNodes.Length) break;
+                            fineNodes[validFineNodeIndex] = true;                            
+                        }                         
+                    }
+                }
+                
+                /*foreach (var m in massList)
                 {
                     var validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + m);
                     if (validFineNodeIndex >= fineNodes.Length) break;
                     fineNodes[validFineNodeIndex] = true;
-                }
+                }*/
 
                 var binNum = _mzComparer.GetBinNumber(fineNodeMass);
                 if (fineBinIdx == 0 || (binNum >= _minMzBinIndex && binNum <= _maxMzBinIndex && _mzBinToFilteredBinMap[binNum - _minMzBinIndex + 1] < 0))
@@ -70,7 +83,47 @@ namespace InformedProteomics.Scoring.TopDown
                 }
             }
             _filteredBinToMzBinMap = new int[effectiveBinCounter];
-            Array.Copy(tempMap, _filteredBinToMzBinMap, effectiveBinCounter);
+            Array.Copy(tempMap, _filteredBinToMzBinMap, effectiveBinCounter);            
+        }
+
+        private readonly AminoAcidSet _aminoAcidSet;
+
+        public static Modification[] GetTerminalModifications(AminoAcidSet aminoAcidSet)
+        {
+            var terminalModifications = new HashSet<Modification>();
+            var terminalLocations = new[] {SequenceLocation.ProteinNTerm, SequenceLocation.ProteinCTerm};
+            var terminalResidues = new char[] {AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinCTerm.Residue};
+            var modParam = aminoAcidSet.GetModificationParams();
+
+            for (var i = 0; i < terminalLocations.Length; i++)
+            {
+                var location = terminalLocations[i];
+                var residue = terminalResidues[i];
+                foreach (var modIndex in aminoAcidSet.GetModificationIndices(residue, location))
+                {
+                    var modification = modParam.GetModification(modIndex);
+                    terminalModifications.Add(modification);
+                }
+            }
+            return terminalModifications.ToArray();
+        }
+        
+        public static AminoAcid[] GetExtendedAminoAcidArray(AminoAcidSet aaSet)
+        {
+            var ret = new List<AminoAcid>();
+            var modParam = aaSet.GetModificationParams();
+            var aminoAcidArray = AminoAcid.StandardAminoAcidArr;
+
+            foreach (var aa in aminoAcidArray)
+            {
+                ret.Add(aa);
+                foreach (var modIndex in aaSet.GetModificationIndices(aa.Residue, SequenceLocation.Everywhere))
+                {
+                    var aa2 = new ModifiedAminoAcid(aa, modParam.GetModification(modIndex));
+                    ret.Add(aa2);
+                }
+            }
+            return ret.ToArray();
         }
 
         public bool Filtered { get { return true;  } }
@@ -116,7 +169,7 @@ namespace InformedProteomics.Scoring.TopDown
         public double MaxMass { get; private set; }
         public double MinMass { get; private set; }
         public int NumberOfBins { get { return _filteredBinToMzBinMap.Length; } }
-
+        /*
         private static double[] GetUniqueMass(IEnumerable<Composition> compSet)
         {
             var massSet = new HashSet<double>();
@@ -142,7 +195,7 @@ namespace InformedProteomics.Scoring.TopDown
             }
 
             return massSet.ToArray();
-        }
+        }*/
 
         private readonly int[] _mzBinToFilteredBinMap;
         private readonly int[] _filteredBinToMzBinMap;

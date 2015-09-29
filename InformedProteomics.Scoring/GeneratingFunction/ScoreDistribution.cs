@@ -2,7 +2,7 @@
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
-    internal class ScoreDistribution
+    public class ScoreDistribution
     {
         public ScoreDistribution(int minScore, int maxScore)
         {
@@ -23,16 +23,16 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         {
             if (otherDistribution == null) return;
             
-            
             for (var index = Math.Max(otherDistribution.MinScore, MinScore - deltaScore); index < otherDistribution.MaxScore; index++)
             {
-                
                 var delEValue = otherDistribution._eValueDistribution[index - otherDistribution.MinScore]*weight;
-
-
-
                 _eValueDistribution[index + deltaScore - MinScore] += delEValue;
             }
+        }
+
+        public double GetSpectralEValue(double score)
+        {
+            return GetSpectralEValue((int)Math.Round(score));
         }
 
         public double GetSpectralEValue(int score)

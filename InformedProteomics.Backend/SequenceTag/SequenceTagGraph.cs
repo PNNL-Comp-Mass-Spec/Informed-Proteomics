@@ -152,11 +152,11 @@ namespace InformedProteomics.Backend.SequenceTag
 
             return true;
         }
-
+        /*
         protected virtual bool AlreadyUsedPeak(int node)
         {
             return false;
-        }
+        }*/
 
         protected bool StopFindPath;
         protected readonly Stack<T> EdgeList = new Stack<T>();
@@ -194,8 +194,8 @@ namespace InformedProteomics.Backend.SequenceTag
             var flag = false;
             foreach(var edge in OutEdges(node))
             {
-                //if (!NodeVisitFlag[edge.Node2])
-                if (!NodeVisitFlag[edge.Node2] && !AlreadyUsedPeak(edge.Node2))
+                //if (!NodeVisitFlag[edge.Node2] && !AlreadyUsedPeak(edge.Node2))
+                if (!NodeVisitFlag[edge.Node2])
                 {
                     flag = true;
                     FindPaths(edge.Node2, false, edge);

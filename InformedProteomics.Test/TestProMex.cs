@@ -86,6 +86,8 @@ namespace InformedProteomics.Test
                     writer.Write(prsmSet[0].Sequence);
                     writer.Write("\t");
                     writer.Write(prsmSet[0].Modifications);
+                    //writer.Write("\t")
+                    //writer.Write(string.Join(";", prsmSet.Select(prsm => prsm.ScanNum)));
                     writer.Write("\n");
                 }
 
@@ -500,7 +502,7 @@ namespace InformedProteomics.Test
 
 
 
-        public string[] TrainSetFileLists = new string[]
+        public static string[] TrainSetFileLists = new string[]
             {
             
                 @"D:\MassSpecFiles\bottom_up\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw",  // bottom-up datasets
@@ -544,8 +546,8 @@ namespace InformedProteomics.Test
                 
                 @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf",
                 @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
-                @"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
- 
+                //@"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_2\yufeng_column_test2.pbf"
             };
 
     }

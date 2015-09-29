@@ -5,6 +5,7 @@ using InformedProteomics.Scoring.GeneratingFunction;
 
 namespace InformedProteomics.Scoring.BottomUp
 {
+    /*
     public class PeptideScoringGraph: IScoringGraph
     {
         public int GetNodeScore(int nodeIndex)
@@ -26,6 +27,5 @@ namespace InformedProteomics.Scoring.BottomUp
         private readonly AminoAcidSet _aminoAcidSet;
         private readonly Enzyme _enzyme;
         //private readonly RankScorer _scorer;
-
-    }
+    }*/
 }

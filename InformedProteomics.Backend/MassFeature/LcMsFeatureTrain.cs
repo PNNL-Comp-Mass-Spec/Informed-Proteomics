@@ -129,12 +129,14 @@ namespace InformedProteomics.Backend.MassFeature
 
             if (sequence.Composition.Mass > 3000)
             {
-                if ((double) nObservedPrefixIonPeaks/nObservedIonPeaks > 0.9 ||
-                    (double) nObservedsuffixIonPeaks/nObservedIonPeaks > 0.9) return false;
+                if ((double) nObservedPrefixIonPeaks/nObservedIonPeaks > 0.85 ||
+                    (double) nObservedsuffixIonPeaks/nObservedIonPeaks > 0.85) return false;
+
+                if (nObservedPrefixIonPeaks < 3 || nObservedsuffixIonPeaks < 3) return false;
             }
             else
             {
-                if (nObservedPrefixIonPeaks == 0 || nObservedsuffixIonPeaks == 0) return false;
+                if (nObservedPrefixIonPeaks < 1 || nObservedsuffixIonPeaks < 1) return false;
             }
 
             return true;

@@ -34,7 +34,13 @@ namespace InformedProteomics.Backend.MassFeature
 
         public double Mass { get { return this.Select(item => item.Mass).Median(); } }
 
-        public readonly int DataId;
+
+        public void SetDataId(int dataid)
+        {
+            DataId = dataid;
+        }
+
+        public int DataId { get; private set; }
 
         public bool ShareProteinId(ProteinSpectrumMatchSet other)
         {
@@ -65,7 +71,10 @@ namespace InformedProteomics.Backend.MassFeature
             LastResidue = lastResidue;
             SearchToolType = searchTool;
             Score = score;
+            ProteinDesc = protDesc;
         }
+
+        public double SpectralEvalue { get; internal set; }
 
         public string Sequence { get; private set; }
         public int ScanNum { get; private set; }
@@ -75,6 +84,11 @@ namespace InformedProteomics.Backend.MassFeature
         public string ProteinName { get; private set; }
         public string ProteinDesc { get; private set; }
 
+        public int ProteinLength { get; internal set; }
+
+        public string Pre { get; internal set; }
+        public string Post { get; internal set; }
+
         public int FirstResidue { get; private set; }
         public int LastResidue { get; private set; }
         public double Score { get; private set; }
@@ -83,8 +97,6 @@ namespace InformedProteomics.Backend.MassFeature
         public string Modifications { get; internal set; }
 
         public SearchTool SearchToolType { get; private set; }
-
-
         public string ProteinId { get; set; }
 
         public bool Equals(ProteinSpectrumMatch other)

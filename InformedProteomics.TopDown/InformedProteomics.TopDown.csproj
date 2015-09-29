@@ -53,6 +53,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="PNNLOmics, Version=1.1.5714.31155, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\PNNLOmics.dll</HintPath>
@@ -62,12 +66,16 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\ProteoformSpectrumMatchContainer.cs" />
     <Compile Include="Execution\IcRescorer.cs" />
     <Compile Include="Execution\IcTopDownLauncher.cs" />
     <Compile Include="Execution\LcMsFeatureFinderInputParameter.cs" />
     <Compile Include="Execution\LcMsFeatureFinderLauncher.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
-    <Compile Include="Scoring\DeconvolutedSpectrumScorer.cs" />
+    <Compile Include="Scoring\CompositeScorerBasedOnDeconvolutedSpectrum.cs" />
+    <Compile Include="Scoring\CompositeScorerFactory.cs" />
+    <Compile Include="Scoring\CompositeScorer.cs" />
+    <Compile Include="Scoring\ProteinScoringGraphFactory.cs" />
     <Compile Include="TagBasedSearch\ISequenceTagFinder.cs" />
     <Compile Include="Scoring\Ms1FtParser.cs" />
     <Compile Include="TagBasedSearch\FeatureBasedTagSearchEngine.cs" />
@@ -112,6 +120,9 @@
       <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
       <Name>InformedProteomics.Scoring</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scoring\Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

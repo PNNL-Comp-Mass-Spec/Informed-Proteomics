@@ -112,55 +112,67 @@ namespace InformedProteomics.Backend.MassFeature
         {
             return _alignedFeatures;
         }
-        
+
+        public void FillMissingFeatures(int dataSetIndex, double scoreThreshold = -30)
+        {
+            if (_alignedFeatures == null) return;
+
+            var run = _runList[dataSetIndex];
+            var ms1ScanNums = run.GetMs1ScanVector();
+            var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
+
+            for (var j = 0; j < CountAlignedFeatures; j++)
+            {
+                if (_alignedFeatures[j][dataSetIndex] != null) continue;
+
+                var mass = 0d;
+                var charge = 0;
+                var minScanNum = -1;
+                var maxScanNum = ms1ScanNums.Last();
+                var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
+                mass = repFt.Mass;
+                charge = repFt.Charge;
+                var minNet = repFt.MinNet;
+                var maxNet = repFt.MaxNet;
+
+                for (var k = 0; k < ms1ScanNums.Length; k++)
+                {
+                    var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
+                    if (net > minNet && minScanNum < 0)
+                    {
+                        minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
+                    }
+
+                    if (net > maxNet)
+                    {
+                        maxScanNum = ms1ScanNums[k];
+                        break;
+                    }
+                }
+
+                if (minScanNum < 0) minScanNum = 0;
+
+                _alignedFeatures[j][dataSetIndex] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
+                /*
+                var ft = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
+
+                if (ft == null || ft.Score < scoreThreshold)
+                    _alignedFeatures[j][dataSetIndex] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum,
+                        maxScanNum, repFt.MinCharge, repFt.MaxCharge);
+                else
+                    _alignedFeatures[j][dataSetIndex] = ft;*/
+            }
+
+            featureFinder = null;
+        }
+
         public void RefineAbundance(double scoreThreshold = -30)
         {
             if (_alignedFeatures == null) return;
 
             for (var i = 0; i < CountDatasets; i++)
             {
-                var run = _runList[i];
-                var ms1ScanNums = run.GetMs1ScanVector();
-                var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
-
-                for (var j = 0; j < CountAlignedFeatures; j++)
-                {
-                    if (_alignedFeatures[j][i] != null) continue;
-
-                    var mass = 0d;
-                    var charge = 0;
-                    var minScanNum = -1;
-                    var maxScanNum = ms1ScanNums.Last();
-                    var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
-                    mass = repFt.Mass;
-                    charge = repFt.Charge;
-                    var minNet = repFt.MinNet;
-                    var maxNet = repFt.MaxNet;
-
-                    for (var k = 0; k < ms1ScanNums.Length; k++)
-                    {
-                        var net = run.GetElutionTime(ms1ScanNums[k]) / run.GetElutionTime(run.MaxLcScan);
-                        if (net > minNet && minScanNum < 0)
-                        {
-                            minScanNum = (k == 0) ? ms1ScanNums[k] : ms1ScanNums[k - 1];
-                        }
-
-                        if (net > maxNet)
-                        {
-                            maxScanNum = ms1ScanNums[k];
-                            break;
-                        }
-                    }
-                    
-                    if (minScanNum < 0) minScanNum = 0;
-                    var ft = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
-
-                    if (ft == null || ft.Score < scoreThreshold)
-                        _alignedFeatures[j][i] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum,
-                            maxScanNum, repFt.MinCharge, repFt.MaxCharge);
-                    else
-                        _alignedFeatures[j][i] = ft;
-                }
+                FillMissingFeatures(i, scoreThreshold);
                 //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
         }

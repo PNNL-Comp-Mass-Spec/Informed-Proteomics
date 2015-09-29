@@ -10,7 +10,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
-//using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 
 namespace InformedProteomics.TopDown.TagBasedSearch
 {
@@ -26,7 +25,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             FastaDatabase fastaDb,
             Tolerance tolerance,
             AminoAcidSet aaSet,
-            DeconvolutedSpectrumScorer ms2ScorerFactory = null,
+            CompositeScorerFactory ms2ScorerFactory = null,
             int minMatchedTagLength = DefaultMinMatchedTagLength,
             double maxSequenceMass = 50000.0,
             int minProductIonCharge = 1,
@@ -46,18 +45,15 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             MinScan = int.MinValue;
             MaxScan = int.MaxValue;
             _ms2ScorerFactory = ms2ScorerFactory;
-            //_ms2ScanToTagMap = new Dictionary<int, IList<SequenceTagString>>();
             _seqTagFinder = seqTagFinder;
         }
         
         public int MinScan { get; private set; }
         public int MaxScan { get; private set; }
-        private readonly DeconvolutedSpectrumScorer _ms2ScorerFactory;
+        private readonly CompositeScorerFactory _ms2ScorerFactory;
         private readonly ISequenceTagFinder _seqTagFinder;
 
         public long NumTags { get { return _seqTagFinder.NumberOfGeneratedTags();  } }
-        
-        //private readonly Dictionary<int, IList<SequenceTagString>> _ms2ScanToTagMap;
 
         public void SetDatabase(FastaDatabase fastaDb)
         {
@@ -108,11 +104,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             }
         }
 
-        private IList<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
+        private IEnumerable<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
         {
             // Match tags against the database
             var proteinsToTags = GetProteinToMatchedTagsMap(tags, _searchableDb, _aaSet, _tolerance, _tolerance);
-            var tagSequenceMatchList = new List<TagSequenceMatch>();
+            //var tagSequenceMatchList = new List<TagSequenceMatch>();
 
             // Extend matches
             foreach (var entry in proteinsToTags)
@@ -130,31 +126,42 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                     var matches = tagFinder.FindMatches(matchedTag).ToArray();
                     var prevScore = double.NegativeInfinity;
-                    foreach (var match in matches.OrderByDescending(m => m.Score))
+                    //foreach (var match in matches.OrderByDescending(m => m.Score))
+                    foreach(var match in matches)
                     {
                         var sequence = proteinSequence.Substring(match.StartIndex, match.EndIndex - match.StartIndex);
-                        var numMatches = matchedTag.Length * 2 + match.NTermScore + match.CTermScore;
+                        //re-scoring
+                        var sequenceObj = Sequence.CreateSequence(sequence, match.ModificationText, _aaSet);
+                        match.Score = sequenceObj.GetInternalCleavages().Sum(c => scorer.GetFragmentScore(c.PrefixComposition, c.SuffixComposition));
+
+                        //var numMatches = matchedTag.Length * 2 + match.NTermScore + match.CTermScore;
+                        //var score = match.NTermScore + match.CTermScore;
+                        //score += (matchedTag.NumReliableNTermFlankingMasses > 0)
+                          //  ? matchedTag.Length*CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch
+                            //: matchedTag.Length*CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;
+                        
 
                         // Poisson p-value score
                         //var n = (match.EndIndex - match.StartIndex - 1)*2;
                         //var lambda = numMatches / n;
                         //var pValue = 1 - Poisson.CDF(lambda, numMatches);
                         //var pScore = (pValue > 0) ? - Math.Log(pValue, 2) : 50.0;
-
-                        //if (numMatches < 10) break;
-                        if (numMatches < 5) break;
-                        if (prevScore - numMatches > 2) break;
-                        prevScore = numMatches;
+                        //if (numMatches < 5) break;
+                        //if (prevScore - numMatches > 2) break;
+                        //prevScore = numMatches;
 
                         var pre = match.StartIndex == 0 ? '-' : proteinSequence[match.StartIndex - 1]; // startIndex is inclusive
                         var post = match.EndIndex >= proteinSequence.Length ? '-' : proteinSequence[match.EndIndex]; // endIndex is Exclusive
 
-                        tagSequenceMatchList.Add(new TagSequenceMatch(sequence, proteinName, match, pre, post));
+                        yield return new TagSequenceMatch(sequence, proteinName, match, pre, post);
+
+                        //tagSequenceMatchList.Add(new TagSequenceMatch(sequence, proteinName, match, pre, post));
                     }
                 }
             }
-            return tagSequenceMatchList;
+            //return tagSequenceMatchList;
         }
+
 
         public class TagSequenceMatch
         {

@@ -156,7 +156,7 @@ namespace InformedProteomics.BottomUp.Execution
                 sw.Reset();
                 Console.WriteLine(@"Searching the target database");
                 sw.Start();
-                var targetMatches = RunSearch(GetAnnotationsAndOffsets(targetDb), ms1Filter);
+                var targetMatches = RunSearch(GetAnnotationsAndOffsets(targetDb), ms1Filter, false);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                 Console.WriteLine(@"Target database search elapsed time: {0:f4} sec", sec);
@@ -184,7 +184,7 @@ namespace InformedProteomics.BottomUp.Execution
                 sw.Reset();
                 Console.WriteLine(@"Searching the decoy database");
                 sw.Start();
-                var decoyMatches = RunSearch(GetAnnotationsAndOffsets(decoyDb), ms1Filter);
+                var decoyMatches = RunSearch(GetAnnotationsAndOffsets(decoyDb), ms1Filter, true);
                 sw.Stop();
                 sec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                 Console.WriteLine(@"Decoy database search elapsed Time: {0:f4} sec", sec);
@@ -232,7 +232,7 @@ namespace InformedProteomics.BottomUp.Execution
             return annotationsAndOffsets;
         }
 
-        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets, ISequenceFilter ms1Filter)
+        private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets, ISequenceFilter ms1Filter, bool isDecoy)
         {
             var sw = new Stopwatch();
             var numPeptides = 0;
@@ -269,9 +269,10 @@ namespace InformedProteomics.BottomUp.Execution
                     //                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
                     continue;
                 }
+                
 
                 //var protCompositions = seqGraph.GetSequenceCompositions();
-                var numProteoforms = seqGraph.GetNumProteoforms();
+                var numProteoforms = seqGraph.GetNumProteoformCompositions();
                 var modCombs = seqGraph.GetModificationCombinations();
                 for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
                 {
@@ -295,7 +296,7 @@ namespace InformedProteomics.BottomUp.Execution
                         var pre = annotation[0];
                         var post = annotation[annotation.Length - 1];
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, 0, modCombinations,
-                            precursorIon, score);
+                            precursorIon, score, isDecoy);
 
                         if (matches[ms2ScanNum] == null)
                         {

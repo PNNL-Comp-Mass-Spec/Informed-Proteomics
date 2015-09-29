@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -28,6 +29,20 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Sequence(string sequence, AminoAcidSet aminoAcidSet): this(sequence.Select(aminoAcidSet.GetAminoAcid))
         {
+        }
+
+        public string GetModificationString()
+        {
+            var sb = new StringBuilder();
+            for (var i = 0; i < Count; i++)
+            {
+                var modAa = this[i] as ModifiedAminoAcid;
+                if (modAa == null) continue;
+
+                if (sb.Length > 0) sb.Append(",");
+                sb.AppendFormat("{0} {1}", modAa.Modification.Name, i);
+            }
+            return sb.ToString();
         }
 
         // modStr: E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27

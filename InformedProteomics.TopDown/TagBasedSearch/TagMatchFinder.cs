@@ -69,6 +69,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
+
+                    var modList = new List<Modification>();
+                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+
                     var tagMatch = new TagMatch(
                         backwardMatch.Index, 
                         forwardMatch.Index, 
@@ -77,6 +82,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
+                        new ModificationCombination(modList), 
                         modStr);
                     yield return tagMatch;
                 }
@@ -108,6 +114,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
+                    
+                    var modList = new List<Modification>();
+                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+
                     var tagMatch = new TagMatch(
                         backwardMatch.Index, 
                         forwardMatch.Index,
@@ -116,6 +127,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
+                        new ModificationCombination(modList), 
                         modStr);
                     yield return tagMatch;
                 }
@@ -147,6 +159,10 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
+                    var modList = new List<Modification>();
+                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+
                     var tagMatch = new TagMatch(
                         backwardMatch.Index, 
                         forwardMatch.Index,
@@ -155,6 +171,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
+                        new ModificationCombination(modList), 
                         modStr);
                     yield return tagMatch;
                 }

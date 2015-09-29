@@ -61,7 +61,7 @@ namespace MSPathFinderT
                     {"-f", "10"},
                     {"-tda", "0"},
                     {"-minLength", "21"},
-                    {"-maxLength", "500"},
+                    {"-maxLength", "300"},
                     {"-minCharge", "2"},
                     {"-maxCharge", "60"},
                     {"-minFragCharge", "1"},
@@ -98,6 +98,7 @@ namespace MSPathFinderT
 
             foreach (var specFilePath in parameters.SpecFilePaths)
             {
+                
                 var topDownLauncher = new IcTopDownLauncher(
                     specFilePath,
                     parameters.DatabaseFilePath,

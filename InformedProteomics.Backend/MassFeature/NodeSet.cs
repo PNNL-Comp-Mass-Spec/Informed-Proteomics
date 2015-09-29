@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 
 namespace InformedProteomics.Backend.MassFeature
@@ -8,16 +10,16 @@ namespace InformedProteomics.Backend.MassFeature
         public List<List<T>> ConnnectedComponents(INodeComparer<T> comparer)
         {
             SetAdjacentList(comparer);
-
             var componentSet = new List<List<T>>();
-            var visited = new bool[Count];
+            var visited = new BitArray(Count);
+
             for (var i = 0; i < Count; i++)
             {
                 if (visited[i]) continue;
-
                 var component = new NodeSet<T>();
                 var neighbors = new Queue<int>();
                 neighbors.Enqueue(i);
+
                 while (true)
                 {
                     if (neighbors.Count < 1) break;
@@ -39,10 +41,10 @@ namespace InformedProteomics.Backend.MassFeature
 
         private void SetAdjacentList(INodeComparer<T> comparer)
         {
-            _adjList = new List<int>[Count];
+            _adjList = new LinkedList<int>[Count];
             for (var i = 0; i < Count; i++)
             {
-                _adjList[i] = new List<int>();
+                _adjList[i] = new LinkedList<int>();
             }
 
             for (var i = 0; i < Count; i++)
@@ -51,14 +53,14 @@ namespace InformedProteomics.Backend.MassFeature
                 {
                     if (comparer.SameCluster(this[i], this[j]))
                     {
-                        _adjList[i].Add(j);
-                        _adjList[j].Add(i);
+                        _adjList[i].AddLast(j);
+                        _adjList[j].AddLast(i);
                     }
                 }
             }
         }
 
 
-        private List<int>[] _adjList;
+        private LinkedList<int>[] _adjList;
      }
 }

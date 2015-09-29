@@ -4,8 +4,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 {
     public interface IScoringGraph
     {
-        int GetNodeScore(int nodeIndex);
+        double GetNodeScore(int nodeIndex);
         IEnumerable<ScoringGraphEdge> GetEdges(int nodeIndex);
+
+        double GetEdgeScore(int nodeIndex1, int nodeIndex2);
         int GetNumNodes();
     }
 }

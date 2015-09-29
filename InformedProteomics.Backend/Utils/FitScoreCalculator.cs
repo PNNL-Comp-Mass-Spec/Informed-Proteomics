@@ -101,6 +101,61 @@ namespace InformedProteomics.Backend.Utils
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
         }*/
 
+        public static Tuple<double, double> GetDistanceAndCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
+        {
+            if (count == -1) count = v1.Length;
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return new Tuple<double, double>(0d, 0d); 
+
+            var s1 = 0d;
+            var s2 = 0d;
+
+            for (var i = 0; i < count; i++)
+            {
+                s1 += v1[i + v1Index];
+                s2 += v2[i + v2Index];
+            }
+
+            if (!(s1 > 0) || !(s2 > 0))
+            {
+                return new Tuple<double, double>(1d, 0d); 
+            }
+            
+            var m1 = s1 / count;
+            var m2  = s2 / count;
+
+            // compute Pearson correlation
+            var cov = 0.0;
+            var c1 = 0.0;
+            var c2 = 0.0;
+            var corr = 0d;
+            var bc = 0d;
+
+            for (var i = 0; i < count; i++)
+            {
+                var e1 = v1[v1Index + i];
+                var e2 = v2[v2Index + i];
+                var d1 = e1 - m1;
+                var d2 = e2 - m2;
+                
+                cov += d1 * d2;
+                c1 += d1 * d1;
+                c2 += d2 * d2;
+
+                var p = e1 / s1;
+                var q = e2 / s2;
+                bc += Math.Sqrt(p * q);
+            }
+
+            if (c1 > 0 && c2 > 0 && cov > 0)
+            {
+                corr = cov / Math.Sqrt(c1 * c2);    
+            }
+            var dist = -Math.Log(bc);
+
+            return new Tuple<double, double>(dist, corr);
+        }
+
+
         public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1) count = v1.Length;

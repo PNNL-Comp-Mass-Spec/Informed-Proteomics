@@ -121,7 +121,7 @@ namespace InformedProteomics.Backend.SequenceTag
 
                 for (var j = i + 1; j < _deconvolutedPeaks.Count; j++)
                 {
-                    if (_deconvolutedPeaks[i].PeakShare(_deconvolutedPeaks[j])) continue;
+                    //if (_deconvolutedPeaks[i].PeakShare(_deconvolutedPeaks[j])) continue;
 
                     var massGap = _deconvolutedPeaks[j].Mass - _deconvolutedPeaks[i].Mass;
                     var maxMassGap = massGap + massTh;
@@ -140,7 +140,7 @@ namespace InformedProteomics.Backend.SequenceTag
                 }
             }
         }
-       
+       /*
         protected override bool AlreadyUsedPeak(int node)
         {
             foreach (var e in EdgeList)
@@ -149,7 +149,7 @@ namespace InformedProteomics.Backend.SequenceTag
                 if (_deconvolutedPeaks[e.Node2].PeakShare(_deconvolutedPeaks[node])) return true;
             }
             return false;
-        }
+        }*/
 
         protected int NumberOfAddedPaths;
         protected int MaxNumberOfProcessedPaths;

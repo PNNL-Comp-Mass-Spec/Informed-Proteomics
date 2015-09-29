@@ -1,86 +1,171 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics.Financial;
+using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class LikelihoodScorer : IScorer
+    public class LikelihoodScorer : AbstractFragmentScorer
     {
-        public const double RelativeIntensityThreshold = 0.1;
-        public LikelihoodScorer(LikelihoodScoringModel model, ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
+        public const double CorrThreshold = 0.7;
+        public const double DistThreshold = 0.07;
+        private readonly bool _includeMassErrorScore;
+
+        public LikelihoodScorer(LikelihoodScoringModel model, ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, bool massErrorScore = true)
+            : base(ms2Spec, tolerance, minCharge, maxCharge, 0.1)
         {
-            _model = model;
-            _ms2Spec = ms2Spec;
-            _tolerance = tolerance;
-            _minCharge = minCharge;
-            _maxCharge = maxCharge;
-            _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
+            //_model = model;
+
+            //var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity) * 0.1;
+            //var medIntensity = ms2Spec.Peaks.Select(p => p.Intensity).Median();
+            //_refIntensity = Math.Min(medIntensity, refIntensity);
+
+            _refIntensity = GetRefIntensity(ms2Spec.Peaks);
+
+            _includeMassErrorScore = massErrorScore;
         }
 
-        public double GetPrecursorIonScore(Ion precursorIon)
+        public static double GetRefIntensity(Peak[] peaks)
         {
-            return 0;
+            return peaks.Sum(p => p.Intensity);
         }
 
-        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
         {
             var score = 0.0;
-
-            foreach (var baseIonType in _baseIonTypes)
+            foreach (var baseIonType in BaseIonTypes)
             {
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
-                //fragmentComposition.ComputeApproximateIsotopomerEnvelop();
-                var isotopomerEnvelope = fragmentComposition.GetIsotopomerEnvelopeRelativeIntensities();
 
-                var bestCorrScore = -1.0;
-                var bestObsIntensity = -1.0;
-                for (var charge = _minCharge; charge <= _maxCharge; charge++)
+                var observedCharge = 0;
+                var envelopeCorr = 0d;
+                var envelopeDist = 0d;
+                var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
+
+                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out observedCharge,
+                    out envelopeCorr, out envelopeDist);
+                var fragmentIonMass = fragmentComposition.Mass;
+
+                if (observedPeaks == null) continue;
+                var observedMostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
+              
+                var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, observedCharge, mostAbundantIsotopeIndex);
+                var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass)/fragmentIonMass)*1e6;
+
+                score += 1;
+                var intScore = (observedMostAbuPeak.Intensity / _refIntensity) * 10;
+                var corrScore = (fragmentIonMass > 1300 & envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
+                var distScore = (fragmentIonMass > 1300 & envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
+                score += intScore;
+                score += corrScore;
+                score += distScore;
+
+                if (_includeMassErrorScore)
                 {
-                    var ion = new Ion(fragmentComposition, charge);
-
-                    var observedPeaks = _ms2Spec.GetAllIsotopePeaks(ion, _tolerance, RelativeIntensityThreshold);
-                    if (observedPeaks == null) continue;
-
-                    var theoIntensities = new double[observedPeaks.Length];
-                    var observedIntensities = new double[observedPeaks.Length];
-
-                    for (var i = 0; i < observedPeaks.Length; i++)
-                    {
-                        theoIntensities[i] = isotopomerEnvelope[i];
-                        var observedPeak = observedPeaks[i];
-                        observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
-                    }
-//                    var corrScore = FitScoreCalculator.GetCosine(isotopomerEnvelope, observedIntensities);
-                    var corrScore = FitScoreCalculator.GetPearsonCorrelation(isotopomerEnvelope, observedIntensities);
-                    if (corrScore > bestCorrScore)
-                    {
-                        bestCorrScore = corrScore;
-                        bestObsIntensity = observedIntensities.Max();
-                    }
+                    /*score += _model.GetNodeScore(Ms2Spectrum.ActivationMethod, baseIonType.IsPrefix,
+                        fragmentIonMass, observedCharge,
+                        envelopeCorr, envelopeDist,
+                        observedMostAbuPeak.Intensity / _refIntensity, massErrorPpm);    
+                     */
+                    var massErrorScore = GetMassErrorScore(massErrorPpm);
+                    score += massErrorScore;
                 }
-
-                score += _model.GetScore(baseIonType, bestCorrScore, bestObsIntensity);
+                else
+                {
+                    /*score += _model.GetNodeScoreWithoutMassError(Ms2Spectrum.ActivationMethod, baseIonType.IsPrefix,
+                        fragmentIonMass, observedCharge,
+                        envelopeCorr, envelopeDist,
+                        observedMostAbuPeak.Intensity / _refIntensity);
+                     */
+                }
+                //score += _model.GetScore(baseIonType, bestCorrScore, bestObsIntensity);
             }
             return score;
         }
 
-        private readonly LikelihoodScoringModel _model;
-        private readonly ProductSpectrum _ms2Spec;
-        private readonly Tolerance _tolerance;
-        private readonly int _minCharge;
-        private readonly int _maxCharge;
-        private readonly BaseIonType[] _baseIonTypes;
 
-        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
-        static LikelihoodScorer()
+        public double GetMassErrorScore(double massErrorPpm)
         {
-            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
-            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+            //y = normpdf(bin_Z, 5.0140, 3.1534);
+            //y2 = normpdf(bin_Z, 6.3361, 4.0447);
+            var p = Normal.PDF(5.014, 3.1534, massErrorPpm);
+            var pnull = Normal.PDF(7.3361, 4.0447, massErrorPpm);
+            return Math.Max(Math.Log(p / pnull), 0);
         }
 
+        public Tuple<double, int> GetLikelihoodAndPeakCountScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        {
+            var score = 0.0;
+            var peakCount = 0;
+            foreach (var baseIonType in BaseIonTypes)
+            {
+                var fragmentComposition = baseIonType.IsPrefix
+                              ? prefixFragmentComposition + baseIonType.OffsetComposition
+                              : suffixFragmentComposition + baseIonType.OffsetComposition;
+
+                var observedCharge = 0;
+                var envelopeCorr = 0d;
+                var envelopeDist = 0d;
+                var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
+
+                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out observedCharge,
+                    out envelopeCorr, out envelopeDist);
+                var fragmentIonMass = fragmentComposition.Mass;
+
+                if (observedPeaks == null) continue;
+                var observedMostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
+
+                var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, observedCharge, mostAbundantIsotopeIndex);
+                var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
+
+                peakCount++;
+
+                score += 1;
+                var intScore = (observedMostAbuPeak.Intensity / _refIntensity) * 10;
+                var corrScore = (fragmentIonMass > 1300 & envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
+                var distScore = (fragmentIonMass > 1300 & envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
+                score += intScore;
+                score += corrScore;
+                score += distScore;
+                if (_includeMassErrorScore)
+                {
+                    var massErrorScore = GetMassErrorScore(massErrorPpm);
+                    score += massErrorScore;
+                }
+
+                /*
+                if (_includeMassErrorScore)
+                {
+                    score += _model.GetNodeScore(Ms2Spectrum.ActivationMethod, baseIonType.IsPrefix,
+                        fragmentIonMass, observedCharge,
+                        envelopeCorr, envelopeDist,
+                        observedMostAbuPeak.Intensity / _refIntensity, massErrorPpm);
+                }
+                else
+                {
+                    score += _model.GetNodeScoreWithoutMassError(Ms2Spectrum.ActivationMethod, baseIonType.IsPrefix,
+                        fragmentIonMass, observedCharge,
+                        envelopeCorr, envelopeDist,
+                        observedMostAbuPeak.Intensity / _refIntensity);
+                }*/
+
+                //score += _model.GetScore(baseIonType, bestCorrScore, bestObsIntensity);
+            }
+            return new Tuple<double, int>(score, peakCount);
+        }
+
+
+
+
+        //private readonly LikelihoodScoringModel _model;
+        private readonly double _refIntensity;
     }
 }

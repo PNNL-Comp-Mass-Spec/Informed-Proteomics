@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
@@ -8,16 +9,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Deconvoluter
     {
-        // Select the best peak within +/- filteringWindowSize
+        public static DeconvolutedSpectrum GetDeconvolutedSpectrum(
+                    Spectrum spec, int minCharge, int maxCharge,
+                    int isotopeOffsetTolerance, double filteringWindowSize,
+                    Tolerance tolerance, double corrScoreThreshold = 0.7)
+        {
+            var peaks = GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize,
+                tolerance, corrScoreThreshold);
+
+            return new DeconvolutedSpectrum(spec, peaks.ToArray());
+        }
+
+
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
-            Spectrum spec, int minCharge, int maxCharge, 
+            Spectrum spec, int minCharge, int maxCharge,
             int isotopeOffsetTolerance, double filteringWindowSize,
             Tolerance tolerance, double corrScoreThreshold)
         {
-            var peaks = spec.Peaks;
+            return GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize,
+                tolerance, corrScoreThreshold);
+        }
+
+        // Select the best peak within +/- filteringWindowSize
+        public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
+            Peak[] peaks, int minCharge, int maxCharge, 
+            int isotopeOffsetTolerance, double filteringWindowSize,
+            Tolerance tolerance, double corrScoreThreshold)
+        {
 
             var monoIsotopePeakList = new List<DeconvolutedPeak>();
-            //            var massHash = new HashSet<int>();
             for (var peakIndex = 0; peakIndex < peaks.Length; peakIndex++)
             {
                 var peak = peaks[peakIndex];
@@ -59,10 +79,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                 var window = new Peak[nextIndex - prevIndex - 1];
                 Array.Copy(peaks, prevIndex + 1, window, 0, window.Length);
-                var windowSpectrum = new Spectrum(window, spec.ScanNum);
+                var windowSpectrum = new Spectrum(window, 1);
                 var peakMz = peak.Mz;
 
-                //var hasToSkip = new bool[maxCharge - minCharge + 1, isotopeOffsetTolerance * 2 + 1];
                 for (var charge = maxCharge; charge >= minCharge; charge--)
                 {
                     var mass = peak.Mz * charge;
@@ -72,8 +91,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
                         var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
-                        var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope,
-                            tolerance, 0.1);
+                        var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
                         if (observedPeaks == null) continue;
 
                         var envelop = isotopomerEnvelope.Envolope;
@@ -85,18 +103,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
                         }
 
-                        var corr = FitScoreCalculator.GetPearsonCorrelation(envelop, observedIntensities);
-                        var bcDist = FitScoreCalculator.GetBhattacharyyaDistance(envelop, observedIntensities);
+                        var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                        var bcDist = sim.Item1;
+                        var corr = sim.Item2;
 
-                        if (corr < corrScoreThreshold && bcDist > 0.05) continue;
+                        if (corr < corrScoreThreshold && bcDist > 0.03) continue;
 
                         // monoIsotopeMass is valid
-                        monoIsotopePeakList.Add(new DeconvolutedPeak(monoIsotopeMass, charge, observedPeaks, envelop));
-                        //foreach (var factorCharge in SimpleMath.GetFactors(charge))
-                        //{
-                        //    if (factorCharge < minCharge) continue;
-                        //    hasToSkip[factorCharge - minCharge, isotopeIndex - mostAbundantIsotopeIndex + isotopeOffsetTolerance] = true;
-                        //}
+                        var deconvPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
+                        monoIsotopePeakList.Add(deconvPeak);
                     }
                 }
             }
@@ -107,40 +122,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public static List<DeconvolutedPeak> FilterOut(List<DeconvolutedPeak> peaks, double windowSize, int topRankCutoff)
         {
-                // select each peak if it is top n within window (-window,+window) around it
-                //Spectrum retSpec = (Spectrum)s.clone();
-                //retSpec.clear();    // remove all peaks 
-                var retSpec = new List<DeconvolutedPeak>();
-                for (int peakIndex = 0; peakIndex < peaks.Count; peakIndex++)
+            var retSpec = new List<DeconvolutedPeak>();
+            for (var peakIndex = 0; peakIndex < peaks.Count; peakIndex++)
+            {
+                var rank = 1;
+                var thisPeak = peaks[peakIndex];
+                var thisMass = thisPeak.Mass;
+                var thisInten = thisPeak.Intensity;
+
+                // move left
+                var prevIndex = peakIndex - 1;
+                while (prevIndex >= 0)
                 {
-                    int rank = 1;
-
-                    var thisPeak = peaks[peakIndex];
-                    var thisMass = thisPeak.Mass;
-                    var thisInten = thisPeak.Intensity;
-
-                    // move left
-                    int prevIndex = peakIndex - 1;
-                    while (prevIndex >= 0)
-                    {
-                        var prevPeak = peaks[prevIndex];
-                        if (thisMass - prevPeak.Mass > windowSize) break;
-                        if (prevPeak.Intensity > thisInten) rank++;
-                        prevIndex--;
-                    }
-
-                    // move right
-                    int nextIndex = peakIndex + 1;
-                    while (nextIndex < peaks.Count)
-                    {
-                        var nextPeak = peaks[nextIndex];
-                        if (nextPeak.Mass - thisMass > windowSize) break;
-                        if (nextPeak.Intensity > thisInten) rank++;
-                        nextIndex++;
-                    }
-
-                    if (rank <= topRankCutoff) retSpec.Add(thisPeak);
+                    var prevPeak = peaks[prevIndex];
+                    if (thisMass - prevPeak.Mass > windowSize) break;
+                    if (prevPeak.Intensity > thisInten) rank++;
+                    prevIndex--;
                 }
+
+                // move right
+                var nextIndex = peakIndex + 1;
+                while (nextIndex < peaks.Count)
+                {
+                    var nextPeak = peaks[nextIndex];
+                    if (nextPeak.Mass - thisMass > windowSize) break;
+                    if (nextPeak.Intensity > thisInten) rank++;
+                    nextIndex++;
+                }
+                if (rank <= topRankCutoff) retSpec.Add(thisPeak);
+            }                
 
             return retSpec;
         }

@@ -32,9 +32,16 @@ namespace InformedProteomics.Backend.MassFeature
             
             MaxNet = maxNet;
             MinNet = minNet;
+
+            ProteinSpectrumMatches = new ProteinSpectrumMatchSet(0);
         }
-       
-        public int DataSetId { get; set; }
+
+        public int DataSetId
+        {
+            get { return ProteinSpectrumMatches.DataId; }
+            set { ProteinSpectrumMatches.SetDataId(value); } 
+        }
+
         public int FeatureId { get; set; }
         
         public int MinCharge { get; protected set; }
@@ -140,14 +147,10 @@ namespace InformedProteomics.Backend.MassFeature
             if (other.MinScanNum - tolScan < MaxScanNum && MaxScanNum < other.MaxScanNum + tolScan) return true;
             return false;
         }
-        
-        //public LcMsRun Run { get; protected set; }
-        public ProteinSpectrumMatchSet ProteinSpectrumMatches { get; set; }
+
+        public readonly ProteinSpectrumMatchSet ProteinSpectrumMatches;
 
         [Serializable]
         public class LcMsRunNullException : Exception { }
-        //private readonly double _minElution;
-        //private readonly double _maxElution;
-
     }
 }

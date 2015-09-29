@@ -1,13 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using DeconTools.Backend.ProcessingTasks.ChargeStateDeciders;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.GeneratingFunction;
+using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -35,7 +42,7 @@ namespace InformedProteomics.Test.FunctionalTests
             const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
             var parser = new MsDeconvFilter(run, new Tolerance(10), filePath);
         }
-
+        /*
         [Test]
         public void PrintAllScorers()
         {
@@ -69,7 +76,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var scoringModel = new LikelihoodScoringModel(filePath);
             Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.99, 1200));
-        }
+        }*/
 
         [Test]
         public void TestMatchedPeakCounter()
@@ -234,54 +241,105 @@ namespace InformedProteomics.Test.FunctionalTests
         }
 
         [Test]
-        public void TestJungkapScoring()
+        public void TestCompositeScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
 
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            // Configure amino acid set
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
 
+            const int numMaxModsPerProtein = 4;
+            var searchModifications = new List<SearchModification>
+            {
+                dehydroC,
+                oxM,
+                acetylN
+            };
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+            var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            const double filteringWindowSize = 1.1;
+            const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
             const int minCharge = 1;
-            const int maxCharge = 15;
-
+            const int maxCharge = 20;
+            var graphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
             var aminoAcidSet = new AminoAcidSet();
-            var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
+            //var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
+            var scorer = new InformedTopDownScorer(run, aminoAcidSet, minCharge, maxCharge, tolerance);
 
-            const string resultFileName = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv";
-            var parser = new TsvFileParser(resultFileName);
-            var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
-            var protSequences = parser.GetData("Sequence").ToArray();
-            var modStrs = parser.GetData("Modifications").ToArray();
-            var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
-
-            const string outputFileName = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
-            using (var writer = new StreamWriter(outputFileName))
+            var fileExt = new string[] {"IcTarget", "IcDecoy"};
+            foreach (var ext in fileExt)
             {
-                writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tScore");
-                for (var i = 0; i < parser.NumData; i++)
+                var resultFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}.tsv", ext);
+                var parser = new TsvFileParser(resultFileName);
+                var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
+                var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
+                var protSequences = parser.GetData("Sequence").ToArray();
+                var modStrs = parser.GetData("Modifications").ToArray();
+                var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
+                var protMass = parser.GetData("Mass").Select(s => Convert.ToDouble(s)).ToArray();
+                var outputFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}_Rescored.tsv", ext);
+
+                using (var writer = new StreamWriter(outputFileName))
                 {
-                    var scan = scans[i];
-                    var protSequence = protSequences[i];
-                    var modStr = modStrs[i];
-                    //if (scan != 1765) continue;
-                    var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
-                    //Console.WriteLine("{0}: {1} ? {2}", scan, sequence.Composition, compositions[i] - Composition.H2O);
-                    Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
-                    var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
-                    Assert.True(ms2Spec != null);
-                    var score = scorer.ComputeScore(ms2Spec, sequence);
-                    writer.WriteLine("{0}\t{1}", parser.GetRows()[i], score);
+                    writer.WriteLine(string.Join("\t", parser.GetHeaders().ToArray(), 0, 15) + "\tScore\tEValue");
+
+                    var lines = new string[parser.NumData];
+                    
+                    //for (var i = 0; i < parser.NumData; i++)
+                    Parallel.For(0, parser.NumData, i =>
+                    {
+                        var scan = scans[i];
+                        var charge = charges[i];
+                        var protSequence = protSequences[i];
+                        var modStr = modStrs[i];
+                        var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
+                        Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
+                        var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
+                        Assert.True(ms2Spec != null);
+                        var scores = scorer.GetScores(sequence, charge, scan);
+
+                        var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
+                            isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
+
+                        var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
+                            comparer);
+                        var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
+
+                        var gf = new GeneratingFunction(graph);
+                        gf.ComputeGeneratingFunction();
+
+                        var specEvalue = gf.GetSpectralEValue(scores.Score);
+
+                        var rowStr = parser.GetRows()[i];
+                        var items = rowStr.Split('\t').ToArray();
+                        var newRowStr = string.Join("\t", items, 0, 15);
+
+                        //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                        lock (lines)
+                        {
+                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);    
+                        }
+                        //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                    });
+
+                    foreach (var line in lines) writer.WriteLine(line);
                 }
+                Console.WriteLine("Done");
             }
-            Console.WriteLine("Done");
         }
 
         [Test]
@@ -290,9 +348,9 @@ namespace InformedProteomics.Test.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string targetResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
-            const string decoyResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
-            const string tdaResultPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Results\Fdr\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";
+            const string targetResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";
+            const string decoyResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
+            const string tdaResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";
 
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";

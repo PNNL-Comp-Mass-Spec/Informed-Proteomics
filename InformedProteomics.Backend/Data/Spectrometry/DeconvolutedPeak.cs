@@ -1,11 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    public class DeconvolutedPeak : Peak
+    {
+        public DeconvolutedPeak(double mass, double intensity, int charge, double corr, double dist, Peak[] isotopePeaks = null) : base(mass, intensity)
+        {
+            Charge = charge;
+
+            Corr = corr;
+            Dist = dist;
+
+            ObservedPeaks = isotopePeaks;
+            //_isotopePeaks = new HashSet<Peak>();
+            /*
+            if (isotopePeaks == null)
+            {
+                SummedIntensity = intensity;
+                return;
+            }*/
+
+            //SummedIntensity = 0;
+            /*
+            foreach (var peak in isotopePeaks.Where(peak => peak != null))
+            {
+                _isotopePeaks.Add(peak);
+                SummedIntensity += peak.Intensity;
+            }*/
+        }
+
+        public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
+        public double MzWithoutAdductIonMass { get { return Mass / Charge; } }
+        public double Mass { get { return Mz; } }
+        public int Charge { get; private set; }
+
+        public double Corr { get; private set; }
+        public double Dist { get; private set; }
+
+        /*
+        public bool PeakShare(DeconvolutedPeak other)
+        {
+            return ObservedPeaks.Any(peak => other.ObservedPeaks.Contains(peak));
+        }*/
+
+        public Peak[] ObservedPeaks { get; private set; }
+        //private readonly HashSet<Peak> _isotopePeaks;
+    }
+    
+    /*
     public class DeconvolutedPeak: IComparable<DeconvolutedPeak>
     {
         public DeconvolutedPeak(double mass, int charge, Peak[] isotopePeaks = null, double[] envelop = null, double relativeThreshold = 0.3)
@@ -27,10 +70,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         public double Mass { get; private set; }
-        
-        //public double Intensity { get { return MzPeak != null ? MzPeak.Intensity : 0; } }
-        //public double Mz { get { return MzPeak.Mz;  } }
-        //public Peak MzPeak { get; private set; }
+        public double Corr { get; internal set; }
         public double Intensity { get; private set; }
 
         public bool PeakShare(DeconvolutedPeak other)
@@ -75,7 +115,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             return !Equals(left, right);
         }
-    }
+    }*/
 
 
 }

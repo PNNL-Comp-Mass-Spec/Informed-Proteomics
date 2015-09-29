@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Gets the number of possible compositions of the current sequence 
         /// </summary>
         /// <returns>the number of possible compositions</returns>
-        public int GetNumSequenceCompositions()
+        public int GetNumProteoformCompositions()
         {
             return _graph[_index].Length;
         }
@@ -97,7 +97,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             return compositions;
         }
-
+        
         /// <summary>
         /// Gets number of possible proteoforms
         /// </summary>
@@ -105,6 +105,77 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int GetNumProteoforms()
         {
             return _graph[_index].Length;
+        }
+        
+        public double GetNumProteoformSequencesByNumMods(int nDynMods)
+        {
+            if (nDynMods < 1 || nDynMods > ModificationParams.MaxNumDynModsPerSequence) return 0;
+
+            var numModCombs = _graph[_index].Length;
+            var nProteoforms = 0d;
+            for (var modIndex = 0; modIndex < numModCombs; modIndex++)
+            {
+                var modCombs = ModificationParams.GetModificationCombination(_graph[_index][modIndex].ModificationCombinationIndex);
+                if (modCombs.GetNumModifications() < nDynMods) continue;
+                if (modCombs.GetNumModifications() > nDynMods) break;
+
+                nProteoforms += GetNumProteoformSequences(modIndex);
+                //if (nProteoforms > double.MaxValue) return double.MaxValue; // overflow
+            }
+            return nProteoforms;
+        }
+        
+        private double[][] _countTable;
+        public double GetNumProteoformSequences(int modIndex)
+        {
+            var numModCombs = _graph[_index].Length;
+            if (modIndex < 0 || modIndex >= numModCombs) return 0;
+
+            if (_countTable == null)
+            {
+                _countTable = new double[_maxSeqIndex][];
+                for (var i = 0; i < _maxSeqIndex; i++)
+                {
+                    _countTable[i] = new double[_graph[i].Length];
+                }
+
+                _countTable[0][0] = 1;
+                for (var i = 1; i < _maxSeqIndex; i++)
+                {
+                    for (var j = 0; j < _graph[i].Length; j++)
+                    {
+                        foreach (var k in _graph[i][j].GetPrevNodeIndices())
+                        {
+                            _countTable[i][j] += _countTable[i - 1][k];
+                        }
+                    }
+                }
+            }
+
+            return _countTable[_index][modIndex];
+            /*
+            var countTable2 = new double[_maxSeqIndex, numModCombs];
+            for (var i = 0; i < _maxSeqIndex; i++)
+            {
+                for (var j = 0; j < _graph[i].Length; j++)
+                {
+                    countTable2[i, j] = countTable[i][j];
+                }
+            }
+
+            for (var j = 0; j < numModCombs; j++) 
+            {
+                var modCombs = ModificationParams.GetModificationCombination(_graph[_index][j].ModificationCombinationIndex);
+                Console.Write(modCombs);
+                Console.Write("\t");
+
+                for (var i = 0; i < _maxSeqIndex; i++)
+                {
+                    Console.Write(countTable2[i, j]); 
+                    Console.Write("\t");
+                }
+                Console.Write("\n");
+            }*/
         }
 
         //public Composition.Composition[] GetSequenceCompositionsWithNTermCleavage(int numNTermCleavages)
@@ -278,6 +349,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             return new Tuple<double, string>(fragmentScore.Item1, fragmentScore.Item2);
         }
+
+
 
         protected SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
         {

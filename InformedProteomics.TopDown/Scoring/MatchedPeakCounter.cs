@@ -1,42 +1,35 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class MatchedPeakCounter: IScorer
+    public class MatchedPeakCounter: AbstractFragmentScorer
     {
         public MatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
+            : base(ms2Spec, tolerance, minCharge, maxCharge)
         {
-            _ms2Spec = ms2Spec;
-            _tolerance = tolerance;
-            _minCharge = minCharge;
-            _maxCharge = maxCharge;
-            _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
+            RelativeIsotopeIntensityThreshold = 0.7;
         }
 
-        public double GetPrecursorIonScore(Ion precursorIon)
-        {
-            return 0;
-        }
-
-        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
         {
             var score = 0.0;
 
-            foreach (var baseIonType in _baseIonTypes)
+            foreach (var baseIonType in BaseIonTypes)
             {
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
-                //fragmentComposition.ComputeApproximateIsotopomerEnvelop();
+                
+                if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
+                var chargeRange = GetMinMaxChargeRange(fragmentComposition);
 
                 var containsIon = false;
-                for (var charge = _minCharge; charge <= _maxCharge; charge++)
+                for (var charge = chargeRange.Min; charge <= chargeRange.Max; charge++)
                 {
                     var ion = new Ion(fragmentComposition, charge);
-                    if (_ms2Spec.ContainsIon(ion, _tolerance, RelativeIsotopeIntensityThreshold))
+                    if (Ms2Spectrum.ContainsIon(ion, Tolerance, RelativeIsotopeIntensityThreshold))
                     {
                         containsIon = true;
                         break;
@@ -46,21 +39,6 @@ namespace InformedProteomics.TopDown.Scoring
                 if (containsIon) score += 1.0;
             }
             return score;
-        }
-
-        private readonly ProductSpectrum _ms2Spec;
-        private readonly Tolerance _tolerance;
-        private readonly int _minCharge;
-        private readonly int _maxCharge;
-        private readonly BaseIonType[] _baseIonTypes;
-
-        private const double RelativeIsotopeIntensityThreshold = 0.8;
-
-        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
-        static MatchedPeakCounter()
-        {
-            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
-            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
         }
     }
 }

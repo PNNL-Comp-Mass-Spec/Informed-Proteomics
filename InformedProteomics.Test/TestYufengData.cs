@@ -142,7 +142,7 @@ namespace InformedProteomics.Test
             for (var numNTermCleavages = 0; numNTermCleavages <= 0; numNTermCleavages++)
             {
                 if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
-                var numProteoforms = seqGraph.GetNumProteoforms();
+                var numProteoforms = seqGraph.GetNumProteoformCompositions();
                 var modCombs = seqGraph.GetModificationCombinations();
                 for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
                 {

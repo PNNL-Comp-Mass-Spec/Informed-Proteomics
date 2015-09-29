@@ -259,7 +259,7 @@ namespace InformedProteomics.Test
                 // tag features by PrSMs
                 for(var j = 0; j < features.Count; j++)
                 {
-                    features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
+                    //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
                     var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
                     foreach (var match in prsmList)
                     {

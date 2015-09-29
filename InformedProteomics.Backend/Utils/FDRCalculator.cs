@@ -13,6 +13,8 @@ namespace InformedProteomics.Backend.Utils
         private string[] _results;
         private readonly bool _multiplePeptidesPerScan;
 
+        private bool _hasEvalueColumn;
+
         public int NumPsms { get; private set; }
         public int NumPeptides { get; private set; }
 
@@ -40,6 +42,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "PepQvalue"
+            
             if (!CalculatePepQValues(targetResultFilePath, decoyResultFilePath))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
@@ -94,12 +97,18 @@ namespace InformedProteomics.Backend.Utils
 
             if (!GetColumnIndex("QValues", "ProteinName", out proteinIndex))
                 return false;
-    
-            var distinctSorted = concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                .Select(grp => grp.First())
-                .ToArray();
+
+            var distinctSorted = (_hasEvalueColumn)
+                ? concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                    .Select(grp => grp.First())
+                    .ToArray()
+                : concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                    .Select(grp => grp.First())
+                    .ToArray();
 
             NumPsms = 0;
 
@@ -137,7 +146,6 @@ namespace InformedProteomics.Backend.Utils
       
         private bool CalculatePepQValues(string targetResultFilePath, string decoyResultFilePath)
         {
-
             string[] concatenated;
             int scoreIndex;
             int rawScoreIndex;
@@ -173,19 +181,41 @@ namespace InformedProteomics.Backend.Utils
             if (!GetColumnIndex("PepQValues", "ProteinName", out proteinIndex))
                 return false;
 
-            var distinctSorted = !_multiplePeptidesPerScan ?
-                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                    .Select(grp => grp.First())
-                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                    .Select(grp => grp.First())
-                    .ToArray() :
-                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                    .Select(grp => grp.First())
-                    .ToArray();
+            string[] distinctSorted;
+
+            if (_hasEvalueColumn)
+            {
+                distinctSorted = !_multiplePeptidesPerScan ?
+                                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                                    .Select(grp => grp.First())
+                                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                                    .Select(grp => grp.First())
+                                    .ToArray() :
+                                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                                    .Select(grp => grp.First())
+                                    .ToArray();                
+            }
+            else
+            {
+                distinctSorted = !_multiplePeptidesPerScan ?
+                                               concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                                               .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                                                   .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
+                                                   .Select(grp => grp.First())
+                                                   .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                                                   .Select(grp => grp.First())
+                                                   .ToArray() :
+                                               concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
+                                                   .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
+                                                   .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
+                                                   .Select(grp => grp.First())
+                                                   .ToArray();                    
+            }
+            
 
             // Calculate q values
             _headers = _headers.Concat(new[] { "PepQValue" }).ToArray();
@@ -302,15 +332,25 @@ namespace InformedProteomics.Backend.Utils
                 ErrorMessage = "No results found; cannot compute " + targetStatistic;
                 return false;
             }
-
-            scoreIndex = _headers.IndexOf("SpecEValue");
+            
+            scoreIndex = _headers.IndexOf("EValue");
             if (scoreIndex < 0)
             {
-                ErrorMessage = errorBase + "SpecEValue column is missing";
+                scoreIndex = _headers.IndexOf("#MatchedFragments");
+                _hasEvalueColumn = false;
+            }
+            else
+            {
+                _hasEvalueColumn = true;
+            }
+
+            if (scoreIndex < 0)
+            {
+                ErrorMessage = errorBase + "EValue(Score) column is missing";
                 return false;
             }
-            
-            rawScoreIndex = _headers.IndexOf("Score");
+
+            rawScoreIndex = _headers.IndexOf("Probability");
             if (rawScoreIndex < 0)
             {
                 rawScoreIndex = _headers.IndexOf("#MatchedFragments");

@@ -240,16 +240,17 @@ namespace InformedProteomics.Test.FunctionalTests
         }
 
         [Test]
-        public void TestGettingSequence()
+        public void TestNumberOfProteoforms()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            const string annotation = "_.AECMC._";
+            //const string annotation = "_.AMCMC._";
+            const string annotation = "_.MARTKQTARK._";
 
             // Configure amino acid set
             var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
-            //var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
             var methylC = new SearchModification(Modification.Methylation, 'C', SequenceLocation.Everywhere, true);
@@ -257,11 +258,63 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var searchModifications = new List<SearchModification>
             {
-                carbamidomethylC,
-                methylC
-                //methylK,
+                //carbamidomethylC,
+                //methylC,
+                methylK,
                 //pyroGluQ,
-                //oxM,
+                oxM,
+                //acetylN
+            };
+
+            const int numMaxModsPerProtein = 4;
+
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
+
+            var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
+            var protCompositions = seqGraph.GetSequenceCompositions();
+            var modCombs = seqGraph.GetModificationCombinations();
+
+            Console.WriteLine("\n#Protoeoforms by mod combinations: ");
+            for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+            {
+                Console.Write((modIndex == 0) ? "No modifications" : modCombs[modIndex].ToString());
+                Console.Write("\t");
+                Console.WriteLine("{0}", seqGraph.GetNumProteoformSequences(modIndex));
+            }
+
+            Console.WriteLine("\n#Protoeoforms by number of modificaionts: ");
+            for (var nMod = 0; nMod <= numMaxModsPerProtein; nMod++)
+            {
+                Console.Write("#modificaitons = {0}", nMod);
+                Console.Write("\t");
+                Console.WriteLine("{0}", seqGraph.GetNumProteoformSequencesByNumMods(nMod));
+            }
+        }
+
+        [Test]
+        public void TestGettingSequence()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            //const string annotation = "_.AMCMC._";
+            const string annotation = "_.MARTKQTARK._";
+
+            // Configure amino acid set
+            var methylK = new SearchModification(Modification.Methylation, 'K', SequenceLocation.Everywhere, false);
+            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.Everywhere, false);
+            var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
+            var carbamidomethylC = new SearchModification(Modification.Carbamidomethylation, 'C', SequenceLocation.Everywhere, true);
+            var methylC = new SearchModification(Modification.Methylation, 'C', SequenceLocation.Everywhere, true);
+            var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.PeptideNTerm, false);
+
+            var searchModifications = new List<SearchModification>
+            {
+                //carbamidomethylC,
+                //methylC,
+                methylK,
+                //pyroGluQ,
+                oxM,
                 //acetylN
             };
 
@@ -270,8 +323,8 @@ namespace InformedProteomics.Test.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
-
             var protCompositions = seqGraph.GetSequenceCompositions();
+            
             for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
             {
                 seqGraph.SetSink(modIndex);
@@ -327,8 +380,8 @@ namespace InformedProteomics.Test.FunctionalTests
             var graph = SequenceGraph.CreateGraph(aaSet, annotation);
 
             var numFragCompositions = graph.GetNumFragmentCompositions();
-            var numProteoforms = graph.GetNumProteoforms();
-            var numSeqCompositions = graph.GetNumSequenceCompositions();
+            var numProteoforms = graph.GetNumProteoformCompositions();
+            var numSeqCompositions = graph.GetNumProteoformCompositions();
 
             Console.WriteLine("NumFragmentCompositions: " + numFragCompositions);
             Console.WriteLine("NumProteoforms: " + numProteoforms);
