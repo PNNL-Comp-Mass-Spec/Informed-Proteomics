@@ -15,10 +15,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             IsFixedModification = isFixedModification;
         }
 
-        public Modification Modification { get; private set; }
-        public char TargetResidue { get; private set; }
-        public SequenceLocation Location { get; private set; }
-        public bool IsFixedModification { get; private set; }
+        public SearchModification()
+        {
+            
+        }
+
+        public Modification Modification { get; set; }
+        public char TargetResidue { get; set; }
+        public SequenceLocation Location { get; set; }
+        public bool IsFixedModification { get; set; }
         public override string ToString()
         {
             return string.Format("{0},{1},{2},{3},{4}", 

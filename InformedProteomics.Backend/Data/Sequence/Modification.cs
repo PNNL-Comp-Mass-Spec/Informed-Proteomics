@@ -7,23 +7,30 @@ namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Modification : IMolecule
     {
-        public int AccessionNum { get; private set; }
-        public Composition.Composition Composition { get; private set; }
-        public string Name { get; private set; }
+        public int AccessionNum { get; set; }
+        public Composition.Composition Composition { get; set; }
+        public string Name { get; set; }
+
+        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public double Mass { get { return Composition.Mass; } }
 
-        private Modification(int accessionNum, Composition.Composition composition, string name)
+        public Modification(int accessionNum, Composition.Composition composition, string name)
         {
             AccessionNum = accessionNum;
             Composition = composition;
             Name = name;
         }
 
-        private Modification(int accessionNum, double deltaMass, string name)
+        public Modification(int accessionNum, double deltaMass, string name)
         {
             AccessionNum = accessionNum;
             Composition = new CompositionWithDeltaMass(deltaMass);
             Name = name;
+        }
+
+        public Modification()
+        {
+            
         }
 
         public override int GetHashCode()
@@ -217,7 +224,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
         }
 
-        private static void Register(Modification modification)
+        public static void Register(Modification modification)
         {
             NameToModMap.Add(modification.Name, modification);
             var massStr = string.Format("{0:N3}", modification.Composition.Mass);

@@ -17,13 +17,18 @@ namespace InformedProteomics.Backend.Data.Biology
             Name = name;
         }
 
-        public string Code { get; private set; }
+        public Atom()
+        {
+            
+        }
 
-        public string Name { get; private set; }
+        public string Code { get; set; }
 
-        public double Mass { get; private set; }
+        public string Name { get; set; }
 
-        public int NominalMass { get; private set; }
+        public double Mass { get; set; }
+
+        public int NominalMass { get; set; }
 
         public static readonly Atom[] AtomArr =
             {

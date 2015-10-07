@@ -62,6 +62,11 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        public Composition()
+        {
+            _additionalElements = new Dictionary<Atom, short>();
+        }
+
         private Composition(int c, int h, int n, int o, int s, int p, Dictionary<Atom, short> additionalElements)
             : this(c, h, n, o, s, p)
         {
@@ -74,38 +79,87 @@ namespace InformedProteomics.Backend.Data.Composition
         public short C
         {
             get { return _c; }
+            set
+            {
+                _c = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
         public short H
         {
             get { return _h; }
+            set
+            {
+                _h = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
         public short N
         {
             get { return _n; }
+            set
+            {
+                _n = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
         public short O
         {
             get { return _o; }
+            set
+            {
+                _o = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
         public short S
         {
             get { return _s; }
+            set
+            {
+                _s = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
         public short P
         {
             get { return _p; }
+            set
+            {
+                _p = value;
+                _mass = null;
+                _nominalMass = null;
+            }
         }
 
+        public Dictionary<Atom, short> AdditionalElements
+        {
+            get { return _additionalElements; }
+            set
+            {
+                _additionalElements = value;
+                _mass = null;
+                _nominalMass = null;
+            }
+        }
+
+        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public override double Mass
         {
             get { return (double)(_mass ?? (_mass = GetMonoIsotopicMass())); }
         }
 
+        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public override int NominalMass
         {
             get { return (int)(_nominalMass ?? (_nominalMass = GetNominalMass())); }
@@ -115,13 +169,13 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Private members
 
-        private readonly Dictionary<Atom, short> _additionalElements;
-        private readonly short _c;
-        private readonly short _h;
-        private readonly short _n;
-        private readonly short _o;
-        private readonly short _s;
-        private readonly short _p;
+        private Dictionary<Atom, short> _additionalElements;
+        private short _c;
+        private short _h;
+        private short _n;
+        private short _o;
+        private short _s;
+        private short _p;
 
         private double? _mass;
         private int? _nominalMass;
