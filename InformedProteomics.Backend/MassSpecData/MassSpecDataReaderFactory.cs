@@ -252,7 +252,7 @@ namespace InformedProteomics.Backend.MassSpecData
             get
             {
                 // differs from ProteoWizardReader filter string by the *.pbf extension
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.pbf"
+                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf;*.pbf"
                        + "|Thermo .RAW|*.raw"
                        + "|mzML[.gz]|*.mzML;*.mzML.gz"
                        + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
@@ -262,6 +262,7 @@ namespace InformedProteomics.Backend.MassSpecData
                        + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
                        + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
                        + "|Shimadzu lcd|*.lcd"
+                       + "|UIMF|*.uimf"
                        + "|PBF|*.pbf"
                     ;
             }

@@ -97,11 +97,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Public static utility functions (stateless)
 
+        /// <summary>
+        /// Filter string designed to be used in a file browser
+        /// </summary>
         public static string ProteoWizardFilterString
         {
             get
             {
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd"
+                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf"
                     + "|Thermo .RAW|*.raw"
                     + "|mzML[.gz]|*.mzML;*.mzML.gz"
                     + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
@@ -110,10 +113,15 @@ namespace InformedProteomics.Backend.MassSpecData
                     + "|AB Sciex .wiff|*.wiff"
                     + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
                     + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
-                    + "|Shimadzu lcd|*.lcd";
+                    + "|Shimadzu lcd|*.lcd"
+                    + "|UIMF|*.uimf"
+                    ;
             }
         }
 
+        /// <summary>
+        /// All files that ProteoWizard supports, either directly, or as part of a folder dataset
+        /// </summary>
         public static List<string> SupportedFilesFilterList
         {
             get
@@ -138,6 +146,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     ".mzxml.gz",
                     ".mgf",
                     ".mgf.gz",
+                    ".uimf",
                 };
             }
         }
@@ -164,6 +173,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// All file extensions that ProteoWizard directly reads - i.e., we don't need to back out of a folder
+        /// </summary>
         private static List<string> DirectlySupportedFilesFilterList
         {
             get
@@ -183,6 +195,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     ".mzxml.gz",
                     ".mgf",
                     ".mgf.gz",
+                    ".uimf",
                 };
             }
         }
