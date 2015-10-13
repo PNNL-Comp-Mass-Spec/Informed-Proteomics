@@ -95,6 +95,26 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// The list of all formats supported by built-in type and ProteoWizard (not all-inclusive).
+        /// </summary>
+        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets.</remarks>
+        public static List<Tuple<string, string[]>> MassSpecDataTypes
+        {
+            get
+            {
+                if (_pwizAvailable)
+                {
+                    return SupportedTypesAll;
+                }
+                if (_thermoRawAvailable)
+                {
+                    return SupportedTypesBuiltIn;
+                }
+                return SupportedTypesNoExternalDll;
+            }
+        }
+
+        /// <summary>
         /// The list of extensions (some file names) of all formats supported by built-in types and by ProteoWizard (not all-inclusive)
         /// </summary>
         /// <remarks>Included are some filenames, which are inner contents for folder-type datasets.</remarks>
@@ -247,12 +267,70 @@ namespace InformedProteomics.Backend.MassSpecData
             return false;
         }
 
+        /// <summary>
+        /// Gets the list of all file types supported as a pair of description and file extensions.
+        /// Contains all files supported when ProteoWizard is available.
+        /// </summary>
+        private static List<Tuple<string, string[]>> SupportedTypesAll
+        {
+            get
+            {
+                return new List<Tuple<string, string[]>>
+                {
+                    new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
+                    new Tuple<string, string[]>("mzML", new[] { ".mzml", ".mzml.gz" }),
+                    new Tuple<string, string[]>("mzXML", new[] { ".mzXML", ".mzXML.gz" }),
+                    new Tuple<string, string[]>("Mascot Generic Format", new[] { ".mgf", ".mgf.gz" }),
+                    new Tuple<string, string[]>("Agilent", new[] { ".d", "mspeak.bin", "msprofile.bin" }),
+                    new Tuple<string, string[]>("AB Sciex", new[] { ".wiff" }),
+                    new Tuple<string, string[]>("Bruker", new[] { ".d", ".u2", "FID", "analysis.yep", "analysis.baf" }),
+                    new Tuple<string, string[]>("Waters", new[] { ".raw", "_extern.inf", "_inlet.inf", ".DAT" }),
+                    new Tuple<string, string[]>("Shimadzu", new[] { ".lcd" }),
+                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+                };
+            }   
+        }
+
+        /// <summary>
+        /// Gets the list of all file types supported as a pair of description and file extensions.
+        /// Contains all file types supported if only ThermoRawFileReaderDLL is available.
+        /// </summary>
+        private static List<Tuple<string, string[]>> SupportedTypesBuiltIn
+        {
+            get
+            {
+                return new List<Tuple<string, string[]>>
+                {
+                    new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
+                    new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
+                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+                };
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of all file types supported as a pair of description and file extensions.
+        /// Contains only file types that are natively supported by InformedProteomics without
+        /// any external DLLs available.
+        /// </summary>
+        private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll
+        {
+            get
+            {
+                return new List<Tuple<string, string[]>>
+                {
+                    new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
+                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+                };
+            }
+        }
+
         private static string FilterStringAll
         {
             get
             {
                 // differs from ProteoWizardReader filter string by the *.pbf extension
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf;*.pbf"
+                return "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf;*.pbf"
                        + "|Thermo .RAW|*.raw"
                        + "|mzML[.gz]|*.mzML;*.mzML.gz"
                        + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
@@ -272,7 +350,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.pbf"
+                return "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.pbf"
                        + "|Thermo .RAW|*.raw"
                        + "|mzML[.gz]|*.mzML;*.mzML.gz"
                        + "|PBF|*.pbf"
@@ -284,7 +362,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                return "All Supported|*.mzML;*.mzML.gz;*.pbf"
+                return "All Supported Spectrum Files|*.mzML;*.mzML.gz;*.pbf"
                        + "|mzML[.gz]|*.mzML;*.mzML.gz"
                        + "|PBF|*.pbf"
                     ;
