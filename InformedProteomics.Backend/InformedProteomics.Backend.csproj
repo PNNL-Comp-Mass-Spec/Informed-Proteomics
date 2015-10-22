@@ -108,6 +108,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\DatabaseSearchMode.cs" />
+    <Compile Include="Database\InternalCleavageType.cs" />
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Database\AnnotationAndOffset.cs" />
     <Compile Include="Database\SearchableDatabase.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Database;
 
 namespace MSPathFinder
 {
@@ -16,7 +17,35 @@ namespace MSPathFinder
         public AminoAcidSet AminoAcidSet { get; set; }
         public Enzyme Enzyme { get; set; }
         public int NumTolerableTermini { get; set; }
-        public bool Tda { get; set; }
+        public bool? TdaBool
+        {
+            get
+            {
+                if (Tda == DatabaseSearchMode.Both)
+                    return true;
+                if (Tda == DatabaseSearchMode.Decoy)
+                    return null;
+                //(Tda2 == DatabaseSearchMode.Target)
+                return false;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    Tda = DatabaseSearchMode.Decoy;
+                }
+                else if (value.Value)
+                {
+                    Tda = DatabaseSearchMode.Both;
+                }
+                else
+                {
+                    Tda = DatabaseSearchMode.Target;
+                }
+            }
+        }
+
+        public DatabaseSearchMode Tda { get; set; }
         public double PrecursorIonTolerancePpm { get; set; }
         public double ProductIonTolerancePpm { get; set; }
         public int MinSequenceLength { get; set; }
@@ -37,7 +66,7 @@ namespace MSPathFinder
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("Enzyme: " + Enzyme.Name);
             Console.WriteLine("NumTolerableTermini: " + NumTolerableTermini);
-            Console.WriteLine("Tda: " + Tda);
+            Console.WriteLine("Tda: " + TdaBool);
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
             Console.WriteLine("MinSequenceLength: " + MinSequenceLength);
@@ -66,7 +95,7 @@ namespace MSPathFinder
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                     writer.WriteLine("Enzyme\t" + Enzyme.Name);
                     writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
-                    writer.WriteLine("Tda\t" + Tda);
+                    writer.WriteLine("Tda\t" + TdaBool);
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                     writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
                     writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
@@ -183,7 +212,7 @@ namespace MSPathFinder
             {
                 return "Invalid value (" + tdaVal + ") for parameter -tda";
             }
-            Tda = (tdaVal == 1);
+            TdaBool = (tdaVal == 1);
 
             MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
             MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);

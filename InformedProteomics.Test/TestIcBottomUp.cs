@@ -84,22 +84,23 @@ namespace InformedProteomics.Test
             const double corrThreshold = 0.7;
 
             var bottomUpLauncher = new IcBottomUpLauncher(
-                    specFilePath,
-                    dbFilePath,
-                    outputDir,
-                    aaSet,
-                    null,
-                    minSequenceLength,
-                    maxSequenceLength,
-                    minPrecursorIonCharge,
-                    maxPrecursorIonCharge,
-                    minProductIonCharge,
-                    maxProductIonCharge,
-                    precursorIonTolerancePpm,
-                    productIonTolerancePpm,
-                    tda,
-                    0
-                    );
+                specFilePath,
+                dbFilePath,
+                outputDir,
+                aaSet,
+                null)
+            {
+                MinSequenceLength = minSequenceLength,
+                MaxSequenceLength = maxSequenceLength,
+                MinPrecursorIonCharge = minPrecursorIonCharge,
+                MaxPrecursorIonCharge = maxPrecursorIonCharge,
+                MinProductIonCharge = minProductIonCharge,
+                MaxProductIonCharge = maxProductIonCharge,
+                PrecursorIonTolerancePpm = precursorIonTolerancePpm,
+                ProductIonTolerancePpm = productIonTolerancePpm,
+                RunTargetDecoyAnalysisBool = tda,
+                NumTolerableTermini = 0
+            };
 
             bottomUpLauncher.RunSearch(corrThreshold);
         }
@@ -328,7 +329,7 @@ namespace InformedProteomics.Test
             TestBottomUpSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, ntt);
         }
 
-        public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int searchMode, double corrThreshold = 0.3)
+        public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int ntt, double corrThreshold = 0.3)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
@@ -346,22 +347,23 @@ namespace InformedProteomics.Test
             var enzyme = Enzyme.Trypsin;
 
             var bottomUpLauncher = new IcBottomUpLauncher(
-                    specFilePath,
-                    dbFilePath,
-                    outputDir,
-                    aaSet,
-                    enzyme,
-                    minSequenceLength,
-                    maxSequenceLength,
-                    minPrecursorIonCharge,
-                    maxPrecursorIonCharge,
-                    minProductIonCharge,
-                    maxProductIonCharge,
-                    precursorIonTolerancePpm,
-                    productIonTolerancePpm,
-                    tda,
-                    searchMode
-                    );
+                specFilePath,
+                dbFilePath,
+                outputDir,
+                aaSet,
+                enzyme)
+            {
+                MinSequenceLength = minSequenceLength,
+                MaxSequenceLength = maxSequenceLength,
+                MinPrecursorIonCharge = minPrecursorIonCharge,
+                MaxPrecursorIonCharge = maxPrecursorIonCharge,
+                MinProductIonCharge = minProductIonCharge,
+                MaxProductIonCharge = maxProductIonCharge,
+                PrecursorIonTolerancePpm = precursorIonTolerancePpm,
+                ProductIonTolerancePpm = productIonTolerancePpm,
+                RunTargetDecoyAnalysisBool = tda,
+                NumTolerableTermini = ntt
+            };
 
             bottomUpLauncher.RunSearch(corrThreshold);
             //topDownLauncher.RunIntactProteinSearch();

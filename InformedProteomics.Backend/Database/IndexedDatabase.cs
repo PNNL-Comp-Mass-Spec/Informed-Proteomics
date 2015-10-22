@@ -230,10 +230,30 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        public long EstimateTotalPeptides(int mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1, int numCTermCleavages = 0)
+        public long EstimateTotalPeptides(int mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1,
+            int numCTermCleavages = 0)
+        {
+            InternalCleavageType cleavageType;
+            if (mode == 0)
+            {
+                cleavageType = InternalCleavageType.MultipleInternalCleavages;
+            }
+            else if (mode == 2)
+            {
+                cleavageType = InternalCleavageType.NoInternalCleavage;
+            }
+            else
+            {
+                cleavageType = InternalCleavageType.SingleInternalCleavage;
+            }
+
+            return EstimateTotalPeptides(cleavageType, minLength, maxLength, numNTermCleavages, numCTermCleavages);
+        }
+
+        public long EstimateTotalPeptides(InternalCleavageType mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1, int numCTermCleavages = 0)
         {
             long count = 0;
-            if (mode == 0)
+            if (mode == InternalCleavageType.MultipleInternalCleavages)
             {
                 var curSequence = new LinkedList<byte>();
                 var lcpList = new LinkedList<byte>();
@@ -291,12 +311,12 @@ namespace InformedProteomics.Backend.Database
                     for (int i = 0; i <= numCTermCleavages; i++)
                     {
                         // mode 2
-                        if (mode == 2 && minLength <= seqLength - i && seqLength - i <= maxLength)
+                        if (mode == InternalCleavageType.NoInternalCleavage && minLength <= seqLength - i && seqLength - i <= maxLength)
                         {
                             count++;
                         }
                         // mode 1 #1
-                        if (mode == 1)
+                        if (mode == InternalCleavageType.SingleInternalCleavage)
                         {
                             for (int j = 0; minLength <= seqLength - i - j; j++)
                             {
@@ -307,7 +327,7 @@ namespace InformedProteomics.Backend.Database
                             }
                         }
                     }
-                    if (mode == 1)
+                    if (mode == InternalCleavageType.SingleInternalCleavage)
                     {
                         // mode 1 #2
                         for (int i = numCTermCleavages + 1; i <= seqLength - minLength; i++)

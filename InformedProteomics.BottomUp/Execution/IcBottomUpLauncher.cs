@@ -17,7 +17,7 @@ namespace InformedProteomics.BottomUp.Execution
 {
     public class IcBottomUpLauncher
     {
-        public const int NumMatchesPerSpectrum = 10;
+        //public const int NumMatchesPerSpectrum = 10;
         public const string TargetFileExtension = "_IcTarget.tsv";
         public const string DecoyFileExtension = "_IcDecoy.tsv";
         public const string TdaFileExtension = "_IcTda.tsv";
@@ -27,17 +27,7 @@ namespace InformedProteomics.BottomUp.Execution
             string dbFilePath,
             string outputDir,
             AminoAcidSet aaSet,
-            Enzyme enzyme,
-            int minSequenceLength = 6,
-            int maxSequenceLength = 30,
-            int minPrecursorIonCharge = 1,
-            int maxPrecursorIonCharge = 4,
-            int minProductIonCharge = 1,
-            int maxProductIonCharge = 3,
-            double precursorIonTolerancePpm = 10,
-            double productIonTolerancePpm = 10,
-            bool? runTargetDecoyAnalysis = true,
-            int numTolerableTermini = 1)
+            Enzyme enzyme)
         {
             ErrorMessage = string.Empty;
 
@@ -51,7 +41,7 @@ namespace InformedProteomics.BottomUp.Execution
                 OutputDir = Path.GetDirectoryName(SpecFilePath);
             }
             else
-            {                
+            {
                 if (!Directory.Exists(outputDir))
                 {
                     if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
@@ -64,16 +54,17 @@ namespace InformedProteomics.BottomUp.Execution
             }
 
             OutputDir = outputDir;
-            MinSequenceLength = minSequenceLength;
-            MaxSequenceLength = maxSequenceLength;
-            MinPrecursorIonCharge = minPrecursorIonCharge;
-            MaxPrecursorIonCharge = maxPrecursorIonCharge;
-            MinProductIonCharge = minProductIonCharge;
-            MaxProductIonCharge = maxProductIonCharge;
-            PrecursorIonTolerance = new Tolerance(precursorIonTolerancePpm);
-            ProductIonTolerance = new Tolerance(productIonTolerancePpm);
-            RunTargetDecoyAnalysis = runTargetDecoyAnalysis;
-            NumTolerableTermini = numTolerableTermini;
+            MinSequenceLength = 6;
+            MaxSequenceLength = 30;
+            MinPrecursorIonCharge = 1;
+            MaxPrecursorIonCharge = 4;
+            MinProductIonCharge = 1;
+            MaxProductIonCharge = 3;
+            PrecursorIonTolerance = new Tolerance(10);
+            ProductIonTolerance = new Tolerance(10);
+            RunTargetDecoyAnalysis = DatabaseSearchMode.Both;
+            NumTolerableTermini = 1;
+            NumMatchesPerSpectrum = 10;
         }
 
         public string ErrorMessage { get; private set; }
@@ -82,17 +73,86 @@ namespace InformedProteomics.BottomUp.Execution
         public string OutputDir { get; private set; }
         public AminoAcidSet AminoAcidSet { get; private set; }
         public Enzyme Enzyme { get; private set; }
-        public int MinSequenceLength { get; private set; }
-        public int MaxSequenceLength { get; private set; }
-        public int MinPrecursorIonCharge { get; private set; }
-        public int MaxPrecursorIonCharge { get; private set; }
-        public int MinProductIonCharge { get; private set; }
-        public int MaxProductIonCharge { get; private set; }
-        public Tolerance PrecursorIonTolerance { get; private set; }
-        public Tolerance ProductIonTolerance { get; private set; }
-        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
 
-        public int NumTolerableTermini { get; private set; }
+        /// <remarks>default 6</remarks>
+        public int MinSequenceLength { get; set; }
+
+        /// <remarks>default 30</remarks>
+        public int MaxSequenceLength { get; set; }
+
+        /// <remarks>default 1</remarks>
+        public int MinPrecursorIonCharge { get; set; }
+
+        /// <remarks>default 4</remarks>
+        public int MaxPrecursorIonCharge { get; set; }
+
+        /// <remarks>default 1</remarks>
+        public int MinProductIonCharge { get; set; }
+
+        /// <remarks>default 3</remarks>
+        public int MaxProductIonCharge { get; set; }
+
+        /// <remarks>default 10 ppm</remarks>
+        public Tolerance PrecursorIonTolerance { get; set; }
+
+        /// <remarks>default 10 ppm</remarks>
+        public Tolerance ProductIonTolerance { get; set; }
+
+        /// <remarks>default true
+        /// true: target and decoy, false: target only, null: decoy only</remarks>
+        public bool? RunTargetDecoyAnalysisBool
+        {
+            get
+            {
+                if (RunTargetDecoyAnalysis == DatabaseSearchMode.Both)
+                    return true;
+                if (RunTargetDecoyAnalysis == DatabaseSearchMode.Decoy)
+                    return null;
+                //(Tda2 == DatabaseSearchMode.Target)
+                return false;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    RunTargetDecoyAnalysis = DatabaseSearchMode.Decoy;
+                }
+                else if (value.Value)
+                {
+                    RunTargetDecoyAnalysis = DatabaseSearchMode.Both;
+                }
+                else
+                {
+                    RunTargetDecoyAnalysis = DatabaseSearchMode.Target;
+                }
+            }
+        }
+
+        /// <remarks>default Both</remarks>
+        public DatabaseSearchMode RunTargetDecoyAnalysis { get; set; }
+        
+        /// <remarks>default 1</remarks>
+        public int NumTolerableTermini { get; set; }
+
+        /// <remarks>default 10</remarks>
+        public int NumMatchesPerSpectrum { get; set; }
+
+        /// <remarks>default 4</remarks>
+        public int MaxNumThreads { get; set; } // TODO: Actually implement multithreading....
+
+        /// <remarks>default 10 ppm</remarks>
+        public double PrecursorIonTolerancePpm
+        {
+            get { return PrecursorIonTolerance.GetValue(); }
+            set { PrecursorIonTolerance = new Tolerance(value); }
+        }
+
+        /// <remarks>default 10 ppm</remarks>
+        public double ProductIonTolerancePpm
+        {
+            get { return ProductIonTolerance.GetValue(); }
+            set { ProductIonTolerance = new Tolerance(value); }
+        }
 
         private LcMsRun _run;
         private ProductScorerBasedOnDeconvolutedSpectra _ms2ScorerFactory;
@@ -143,7 +203,7 @@ namespace InformedProteomics.BottomUp.Execution
             var decoyOutputFilePath = Path.Combine(OutputDir, baseName + DecoyFileExtension);
             var tdaOutputFilePath = Path.Combine(OutputDir, baseName + TdaFileExtension);
 
-            if (RunTargetDecoyAnalysis != null)
+            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Target))
             {
                 sw.Reset();
                 Console.Write(@"Reading the target database...");
@@ -170,7 +230,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Elapsed time: {0:f4} sec", sec);
             }
 
-            if (RunTargetDecoyAnalysis == true || RunTargetDecoyAnalysis == null)
+            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Decoy))
             {
                 // Decoy database
                 sw.Reset();
@@ -198,7 +258,7 @@ namespace InformedProteomics.BottomUp.Execution
                 Console.WriteLine(@"Elapsed time: {0:f4} sec", sec);
             }
 
-            if (RunTargetDecoyAnalysis == true)
+            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Both))
             {
                 var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
                 if (fdrCalculator.HasError())

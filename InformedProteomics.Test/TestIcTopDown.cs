@@ -396,22 +396,23 @@ namespace InformedProteomics.Test
                     specFilePath,
                     dbFilePath,
                     outputDir,
-                    aaSet,
-                    minSequenceLength,
-                    maxSequenceLength,
-                    maxNumNTermCleavages,
-                    maxNumCTermCleavages,
-                    minPrecursorIonCharge,
-                    maxPrecursorIonCharge,
-                    minProductIonCharge,
-                    maxProductIonCharge,
-                    minSequenceMass,
-                    maxSequenceMass,
-                    precursorIonTolerancePpm,
-                    productIonTolerancePpm,
-                    tda,
-                    searchMode
-                    );
+                    aaSet, "")
+                    {
+                    MinSequenceLength = minSequenceLength,
+                    MaxSequenceLength = maxSequenceLength,
+                    MaxNumNTermCleavages = maxNumNTermCleavages,
+                    MaxNumCTermCleavages = maxNumCTermCleavages,
+                    MinPrecursorIonCharge = minPrecursorIonCharge,
+                    MaxPrecursorIonCharge = maxPrecursorIonCharge,
+                    MinProductIonCharge = minProductIonCharge,
+                    MaxProductIonCharge = maxProductIonCharge,
+                    MinSequenceMass = minSequenceMass,
+                    MaxSequenceMass = maxSequenceMass,
+                    PrecursorIonTolerancePpm = precursorIonTolerancePpm,
+                    ProductIonTolerancePpm = productIonTolerancePpm,
+                    RunTargetDecoyAnalysisBool = tda,
+                    SearchModeInt = searchMode,
+                    };
 
             //topDownLauncher.ForceParallel = true;
             //topDownLauncher.MaxNumThreads = -1;

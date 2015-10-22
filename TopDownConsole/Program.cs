@@ -104,23 +104,26 @@ namespace MSPathFinderT
                     parameters.DatabaseFilePath,
                     parameters.OutputDir,
                     parameters.AminoAcidSet,
-                    parameters.MinSequenceLength,
-                    parameters.MaxSequenceLength,
-                    1, // max number of N-term cleavages
-                    0, // max number of C-term cleavages
-                    parameters.MinPrecursorIonCharge,
-                    parameters.MaxPrecursorIonCharge,
-                    parameters.MinProductIonCharge,
-                    parameters.MaxProductIonCharge,
-                    parameters.MinSequenceMass,
-                    parameters.MaxSequenceMass,
-                    parameters.PrecursorIonTolerancePpm,
-                    parameters.ProductIonTolerancePpm,
-                    parameters.Tda,
-                    parameters.SearchMode,
-                    parameters.FeatureFilePath,
-                    parameters.MaxNumThreads
-                    );
+                    parameters.FeatureFilePath)
+                {
+                    MinSequenceLength = parameters.MinSequenceLength,
+                    MaxSequenceLength = parameters.MaxSequenceLength,
+                    MaxNumNTermCleavages = 1, // max number of N-term cleavages
+                    MaxNumCTermCleavages = 0, // max number of C-term cleavages
+                    MinPrecursorIonCharge = parameters.MinPrecursorIonCharge,
+                    MaxPrecursorIonCharge = parameters.MaxPrecursorIonCharge,
+                    MinProductIonCharge = parameters.MinProductIonCharge,
+                    MaxProductIonCharge = parameters.MaxProductIonCharge,
+                    MinSequenceMass = parameters.MinSequenceMass,
+                    MaxSequenceMass = parameters.MaxSequenceMass,
+                    PrecursorIonTolerancePpm = parameters.PrecursorIonTolerancePpm,
+                    ProductIonTolerancePpm = parameters.ProductIonTolerancePpm,
+                    //RunTargetDecoyAnalysisBool = parameters.TdaBool,
+                    RunTargetDecoyAnalysis = parameters.Tda,
+                    //SearchModeInt = parameters.SearchModeInt,
+                    SearchMode = parameters.SearchMode,
+                    MaxNumThreads = parameters.MaxNumThreads,
+                };
                 
                 var success = topDownLauncher.RunSearch();
 

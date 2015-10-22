@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 
@@ -15,8 +16,65 @@ namespace MSPathFinderT
         public string DatabaseFilePath { get; set; }
         public string OutputDir { get; set; }
         public AminoAcidSet AminoAcidSet { get; set; }
-        public int SearchMode { get; set; }
-        public bool? Tda { get; set; }
+
+        public int SearchModeInt
+        {
+            get
+            {
+                if (SearchMode == InternalCleavageType.MultipleInternalCleavages)
+                    return 0;
+                if (SearchMode == InternalCleavageType.SingleInternalCleavage)
+                    return 1;
+                return 2;
+            }
+            set
+            {
+                if (value == 0)
+                {
+                    SearchMode = InternalCleavageType.MultipleInternalCleavages;
+                }
+                else if (value == 1)
+                {
+                    SearchMode = InternalCleavageType.SingleInternalCleavage;
+                }
+                else
+                {
+                    SearchMode = InternalCleavageType.NoInternalCleavage;
+                }
+            }
+        }
+
+        public InternalCleavageType SearchMode { get; set; }
+
+        public bool? TdaBool
+        {
+            get
+            {
+                if (Tda == DatabaseSearchMode.Both)
+                    return true;
+                if (Tda == DatabaseSearchMode.Decoy)
+                    return null;
+                //(Tda2 == DatabaseSearchMode.Target)
+                return false;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    Tda = DatabaseSearchMode.Decoy;
+                }
+                else if (value.Value)
+                {
+                    Tda = DatabaseSearchMode.Both;
+                }
+                else
+                {
+                    Tda = DatabaseSearchMode.Target;
+                }
+            }
+        }
+
+        public DatabaseSearchMode Tda { get; set; }
         public double PrecursorIonTolerancePpm { get; set; }
         public double ProductIonTolerancePpm { get; set; }
         public int MinSequenceLength { get; set; }
@@ -44,8 +102,8 @@ namespace MSPathFinderT
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
             Console.WriteLine("OutputDir:        " + OutputDir);
-            Console.WriteLine("SearchMode: " + SearchMode);
-            Console.WriteLine("Tda: " + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
+            Console.WriteLine("SearchMode: " + SearchModeInt);
+            Console.WriteLine("Tda: " + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
             Console.WriteLine("MinSequenceLength: " + MinSequenceLength);
@@ -81,8 +139,8 @@ namespace MSPathFinderT
                     writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                     writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(specFilePath, ".ms1ft")));
-                    writer.WriteLine("SearchMode\t" + SearchMode);
-                    writer.WriteLine("Tda\t" + (Tda == null ? "Decoy" : (bool)Tda ? "Target+Decoy" : "Target"));
+                    writer.WriteLine("SearchMode\t" + SearchModeInt);
+                    writer.WriteLine("Tda\t" + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                     writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
                     writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
@@ -177,11 +235,12 @@ namespace MSPathFinderT
                 FeatureFilePath = parameters["-feature"];
 
                 currentParameter = "-m";
-                SearchMode = Convert.ToInt32(parameters["-m"]);
-                if (SearchMode < 0 || SearchMode > 2)
+                var searchMode = Convert.ToInt32(parameters["-m"]);
+                if (searchMode < 0 || searchMode > 2)
                 {
-                    return "Invalid value (" + SearchMode + ") for parameter -m";
+                    return "Invalid value (" + searchMode + ") for parameter -m";
                 }
+                SearchModeInt = searchMode;
 
                 currentParameter = "-t";
                 PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
@@ -197,11 +256,17 @@ namespace MSPathFinderT
                 }
 
                 if (tdaVal == 1)
-                    Tda = true;
-                else if
-                    (tdaVal == -1) Tda = null;
+                {
+                    Tda = DatabaseSearchMode.Both;
+                }
+                else if (tdaVal == -1)
+                {
+                    Tda = DatabaseSearchMode.Decoy;
+                }
                 else
-                    Tda = false;
+                {
+                    Tda = DatabaseSearchMode.Target;
+                }
 
                 currentParameter = "-minLength";
                 MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);

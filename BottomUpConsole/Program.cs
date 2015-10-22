@@ -78,18 +78,20 @@ namespace MSPathFinder
                     parameters.DatabaseFilePath,
                     parameters.OutputDir,
                     parameters.AminoAcidSet,
-                    parameters.Enzyme,
-                    parameters.MinSequenceLength,
-                    parameters.MaxSequenceLength,
-                    parameters.MinPrecursorIonCharge,
-                    parameters.MaxPrecursorIonCharge,
-                    parameters.MinProductIonCharge,
-                    parameters.MaxProductIonCharge,
-                    parameters.PrecursorIonTolerancePpm,
-                    parameters.ProductIonTolerancePpm,
-                    parameters.Tda,
-                    parameters.NumTolerableTermini
-                    );
+                    parameters.Enzyme)
+                {
+                    MinSequenceLength = parameters.MinSequenceLength,
+                    MaxSequenceLength = parameters.MaxSequenceLength,
+                    MinPrecursorIonCharge = parameters.MinPrecursorIonCharge,
+                    MaxPrecursorIonCharge = parameters.MaxPrecursorIonCharge,
+                    MinProductIonCharge = parameters.MinProductIonCharge,
+                    MaxProductIonCharge = parameters.MaxProductIonCharge,
+                    PrecursorIonTolerancePpm = parameters.PrecursorIonTolerancePpm,
+                    ProductIonTolerancePpm = parameters.ProductIonTolerancePpm,
+                    //RunTargetDecoyAnalysisBool = parameters.TdaBool,
+                    RunTargetDecoyAnalysis = parameters.Tda,
+                    NumTolerableTermini = parameters.NumTolerableTermini,
+                };
 
                 bottomUpLauncher.RunSearch(CorrThreshold);
             }
