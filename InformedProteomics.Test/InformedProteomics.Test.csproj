@@ -144,8 +144,10 @@
     <Compile Include="TestYufengData.cs" />
     <Compile Include="TopDownAnalysis\AnalysisCompRef.cs" />
     <Compile Include="TopDownAnalysis\AnalysisLewy.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisSpikeIn.cs" />
     <Compile Include="TopDownAnalysis\AnalysisTopDownMatchedPeaks.cs" />
     <Compile Include="TopDownAnalysis\TestLikelihoodScorer.cs" />
+    <Compile Include="TopDownAnalysis\TestMsDeconvDecon2LS.cs" />
     <Compile Include="UnitTests\TestLcMsRun.cs" />
     <Compile Include="UnitTests\TestMzMLReader.cs" />
     <Compile Include="UnitTests\TestProteoWizardWrapper.cs" />

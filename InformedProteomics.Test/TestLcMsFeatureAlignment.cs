@@ -13,7 +13,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
-using ProMex;
 
 namespace InformedProteomics.Test
 {
@@ -378,7 +377,7 @@ namespace InformedProteomics.Test
             return new Tuple<int, int>(minScanNum, maxScanNum);
         }
       
-        private Tuple<double, int, double, double> GetMinMaxNet(IList<LcMsFeature> features)
+        public static Tuple<double, int, double, double> GetMinMaxNet(IList<LcMsFeature> features)
         {
             //var minNet = 1.0d;
             //var maxNet = 0d;

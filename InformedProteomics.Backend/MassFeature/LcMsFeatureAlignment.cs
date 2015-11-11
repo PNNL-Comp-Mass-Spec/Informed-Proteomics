@@ -5,7 +5,9 @@ using System.Linq;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
+using PNNLOmics.Data.Constants;
 using pwiz.CLI.msdata;
+using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
 namespace InformedProteomics.Backend.MassFeature
 {
@@ -50,7 +52,7 @@ namespace InformedProteomics.Backend.MassFeature
         }
         */
 
-        public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run)
+        public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run, double minMass = 2000, double maxMass = 50000)
         {
             var featureList = new List<LcMsFeature>();
             var tsvReader = new TsvFileParser(featureFilePath);
@@ -65,27 +67,31 @@ namespace InformedProteomics.Backend.MassFeature
             var maxCharges = tsvReader.GetData("MaxCharge");
             var monoMass = tsvReader.GetData("MonoMass");
 
+            var minElutionTime = tsvReader.GetData("MinElutionTime");
+            var maxElutionTime = tsvReader.GetData("MaxElutionTime");
+
             var repCharges = tsvReader.GetData("RepCharge");
             var repScans = tsvReader.GetData("RepScan");
             var repMzs = tsvReader.GetData("RepMz");
-            
             var scores = tsvReader.GetData("LikelihoodRatio");
-            var minElutionTime = tsvReader.GetData("MinElutionTime");
-            var maxElutionTime = tsvReader.GetData("MaxElutionTime");
             
             for (var i = 0; i < tsvReader.NumData; i++)
             {
                 var abundance = double.Parse(abu[i]);
                 var repMass = double.Parse(monoMass[i]);
+                if (repMass < minMass || repMass > maxMass) continue;
+
                 var minCharge = int.Parse(minCharges[i]);
                 var maxCharge = int.Parse(maxCharges[i]);
                 var minScan = int.Parse(minScans[i]);
                 var maxScan = int.Parse(maxScans[i]);
                 var fid = int.Parse(featureIds[i]);
-                var repCharge = int.Parse(repCharges[i]);
-                var repMz = double.Parse(repMzs[i]);
-                var repScanNum = int.Parse(repScans[i]);
-                var score = double.Parse(scores[i]);
+                
+                var repCharge = (repCharges != null) ? int.Parse(repCharges[i]) : (int)Math.Round(0.5*(minCharge + maxCharge));
+                var repMz = (repMzs != null) ? double.Parse(repMzs[i]) : (repMass / repCharge) + Constants.Proton;
+                var repScanNum = (repScans != null) ? int.Parse(repScans[i]) : minScan;
+                var score = (scores != null) ? double.Parse(scores[i]) : 0;
+
                 var minEt = double.Parse(minElutionTime[i]);
                 var maxEt = double.Parse(maxElutionTime[i]);
                 var minNet = minEt/run.GetElutionTime(run.MaxLcScan);
@@ -152,7 +158,8 @@ namespace InformedProteomics.Backend.MassFeature
 
                 if (minScanNum < 0) minScanNum = 0;
 
-                _alignedFeatures[j][dataSetIndex] = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
+                var newFt = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
+                _alignedFeatures[j][dataSetIndex] = (newFt == null) ? featureFinder.GetLcMsPeaksFromNoisePeaks(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge) : newFt;
                 /*
                 var ft = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
 

@@ -179,7 +179,7 @@ namespace InformedProteomics.Backend.MassFeature
             return prsmList;
         }
 
-        private static string GetSequenceText(Sequence sequence)
+        public static string GetSequenceText(Sequence sequence)
         {
             var sequenceText = new StringBuilder();
             foreach (var aa in sequence)
@@ -196,7 +196,7 @@ namespace InformedProteomics.Backend.MassFeature
             return sequenceText.ToString();
         }
 
-        private static string GetSequenceText(string cleanSequence, string modifications)
+        public static string GetSequenceText(string cleanSequence, string modifications)
         {
             var sequenceText = cleanSequence;
             var parsedModifications = ParseModifications(modifications);

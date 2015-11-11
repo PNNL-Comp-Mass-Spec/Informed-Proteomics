@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
@@ -68,7 +69,16 @@ namespace InformedProteomics.Backend.MassFeature
             var idx = Array.BinarySearch(ms1ScanNums, ms1ScanNum);
             return idx < 0 ? null : Ms1Spectra[idx];
         }
-        
+
+        /// <summary>
+        /// find Lc-Ms feature for a specified mass, charge state, and range of scan
+        /// </summary>
+        /// <param name="targetMass"></param>
+        /// <param name="targetCharge"></param>
+        /// <param name="targetMinScanNum"></param>
+        /// <param name="targetMaxScanNum"></param>
+        /// <param name="featureMatrixCreated"></param>
+        /// <returns></returns>
         public LcMsPeakCluster GetLcMsPeakCluster(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, bool featureMatrixCreated = false)
         {
             if (!featureMatrixCreated) BuildFeatureMatrix(targetMass); // should be called first
@@ -80,8 +90,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             if (Run.GetMsLevel(targetMinScanNum) > 1) targetMinScanNum = Run.GetPrevScanNum(targetMinScanNum, 1);
             if (Run.GetMsLevel(targetMaxScanNum) > 1) targetMaxScanNum = Run.GetNextScanNum(targetMaxScanNum, 1);
-            
-            //var row = Math.Max(Math.Min(targetCharge - MinScanCharge, MaxScanCharge - MinScanCharge), 0);
+
             var row = targetCharge - _targetMinCharge;
             if (row < _rows.First() || row > _rows.Last()) row = _rows[(int) (_rows.Length*0.5)];
 
@@ -89,7 +98,6 @@ namespace InformedProteomics.Backend.MassFeature
             var maxCol = ms1ScanNumToIndex[targetMaxScanNum];
             
             // 2) determine charge state range and elution period
-            
             var range = DetermineFeatureRange(targetMass, row, minCol, maxCol);
 
             if (range == null) return null;
@@ -110,11 +118,20 @@ namespace InformedProteomics.Backend.MassFeature
             else feature.Score = 0d;
            
             // 5) determine abundance
-            SetAbundanceByAUC(ref feature);
+            SetAbundanceByAuc(ref feature);
            
             return feature;
         }
 
+        /// <summary>
+        /// find Lc-Ms feature for a specified mass, given charge states and a range of scan
+        /// </summary>
+        /// <param name="targetMass"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="minScanNum"></param>
+        /// <param name="maxScanNum"></param>
+        /// <returns></returns>
         public LcMsPeakCluster GetLcMsPeakCluster(double targetMass, int minCharge, int maxCharge, int minScanNum, int maxScanNum)
         {
             InitFeatureMatrix();
@@ -128,7 +145,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             // 3) collect envelopes
             var feature = CollectLcMsPeaks(targetMass, minRow, maxRow, minCol, maxCol, true);
-
+            
             if (feature == null) return null;
 
             // 4) scoring
@@ -137,12 +154,42 @@ namespace InformedProteomics.Backend.MassFeature
             else feature.Score = 0d;
 
             // 5) determine abundance
-            SetAbundanceByAUC(ref feature);
-
+            SetAbundanceByAuc(ref feature);
+          
             return feature;
         }
-        
-        public void SetAbundanceByAUC(ref LcMsPeakCluster feature)
+
+        public LcMsPeakCluster GetLcMsPeaksFromNoisePeaks(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, int targetMinCharge, int targetMaxCharge)
+        {
+            SetTargetMass(targetMass);
+
+            var ms1ScanNums = Run.GetMs1ScanVector();
+            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+
+            if (Run.GetMsLevel(targetMinScanNum) > 1) targetMinScanNum = Run.GetPrevScanNum(targetMinScanNum, 1);
+            if (Run.GetMsLevel(targetMaxScanNum) > 1) targetMaxScanNum = Run.GetNextScanNum(targetMaxScanNum, 1);
+
+            var minCol = ms1ScanNumToIndex[targetMinScanNum];
+            var maxCol = ms1ScanNumToIndex[targetMaxScanNum];
+
+            var minRow = targetMinCharge - _targetMinCharge;
+            var maxRow = targetMaxCharge - _targetMinCharge;
+            var abundance = 0d;
+
+            for (var j = minCol; j <= maxCol; j++)
+            {
+                abundance += Ms1Spectra[j].MedianIntensity;
+            }
+
+            var repScanNum = ms1ScanNums[(int)((minCol + maxCol) * 0.5)];
+            var repMz = 0;
+            var cluster = new LcMsPeakCluster(Run, _theoreticalEnvelope, targetMass, targetCharge, repMz, repScanNum, abundance);
+            cluster.AddEnvelopes(minRow + _targetMinCharge, maxRow + _targetMinCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol]);
+            cluster.Score = float.MinValue;
+            return cluster;
+        }
+
+        private double[] SetAbundanceByAuc(ref LcMsPeakCluster feature)
         {
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var ms1ScanNums = Run.GetMs1ScanVector();
@@ -155,15 +202,14 @@ namespace InformedProteomics.Backend.MassFeature
             var simCutoff = GetDistanceCorrelationThreshold(minRow, maxRow, minCol, maxCol);
             var bcCutoff = Math.Max(0.07, simCutoff.Item1);
             var corrCutoff = Math.Min(0.7, simCutoff.Item2);
-
-            //Array.Clear(_xic, 0, _xic.Length);
+            
             var xic = new double[maxCol - minCol + 1 + 18];
             const int xicStartIndex = 9;
-            var xicEndIndex = xic.Length - 9 - 1;
 
             foreach (var envelope in feature.EnumerateEnvelopes())
             {
                 var envCol = ms1ScanNumToIndex[envelope.ScanNum];
+
                 if (_featureMatrix[envelope.Charge - _targetMinCharge][envCol].DivergenceDist > bcCutoff &&
                     _featureMatrix[envelope.Charge - _targetMinCharge][envCol].CorrelationCoeff < corrCutoff) continue;
                 xic[envCol - minCol + xicStartIndex] += envelope.Abundance;
@@ -179,7 +225,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 var col = k + minCol - xicStartIndex;
                 if (col < 0 || col >= NColumns - 1) continue;
-                
+
                 var centerIntensity = 0.5 * (Math.Max(0, smoothedXic[k]) + Math.Max(0, smoothedXic[k + 1]));
 
                 if (!(centerIntensity > 0)) continue;
@@ -200,6 +246,8 @@ namespace InformedProteomics.Backend.MassFeature
             }
 
             feature.SetAbundance(abundance, apexScanNum, apexIntensity, boundaryIntensity*0.5);
+
+            return smoothedXic;
         }
 
         public double GetMs1EvidenceScore(int ms2ScanNum, double targetMass, int charge)
@@ -210,8 +258,6 @@ namespace InformedProteomics.Backend.MassFeature
                 var ms2ScanNums = _ms1Filter.GetMatchingMs2ScanNums(targetMass);
                 if (ms2ScanNums.Any(ms2 => ms2 == ms2ScanNum)) return 1.0d;
             }
-            
-            //SetTargetMass(targetMass);
 
             var theoreticalEnvelope = new TheoreticalIsotopeEnvelope(targetMass, MaxEnvelopeLength, RelativeIsotopePeakIntensityThreshold);
             var totalElutionTime = Run.GetElutionTime(Run.MaxLcScan);
@@ -221,8 +267,6 @@ namespace InformedProteomics.Backend.MassFeature
             var minElutionTime = elutionTime - totalElutionTime * 0.002;
             var maxElutionTime = elutionTime + totalElutionTime * 0.002;
 
-            //var ms1ScanIndex = Array.BinarySearch(ms1ScanNums, ms2ScanNum);
-            //if (ms1ScanIndex < 0) ms1ScanIndex = ~ms1ScanIndex; // next Ms1 scan num
             var ms1ScanIndex = Run.GetPrevScanNum(ms2ScanNum, 1);
 
             var bcDistances = new List<double>();
@@ -256,7 +300,6 @@ namespace InformedProteomics.Backend.MassFeature
 
                     bcDistances.Add(bcDist);
                     correlations.Add(corrCoeff);
-                    //enelopes.Add(obsEnv);
                 }
             }
 
@@ -273,7 +316,6 @@ namespace InformedProteomics.Backend.MassFeature
 
         public readonly int NColumns;
         public readonly int NRows;
-        //public const int NRows = 30;
 
         public readonly MzComparerWithBinning Comparer;
         public const double RelativeIsotopePeakIntensityThreshold = 0.1d;
@@ -286,11 +328,8 @@ namespace InformedProteomics.Backend.MassFeature
 
         private readonly double[] _distProfileAcrossCharge;
         private readonly double[] _corrProfileAcrossCharge;
-
         private readonly double[] _intensityAcrossCharge;
-
         private readonly int[,] _summedEnvelopeColRange;
-        //private readonly double[] _xic;
 
         private LcMsPeakMatrixCell[][] _featureMatrix;
         private int[] _rows;
@@ -302,9 +341,7 @@ namespace InformedProteomics.Backend.MassFeature
         {
             /*var chargeLowerBound = Math.Ceiling(targetMass / Run.MaxMs1Mz);
             var chargeUpperBound = Math.Floor(targetMass / Run.MinMs1Mz);
-
             if (targetMass > 2000) chargeLowerBound = Math.Max(chargeLowerBound, 2);
-
             var rowLb = Math.Max(0, chargeLowerBound - MinScanCharge);
             var rowUb = Math.Min(NRows - 1, chargeUpperBound - MinScanCharge);
             */
@@ -312,7 +349,6 @@ namespace InformedProteomics.Backend.MassFeature
             var chargeRange = GetDetectableMinMaxCharge(targetMass, Run.MinMs1Mz, Run.MaxMs1Mz);
             _targetMinCharge = chargeRange.Item1;
             _targetMaxCharge = chargeRange.Item2;
-            //_rows = Enumerable.Range((int)rowLb, (int)(rowUb - rowLb + 1)).ToArray();
             _rows = Enumerable.Range(0, _targetMaxCharge - _targetMinCharge + 1).ToArray();
             _theoreticalEnvelope = new TheoreticalIsotopeEnvelope(targetMass, MaxEnvelopeLength, RelativeIsotopePeakIntensityThreshold);
         }
@@ -508,44 +544,7 @@ namespace InformedProteomics.Backend.MassFeature
                 return 6;
             }
         }
-        /*
-        private IList<ObservedIsotopeEnvelope> GetSeedCells()
-        {
-            var seedList = new List<KeyValuePair<double, ObservedIsotopeEnvelope>>();
-            var ms1ScanNums = Run.GetMs1ScanVector();
-            var bcCutoff = GetSeedBcDistThreshold();
-            var corrCutoff = GetSeedCorrThreshold();
-
-            var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
-            
-            foreach (var i in _rows)
-            {
-                foreach (var j in _cols)
-                {
-                    if (!_featureMatrix[i][j].Exist) continue;
-                    
-                    var mostAbuPeak = _featureMatrix[i][j].EnvelopePeaks[mostAbuInternalIndex];
-                    if (mostAbuPeak == null) continue;
-
-                    if (_featureMatrix[i][j].CountActivePeaks < NumberOfPeaksCutoff) continue;
-
-                    var bcDist = _featureMatrix[i][j].DivergenceDist;
-                    var corr = _featureMatrix[i][j].CorrelationCoeff;
-                    
-                    if (bcDist > bcCutoff && corr < corrCutoff) continue;
-
-                    var signalToNoiseRatio = mostAbuPeak.Intensity / Ms1Spectra[j].MedianIntensity;
-                    if (signalToNoiseRatio < 3) continue;
-                    
-                    var seed = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass, i + MinScanCharge, ms1ScanNums[j], _featureMatrix[i][j].EnvelopePeaks, _theoreticalEnvelope);
-                    seedList.Add(new KeyValuePair<double, ObservedIsotopeEnvelope>(bcDist, seed));
-                    //seedList.Add(new KeyValuePair<double, ObservedIsotopeEnvelope>(corr, seed));
-                }
-            }
-            //return seedList.OrderByDescending(x => x.Key).Select(x => x.Value).ToList();
-            return seedList.OrderBy(x => x.Key).Select(x => x.Value).ToList();
-        }*/
-
+      
         private IList<LcMsPeakCluster> GetLcMs1PeakClusters(int binNumber)
         {
             const int chargeNeighborGap = 4;
@@ -689,8 +688,6 @@ namespace InformedProteomics.Backend.MassFeature
                 }
             }
 
-            //var meanStd = distList.MeanStandardDeviation();
-            //var bcCutoff = Math.Min(Math.Max(meanStd.Item1 - meanStd.Item2 * sigma, 0.05), 0.3);
             var distCutoff = distList.Median();
             var corrCutoff = corrList.Median();
             return new Tuple<double, double>(distCutoff, corrCutoff);
@@ -709,7 +706,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             var bcCutoff = GetSeedBcDistThreshold();
             var corrCutoff = GetSeedCorrThreshold();
-
+            
             for (var i = minRow; i <= maxRow; i++)
             {
                 for (var j = minCol; j <= maxCol; j++)
@@ -748,86 +745,6 @@ namespace InformedProteomics.Backend.MassFeature
             var cluster = new LcMsPeakCluster(Run, bestEnvelope);
             cluster.AddEnvelopes(minRow + _targetMinCharge, maxRow + _targetMinCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol], envelopes);
             
-            return cluster;
-        }
-
-        public LcMsPeakCluster CollectLcMsPeaksWithNoise(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, int targetMinCharge, int targetMaxCharge)
-        {
-            SetTargetMass(targetMass);
-
-            var ms1ScanNums = Run.GetMs1ScanVector();
-            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
-
-            if (Run.GetMsLevel(targetMinScanNum) > 1) targetMinScanNum = Run.GetPrevScanNum(targetMinScanNum, 1);
-            if (Run.GetMsLevel(targetMaxScanNum) > 1) targetMaxScanNum = Run.GetNextScanNum(targetMaxScanNum, 1);
-
-            var minCol = ms1ScanNumToIndex[targetMinScanNum];
-            var maxCol = ms1ScanNumToIndex[targetMaxScanNum];
-
-            var minRow = targetMinCharge - _targetMinCharge;
-            var maxRow = targetMaxCharge - _targetMinCharge;
-            var abundance = 0d;
-
-            for (var j = minCol; j <= maxCol; j++)
-            {
-                //var mostAbuMz = _theoreticalEnvelope.GetIsotopeMz(i + MinScanCharge, mostAbuInternalIndex);
-                //var seedLocalWin = Ms1Spectra[j].GetLocalMzWindow(mostAbuMz);
-                //_xic[j] += seedLocalWin.MedianIntensity;
-                //tempAbundance += Ms1Spectra[j].MedianIntensity;
-                abundance += Ms1Spectra[j].MedianIntensity;
-            }
-
-            /*
-            Array.Clear(_xic, 0, _xic.Length);
-            var tempAbundance = 0d;
-            var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
-
-            for (var i = minRow; i <= maxRow; i++)
-            {
-                for (var j = minCol; j <= maxCol; j++)
-                {
-                    if (!_featureMatrix[i][j].Exist) continue;
-                    _xic[j] += _featureMatrix[i][j].Intensity;
-                    tempAbundance += _featureMatrix[i][j].Intensity;
-                }
-            }
-
-            if (!(tempAbundance > 0))
-            {
-                for (var i = minRow; i <= maxRow; i++)
-                {
-                    for (var j = minCol; j <= maxCol; j++)
-                    {
-                        var mostAbuMz = _theoreticalEnvelope.GetIsotopeMz(i + MinScanCharge, mostAbuInternalIndex);
-                        var seedLocalWin = Ms1Spectra[j].GetLocalMzWindow(mostAbuMz);
-                        _xic[j] += seedLocalWin.MedianIntensity;
-                        tempAbundance += Ms1Spectra[j].MedianIntensity;
-                    }
-                }
-            }
-
-            var smoothedXic = Smoother.Smooth(_xic);
-            var abundance = 0d;
-            for (var k = 0; k < smoothedXic.Length - 1; k++)
-            {
-                var centerIntensity = 0.5 * (Math.Max(0, smoothedXic[k]) + Math.Max(0, smoothedXic[k + 1]));
-
-                if (!(centerIntensity > 0)) continue;
-                var timeInterval = Run.GetElutionTime(ms1ScanNums[k + 1]) - Run.GetElutionTime(ms1ScanNums[k]);
-
-                abundance += centerIntensity * timeInterval;
-            }
-            
-            if (!(abundance > 0)) abundance = tempAbundance;
-            */
-
-            var repScanNum = ms1ScanNums[(int)((minCol+maxCol)*0.5)];
-            var repMz = 0;
-
-            var cluster = new LcMsPeakCluster(Run, _theoreticalEnvelope, targetMass, targetCharge, repMz, repScanNum, abundance);
-            cluster.AddEnvelopes(minRow + _targetMinCharge, maxRow + _targetMinCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol]);
-            cluster.Score = float.MinValue;
-
             return cluster;
         }
 

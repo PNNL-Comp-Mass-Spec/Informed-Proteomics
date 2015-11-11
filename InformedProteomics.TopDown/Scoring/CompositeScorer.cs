@@ -90,14 +90,14 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         internal static ScoreWeight ScoreParam; // score weights without mass error temrs for generating function evaluation
-
         private const double WeightScaleFactor = 4.0;
+
         static CompositeScorer()
         {
-            ScoreParam = new ScoreWeight()
+            /*ScoreParam = new ScoreWeight()
             {
                 Beta0 = -5.39335774417474*WeightScaleFactor,
-                Cutoff = 3.0 * WeightScaleFactor,
+                Cutoff = 2.5 * WeightScaleFactor,
                 ComplementaryIonCount = -0.378768218613132 * WeightScaleFactor,
                 Prefix = new IonScoreWeight
                 {
@@ -116,6 +116,48 @@ namespace InformedProteomics.TopDown.Scoring
                     Corr = 1.18929338 * WeightScaleFactor,
                     Dist = -0.284321389 * WeightScaleFactor,
                     MassError = -0.026141488 * WeightScaleFactor,
+                },
+            };*/
+            var trainedParam = new double[]
+            {
+                -4.35615875783574,
+                -0.263297798433790,
+                -0.863126458013878,
+                0.238325241230975,
+                0.294277332664349,
+                0.882288576167220,
+                0.732263929496114,
+                -0.0199416790747384,
+                -0.498811136842684,
+                0.180874679890120,
+                0.299790673329884,
+                0.492391631834416,
+                0.314410358803801,
+                -0.0134845040032297,
+            };
+
+            ScoreParam = new ScoreWeight()
+            {
+                Beta0 = trainedParam[0] * WeightScaleFactor,
+                Cutoff = 1.5 * WeightScaleFactor,
+                ComplementaryIonCount = trainedParam[1] * WeightScaleFactor,
+                Prefix = new IonScoreWeight
+                {
+                    Count = trainedParam[2] * WeightScaleFactor,
+                    ConsecutiveMatch = trainedParam[3] * WeightScaleFactor,
+                    Intensity = trainedParam[4] * WeightScaleFactor,
+                    Corr = trainedParam[5] * WeightScaleFactor,
+                    Dist = trainedParam[6] * WeightScaleFactor,
+                    MassError = trainedParam[7] * WeightScaleFactor,
+                },
+                Suffix = new IonScoreWeight()
+                {
+                    Count = trainedParam[8] * WeightScaleFactor,
+                    ConsecutiveMatch = trainedParam[9] * WeightScaleFactor,
+                    Intensity = trainedParam[10] * WeightScaleFactor,
+                    Corr = trainedParam[11] * WeightScaleFactor,
+                    Dist = trainedParam[12] * WeightScaleFactor,
+                    MassError = trainedParam[13] * WeightScaleFactor,
                 },
             };
         }

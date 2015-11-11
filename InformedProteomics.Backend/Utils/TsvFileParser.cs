@@ -14,7 +14,7 @@ namespace InformedProteomics.Backend.Utils
             _delimeter = delimiter;
             Parse();
         }
-        
+
         public string FileName { get; private set; }
 
         public int NumData
@@ -65,7 +65,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = 0; i < pepQValues.Count; i++)
             {
                 var pepQValue = Convert.ToDouble(pepQValues[i]);
-                if(pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
+                if (pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
             }
             return peptideSet;
         }

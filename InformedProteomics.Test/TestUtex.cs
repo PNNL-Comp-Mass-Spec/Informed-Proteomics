@@ -98,7 +98,7 @@ namespace InformedProteomics.Test
                     var prsmSet = new ProteinSpectrumMatchSet(i) { match };
                     if (feature == null)
                     {
-                        feature = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, charge, charge);
+                        feature = featureFinder.GetLcMsPeaksFromNoisePeaks(mass, charge, minScanNum, maxScanNum, charge, charge);
                         prsmToFeatureIdMap[j] = featureId;
                     }
                     else

@@ -130,6 +130,7 @@
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
+    <Compile Include="Data\Spectrometry\MaxEntDeconvoluter.cs" />
     <Compile Include="Data\Spectrometry\Ms1Peak.cs" />
     <Compile Include="Data\Spectrometry\Ms1Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
@@ -165,9 +166,11 @@
     <Compile Include="MassFeature\LcMsFeatureLikelihood.cs" />
     <Compile Include="MassFeature\LcMsFeatureMergeComparer.cs" />
     <Compile Include="MassFeature\LcMsFeatureTrain.cs" />
+    <Compile Include="MassFeature\LcMsPeakMatrixLowResolution.cs" />
     <Compile Include="MassFeature\LcMsPeakCluster.cs" />
     <Compile Include="MassFeature\LcMsPeakScorer.cs" />
     <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
+    <Compile Include="MassFeature\Ms1Feature.cs" />
     <Compile Include="MassFeature\NodeSet.cs" />
     <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatchAlignment.cs" />

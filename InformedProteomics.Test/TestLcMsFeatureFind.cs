@@ -21,47 +21,37 @@ namespace InformedProteomics.Test
     public class TestLcMsFeatureFind
     {
         [Test]
-        public void TestIsotopeCount()
+        public void TestMaxEntDeconvoluter()
         {
+
+            const string rawFileFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";
+            const string fname = "WHIM2_LoHi_T2DD_HCD_GF07_02";
+            string rawFile = string.Format(@"{0}\{1}.pbf", rawFileFolder, fname);
+            string ms1ft = string.Format(@"\\protoapps\UserData\Jungkap\CompRef\lowRes\{0}.ms1ft", fname);
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFile, 1.4826, 0);
+            var ms1ScanNums = run.GetMs1ScanVector();
             
-            for (var m = 100; m < 10000; m+=100)
-            {
-                var envelope = Averagine.GetIsotopomerEnvelope(m);
+            var featureFinder = new LcMsPeakMatrixLowResolution(run);
 
-                var n = 0;
-                foreach (var e in envelope.Envolope)
-                {
-                    if (e > 0.3) n++;
-                }
-                Console.WriteLine("{0}: {1}/{2}", m, n, envelope.Envolope.Length);
+            foreach (var scan in ms1ScanNums)
+            {
+                var fts = featureFinder.DetectMs1Features(scan);
+                //Console.WriteLine("{0}\t{1}",scan, fts.Count);
             }
 
-            /*
-            var mzComparer = new ProteinMassBinning(28);
-            var proteinMassBinning = new FilteredProteinMassBinning(AminoAcidSet.GetStandardAminoAcidSet(), 50000, 28);
-            var aaList = AminoAcid.StandardAminoAcidArr;
-            var rnd = new Random();
-            var m = 0d;
-            for (var i = 0; i < 100000; i++)
+            var features = featureFinder.GetLcMsFeatures();
+            
+            var writer = new StreamWriter(ms1ft);
+            var id = 1;
+            writer.WriteLine("FeatureID\tMinScan\tMaxScan\tMinCharge\tMaxCharge\tMonoMass\tAbundance\tRepScan\tMaxElutionTime\tElutionLength\tLikelihoodRatio");
+            foreach (var feature in features.OrderBy(f => f.Mass))
             {
-                var j = rnd.Next(aaList.Length);
-                m += aaList[j].Mass;
-
-                if (m > 50000) break;
-                
-                Console.Write(m);
-                Console.Write("\t");
-                Console.Write(Constants.GetBinNum(m));
-                Console.Write("\t");
-                Console.Write(Constants.GetBinNumHighPrecision(m));
-                Console.Write("\t");
-                Console.Write(mzComparer.GetBinNumber(m));
-                Console.Write("\t");
-                Console.Write(proteinMassBinning.GetBinNumber(m));
-                Console.Write("\n");
-            }
-            */
-
+                writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}", id, feature.MinScanNum, feature.MaxScanNum, feature.MinCharge,
+                    feature.MaxCharge, feature.Mass,  feature.Abundance, feature.RepresentativeScanNum, feature.MinElutionTime, feature.MaxElutionTime, 0);
+                id++;
+            }            
+            writer.Close();
         }
 
         [Test]

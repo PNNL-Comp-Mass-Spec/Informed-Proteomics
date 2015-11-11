@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics;
+using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -29,6 +31,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 SummedIntensity += peak.Intensity;
             }*/
         }
+
+
+        public DeconvolutedPeak(Peak mzPeak, int charge, double corr = 0, double dist = 0)
+            : this(charge * (mzPeak.Mz - Constants.Proton), mzPeak.Intensity, charge, corr, dist)
+        {
+        }
+
 
         public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
         public double MzWithoutAdductIonMass { get { return Mass / Charge; } }

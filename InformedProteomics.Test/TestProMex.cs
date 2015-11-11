@@ -8,6 +8,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
@@ -418,6 +419,13 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        public void TestFasta()
+        {
+            var db = new FastaDatabase(@"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta");
+            Console.WriteLine(db.GetNumEntries());
+        }
+
+        [Test]
         public void TestGeneratingMs1FeatureFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -498,6 +506,45 @@ namespace InformedProteomics.Test
 
 //            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
             Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
+        }
+
+        [Test]
+        public void TestFeatureExampleForFigure()
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            TestUtils.ShowStarting(methodName);
+
+            const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
+            //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+
+            if (!File.Exists(rawFile))
+            {
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
+            }
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            var scorer = new LcMsFeatureLikelihood();
+            var featureFinder = new LcMsPeakMatrix(run, scorer);
+            var feature = featureFinder.GetLcMsPeakCluster(28061.6177, 20, 34, 7624, 7736);
+
+            var writer = new StreamWriter(@"D:\MassSpecFiles\CPTAC_rep10\example\peaks.txt");
+
+            var envelope = feature.TheoreticalEnvelope;
+            foreach (var e in envelope.Isotopes) Console.WriteLine(e.Ratio);
+
+            foreach (var env in feature.EnumerateEnvelopes())
+            {
+                var corr = env.PearsonCorrelation;
+                for(var i = 0; i < envelope.Size; i++)
+                {
+                    var peak = env.Peaks[i];
+                    if (peak == null) continue;
+                    writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n", env.ScanNum, run.GetElutionTime(env.ScanNum), env.Charge, i, peak.Mz, peak.Intensity, corr);
+                }
+            }
+            writer.Close();
+
+
         }
 
 
