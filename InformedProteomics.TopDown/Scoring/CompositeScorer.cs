@@ -139,7 +139,7 @@ namespace InformedProteomics.TopDown.Scoring
             ScoreParam = new ScoreWeight()
             {
                 Beta0 = trainedParam[0] * WeightScaleFactor,
-                Cutoff = 1.5 * WeightScaleFactor,
+                Cutoff = 2.0 * WeightScaleFactor,
                 ComplementaryIonCount = trainedParam[1] * WeightScaleFactor,
                 Prefix = new IonScoreWeight
                 {

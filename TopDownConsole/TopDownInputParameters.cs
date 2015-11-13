@@ -46,6 +46,8 @@ namespace MSPathFinderT
 
         public InternalCleavageType SearchMode { get; set; }
 
+        public bool TagBasedSearch { get; set; }
+
         public bool? TdaBool
         {
             get
@@ -103,6 +105,7 @@ namespace MSPathFinderT
             Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
             Console.WriteLine("OutputDir:        " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchModeInt);
+            Console.WriteLine("Tag-based search: " + TagBasedSearch);
             Console.WriteLine("Tda: " + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
@@ -140,6 +143,7 @@ namespace MSPathFinderT
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                     writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(specFilePath, ".ms1ft")));
                     writer.WriteLine("SearchMode\t" + SearchModeInt);
+                    writer.WriteLine("Tag-based search\t" + TagBasedSearch);
                     writer.WriteLine("Tda\t" + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                     writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
@@ -311,6 +315,9 @@ namespace MSPathFinderT
                 currentParameter = "-threads";
                 MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
                 MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
+
+                currentParameter = "-tagSearch";
+                TagBasedSearch = Convert.ToInt32(parameters["-tagSearch"]) == 1;
             }
             catch (Exception ex)
             {

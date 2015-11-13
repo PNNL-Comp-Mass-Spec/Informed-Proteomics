@@ -70,6 +70,7 @@ namespace MSPathFinderT
                     {"-maxMass", "50000.0"},
                     {"-feature", null},
                     {"-threads", "0"},
+                    {"-tagSearch", "1"},
                 };
 
             for (var i = 0; i < args.Length / 2; i++)
@@ -123,6 +124,7 @@ namespace MSPathFinderT
                     //SearchModeInt = parameters.SearchModeInt,
                     SearchMode = parameters.SearchMode,
                     MaxNumThreads = parameters.MaxNumThreads,
+                    TagBasedSearch = parameters.TagBasedSearch
                 };
                 
                 var success = topDownLauncher.RunSearch();
@@ -201,6 +203,7 @@ namespace MSPathFinderT
                 "\t-d DatabaseFile (*.fasta or *.fa)\n" +
                 "\t[-o OutputFolder]\n" +
                 "\t[-m SearchMode] (0: multiple internal cleavages, 1: single internal cleavage (default), 2: no internal cleavage)\n" +
+                "\t[-tagSearch 0/1] (1: include tag-based search (default), 0: skip tag-based search)\n" +
                 "\t[-mod ModificationFileName] (modification file, default: no modification)\n" +
                 "\t[-t PrecursorToleranceInPpm] (e.g. 10, Default: 10)\n" +
                 "\t[-f FragmentIonToleranceInPpm] (e.g. 10, Default: 10)\n" +

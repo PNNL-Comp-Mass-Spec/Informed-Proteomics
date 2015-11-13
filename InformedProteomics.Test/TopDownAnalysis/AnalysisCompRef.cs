@@ -178,7 +178,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
-        public void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
+        public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
         {
             var nDataset = runLabels.Length;
             var writer = new StreamWriter(outputFilePath);

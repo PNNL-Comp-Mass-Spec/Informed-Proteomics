@@ -143,6 +143,7 @@
     <Compile Include="TestUtils.cs" />
     <Compile Include="TestYufengData.cs" />
     <Compile Include="TopDownAnalysis\AnalysisCompRef.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisCompRefKelleherData.cs" />
     <Compile Include="TopDownAnalysis\AnalysisLewy.cs" />
     <Compile Include="TopDownAnalysis\AnalysisSpikeIn.cs" />
     <Compile Include="TopDownAnalysis\AnalysisTopDownMatchedPeaks.cs" />
