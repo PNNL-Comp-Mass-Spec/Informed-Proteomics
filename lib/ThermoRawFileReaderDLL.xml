@@ -276,7 +276,7 @@ ThermoRawFileReaderDLL
 	<remarks></remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
 	<param name="scan"></param>
 	<param name="dblMZList"></param>
@@ -286,7 +286,7 @@ ThermoRawFileReaderDLL
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@,System.Boolean)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
 	<param name="scan"></param>
 	<param name="dblMZList"></param>
@@ -297,7 +297,7 @@ ThermoRawFileReaderDLL
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@,System.Int32)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
 	<param name="scan"></param>
 	<param name="dblMZList"></param>
@@ -308,7 +308,7 @@ ThermoRawFileReaderDLL
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@,System.Int32,System.Boolean)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
 	<param name="scan"></param>
 	<param name="dblMZList"></param>
@@ -320,20 +320,20 @@ ThermoRawFileReaderDLL
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
-	<param name="scanNumber"></param>
-	<param name="mzList"></param>
-	<param name="intensityList"></param>
+	<param name="scanNumber">Scan number</param>
+	<param name="mzList">Output array of mass values</param>
+	<param name="intensityList">Output array of intensity values (parallel to mzList)</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,System.Int32)">
 	<summary>
- Obtain the mass and intensity for the specified scan
+ Obtain the mass and intensity list for the specified scan
  </summary>
-	<param name="scanNumber"></param>
-	<param name="mzList"></param>
-	<param name="intensityList"></param>
+	<param name="scanNumber">Scan number</param>
+	<param name="mzList">Output array of mass values</param>
+	<param name="intensityList">Output array of intensity values (parallel to mzList)</param>
 	<param name="maxNumberOfPeaks">Set to 0 (or negative) to return all of the data</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
@@ -341,9 +341,9 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="scan"></param>
-	<param name="dblMZList"></param>
-	<param name="dblIntensityList"></param>
+	<param name="scan">Scan number</param>
+	<param name="dblMZList">Output array of mass values</param>
+	<param name="dblIntensityList">Output array of intensity values (parallel to mzList)</param>
 	<param name="intMaxNumberOfPeaks">Set to 0 (or negative) to return all of the data</param>
 	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired)</param>
 	<returns>The number of data points, or -1 if an error</returns>
@@ -385,6 +385,32 @@ ThermoRawFileReaderDLL
 	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired)</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanLabelData(System.Int32,ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.udtFTLabelInfoType[]@)">
+	<summary>
+ Gets the scan label data for an FTMS-tagged scan
+ </summary>
+	<param name="scan">Scan number</param>
+	<param name="ftLabelData">List of mass, intensity, resolution, baseline intensity, noise floor, and charge for each data point</param>
+	<returns>The number of data points, or -1 if an error</returns>
+	<remarks></remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanPrecisionData(System.Int32,ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.udtMassPrecisionInfoType[]@)">
+	<summary>
+ Gets scan precision data for FTMS data (resolution of each data point)
+ </summary>
+	<param name="scan"></param>
+	<param name="massResolutionData">List of Intensity, Mass, AccuracyMMU, AccuracyPPM, and Resolution for each data point</param>
+	<returns>The number of data points, or -1 if an error</returns>
+	<remarks>This returns a subset of the data thatGetScanLabelData does, but with 2 additional fields.</remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanDataSumScans(System.Int32,System.Int32,System.Double[0:,0:]@,System.Int32,System.Boolean)">
+	<summary>
+	</summary>
+	<param name="scanFirst"></param>
+	<param name="scanLast"></param>
+	<param name="dblMassIntensityPairs"></param>
+	<param name="intMaxNumberOfPeaks"></param>
+	<param name="blnCentroid"></param>
+	<returns>The number of data points</returns>
+	<remarks></remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.#ctor">
 	<summary>
  Constructor
