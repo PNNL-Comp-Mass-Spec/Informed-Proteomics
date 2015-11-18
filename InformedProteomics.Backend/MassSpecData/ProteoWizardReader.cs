@@ -52,7 +52,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="filePath"></param>
         public ProteoWizardReader(string filePath)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReaderImplementation.ProteoWizardAssemblyResolver;
+            ProteoWizardReaderImplementation.AddAssemblyResolver();
+            ProteoWizardReaderImplementation.ValidateLoader();
 
             _pwizReader = new ProteoWizardReaderImplementation(filePath);
         }
@@ -260,6 +261,26 @@ namespace InformedProteomics.Backend.MassSpecData
         #region AssemblyResolverHandler for finding ProteoWizard dlls
 
         /// <summary>
+        /// Add the Assembly Resolver to the system assembly resolver chain
+        /// </summary>
+        /// <remarks>This should be called early in the program, so that the ProteoWizard Assembly Resolver will 
+        /// already be in the resolver chain before any other use of ProteoWizardWrapper.
+        /// Also, DependencyLoader.ValidateLoader() should be used to make sure a meaningful error message is thrown if ProteoWizard is not available.</remarks>
+        public static void AddAssemblyResolver()
+        {
+            if (!_resolverAdded)
+            {
+#if DEBUG
+                Console.WriteLine("Adding assembly resolver...");
+#endif
+                AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReaderImplementation.ProteoWizardAssemblyResolver;
+                _resolverAdded = true;
+            }
+        }
+
+        private static bool _resolverAdded = false;
+
+        /// <summary>
         /// On a missing DLL event, searches a path specified by FindPwizPath for the ProteoWizard dlls, and loads them
         /// </summary>
         /// <param name="sender"></param>
@@ -283,6 +304,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //This handler is called only when the common language runtime tries to bind to the assembly and fails.
             if (string.IsNullOrWhiteSpace(PwizPath))
             {
+                ValidateLoaderByPath();
                 return null;
             }
 
@@ -342,6 +364,48 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Static stateful variable and populating functions
 
         /// <summary>
+        /// Checks to make sure the path to ProteoWizard files is set. If not, throws an exception.
+        /// </summary>
+        /// <remarks>This function should generally only be called inside of a conditional statement to prevent the 
+        /// exception from being thrown when the ProteoWizard dlls will not be needed.</remarks>
+        public static void ValidateLoader()
+        {
+            try
+            {
+                Assembly.Load("pwiz_bindings_cli, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+            }
+            catch
+            {
+                var bits = Environment.Is64BitProcess ? "64" : "32";
+                var message = CannotFindExceptionMessage();
+
+                System.Console.WriteLine(message);
+                throw new System.TypeLoadException(message);
+            }
+        }
+
+        private static void ValidateLoaderByPath()
+        {
+            if (string.IsNullOrWhiteSpace(PwizPath))
+            {
+                var message = CannotFindExceptionMessage();
+
+                System.Console.WriteLine(message);
+                throw new System.TypeLoadException(message);
+            }
+        }
+
+        private static string CannotFindExceptionMessage()
+        {
+            var bits = Environment.Is64BitProcess ? "64" : "32";
+            var message = "Cannot load ProteoWizard dlls. Please ensure that " + bits
+                + "-bit ProteoWizard is installed to its default install directory (\""
+                + Environment.GetEnvironmentVariable("ProgramFiles") + "\\ProteoWizard\\ProteoWizard 3.0.[x]\").";
+
+            return message;
+        }
+
+        /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
         /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
         /// </summary>
@@ -350,18 +414,35 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Finds the path to the most recent 64-bit ProteoWizard install
         /// PwizPath is populated from this, but only causes a single search.
-        /// Paths searched, in order: "%ProteoWizard%" environment variable data, "C:\DMS_Programs\ProteoWizard", "%ProgramFiles%\ProteoWizard\(highest sorted)"
         /// </summary>
         /// <returns></returns>
+        /// <remarks>Paths searched, in order: 
+        /// "%ProteoWizard%"/"%ProteoWizard%_x86" environment variable data, 
+        /// "C:\DMS_Programs\ProteoWizard"/"C:\DMS_Programs\ProteoWizard_x86", 
+        /// "%ProgramFiles%\ProteoWizard\(highest sorted)"</remarks>
         public static string FindPwizPath()
         {
-            string pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
-            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(@"C:\DMS_Programs\ProteoWizard"))
+            string pwizPath = string.Empty;
+
+            // Set the DMS_Programs ProteoWizard path based on if the process is 32- or 64-bit.
+            var dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard";
+            if (!Environment.Is64BitProcess)
             {
-                pwizPath = @"C:\DMS_Programs\ProteoWizard";
+                // Check for a x86 ProteoWizard environment variable
+                pwizPath = Environment.GetEnvironmentVariable("ProteoWizard_x86");
+                dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard_x86";
+            }
+
+            // Check for a x64 ProteoWizard environment variable
+            pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
+
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgPwiz))
+            {
+                pwizPath = dmsProgPwiz;
             }
             if (string.IsNullOrWhiteSpace(pwizPath))
             {
+                // NOTE: Should automatically function as-is to get 32-bit ProteoWizard for 32-bit process and 64-bit ProteoWizard for 64-bit process...
                 var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
                 if (string.IsNullOrWhiteSpace(progFiles))
                 {
