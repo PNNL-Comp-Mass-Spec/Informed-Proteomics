@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("InformedProteomics")]
+[assembly: AssemblyTitle("InformedProteomics.Backend")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PNNL")]
-[assembly: AssemblyProduct("InformedProteomics")]
+[assembly: AssemblyProduct("InformedProteomics.Backend")]
 [assembly: AssemblyCopyright("Copyright © PNNL 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
