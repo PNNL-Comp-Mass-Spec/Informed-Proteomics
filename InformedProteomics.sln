@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.IMS", "I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Scoring", "InformedProteomics.Scoring\InformedProteomics.Scoring.csproj", "{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinderT", "TopDownConsole\MSPathFinderT.csproj", "{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinderT", "MSPathFinderT\MSPathFinderT.csproj", "{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC} = {97B9F853-1B2A-4101-AF09-68E0B4CF19EC}
 		{70A129AC-217A-4086-9ECB-63FF22289D90} = {70A129AC-217A-4086-9ECB-63FF22289D90}
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinderT", "TopDownCon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.BottomUp", "InformedProteomics.BottomUp\InformedProteomics.BottomUp.csproj", "{70EFA57F-7566-4673-93C9-75CC85F8731D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinder", "BottomUpConsole\MSPathFinder.csproj", "{0DD71ED9-6BB8-4436-8459-8DF9ABC70236}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinder", "MSPathFinder\MSPathFinder.csproj", "{0DD71ED9-6BB8-4436-8459-8DF9ABC70236}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PbfGen", "PbfGen\PbfGen.csproj", "{B31C2AC2-88C6-43C9-B809-26B7547592FF}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -38,7 +38,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PbfGen", "PbfGen\PbfGen.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelMSPathFinderT", "ParallelMSPathFinderT\ParallelMSPathFinderT.csproj", "{04E5216D-7451-4855-961F-EE212158AB73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMex", "MS1FeatureExtractor\ProMex.csproj", "{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMex", "ProMex\ProMex.csproj", "{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelectivityScore", "SelectivityScore\SelectivityScore.csproj", "{19658C05-EF09-404D-959F-EF9A6029013B}"
 EndProject

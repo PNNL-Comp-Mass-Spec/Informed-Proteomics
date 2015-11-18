@@ -188,7 +188,7 @@
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
       <Name>InformedProteomics.TopDown</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MS1FeatureExtractor\ProMex.csproj">
+    <ProjectReference Include="..\ProMex\ProMex.csproj">
       <Project>{1586b333-5f3c-4e33-abb9-6767eac8fcd1}</Project>
       <Name>ProMex</Name>
     </ProjectReference>
@@ -200,7 +200,7 @@
       <Project>{19658c05-ef09-404d-959f-ef9a6029013b}</Project>
       <Name>SelectivityScore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TopDownConsole\MSPathFinderT.csproj">
+    <ProjectReference Include="..\MSPathFinderT\MSPathFinderT.csproj">
       <Project>{dfbecbac-7fda-4c78-9f4e-cc21c79a6db6}</Project>
       <Name>MSPathFinderT</Name>
     </ProjectReference>

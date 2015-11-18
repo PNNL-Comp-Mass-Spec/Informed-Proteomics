@@ -48,16 +48,16 @@ Source: InformedProteomics.TopDown\bin\x64\Release\InformedProteomics.TopDown.dl
 ;Source: MSPathFinder\bin\x64\Release\MSPathFinder.exe.config                                                                                      ; DestDir: {app}
 
 ; MSPathFinder (top down)
-Source: TopDownConsole\bin\x64\Release\MSPathFinderT.exe                                                                                           ; DestDir: {app}
-Source: TopDownConsole\bin\x64\Release\MSPathFinderT.exe.config                                                                                    ; DestDir: {app}
+Source: MSPathFinderT\bin\x64\Release\MSPathFinderT.exe                                                                                           ; DestDir: {app}
+Source: MSPathFinderT\bin\x64\Release\MSPathFinderT.exe.config                                                                                    ; DestDir: {app}
 
 ; PbfGen
 Source: PbfGen\bin\x64\Release\PbfGen.exe                                                                                                         ; DestDir: {app}
 Source: PbfGen\bin\x64\Release\PbfGen.exe.config                                                                                                  ; DestDir: {app}
 
 ; ProMex
-Source: MS1FeatureExtractor\bin\x64\Release\ProMex.exe                                                                                                         ; DestDir: {app}
-Source: MS1FeatureExtractor\bin\x64\Release\ProMex.exe.config                                                                                                  ; DestDir: {app}
+Source: ProMex\bin\x64\Release\ProMex.exe                                                                                                         ; DestDir: {app}
+Source: ProMex\bin\x64\Release\ProMex.exe.config                                                                                                  ; DestDir: {app}
 
 Source: README.md                                                                                                                                 ; DestDir: {app}\Readme.txt
 ;Source: RevisionHistory.txt                                                                                                                       ; DestDir: {app}

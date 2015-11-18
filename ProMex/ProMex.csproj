@@ -112,8 +112,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem xcopy /y "$(ProjectDir)lib\msvcr120.dll" "$(TargetDir)"
-rem xcopy /y "$(ProjectDir)data\*.tsv" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>rem xcopy /y "$(ProjectDir)data\*.tsv" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
