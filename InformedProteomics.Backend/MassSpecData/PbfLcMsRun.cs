@@ -239,7 +239,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 throw new FormatException("Illegal pbf file (too small)!");
             }
 
-            _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
+            _reader = new BinaryReader(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
@@ -312,7 +312,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     throw new FormatException("Illegal pbf file (too small)!");
                 }
 
-                _reader = new BinaryReader(new BufferedStream(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read)));
+                _reader = new BinaryReader(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
 
                 _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
                 _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
@@ -373,7 +373,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     WriteToPbf(msdr, writer, progress);
                 }
             }
-            _reader = new BinaryReader(new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)));
+            _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             CreatePrecursorNextScanMap();
         }
@@ -1527,9 +1527,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (_reader == null)
                 {
                     _reader =
-                        new BinaryReader(
-                            new BufferedStream(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
-                                FileShare.ReadWrite)));
+                        new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
+                                FileShare.ReadWrite));
                 }
 
                 progData.StepRange(5);
@@ -1646,7 +1645,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            GC.Collect(); // We just killed a large number of objects when the list of peaks went out of scope.
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false); // We just killed a large number of objects when the list of peaks went out of scope.
         }
 
         private class SplitLcMsPeakLists
