@@ -17,7 +17,7 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestIprg
     {
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestReadingExcelFile()
         {

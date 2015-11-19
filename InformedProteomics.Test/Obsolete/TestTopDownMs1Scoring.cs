@@ -17,7 +17,7 @@ namespace InformedProteomics.Test.Obsolete
     [TestFixture]
     internal class TestTopDownMs1Scoring
     {
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestTopDownScoringForAllXics()
         {
@@ -127,7 +127,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestMsAlignPlusResults()
         {
@@ -193,7 +193,7 @@ namespace InformedProteomics.Test.Obsolete
             reader.Close();
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestTopDownScoring()
         {

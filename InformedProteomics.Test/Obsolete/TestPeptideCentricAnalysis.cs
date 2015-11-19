@@ -17,7 +17,7 @@ namespace InformedProteomics.Test.Obsolete
     [TestFixture]
     internal class TestPeptideCentricAnalysis
     {
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void CompareRt()
         {
@@ -82,7 +82,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void CompareRtFusion()
         {
@@ -133,7 +133,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void RunPeptideCentricAnalysis()
         {
@@ -148,7 +148,7 @@ namespace InformedProteomics.Test.Obsolete
             TestQExactiveDdaDataPostProcessingPerFile();
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestQExactiveDdaDataPostProcessing()
         {
@@ -165,7 +165,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestQExactiveDiaDataPostProcessing()
         {
@@ -182,7 +182,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestQExactiveDiaDataPostProcessingNoEdgeNtt2()
         {
@@ -196,7 +196,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestFusionDiaDataPostProcessing()
         {
@@ -213,7 +213,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestFusionDdaDataPostProcessing()
         {
@@ -230,7 +230,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestQExactiveDdaDataPostProcessingPerFile()
         {
@@ -258,7 +258,7 @@ namespace InformedProteomics.Test.Obsolete
         }
 
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void GenerateVennDiagrams()
         {
@@ -295,7 +295,7 @@ namespace InformedProteomics.Test.Obsolete
                               vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void ProcessPemmrData()
         {
@@ -312,7 +312,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void GenerateVennDiagramsPeMmr()
         {
@@ -356,7 +356,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void ProcessMhcData()
         {
@@ -381,7 +381,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine("NumId: {0}", numId);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestSpecEValueCalibration()
         {
@@ -471,7 +471,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestXicGen()
         {
@@ -515,7 +515,7 @@ namespace InformedProteomics.Test.Obsolete
             }
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestFusionDdaData()
         {
@@ -623,7 +623,7 @@ namespace InformedProteomics.Test.Obsolete
             Console.WriteLine(@"TimeForPrecursorValidation {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void AnalyizeFusionDdaData()
         {

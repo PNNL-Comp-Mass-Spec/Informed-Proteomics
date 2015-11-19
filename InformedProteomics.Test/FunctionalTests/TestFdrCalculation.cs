@@ -31,7 +31,7 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(@"Done");
         }
 
-        [Ignore]
+        [Ignore("File Missing, test obsolete, or long test")]
         public void MergeTargetDecoyFiles()
         {
             const string dir = @"C:\cygwin\home\kims336\Data\TopDown\raw\Cache";
