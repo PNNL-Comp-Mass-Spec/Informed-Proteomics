@@ -366,7 +366,6 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             catch (UnauthorizedAccessException)
             {
-
                 PbfFilePath = tempPath;
                 using (var writer =
                         new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
@@ -1519,11 +1518,12 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 progData.Status = "Writing precursor chromatogram";
             }
-            var peaks = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
-            var peaksCount = 0;
-            var metadata = new Dictionary<int, ScanPeakMetaData>(scansForMsLevelX.Count);
             lock (_filelock)
             {
+                var peaks = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
+                var peaksCount = 0;
+                var metadata = new Dictionary<int, ScanPeakMetaData>(scansForMsLevelX.Count);
+
                 if (_reader == null)
                 {
                     _reader =
