@@ -491,7 +491,9 @@ namespace InformedProteomics.Backend.MassSpecData
         private int _numSpectra = 0;
 
         private readonly MSData _dataFile = new MSData();
+        // Uses the centroiding/peak picking algorithm that the vendor libraries provide, if available; otherwise uses a low-quality centroiding algorithm
         private readonly string _vendorCentroiding = "peakPicking true 1-";
+        // Continuous Wavelet Transform peak picker - high-quality peak picking, may be slow with some high-res data.
         private readonly string _cwtCentroiding = "peakPicking cwt snr=1.0 peakSpace=0.1 msLevel=1-";
         private readonly List<string> _filters = new List<string>();
         private void LoadPwizReader()
@@ -503,9 +505,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var readers = ReaderList.FullReaderList;
             readers.read(_filePath, _dataFile);
-            if ((new string[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt" })
+            if ((new string[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt", "uimf", "uimf.gz" })
                 .Any(ext => _filePath.ToLower().EndsWith(ext)))
             {
+                // Files that do not have vendor centroiding available
                 Console.WriteLine("Using cwt Centroiding");
                 _filters.Add(_cwtCentroiding);
             }
