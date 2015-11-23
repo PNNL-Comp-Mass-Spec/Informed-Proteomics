@@ -250,7 +250,11 @@ namespace InformedProteomics.TopDown.Execution
 
             progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
-            if (string.IsNullOrWhiteSpace(FeatureFilePath))
+            if (this.ScanNumbers != null && this.ScanNumbers.Any())
+            {
+                ms1Filter = new SelectedMsMsFilter(this.ScanNumbers);
+            }
+            else if (string.IsNullOrWhiteSpace(FeatureFilePath))
             {
                 // Checks whether SpecFileName.ms1ft exists
                 var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, LcMsFeatureFinderLauncher.FileExtension);
