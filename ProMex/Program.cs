@@ -52,17 +52,18 @@ namespace ProMex
                 // initialize parameters
                 _paramDic = new Dictionary<string, string>
                 {
-                    {"-i", null},
-                    {"-o", null},
-                    {"-minCharge", "1"},
-                    {"-maxCharge", "60"},
-                    {"-minMass", "2000.0"},
-                    {"-maxMass", "50000.0"},
-                    {"-score", "n"},
-                    {"-csv", "n"},
-                    {"-featureMap", "y"},
-                    {"-scoreTh", "-10"},
-                    {"-maxThreads", "0"},
+                    {LcMsFeatureFinderInputParameter.INPUT_FILE_PATH, null},
+                    {LcMsFeatureFinderInputParameter.OUTPUT_FOLDER_PATH, null},
+                    {LcMsFeatureFinderInputParameter.MINIMUM_CHARGE, "1"},
+                    {LcMsFeatureFinderInputParameter.MAXIMUM_CHARGE, "60"},
+                    {LcMsFeatureFinderInputParameter.MINIMUM_MASS, "2000.0"},
+                    {LcMsFeatureFinderInputParameter.MAXIMUM_MASS, "50000.0"},
+                    {LcMsFeatureFinderInputParameter.INCLUDE_ADDITIONAL_SCORES, "n"},
+                    {LcMsFeatureFinderInputParameter.SAVE_CSV, "n"},
+                    {LcMsFeatureFinderInputParameter.SAVE_PNG_FEATURE_MAP, "y"},
+                    {LcMsFeatureFinderInputParameter.LIKELIHOOD_SCORE_THRESHOLD, "-10"},
+                    {LcMsFeatureFinderInputParameter.MAXIMUM_THREADS, "0"},
+                    {LcMsFeatureFinderInputParameter.EXISTING_MS1FT_FILE, ""}
                 };
 
                 for (var i = 0; i < args.Length / 2; i++)
@@ -107,7 +108,18 @@ namespace ProMex
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
                 param.Display();
                 var launcher = new LcMsFeatureFinderLauncher(param);
-                launcher.Run();
+                int errorCode;
+
+                if (string.IsNullOrWhiteSpace(param.ExistingFeaturesFilePath))
+                {
+                    errorCode = launcher.Run();
+                }
+                else
+                {
+                    errorCode = launcher.CreateFeatureMapImage(param.InputPath, param.ExistingFeaturesFilePath);
+                }
+
+                return errorCode;
 #if (!DEBUG)
             }
             catch (Exception ex)
@@ -118,11 +130,10 @@ namespace ProMex
                 var errorCode = -Math.Abs(ex.Message.GetHashCode());
                 if (errorCode == 0)
                     return -1;
-                else
-                    return errorCode;
+                
+                return errorCode;
             }
-#endif
-            return 0;
+#endif            
         }
 
         private static void PrintUsageInfo(string errorMessage = null)
@@ -142,11 +153,22 @@ namespace ProMex
                 "\t[-o OutFolder (default : InputFolder)]\n" +
                 "\t[-minCharge MinCharge] (minimum charge state, default: 1)\n" +
                 "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
-                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 600.0)\n" +
+                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)\n" +
                 "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
                 "\t[-featureMap y or n (default: y)]\n" +
                 "\t[-score y or n (default: n)]\n" +
                 "\t[-maxThreads 0 (default: 0 (automatic set))]\n"
+                );
+
+            Console.WriteLine(
+                "Syntax to create a PNG of the features in an existing ms1ft file\n" +
+                "(requires both a .pbf file and a .ms1ft file)\n"  +
+                Name + ".exe\n" +
+                "\t[-i PbfFile]\n" +
+                "\t[-o OutFolder (default : InputFolder)]\n" +
+                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)\n" +
+                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
+                "\t[-ms1ft FeaturesFilePath]\n"
                 );
 
             // Wait for 1.5 seconds

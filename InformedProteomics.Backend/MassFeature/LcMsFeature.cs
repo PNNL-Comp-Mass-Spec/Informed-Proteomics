@@ -152,5 +152,13 @@ namespace InformedProteomics.Backend.MassFeature
 
         [Serializable]
         public class LcMsRunNullException : Exception { }
+
+        public override string ToString()
+        {
+            return RepresentativeMass.ToString("0.0") + " Da, " + 
+                RepresentativeCharge + "+, " + 
+                RepresentativeMz.ToString("0.0") + " m/z, scan " + 
+                RepresentativeScanNum;
+        }
     }
 }

@@ -125,7 +125,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     if (matchedTag.NTermFlankingMass == null && matchedTag.CTermFlankingMass == null) continue;
 
                     var matches = tagFinder.FindMatches(matchedTag).ToArray();
-                    var prevScore = double.NegativeInfinity;
+                    //var prevScore = double.NegativeInfinity;
                     //foreach (var match in matches.OrderByDescending(m => m.Score))
                     foreach(var match in matches)
                     {

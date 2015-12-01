@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassFeature;
@@ -33,29 +34,36 @@ namespace InformedProteomics.TopDown.Execution
             }            
         }
 
-        public void Run()
+        /// <summary>
+        /// Process the given file or folder
+        /// </summary>
+        /// <returns>0 if success, otherwise an error code</returns>
+        /// <remarks>Folder could either be a supported mass spec data folder, or a normal directory with several supported data files</remarks>
+        public int Run()
         {
             // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
             Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
 
             var attr = File.GetAttributes(Parameters.InputPath);
+            int errorCode;
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
                 !MassSpecDataReaderFactory.IsADirectoryDataset(Parameters.InputPath))
             {
-                ProcessDirectory(Parameters.InputPath);
+                errorCode = ProcessDirectory(Parameters.InputPath);                
             }
             else
             {
                 if (!MsRawFile(Parameters.InputPath) && !MsPbfFile(Parameters.InputPath))
                 {
                     ShowErrorMessage(@"File extension not supported, " + Parameters.InputPath);
+                    return -1;
                 }
-                else
-                {
-                    ProcessFile(Parameters.InputPath);
-                }
+                
+                errorCode = ProcessFile(Parameters.InputPath);
             }
+
+            return errorCode;
         }
 
         public static string GetHeaderString(bool scoreReport = false)
@@ -65,20 +73,38 @@ namespace InformedProteomics.TopDown.Execution
             return header;
         }
 
-        private void ProcessDirectory(string targetDirectory)
+        /// <summary>
+        /// Process each file in the target folder
+        /// </summary>
+        /// <param name="targetDirectory"></param>
+        /// <returns>0 if success, number of errors if a problem</returns>
+        private int ProcessDirectory(string targetDirectory)
         {
             var fileEntries = Directory.GetFiles(targetDirectory);
+            var errorCount = 0;
+
             foreach (var fileName in fileEntries)
             {
-                if ((MsRawFile(fileName) && !HasExistingPbfFile(fileName)) || MsPbfFile(fileName)) ProcessFile(fileName);
+                if ((MsRawFile(fileName) && !HasExistingPbfFile(fileName)) || MsPbfFile(fileName))
+                {
+                    var returnCode = ProcessFile(fileName);
+                    if (returnCode != 0)
+                    {
+                        Console.WriteLine(@"  error code {0} for {1}", returnCode, Path.GetFileName(fileName));
+                        errorCount++;
+                    }
+                }
             }
+
+            return errorCount;
         }
 
         private bool MsRawFile(string specFilePath)
         {
-            //return (path.EndsWith(".raw") || path.EndsWith(".mzML"));
+            
             var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
+
             // Only supposed to affect execution when running on a directory; however having this test here will affect single file execution
             // i.e., if run with a raw file as input when a .pbf file exists for the dataset, this will return false, and kill the run erroneously.
             //var pbfFilePath = MassSpecDataReaderFactory.ChangeExtension(specFilePath, "pbf");
@@ -105,31 +131,38 @@ namespace InformedProteomics.TopDown.Execution
 
         private bool MsPbfFile(string path)
         {
-            return path.EndsWith(".pbf");
+            return path.ToLower().EndsWith(".pbf");
         }
 
         public const string FileExtension = "ms1ft";
         public readonly LcMsFeatureFinderInputParameter Parameters;
 
-        private void ProcessFile(string rawFile)
+        /// <summary>
+        /// Find features in the data file
+        /// </summary>
+        /// <param name="rawFile">Data file (either a pbf file or a file type from which a pbf file can be auto-created)</param>
+        /// <returns>0 if success; negative number on error</returns>
+        private int ProcessFile(string rawFile)
         {
-            var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(rawFile));
+            var outDirectory = GetOutputDirectory(rawFile);
+            if (string.IsNullOrEmpty(outDirectory))
+                return -1;
 
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
-            var outTsvFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
+            var ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
-            var outImgFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
+            var pngFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
 
-            if (File.Exists(outTsvFilePath))
+            if (File.Exists(ms1FeaturesFilePath))
             {
-                Console.WriteLine(@"ProMex output already exists: {0}", outTsvFilePath);
-                return;
+                Console.WriteLine(@"ProMex output already exists: {0}", ms1FeaturesFilePath);
+                return -2;
             }
 
             if (!File.Exists(rawFile))
             {
                 ShowErrorMessage(@"Cannot find input file: " + rawFile);
-                return;
+                return -3;
             }
 
             var stopwatch = Stopwatch.StartNew();
@@ -142,7 +175,7 @@ namespace InformedProteomics.TopDown.Execution
             if (run.GetMs1ScanVector().Length == 0)
             {
                 ShowErrorMessage(@"Data file has no MS1 spectra: " + Path.GetFileName(rawFile));
-                return;
+                return -4;
             }
 
             var comparer = featureFinder.Comparer;
@@ -177,7 +210,7 @@ namespace InformedProteomics.TopDown.Execution
             
 
             // write result files
-            var tsvWriter = new StreamWriter(outTsvFilePath);
+            var tsvWriter = new StreamWriter(ms1FeaturesFilePath);
             tsvWriter.WriteLine(GetHeaderString(Parameters.ScoreReport));
 
             StreamWriter csvWriter = null;
@@ -211,10 +244,10 @@ namespace InformedProteomics.TopDown.Execution
             }
             tsvWriter.Close();
 
-            Console.WriteLine(@"Complete feature filteration");
+            Console.WriteLine(@"Complete feature filtration");
             Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of filtered features = {0}", featureId);
-            Console.WriteLine(@" - ProMex output: {0}", outTsvFilePath);
+            Console.WriteLine(@" - ProMex output: {0}", ms1FeaturesFilePath);
 
             if (csvWriter != null)
             {
@@ -224,19 +257,74 @@ namespace InformedProteomics.TopDown.Execution
 
             if (Parameters.FeatureMapImage)
             {
-                //Console.WriteLine(@"Start feature map image generation");
-                //stopwatch.Restart();
-                //_plotter.PlotLcMsFeatureMap(outTsvFilePath, outImgFilePath, baseName, string.Format("{0}", Math.Ceiling(run.GetElutionTime(run.MaxLcScan))));
-                var map = new LcMsFeatureMap(run, outTsvFilePath, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
-                map.SaveImage(outImgFilePath);
-                //stopwatch.Stop();
-                //Console.WriteLine(@"Complete feature map image generation");
-                //Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-                Console.WriteLine(@" - Feature map image output: {0}", outImgFilePath);
+                CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
             }
+
+            return 0;
         }
 
+        /// <summary>
+        /// Create a PNG image of previously found MS1 features
+        /// </summary>
+        /// <param name="pbfFilePath">.pbf file path</param>
+        /// <param name="ms1FeaturesFilePath">.ms1ft file path</param>
+        /// <returns>0 if success, otherwise an error code</returns>
+        /// <remarks>
+        /// If ms1FeaturesFilePath is an empty string, it is auto-determined based on the .pbf file name
+        /// Mass range is determined using Parameters.MinSearchMass and Parameters.MaxSearchMass
+        /// </remarks>
+        public int CreateFeatureMapImage(string pbfFilePath, string ms1FeaturesFilePath)
+        {
+            if (!File.Exists(pbfFilePath))
+            {
+                Console.WriteLine(@"Error: Data file not found: " + pbfFilePath);
+                return -1;
+            }
 
+            var outDirectory = GetOutputDirectory(pbfFilePath);
+            if (string.IsNullOrEmpty(outDirectory))
+                return -2;
+
+            var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(pbfFilePath));
+
+            if (string.IsNullOrEmpty(ms1FeaturesFilePath))
+                ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
+
+            var pngFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
+
+            if (!File.Exists(ms1FeaturesFilePath))
+            {
+                Console.WriteLine(@"Error: MS1 features file not found: " + ms1FeaturesFilePath);
+                return -3;
+            }
+
+            Console.WriteLine(@"Start loading MS1 data from {0}", pbfFilePath);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFilePath);
+
+            CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
+            
+            return 0;
+        }
+
+        private void CreateFeatureMapImage(LcMsRun run, string featuresFilePath, string imgFilePath)
+        {
+            var map = new LcMsFeatureMap(run, featuresFilePath, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
+            map.SaveImage(imgFilePath);
+            Console.WriteLine(@" - Feature map image output: {0}", imgFilePath);
+        }
+
+        private string GetOutputDirectory(string dataFilePath)
+        {
+            var outDirectory = Parameters.OutputPath ?? Path.GetDirectoryName(Path.GetFullPath(dataFilePath));
+
+            if (string.IsNullOrEmpty(outDirectory))
+            {
+                Console.WriteLine(@"Unable to determine the folder path for the data file: {0}", dataFilePath);
+                return string.Empty;
+            }
+
+            return outDirectory;
+        }
 
         public static string GetString(LcMsFeature feature)
         {
