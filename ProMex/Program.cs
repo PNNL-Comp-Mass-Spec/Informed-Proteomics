@@ -168,7 +168,7 @@ namespace ProMex
                 "\t[-o OutFolder (default : InputFolder)]\n" +
                 "\t[-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)\n" +
                 "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
-                "\t[-ms1ft FeaturesFilePath]\n"
+                "\t[-ms1ft FeaturesFilePath (use a period to infer the name from the pbf file)]\n"
                 );
 
             // Wait for 1.5 seconds

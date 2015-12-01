@@ -287,7 +287,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(pbfFilePath));
 
-            if (string.IsNullOrEmpty(ms1FeaturesFilePath))
+            if (string.IsNullOrEmpty(ms1FeaturesFilePath) || string.Equals(ms1FeaturesFilePath, "."))
                 ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
 
             var pngFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
