@@ -426,15 +426,16 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Set the DMS_Programs ProteoWizard path based on if the process is 32- or 64-bit.
             var dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard";
-            if (!Environment.Is64BitProcess)
+
+            // Check for a x64 ProteoWizard environment variable
+            pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
+
+            if (!Environment.Is64BitProcess && Environment.Is64BitOperatingSystem)
             {
                 // Check for a x86 ProteoWizard environment variable
                 pwizPath = Environment.GetEnvironmentVariable("ProteoWizard_x86");
                 dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard_x86";
             }
-
-            // Check for a x64 ProteoWizard environment variable
-            pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
 
             if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgPwiz))
             {
