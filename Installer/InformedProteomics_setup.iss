@@ -1,63 +1,66 @@
 ; This is an Inno Setup configuration file
 ; http://www.jrsoftware.org/isinfo.php
 
-#define ApplicationVersion GetFileVersion('..\InformedProteomics.Backend\bin\x64\Release\InformedProteomics.Backend.dll')
+#define ApplicationVersion GetFileVersion('..\InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll')
 
 [CustomMessages]
 AppName=DeconTools
 [Messages]
-WelcomeLabel2=This will install [name/ver] on your computer.%n%n%n%nNOTICE:%nSome source files require access to a 64-bit ProteoWizard installation. Please install 64-bit ProteoWizard before using the program to avoid errors.%n%n
+; WelcomeLabel2 set in the code section
+; WelcomeLabel2=This will install [name/ver] on your computer.%n%n%n%nNOTICE:%nReading of some data files requires access to a "{code:GetInstallArch}"-bit ProteoWizard installation. Please install "{code:GetInstallArch}"-bit ProteoWizard before using the program to avoid errors.%n%n
 ; Example with multiple lines:
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
 [Files]
 ; InformedProteomics.Backend
-Source: InformedProteomics.Backend\bin\x64\Release\InformedProteomics.Backend.dll                                                                 ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\x64\Release\InformedProteomics.Backend.dll.config                                                          ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll                                                                     ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll.config                                                              ; DestDir: {app}
 
 ; InformedProteomics.Backend Nuget libraries
-Source: InformedProteomics.Backend\bin\x64\Release\MathNet.Numerics.dll                                                                           ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\MathNet.Numerics.dll                                                                               ; DestDir: {app}
+
+; SAIS
+Source: SAIS\bin\Release\SAIS.dll                                                                                                                 ; DestDir: {app}
 
 ; Manually managed libraries
-Source: lib\alglibnet2.dll                                                                                                                        ; DestDir: {app}
-Source: lib\PNNLOmics.dll                                                                                                                         ; DestDir: {app}
-Source: lib\ProteinFileReader.dll                                                                                                                 ; DestDir: {app}
-Source: lib\x64\SAIS.dll                                                                                                                          ; DestDir: {app}
-Source: lib\ThermoRawFileReaderDLL.dll                                                                                                            ; DestDir: {app}
+Source: lib\MSIL\alglibnet2.dll                                                                                                                   ; DestDir: {app}
+Source: lib\MSIL\PNNLOmics.dll                                                                                                                    ; DestDir: {app}
+Source: lib\MSIL\ProteinFileReader.dll                                                                                                            ; DestDir: {app}
+Source: lib\MSIL\ThermoRawFileReaderDLL.dll                                                                                                       ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
-Source: InformedProteomics.BottomUp\bin\x64\Release\InformedProteomics.BottomUp.dll                                                               ; DestDir: {app}
+Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}
 
 ; InformedProteomics.Graphics
-Source: InformedProteomics.Graphics\bin\x64\Release\InformedProteomics.Graphics.dll                                                               ; DestDir: {app}
+Source: InformedProteomics.Graphics\bin\Release\InformedProteomics.Graphics.dll                                                                   ; DestDir: {app}
 
 ; InformedProteomics.Graphics Nuget libraries
-Source: InformedProteomics.Graphics\bin\x64\Release\OxyPlot.dll                                                                                   ; DestDir: {app}
-Source: InformedProteomics.Graphics\bin\x64\Release\OxyPlot.Wpf.dll                                                                               ; DestDir: {app}
+Source: InformedProteomics.Graphics\bin\Release\OxyPlot.dll                                                                                       ; DestDir: {app}
+Source: InformedProteomics.Graphics\bin\Release\OxyPlot.Wpf.dll                                                                                   ; DestDir: {app}
 
 ; InformedProteomics.Scoring
-Source: InformedProteomics.Scoring\bin\x64\Release\InformedProteomics.Scoring.dll                                                                 ; DestDir: {app}
+Source: InformedProteomics.Scoring\bin\Release\InformedProteomics.Scoring.dll                                                                     ; DestDir: {app}
 
 ; InformedProteomics.TopDown
-Source: InformedProteomics.TopDown\bin\x64\Release\InformedProteomics.TopDown.dll                                                                 ; DestDir: {app}
+Source: InformedProteomics.TopDown\bin\Release\InformedProteomics.TopDown.dll                                                                     ; DestDir: {app}
 
 ; InformedProteomics.TopDown Nuget libraries
-;Source: InformedProteomics.TopDown\bin\x64\Release\MathNet.Numerics.dll                                                                                   ; DestDir: {app}
+;Source: InformedProteomics.TopDown\bin\Release\MathNet.Numerics.dll                                                                               ; DestDir: {app}
 
 ; MSPathFinder (bottom up)
-;Source: MSPathFinder\bin\x64\Release\MSPathFinder.exe                                                                                             ; DestDir: {app}
-;Source: MSPathFinder\bin\x64\Release\MSPathFinder.exe.config                                                                                      ; DestDir: {app}
+;Source: MSPathFinder\bin\Release\MSPathFinder.exe                                                                                                 ; DestDir: {app}
+;Source: MSPathFinder\bin\Release\MSPathFinder.exe.config                                                                                          ; DestDir: {app}
 
 ; MSPathFinder (top down)
-Source: MSPathFinderT\bin\x64\Release\MSPathFinderT.exe                                                                                           ; DestDir: {app}
-Source: MSPathFinderT\bin\x64\Release\MSPathFinderT.exe.config                                                                                    ; DestDir: {app}
+Source: MSPathFinderT\bin\Release\MSPathFinderT.exe                                                                                               ; DestDir: {app}
+Source: MSPathFinderT\bin\Release\MSPathFinderT.exe.config                                                                                        ; DestDir: {app}
 
 ; PbfGen
-Source: PbfGen\bin\x64\Release\PbfGen.exe                                                                                                         ; DestDir: {app}
-Source: PbfGen\bin\x64\Release\PbfGen.exe.config                                                                                                  ; DestDir: {app}
+Source: PbfGen\bin\Release\PbfGen.exe                                                                                                             ; DestDir: {app}
+Source: PbfGen\bin\Release\PbfGen.exe.config                                                                                                      ; DestDir: {app}
 
 ; ProMex
-Source: ProMex\bin\x64\Release\ProMex.exe                                                                                                         ; DestDir: {app}
-Source: ProMex\bin\x64\Release\ProMex.exe.config                                                                                                  ; DestDir: {app}
+Source: ProMex\bin\Release\ProMex.exe                                                                                                             ; DestDir: {app}
+Source: ProMex\bin\Release\ProMex.exe.config                                                                                                      ; DestDir: {app}
 
 Source: README.md                                                                                                                                 ; DestDir: {app}\Readme.txt
 ;Source: RevisionHistory.txt                                                                                                                       ; DestDir: {app}
@@ -84,8 +87,9 @@ Name: {group}\Uninstall InformedProteomics; Filename: {uninstallexe}
 ;C:\Windows\System32\cmd.exe /K "set PATH=%PATH%;%ProgramFiles%\InformedProteomics"
 
 [Setup]
+; As AnyCPU, we can install as 32-bit or 64-bit, so allow installing on 32-bit Windows, but make sure it installs as 64-bit on 64-bit Windows
 ArchitecturesInstallIn64BitMode=x64
-ArchitecturesAllowed=x64
+ArchitecturesAllowed=x64 x86
 AppName=InformedProteomics
 AppVersion={#ApplicationVersion}
 ;AppVerName=InformedProteomics
@@ -126,3 +130,33 @@ SolidCompression=yes
 ;Root: HKCR; Subkey: MageSetting\DefaultIcon; ValueType: string; ValueData: {app}\wand.ico,0; Flags: uninsdeletevalue
 [UninstallDelete]
 Name: {app}; Type: filesandordirs
+
+
+[Code]
+function GetInstallArch(): String;
+begin
+  { Return a user value }
+  if Is64BitInstallMode then
+    Result := '64'
+  else
+    Result := '32';
+end;
+
+procedure InitializeWizard;
+var
+  message2_a: string;
+  message2_b: string;
+  message2_c: string;
+  message2: string;
+  appname: string;
+  appversion: string;
+begin
+  appname := '{#SetupSetting("AppName")}';
+  appversion := '{#SetupSetting("AppVersion")}';
+  (* #13 is carriage return, #10 is new line *)
+  message2_a := 'This will install ' + appname + ' version ' + appversion + ' on your computer.' + #10#10#10#10 + 'NOTICE:' + #10 + 'Reading of some data files requires access to a ';
+  message2_b := '-bit ProteoWizard installation. Please install ';
+  message2_c := '-bit ProteoWizard before using the program to avoid errors.' + #10#10;
+  message2 := message2_a + GetInstallArch + message2_b + GetInstallArch + message2_c;
+  WizardForm.WelcomeLabel2.Caption := message2;
+end;
