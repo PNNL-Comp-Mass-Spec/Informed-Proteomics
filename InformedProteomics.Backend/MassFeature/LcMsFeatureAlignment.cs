@@ -119,13 +119,16 @@ namespace InformedProteomics.Backend.MassFeature
             return _alignedFeatures;
         }
 
-        public void FillMissingFeatures(int dataSetIndex, double scoreThreshold = -30)
+        public void FillMissingFeatures(int dataSetIndex, double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
         {
             if (_alignedFeatures == null) return;
 
             var run = _runList[dataSetIndex];
             var ms1ScanNums = run.GetMs1ScanVector();
             var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
+
+            progressReporter = progressReporter ?? new Progress<ProgressData>();
+            var progressData = new ProgressData(progressReporter);
 
             for (var j = 0; j < CountAlignedFeatures; j++)
             {
@@ -168,18 +171,26 @@ namespace InformedProteomics.Backend.MassFeature
                         maxScanNum, repFt.MinCharge, repFt.MaxCharge);
                 else
                     _alignedFeatures[j][dataSetIndex] = ft;*/
+
+                progressData.Report(j, this.CountAlignedFeatures);    
             }
 
             featureFinder = null;
         }
 
-        public void RefineAbundance(double scoreThreshold = -30)
+        public void RefineAbundance(double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
         {
             if (_alignedFeatures == null) return;
 
+            progressReporter = progressReporter ?? new Progress<ProgressData>();
+
+            var progressData = new ProgressData { IsPartialRange = true };
+
             for (var i = 0; i < CountDatasets; i++)
             {
-                FillMissingFeatures(i, scoreThreshold);
+                progressData.MaxPercentage = ((i + 1) * 100.0) / this.CountDatasets;
+                var subProgress = new Progress<ProgressData>(pd => progressReporter.Report(progressData.UpdatePercent(pd.Percent)));
+                FillMissingFeatures(i, scoreThreshold, subProgress);
                 //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
         }
