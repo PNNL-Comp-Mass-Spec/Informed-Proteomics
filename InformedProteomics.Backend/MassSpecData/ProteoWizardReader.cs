@@ -605,27 +605,37 @@ namespace InformedProteomics.Backend.MassSpecData
                 foreach (var precursor in pwizSpec.precursors)
                 {
                     var act = precursor.activation;
+                    var activationMethods = new List<ActivationMethod>();
                     foreach (var param in act.cvParams)
                     {
                         switch (param.cvid)
                         {
                             case CVID.MS_collision_induced_dissociation:
-                                am = ActivationMethod.CID;
+                                activationMethods.Add(ActivationMethod.CID);
                                 break;
                             case CVID.MS_electron_transfer_dissociation:
-                                am = ActivationMethod.ETD;
+                                activationMethods.Add(ActivationMethod.ETD);
                                 break;
                             case CVID.MS_beam_type_collision_induced_dissociation:
-                                am = ActivationMethod.HCD;
+                                activationMethods.Add(ActivationMethod.HCD);
                                 break;
                             case CVID.MS_electron_capture_dissociation:
-                                am = ActivationMethod.ECD;
+                                activationMethods.Add(ActivationMethod.ECD);
                                 break;
                             case CVID.MS_pulsed_q_dissociation:
-                                am = ActivationMethod.PQD;
+                                activationMethods.Add(ActivationMethod.PQD);
                                 break;
                         }
                     }
+                    if (activationMethods.Count > 1 && activationMethods.Contains(ActivationMethod.ETD))
+                    {
+                        am = ActivationMethod.ETD;
+                    }
+                    else if (activationMethods.Count > 0)
+                    {
+                        am = activationMethods[0];
+                    }
+
                     var piw = precursor.isolationWindow;
                     var target = (double)(piw.cvParam(CVID.MS_isolation_window_target_m_z).value);
                     var lowOff = (double)(piw.cvParam(CVID.MS_isolation_window_lower_offset).value);

@@ -2403,6 +2403,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                     case "activation":
                         // Schema requirements: one instance of this element
+                        var activationMethods = new List<ActivationMethod>();
                         innerReader = reader.ReadSubtree();
                         innerReader.MoveToContent();
                         innerReader.ReadStartElement("activation"); // Throws exception if we are not at the "activation" tag.
@@ -2464,23 +2465,23 @@ namespace InformedProteomics.Backend.MassSpecData
                                     {
                                         case "MS:1000133":
                                             // name="collision-induced dissociation"
-                                            precursor.Activation = ActivationMethod.CID;
+                                            activationMethods.Add(ActivationMethod.CID);
                                             break;
                                         case "MS:1000598":
                                             // name="electron transfer dissociation"
-                                            precursor.Activation = ActivationMethod.ETD;
+                                            activationMethods.Add(ActivationMethod.ETD);
                                             break;
                                         case "MS:1000422":
                                             // name="beam-type collision-induced dissociation", "high-energy collision-induced dissociation"
-                                            precursor.Activation = ActivationMethod.HCD;
+                                            activationMethods.Add(ActivationMethod.HCD);
                                             break;
                                         case "MS:1000250":
                                             // name="electron capture dissociation"
-                                            precursor.Activation = ActivationMethod.ECD;
+                                            activationMethods.Add(ActivationMethod.ECD);
                                             break;
                                         case "MS:1000599":
                                             // name="pulsed q dissociation"
-                                            precursor.Activation = ActivationMethod.PQD;
+                                            activationMethods.Add(ActivationMethod.PQD);
                                             break;
                                         case "MS:1000045":
                                             // name="collision energy"
@@ -2500,6 +2501,15 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                         innerReader.Close();
                         reader.Read(); // "selectedIon" might not have child nodes
+
+                        if (activationMethods.Count > 1 && activationMethods.Contains(ActivationMethod.ETD))
+                        {
+                            precursor.Activation = ActivationMethod.ETD;
+                        }
+                        else if (activationMethods.Count > 0)
+                        {
+                            precursor.Activation = activationMethods[0];
+                        }
                         // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                         break;
                     default:
