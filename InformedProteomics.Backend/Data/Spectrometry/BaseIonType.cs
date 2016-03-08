@@ -33,11 +33,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             // For A, B, C, X, Y, Z ions: sum of all amino acids + offset
             A = new BaseIonType("a", true, new Composition(-1, 0, 0, -1, 0)); // -CO
-            Ar = new BaseIonType("a.", true, new Composition(-1, 1, 0, 0, -1));
+            Ar = new BaseIonType("a.", true, A.OffsetComposition + Composition.Hydrogen);
             B = new BaseIonType("b", true, Composition.Zero);
             C = new BaseIonType("c", true, Composition.NH3);
 
-            X = new BaseIonType("x", false, Composition.H2O + Composition.CO);
+            //X = new BaseIonType("x", false, Composition.H2O + Composition.CO);
+            X = new BaseIonType("x", false, new CompositionWithDeltaMass(44.9977) - Composition.Hydrogen);
             Xr = new BaseIonType("x.", false, X.OffsetComposition + Composition.Hydrogen);
             Y = new BaseIonType("y", false, Composition.H2O);
             YM1 = new BaseIonType("y-1", false, Y.OffsetComposition - Composition.Hydrogen);
@@ -50,21 +51,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             // D ions have additional options for isoleucine and threonine. All offsets defined as sum of previous residues + offset.
             var dIonOffsets = new Dictionary<char, double[]>
             {   // Defined in terms of sum of previous residue weights + offset
-                { '*', new [] { 44.0500 } },    // For all residues except for I and T
-                { 'I', new [] { 58.0657, 72.0813 } }, // for isoleucine
-                { 'T', new [] { 58.0657, 60.0450 } }  // for threonine
+                { '*', new [] { 44.0500 - Composition.Hydrogen.Mass } },    // For all residues except for V, I and T
+                { 'V', new [] { 58.0657 - Composition.Hydrogen.Mass } },
+                { 'I', new [] { 58.0657 - Composition.Hydrogen.Mass, 72.0813 - Composition.Hydrogen.Mass } }, // for isoleucine
+                { 'T', new [] { 58.0657 - Composition.Hydrogen.Mass, 60.0450 - Composition.Hydrogen.Mass } }  // for threonine
             };
             D = new BaseIonType("d", true, new CompositionWithDeltaMass(44.0500), aminoAcid => DefaultCompositionCalculator(dIonOffsets, aminoAcid));
 
             // V only has one option for all terminal residues. Sum of previous residues + offset
-            V = new BaseIonType("v", false, Composition.Zero, r => new List<Composition> { r == null ? Composition.Zero : new CompositionWithDeltaMass(74.0242) - r.Composition });
+            V = new BaseIonType("v", false, Composition.Zero, r => new List<Composition> { r == null ? Composition.Zero : new CompositionWithDeltaMass(74.0242) - r.Composition - Composition.Hydrogen });
 
             // W ions have additional options for isoleucine and threonine. All offsets defined as sum of previous residues + offset.
             var wIonOffsets = new Dictionary<char, double[]>
             {   // Defined in terms of sum of previous residue weights + offset
-                { '*', new [] { 73.0290 } },    // For all residues except for I and T
-                { 'I', new [] { 87.0446, aminoAcidSet.GetAminoAcid('I').Mass - 12.0238 } }, // for isoleucine
-                { 'T', new [] { 87.0446, aminoAcidSet.GetAminoAcid('T').Mass - 12.0238 } }  // for threonine
+                { '*', new [] { 73.0290 - Composition.Hydrogen.Mass } },    // For all residues except for V, I and T
+                { 'V', new [] { 87.0446 - Composition.Hydrogen.Mass } },
+                { 'I', new [] { 87.0446 - Composition.Hydrogen.Mass, aminoAcidSet.GetAminoAcid('I').Mass - 12.0238 - Composition.Hydrogen.Mass } }, // for isoleucine
+                { 'T', new [] { 87.0446 - Composition.Hydrogen.Mass, aminoAcidSet.GetAminoAcid('T').Mass - 12.0238 - Composition.Hydrogen.Mass } }  // for threonine
             };
             W = new BaseIonType("w", false, new CompositionWithDeltaMass(73.0290), aminoAcid => DefaultCompositionCalculator(wIonOffsets, aminoAcid));
 
