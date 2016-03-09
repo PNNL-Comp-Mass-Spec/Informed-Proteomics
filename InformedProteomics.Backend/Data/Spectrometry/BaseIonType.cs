@@ -71,7 +71,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             };
             W = new BaseIonType("w", false, new CompositionWithDeltaMass(73.0290), aminoAcid => DefaultCompositionCalculator(wIonOffsets, aminoAcid));
 
-            AllBaseIonTypes = new List<BaseIonType> { A, Ar, B, C, D, V, W, X, Y, Z, Zr };
+            AllBaseIonTypes = new List<BaseIonType> { A, Ar, B, C, D, V, W, X, Xr, Y, YM1, Z, Zr };
         }
 
         public delegate IEnumerable<Composition> CompositionCalculator(AminoAcid aminoAcid = null);
