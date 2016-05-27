@@ -214,6 +214,21 @@ namespace InformedProteomics.Backend.Utils
             return innerProduct / Math.Sqrt(magnitudeTheo * magnitudeObs);
         }
 
+        public static double GetDotProduct(double[] theorPeakList, double[] observedPeakList)
+        {
+            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
+
+            var innerProduct = 0.0;
+            for (var i = 0; i < theorPeakList.Length; i++)
+            {
+                var theo = theorPeakList[i];
+                var obs = observedPeakList[i];
+                innerProduct += theo * obs;
+            }
+
+            return innerProduct;
+        }
+
         // the smaller the better
         public static double GetDeconToolsFit(double[] theorPeakList, double[] observedPeakList)
         {
