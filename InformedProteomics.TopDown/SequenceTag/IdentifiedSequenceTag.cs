@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace InformedProteomics.Backend.SequenceTag
+namespace InformedProteomics.TopDown.SequenceTag
 {
     public class IdentifiedSequenceTag
     {

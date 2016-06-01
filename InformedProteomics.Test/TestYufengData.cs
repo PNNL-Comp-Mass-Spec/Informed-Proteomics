@@ -13,7 +13,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
-using InformedProteomics.Backend.SequenceTag;
 
 namespace InformedProteomics.Test
 {

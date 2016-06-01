@@ -10,10 +10,10 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
+using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
 //using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 

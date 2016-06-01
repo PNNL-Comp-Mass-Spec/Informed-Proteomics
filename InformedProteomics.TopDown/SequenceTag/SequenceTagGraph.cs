@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 
-namespace InformedProteomics.Backend.SequenceTag
+namespace InformedProteomics.TopDown.SequenceTag
 {
     public class SequenceTagGraph<T> where T : GraphEdge
     {

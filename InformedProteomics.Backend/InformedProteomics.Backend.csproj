@@ -155,13 +155,6 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="SequenceTag\GraphEdge.cs" />
-    <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
-    <Compile Include="SequenceTag\SequenceTag.cs" />
-    <Compile Include="SequenceTag\SequenceTagFinder.cs" />
-    <Compile Include="SequenceTag\SequenceTagGraph.cs" />
-    <Compile Include="SequenceTag\SequenceTagGraphEdge.cs" />
-    <Compile Include="SequenceTag\SequenceTagIndexFinder.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />
