@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class LcMsFeatureLikelihood
     {

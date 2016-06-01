@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class ProteinSpectrumMatchSet : List<ProteinSpectrumMatch>
     {
@@ -130,11 +128,11 @@ namespace InformedProteomics.Backend.MassFeature
         {
             if (SearchToolType == SearchTool.MsGfPlus)
             {
-                return Data.Sequence.Sequence.GetSequenceFromMsGfPlusPeptideStr(Sequence);
+                return Backend.Data.Sequence.Sequence.GetSequenceFromMsGfPlusPeptideStr(Sequence);
             }
             else if (SearchToolType == SearchTool.MsPathFinder)
             {
-                return Data.Sequence.Sequence.CreateSequence(Sequence, Modifications, new AminoAcidSet());
+                return Backend.Data.Sequence.Sequence.CreateSequence(Sequence, Modifications, new AminoAcidSet());
             }
             // todo : MsAlign
 

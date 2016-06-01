@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.MassFeature;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;

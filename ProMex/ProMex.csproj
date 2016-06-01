@@ -71,6 +71,10 @@
       <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
       <Name>InformedProteomics.Backend</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{2451e7b5-3b3e-4059-8530-80489e5188de}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
       <Name>InformedProteomics.TopDown</Name>

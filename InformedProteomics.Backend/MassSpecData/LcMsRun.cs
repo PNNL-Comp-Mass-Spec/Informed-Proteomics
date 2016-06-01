@@ -44,7 +44,7 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Spectra and scan operations
 
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
-        public abstract Ms1Spectrum GetMs1Spectrum(int scanNum);
+        public abstract Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex);
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
 
         public Spectrum GetSummedMs1Spectrum(int scanNum, double elutionTimeTolerance)

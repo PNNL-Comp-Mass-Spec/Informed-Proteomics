@@ -4,7 +4,6 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.Utils;
 using PNNLOmics.Utilities;
 

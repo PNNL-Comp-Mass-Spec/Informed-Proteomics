@@ -60,6 +60,10 @@
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{2451e7b5-3b3e-4059-8530-80489e5188de}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
