@@ -63,7 +63,7 @@ namespace InformedProteomics.TopDown.Execution
                             existingMatches.RemoveWhere(mt => mt.Score < maxScore * ScoreRatioCutoff);
                         }
                     }
-                }                
+                }
             }
         }
 
@@ -71,7 +71,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             return (from matchesWithSameNMods in _matchedSet where matchesWithSameNMods != null from matchesPerSpec in matchesWithSameNMods where matchesPerSpec != null select matchesPerSpec.Count).Sum();
         }
-        
+
         public SortedSet<DatabaseSequenceSpectrumMatch>[] GetMatches(int nModifications)
         {
             return _matchedSet[nModifications];

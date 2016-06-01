@@ -10,7 +10,7 @@
 
         private bool _isScoreCalculated; // for speed-up
         private readonly int _ratio;
-       
+
         private readonly SubScoreFactory _scoringParams;
 
         public FeatureEdge(FeatureNode l, FeatureNode r, SubScoreFactory scoringParams)
@@ -20,12 +20,12 @@
             var ri = r.Feature == null ? 0.0 : r.Feature.IntensityMax;
             var li = l.Feature == null ? 0.0 : l.Feature.IntensityMax;
             _scoringParams = scoringParams;
-            
+
             if (LNode is PrecursorFeatureNode) // TODO fix later when no summed intensity is used
                 _ratio = GetRatioIndex(ri, ri);
             else
                 _ratio = GetRatioIndex(li, ri);
-            
+
             Weight = GetWeight();
         }
 
@@ -33,7 +33,7 @@
         {
             var r = (FragmentFeatureNode)RNode;
             if (LNode is PrecursorFeatureNode)
-                return _scoringParams.GetKLDivergence(r.FragmentIonClassBase, _ratio, r.GroupParameter); 
+                return _scoringParams.GetKLDivergence(r.FragmentIonClassBase, _ratio, r.GroupParameter);
             var l = (FragmentFeatureNode) LNode;
             return _scoringParams.GetKLDivergence(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, l.GroupParameter);
         }
@@ -53,7 +53,7 @@
                 if (RNode.Feature != null) rr /= RNode.Feature.IntensityMax;
                 else rr = 0.0;
 
-                //if (rr > 100 || rr < .01) _ratioScore -= 4; //TODO 
+                //if (rr > 100 || rr < .01) _ratioScore -= 4; //TODO
                 //Console.WriteLine("Prec : " + r.FragmentIonClassBase.Name +"\t" + _ratio + "\t" + RatioScore + "\t" + r.Feature);
 
                 //Console.WriteLine("pre " + _ratioScore);
@@ -62,7 +62,7 @@
             {
                 var l = (FragmentFeatureNode) LNode;
                 _ratioScore = _scoringParams.GetRatioScore(l.FragmentIonClassBase, r.FragmentIonClassBase, _ratio, r.GroupParameter);
-               
+
             }
 
             _isScoreCalculated = true;
@@ -76,15 +76,15 @@
 
         public double GetRatioScore()
         {
-            if (!_isScoreCalculated) CalculateScores(); 
+            if (!_isScoreCalculated) CalculateScores();
             return _ratioScore;
         }
 
 
         static public int GetRatioIndex(double v1, double v2)
         {
-           
-            
+
+
             //if (v2 <= 0) return 0;
             //if (v2 > v1) return -1;
             //return 1;
@@ -138,6 +138,6 @@
             return new[] { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4};
            // return new[] {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
         }
-       
+
     }
 }

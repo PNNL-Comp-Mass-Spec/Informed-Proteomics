@@ -30,7 +30,7 @@ namespace SelectivityScore
             var combinations = CreateNtoTheKCombinations(3, numTransitions);
 
             var pValues = new double[numTransitions + 1];
-            
+
             for (var precursorCharge = _minPrecursorCharge; precursorCharge <= _maxPrecursorCharge; precursorCharge++)
             {
                 var intPeptideMass = GetIntMass((precursorMzTarget - Proton) * precursorCharge - Water);
@@ -118,7 +118,7 @@ namespace SelectivityScore
                             pValue *= _probability[suffixList[i] - suffixList[i - 1]];
                         }
                         pValues[score] += pValue * GetPriorProbability(intPeptideMass, precursorCharge);
-                    }                    
+                    }
                 }
             }
             return pValues;

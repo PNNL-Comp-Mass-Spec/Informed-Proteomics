@@ -31,8 +31,8 @@ namespace InformedProteomics.TopDown.Execution
         public int MaxProductIonCharge { get; private set; }
         public Tolerance PrecursorIonTolerance { get; private set; }
         public Tolerance ProductIonTolerance { get; private set; }
-        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only  
-      
+        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
+
         public void QuickId()
         {
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
@@ -110,7 +110,7 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     Console.WriteLine(@"Processing, {0} proteins done, {1:f1} sec elapsed",
                         numProteins,
-                        sw.Elapsed.TotalSeconds);           
+                        sw.Elapsed.TotalSeconds);
                 }
                 var annotation = annotationAndOffset.Annotation;
                 var offset = annotationAndOffset.Offset;
@@ -157,7 +157,7 @@ namespace InformedProteomics.TopDown.Execution
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
                 Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestScore[ms2ScanNum], bestProtein[ms2ScanNum] ?? "");
-            }            
+            }
         }
     }
 }

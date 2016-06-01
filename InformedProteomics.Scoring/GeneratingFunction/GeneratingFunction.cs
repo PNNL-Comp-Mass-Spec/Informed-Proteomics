@@ -7,8 +7,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 {
     public class GeneratingFunction
     {
-        
-        
+
+
         public GeneratingFunction(IScoringGraph graph)
         {
             _graph = graph;
@@ -95,8 +95,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             }
 
             if (!hasValidEdge) return null; //new ScoreDistribution(0, 1);
-            
-            // considering Target score for fast computing.....max 2 times faster but not useful at this point Scoredistriubtion 
+
+            // considering Target score for fast computing.....max 2 times faster but not useful at this point Scoredistriubtion
             //minScore = Math.Max(_targetScore - _maxAchievableScore[nodeIndex], minScore);
 
             // Compute scoring distribution for the current node
@@ -120,7 +120,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         private readonly int[] _maxScoreAtNode;
         private bool _tableInit;
         private IScoringGraph _graph;
-        
+
         public GeneratingFunction2(int maxPossibleNodes)
         {
             _eValueTable = new double[maxPossibleNodes][];
@@ -187,7 +187,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         }
 
         public void ComputeGeneratingFunction(IScoringGraph graph)
-        {                        
+        {
             if (graph == null) return;
 
             _graph = graph;
@@ -196,7 +196,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             for (var curNodeIndex = 1; curNodeIndex < _graph.GetNumNodes(); curNodeIndex++)
             {
                 var curNodeScore = _graph.GetNodeScore(curNodeIndex);
-                
+
                 // find min/max scores of current node
                 var minScore = int.MaxValue;
                 var maxScore = int.MinValue;
@@ -211,12 +211,12 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                 }
 
                 if (!hasValidEdge) continue;
-                
+
                 _minScoreAtNode[curNodeIndex] = minScore;
                 _maxScoreAtNode[curNodeIndex] = maxScore;
 
                 if (_eValueTable[curNodeIndex].Length < maxScore - minScore + 1) _eValueTable[curNodeIndex] = new double[maxScore - minScore + 1];
-                
+
                 var curNodeEvalues = _eValueTable[curNodeIndex];
                 foreach (var edge in _graph.GetEdges(curNodeIndex))
                 {
@@ -235,10 +235,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                     }
                 }
             }
-            
+
             _tableInit = false;
         }
-      
+
         private void InitTable()
         {
             if (_tableInit) return;

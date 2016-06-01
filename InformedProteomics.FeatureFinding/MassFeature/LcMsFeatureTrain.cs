@@ -41,7 +41,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 return true;
             }
         }
-        
+
         public static ICollection<ProteinSpectrumMatchSet> CollectTrainSet(string pbfFilePath, string idFilePath)
         {
             Modification.RegisterAndGetModification(Modification.Cysteinyl.Name, Modification.Cysteinyl.Composition);
@@ -140,7 +140,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             return true;
         }
 
-        
+
 
 
     }

@@ -21,7 +21,7 @@ namespace InformedProteomics.IMS.IMS
 
         public FeatureSet GetFeatures(double mz, Tolerance tolerance, DataReader.FrameType frameType)
         {
-            var intensityBlock = _uimfUtil.GetXic(mz, tolerance.GetValue(), frameType, 
+            var intensityBlock = _uimfUtil.GetXic(mz, tolerance.GetValue(), frameType,
                 tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Thomson);
             var features = new FeatureSet(intensityBlock);
 
@@ -33,7 +33,7 @@ namespace InformedProteomics.IMS.IMS
             var featureDictionary = new Dictionary<int, FeatureSet>();
 
             var targetMzList = Enumerable.Range(minTargetBin, maxTargetBin - minTargetBin + 1).Select(targetBin => _uimfUtil.GetMzFromBin(targetBin)).ToList();
-            var featureStatisticsDictionary = _featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), frameType, 
+            var featureStatisticsDictionary = _featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), frameType,
                 tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Thomson);
             foreach (var entry in featureStatisticsDictionary)
             {

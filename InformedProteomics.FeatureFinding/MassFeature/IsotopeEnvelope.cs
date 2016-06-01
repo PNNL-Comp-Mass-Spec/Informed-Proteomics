@@ -22,10 +22,10 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 var q = other.Probability[i];
                 bc += Math.Sqrt(p * q);
             }
-            
+
             if (!(bc > 0)) return MaxBhattacharyyaDistance;
 
-            return -Math.Log(bc);            
+            return -Math.Log(bc);
         }
 
         public double GetBhattacharyyaDistance(Ms1Peak[] isotopePeaks)

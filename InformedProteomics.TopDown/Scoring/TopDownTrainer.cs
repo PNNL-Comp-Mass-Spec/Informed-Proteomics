@@ -73,4 +73,3 @@ namespace InformedProteomics.TopDown.Scoring
         }
     }
 }
- 

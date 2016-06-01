@@ -37,7 +37,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
 
             return prsmList;
         }
-      
+
 
         public List<ProteinSpectrumMatch> ReadMsAlignResult(string msAlignResultTablePath, int maxPrsm)
         {
@@ -54,7 +54,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 var k = protNameDesc.IndexOf(' ');
                 var protName = (k < 0) ? protNameDesc : protNameDesc.Substring(0, k);
                 var protDesc = (k < 0) ? protNameDesc : protNameDesc.Substring(k+1);
-                
+
                 var firstResId = int.Parse(parser.GetData("First_residue")[i]);
                 var lastResId = int.Parse(parser.GetData("Last_residue")[i]);
                 var score = double.Parse(parser.GetData("#matched_fragment_ions")[i]);
@@ -145,7 +145,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 var score = double.Parse(scoreColumn[i]);
                 var mod = parser.GetData("Modifications")[i];
                 var evalue = (evalueColumn != null) ? double.Parse(parser.GetData("SpecEValue")[i]) : 0;
-                
+
                 var pre = parser.GetData("Pre")[i];
                 var post = parser.GetData("Post")[i];
                 var proteinLen = int.Parse(parser.GetData("ProteinLength")[i]);

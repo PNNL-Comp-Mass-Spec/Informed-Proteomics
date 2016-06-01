@@ -102,7 +102,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         WorstScore.Total++;
                         if (score.Equals(0))
                             WorstScore.Found++;
-                        
+
                         debugFile.WriteLine("{0}\t{1}", bestscore.Intensity, score);
                     }
                     _intensityHistogram.AddData(bestScores);

@@ -27,7 +27,7 @@ namespace InformedProteomics.Test
 
             var map = new LcMsFeatureMap(testFile,185);
             map.SaveImage(outputFile + "test.png",100);
-        } 
+        }
 
     }
 }

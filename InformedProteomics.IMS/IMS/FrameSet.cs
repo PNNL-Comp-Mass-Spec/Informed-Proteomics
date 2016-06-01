@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.IMS
             {
             }
         }
-    
+
         // Usually the first frame
         public Frame GetMS1Frame()
         {

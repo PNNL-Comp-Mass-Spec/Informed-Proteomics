@@ -41,7 +41,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
 
             //foreach (var aa in AminoAcid.StandardAminoAcidArr)
-            
+
                 /*
                 var keys = _locationSpecificResidueMap[location].Keys.ToArray();
                 Array.Sort(keys);
@@ -55,7 +55,7 @@ namespace InformedProteomics.Test.FunctionalTests
                     }
                     Console.WriteLine();
                 }
-            }     */            
+            }     */
 
 
         }

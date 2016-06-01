@@ -46,21 +46,21 @@ namespace InformedProteomics.TopDown.Scoring
                 else if(isMs1 && line.Length > 0)
                 {
                     var token = line.Split();
-                    if (token.Length != 3) 
+                    if (token.Length != 3)
                         continue;
 
                     featureCountUnfiltered++;
 
                     var charge = Convert.ToInt32(token[2]);
-                    if (charge == 1) 
+                    if (charge == 1)
                         continue;
 
                     var monoMass = Convert.ToDouble(token[0]);
 
-                    if (minMass > monoMass) 
+                    if (minMass > monoMass)
                         minMass = monoMass;
 
-                    if (maxMass < monoMass) 
+                    if (maxMass < monoMass)
                         maxMass = monoMass;
 
                     featureCountFiltered++;

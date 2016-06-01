@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 _maxPercentage = 100;
             }
-            
+
             // Trigger an update, with the proper minimum value for the range
             Report(0.0);
         }

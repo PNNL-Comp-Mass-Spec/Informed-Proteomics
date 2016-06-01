@@ -253,7 +253,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
             var newComposition = new Composition(numC, numH, numN, numO, numS, numP, additionalElements);
 
-            return newComposition;              
+            return newComposition;
         }
 
         public Composition Add(Composition c)

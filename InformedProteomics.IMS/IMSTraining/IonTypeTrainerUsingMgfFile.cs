@@ -12,7 +12,7 @@ namespace InformedProteomics.IMS.IMSTraining
         private readonly Tolerance _tolerance;
         private readonly int _maxCharge;
         private readonly Dictionary<GroupParameter, Dictionary<IonType, double>> _ionFrequencyFunction;
-        public Dictionary<GroupParameter, List<IonType>> IonTypes { get; private set; } 
+        public Dictionary<GroupParameter, List<IonType>> IonTypes { get; private set; }
 
         public IonTypeTrainerUsingMgfFile(List<MSMSSpectrum> spectra, Tolerance tolerance, int maxCharge)
         {
@@ -33,7 +33,7 @@ namespace InformedProteomics.IMS.IMSTraining
                 for (var cutNumber = 1; cutNumber < annotation.Count; cutNumber++)
                 {
                     var groupParameter = spectrum.GetGroupParameter(annotation, cutNumber);
-                    
+
                     if (!_ionFrequencyFunction.ContainsKey(groupParameter))
                         _ionFrequencyFunction[groupParameter] = new Dictionary<IonType, double>();
                     var subIonFrequencyFunction = _ionFrequencyFunction[groupParameter];
@@ -62,7 +62,7 @@ namespace InformedProteomics.IMS.IMSTraining
                 foreach (var ionType in subIonFrequencyFunction.Keys)
                 {
                     if (offsets.Count <= NumberPerGroup || subIonFrequencyFunction[ionType] < offsets[offsets.Count - NumberPerGroup]) continue;
-                    if (subIonTypes.Count < NumberPerGroup) 
+                    if (subIonTypes.Count < NumberPerGroup)
                         subIonTypes.Add(ionType);
                 }
             }

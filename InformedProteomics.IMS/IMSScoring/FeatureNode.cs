@@ -36,10 +36,10 @@ namespace InformedProteomics.IMS.IMSScoring
             for (var k = 0; k < _isotopomerFeatures.Count; k++)
             {
                 i[k] = _isotopomerFeatures.TheoreticalIsotopomerEnvelope[k];
-                
+
                 var lcCorrelation = StatisticsTools.GetLcCorrelation(PrecursorFeature, _isotopomerFeatures[k]);
                 var imsCorrelation = StatisticsTools.GetImsCorrelation(PrecursorFeature, _isotopomerFeatures[k]);
-                
+
                 if (lcCorrelation >= 0.25 && imsCorrelation >= 0.25) //TODO take the good numbers!!
                 {
                     f[k] = _isotopomerFeatures[k];

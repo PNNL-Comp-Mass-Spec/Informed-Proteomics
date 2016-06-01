@@ -204,7 +204,7 @@ namespace InformedProteomics.Test.FunctionalTests
             _ionTypes = new List<IonType> {ionTypeFactory.GetIonType("b"), ionTypeFactory.GetIonType("y-H2O")};
 
 //            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
-            
+
 
 //            var lcms = InMemoryLcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 

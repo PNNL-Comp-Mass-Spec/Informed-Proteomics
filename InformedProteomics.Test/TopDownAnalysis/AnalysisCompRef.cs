@@ -18,7 +18,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
         public const string Ms1FtFolder = @"\\protoapps\UserData\Jungkap\CompRef\ms1ft";
         public const string MsPfFolder = @"\\protoapps\UserData\Jungkap\CompRef\MSPF";
         public const string RawFolder = @"\\protoapps\UserData\Jungkap\CompRef\raw";
-        
+
         internal class CompRefFeatureComparer : INodeComparer<LcMsFeature>
         {
             public CompRefFeatureComparer(Tolerance tolerance = null)
@@ -40,7 +40,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                     return f1.CoElutedByNet(f2, 0.03) && f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches);
                 }
 
-                return f1.CoElutedByNet(f2, 0.01); 
+                return f1.CoElutedByNet(f2, 0.01);
             }
 
             private readonly Tolerance _tolerance;
@@ -65,7 +65,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var rawFile = string.Format(@"{0}\Diabetes_iPSC_Beta_{1}_IMER_{2}May14_Alder_14-01-33.pbf", rawFolder, runLabels[i], k);
                 var mspFile = string.Format(@"{0}\Diabetes_iPSC_Beta_{1}_IMER_{2}May14_Alder_14-01-33_msgfdb_syn.txt", rawFolder, runLabels[i], k);
                 var ms1FtFile = string.Format(@"{0}\Diabetes_iPSC_Beta_{1}_IMER_{2}May14_Alder_14-01-33.ms1ft", rawFolder, runLabels[i], k);
-                
+
                 Console.WriteLine(rawFile);
                 Console.WriteLine(File.Exists(rawFile));
 
@@ -104,13 +104,13 @@ namespace InformedProteomics.Test.TopDownAnalysis
             alignment.AlignFeatures();
 
             Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
-            
+
             for (var i = 0; i < nDataset; i++)
             {
                 alignment.FillMissingFeatures(i);
                 Console.WriteLine("{0} has been processed", runLabels[i]);
             }
-            
+
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
@@ -158,23 +158,23 @@ namespace InformedProteomics.Test.TopDownAnalysis
                                 features[j].ProteinSpectrumMatches.Add(match);
                             }
                         }
-                    }    
+                    }
                 }
-                
 
-                alignment.AddDataSet(i, features, run);                
+
+                alignment.AddDataSet(i, features, run);
             }
 
             alignment.AlignFeatures();
-            
+
             Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
-            
+
             for (var i = 0; i < nDataset; i++)
             {
                 alignment.FillMissingFeatures(i);
                 Console.WriteLine("{0} has been processed", runLabels[i]);
             }
-            
+
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
@@ -182,7 +182,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
         {
             var nDataset = runLabels.Length;
             var writer = new StreamWriter(outputFilePath);
-            
+
             writer.Write("MonoMass");
             writer.Write("\t");
             writer.Write("MinElutionTime");
@@ -200,7 +200,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 writer.Write("\t");
                 writer.Write(dataName + "_Ms1Score");
             }
-            
+
             writer.Write("\t");
             writer.Write("Pre");
             writer.Write("\t");
@@ -284,7 +284,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                     writer.Write("\t");
                     writer.Write(prsm.LastResidue);
                 }
-                
+
                 // spectral count from ms2
                 for (var i = 0; i < nDataset; i++)
                 {
@@ -295,7 +295,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             }
 
             writer.Close();
-            
+
         }
 
     }

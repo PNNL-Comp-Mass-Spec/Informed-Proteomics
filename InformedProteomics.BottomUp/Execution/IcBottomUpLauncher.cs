@@ -130,7 +130,7 @@ namespace InformedProteomics.BottomUp.Execution
 
         /// <remarks>default Both</remarks>
         public DatabaseSearchMode RunTargetDecoyAnalysis { get; set; }
-        
+
         /// <remarks>default 1</remarks>
         public int NumTolerableTermini { get; set; }
 
@@ -283,7 +283,7 @@ namespace InformedProteomics.BottomUp.Execution
             {
                 annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
             }
-            else 
+            else
             {
                 annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength,
                     NumTolerableTermini, 2, Enzyme);
@@ -329,7 +329,7 @@ namespace InformedProteomics.BottomUp.Execution
                     //                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
                     continue;
                 }
-                
+
 
                 //var protCompositions = seqGraph.GetSequenceCompositions();
                 var numProteoforms = seqGraph.GetNumProteoformCompositions();

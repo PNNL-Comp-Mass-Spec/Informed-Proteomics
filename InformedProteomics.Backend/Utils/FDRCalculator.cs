@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "PepQvalue"
-            
+
             if (!CalculatePepQValues(targetResultFilePath, decoyResultFilePath))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
@@ -91,7 +91,7 @@ namespace InformedProteomics.Backend.Utils
 
             int scanNumIndex;
             int proteinIndex;
-           
+
             if (!GetColumnIndex("QValues", "Scan", out scanNumIndex))
                 return false;
 
@@ -122,9 +122,9 @@ namespace InformedProteomics.Backend.Utils
                 var row = distinctSorted[i];
                 var columns = row.Split('\t');
                 var protein = columns[proteinIndex];
-                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) 
+                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix))
                     numDecoy++;
-                else 
+                else
                     numTarget++;
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
@@ -143,7 +143,7 @@ namespace InformedProteomics.Backend.Utils
 
             return true;
         }
-      
+
         private bool CalculatePepQValues(string targetResultFilePath, string decoyResultFilePath)
         {
             string[] concatenated;
@@ -197,7 +197,7 @@ namespace InformedProteomics.Backend.Utils
                                     .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
                                     .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
                                     .Select(grp => grp.First())
-                                    .ToArray();                
+                                    .ToArray();
             }
             else
             {
@@ -213,9 +213,9 @@ namespace InformedProteomics.Backend.Utils
                                                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
                                                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
                                                    .Select(grp => grp.First())
-                                                   .ToArray();                    
+                                                   .ToArray();
             }
-            
+
 
             // Calculate q values
             _headers = _headers.Concat(new[] { "PepQValue" }).ToArray();
@@ -229,9 +229,9 @@ namespace InformedProteomics.Backend.Utils
                 var columns = row.Split('\t');
                 var protein = columns[proteinIndex];
                 var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
-                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) 
+                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix))
                     numDecoy++;
-                else 
+                else
                     numTarget++;
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
@@ -243,7 +243,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
                 pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
-                if (pepQValue[i] <= 0.01) 
+                if (pepQValue[i] <= 0.01)
                     ++NumPeptides;
             }
 
@@ -332,7 +332,7 @@ namespace InformedProteomics.Backend.Utils
                 ErrorMessage = "No results found; cannot compute " + targetStatistic;
                 return false;
             }
-            
+
             scoreIndex = _headers.IndexOf("EValue");
             if (scoreIndex < 0)
             {

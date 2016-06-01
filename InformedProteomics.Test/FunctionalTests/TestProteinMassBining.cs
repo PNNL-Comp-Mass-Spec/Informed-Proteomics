@@ -30,7 +30,7 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(comparer2.NumberOfBins);
 
             var rnd = new Random();
-            
+
             var mass = 0d;
             for (var i = 0; i < 450; i ++)
             {
@@ -63,7 +63,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 var binNum2 = comparer.GetBinNumber(m);
 
                 Console.WriteLine("{0}\t{1}\t{2}", m, binNum1, binNum2);
-            }            
+            }
         }
     }
 }

@@ -159,14 +159,14 @@ namespace InformedProteomics.Test.FunctionalTests
                     Console.WriteLine(@"Fit=" + result);
 
                 if (result < smallestFit)
-                    smallestFit = result;                
+                    smallestFit = result;
             }
 
             Console.WriteLine(@"SmallestFit=" + smallestFit);
             Assert.IsTrue(smallestFit > 0.94);
 
             sw.Stop();
-            
+
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }

@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                 var mz = ion.GetMonoIsotopicMz();
 
                 var offsets = _offsets.GetChargeOffsets(i + 1);
-                
+
                 foreach (var offset in offsets)
                 {
                     var offsetMz = mz + offset;

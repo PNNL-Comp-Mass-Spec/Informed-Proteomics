@@ -28,8 +28,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public double MinMz
         {
-            get 
-            { 
+            get
+            {
                 return IsolationWindowTargetMz - IsolationWindowLowerOffset;
             }
         }

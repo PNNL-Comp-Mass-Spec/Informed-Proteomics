@@ -52,8 +52,8 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             return false;
         }
     }
-    
-    
+
+
     public class ProteinSpectrumMatch : IEquatable<ProteinSpectrumMatch>, IComparable<ProteinSpectrumMatch>
     {
         public ProteinSpectrumMatch(string sequence, int scanNum, double mass, int charge, string protName, string protDesc, int firstResidue, int lastResidue, double score, SearchTool searchTool = SearchTool.Unknown)
@@ -91,7 +91,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
         public int LastResidue { get; private set; }
         public double Score { get; private set; }
         public string SequenceText { get; internal set; }
-        
+
         public string Modifications { get; internal set; }
 
         public SearchTool SearchToolType { get; private set; }
@@ -103,11 +103,11 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             {
                 return SequenceText.Equals(other.SequenceText);
             }
-            
+
             var massDiff = Math.Abs(Mass - other.Mass);
-            var tol = new Tolerance(10);                
+            var tol = new Tolerance(10);
             if (massDiff < tol.GetToleranceAsTh(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue) return true;
-            
+
             return false;
         }
 
@@ -141,7 +141,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
         }
 
 
-      
+
 
 
     }

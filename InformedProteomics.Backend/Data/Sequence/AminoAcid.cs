@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             return StandardAminoAcidCharacters.IndexOf(residue) >= 0;
         }
-        
+
         //Ala (A) 8.26   Gln (Q) 3.93   Leu (L) 9.66   Ser (S) 6.58
         //Arg (R) 5.53   Glu (E) 6.74   Lys (K) 5.83   Thr (T) 5.34
         //Asn (N) 4.06   Gly (G) 7.08   Met (M) 2.41   Trp (W) 1.09

@@ -29,7 +29,7 @@ namespace InformedProteomics.Backend.Data.Composition
         public new Composition Add(Composition c)
         {
             var comWithDelta = c as CompositionWithDeltaMass;
-            return comWithDelta == null ? 
+            return comWithDelta == null ?
                 new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass)
                 : new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
         }

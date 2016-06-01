@@ -124,7 +124,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var prefixIonMass = peak.Mass;
                 var prefixFragmentMass = prefixIonMass - prefixOffsetMass;
                 var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
-                
+
                 if (binIndex >= 0 && binIndex < numNodes)
                     prefixFragScores[binIndex] = GetMatchedIonPeakScore(true, peak);
 

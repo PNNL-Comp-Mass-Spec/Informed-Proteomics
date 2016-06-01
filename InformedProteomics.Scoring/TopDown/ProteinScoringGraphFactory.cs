@@ -45,11 +45,11 @@ namespace InformedProteomics.Scoring.TopDown
                 }
             }
         }
-    
+
         public IScoringGraph CreateScoringGraph(ProductSpectrum deconvSpectrum, double proteinMass)
         {
             if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
-            
+
             var nodeScores = (deconvSpectrum != null)
                 ? GetNodeScores(deconvSpectrum, proteinMass)
                 : new int[_comparer.GetBinNumber(proteinMass) + 1];
@@ -117,7 +117,7 @@ namespace InformedProteomics.Scoring.TopDown
             {
                 var prefixIonMass = peak.Mz;
                 var prefixFragmentMass = prefixIonMass - prefixOffsetMass;
-                
+
                 var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
                 if (binIndex < 0 || binIndex >= numNodes) continue;
                 nodeScores[binIndex] = 1;
@@ -134,7 +134,7 @@ namespace InformedProteomics.Scoring.TopDown
                 if (binIndex < 0 || binIndex >= numNodes) continue;
                 if (nodeScores[binIndex] < 2) nodeScores[binIndex]++;
             }
-            return nodeScores;            
+            return nodeScores;
         }
 
         private const int EdgeScore = 0;
@@ -158,7 +158,7 @@ namespace InformedProteomics.Scoring.TopDown
             public AminoAcid AminoAcid { get; private set; }
             public double Probability { get; private set; }
         }
-        
+
         internal class ProteinScoringGraph : IScoringGraph
         {
             internal ProteinScoringGraph(int[] nodeScores, List<ScoringGraphEdge>[] adjList)

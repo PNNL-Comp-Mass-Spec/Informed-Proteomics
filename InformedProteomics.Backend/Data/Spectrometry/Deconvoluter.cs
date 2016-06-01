@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         // Select the best peak within +/- filteringWindowSize
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
-            Peak[] peaks, int minCharge, int maxCharge, 
+            Peak[] peaks, int minCharge, int maxCharge,
             int isotopeOffsetTolerance, double filteringWindowSize,
             Tolerance tolerance, double corrScoreThreshold)
         {
@@ -150,11 +150,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     nextIndex++;
                 }
                 if (rank <= topRankCutoff) retSpec.Add(thisPeak);
-            }                
+            }
 
             return retSpec;
         }
 
-        
+
     }
 }

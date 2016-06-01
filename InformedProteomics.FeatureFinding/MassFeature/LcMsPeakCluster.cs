@@ -10,7 +10,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
     public class LcMsPeakCluster : LcMsFeature
     {
         public LcMsPeakCluster(LcMsRun run, ObservedIsotopeEnvelope observedEnvelope)
-            : this(run, observedEnvelope.TheoreticalEnvelope, observedEnvelope.MonoMass, observedEnvelope.Charge, 
+            : this(run, observedEnvelope.TheoreticalEnvelope, observedEnvelope.MonoMass, observedEnvelope.Charge,
             observedEnvelope.RepresentativePeak.Mz, observedEnvelope.ScanNum, observedEnvelope.Abundance)
         {
         }
@@ -76,7 +76,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
             MinCharge = targetMinCharge;
             MaxCharge = targetMaxCharge;
-            
+
             var rnd = new Random();
             var comparer = new MzComparerWithBinning(28);
             var mostAbuInternalIndex = TheoreticalEnvelope.IndexOrderByRanking[0];
@@ -141,11 +141,11 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             var maxCol = ms1ScanNumToIndex[MaxScanNum];
             var nCols = maxCol - minCol + 1;
             var mostAbuIdx = TheoreticalEnvelope.IndexOrderByRanking[0];
-            
+
             ClearScore();
 
             var bestChargeDist = new double[]{10.0d, 10.0d};
-            // sum envelopes at each charge 
+            // sum envelopes at each charge
             var summedIntensity = new double[TheoreticalEnvelope.Size];
 
             var xicLen = nCols + 18;
@@ -156,7 +156,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 xicLen = 13;
                 xicStartIdx = (int) Math.Floor((xicLen - nCols)*0.5);
             }*/
-            
+
             var xic2 = new double[2][];
             xic2[0] = new double[xicLen];
             xic2[1] = new double[xicLen];
@@ -189,14 +189,14 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 {
                     var envelope = Envelopes[i][j];
                     var col = minCol + j;
-                    
+
                     var localWin = ms1Spectra[col].GetLocalMzWindow(mostAbuMz);
 
                     if (envelope == null) continue;
-                    
+
                     envelope.Peaks.SumEnvelopeTo(summedIntensity);
                     var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                        
+
                     if (mostAbuPeak != null && mostAbuPeak.Active)
                     {
                         summedMostAbuIsotopeIntensity += mostAbuPeak.Intensity;
@@ -235,7 +235,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                                 BestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
                             else BestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
                         }
-                        
+
                         BestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(BestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
 
                         if (newBcDist < repEnvelopeBcDist)
@@ -290,7 +290,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             // when good envellope is observed at only either even or odd charge...
             if (BestCorrelationScoreAcrossCharge[0] > 0.7 && BestCorrelationScoreAcrossCharge[1] < 0.5)
             {
-                const int i = 1;    
+                const int i = 1;
                 BestCorrelationScoreAcrossCharge[i] = tempBestCorrelationScoreAcrossCharge[i];
                 BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
                 BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
@@ -303,12 +303,12 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 BestIntensityScoreAcrossCharge[i] = tempBestIntensityScoreAcrossCharge[i];
                 BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
             }
-            
+
             // normalize abudnace across charges
             var s = AbundanceDistributionAcrossCharge[0] + AbundanceDistributionAcrossCharge[1];
             if (s > 0)
             {
-                for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++) AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;    
+                for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++) AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;
             }
 
             if (nCols > 1)
@@ -326,7 +326,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 // set representative charge, mz and scanNum
                 RepresentativeCharge = repEnvelope.Charge;
                 RepresentativeMz = repEnvelope.RepresentativePeak.Mz;
-                RepresentativeScanNum = repEnvelope.ScanNum;                
+                RepresentativeScanNum = repEnvelope.ScanNum;
             }
 
             _initScore = true;
@@ -370,9 +370,9 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             if (MinCharge < 0 || envelope.Charge < MinCharge)
             {
                 MinCharge = envelope.Charge;
-            }            
+            }
         }
-   
+
         public void ExpandElutionRange()
         {
             // considering DDA instrument
@@ -402,7 +402,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 }
             }
         }
-        
+
         public IEnumerable<ObservedIsotopeEnvelope> EnumerateEnvelopes()
         {
             for (var i = 0; i < Envelopes.Length; i++)
@@ -426,7 +426,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                     if (TheoreticalEnvelope.Isotopes[i].Ratio > 0.3)
                     {
                         var peak = envelope.Peaks[i];
-                        if (peak != null && peak.Active) yield return peak;                        
+                        if (peak != null && peak.Active) yield return peak;
                     }
                 }
             }
@@ -446,7 +446,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                         if (peak != null && peak.Active) yield return peak;
                     }
                 }
-            }            
+            }
         }
 
         public void ActivateAllPeaks()
@@ -494,7 +494,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 if (Mass > 35000) return BestCorrelationScore > 0.85;
                 if (Mass > 25000) return BestCorrelationScore > 0.8;
                 if (Mass > 15000) return BestCorrelationScore > 0.75;
-                return BestCorrelationScore > 0.7;                
+                return BestCorrelationScore > 0.7;
             }
         }
         public double ApexElutionTime { get { return _run.GetElutionTime(ApexScanNum); } }
@@ -523,16 +523,16 @@ namespace InformedProteomics.FeatureFinding.MassFeature
         }
 
         //public readonly int DetectableMaxCharge;
-        //public readonly int DetectableMinCharge; 
+        //public readonly int DetectableMinCharge;
         public ObservedIsotopeEnvelope[][] Envelopes;
 
         public readonly int[] BestCharge;
         public readonly double[] RepresentativeSummedEnvelop;
-        
+
         public readonly double[] EnvelopeDistanceScoreAcrossCharge;
         public readonly double[] EnvelopeCorrelationScoreAcrossCharge;
         public readonly double[] EnvelopeIntensityScoreAcrossCharge;
-        
+
         public readonly double[] AbundanceDistributionAcrossCharge;
 
         public readonly double[] BestCorrelationScoreAcrossCharge;

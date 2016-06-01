@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Utils
 		/// <param name="x">The first object.</param>
 		/// <param name="y">The second object.</param>
 		/// <returns>
-		/// Less than zero if the first object precedes the second. 
+		/// Less than zero if the first object precedes the second.
 		/// Zero if the objects occur in the same position.
 		/// Greater than zero if the first object follows the second.
 		/// </returns>

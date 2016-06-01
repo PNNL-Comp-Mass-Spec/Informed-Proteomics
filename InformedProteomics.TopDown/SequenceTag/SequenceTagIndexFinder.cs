@@ -172,7 +172,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var startIndex = start - 1;
             var endIndex = end - 1;
             var peaks = new List<Peak>();
-           
+
             for (var i = startIndex; i <= endIndex; i++)
             {
                 if (i > prefixPeaks.Length) continue;
@@ -191,7 +191,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var startIndex = start - 1;
             var endIndex = end - 1;
             var peaks = new List<Peak>();
-            
+
             for (var i = startIndex; i <= endIndex; i++)
             {
                 if (i > suffixPeaks.Length-1) continue;

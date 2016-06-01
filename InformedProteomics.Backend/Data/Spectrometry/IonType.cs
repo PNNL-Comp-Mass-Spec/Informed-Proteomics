@@ -17,9 +17,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double _offsetMass;    // duplication but stored for performance
 
         internal IonType(
-            string name, 
+            string name,
             Composition.Composition offsetComposition,
-            int charge, 
+            int charge,
             BaseIonType baseIonType,
             NeutralLoss neutralLoss
             )
@@ -114,5 +114,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return IsPrefixIon.GetHashCode()*OffsetComposition.GetHashCode()*Charge.GetHashCode();
         }
     }
-  
+
 }

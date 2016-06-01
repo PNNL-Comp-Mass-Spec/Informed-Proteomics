@@ -31,7 +31,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 }
             }
         }
-        
+
         public ProteinSpectrumMatch FindByFeature(LcMsFeature feature, Tolerance tolerance)
         {
             return FindByFeature(feature.Mass, feature.MinScanNum, feature.MaxScanNum, tolerance);
@@ -100,13 +100,13 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             return uniqueSeq.Count;
         }
 
-        public readonly List<ProteinSpectrumMatch> ProteinSpectrumMatches; 
+        public readonly List<ProteinSpectrumMatch> ProteinSpectrumMatches;
         public readonly LcMsRun Run;
         public int DataId { get; private set; }
         public string DataDesc { get; private set; }
         public const double FdrCutoff = 0.01;
         private readonly Dictionary<int, ProteinSpectrumMatch> _scanNumToMatchMap;
-        
+
 
     }
 }

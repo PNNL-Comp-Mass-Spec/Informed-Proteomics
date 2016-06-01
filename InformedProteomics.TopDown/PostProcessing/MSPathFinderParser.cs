@@ -59,9 +59,9 @@ namespace InformedProteomics.TopDown.PostProcessing
 
             for (var i = 0; i < parser.NumData; i++)
             {
-                var id = new MsPathFinderId(scan[i], pre[i], sequence[i], post[i], mod[i], 
+                var id = new MsPathFinderId(scan[i], pre[i], sequence[i], post[i], mod[i],
                     composition[i], proteinName[i], proteinDesc[i], proteinLength[i],
-                    start[i], end[i], charge[i], mostAbundantIsotopeMz[i], mass[i], 
+                    start[i], end[i], charge[i], mostAbundantIsotopeMz[i], mass[i],
                     numMatchedFragment[i], qValue[i], pepQValue[i])
                 ;
                 _idList.Add(id);

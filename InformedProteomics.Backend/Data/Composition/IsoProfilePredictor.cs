@@ -72,7 +72,7 @@ namespace InformedProteomics.Backend.Data.Composition
         private static readonly double[] ProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
         private static int[][][] _possibleIsotopeCombinations;
 
-        private static void ComputePossibleIsotopeCombinations(int max) // called just once. 
+        private static void ComputePossibleIsotopeCombinations(int max) // called just once.
         {
             var comb = new List<int[]>[max + 1];
             var maxIsotopeNumberInElement = ProbC.Length - 1;

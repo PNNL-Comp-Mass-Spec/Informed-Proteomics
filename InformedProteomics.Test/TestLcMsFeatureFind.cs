@@ -31,7 +31,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 1.4826, 0);
             var ms1ScanNums = run.GetMs1ScanVector();
-            
+
             var featureFinder = new LcMsPeakMatrixLowResolution(run);
 
             foreach (var scan in ms1ScanNums)
@@ -41,7 +41,7 @@ namespace InformedProteomics.Test
             }
 
             var features = featureFinder.GetLcMsFeatures();
-            
+
             var writer = new StreamWriter(ms1ft);
             var id = 1;
             writer.WriteLine("FeatureID\tMinScan\tMaxScan\tMinCharge\tMaxCharge\tMonoMass\tAbundance\tRepScan\tMaxElutionTime\tElutionLength\tLikelihoodRatio");
@@ -50,7 +50,7 @@ namespace InformedProteomics.Test
                 writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}", id, feature.MinScanNum, feature.MaxScanNum, feature.MinCharge,
                     feature.MaxCharge, feature.Mass,  feature.Abundance, feature.RepresentativeScanNum, feature.MinElutionTime, feature.MaxElutionTime, 0);
                 id++;
-            }            
+            }
             writer.Close();
         }
 
@@ -62,7 +62,7 @@ namespace InformedProteomics.Test
 
             const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf";
             //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            
+
             if (!File.Exists(rawFile))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
@@ -76,13 +76,13 @@ namespace InformedProteomics.Test
             //feature = featureFinder.GetLcMsPeakCluster(8151.3706, 7, 13, 4201, 4266);
 
             //feature = featureFinder.GetLcMsPeakCluster(8151.41789, 7, 13, 2861, 2941);
-            
+
             var ms1ScanToIndex = run.GetMs1ScanNumToIndex();
             var minCol = ms1ScanToIndex[feature.MinScanNum];
             var maxCol = ms1ScanToIndex[feature.MaxScanNum];
             //var minRow = feature.MinCharge - LcMsPeakMatrix.MinScanCharge;
             //var maxRow = feature.MaxCharge - LcMsPeakMatrix.MinScanCharge;
-            
+
             Console.WriteLine("---------------------------------------------------------------");
             for (var i = 0; i < feature.Envelopes.Length; i++)
             {
@@ -114,8 +114,8 @@ namespace InformedProteomics.Test
                 }
                 Console.Write("\n");
             }
-            
-            
+
+
 
 
 
@@ -178,7 +178,7 @@ namespace InformedProteomics.Test
 
             // write result files
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
-            
+
 
             stopwatch.Stop();
 
@@ -191,7 +191,7 @@ namespace InformedProteomics.Test
             var featureId = 0;
             var ms1ScanNums = run.GetMs1ScanVector();
             //tsvWriter.WriteLine(GetHeaderString() + "\tQMinScanNum\tQMaxScanNum\tQMinCharge\tQMaxCharge\tQAbundance");
-            
+
             var filteredFeatures = container.GetFilteredFeatures(featureFinder);
             foreach (var feature in filteredFeatures)
             {

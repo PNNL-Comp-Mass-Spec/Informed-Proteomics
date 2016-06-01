@@ -7,7 +7,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class InMemoryLcMsRun : LcMsRun //LcMsRun 
+    public class InMemoryLcMsRun : LcMsRun //LcMsRun
     {
         private struct SpectrumTrackingInfo
         {
@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="singleScanNum"></param>
@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="scanStart"></param>
@@ -52,7 +52,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
@@ -65,7 +65,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -74,17 +74,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
-            string specFilePath, 
-            double precursorSignalToNoiseRatioThreshold, 
+            string specFilePath,
+            double precursorSignalToNoiseRatioThreshold,
             double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
             return GetLcMsRun(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), precursorSignalToNoiseRatioThreshold,
                 productSignalToNoiseRatioThreshold, progress);
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -96,11 +96,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
-            string specFilePath, 
+            string specFilePath,
             IMassSpecDataReader specReader,
-            double precursorSignalToNoiseRatioThreshold, 
-            double productSignalToNoiseRatioThreshold, 
-            IProgress<ProgressData> progress = null,            
+            double precursorSignalToNoiseRatioThreshold,
+            double productSignalToNoiseRatioThreshold,
+            IProgress<ProgressData> progress = null,
             int scanStart = 0,
             int scanEnd = 0)
         {
@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -131,7 +131,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -149,11 +149,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return PbfLcMsRun.ConvertToPbf(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath),
                 precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
         }
-      
+
         public InMemoryLcMsRun(
-            IMassSpecDataReader massSpecDataReader, 
-            double precursorSignalToNoiseRatioThreshold, 
-            double productSignalToNoiseRatioThreshold,            
+            IMassSpecDataReader massSpecDataReader,
+            double precursorSignalToNoiseRatioThreshold,
+            double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null,
             int scanStart = 0,
             int scanEnd = 0)
@@ -207,7 +207,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
                 }
             }
-                        
+
             progressData.Status = "Processing Isolation Bins";
             progressData.IsPartialRange = false;
             progressData.Report(95.1);

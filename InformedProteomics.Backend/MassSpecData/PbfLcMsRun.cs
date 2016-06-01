@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /** File format id history
          * 150604: Earliest supported, has all data needed by InformedProteomics projects
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
-         * 
+         *
          */
 
         #region Public static functions
@@ -35,7 +35,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -56,9 +56,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
-            string specFilePath, 
-            double precursorSignalToNoiseRatioThreshold, 
-            double productSignalToNoiseRatioThreshold, 
+            string specFilePath,
+            double precursorSignalToNoiseRatioThreshold,
+            double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
             var specReader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath);
@@ -66,7 +66,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -283,7 +283,7 @@ namespace InformedProteomics.Backend.MassSpecData
             CreatePrecursorNextScanMap();
         }
 
-        public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null, 
+        public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
             double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null)
         {
             string pbfPath2, fileName, tempPath;
@@ -532,7 +532,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var newXic = new Xic();
-            
+
             newXic.AddRange(GetFragmentationSpectraScanNums(precursorMz).Select(scanNum => scanToXicPoint[scanNum - MinLcScan] ?? new XicPoint(scanNum, 0, 0)));
             return newXic;
         }

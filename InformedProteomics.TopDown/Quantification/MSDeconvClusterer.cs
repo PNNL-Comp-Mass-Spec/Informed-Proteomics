@@ -22,7 +22,7 @@ namespace InformedProteomics.TopDown.Quantification
         public List<List<MSDeconvNode>> GetClustersList(Tolerance tol, double elutionInterval,List<MSDeconvNode> nodeList)
         {
             var edgeDict = GetEdges(nodeList,tol,elutionInterval);
-            
+
             var connectedComponents = new List<List<MSDeconvNode>>();
             var nodesInComponenets = new Dictionary<MSDeconvNode,int>();
 
@@ -31,7 +31,7 @@ namespace InformedProteomics.TopDown.Quantification
                 if (!nodesInComponenets.ContainsKey(nodeList[i]))
                 {
                     connectedComponents.Add(GetConnectedComponenet(nodeList[i],edgeDict,nodesInComponenets));
-                }           
+                }
             }
 
             /**foreach (var c in connectedComponents)
@@ -66,7 +66,7 @@ namespace InformedProteomics.TopDown.Quantification
                 var halfIndex = c.Count() / 2;
                 var medianMass = c[0].RealMonoMass;
                 if (c.Count()%2 == 0)
-                { 
+                {
                     medianMass = (sortedMono.ElementAt(halfIndex).RealMonoMass +
                               sortedMono.ElementAt(halfIndex - 1).RealMonoMass)/2;
                 }
@@ -98,7 +98,7 @@ namespace InformedProteomics.TopDown.Quantification
                     var deltaMass = Math.Abs(nodeList[i].RealMonoMass - n1.RealMonoMass);
                     if(deltaMass <= tol.GetValue()) edgeDict[n1].Add(nodeList[i]);
                 }
-                
+
             }
             return edgeDict;
         }
@@ -149,7 +149,7 @@ namespace InformedProteomics.TopDown.Quantification
                     break;
                 }
             }
-            
+
             return new Tuple<int, int>(startIndex,endIndex);
         }
 

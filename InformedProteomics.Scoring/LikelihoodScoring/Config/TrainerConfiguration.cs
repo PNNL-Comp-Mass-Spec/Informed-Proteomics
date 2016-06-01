@@ -19,7 +19,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public string DataPath { get; private set; }
         public string OutputPath { get; private set; }
         public DataFileFormat DataFormat { get; private set; }
-        
+
         public int MaxRanks { get; private set; }
         public double RelativeIntensityThreshold { get; private set; }
 
@@ -38,7 +38,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public double WindowWidth { get; private set; }
         public double PrecursorOffsetWidth { get; private set; }
         public double PrecursorOffsetThreshold { get; private set; }
-        
+
         public const double BinWidth = 1.005;
         public int MassBinSize { get; private set; }
         public const double MassErrorBinWidth = 0.01;

@@ -29,7 +29,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             ScanNum = scanNum;
         }
-        
+
         public int ScanNum { get; protected set; }
 
 		public string NativeId { get; set; }
@@ -63,7 +63,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Gets a list of peaks within [minMz, maxMz] 
+        /// Gets a list of peaks within [minMz, maxMz]
         /// </summary>
         /// <param name="minMz">minimum m/z</param>
         /// <param name="maxMz">maximum m/z</param>
@@ -488,7 +488,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         for (var i = prevSt; i <= prevEd; i++) intensityValues.Remove(Peaks[i].Intensity);
                     }
                 }
-                
+
                 var intensityMedian = intensityValues.Median();
                 if (peak.Intensity > intensityMedian*signalToNoiseRatio) filteredPeaks.Add(peak);
 
@@ -514,7 +514,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 maxCount = histogram[i].Count;
                 mostAbundantBinIndex = i;
             }
-            
+
             return histogram[mostAbundantBinIndex];
         }
 
@@ -551,7 +551,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     continue;
 
                 filteredPeaks.Add(peak);
-                
+
             }
             filteredPeaks.Sort();
             Peaks = filteredPeaks.ToArray();
@@ -577,7 +577,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var intensitySlope = spline.EvalSlope(mzData);
 
             var filteredPeaks = new List<Peak>();
-            
+
             for (i = 0; i < Peaks.Length; i++)
             {
                 if (Math.Abs(intensitySlope[i]) > slopeThreshold)
@@ -592,7 +592,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             filteredSpec.FilterNoise(signalToNoiseRatio);
             return filteredSpec;
         }
-        
+
         public Spectrum GetFilteredSpectrumBySlope(double slopeThreshold = 0.33)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();

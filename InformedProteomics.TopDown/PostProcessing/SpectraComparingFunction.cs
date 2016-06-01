@@ -24,7 +24,7 @@ namespace InformedProteomics.TopDown.PostProcessing
             var featureVector1 = ConvertToFullIntensityVector(spectrum1,vectorLength,comparer);
             var featureVector2 = ConvertToFullIntensityVector(spectrum2, vectorLength,comparer);
 
-  
+
             var sum = 0d;
             for (int i = 0; i < vectorLength; i++)
             {
@@ -38,13 +38,13 @@ namespace InformedProteomics.TopDown.PostProcessing
 
         public double PearsonCorrelation(Peak[] spectrum1, Peak[] spectrum2,FilteredProteinMassBinning comparer)
         {
-            
+
             var spec1Bar = 0d;
             var spec2Bar = 0d;
 
             spectrum1 = GuassianFilter(spectrum1, .5);
             spectrum2 = GuassianFilter(spectrum2, .5);
-            var vectorLength = comparer.GetBinNumber(10000.0); 
+            var vectorLength = comparer.GetBinNumber(10000.0);
 
             spec1Bar = spectrum1.Sum(x => x.Intensity)/vectorLength;
             spec2Bar = spectrum1.Sum(y => y.Intensity)/vectorLength;

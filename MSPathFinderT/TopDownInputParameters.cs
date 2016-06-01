@@ -95,7 +95,7 @@ namespace MSPathFinderT
         public void Display()
         {
             Console.WriteLine("MaxThreads: " + MaxNumThreads);
-            
+
             foreach (var specFilePath in SpecFilePaths)
             {
                 Console.WriteLine("SpectrumFilePath: " + specFilePath);
@@ -232,7 +232,7 @@ namespace MSPathFinderT
             }
 
             var currentParameter = string.Empty;
-           
+
             try
             {
                 currentParameter = "-feature";
@@ -248,7 +248,7 @@ namespace MSPathFinderT
 
                 currentParameter = "-t";
                 PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
-                
+
                 currentParameter = "-f";
                 ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
 

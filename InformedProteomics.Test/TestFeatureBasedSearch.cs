@@ -144,7 +144,7 @@ namespace InformedProteomics.Test
                 break;
             }
         }
-        
+
         [Test]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
@@ -220,9 +220,9 @@ namespace InformedProteomics.Test
                     var nTermMass = protein.GetMass(0, matchedTag.StartIndex);
                     var cTermMass = protein.GetMass(matchedTag.EndIndex, protein.Count);
                     Console.WriteLine("\t{0} ({1})\t{2}\t{3} ({4})\t{5}\t{6}\t{7}",
-                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass), 
-                        seq, 
-                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass), 
+                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass),
+                        seq,
+                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass),
                         matchedTag.StartIndex,
                         matchedTag.IsNTermFlankingMassReliable, matchedTag.IsCTermFlankingMassReliable);
 

@@ -136,7 +136,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             observedCharge = 0;
             envelopeCorr = 0d;
             envelopeDist = 1.0d;
-            
+
             if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz) return null;
 
             var fragmentIonMostAbuMass = fragmentIonMass + Constants.C13MinusC12 * mostAbundantIsotopeIndex;
@@ -163,7 +163,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
             return intenseObservedPeaks;
         }
-        
+
         public static Tuple<double, double> GetDistCorr(Ion ion, Peak[] observedPeaks)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
@@ -179,15 +179,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             //var corr = FitScoreCalculator.GetPearsonCorrelation(envelope, observedIntensities);
             //return new Tuple<double, double>(bcDist, corr);
         }
-        
+
         public readonly Spectrum Ms2Spectrum;
         protected readonly Tolerance Tolerance;
         protected readonly int MinProductCharge;
         protected readonly int MaxProductCharge;
         protected readonly BaseIonType[] BaseIonTypes;
-        
+
         protected double RelativeIsotopeIntensityThreshold;
-        
+
         protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         static AbstractFragmentScorer()
         {

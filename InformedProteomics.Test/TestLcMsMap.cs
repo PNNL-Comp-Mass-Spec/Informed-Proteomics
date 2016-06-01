@@ -14,7 +14,7 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsMap
     {
-        
+
         [Test]
         public void TestMs1Filter()
         {
@@ -48,7 +48,7 @@ namespace InformedProteomics.Test
                 var matchingMass = ms1ftFilter.GetMatchingMass(ms2ScanNum);
                 n += matchingMass.Count();
             }
-            
+
             Console.WriteLine("{0} / {1}", n, ms2ScanNums.Count);
             /*
             var tsvReader = new TsvFileParser(idFilePath);
@@ -68,7 +68,7 @@ namespace InformedProteomics.Test
                 var mod = tsvReader.GetData("Modifications")[i];
                 var nMatched = int.Parse(tsvReader.GetData("#MatchedFragments")[i]);
 
-                
+
 
                 var hit = false;
                 foreach (var ms2Scan in ms1ftFilter.GetMatchingMs2ScanNums(mass))
@@ -86,7 +86,7 @@ namespace InformedProteomics.Test
                 }
             }*/
         }
-        
+
         /*
         public void TestCalculatingNumBins()
         {

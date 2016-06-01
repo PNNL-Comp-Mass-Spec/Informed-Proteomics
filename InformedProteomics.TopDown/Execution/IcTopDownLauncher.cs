@@ -165,7 +165,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         /// <summary>
-        /// 0: all internal sequences, 
+        /// 0: all internal sequences,
         /// 1: #NCleavages <= Max OR Cleavages <= Max (Default)
         /// 2: 1: #NCleavages <= Max AND Cleavages <= Max
         /// </summary>
@@ -351,7 +351,7 @@ namespace InformedProteomics.TopDown.Execution
                 _tagSearchEngine = new ScanBasedTagSearchEngine(_run, seqTagGen, new LcMsPeakMatrix(_run, ms1Filter), targetDb, ProductIonTolerance, AminoAcidSet,
                                 _ms2ScorerFactory2,
                                 ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
-                                MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);                
+                                MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);
             }
 
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
@@ -422,7 +422,7 @@ namespace InformedProteomics.TopDown.Execution
                     Console.WriteLine(@"Tag-based searching the decoy database");
                     sw.Start();
                     RunTagBasedSearch(decoyMatches, decoyDb, null, prog);
-                    Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);                    
+                    Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
                 }
                 progData.MaxPercentage = 95.0;
 
@@ -543,7 +543,7 @@ namespace InformedProteomics.TopDown.Execution
                         ModificationText = tagSequenceMatch.TagMatch.ModificationText,
                     };
 
-                    AddMatch(matches, ms2ScanNum, prsm);    
+                    AddMatch(matches, ms2ScanNum, prsm);
                 }
 
                 SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");

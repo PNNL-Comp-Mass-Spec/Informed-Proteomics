@@ -19,7 +19,7 @@ namespace InformedProteomics.IMS.IMSTraining
             Console.WriteLine("Number of spectra: " + spectra.Count);
             var ionTypeTrainer = new IonTypeTrainerUsingMgfFile(spectra, tolerance, maxCharge);
             ionTypeTrainer.Train();
-           
+
             /*Console.WriteLine("Number of ion types: " + ionTypeTrainer.IonTypes.Count);
             foreach (var groupParameter in ionTypeTrainer.IonTypes.Keys)
             {
@@ -54,7 +54,7 @@ namespace InformedProteomics.IMS.IMSTraining
             ratioScoreTrainerD.Train();
             Write(outFileName, ionTypeTrainer, isotopeIntensityCorrelationScoreTrainerD, ratioScoreTrainerD, true);
             Console.WriteLine("Ion Ratio Training Done (Decoy)");
-            
+
         }
 
         private static void WriteIonTypes(string outFileName, IonTypeTrainerUsingMgfFile ionTypeTrainer)
@@ -77,7 +77,7 @@ namespace InformedProteomics.IMS.IMSTraining
         {
             var writer = new StreamWriter(outFileName, true);
             if(isDecoy) writer.WriteLine("###DECOY");
-            var isotope = isotopeIntensityCorrelationScoreTrainer.IsotopeIntensityCorrProbDictionary; 
+            var isotope = isotopeIntensityCorrelationScoreTrainer.IsotopeIntensityCorrProbDictionary;
             writer.Write("##ISOTOPE\n");
             foreach (var groupParameter in isotope.Keys)
             {
@@ -106,7 +106,7 @@ namespace InformedProteomics.IMS.IMSTraining
                 {
                     writer.Write("#I");
                     writer.Write("\t" + si.IndexOf(ionTypes.Item1) + "\t" + si.IndexOf(ionTypes.Item2));
-                        
+
                     writer.Write("\n");
                     var t = s[ionTypes];
                     foreach (var k in t.Keys)

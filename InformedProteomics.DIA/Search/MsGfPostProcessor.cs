@@ -341,7 +341,7 @@ namespace InformedProteomics.DIA.Search
                 if (!match.IsValid || match.Protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) continue;
 
                 _msGfMatches.Add(match);
-            }                
+            }
             _msGfMatches.Sort();
         }
 

@@ -251,7 +251,7 @@ namespace InformedProteomics.Test.Obsolete
     //        const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
     //        var imsData = new ImsDataCached(uimfFilePath);
     //        var imsScorerFactory = new ImsScorerFactory(paramFile);
-        
+
     //        var num = 0;
     //        var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
 
@@ -260,11 +260,11 @@ namespace InformedProteomics.Test.Obsolete
     //         * K.VPELDDEDSSLKLDDELMKTSAR.T -154
     //    K.SHQSLMVQSQDQLAEVHEPDK.L -151
 
-    //         * 
-    //         * 
-    //         * 
+    //         *
+    //         *
+    //         *
     //         * target
-    //         * 
+    //         *
     //         R.FTVDRPFLFLIYEHR.T 77
     //         K.SEVMFFADATSHLEEK.K -55
     //    K.GNKPDFHLAMPTEQAEGFYNSFLEQLR.K -209
@@ -295,7 +295,7 @@ namespace InformedProteomics.Test.Obsolete
     //                    // Console.WriteLine("Feature: " + precursorFeature);
     //                    Console.WriteLine("Precursor score: " + score);
     //                   // continue;
-    //                    // if (score < -0.5) continue; 
+    //                    // if (score < -0.5) continue;
     //                    var portionExplainedFrags = 0.0;
     //                    for (var cutNumber = 1; cutNumber < pep.Length; cutNumber++)
     //                    {
@@ -319,9 +319,9 @@ namespace InformedProteomics.Test.Obsolete
     //                }
     //            }
     //    Console.WriteLine("Max Score " + maxScore);
-                
+
     //    }
-    
+
     }
 
 

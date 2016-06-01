@@ -153,7 +153,7 @@ namespace InformedProteomics.Test.Obsolete
 //            sw.Reset();
 //            sw.Start();
 //            var targetMzList = Enumerable.Range(minTargetBin, maxTargetBin - minTargetBin + 1).Select(uimfUtil.GetMzFromBin).ToList();
-//            featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1, 
+//            featureDetectionUtil.GetFeatureStatistics(targetMzList, tolerance.GetValue(), DataReader.FrameType.MS1,
 //                tolerance.GetUnit() == ToleranceUnit.Ppm ? DataReader.ToleranceType.PPM : DataReader.ToleranceType.Th);
 //            sw.Stop();
 
@@ -413,7 +413,7 @@ namespace InformedProteomics.Test.Obsolete
 //            var imsScorerFactory = new ImsScorerFactory(paramFile);
 
 
-//            var dbFilePaths = new string[] 
+//            var dbFilePaths = new string[]
 //                {
 //                    @"..\..\..\TestFiles\BSAPeptides_ST.txt",
 //                    @"..\..\..\TestFiles\BSA_ReversePeptides_ST.txt"
@@ -545,7 +545,7 @@ namespace InformedProteomics.Test.Obsolete
 //            const string paramFile = @"..\..\..\TestFiles\HCD_train.mgf_para.txt";
 //            var imsScorerFactory = new ImsScorerFactory(paramFile);
 
-//            var dbFilePaths = new string[] 
+//            var dbFilePaths = new string[]
 //                {
 //                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt",
 //                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides_Reverse.txt"
@@ -631,7 +631,7 @@ namespace InformedProteomics.Test.Obsolete
 
 //            Console.WriteLine("Finished reading the UIMF file.");
 
-//            var dbFilePaths = new string[] 
+//            var dbFilePaths = new string[]
 //                {
 //                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt",
 //                    @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides_Reverse.txt"
@@ -703,7 +703,7 @@ namespace InformedProteomics.Test.Obsolete
 
 //            //Console.WriteLine("Generating precursor features (MinMz: " + imsData.MinPrecursorMz + " MaxMz: " + imsData.MaxPrecursorMz + ")");
 //            //int numPrecursorFeatures = imsData.CreatePrecursorFeatures();
-//            //Console.WriteLine("TotalNumPrecursorFeatures: " + numPrecursorFeatures);            
+//            //Console.WriteLine("TotalNumPrecursorFeatures: " + numPrecursorFeatures);
 
 //            const string targetPeptide = "VTLTCVAPLSGVDFQLR";//EYANQFMWEYSTNYGQAPLSLLVSYTK  CCHGDLLECADDRADLAK
 //            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
@@ -825,7 +825,7 @@ namespace InformedProteomics.Test.Obsolete
 //        public void TestSimple()
 //        {
 //            const string uimfFilePath = @"..\..\..\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-//            var uimfReader = new DataReader(uimfFilePath);         
+//            var uimfReader = new DataReader(uimfFilePath);
 //            Console.WriteLine("NumFrames: " + uimfReader.GetGlobalParameters().NumFrames);
 //            Console.WriteLine("NumScans: " + uimfReader.GetFrameParameters(1).Scans);
 //        }

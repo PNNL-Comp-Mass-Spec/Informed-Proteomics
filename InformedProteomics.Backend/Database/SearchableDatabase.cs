@@ -120,7 +120,7 @@ namespace InformedProteomics.Backend.Database
                         rightIndex = middleIndex;
                     }
                     else
-                    {     // queryLeft == leftMiddle == queryMiddle 
+                    {     // queryLeft == leftMiddle == queryMiddle
                         var middleResult = Compare(pattern, _suffixArray[middleIndex], queryLeftLcp);
                         if (middleResult <= 0)
                         {      // pattern <= middle
@@ -206,8 +206,8 @@ namespace InformedProteomics.Backend.Database
         /// <param name="index">suffix index</param>
         /// <param name="pattern">sequence to compare</param>
         /// <param name="startIndex">known common prefix</param>
-        /// <returns>a positive number if 1 is larger, 
-        /// a negative if 1 is smaller and 0 if they are equal. 
+        /// <returns>a positive number if 1 is larger,
+        /// a negative if 1 is smaller and 0 if they are equal.
         /// The longest common prefix length can be retrieved by taking absolute value of the return value minus 1
         /// </returns>
         private int Compare(IList<byte> pattern, int index, byte startIndex)

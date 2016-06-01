@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public Peak[] ObservedPeaks { get; private set; }
         //private readonly HashSet<Peak> _isotopePeaks;
     }
-    
+
     /*
     public class DeconvolutedPeak: IComparable<DeconvolutedPeak>
     {

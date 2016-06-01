@@ -9,7 +9,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
     public class MaxEntDeconvoluter
     {
         /// <summary>
-        /// MaxEnt deconvolution algorithm constructor 
+        /// MaxEnt deconvolution algorithm constructor
         /// </summary>
         /// <param name="tolerance">tolerance</param>
         /// <param name="massBinning">mass binning interface</param>
@@ -85,7 +85,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 var mass = GetAveragingMass(collectedPeaks);
                 var charges = collectedPeaks.Select(p => p.Charge).ToArray();
                 var abundance = collectedPeaks.Sum(p => p.Intensity);
-                
+
                 /*
                 var maxChg = charges.Max();
                 var minChg = charges.Min();
@@ -136,7 +136,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
 
             var minCharge = (int)Math.Max(_minCharge, Math.Ceiling(mass / (maxMz - Constants.Proton)));
             var maxCharge = (int)Math.Min(_maxCharge, Math.Floor(mass / (minMz - Constants.Proton)));
-       
+
             for (var charge = minCharge; charge < maxCharge; charge++)
             {
                 var mz = mass / charge + Constants.Proton;
@@ -178,7 +178,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             return weights;
         }
 
-        
+
         private const double WeightingIndex = 2;
         private readonly Tolerance _tolerance;
         private readonly double _minMass;

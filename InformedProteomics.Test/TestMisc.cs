@@ -141,7 +141,7 @@ namespace InformedProteomics.Test
                         if(j != 2) writer.Write(skylineData[j]+"\t");
                         else writer.Write("" + skylineData[j][0] + skylineData[j][2]+"\t");
                     }
-                    writer.WriteLine("{0}\t{1}", 
+                    writer.WriteLine("{0}\t{1}",
                         prob != null ? prob.ToString() : "NA",
                         qValue != null ? qValue.ToString() : "NA");
                 }
@@ -192,13 +192,13 @@ namespace InformedProteomics.Test
             Console.WriteLine(Path.Combine(Path.GetDirectoryName(rawFilePath), Path.GetFileNameWithoutExtension(rawFilePath) + "_IcTarget.tsv"));
 
             var outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2\Synocho_L1_1_IcTarget.tsv";
-            
+
             if (!Directory.Exists(outputDir))
             {
                 if (!File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
                 {
                     throw new Exception(outputDir + " is not a directory!");
-                } 
+                }
                 Directory.CreateDirectory(outputDir);
             }
             Console.WriteLine(outputDir);

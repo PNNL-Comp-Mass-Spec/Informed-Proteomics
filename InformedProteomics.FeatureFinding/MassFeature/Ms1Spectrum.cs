@@ -101,18 +101,18 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             }
             return observedPeaks;
         }
-      
+
         internal int Index { private set; get; }
 
         private int[][] _peakStartIndex;
         private int[][][] _peakRanking;
-        
+
         private double[][] _medianIntensity;
         private double[][] _highestIntensity;
         private int[][] _intensePeakCount;
 
         private const double MzWindowSize = 6;
-        
+
         private void PreArrangeLocalMzWindows()
         {
             var numberOfbins = (int)Math.Round((MaxMz - MinMz) / MzWindowSize) + 1;
@@ -140,7 +140,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                     intensities[i][j]       = new List<double>();
                 }
             }
-            
+
             for (var i = 0; i < Peaks.Length; i++)
             {
                 var binIdx = (int) Math.Round((Peaks[i].Mz - MinMz)/MzWindowSize);
@@ -225,10 +225,10 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 };
                 return emptyWin;
             }
-            
+
             var peakStartIndex = _peakStartIndex[binShift][binIndex];
             var numOfPeaks = _peakRanking[binShift][binIndex].Length;
-            
+
             var window = new LocalMzWindow()
             {
                 MinMz = binStartMz,
@@ -243,12 +243,12 @@ namespace InformedProteomics.FeatureFinding.MassFeature
 
             return window;
         }
-     
+
         private int[] GetRankings(double[] values, out double medianValue, out double highestValue)
         {
             var index = Enumerable.Range(0, values.Length).ToArray();
             Array.Sort(values, index);
-            
+
             medianValue = values[values.Length/2];
             highestValue = values[index.Length - 1];
 
@@ -286,7 +286,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 if (peaks[i] != null && peaks[i].Active) targetEnvelope[i] += peaks[i].Intensity;
             }
         }
-      
+
         public static double GetChiSquareSignificanceScore(this Ms1Peak[] isotopePeaks, double[] theoreticalEnvelopePdf)
         {
             var k = theoreticalEnvelopePdf.Length - 1;
@@ -387,7 +387,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
         public double GetRankSumTestPvalue(Ms1Peak[] peaks, int envelopeSize)
         {
             if (PeakRanking == null) return 1.0d;
-            
+
             // calculate ranksum test score
             var ranksum = 0;
             var nRankSum = 0;

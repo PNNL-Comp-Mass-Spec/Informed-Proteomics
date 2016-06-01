@@ -30,7 +30,7 @@ namespace InformedProteomics.IMS.IMS
 
         public FeatureSet(double[,] intensityBlock)
         {
-            Smoother.Smooth(ref intensityBlock); 
+            Smoother.Smooth(ref intensityBlock);
             FindFeatures(intensityBlock);
         }
 

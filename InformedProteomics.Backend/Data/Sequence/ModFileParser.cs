@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 				    if(token.Length != 5) continue;
 
 				    // Composition
-				    
+
 				    var compStr = token[0].Trim();
 			        var composition = Composition.Composition.ParseFromPlainString(compStr) ??
 			                          Composition.Composition.Parse(compStr);
@@ -74,10 +74,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                         maxNumDynModsPerPeptide = -1;
                         return null;
 			        }
-				
+
 				    // Residues
 				    var residueStr = token[1].Trim();
-				    var isResidueStrLegitimate = residueStr.Equals("*") 
+				    var isResidueStrLegitimate = residueStr.Equals("*")
                         || residueStr.Any() && residueStr.All(AminoAcid.IsStandardAminoAcidResidue);
                     if(!isResidueStrLegitimate)
 				    {
@@ -85,7 +85,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         maxNumDynModsPerPeptide = -1;
                         return null;
                     }
-				
+
 				    // isFixedModification
 				    bool isFixedModification;
 				    if(token[2].Trim().Equals("fix", StringComparison.InvariantCultureIgnoreCase)) isFixedModification = true;
@@ -96,7 +96,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         maxNumDynModsPerPeptide = -1;
                         return null;
                     }
-					
+
 				    // Location
 				    SequenceLocation location;
 				    var locStr = token[3].Trim().Split()[0];

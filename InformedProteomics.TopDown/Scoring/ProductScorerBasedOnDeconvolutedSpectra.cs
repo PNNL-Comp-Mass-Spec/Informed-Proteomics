@@ -11,7 +11,7 @@ namespace InformedProteomics.TopDown.Scoring
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
-            ILcMsRun run, 
+            ILcMsRun run,
             int minProductCharge = 1, int maxProductCharge = 20,
             double productTolerancePpm = 10,
             int isotopeOffsetTolerance = 2,
@@ -25,7 +25,7 @@ namespace InformedProteomics.TopDown.Scoring
             ILcMsRun run,
             int minProductCharge, int maxProductCharge,
             Tolerance productTolerance,
-            int isotopeOffsetTolerance = 2, 
+            int isotopeOffsetTolerance = 2,
             double filteringWindowSize = 1.1)
         {
             _run = run;

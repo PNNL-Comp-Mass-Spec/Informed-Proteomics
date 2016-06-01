@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly Modification[] _modifications;
         private ModificationCombination[] _modificationCombinations;
         private readonly int _maxNumDynModsPerSequence;
-        private Dictionary<int, int> _modCombMap;   
+        private Dictionary<int, int> _modCombMap;
         private Dictionary<int, int> _modCombsToModMap;
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             GenerateModCombMap();
         }
 
-        public int MaxNumDynModsPerSequence 
+        public int MaxNumDynModsPerSequence
         {
             get { return _maxNumDynModsPerSequence; }
         }

@@ -56,7 +56,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 if (observedPeaks == null) continue;
                 var observedMostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
-              
+
                 var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, observedCharge, mostAbundantIsotopeIndex);
                 var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass)/fragmentIonMass)*1e6;
 
@@ -73,7 +73,7 @@ namespace InformedProteomics.TopDown.Scoring
                     /*score += _model.GetNodeScore(Ms2Spectrum.ActivationMethod, baseIonType.IsPrefix,
                         fragmentIonMass, observedCharge,
                         envelopeCorr, envelopeDist,
-                        observedMostAbuPeak.Intensity / _refIntensity, massErrorPpm);    
+                        observedMostAbuPeak.Intensity / _refIntensity, massErrorPpm);
                      */
                     var massErrorScore = GetMassErrorScore(massErrorPpm);
                     score += massErrorScore;

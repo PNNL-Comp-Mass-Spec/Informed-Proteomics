@@ -320,14 +320,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             return key;
         }
 
-        private readonly Queue<SpectrumMatch> _dataSet; 
+        private readonly Queue<SpectrumMatch> _dataSet;
         private readonly Dictionary<int, int> _massBins;
         private HashSet<int> _charges;
         private readonly Dictionary<int, List<RankTable>> _rankTables;
         private readonly Dictionary<int, List<RankTable>> _drankTables;
         private readonly Dictionary<int, List<IonFrequencyTable>> _ionProbabilities;
         private readonly Dictionary<int, List<MassErrorTable>> _massErrors;
-        private readonly Dictionary<int, List<PrecursorOffsets>> _precursorOffsets; 
+        private readonly Dictionary<int, List<PrecursorOffsets>> _precursorOffsets;
         private readonly Dictionary<int, Histogram<double>> _massSorter;
         private bool _computed;
 

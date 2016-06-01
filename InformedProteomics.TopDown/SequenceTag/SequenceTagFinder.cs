@@ -18,17 +18,17 @@ namespace InformedProteomics.TopDown.SequenceTag
             _aminoAcidsArray = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
             _tolerance = tolerance;
 
-            if (_aminoAcidsArray.Length - 1 > Byte.MaxValue) 
+            if (_aminoAcidsArray.Length - 1 > Byte.MaxValue)
                 throw new Exception("Too many amino acid types");
 
             _maxAminoAcidMass = 0d;
             _minAminoAcidMass = 10E4;
             foreach (var aa in _aminoAcidsArray)
             {
-                if (aa.Composition.Mass > _maxAminoAcidMass) 
+                if (aa.Composition.Mass > _maxAminoAcidMass)
                     _maxAminoAcidMass = aa.Composition.Mass;
-                
-                if (aa.Composition.Mass < _minAminoAcidMass) 
+
+                if (aa.Composition.Mass < _minAminoAcidMass)
                     _minAminoAcidMass = aa.Composition.Mass;
 
             }
@@ -157,23 +157,23 @@ namespace InformedProteomics.TopDown.SequenceTag
             var edgeList = edges.ToList();
             if (edgeList.Count < _minTagLength)
                 return true;
-            
+
             NumberOfProcessedPaths++;
-            
+
             var added = false;
             /*var tag = new SequenceTag(edgeList, _deconvolutedPeaks, _tolerance);
             foreach (var tagStr in GetSequenceTagStrings(tag))
             {
-                if (_seqTagSet.Add(tagStr)) added = true; 
+                if (_seqTagSet.Add(tagStr)) added = true;
             }*/
             foreach (var seqTag in EnumerateAllSequenceTags(edgeList))
             {
-                if (_seqTagSet.Add(seqTag)) added = true; 
+                if (_seqTagSet.Add(seqTag)) added = true;
             }
 
             if (added) NumberOfAddedPaths++;
 
-            if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths) 
+            if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths)
                 StopFindPath = true;
 
             return true;
@@ -191,7 +191,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                     else
                         yield return new SequenceTag(_spectrum.ScanNum, SequenceTag.Reverse(tagStr), false, flankingMass, _spectrum.ActivationMethod);
                 }
-    
+
             }
         }*/
 
@@ -208,7 +208,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var indexArray = new int[tagLength];
             var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
             //TagStrings = new HashSet<string>();
-            
+
             var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[edges[0].Node1].Mass);
             var flankingMass = _deconvolutedPeaks[edges[0].Node1].Mass;
 
@@ -268,7 +268,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var bIonTypes = new List<IonType>(); // list of ion types
             var yIonTypes = new List<IonType>();
 
-            var index = 0; // cleavage index 
+            var index = 0; // cleavage index
             foreach (var c in cleavages)
             {
                 foreach (var ionType in _ionTypes)

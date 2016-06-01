@@ -264,8 +264,8 @@ namespace InformedProteomics.Test
             var sequence = new Sequence("CCAADDKEACFAVEGPK", aaSet);
 
             var ionTypeFactory = new IonTypeFactory(
-                new[] {BaseIonType.B, BaseIonType.Y}, 
-                new[] {NeutralLoss.NoLoss, NeutralLoss.H2O}, 
+                new[] {BaseIonType.B, BaseIonType.Y},
+                new[] {NeutralLoss.NoLoss, NeutralLoss.H2O},
                 maxCharge: 2);
 
             Console.WriteLine("Precursor Ion: {0}\t{1}", sequence.GetPrecursorIon(2).Composition, sequence.GetPrecursorIon(2).GetMonoIsotopicMz());
@@ -385,7 +385,7 @@ namespace InformedProteomics.Test
             ShowStarting(methodName);
 
             //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
-            const string molFormula = "C83H136N22O24S1"; 
+            const string molFormula = "C83H136N22O24S1";
 //            const string molFormula = "C4195H6470N1164O1213S34";
 
             var isoCalc = IsotopicDistributionCalculator.Instance;

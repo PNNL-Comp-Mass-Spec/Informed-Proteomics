@@ -19,7 +19,7 @@ namespace InformedProteomics.Test.UnitTests
 
             const string str = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
             var shuffled = SimpleStringProcessing.Shuffle(str);
-            
+
             var strSorted = String.Concat(str.OrderBy(c => c));
             var shuffledSorted = String.Concat(shuffled.OrderBy(c => c));
             Assert.IsTrue(strSorted.Equals(shuffledSorted));
@@ -87,7 +87,7 @@ namespace InformedProteomics.Test.UnitTests
             TestValue(50, 0, "50");
             TestValue(50, 2, "50");
             TestValue(50, 4, "50");
-            
+
             TestValue(50.653, 0, "51");
             TestValue(50.653, 1, "50.7");
             TestValue(50.653, 2, "50.65");
@@ -263,7 +263,7 @@ namespace InformedProteomics.Test.UnitTests
         {
             var result = StringUtilities.DblToString(value, digitsAfterDecimal, limitDecimalsForLargeValues, thresholdScientific);
             Console.Write(@"{0,20}, digits={1,2}: {2,-8}", value, digitsAfterDecimal, result);
-            
+
             if (limitDecimalsForLargeValues)
                 Console.WriteLine(@" (limitDecimals=True)");
             else

@@ -17,7 +17,7 @@ namespace InformedProteomics.IMS.IMSScoring
         private readonly SubScoreFactory _scoringParams;
         private readonly PrecursorFeatureNode _precursorFeatureNode;
 
-        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature, 
+        public FragmentFeatureGraph(ImsDataCached imsData, PrecursorFeatureNode precursorNode, Feature precursorFeature,
             Ion precursorIon, Composition cutComposition, GroupParameter parameter, SubScoreFactory scoringParams)
         {
             _scoringParams = scoringParams;
@@ -34,29 +34,29 @@ namespace InformedProteomics.IMS.IMSScoring
             //var nn = fragmentNodes.Count(no => no.Feature != null);
             //Console.WriteLine(this + "Num features : " + nn);
 
-            
+
             var usedNodes = new List<FeatureNode> {precursorNode};
             UpdateEdges(fragmentNodes, usedNodes); // from precursor to any of fragment nodes
             if (this[precursorNode].Count == 0)
             {
-                NodeScore = RatioScore = -1; //TODO should be trained.. 
+                NodeScore = RatioScore = -1; //TODO should be trained..
                 Score = NodeScore + RatioScore;
                 return;
             }
            // usedNodes.Remove(precursorNode);// exclude precursorNode
             var primeNode = (FragmentFeatureNode) this[precursorNode][0].RNode;
             var targetNodes = GetTargetNodes(primeNode, fragmentNodes, true, false);
-            
+
             UpdateEdges(targetNodes, usedNodes); // to the nodes of different terminal ions
             targetNodes = GetTargetNodes(primeNode, fragmentNodes, false, false);
 
             UpdateEdges(targetNodes, usedNodes); // to the nodes of the same terminal ions
             targetNodes = GetTargetNodes(primeNode, fragmentNodes, true, true);
             UpdateEdges(targetNodes, usedNodes); // to the nodes of differently charged ions
-            
+
             GetScore();
         }
-        
+
         private void GetScore()
         {
             NodeScore = RatioScore = 0;
@@ -74,10 +74,10 @@ namespace InformedProteomics.IMS.IMSScoring
 //                      Console.WriteLine((io == null? "P" : io.Name + " " + (edge.LNode.Feature==null)) + " " + edge.RNode.FragmentIonClassBase.Name + " " + (edge.RNode.Feature==null) + " " +  edge.NodeScore + " " + edge.RatioScore + " " + edge.LcScore + " " + edge.ImsScore);
                 }
             }
-            Score = NodeScore + RatioScore; 
+            Score = NodeScore + RatioScore;
         }
 
-        static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored 
+        static private List<FragmentFeatureNode> GetTargetNodes(FragmentFeatureNode primeNode, IEnumerable<FragmentFeatureNode> nodes, bool diffTerminal, bool diffCharge) // if diffCharge is true, diffTerminal is ignored
         {
             var targetNodes = new List<FragmentFeatureNode>();
             //var primeNterm = primeNode.FragmentIonClassBase is IonType.NtermIonType;
@@ -107,13 +107,13 @@ namespace InformedProteomics.IMS.IMSScoring
                 }
             }
             return targetNodes;
-        } 
+        }
 
         private void UpdateEdges(IEnumerable<FeatureNode> nodes, List<FeatureNode> lNodes)
         {
             var maxWeight = double.NegativeInfinity;
             FeatureEdge edgeWithMaxWeight = null;
-            
+
             foreach (var rnode in nodes)
             {
                 //if (rnode.Feature == null) continue;
@@ -128,7 +128,7 @@ namespace InformedProteomics.IMS.IMSScoring
                     }
                 }
             }
-            
+
             /*if (edgeWithMaxWeight == null)
             {
                 foreach (var rnode in nodes)
@@ -150,9 +150,9 @@ namespace InformedProteomics.IMS.IMSScoring
             if (edgeWithMaxWeight != null)
             {
                 lNodes.Add(edgeWithMaxWeight.RNode);
-                if(!ContainsKey(edgeWithMaxWeight.LNode)) this[edgeWithMaxWeight.LNode] = new List<FeatureEdge>(); 
+                if(!ContainsKey(edgeWithMaxWeight.LNode)) this[edgeWithMaxWeight.LNode] = new List<FeatureEdge>();
                 this[edgeWithMaxWeight.LNode].Add(edgeWithMaxWeight);
-            } 
+            }
         }
 
         private List<FragmentFeatureNode> GetFragmentNodes(ImsDataCached imsData, Feature precursorFeature, Composition cutComposition, Ion precursorIon, GroupParameter parameter)
@@ -161,7 +161,7 @@ namespace InformedProteomics.IMS.IMSScoring
 
             var nodes = new List<FragmentFeatureNode>();
             var suffixComposition = precursorIon.Composition -Composition.H2O - cutComposition;
-            
+
             //Console.WriteLine(cutComposition.GetMass() + " " + suffixComposition.GetMass());
 
             foreach (var ionType in ionTypes)
@@ -170,12 +170,12 @@ namespace InformedProteomics.IMS.IMSScoring
                 //Console.WriteLine("FragFeatureGraph\t" + ionType.Name + "\t" + composition.GetMass() + "\t" + ionType.GetIon(composition).GetMonoIsotopicMz());
                 var node = new FragmentFeatureNode(IsotopomerFeatures.GetFramentIsotopomerFeatures(imsData, composition, ionType, precursorFeature), ionType, precursorFeature, parameter, _scoringParams);
                 //if(node.Feature != null)
-                //    if (20 * node.Feature.IntensityMax < precursorFeature.IntensityMax || node.Feature.IntensityMax > 20 * precursorFeature.IntensityMax) continue; // 
+                //    if (20 * node.Feature.IntensityMax < precursorFeature.IntensityMax || node.Feature.IntensityMax > 20 * precursorFeature.IntensityMax) continue; //
 
                 nodes.Add(node);
             }
             return nodes;
-        } 
+        }
 
     }
 }

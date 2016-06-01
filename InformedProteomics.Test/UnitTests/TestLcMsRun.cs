@@ -96,7 +96,7 @@ namespace InformedProteomics.Test.UnitTests
             Console.WriteLine(run.GetNextScanNum(20025));
         }
 
-        
+
 
         public void TestParsingSpectrumFile()
         {

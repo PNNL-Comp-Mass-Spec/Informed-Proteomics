@@ -268,14 +268,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new Tolerance(ppm);
         }
 
-        public int Ppm 
+        public int Ppm
         {
             get
             {
                 var numBits = sizeof(double) * 8 - _numShifts;
                 var ppm = (int)(16 * Math.Pow(2, 27 - numBits));
                 return ppm;
-            } 
+            }
         }
 
         public readonly int NumBits;

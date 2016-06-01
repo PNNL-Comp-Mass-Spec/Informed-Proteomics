@@ -30,7 +30,7 @@ namespace InformedProteomics.IMS.IMSScoring
         {
             get { return _imsData; }
         }
-        
+
         private void UpdatePrecursorFeatureNode(Feature precursorFeature)
         {
             if (_previousPrecursorFeature != null && _previousPrecursorFeature == precursorFeature) return;

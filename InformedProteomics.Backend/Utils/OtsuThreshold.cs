@@ -43,11 +43,11 @@ namespace InformedProteomics.Backend.Utils
                     if (binIndex < 0) binIndex = 0;
                     else if (binIndex >= nBins) binIndex = nBins - 1;
 
-                    hist[binIndex]++;                    
+                    hist[binIndex]++;
                 }
             }
 
-            return RunOtsuMethod(hist, minX, intervalX);            
+            return RunOtsuMethod(hist, minX, intervalX);
         }
 
         private static double RunOtsuMethod(int[] hist, double minX, double intervalX)
@@ -71,7 +71,7 @@ namespace InformedProteomics.Backend.Utils
             var thresholdIndex = findMax(vet);
             var threshold = minX + (thresholdIndex + 1) * intervalX;
 
-            return threshold;            
+            return threshold;
         }
 
         // function is used to compute the q values in the equation

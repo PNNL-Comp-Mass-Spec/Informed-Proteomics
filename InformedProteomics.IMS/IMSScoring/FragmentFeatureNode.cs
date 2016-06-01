@@ -18,14 +18,14 @@ namespace InformedProteomics.IMS.IMSScoring
         {
             if (IsScoreCalculated) return Score;
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScore(IsotopeCorrelation, GroupParameter);
-            
+
             //var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
             //var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
-            
+
             //Score = lcScore + imsScore + isotopeScore;
             Score = isotopeScore;
             //Console.WriteLine(this + " " + lcScore + " " + imsScore + " " + isotopeScore);
-            
+
             IsScoreCalculated = true;
             return Score;
         }

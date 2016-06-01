@@ -49,9 +49,9 @@ namespace InformedProteomics.FeatureFinding.MassFeature
         {
             return Isotopes[IndexOrderByRanking[ranking - 1]];
         }
-        
+
         public override Isotope GetMostAbundantIsotope() { return GetIsotopeRankedAt(1); }
-        
+
         // zero-based internal index
         public double GetIsotopeMz(int charge, int internalIndex)
         {

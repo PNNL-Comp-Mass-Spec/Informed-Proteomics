@@ -40,7 +40,7 @@ namespace InformedProteomics.TopDown.Scoring
                             j = _comparer.GetBinNumber(fineNodeMass + modifiedAa.Mass);
                             if (j < 0 || j >= _comparer.NumberOfBins) continue;
                             _adjList[j].AddLast(new ScoringGraphEdge(i));
-                        }                        
+                        }
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace InformedProteomics.TopDown.Scoring
         public IScoringGraph CreateScoringGraph(CompositeScorerBasedOnDeconvolutedSpectrum scorer, double proteinMass)
         {
             if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
-            
+
             var nodeScores = scorer.GetNodeScores(proteinMass);
             var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList);
 
@@ -102,7 +102,7 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 return _nodeScoresByPrefixIon.Length;
             }
-         
+
             private readonly double?[] _nodeScoresByPrefixIon;
             private readonly double?[] _nodeScoresBySuffixIon;
             private readonly LinkedList<ScoringGraphEdge>[] _adjList;

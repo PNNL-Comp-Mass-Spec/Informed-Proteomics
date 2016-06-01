@@ -106,7 +106,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 var comp = comparer.Compare(spec[index1], isoProfile[index2]);
                 if (comp < 0) ++index1;
-                else if (comp > 0) 
+                else if (comp > 0)
                 {
                     ++index2;
                 }
@@ -250,7 +250,7 @@ namespace InformedProteomics.Backend.Utils
 
         // startIndex: inclusive
         // endIndex: exclusive
-        public static void FilterNoise(IList<Peak> peakList, 
+        public static void FilterNoise(IList<Peak> peakList,
             ref List<Peak> filteredPeakList, double signalToMedianRatio = 1.4826)
         {
             //var medianIntensity = peakList.OrderByDescending(p => p.Intensity).Select(p => p.Intensity).Median();

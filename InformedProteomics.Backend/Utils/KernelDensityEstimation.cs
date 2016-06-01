@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Utils
                 Console.WriteLine("Cannot have more points then there are elements in an observation");
                 return null;
             }
-           
+
             for (var j = 0; j < x.Length; j++)
             {
                 var sum = 0.0;
@@ -43,7 +43,7 @@ namespace InformedProteomics.Backend.Utils
                 }
                 x[j] = c*sum;
             }
-             
+
             return x;
         }
 

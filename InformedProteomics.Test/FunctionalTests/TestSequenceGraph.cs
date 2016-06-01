@@ -217,7 +217,7 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modFilePath);
             }
-            
+
             var modFileParser = new ModFileParser(modFilePath);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)
@@ -324,7 +324,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
             var protCompositions = seqGraph.GetSequenceCompositions();
-            
+
             for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
             {
                 seqGraph.SetSink(modIndex);

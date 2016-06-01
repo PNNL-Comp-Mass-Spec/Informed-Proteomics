@@ -33,7 +33,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _graph = new Node[_maxSeqIndex][];
             _graph[0] = new[] { new Node(0) };
 
-            _nodeComposition = new Composition.Composition[_maxSeqIndex][]; 
+            _nodeComposition = new Composition.Composition[_maxSeqIndex][];
             _compNodeComposition = new Composition.Composition[_maxSeqIndex][];
             for (var i = 0; i < _maxSeqIndex; i++)
             {
@@ -221,7 +221,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var nodeComposition = GetComposition(seqIndex, modIndex);
                 _compNodeComposition[seqIndex][modIndex] = _sinkSequenceComposition - nodeComposition;
             }
-            return _compNodeComposition[seqIndex][modIndex];            
+            return _compNodeComposition[seqIndex][modIndex];
             /*
             if (_compNodeComposition[seqIndex, modIndex] == null)
             {
@@ -238,7 +238,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             var node = _graph[seqIndex][modIndex];
             var curNodeScore = nodeScore[seqIndex][modIndex] ??
-                (nodeScore[seqIndex][modIndex] = 
+                (nodeScore[seqIndex][modIndex] =
                     _isForward ? scorer.GetFragmentScore(GetComposition(seqIndex, modIndex), GetComplementaryComposition(seqIndex, modIndex))
                     : scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex))
                     );

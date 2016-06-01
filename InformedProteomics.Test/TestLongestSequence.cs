@@ -25,18 +25,18 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-           
+
 
             var rawFiles = new []
             {/*@"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
-             @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",                
+             @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep3_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep4_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep5_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep7_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep8_15Jan15_Bane_C2-14-08-02RZ.pbf",
-             @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf",   
+             @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_01_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_02_15Jan15_Bane_C2-14-08-02RZ.pbf",
              @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_03_15Jan15_Bane_C2-14-08-02RZ.pbf",
@@ -47,14 +47,14 @@ namespace InformedProteomics.Test
             };
             var resultFiles = new string[]
             {/*@"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5_IcTda.tsv",
-             @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",                
+             @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep3_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep4_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep5_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep7_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep8_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
-             @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",   
+             @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_SDS_T_01_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_SDS_T_02_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\CPTAC_Intact_SDS_T_03_15Jan15_Bane_C2-14-08-02RZ_IcTda.tsv",
@@ -64,8 +64,8 @@ namespace InformedProteomics.Test
              @"\\protoapps\UserData\Jungkap\Joshua\IdResult\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv"
             };
 
-            
-            
+
+
             for (int i = 0; i < 1; i++)
             {
                 var stringPieces = rawFiles[i].Split(new char[] {'\\', '.'});
@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
                 csv.Append(resultLine);
                 File.WriteAllText(outputFile, csv.ToString());
             }
-            
+
         }
 
         public string ProcessFile(string rawFile, string resultFile, string methodName)
@@ -101,7 +101,7 @@ namespace InformedProteomics.Test
             var ms2ScanNumbers = tsvData["Scan"];
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 0, 0);
-            
+
             var resultLine = "";
             for (int i = 0; i < ms2ScanNumbers.Count; i++)
             {

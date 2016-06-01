@@ -68,11 +68,11 @@ namespace InformedProteomics.IMS.IMSTraining
                             var ratio = FeatureEdge.GetRatioIndex(explainedPeaks[i].Intensity, explainedPeaks[j].Intensity);
                             if (!t.ContainsKey(ratio)) t[ratio] = 0;
                             t[ratio] = t[ratio] + 1;
-                        }   
+                        }
                     }
                 }
             }
-            Normalize();  
+            Normalize();
             Console.WriteLine(RatioProbDictionary.Count);
         }
 

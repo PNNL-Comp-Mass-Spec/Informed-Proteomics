@@ -33,11 +33,11 @@ namespace InformedProteomics.TopDown.Scoring
             bool prefixHit, suffixHit;
             return GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition, out prefixHit, out suffixHit);
         }
-        
+
         public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition, out bool prefixHit, out bool suffixHit)
         {
             var score = 0.0;
-            
+
             prefixHit = false;
             suffixHit = false;
 
@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
                 var fragmentIonMass = fragmentComposition.Mass;
-                
+
                 var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
 
                 foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
@@ -59,7 +59,7 @@ namespace InformedProteomics.TopDown.Scoring
                     var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
                     var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
                     var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
-                    
+
                     score += param.Count;
                     score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
                     score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
@@ -175,7 +175,7 @@ namespace InformedProteomics.TopDown.Scoring
         internal class IonScoreWeight
         {
             internal double Count;
-            
+
             internal double Intensity;
             internal double Corr;
             internal double Dist;

@@ -21,7 +21,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var fragmentComposition = baseIonType.IsPrefix
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
-                
+
                 if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
                 var chargeRange = GetMinMaxChargeRange(fragmentComposition);
 

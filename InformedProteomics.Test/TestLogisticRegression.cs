@@ -74,7 +74,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(x);
             }
             Console.WriteLine();
-            
+
             var oneCount = 0;
             var zeroCount = 0;
             var totalRight = 0;

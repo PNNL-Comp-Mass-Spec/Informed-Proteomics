@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.IMSScoring
         {
             _massIndex = GetMassIndex(peptide);
             _locationIndex = GetLocationIndex(peptide, cutNumber);
-            _flankingResidueIndex = GetFlankingResidueIndex(peptide, cutNumber); 
+            _flankingResidueIndex = GetFlankingResidueIndex(peptide, cutNumber);
         }
 
 

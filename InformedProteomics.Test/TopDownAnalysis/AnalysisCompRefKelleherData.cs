@@ -71,7 +71,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 }
             }
         }
-        
+
         [Test]
         public void FindMissingLcMsFeatures()
         {
@@ -143,14 +143,14 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var minScan = run.GetPrevScanNum(match.ScanNum, 1);
                 var maxScan = run.GetNextScanNum(match.ScanNum, 1);
                 var feature = featureFinder.GetLcMsPeakCluster(match.Mass, match.Charge, minScan, maxScan);
-                
+
                 if (feature == null) continue;
-                
+
                 tsvWriter.WriteLine("{0}\t{1}", featureId, LcMsFeatureFinderLauncher.GetString(feature, false));
                 featureId++;
             }
-            
-            tsvWriter.Close();            
+
+            tsvWriter.Close();
         }
 
 
@@ -178,7 +178,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
         }
 
-        
+
 
         public void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)
         {

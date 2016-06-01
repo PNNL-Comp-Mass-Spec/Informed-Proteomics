@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.Utils
             }
             File.WriteAllText(outputLocation, tsv.ToString());
         }
-  
+
         public void AddObservations(IEnumerable<double[]> observations)
         {
             foreach (var obs in observations)
@@ -98,7 +98,7 @@ namespace InformedProteomics.Backend.Utils
                         maxMass = int.MaxValue;
                     }
 
-                    if(obsMass >= minMass && obsMass <= maxMass) _densityEstimators[i].AddObservation(obs); 
+                    if(obsMass >= minMass && obsMass <= maxMass) _densityEstimators[i].AddObservation(obs);
                 }
             }
         }

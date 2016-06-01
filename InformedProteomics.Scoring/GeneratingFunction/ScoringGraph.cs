@@ -14,7 +14,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
     /*
     public class ScoringGraph : IScoringGraph
     {
-        
+
         public ScoringGraph(double[] massList, int[] peakScore, double proteinMass, AminoAcid[] aminoArray, double[] aminoAcidProb, ProteinMassComparerWithBinning comparer)
         {
             var maxBinIndex = comparer.GetBinNumber(proteinMass);
@@ -24,7 +24,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             var stopwatch = Stopwatch.StartNew();
 
             //var graph = new ScoringGraph(massList, peakScores, proteinMass, aminoArray, aminoProb, comparer);
-            
+
             // node generation
             _scoreNodes = new ScoringGraphNode[maxBinIndex + 1];
             for (var j = 0; j < massList.Length; j++)

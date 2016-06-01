@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class DiaLcMsRun: LcMsRun
     {
-        public DiaLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold) 
+        public DiaLcMsRun(IMassSpecDataReader massSpecDataReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold)
             : base(massSpecDataReader, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold)
         {
             _isolationWindows = new SortedSet<IsolationWindow>();
@@ -76,7 +76,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var maxMz = mz + tolTh;
             return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
         }
-        
+
         public new Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz)
         {
             var xic = GetProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
@@ -102,7 +102,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var higher = new IsolationWindow(precursorMz + _isolationWindowLowerOffset, 0, 0);
             return _isolationWindows.GetViewBetween(lower, higher);
         }
-        
+
         private readonly bool _variableWindows;
         private readonly double _isolationWindowUpperOffset;
         private readonly double _isolationWindowLowerOffset;

@@ -25,7 +25,7 @@ namespace InformedProteomics.Test
             var testTargetObsFile = @"\\protoapps\UserData\Jungkap\Joshua\LcMsFeatureScoreTrain\target_trainset.tsv";
 
 
-            string line; 
+            string line;
             var file = new System.IO.StreamReader(testDecoyObsFile);
             while ((line = file.ReadLine()) != null)
             {
@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
                 probabilityCalc.GetLikelihoods(targetFile, decoyFile, outPutFile);
             }
 
-            
+
 
 
         }

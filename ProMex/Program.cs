@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace ProMex
 {
-    
+
     class Program
     {
         public const string Name = "ProMex";
@@ -130,10 +130,10 @@ namespace ProMex
                 var errorCode = -Math.Abs(ex.Message.GetHashCode());
                 if (errorCode == 0)
                     return -1;
-                
+
                 return errorCode;
             }
-#endif            
+#endif
         }
 
         private static void PrintUsageInfo(string errorMessage = null)

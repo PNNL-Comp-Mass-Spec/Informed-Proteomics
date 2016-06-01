@@ -35,6 +35,6 @@ namespace InformedProteomics.IMS.IMSTraining
                 if (x.Mz < y.Mz) return -1;
                 return 0;
             }
-        } 
+        }
     }
 }

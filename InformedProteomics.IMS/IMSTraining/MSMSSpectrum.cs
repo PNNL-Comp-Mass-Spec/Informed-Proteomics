@@ -63,7 +63,7 @@ namespace InformedProteomics.IMS.IMSTraining
         {
             var precursorIon = new Ion(annotation.Composition + Composition.H2O, Charge);
             var prefixComposition = annotation.GetComposition(0, cutNumber);
-            return new GroupParameter(prefixComposition, annotation[cutNumber - 1].Residue, annotation[cutNumber].Residue, precursorIon); 
+            return new GroupParameter(prefixComposition, annotation[cutNumber - 1].Residue, annotation[cutNumber].Residue, precursorIon);
         }
 
         public Tuple<List<MSMSSpectrumPeak>, double[]> GetIsotopomerEnvelop(Sequence annotation, int cutNumber, IonType ionType, Tolerance tolerance)
@@ -83,10 +83,10 @@ namespace InformedProteomics.IMS.IMSTraining
                 isotopomerEnvelop.Add(GetPeak(mz, tolerance));
             }
             return write ? new Tuple<List<MSMSSpectrumPeak>, double[]>(isotopomerEnvelop, theoreticalDist) : null;
-        } 
+        }
 
         public List<MSMSSpectrumPeak> GetExplainedPeaks(Sequence annotation, int cutNumber, List<IonType> ionTypes, Tolerance tolerance)
-        {  
+        {
             var prefixComposition = annotation.GetComposition(0, cutNumber);
             var suffixCompostion = annotation.Composition - prefixComposition;
             var peakList = new List<MSMSSpectrumPeak>();

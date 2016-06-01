@@ -10,7 +10,7 @@ namespace ProMex
         {
             FileName = fileName;
             _delimeter = delimiter;
-			
+
 			_fileReader = new StreamReader(fileName);
             var line = _fileReader.ReadLine();
             _header = line.Split(_delimeter);
@@ -21,7 +21,7 @@ namespace ProMex
 			_fileReader.Close();
 		}
         public string FileName { get; private set; }
-        
+
         public IList<string> GetHeaders()
         {
             return _header;
@@ -35,7 +35,7 @@ namespace ProMex
         private readonly string[] _header;
         private readonly char _delimeter;
 		private readonly StreamReader _fileReader;
-		
+
 		public int LineCounter { get; private set; }
 
         public IEnumerable<string[]> ReadLine()

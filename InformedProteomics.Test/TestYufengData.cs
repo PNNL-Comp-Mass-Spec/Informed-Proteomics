@@ -167,7 +167,7 @@ namespace InformedProteomics.Test
                         var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
                         var post = annotation[annotation.Length - 1];
 
-                        Console.WriteLine("{0}.{1}.{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}", pre, sequence, post, ms2ScanNum, modCombinations, 
+                        Console.WriteLine("{0}.{1}.{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}", pre, sequence, post, ms2ScanNum, modCombinations,
                             precursorIon.GetMostAbundantIsotopeMz(), precursorIon.Charge, precursorIon.Composition.Mass, score);
                     }
                 }
@@ -254,7 +254,7 @@ namespace InformedProteomics.Test
                     Math.Min(scanNum + windowSize, run.MaxLcScan));
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -366,11 +366,11 @@ namespace InformedProteomics.Test
             }
 
             var ion27 = new Ion(neutral, 29);
-            var isotopes = ion27.GetIsotopes(0.1); 
+            var isotopes = ion27.GetIsotopes(0.1);
             foreach (var isotope in isotopes)
             {
                 Console.WriteLine("{0}\t{1}", ion27.GetIsotopeMz(isotope.Index), isotope.Ratio);
-            }                
+            }
         }
 
         [Test]
@@ -388,7 +388,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"NumBins: " + numBins);
 
             Assert.IsTrue(numBins == 16384);
-        }        
+        }
 
         [Test]
         public void TestGeneratingXicsOfAllCharges()
@@ -400,7 +400,7 @@ namespace InformedProteomics.Test
             {
                 Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
             }
-            
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
             var comparer = new MzComparerWithBinning(27);
             const string protSequence =
@@ -417,7 +417,7 @@ namespace InformedProteomics.Test
             var targetColIndex = 0;
 
             #pragma warning disable 0162
-            if (SHOW_ALL_SCANS)           
+            if (SHOW_ALL_SCANS)
                 Console.WriteLine("Charge\t" + string.Join("\t", run.GetScanNumbers(1)));
             else
             {
@@ -455,7 +455,7 @@ namespace InformedProteomics.Test
                 #pragma warning restore 0162
             }
         }
-      
+
         [Test]
         public void TestAbpSumMs1Spectra()
         {
@@ -517,9 +517,9 @@ namespace InformedProteomics.Test
             //const int maxCharge = 6;
             const string sequence = "EIRGYRPPEPYKGKGVRYDDEEVRRKEAKKK";
             var aaSet = new AminoAcidSet();
-            
+
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
-            
+
             var scorer = new InformedTopDownScorer(run, aaSet, 1, minCharge - 1, new Tolerance(10));
             scorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm,
                 Composition.Parse("C(166) H(270) N(52) O(49) S(0)"), minCharge, minScanNum);

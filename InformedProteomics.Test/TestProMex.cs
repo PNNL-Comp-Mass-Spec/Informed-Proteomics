@@ -66,7 +66,7 @@ namespace InformedProteomics.Test
 
                 var targetSets = LcMsFeatureTrain.CollectTrainSet(dataset, idFile);
                 Console.WriteLine(targetSets.Count);
-                
+
 
                 var writer =
                     new StreamWriter(outFileName);
@@ -107,12 +107,12 @@ namespace InformedProteomics.Test
             {
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
-            
+
             var tolerance = new Tolerance(10);
             var tolerance2 = new Tolerance(20);
             var id = 1;
-            
-            
+
+
             for(var d = 0; d < TrainSetFileLists.Length; d++)
             {
                 var dataset = TrainSetFileLists[d];
@@ -133,8 +133,8 @@ namespace InformedProteomics.Test
 
 
                 var run = PbfLcMsRun.GetLcMsRun(dataset);
-                
-                
+
+
                 var targetStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\statistics\{0}.tsv", Path.GetFileNameWithoutExtension(dataset)));
                 var decoyStatWriter = new StreamWriter(string.Format(@"D:\MassSpecFiles\training\statistics\{0}_decoy.tsv", Path.GetFileNameWithoutExtension(dataset)));
                 var writer = new StreamWriter(featureResult);
@@ -144,8 +144,8 @@ namespace InformedProteomics.Test
                 var tsvParser = new TsvFileParser(filtedIdResultFile);
 
                 var featureFinder = new LcMsPeakMatrix(run);
-                
-                
+
+
                 for (var i = 0; i < tsvParser.NumData; i++)
                 {
                     var minScan = int.Parse(tsvParser.GetData("MinScan")[i]);
@@ -280,7 +280,7 @@ namespace InformedProteomics.Test
             public double[] AbundanceDistributionAcrossCharge { get; internal set; }
             public double[] BestCorrelationScoreAcrossCharge { get; private set; }
             public double[] BestDistanceScoreAcrossCharge { get; private set; }
-            public double[] BestIntensityScoreAcrossCharge { get; private set; }            
+            public double[] BestIntensityScoreAcrossCharge { get; private set; }
             */
 
             //for(var charge = feature.MinCharge; charge <= feature.MaxCharge; charge++)
@@ -327,7 +327,7 @@ namespace InformedProteomics.Test
         }
 
 
-       
+
 
 
         [Test]
@@ -362,9 +362,9 @@ namespace InformedProteomics.Test
                 //var targetFeature = new TargetFeature(mass, charge, scan);
                 var score = featureFinder.GetMs1EvidenceScore(scan, mass, charge);
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", scan, mass, charge, qvalue, score);
-            }   
+            }
         }
-        
+
         [Test]
         public void TestPredictPTMfromMs1ft()
         {
@@ -444,7 +444,7 @@ namespace InformedProteomics.Test
             }
 
             //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
-            
+
             const int minScanCharge = 2;
             const int maxScanCharge = 60;
             const double minScanMass = 3000;
@@ -495,7 +495,7 @@ namespace InformedProteomics.Test
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
-            
+
             const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             if (!File.Exists(ms1FtPath))
             {
@@ -551,17 +551,17 @@ namespace InformedProteomics.Test
 
         public static string[] TrainSetFileLists = new string[]
             {
-            
-                @"D:\MassSpecFiles\bottom_up\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw",  // bottom-up datasets
-                @"D:\MassSpecFiles\bottom_up\QC_Shew_13_05_2_17Apr14_Samwise_13-07-17.raw",                
 
-                @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf",   
+                @"D:\MassSpecFiles\bottom_up\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw",  // bottom-up datasets
+                @"D:\MassSpecFiles\bottom_up\QC_Shew_13_05_2_17Apr14_Samwise_13-07-17.raw",
+
+                @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf",
                 @"D:\MassSpecFiles\IMER\Dey_IMERblast_02_08May14_Alder_14-01-33.pbf",
                 @"D:\MassSpecFiles\IMER\Dey_IMERblast_03_09May14_Alder_14-01-33.pbf",
-                
+
                 @"D:\MassSpecFiles\IMER\Diabetes_iPSC_Beta_1_IMER_13May14_Alder_14-01-33.pbf",
                 @"D:\MassSpecFiles\IMER\Diabetes_iPSC_Beta_3_IMER_14May14_Alder_14-01-33.pbf",
-                
+
                 @"\\protoapps\UserData\Jungkap\peptidome\CPTAC_Peptidome_Test1_P2_13Jan12_Polaroid_11-10-14.pbf", // peptidomics datasets
                 @"\\protoapps\UserData\Jungkap\peptidome\CPTAC_Peptidome_Test2_P5-18_13Jan12_Polaroid_11-10-14.pbf",
                 @"\\protoapps\UserData\Jungkap\peptidome\CPTAC_Peptidome_Test2_P6-5_13Jan12_Polaroid_11-10-14.pbf",
@@ -569,8 +569,8 @@ namespace InformedProteomics.Test
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",// top-down datasets
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
-                
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",                
+
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep3_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep4_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep5_15Jan15_Bane_C2-14-08-02RZ.pbf",
@@ -578,7 +578,7 @@ namespace InformedProteomics.Test
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep7_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep8_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ.pbf",
-                
+
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_01_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_02_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_SDS_T_03_15Jan15_Bane_C2-14-08-02RZ.pbf",
@@ -590,7 +590,7 @@ namespace InformedProteomics.Test
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_3_2Feb15_Bane_C2Column4.pbf",
                 @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf",
                 @"D:\MassSpecFiles\SBEP\SBEP_STM_001_02222012_Aragon.pbf",
-                
+
                 @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf",
                 @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
                 //@"D:\MassSpecFiles\training\raw\yufeng_column_test2.pbf",
@@ -598,7 +598,7 @@ namespace InformedProteomics.Test
             };
 
     }
-    
+
 
 
 }

@@ -13,7 +13,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             ScanNum = scanNum;
             TheoreticalEnvelope = theoreticalEnvelope;
             Peaks = new Ms1Peak[theoreticalEnvelope.Size];
-            
+
             Array.Copy(peaks, Peaks, theoreticalEnvelope.Size);
             GoodEnough = false;
         }

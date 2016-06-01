@@ -31,7 +31,7 @@ namespace InformedProteomics.Test
 
             var nominalMassArr = aaList.Select(aa => aa.GetNominalMass()).ToArray();
             var probArr = Enumerable.Repeat(0.05, nominalMassArr.Length).ToArray();
-            
+
             var selScoreCalculator = new SelectivityScoreCalculatorUsingNominalMasses(
                 nominalMassArr, probArr);
             var hist = selScoreCalculator.GetPValues(848.41, new[] {1259.5989, 1130.5563, 1059.5192, 958.4715});

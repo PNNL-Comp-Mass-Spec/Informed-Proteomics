@@ -28,7 +28,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             var alignedPrsms = prsmSet.ConnnectedComponents(prsmGroupComparer);
             var alignedResult = new ProteinSpectrumMatchSet[alignedPrsms.Count][];
             for (var i = 0; i < alignedResult.Length; i++) alignedResult[i] = new ProteinSpectrumMatchSet[nDataset];
-            
+
             for(var i = 0; i < alignedPrsms.Count; i++)
             {
                 foreach (var set in alignedPrsms[i])
@@ -36,11 +36,11 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                     if (alignedResult[i][set.DataId] != null)
                     {
                         alignedResult[i][set.DataId].Merge(set);
-                        //Console.WriteLine("[{4}] {0}-{1}...{2}-{3}", set.MinScanNum, set.MaxScanNum, alignedResult[i][set.DataId].MinScanNum, alignedResult[i][set.DataId].MaxScanNum, set.DataId);    
+                        //Console.WriteLine("[{4}] {0}-{1}...{2}-{3}", set.MinScanNum, set.MaxScanNum, alignedResult[i][set.DataId].MinScanNum, alignedResult[i][set.DataId].MaxScanNum, set.DataId);
                     }
                     else
                     {
-                        alignedResult[i][set.DataId] = set;    
+                        alignedResult[i][set.DataId] = set;
                     }
                 }
             }
@@ -68,9 +68,9 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                     //scanregions
 
                 }
-                
+
             }
-            
+
             Console.WriteLine(alignedPrsmSet.Length);
         }
 
@@ -80,13 +80,13 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             var maxElutionTime = 0d;
             var massList = new List<double>();
             var chargeList = new List<int>();
-            
+
 
             for (var i = 0; i < matches.Length; i++)
             {
                 if (matches[i] == null) continue;
                 var match = matches[i];
-                
+
                 minElutionTime = Math.Min(minElutionTime, runs[i].GetElutionTime(match.MinScanNum));
                 maxElutionTime = Math.Max(maxElutionTime, runs[i].GetElutionTime(match.MaxScanNum));
 
@@ -96,7 +96,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             massList.Sort();
             var mass = massList[(int)(massList.Count * 0.5)];
             var charge = chargeList[(int)(chargeList.Count * 0.5)];
-            
+
             return new Tuple<double, int, double, double>(mass, charge, minElutionTime, maxElutionTime);
         }
         */

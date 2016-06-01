@@ -25,7 +25,7 @@ namespace InformedProteomics.Test
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configurationFile);
             }
-            
+
             var config = new TrainerConfiguration(configurationFile);
 
             var trainingParameters = new TrainingParameters(config);

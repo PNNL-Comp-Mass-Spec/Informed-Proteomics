@@ -52,7 +52,7 @@ namespace InformedProteomics.TopDown.Quantification
                         if (msLevel == 2) file.ReadLine();
                         continue;
                     }
-                    
+
                 }
                 //Process line
                 if (isInfoLine)
@@ -83,7 +83,7 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var line = lineList[i].Split(',');
                 var node = GetDeconvLineDecon2Ls(line);
-                if (node != null) nodeList.Add(node);             
+                if (node != null) nodeList.Add(node);
             }
 
             return nodeList;

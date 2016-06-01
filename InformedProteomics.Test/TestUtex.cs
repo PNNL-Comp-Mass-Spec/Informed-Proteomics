@@ -71,7 +71,7 @@ namespace InformedProteomics.Test
                     var match = prsmList[j];
                     match.ProteinId = match.ProteinName.Substring(match.ProteinName.IndexOf(ProteinNamePrefix) + ProteinNamePrefix.Length, 5);
                 }
-                
+
                 // PrSM To Feature
                 var prsmToFeatureIdMap = new int[prsmList.Count];
                 for (var k = 0; k < prsmToFeatureIdMap.Length; k++) prsmToFeatureIdMap[k] = -1;
@@ -85,7 +85,7 @@ namespace InformedProteomics.Test
                 for(var j = 0; j < prsmList.Count; j++)
                 {
                     if (prsmToFeatureIdMap[j] >= 0) continue;
-                    
+
                     var match = prsmList[j];
                     var minScanNum = match.ScanNum;
                     var maxScanNum = match.ScanNum;
@@ -120,7 +120,7 @@ namespace InformedProteomics.Test
                                 prsmSet.Add(otherMatch);
                             }
                         }
-                        
+
                     }
                     featureId++;
 
@@ -162,7 +162,7 @@ namespace InformedProteomics.Test
                     }
                 }
 
-                // now output results!!                
+                // now output results!!
                 var ms1ftFilePath = String.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftFilePath);
                 writer.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
@@ -176,7 +176,7 @@ namespace InformedProteomics.Test
                     var minScanNum = run.GetPrevScanNum(prsm1.MinScanNum, 1);
                     var maxScanNum = run.GetNextScanNum(prsm1.MaxScanNum, 1);
                     f1.ExpandScanRange(minScanNum, maxScanNum);
-                    
+
                     writer.Write("{0}\t", j+1);
                     writer.WriteLine(LcMsFeatureFinderLauncher.GetString(f1));
                 }
@@ -208,7 +208,7 @@ namespace InformedProteomics.Test
                 dataset[i] = String.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i + 1);
                 //var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
             }
-            
+
             var tolerance = new Tolerance(10);
             var ftComparer = new UtexFeatureComparer(tolerance);
             var align = new LcMsFeatureAlignment(ftComparer);
@@ -255,7 +255,7 @@ namespace InformedProteomics.Test
 
 
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1ftPath, run);
-                
+
                 // tag features by PrSMs
                 for(var j = 0; j < features.Count; j++)
                 {
@@ -314,13 +314,13 @@ namespace InformedProteomics.Test
                             var scanNums = string.Join(";", alignedFeatureList[j][i].ProteinSpectrumMatches.Select(prsm => prsm.ScanNum));
                             writer.Write(scanNums);
                         }
-                        
+
                         writer.Write("\n");
                     }
                 }
                 writer.Close();
             }
-            
+
         }
 
         internal class UtexFeatureComparer : INodeComparer<LcMsFeature>
@@ -334,18 +334,18 @@ namespace InformedProteomics.Test
             {
                 if (f1.DataSetId == f2.DataSetId) return false;
                 // tolerant in mass dimension?
-                
+
                 var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
                 if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
-                
+
                 // tolerant in elution time dimension?
                 //var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Min(f1.NetLength, f2.NetLength);
                 //if (lenDiff > 0.5) return false;
 
                 if (!f1.CoElutedByNet(f2, 0.004)) return false; //e.g) 200*0.001 = 0.2 min = 30 sec
-                
+
                 if (f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches)) return true;
-                
+
                 return false;
             }
 
@@ -371,7 +371,7 @@ namespace InformedProteomics.Test
                var tolerance = new Tolerance(10);
                var massTh = tolerance.GetToleranceAsTh(node1.Mass);
                var massDiff = Math.Abs(node1.Mass - node2.Mass);
-                
+
                if (massDiff > massTh) return false;
 
                var et1 = _run.GetElutionTime(node1.ScanNum);
@@ -393,15 +393,15 @@ namespace InformedProteomics.Test
                _runArray = run;
                _elutionWindow = _runArray[0].GetElutionTime(_runArray[0].MaxLcScan) * 0.005;
            }
-            
+
            public bool SameCluster(ProteinSpectrumMatcheSet node1, ProteinSpectrumMatcheSet node2)
            {
                if (node1.DataId == node2.DataId) return false;
-                
+
                var id1 = node1[0].ProteinName.Substring(node1[0].ProteinName.IndexOf(ProteinNamePrefix) + ProteinNamePrefix.Length, 5);
                var id2 = node2[0].ProteinName.Substring(node2[0].ProteinName.IndexOf(ProteinNamePrefix) + ProteinNamePrefix.Length, 5);
                var tolerance = new Tolerance(10);
-                
+
                if (!id1.Equals(id2)) return false;
 
                var massTh = tolerance.GetToleranceAsTh(node1[0].Mass);
@@ -420,12 +420,12 @@ namespace InformedProteomics.Test
                    }
                    if (massMatch) break;
                }
-                
+
                if (!massMatch) return false;
 
                var et1Min = _runArray[node1.DataId].GetElutionTime(node1.MinScanNum);
                var et1Max = _runArray[node1.DataId].GetElutionTime(node1.MaxScanNum);
-                
+
                var et2Min = _runArray[node2.DataId].GetElutionTime(node2.MinScanNum);
                var et2Max = _runArray[node2.DataId].GetElutionTime(node2.MaxScanNum);
 
@@ -438,7 +438,7 @@ namespace InformedProteomics.Test
                if (Math.Abs(et1Min - et2Max) < _elutionWindow) return true;
                if (Math.Abs(et1Max - et2Min) < _elutionWindow) return true;
 
-               return false;                
+               return false;
            }
            private const string ProteinNamePrefix = "M744_";
            private readonly double _elutionWindow;
@@ -491,9 +491,9 @@ namespace InformedProteomics.Test
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
                     continue;
                 }
-                
+
                 map.LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
-                
+
 
                 var comparer = new MsAlignPrsmComparer(runArray[i]);
                 prsmGroup[i] = alignement.GroupingByPrsm(i, map.ProteinSpectrumMatches, comparer);
@@ -502,7 +502,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine("\t[MSA] Total prsm = {0}, total unique proteins = {1}, grouped PRSMs = {2}", map.CountIdentifiedScans(), map.CountIdentifiedUniqueProteoforms(),
                     prsmGroup[i].Count);
             }
-            
+
             var alignGroupComparer = new MsAlignPrsmGroupComparer(runArray);
             var alignedPrsmSet = alignement.GroupAcrossRuns(prsmGroup, alignGroupComparer);
 
@@ -549,7 +549,7 @@ namespace InformedProteomics.Test
                 var data = dataset[d];
                 var minScanColName = String.Format("{0}_minScan", d);
                 var maxScanColName = String.Format("{0}_maxScan", d);
-                
+
                 var fname = String.Format(@"{0}\{1}_IcTda.tsv", mspDir, data);
                 var idParser = new TsvFileParser(fname);
                 var idRows = idParser.GetRows();
@@ -582,7 +582,7 @@ namespace InformedProteomics.Test
                             break;
                         }
                     }
-                    
+
                     if (found) continue;
                     for (var j = idx + 1; j < massList.Count; j++)
                     {
@@ -597,14 +597,14 @@ namespace InformedProteomics.Test
                     }
                 }
             }
-            
+
             var writer = new StreamWriter(resultFile);
 
             writer.Write("AlignedFeatureID"); writer.Write("\t");
             writer.Write(string.Join("\t", headers));
             for (var i = 0; i < 32; i++)
             {
-                writer.Write("\t");  writer.Write("{0}", i); 
+                writer.Write("\t");  writer.Write("{0}", i);
             }
             writer.Write("\n");
 
@@ -615,7 +615,7 @@ namespace InformedProteomics.Test
                 writer.Write(featureIdMap[key]);
                 for (var i = 0; i < 32; i++)
                 {
-                    writer.Write("\t"); writer.Write("{0}", tsvParser.GetData(String.Format("{0}", i))[key]); 
+                    writer.Write("\t"); writer.Write("{0}", tsvParser.GetData(String.Format("{0}", i))[key]);
                 }
                 writer.Write("\n");
                 id++;
@@ -626,7 +626,7 @@ namespace InformedProteomics.Test
 
 
         private List<string> GetDataList(string featureDir)
-        {            
+        {
             var fileEntries = Directory.GetFiles(featureDir);
             var dataset = new List<string>();
             foreach (string fileName in fileEntries)
@@ -639,7 +639,7 @@ namespace InformedProteomics.Test
             dataset.Sort();
             return dataset;
         }
-            
+
         [Test]
         public void CopyUTEX()
         {

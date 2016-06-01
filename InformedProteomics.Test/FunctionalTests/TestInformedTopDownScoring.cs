@@ -38,7 +38,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 oxM,
                 acetylN,
             };
-            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);            
+            var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
 
             var composition = aaSet.GetComposition(sequence) + Composition.H2O;

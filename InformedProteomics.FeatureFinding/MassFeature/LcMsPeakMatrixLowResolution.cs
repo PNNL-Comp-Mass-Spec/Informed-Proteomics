@@ -37,7 +37,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             var spec = Run.GetSpectrum(scanNum);
             var deconvoluter = new MaxEntDeconvoluter(spec, _tolerance, _comparer, _minCharge, _maxCharge, _minMass, _maxMass);
             var maxInt = -1.0d;
-            
+
 
             foreach (var feature in deconvoluter.GetMassFeatures())
             {
@@ -63,7 +63,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
             foreach (var cluster in clusters)
             {
                 if (cluster.Count < 3) continue;
-                
+
                 var maxCharge = cluster.Select(m => m.MaxCharge).Max();
                 var minCharge = cluster.Select(m => m.MinCharge).Min();
                 var mass = cluster.Select(m => m.Mass).Median();
@@ -103,7 +103,7 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 _run = run;
                 _tolerance = tol;
             }
-            
+
             public bool SameCluster(Ms1Feature node1, Ms1Feature node2)
             {
                 var massDiff = Math.Abs(node1.Mass - node2.Mass);

@@ -18,7 +18,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                 new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('G'),
                                                         new List<Modification> { Modification.Acetylation }));
             Modifications.Add("113.048",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('A'), 
+                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('A'),
                                                         new List<Modification> { Modification.Acetylation }));
             Modifications.Add("129.043",
                 new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('S'),

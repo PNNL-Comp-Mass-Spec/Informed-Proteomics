@@ -31,7 +31,7 @@ namespace InformedProteomics.Backend.Utils
 
         private static void GetCoreData()
         {
-            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
+            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for
             // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
             NumPhysicalCores = 0;
             NumPhysicalProcessors = 0;

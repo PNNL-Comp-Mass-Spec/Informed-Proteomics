@@ -16,8 +16,8 @@ namespace InformedProteomics.TopDown.Quantification
         /*
          * This is a class that Jung Kap asked me to complete to analyze unidentified features from a cross tab file
          * This class checks to see for each feature how many spectrum contained it, from the spectrum how many tags were genereated, and then
-         * how many of those tags exist in our data base. 
-         * 
+         * how many of those tags exist in our data base.
+         *
          */
         public UnidentifiedFeatureAnalysis(string[] rawFiles, string crossTabFile, string databaseFile)
         {
@@ -69,11 +69,11 @@ namespace InformedProteomics.TopDown.Quantification
 
         /**
          * This prints two files:
-         * 
-         * 1) a general file that looks at each feature and gives the spectrum match count, tag count and database hit count 
-         * 2) a more specific file that matches a featuer to a scan # and then the mz and charge value being looked at. 
-         * 
-         * Format is specific to data Jung gave me 
+         *
+         * 1) a general file that looks at each feature and gives the spectrum match count, tag count and database hit count
+         * 2) a more specific file that matches a featuer to a scan # and then the mz and charge value being looked at.
+         *
+         * Format is specific to data Jung gave me
          */
         public void PrintAnalysisToFile(string outputFolder)
         {
@@ -107,7 +107,7 @@ namespace InformedProteomics.TopDown.Quantification
 
         }
 
-        
+
         public void DoAnalysis()
         {
             InitilizeMatrix(_spectrumMatchesMatrix);
@@ -148,13 +148,13 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var scanElutionTime = run.GetElutionTime(ms2List[i]);
                 if (scanElutionTime < minElution || scanElutionTime > maxElution) continue;
-                
+
                 var spectrum = run.GetSpectrum(ms2List[i]) as ProductSpectrum;
                 var window = spectrum.IsolationWindow;
                 var minMz = window.MinMz - .5;
                 var maxMz = window.MaxMz + .5;
                 var mzTable = GetFeatureMassTable(mass);
-                 
+
                 for (var j = 0; j < mzTable.Length; j++)
                 {
                     var mz = mzTable[j];
@@ -189,7 +189,7 @@ namespace InformedProteomics.TopDown.Quantification
         private int TagsInDatabase(List<SequenceTag.SequenceTag> tags)
         {
             var hits = 0;
-            if (tags.Count == 0) return hits; 
+            if (tags.Count == 0) return hits;
             for (var i = 0; i < tags.Count; i++)
             {
                 var index = _searchableDB.Search(tags[i].Sequence);
@@ -236,9 +236,9 @@ namespace InformedProteomics.TopDown.Quantification
         private string _filteredFile;
         private SearchableDatabase _searchableDB;
         private readonly List<Tuple<int,double, double, double,double,double>> _filteredFeatures;
-        private Tuple<int, double, int>[][] _identifiedFeatures; 
+        private Tuple<int, double, int>[][] _identifiedFeatures;
         private int[][] _spectrumMatchesMatrix;
         private int[][] _tagsGeneratedMatrix;
-        private int[][] _dataBaseHitMatrix;   
+        private int[][] _dataBaseHitMatrix;
     }
 }

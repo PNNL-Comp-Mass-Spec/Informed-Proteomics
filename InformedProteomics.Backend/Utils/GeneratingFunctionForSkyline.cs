@@ -3,9 +3,9 @@
     public class GeneratingFunctionForSkyline
     {
         //public GeneratingFunctionForSkyline(
-        //    double minPrecursorIonMass, 
-        //    double maxPrecursorIonMass, 
-        //    double[] minProductIonMasses, 
+        //    double minPrecursorIonMass,
+        //    double maxPrecursorIonMass,
+        //    double[] minProductIonMasses,
         //    double[] maxProductIonMasses
         //    )
         //{
@@ -30,7 +30,7 @@
         //            if(prevMass < 0) continue;
         //            for (var s = 0; s <= _fragmentMasses.Length; s++)
         //            {
-                        
+
         //            }
         //        }
         //    }

@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.Utils
                     else
                     {
                         s.AppendFormat(formatString, array[i][j]);
-                    }                    
+                    }
                 }
                 s.Append("\n");
             }
@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return sum;
-        }      
+        }
 
     }
 }

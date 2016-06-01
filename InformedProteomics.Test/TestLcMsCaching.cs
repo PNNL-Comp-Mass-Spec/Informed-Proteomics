@@ -114,7 +114,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(@"Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             ISequenceFilter ms1Filter = ms1BasedFilter;
-            
+
             sw.Reset();
             sw.Start();
             const double minProteinMass = 3000.0;
@@ -236,7 +236,7 @@ namespace InformedProteomics.Test
             sw.Reset();
             sw.Start();
             //var ms1BasedFilter = new Ms1BasedFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm);
-//            
+//
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm, 20);
             //var ms1BasedFilter = new ProductScorerBasedOnDeconvolutedSpectra(run,
             //    minPrecursorCharge, maxPrecursorCharge,
@@ -408,7 +408,7 @@ namespace InformedProteomics.Test
             sw.Start();
             //var ms1BasedFilter = new Ms1IsotopeCorrFilter(run, 3, 30, 15, 0.7, 1000);
             var ms1BasedFilter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10));
-            
+
             //var masses = ms1BasedFilter.GetPossibleSequenceMasses(1113);
 
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, 3, 30, 15);
@@ -435,7 +435,7 @@ namespace InformedProteomics.Test
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
-                
+
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
@@ -514,7 +514,7 @@ namespace InformedProteomics.Test
                 var chargePlusOneCorr = xicMostAbundant.GetCorrelation(xicChargePlusOne);
 
                 //var max = new[] {preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr}.Max();
-                //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+                //Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
                 //    scanNum, score, preIsotopeCorr, nextIsotopeCorr, apexIsotopeCorr, plusOneIsotopeCorr, chargeMinusOneCorr, chargePlusOneCorr, max, xicMostAbundant.Count);
             }
 

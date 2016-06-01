@@ -98,7 +98,7 @@ namespace PbfGen
                     PrintUsageInfo("Invalid output file directory: " + specFilePath);
                     return -1;
                 }
-                
+
                 if (!Directory.Exists(outputDir))
                 {
                     if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))

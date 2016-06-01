@@ -248,7 +248,7 @@ namespace InformedProteomics.Test.Obsolete
                     //        else if (spikedInPeptide.EndsWith(peptide)) suffix.Add(spikedInPeptide + "\t" + peptide + "\t" + match.ScanNum);
                     //    }
                     //}
-                }                
+                }
             }
 
             //Console.WriteLine("*********Prefix");

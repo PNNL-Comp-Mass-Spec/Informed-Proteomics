@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// ProteoWizard Reader, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers.
     /// </summary>
     /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation.
-    /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be 
+    /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be
     /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.</remarks>
     public sealed class ProteoWizardReader: IMassSpecDataReader, IDisposable
     {
@@ -263,7 +263,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Add the Assembly Resolver to the system assembly resolver chain
         /// </summary>
-        /// <remarks>This should be called early in the program, so that the ProteoWizard Assembly Resolver will 
+        /// <remarks>This should be called early in the program, so that the ProteoWizard Assembly Resolver will
         /// already be in the resolver chain before any other use of ProteoWizardWrapper.
         /// Also, DependencyLoader.ValidateLoader() should be used to make sure a meaningful error message is thrown if ProteoWizard is not available.</remarks>
         public static void AddAssemblyResolver()
@@ -320,7 +320,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (strAssmbName.FullName.Substring(0, strAssmbName.FullName.IndexOf(',')) == args.Name.Substring(0, args.Name.IndexOf(',')))
                 {
                     //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
-                    //Build the path of the assembly from where it has to be loaded.                
+                    //Build the path of the assembly from where it has to be loaded.
                     strTempAssmbPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(',')) + ".dll");
                     break;
                 }
@@ -330,7 +330,7 @@ namespace InformedProteomics.Backend.MassSpecData
 #endif
             var assemblyFile = new FileInfo(strTempAssmbPath);
 
-            // Load the assembly from the specified path.  
+            // Load the assembly from the specified path.
             Assembly myAssembly;
             try
             {
@@ -387,9 +387,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// PwizPath is populated from this, but only causes a single search.
         /// </summary>
         /// <returns></returns>
-        /// <remarks>Paths searched, in order: 
-        /// "%ProteoWizard%" or "%ProteoWizard%_x86" environment variable data, 
-        /// "C:\DMS_Programs\ProteoWizard" or "C:\DMS_Programs\ProteoWizard_x86", 
+        /// <remarks>Paths searched, in order:
+        /// "%ProteoWizard%" or "%ProteoWizard%_x86" environment variable data,
+        /// "C:\DMS_Programs\ProteoWizard" or "C:\DMS_Programs\ProteoWizard_x86",
         /// "%ProgramFiles%\ProteoWizard\(highest sorted)"</remarks>
         public static string FindPwizPath()
         {
@@ -487,7 +487,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Checks to make sure the path to ProteoWizard files is set. If not, throws an exception.
         /// </summary>
-        /// <remarks>This function should generally only be called inside of a conditional statement to prevent the 
+        /// <remarks>This function should generally only be called inside of a conditional statement to prevent the
         /// exception from being thrown when the ProteoWizard dlls will not be needed.</remarks>
         public static void ValidateLoader()
         {
@@ -548,7 +548,7 @@ namespace InformedProteomics.Backend.MassSpecData
         #endregion
 
         #region Private members and functions
-        
+
         private readonly string _filePath;
         private bool _loaded = false;
         private int _numSpectra = 0;
