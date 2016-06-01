@@ -7,8 +7,8 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.MassFeature;
-using InformedProteomics.Graphics;
 
 namespace InformedProteomics.TopDown.Execution
 {

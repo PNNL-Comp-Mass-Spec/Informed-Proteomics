@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.MassFeature;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-
 using LinearAxis = OxyPlot.Axes.LinearAxis;
 
-namespace InformedProteomics.Graphics
+namespace InformedProteomics.FeatureFinding.Graphics
 {
     public class LcMsFeatureMap
     {

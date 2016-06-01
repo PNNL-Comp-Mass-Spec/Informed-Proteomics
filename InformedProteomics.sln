@@ -43,8 +43,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMex", "ProMex\ProMex.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelectivityScore", "SelectivityScore\SelectivityScore.csproj", "{19658C05-EF09-404D-959F-EF9A6029013B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Graphics", "InformedProteomics.Graphics\InformedProteomics.Graphics.csproj", "{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIS", "SAIS\SAIS.csproj", "{DA126245-858B-4084-AB86-54FE1E10772E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj", "{2451E7B5-3B3E-4059-8530-80489E5188DE}"
@@ -199,18 +197,6 @@ Global
 		{19658C05-EF09-404D-959F-EF9A6029013B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{19658C05-EF09-404D-959F-EF9A6029013B}.Release|x64.ActiveCfg = Release|Any CPU
 		{19658C05-EF09-404D-959F-EF9A6029013B}.Release|x64.Build.0 = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Debug|x64.Build.0 = Debug|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|x64.ActiveCfg = Release|Any CPU
-		{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}.Release|x64.Build.0 = Release|Any CPU
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
