@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding.IsotopicEnvelope;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Data
 {
 
     public class Ms1Spectrum : Spectrum

@@ -1,7 +1,8 @@
 ﻿using System;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.FeatureFinding.Data;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 {
     public abstract class IsotopeEnvelope
     {

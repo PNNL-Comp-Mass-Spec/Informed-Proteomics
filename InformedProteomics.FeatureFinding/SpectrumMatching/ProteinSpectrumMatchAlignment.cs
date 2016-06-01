@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.FeatureFinding.Util;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchAlignment
     {

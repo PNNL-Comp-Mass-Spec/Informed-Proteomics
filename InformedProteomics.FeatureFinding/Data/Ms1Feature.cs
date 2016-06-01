@@ -2,7 +2,7 @@
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Data
 {
     public class Ms1Feature
     {

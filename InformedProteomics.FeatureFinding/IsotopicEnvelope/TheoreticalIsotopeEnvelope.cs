@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 {
     public class TheoreticalIsotopeEnvelope : IsotopeEnvelope
     {

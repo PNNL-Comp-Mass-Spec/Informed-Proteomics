@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.FeatureFinding.MassFeature;
+using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 

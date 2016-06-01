@@ -6,7 +6,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.FeatureFinding.MassFeature;
+using InformedProteomics.FeatureFinding.Alignment;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.SpectrumMatching;
+using InformedProteomics.FeatureFinding.Util;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 

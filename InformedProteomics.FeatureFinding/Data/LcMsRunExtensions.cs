@@ -1,6 +1,6 @@
 ﻿using InformedProteomics.Backend.MassSpecData;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Data
 {
     public static class LcMsRunExtensions
     {

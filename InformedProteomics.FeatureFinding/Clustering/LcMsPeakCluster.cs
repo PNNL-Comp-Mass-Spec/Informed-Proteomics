@@ -4,8 +4,10 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.IsotopicEnvelope;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Clustering
 {
     public class LcMsPeakCluster : LcMsFeature
     {

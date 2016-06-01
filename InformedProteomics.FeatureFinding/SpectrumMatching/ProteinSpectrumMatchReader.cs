@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchReader
     {

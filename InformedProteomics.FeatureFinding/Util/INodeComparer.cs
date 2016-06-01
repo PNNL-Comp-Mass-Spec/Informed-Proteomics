@@ -1,4 +1,4 @@
-﻿namespace InformedProteomics.FeatureFinding.MassFeature
+﻿namespace InformedProteomics.FeatureFinding.Util
 {
     public interface INodeComparer<T>
     {

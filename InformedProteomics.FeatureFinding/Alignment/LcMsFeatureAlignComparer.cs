@@ -1,7 +1,9 @@
 ﻿using System;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.Util;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Alignment
 {
     public class LcMsFeatureAlignComparer : INodeComparer<LcMsFeature>
     {

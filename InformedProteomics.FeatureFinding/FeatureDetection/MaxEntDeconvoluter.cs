@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.FeatureFinding.Data;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.FeatureDetection
 {
     public class MaxEntDeconvoluter
     {

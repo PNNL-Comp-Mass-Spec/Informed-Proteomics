@@ -5,8 +5,10 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.SpectrumMatching;
+using InformedProteomics.FeatureFinding.Util;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Training
 {
     public class LcMsFeatureTrain
     {

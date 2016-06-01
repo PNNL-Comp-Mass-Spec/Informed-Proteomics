@@ -12,7 +12,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.FeatureFinding.MassFeature;
+using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
