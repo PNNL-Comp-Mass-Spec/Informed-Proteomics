@@ -11,6 +11,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.SequenceTag;
@@ -26,7 +27,7 @@ namespace InformedProteomics.Test
         public void TestFeatureId()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
 
@@ -149,7 +150,7 @@ namespace InformedProteomics.Test
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\Lewy\raw\Lewy_intact_07";
             //            const int scanNum = 5158;
@@ -234,7 +235,7 @@ namespace InformedProteomics.Test
         public void TestTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
             const int scanNum = 4533;
@@ -274,7 +275,7 @@ namespace InformedProteomics.Test
         public void TestFeatureIdMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string resultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V092\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
 
@@ -467,7 +468,7 @@ namespace InformedProteomics.Test
         public void TestTagMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // Parse sequence tags
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";

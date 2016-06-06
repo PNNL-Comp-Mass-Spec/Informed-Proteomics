@@ -66,68 +66,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FunctionalTests\TestAminoAcidSet.cs" />
-    <Compile Include="FunctionalTests\TestGeneratingFunction.cs" />
-    <Compile Include="FunctionalTests\TestInformedTopDownScoring.cs" />
-    <Compile Include="FunctionalTests\TestProteinMassBining.cs" />
-    <Compile Include="FunctionalTests\TestReadingProMex.cs" />
-    <Compile Include="FunctionalTests\TestSpectrumMethods.cs" />
-    <Compile Include="FunctionalTests\TestTopDownConsole.cs" />
-    <Compile Include="FunctionalTests\TestTopDownDeconvolution.cs" />
-    <Compile Include="FunctionalTests\TestFdrCalculation.cs" />
-    <Compile Include="FunctionalTests\TestFitScore.cs" />
-    <Compile Include="FunctionalTests\TestIcTopDownResults.cs" />
-    <Compile Include="FunctionalTests\TestIonFrequencyFunction.cs" />
-    <Compile Include="FunctionalTests\TestOffsetFrequencyFunction.cs" />
-    <Compile Include="FunctionalTests\TestPbfLcMsRun.cs" />
-    <Compile Include="FunctionalTests\TestReadingMsgfPlusResults.cs" />
-    <Compile Include="FunctionalTests\TestSequenceObjects.cs" />
-    <Compile Include="FunctionalTests\TestTopDownScoring.cs" />
-    <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FunctionalTests\TestMassSpecDataReaderFactory.cs" />
     <Compile Include="TestBottomUpScoring.cs" />
     <Compile Include="TestFastProteinId.cs" />
     <Compile Include="TestFeatureBasedSearch.cs" />
     <Compile Include="TestIcBottomUp.cs" />
-    <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
-    <Compile Include="Obsolete\TestIMSScoring.cs" />
-    <Compile Include="TestIprg.cs" />
-    <Compile Include="TestLcMsFeatureAlignment.cs" />
-    <Compile Include="TestLcMsFeatureFind.cs" />
-    <Compile Include="TestLcMsMap.cs" />
-    <Compile Include="TestMisc.cs" />
     <Compile Include="TestIonFrequency.cs" />
-    <Compile Include="TestMultiThreading.cs" />
     <Compile Include="TestOffsetFrequency.cs" />
-    <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
-    <Compile Include="FunctionalTests\TestSequenceGraph.cs" />
-    <Compile Include="TestLcMsCaching.cs" />
     <Compile Include="TestProMex.cs" />
     <Compile Include="TestRankProbability.cs" />
     <Compile Include="TestRankScore.cs" />
-    <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestResults.cs" />
     <Compile Include="TestSelectivityScore.cs" />
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestSequenceTagMatching.cs" />
-    <Compile Include="TestUtex.cs" />
     <Compile Include="TestUtils.cs" />
-    <Compile Include="TestYufengData.cs" />
-    <Compile Include="TopDownAnalysis\AnalysisCompRef.cs" />
-    <Compile Include="TopDownAnalysis\AnalysisCompRefKelleherData.cs" />
-    <Compile Include="TopDownAnalysis\AnalysisLewy.cs" />
-    <Compile Include="TopDownAnalysis\AnalysisSpikeIn.cs" />
-    <Compile Include="TopDownAnalysis\AnalysisTopDownMatchedPeaks.cs" />
-    <Compile Include="TopDownAnalysis\TestLikelihoodScorer.cs" />
-    <Compile Include="TopDownAnalysis\TestMsDeconvDecon2LS.cs" />
-    <Compile Include="UnidentifiedFeatureAnalysisTest.cs" />
-    <Compile Include="UnitTests\TestLcMsRun.cs" />
-    <Compile Include="UnitTests\TestMzMLReader.cs" />
-    <Compile Include="UnitTests\TestProteoWizardWrapper.cs" />
-    <Compile Include="UnitTests\TestSimpleUtils.cs" />
-    <Compile Include="UnitTests\TestSuffixArray.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -157,6 +111,10 @@
     <ProjectReference Include="..\InformedProteomics.Scoring\InformedProteomics.Scoring.csproj">
       <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
       <Name>InformedProteomics.Scoring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Tests.Base\InformedProteomics.Tests.Base.csproj">
+      <Project>{46c049da-cd38-4b89-a09c-c92e0513d74c}</Project>
+      <Name>InformedProteomics.Tests.Base</Name>
     </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>

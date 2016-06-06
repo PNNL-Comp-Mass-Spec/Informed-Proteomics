@@ -47,6 +47,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIS", "SAIS\SAIS.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj", "{2451E7B5-3B3E-4059-8530-80489E5188DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.DevTests", "InformedProteomics.Tests.DevTests\InformedProteomics.Tests.DevTests.csproj", "{66EC5AEF-807E-470A-9203-D4A061339C44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.UnitTests", "InformedProteomics.Tests.UnitTests\InformedProteomics.Tests.UnitTests.csproj", "{2AA38675-D0CF-45AA-B854-910F5EB435EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.Base", "InformedProteomics.Tests.Base\InformedProteomics.Tests.Base.csproj", "{46C049DA-CD38-4B89-A09C-C92E0513D74C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.FunctionalTests", "InformedProteomics.Tests.FunctionalTests\InformedProteomics.Tests.FunctionalTests.csproj", "{4FF328A8-2CF4-45E7-9B78-2576F4617C17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +171,36 @@ Global
 		{2451E7B5-3B3E-4059-8530-80489E5188DE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2451E7B5-3B3E-4059-8530-80489E5188DE}.Release|x64.ActiveCfg = Release|Any CPU
 		{2451E7B5-3B3E-4059-8530-80489E5188DE}.Release|x64.Build.0 = Release|Any CPU
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Debug|x64.ActiveCfg = Debug|x64
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Debug|x64.Build.0 = Debug|x64
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Release|Any CPU.ActiveCfg = Release|x64
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Release|x64.ActiveCfg = Release|x64
+		{66EC5AEF-807E-470A-9203-D4A061339C44}.Release|x64.Build.0 = Release|x64
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Debug|x64.Build.0 = Debug|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Release|x64.ActiveCfg = Release|Any CPU
+		{2AA38675-D0CF-45AA-B854-910F5EB435EE}.Release|x64.Build.0 = Release|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Debug|x64.Build.0 = Debug|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Release|x64.ActiveCfg = Release|Any CPU
+		{46C049DA-CD38-4B89-A09C-C92E0513D74C}.Release|x64.Build.0 = Release|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Debug|x64.Build.0 = Debug|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Release|x64.ActiveCfg = Release|Any CPU
+		{4FF328A8-2CF4-45E7-9B78-2576F4617C17}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

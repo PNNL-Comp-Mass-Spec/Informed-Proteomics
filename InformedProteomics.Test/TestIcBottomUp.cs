@@ -9,6 +9,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Execution;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -21,7 +22,7 @@ namespace InformedProteomics.Test
         public void TestChaoChaoWhim()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\ChaoChao\WHIM\raw";
             if (!Directory.Exists(specFileDir))
@@ -39,7 +40,7 @@ namespace InformedProteomics.Test
         public void TestChaoChao(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
             {
@@ -109,7 +110,7 @@ namespace InformedProteomics.Test
         public void TestEdrn()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFileDir = @"H:\Research\EDRN\RawFiles\DIA";
             if (!Directory.Exists(specFileDir))
@@ -127,7 +128,7 @@ namespace InformedProteomics.Test
         public void TestEdrn(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
             {
@@ -168,7 +169,7 @@ namespace InformedProteomics.Test
         public void TestMaccossDia()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
             if (!Directory.Exists(specFileDir))
@@ -187,7 +188,7 @@ namespace InformedProteomics.Test
         public void TestMaccossDda()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
             if (!Directory.Exists(specFileDir))
@@ -206,7 +207,7 @@ namespace InformedProteomics.Test
         public void TestMaccoss(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
             {
@@ -247,7 +248,7 @@ namespace InformedProteomics.Test
         public void TestQcShewQExactive()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // QC_Shew QE
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -290,7 +291,7 @@ namespace InformedProteomics.Test
         public void TestDdaPlus()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // QC_Shew QE
             const string specFilePath = @"H:\Research\DDAPlus\raw\20140701_yeast_DDA_01.raw";
@@ -332,7 +333,7 @@ namespace InformedProteomics.Test
         public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int ntt, double corrThreshold = 0.3)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // Search parameters
             const int minSequenceLength = 6; // 7

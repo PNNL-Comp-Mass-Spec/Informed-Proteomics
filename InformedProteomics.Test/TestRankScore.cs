@@ -8,6 +8,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -19,7 +20,7 @@ namespace InformedProteomics.Test
         public void RankScoreParamResources()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int ranks = 20;
             var rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Iontrap, Enzyme.Trypsin,
@@ -42,7 +43,7 @@ namespace InformedProteomics.Test
         public void RankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int ranks = 20;
 
@@ -71,7 +72,7 @@ namespace InformedProteomics.Test
         public void DiaRankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataFile =
     @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";

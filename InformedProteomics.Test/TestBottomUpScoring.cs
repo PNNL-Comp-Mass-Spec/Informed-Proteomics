@@ -11,6 +11,7 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
 using InformedProteomics.DIA.Search;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -23,7 +24,7 @@ namespace InformedProteomics.Test
         public void TestPsm()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             if (!File.Exists(specFilePath))
@@ -60,7 +61,7 @@ namespace InformedProteomics.Test
         public void TestVennDiagram()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string result1Path = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod_NTT1.tsv";
             const string result2Path = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT1_Test\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTda.tsv";
@@ -91,7 +92,7 @@ namespace InformedProteomics.Test
         public void TestLogLikelihoodScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             if (!File.Exists(specFilePath))
@@ -117,7 +118,7 @@ namespace InformedProteomics.Test
         public void TestInitialScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string icResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT2_03_NoMod_NoRescoring\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTarget.tsv";
             if (!File.Exists(icResultPath))
@@ -160,7 +161,7 @@ namespace InformedProteomics.Test
         public void TestMs1Filter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string msgfPlusResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
             if (!File.Exists(msgfPlusResultPath))
@@ -205,7 +206,7 @@ namespace InformedProteomics.Test
         public void TestPeptideLevelStats()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int topK = 10;
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
@@ -289,7 +290,7 @@ namespace InformedProteomics.Test
         public void CompareIpaIc()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_03";
             if (!Directory.Exists(resultDir))

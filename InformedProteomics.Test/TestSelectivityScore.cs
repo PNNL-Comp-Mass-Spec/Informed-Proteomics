@@ -5,6 +5,7 @@ using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 using SelectivityScore;
 
@@ -17,7 +18,7 @@ namespace InformedProteomics.Test
         public void TestSelectivityScoreUsingNominalMasses()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             var aaSet = AminoAcidSet.GetStandardAminoAcidSetWithCarboamidomethylCys();
 
@@ -45,7 +46,7 @@ namespace InformedProteomics.Test
         public void TestBinSize()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const double mass = 907.4763;
             const double minMass = mass - 25.0;
