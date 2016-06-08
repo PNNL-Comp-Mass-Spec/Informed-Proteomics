@@ -25,7 +25,7 @@ Source: SAIS\bin\Release\SAIS.dll                                               
 Source: lib\MSIL\alglibnet2.dll                                                                                                                   ; DestDir: {app}
 Source: lib\MSIL\PNNLOmics.dll                                                                                                                    ; DestDir: {app}
 Source: lib\MSIL\ProteinFileReader.dll                                                                                                            ; DestDir: {app}
-Source: lib\MSIL\ThermoRawFileReaderDLL.dll                                                                                                       ; DestDir: {app}
+Source: lib\MSIL\ThermoRawFileReader.dll                                                                                                       ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
 Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}

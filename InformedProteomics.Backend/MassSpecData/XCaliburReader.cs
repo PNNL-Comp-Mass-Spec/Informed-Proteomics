@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
-using ThermoRawFileReaderDLL.FinniganFileIO;
+using ThermoRawFileReader;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -14,9 +14,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public XCaliburReader(string filePath)
         {
-            _cachedScanInfo = new ThermoRawFileReaderDLL.clsScanInfo(-1);
+            _cachedScanInfo = new clsScanInfo(-1);
 
-            _msfileReader = new ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO();
+            _msfileReader = new XRawFileIO();
 
             var dataFile = new FileInfo(filePath);
             if (!dataFile.Exists)
@@ -176,9 +176,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         // Obsolete: Now using ThermoRawFileReader")>
         //private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
-        private readonly ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO _msfileReader;
+        private readonly XRawFileIO _msfileReader;
 
-        private ThermoRawFileReaderDLL.clsScanInfo _cachedScanInfo;
+        private clsScanInfo _cachedScanInfo;
 
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
@@ -285,19 +285,19 @@ namespace InformedProteomics.Backend.MassSpecData
 
             switch (scanInfo.ActivationType)
             {
-                case FinniganFileReaderBaseClass.ActivationTypeConstants.CID:
+                case ActivationTypeConstants.CID:
                     return ActivationMethod.CID;
 
-                case FinniganFileReaderBaseClass.ActivationTypeConstants.ECD:
+                case ActivationTypeConstants.ECD:
                     return ActivationMethod.ECD;
 
-                case FinniganFileReaderBaseClass.ActivationTypeConstants.PQD:
+                case ActivationTypeConstants.PQD:
                     return ActivationMethod.PQD;
 
-                case FinniganFileReaderBaseClass.ActivationTypeConstants.ETD:
+                case ActivationTypeConstants.ETD:
                     return ActivationMethod.ETD;
 
-                case FinniganFileReaderBaseClass.ActivationTypeConstants.HCD:
+                case ActivationTypeConstants.HCD:
                     return ActivationMethod.HCD;
 
                 default:
@@ -305,7 +305,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        private ThermoRawFileReaderDLL.clsScanInfo GetScanInfo(int scanNum)
+        private clsScanInfo GetScanInfo(int scanNum)
         {
             if (_cachedScanInfo == null || _cachedScanInfo.ScanNumber != scanNum)
                 _msfileReader.GetScanInfo(scanNum, out _cachedScanInfo);
