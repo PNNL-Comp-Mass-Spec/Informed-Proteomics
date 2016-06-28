@@ -12,6 +12,11 @@ namespace InformedProteomics.Backend.Data.Composition
 
         public static IsotopomerEnvelope GetIsotopomerEnvelop(int c, int h, int n, int o, int s)
         {
+            return Predictor.GetIsotopomerEnvelope(c, h, n, o, s);
+        }
+
+        public IsotopomerEnvelope GetIsotopomerEnvelope(int c, int h, int n, int o, int s)
+        {
             var dist = new double[MaxNumIsotopes];
             var means = new double[_possibleIsotopeCombinations[0][0].Length + 1];
             var exps = new double[means.Length];
@@ -55,24 +60,44 @@ namespace InformedProteomics.Backend.Data.Composition
             return new IsotopomerEnvelope(truncatedDist, mostIntenseIsotopomerIndex);
         }
 
-        static IsoProfilePredictor()
+        public static IsoProfilePredictor Predictor = new IsoProfilePredictor();
+
+        public IsoProfilePredictor()
         {
-            ProbC = new[] { .9893, 0.0107, 0, 0 };
-            ProbH = new[] { .999885, .000115, 0, 0 };
-            ProbN = new[] { 0.99632, 0.00368, 0, 0 };
-            ProbO = new[] { 0.99757, 0.00038, 0.00205, 0 };
-            ProbS = new[] { 0.9493, 0.0076, 0.0429, 0.0002 };
+            ProbC = DefaultProbC;
+            ProbH = DefaultProbH;
+            ProbN = DefaultProbN;
+            ProbO = DefaultProbO;
+            ProbS = DefaultProbS;
             ComputePossibleIsotopeCombinations(MaxNumIsotopes);
         }
 
-        private static readonly double[] ProbC = { .9893, 0.0107, 0, 0 };
-        private static readonly double[] ProbH = { .999885, .000115, 0, 0 };
-        private static readonly double[] ProbN = { 0.99632, 0.00368, 0, 0 };
-        private static readonly double[] ProbO = { 0.99757, 0.00038, 0.00205, 0 };
-        private static readonly double[] ProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
-        private static int[][][] _possibleIsotopeCombinations;
+        public IsoProfilePredictor(double[] probC, double[] probH, double[] probN, double[] probO, double[] probS)
+        {
+            ProbC = probC;
+            ProbH = probH;
+            ProbN = probN;
+            ProbO = probO;
+            ProbS = probS;
+            ComputePossibleIsotopeCombinations(MaxNumIsotopes);
+        }
 
-        private static void ComputePossibleIsotopeCombinations(int max) // called just once. 
+        public static readonly double[] DefaultProbC = { .9893, 0.0107, 0, 0 };
+        public static readonly double[] DefaultProbH = { .999885, .000115, 0, 0 };
+        public static readonly double[] DefaultProbN = { 0.99632, 0.00368, 0, 0 };
+        public static readonly double[] DefaultProbO = { 0.99757, 0.00038, 0.00205, 0 };
+        public static readonly double[] DefaultProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
+
+
+        public double[] ProbC { get; private set; }
+        public double[] ProbH { get; private set; }
+        public double[] ProbN { get; private set; }
+        public double[] ProbO { get; private set; }
+        public double[] ProbS { get; private set; }
+
+        private int[][][] _possibleIsotopeCombinations;
+
+        private void ComputePossibleIsotopeCombinations(int max) // called just once. 
         {
             var comb = new List<int[]>[max + 1];
             var maxIsotopeNumberInElement = ProbC.Length - 1;
@@ -109,7 +134,7 @@ namespace InformedProteomics.Backend.Data.Composition
             _possibleIsotopeCombinations = possibleIsotopeCombinations;
         }
 
-        private static double GetIsotopeProbability(int[] number, double[] means, double[] exps)
+        private double GetIsotopeProbability(int[] number, double[] means, double[] exps)
         {
             var prob = 1.0;
             for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)

@@ -8,16 +8,16 @@ namespace InformedProteomics.Backend.Data.Composition
 {
     public class Averagine
     {
-        public static IsotopomerEnvelope GetIsotopomerEnvelope(double monoIsotopeMass)
+        public static IsotopomerEnvelope GetIsotopomerEnvelope(double monoIsotopeMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
-            return GetIsotopomerEnvelopeFromNominalMass(nominalMass);
+            return GetIsotopomerEnvelopeFromNominalMass(nominalMass, isoProfilePredictor);
         }
 
-        public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1)
+        public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1, IsoProfilePredictor isoProfilePredictor = null)
         {
             var peakList = new List<Peak>();
-            var envelope = GetIsotopomerEnvelope(monoIsotopeMass);
+            var envelope = GetIsotopomerEnvelope(monoIsotopeMass, isoProfilePredictor);
             for (var isotopeIndex = 0; isotopeIndex < envelope.Envolope.Length; isotopeIndex++)
             {
                 var intensity = envelope.Envolope[isotopeIndex];
@@ -28,14 +28,14 @@ namespace InformedProteomics.Backend.Data.Composition
             return peakList;
         }
 
-        public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass)
+        public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             IsotopomerEnvelope envelope;
             var nominalMassFound = IsotopeEnvelopMap.TryGetValue(nominalMass, out envelope);
             if (nominalMassFound) return envelope;
 
             var mass = nominalMass/Constants.RescalingConstant;
-            envelope = ComputeIsotopomerEnvelope(mass);
+            envelope = ComputeIsotopomerEnvelope(mass, isoProfilePredictor);
             IsotopeEnvelopMap.AddOrUpdate(nominalMass, envelope, (key, value) => value);
 
             return envelope;
@@ -55,7 +55,7 @@ namespace InformedProteomics.Backend.Data.Composition
             IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
         }
 
-        private static IsotopomerEnvelope ComputeIsotopomerEnvelope(double mass)
+        private static IsotopomerEnvelope ComputeIsotopomerEnvelope(double mass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var numAveragines = mass / AveragineMass;
             var numC = (int)Math.Round(C * numAveragines);
@@ -65,7 +65,9 @@ namespace InformedProteomics.Backend.Data.Composition
             var numS = (int)Math.Round(S * numAveragines);
 
             if (numH == 0) numH = 1;
-            return IsoProfilePredictor.GetIsotopomerEnvelop(numC, numH, numN, numO, numS);
+
+            isoProfilePredictor = isoProfilePredictor ?? IsoProfilePredictor.Predictor;
+            return isoProfilePredictor.GetIsotopomerEnvelope(numC, numH, numN, numO, numS);
         }
     }
 }

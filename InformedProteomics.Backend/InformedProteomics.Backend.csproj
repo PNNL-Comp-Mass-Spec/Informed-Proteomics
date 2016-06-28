@@ -195,6 +195,7 @@
     <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\GeneratingFunctionForSkyline.cs" />
     <Compile Include="Utils\IntRange.cs" />
+    <Compile Include="Utils\IsotopicConcentrationTuner.cs" />
     <Compile Include="Utils\ListUtil.cs" />
     <Compile Include="Utils\Misc.cs" />
     <Compile Include="Utils\OtsuThreshold.cs" />
