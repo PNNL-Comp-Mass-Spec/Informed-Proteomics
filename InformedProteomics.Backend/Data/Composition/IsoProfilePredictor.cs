@@ -60,7 +60,12 @@ namespace InformedProteomics.Backend.Data.Composition
             return new IsotopomerEnvelope(truncatedDist, mostIntenseIsotopomerIndex);
         }
 
-        public static IsoProfilePredictor Predictor = new IsoProfilePredictor();
+        public static IsoProfilePredictor Predictor;
+
+        static IsoProfilePredictor()
+        {
+            Predictor = new IsoProfilePredictor();
+        }
 
         public IsoProfilePredictor()
         {
