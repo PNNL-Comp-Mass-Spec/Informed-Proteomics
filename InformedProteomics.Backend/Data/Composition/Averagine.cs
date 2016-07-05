@@ -8,16 +8,34 @@ namespace InformedProteomics.Backend.Data.Composition
 {
     public class Averagine
     {
-        public static IsotopomerEnvelope GetIsotopomerEnvelope(double monoIsotopeMass, IsoProfilePredictor isoProfilePredictor = null)
+        // NominalMass -> Isotope Envelop (Changed to ConcurrentDictionary by Chris)
+        private readonly ConcurrentDictionary<int, IsotopomerEnvelope> IsotopeEnvelopMap;
+
+        public Averagine()
         {
-            var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
-            return GetIsotopomerEnvelopeFromNominalMass(nominalMass, isoProfilePredictor);
+            this.IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
         }
 
-        public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1, IsoProfilePredictor isoProfilePredictor = null)
+        public static IsotopomerEnvelope GetIsotopomerEnvelope(double monoIsotopeMass)
+        {
+            return DefaultAveragine.GetIsotopomerEnvelopeInst(monoIsotopeMass);
+        }
+
+        public IsotopomerEnvelope GetIsotopomerEnvelopeInst(double monoIsotopeMass, IsoProfilePredictor isoProfilePredictor = null)
+        {
+            var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
+            return GetIsotopomerEnvelopeFromNominalMassInst(nominalMass, isoProfilePredictor);
+        }
+
+        public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1)
+        {
+            return DefaultAveragine.GetTheoreticalIsotopeProfileInst(monoIsotopeMass, charge, relativeIntensityThreshold);
+        }
+
+        public List<Peak> GetTheoreticalIsotopeProfileInst(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1, IsoProfilePredictor isoProfilePredictor = null)
         {
             var peakList = new List<Peak>();
-            var envelope = GetIsotopomerEnvelope(monoIsotopeMass, isoProfilePredictor);
+            var envelope = GetIsotopomerEnvelopeInst(monoIsotopeMass, isoProfilePredictor);
             for (var isotopeIndex = 0; isotopeIndex < envelope.Envolope.Length; isotopeIndex++)
             {
                 var intensity = envelope.Envolope[isotopeIndex];
@@ -28,7 +46,12 @@ namespace InformedProteomics.Backend.Data.Composition
             return peakList;
         }
 
-        public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
+        public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass)
+        {
+            return DefaultAveragine.GetIsotopomerEnvelopeFromNominalMassInst(nominalMass);
+        }
+
+        public IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMassInst(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             IsotopomerEnvelope envelope;
             var nominalMassFound = IsotopeEnvelopMap.TryGetValue(nominalMass, out envelope);
@@ -48,14 +71,14 @@ namespace InformedProteomics.Backend.Data.Composition
         private const double S = 0.0417;
         private const double AveragineMass = C * Atom.C + H * Atom.H + N * Atom.N + O * Atom.O + S * Atom.S;
 
-        private static readonly ConcurrentDictionary<int, IsotopomerEnvelope> IsotopeEnvelopMap; // NominalMass -> Isotope Envelop (Changed to ConcurrentDictionary by Chris)
+        public static Averagine DefaultAveragine;
 
         static Averagine()
         {
-            IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
+            DefaultAveragine = new Averagine();
         }
 
-        private static IsotopomerEnvelope ComputeIsotopomerEnvelope(double mass, IsoProfilePredictor isoProfilePredictor = null)
+        private IsotopomerEnvelope ComputeIsotopomerEnvelope(double mass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var numAveragines = mass / AveragineMass;
             var numC = (int)Math.Round(C * numAveragines);

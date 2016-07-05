@@ -175,7 +175,9 @@ namespace InformedProteomics.Backend.Utils
                 this.Element.Code == "S" ? proportions : IsoProfilePredictor.DefaultProbS
             );
 
-            return Averagine.GetTheoreticalIsotopeProfile(
+            var averagine = new Averagine();
+
+            return averagine.GetTheoreticalIsotopeProfileInst(
                                 this.Mass, 
                                 this.Charge,
                                 this.RelativeIntensityThreshold,
@@ -274,6 +276,15 @@ namespace InformedProteomics.Backend.Utils
         /// </summary>
         public class IsotopeConcentrationCorrelationCurve
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="IsotopeConcentrationCorrelationCurve" />. 
+            /// </summary>
+            public IsotopeConcentrationCorrelationCurve()
+            {
+                this.DataPoints = new List<ConcentrationCorrelationPoint>();
+                this.BestConcentration = new ConcentrationCorrelationPoint();
+            }
+
             /// <summary>
             /// Gets or sets the curve showing isotope concentration vs pearson correlation with fit to observed peaks.
             /// </summary>
