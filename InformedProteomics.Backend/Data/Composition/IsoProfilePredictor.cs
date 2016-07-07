@@ -7,8 +7,8 @@ namespace InformedProteomics.Backend.Data.Composition
 {
     public class IsoProfilePredictor
     {
-        public const int MaxNumIsotopes = 100;
-        public const double IsotopeRelativeIntensityThreshold = 0.1;
+        public int MaxNumIsotopes { get; set; }
+        public double IsotopeRelativeIntensityThreshold { get; set; }
 
         public static IsotopomerEnvelope GetIsotopomerEnvelop(int c, int h, int n, int o, int s)
         {
@@ -67,24 +67,45 @@ namespace InformedProteomics.Backend.Data.Composition
             Predictor = new IsoProfilePredictor();
         }
 
-        public IsoProfilePredictor()
+        public IsoProfilePredictor(double relativeIntensityThreshold = 0.1, int maxNumIsotopes = 100)
         {
             ProbC = DefaultProbC;
             ProbH = DefaultProbH;
             ProbN = DefaultProbN;
             ProbO = DefaultProbO;
             ProbS = DefaultProbS;
-            ComputePossibleIsotopeCombinations(MaxNumIsotopes);
+
+            this.IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
+            this.MaxNumIsotopes = maxNumIsotopes;
+
+            if (_possibleIsotopeCombinations == null)
+            {
+                ComputePossibleIsotopeCombinations(MaxNumIsotopes, ProbC.Length - 1);
+            }
         }
 
-        public IsoProfilePredictor(double[] probC, double[] probH, double[] probN, double[] probO, double[] probS)
+        public IsoProfilePredictor(
+                                   double[] probC,
+                                   double[] probH,
+                                   double[] probN, 
+                                   double[] probO,
+                                   double[] probS,
+                                   double relativeIntensityThreshold = 0.1,
+                                   int maxNumIsotopes = 100)
         {
             ProbC = probC;
             ProbH = probH;
             ProbN = probN;
             ProbO = probO;
             ProbS = probS;
-            ComputePossibleIsotopeCombinations(MaxNumIsotopes);
+
+            this.IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
+            this.MaxNumIsotopes = maxNumIsotopes;
+
+            if (_possibleIsotopeCombinations == null)
+            {
+                ComputePossibleIsotopeCombinations(MaxNumIsotopes, ProbC.Length - 1);   
+            }
         }
 
         public static readonly double[] DefaultProbC = { .9893, 0.0107, 0, 0 };
@@ -100,12 +121,11 @@ namespace InformedProteomics.Backend.Data.Composition
         public double[] ProbO { get; private set; }
         public double[] ProbS { get; private set; }
 
-        private int[][][] _possibleIsotopeCombinations;
+        private static int[][][] _possibleIsotopeCombinations;
 
-        private void ComputePossibleIsotopeCombinations(int max) // called just once. 
+        private static void ComputePossibleIsotopeCombinations(int max, int maxIsotopeNumberInElement = 3) // called just once. 
         {
             var comb = new List<int[]>[max + 1];
-            var maxIsotopeNumberInElement = ProbC.Length - 1;
             comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };
 
             for (var n = 1; n <= max; n++)
