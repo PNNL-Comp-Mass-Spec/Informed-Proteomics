@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class IonTypeFactory
     {
 
@@ -43,6 +45,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IonType GetIonType(string name)
         {
             return _ionTypeMap[name];
+        }
+
+        public IonType GetIonType(BaseIonType baseIonType, int charge, NeutralLoss neutralLoss)
+        {
+            var ionTypeName = string.Format("{0}{1}{2}", baseIonType.Symbol, charge, neutralLoss.Name);
+            return _ionTypeMap[ionTypeName];
         }
 
         public IonType GetIonType(bool isPrefix, int charge, float offset)

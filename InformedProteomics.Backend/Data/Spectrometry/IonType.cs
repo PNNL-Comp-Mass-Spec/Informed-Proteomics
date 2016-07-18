@@ -5,6 +5,11 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class IonType
     {
         public string Name { get; private set; }
@@ -60,6 +65,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             return new Ion(cutComposition + OffsetComposition, Charge);
         }
+
+        public IEnumerable<Ion> GetPossibleIons(Sequence sequence)
+        {
+            var cutComposition = sequence.Composition;
+            var terminalResidue = IsPrefixIon ? sequence[sequence.Count - 1] : sequence[0];
+            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
+                                   .Select(offsetComposition => cutComposition + offsetComposition)
+                                   .Select(comp => new Ion(comp, Charge));
+        } 
 
         public override string ToString()
         {
