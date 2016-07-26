@@ -118,22 +118,47 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new IonType(name, composition, charge, isPrefixIon);
         }
 
+        //public override bool Equals(object obj)
+        //{
+        //    var type = obj as IonType;
+        //    if (type != null)
+        //    {
+        //        var other = type;
+        //        return other.IsPrefixIon.Equals(IsPrefixIon) && other.OffsetComposition.Equals(OffsetComposition) &&
+        //               other.Charge == Charge;
+        //    }
+        //    return false;
+        //}
+
+        //public override int GetHashCode()
+        //{
+        //    //return IsPrefixIon.GetHashCode() + OffsetComposition.GetHashCode() + Charge.GetHashCode();
+
+        protected bool Equals(IonType other)
+        {
+            return string.Equals(this.Name, other.Name) && Equals(this.OffsetComposition, other.OffsetComposition) && this.IsPrefixIon == other.IsPrefixIon;
+        }
+
         public override bool Equals(object obj)
         {
-            var type = obj as IonType;
-            if (type != null)
-            {
-                var other = type;
-                return other.IsPrefixIon.Equals(IsPrefixIon) && other.OffsetComposition.Equals(OffsetComposition) &&
-                       other.Charge == Charge;
-            }
-            return false;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((IonType)obj);
         }
 
         public override int GetHashCode()
         {
-            return IsPrefixIon.GetHashCode()*OffsetComposition.GetHashCode()*Charge.GetHashCode();
+            unchecked
+            {
+                var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.OffsetComposition != null ? this.OffsetComposition.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.IsPrefixIon.GetHashCode();
+                return hashCode;
+            }
         }
+
+        //}
     }
   
 }
