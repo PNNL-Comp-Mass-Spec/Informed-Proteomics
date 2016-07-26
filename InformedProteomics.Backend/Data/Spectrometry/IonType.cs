@@ -66,13 +66,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new Ion(cutComposition + OffsetComposition, Charge);
         }
 
+        public IEnumerable<Ion> GetPossibleIons(Composition.Composition cutComposition, AminoAcid terminalResidue)
+        {
+            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
+                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+                       .Select(comp => new Ion(comp, Charge));
+        }
+
         public IEnumerable<Ion> GetPossibleIons(Sequence sequence)
         {
             var cutComposition = sequence.Composition;
             var terminalResidue = IsPrefixIon ? sequence[sequence.Count - 1] : sequence[0];
             return this.BaseIonType.GetPossibleCompositions(terminalResidue)
-                                   .Select(offsetComposition => cutComposition + offsetComposition)
-                                   .Select(comp => new Ion(comp, Charge));
+                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+                       .Select(comp => new Ion(comp, Charge));
         } 
 
         public override string ToString()
