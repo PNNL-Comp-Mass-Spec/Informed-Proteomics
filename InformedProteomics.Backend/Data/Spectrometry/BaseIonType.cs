@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             D = new BaseIonType("d", true, new CompositionWithDeltaMass(44.0500), aminoAcid => DefaultCompositionCalculator(dIonOffsets, aminoAcid));
 
             // V only has one option for all terminal residues. Sum of previous residues + offset
-            V = new BaseIonType("v", false, Composition.Zero, r => new List<Composition> { r == null ? Composition.Zero : new CompositionWithDeltaMass(74.0242) - r.Composition - Composition.Hydrogen });
+            V = new BaseIonType("v", false, new CompositionWithDeltaMass(74.0242), r => new List<Composition> { r == null ? new CompositionWithDeltaMass(74.0242) : new CompositionWithDeltaMass(74.0242) - r.Composition - Composition.Hydrogen });
 
             // W ions have additional options for isoleucine and threonine. All offsets defined as sum of previous residues + offset.
             var wIonOffsets = new Dictionary<char, double[]>
