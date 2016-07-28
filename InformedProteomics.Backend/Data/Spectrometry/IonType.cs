@@ -136,7 +136,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         protected bool Equals(IonType other)
         {
-            return string.Equals(this.Name, other.Name) && Equals(this.OffsetComposition, other.OffsetComposition) && this.IsPrefixIon == other.IsPrefixIon;
+            return /*string.Equals(this.Name, other.Name) &&*/ Charge == other.Charge && Equals(this.OffsetComposition, other.OffsetComposition) && this.IsPrefixIon == other.IsPrefixIon;
         }
 
         public override bool Equals(object obj)
@@ -151,7 +151,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             unchecked
             {
-                var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
+                //var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
+                var hashCode = Charge;
                 hashCode = (hashCode * 397) ^ (this.OffsetComposition != null ? this.OffsetComposition.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.IsPrefixIon.GetHashCode();
                 return hashCode;
