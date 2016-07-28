@@ -20,6 +20,34 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new DeconvolutedSpectrum(spec, peaks.ToArray());
         }
 
+        public static DeconvolutedSpectrum GetCombinedDeconvolutedSpectrum(
+            Spectrum spec,
+            int minCharge,
+            int maxCharge,
+            int isotopeOffsetTolerance,
+            double filteringWindowSize,
+            Tolerance tolerance,
+            double corrScoreThreshold)
+        {
+            var deconvolutedPeaks = GetDeconvolutedPeaks(spec, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrScoreThreshold);
+            var binHash = new Dictionary<int, DeconvolutedPeak>();
+            foreach (var deconvolutedPeak in deconvolutedPeaks)
+            {
+                var mass = deconvolutedPeak.Mass;
+                var binNum = (int)Math.Round(mass * Constants.RescalingConstantHighPrecision);
+                if (!binHash.ContainsKey(binNum))
+                {
+                    binHash.Add(binNum, deconvolutedPeak);
+                }
+                else if (binHash[binNum].Intensity < deconvolutedPeak.Intensity)
+                {
+                    binHash[binNum] = deconvolutedPeak;
+                }
+            }
+
+            var peakList = binHash.Values.OrderBy(peak => peak.Mz).ToArray();
+            return new DeconvolutedSpectrum(spec, peakList);
+        }
 
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
             Spectrum spec, int minCharge, int maxCharge,
@@ -82,6 +110,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var windowSpectrum = new Spectrum(window, 1);
                 var peakMz = peak.Mz;
 
+                double bestCorrelation = 0.0;
+                DeconvolutedPeak bestPeak = null;
+
                 for (var charge = maxCharge; charge >= minCharge; charge--)
                 {
                     var mass = peak.Mz * charge;
@@ -110,9 +141,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         if (corr < corrScoreThreshold && bcDist > 0.03) continue;
 
                         // monoIsotopeMass is valid
-                        var deconvPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
-                        monoIsotopePeakList.Add(deconvPeak);
+                        if (corr >= bestCorrelation)
+                        {
+                            bestCorrelation = corr;
+                            bestPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
+                        }
                     }
+                }
+
+                if (bestPeak != null)
+                {
+                    monoIsotopePeakList.Add(bestPeak);
                 }
             }
 
