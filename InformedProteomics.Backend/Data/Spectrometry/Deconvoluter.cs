@@ -61,7 +61,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach (var deconvolutedPeak in deconvolutedPeaks)
             {
                 var mass = deconvolutedPeak.Mass;
-                var binNum = (int)Math.Round(mass * Constants.RescalingConstantHighPrecision);
+                var binNum = (int)Math.Round(mass * (2+Constants.RescalingConstant));
                 if (!binHash.ContainsKey(binNum))
                 {
                     binHash.Add(binNum, deconvolutedPeak);
@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         offsetTolerance = isotopomerEnvelope.Envolope.Length;
                     }
 
-                    for (var isotopeIndex = Math.Max(mostAbundantIsotopeIndex - offsetTolerance, 1);
+                    for (var isotopeIndex = Math.Max(mostAbundantIsotopeIndex - offsetTolerance, 0);
                          isotopeIndex <= Math.Min(mostAbundantIsotopeIndex + offsetTolerance, isotopomerEnvelope.Envolope.Length - 1);
                          isotopeIndex++)
                     {
