@@ -9,13 +9,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class IonTypeFactory
     {
 
-        public IonTypeFactory()
+        private bool removeReduntantIonTypes;
+
+        public IonTypeFactory(bool removeRedundantIonTypes = true)
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
                 NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
                 3   // up to charge 3
             )
         {
+            this.removeReduntantIonTypes = removeRedundantIonTypes;
         }
 
         public IonTypeFactory(int maxCharge)
@@ -102,6 +105,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     foreach (var neutralLoss in _neutralLosses)
                     {
+                        if (this.removeReduntantIonTypes &&
+                            ((baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O) ||
+                            (baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O) ||
+                            (baseIonType == BaseIonType.YM1 && neutralLoss == NeutralLoss.NH3) ||
+                            ((baseIonType == BaseIonType.D || baseIonType == BaseIonType.W ||
+                            baseIonType == BaseIonType.V) && neutralLoss != NeutralLoss.NoLoss)))
+                        {
+                            continue;
+                        }
+
                         var name = baseIonType.Symbol + chargeStr + neutralLoss.Name;
                         var offsetComposition = baseIonType.OffsetComposition -
                                                         neutralLoss.Composition;
