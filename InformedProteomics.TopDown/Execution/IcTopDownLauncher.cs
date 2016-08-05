@@ -362,7 +362,7 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(60.0);
             progData.Status = "Running Target search";
 
-            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Target))
+            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Target) && !File.Exists(targetOutputFilePath))
             {
                 sw.Reset();
                 Console.Write(@"Reading the target database...");
@@ -399,11 +399,15 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Stop();
                 Console.WriteLine(@"Target-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
             }
+            else if (File.Exists(targetOutputFilePath))
+            {
+                Console.WriteLine(@"Target results file '{0}' exists; skipping target search.", targetOutputFilePath);
+            }
 
             progData.StepRange(95.0); // total to 95%
             progData.Status = "Running Decoy search";
 
-            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Decoy))
+            if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Decoy) && !File.Exists(decoyOutputFilePath))
             {
                 // Decoy database
                 sw.Reset();
@@ -440,6 +444,10 @@ namespace InformedProteomics.TopDown.Execution
                 WriteResultsToFile(bestDecoyMatches, decoyOutputFilePath, decoyDb);
                 sw.Stop();
                 Console.WriteLine(@"Decoy-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+            }
+            else if (File.Exists(decoyOutputFilePath))
+            {
+                Console.WriteLine(@"Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath);
             }
 
             progData.StepRange(100.0);
