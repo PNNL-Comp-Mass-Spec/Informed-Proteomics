@@ -184,7 +184,7 @@ namespace InformedProteomics.Backend.Database
         {
             if (!ReadSeqFile())
                 throw new FormatException("Error while reading " + _seqFilePath);
-            if (!ReadAnnnoFile())
+            if (!ReadAnnoFile())
                 throw new FormatException("Error while reading " + _annoFilePath);
         }
 
@@ -472,7 +472,7 @@ namespace InformedProteomics.Backend.Database
             return true;
         }
 
-        private bool ReadAnnnoFile()
+        private bool ReadAnnoFile()
         {
             _offsetList = new List<long>();
             _nameToLength = new Dictionary<string, int>();
@@ -492,7 +492,11 @@ namespace InformedProteomics.Backend.Database
                     _offsetList.Add(offset);
                     var length = int.Parse(token[1]);
                     var name = token[2];
-                    if (_nameToLength.ContainsKey(name)) Console.WriteLine("Duplicate Name: {0}", name);
+                    if (_nameToLength.ContainsKey(name))
+                    {
+                        Console.WriteLine("Duplicate protein name; skipping: {0} at offset {1}", name, offset);
+                        continue;
+                    }
                     _nameToLength.Add(name, length);
                     _names.Add(offset, name);
                     _nameToOffset.Add(name, offset);
