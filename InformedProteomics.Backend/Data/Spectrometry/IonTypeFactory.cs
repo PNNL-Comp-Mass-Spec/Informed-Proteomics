@@ -83,6 +83,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Given a list of IonTypes of charge 1 and a charge value, a list of the same IonTypes of charge up to and
+        /// including charge are outputted.
+        /// </summary>
+        /// <param name="ionTypes">List of IonTypes of charge 1</param>
+        /// <param name="charge">IonTypes of charge up to and including charge will be outputted</param>
+        /// <returns>List of charged IonTypes</returns>
+        public static List<IonType> GetIonTypesFromDecharged(IEnumerable<IonType> ionTypes, int charge)
+        {
+            List<IonType> chargedIonTypes = new List<IonType>();
+            foreach (IonType ionType in ionTypes)
+            {
+                for (int ch = 1; ch <= charge; ch++)
+                {
+                    IonType chargedIonType = 
+                        new IonType(ionType.Name, ionType.OffsetComposition, ch, ionType.BaseIonType, ionType.NeutralLoss);
+                    chargedIonTypes.Add(chargedIonType);
+                }
+            }
+            return chargedIonTypes;
+        }
+
         public IEnumerable<IonType> GetAllKnownIonTypes()
         {
             return _ionTypeMap.Values.ToArray();
