@@ -170,6 +170,11 @@
             Reset all data in the struct
             </summary>
         </member>
+        <member name="M:ThermoRawFileReader.RawFileInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:ThermoRawFileReader.udtMRMMassRangeType">
             <summary>
             Type for storing MRM Mass Ranges
@@ -591,6 +596,11 @@
             Full neutral loss scan
             </summary>
         </member>
+        <member name="F:ThermoRawFileReader.MRMScanTypeConstants.SIM">
+            <summary>
+            Selected Ion Monitoring (SIM), which is MS1 of a limited m/z range
+            </summary>
+        </member>
         <member name="T:ThermoRawFileReader.IonModeConstants">
             <summary>
             Ion Modes
@@ -799,10 +809,10 @@
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.DetermineMRMScanType(System.String)">
             <summary>
-            Determins the MRM scan type by parsing the scan filter string
+            Determines the MRM scan type by parsing the scan filter string
             </summary>
             <param name="filterText"></param>
-            <returns></returns>
+            <returns>MRM scan type enum</returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.DetermineIonizationMode(System.String)">
             <summary>
@@ -817,7 +827,25 @@
             </summary>
             <param name="filterText"></param>
             <param name="mrmScanType"></param>
-            <param name="mrmInfo"></param>
+            <param name="mrmInfo">Output: MRM info class</param>
+            <remarks>We do not parse mass information out for Full Neutral Loss scans</remarks>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@)">
+            <summary>
+            Parse out the parent ion from filterText
+            </summary>
+            <param name="filterText"></param>
+            <param name="parentIonMz">Parent ion m/z (output)</param>
+            <returns>True if success</returns>
+            <remarks>If multiple parent ion m/z values are listed then parentIonMz will have the last one.  However, if the filter text contains "Full msx" then parentIonMz will have the first parent ion listed</remarks>
+            <remarks>
+            This was created for use in other programs that only need the parent ion m/z, and no other functions from ThermoRawFileReader.
+            Other projects that use this:
+                 PHRPReader
+            
+            To copy this, take the code from this function, plus the regex strings <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_NONMSX_REGEX"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_MSX_REGEX"/>,
+            with their uses in <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyNonMsx"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyMsx"/>
+            </remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@,System.Int32@,System.String@)">
             <summary>
@@ -899,7 +927,7 @@
             </summary>
             <param name="filterText"></param>
             <param name="msLevel"></param>
-            <param name="simScan"></param>
+            <param name="simScan">True if mrmScanType is SIM or MRMQMS</param>
             <param name="mrmScanType"></param>
             <param name="zoomScan"></param>
             <returns>True if filterText contains a known MS scan type</returns>

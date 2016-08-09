@@ -229,7 +229,18 @@ namespace InformedProteomics.TopDown.Execution
             swAll.Start();
             ErrorMessage = string.Empty;
 
-            Console.Write(@"Reading raw file...");
+            progData.StepRange(5);
+            progData.Status = "Reading Fasta File";
+
+            // Target database
+            var targetDb = new FastaDatabase(DatabaseFilePath);
+            targetDb.Read();
+
+            if (string.Equals(Path.GetExtension(SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
+                Console.Write(@"Reading pbf file...");
+            else
+                Console.Write(@"Reading raw file...");
+
             progData.Status = "Reading spectra file";
             progData.StepRange(10.0);
             sw.Start();
@@ -326,13 +337,6 @@ namespace InformedProteomics.TopDown.Execution
             });
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
-            progData.StepRange(10.0);
-            progData.Status = "Reading Fasta File";
-
-            // Target database
-            var targetDb = new FastaDatabase(DatabaseFilePath);
-            targetDb.Read();
 
             // Generate sequence tags for all MS/MS spectra
             if (TagBasedSearch)
