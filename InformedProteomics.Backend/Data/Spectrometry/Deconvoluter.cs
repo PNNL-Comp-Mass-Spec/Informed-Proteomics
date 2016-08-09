@@ -66,9 +66,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     binHash.Add(binNum, deconvolutedPeak);
                 }
-                else if (binHash[binNum].Intensity < deconvolutedPeak.Intensity)
+                else
                 {
-                    binHash[binNum] = deconvolutedPeak;
+                    var binPeak = binHash[binNum];
+                    if (binPeak.Intensity < deconvolutedPeak.Intensity)
+                    {
+                        binHash[binNum] = deconvolutedPeak;
+                    }
                 }
             }
 
@@ -98,7 +102,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     continue;
                 }
 
-                double bestCorrelation = 0.0;
+                double bestScore = 0.0;
                 DeconvolutedPeak bestPeak = null;
                 Tuple<Peak, int>[] bestObservedPeaks = null;
 
@@ -113,8 +117,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         offsetTolerance = isotopomerEnvelope.Envolope.Length;
                     }
 
-                    for (var isotopeIndex = Math.Max(mostAbundantIsotopeIndex - offsetTolerance, 0);
-                         isotopeIndex <= Math.Min(mostAbundantIsotopeIndex + offsetTolerance, isotopomerEnvelope.Envolope.Length - 1);
+                    for (var isotopeIndex = mostAbundantIsotopeIndex - offsetTolerance;
+                         isotopeIndex <= mostAbundantIsotopeIndex + offsetTolerance;
                          isotopeIndex++)
                     {
                         var monoIsotopeMass = Ion.GetMonoIsotopicMass(peak.Mz, charge, isotopeIndex);
@@ -131,6 +135,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             if (observedPeak != null && peakUsed[observedPeak.Item2])
                             {
                                 observedPeak = null;
+                                observedPeaks[i] = null;
                             }
 
                             observedIntensities[i] = observedPeak != null ? (float)observedPeak.Item1.Intensity : 0.0;
@@ -140,14 +145,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var bcDist = sim.Item1;
                         var corr = sim.Item2;
 
-                        //if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+                        if (corr < corrScoreThreshold && bcDist > 0.03) continue;
 
-                        if (corr < corrScoreThreshold) continue;
+                        var score = corr / (bcDist * (Math.Abs(mostAbundantIsotopeIndex - isotopeIndex) + 1));
+
+                        //if (corr < corrScoreThreshold) continue;
 
                         // monoIsotopeMass is valid
-                        if (corr >= bestCorrelation)
+                        if (score >= bestScore)
                         {
-                            bestCorrelation = corr;
+                            bestScore = score;
                             bestPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks.Where(p => p != null).Select(p => p.Item1).ToArray());
                             bestObservedPeaks = observedPeaks;
                         }
