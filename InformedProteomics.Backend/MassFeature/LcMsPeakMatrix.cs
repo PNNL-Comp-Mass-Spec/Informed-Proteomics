@@ -14,14 +14,28 @@ namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsPeakMatrix
     {
-        public LcMsPeakMatrix(LcMsRun run, ISequenceFilter ms1Filter, LcMsFeatureLikelihood scorer = null, int minScanCharge = 1, int maxScanCharge = 60,
-            int maxThreadCount = 0)
-            : this(run, scorer, minScanCharge, maxScanCharge, maxThreadCount)
+        public LcMsPeakMatrix(
+            LcMsRun run, 
+            ISequenceFilter ms1Filter, 
+            LcMsFeatureLikelihood scorer = null, 
+            int minScanCharge = 1, 
+            int maxScanCharge = 60,
+            int maxThreadCount = 0,
+            int minMs1Scan = int.MinValue,
+            int maxMs1Scan = int.MaxValue)
+            : this(run, scorer, minScanCharge, maxScanCharge, maxThreadCount, minMs1Scan, maxMs1Scan)
         {
             _ms1Filter = ms1Filter;
         }
         
-        public LcMsPeakMatrix(LcMsRun run, LcMsFeatureLikelihood scorer = null, int minScanCharge = 1, int maxScanCharge = 60, int maxThreadCount = 0)
+        public LcMsPeakMatrix(
+            LcMsRun run, 
+            LcMsFeatureLikelihood scorer = null, 
+            int minScanCharge = 1, 
+            int maxScanCharge = 60, 
+            int maxThreadCount = 0, 
+            int minMs1Scan = int.MinValue, 
+            int maxMs1Scan = int.MaxValue)
         {
             Run = run;
             _maxThreadCount = maxThreadCount;
@@ -35,12 +49,28 @@ namespace InformedProteomics.Backend.MassFeature
             MaxSearchCharge = maxScanCharge;
             NRows = Math.Min(MaxSearchCharge - MinSearchCharge + 1, 35);
 
-            for (var i = 0; i < Math.Min(ms1ScanNums.Length, ushort.MaxValue); i++)
+            // ToDo: reduce the memory footprint of this caching
+            // Related to this, note that the following for loop exits after 65,535 MS1 spectra are cached (for memory reasons)
+
+            Console.WriteLine("Caching peaks in MS1 spectra: " + ms1ScanNums.Length + " scans");
+            var scansCached = 0;
+
+            foreach (var ms1Scan in ms1ScanNums)
             {
-                var ms1Spec = run.GetMs1Spectrum(ms1ScanNums[i]);
+                if (ms1Scan < minMs1Scan || ms1Scan > maxMs1Scan)
+                    continue;
+
+                var ms1Spec = run.GetMs1Spectrum(ms1Scan);
                 Ms1Spectra.Add(ms1Spec);
-                foreach (var peak in ms1Spec.Peaks) _ms1PeakList.Add(peak as Ms1Peak);
+                foreach (var peak in ms1Spec.Peaks)
+                    _ms1PeakList.Add(peak as Ms1Peak);
+
+                scansCached++;
+                if (scansCached == ushort.MaxValue)
+                    break;
             }
+
+            Console.WriteLine("Sorting MS1 peaks: " + _ms1PeakList.Count.ToString("#,##0") + " peaks");
             _ms1PeakList.Sort();
 
             _distProfileAcrossCharge = new double[NRows];
@@ -55,7 +85,7 @@ namespace InformedProteomics.Backend.MassFeature
             _ms1Filter = null;
         }
 
-        private ISequenceFilter _ms1Filter;
+        private readonly ISequenceFilter _ms1Filter;
         private readonly LcMsFeatureLikelihood _scorer;        
         public IList<LcMsPeakCluster> FindFeatures(int binNumber)
         {
