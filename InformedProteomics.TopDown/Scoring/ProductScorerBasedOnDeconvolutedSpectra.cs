@@ -75,7 +75,7 @@ namespace InformedProteomics.TopDown.Scoring
         public static Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold,
                                                        int isotopeOffsetTolerance, double filteringWindowSize = 1.1)
         {
-            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, tolerance, corrThreshold);
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, 1.1, tolerance, corrThreshold);
             var peakList = new List<Peak>();
             var binHash = new HashSet<int>();
             foreach (var deconvolutedPeak in deconvolutedPeaks)
