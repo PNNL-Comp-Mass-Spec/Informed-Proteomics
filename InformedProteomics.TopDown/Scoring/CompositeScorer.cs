@@ -77,9 +77,13 @@ namespace InformedProteomics.TopDown.Scoring
 
         public static double GetRefIntensity(Peak[] peaks)
         {
+            if (peaks.Length == 0)
+                return 0;
+
             var intensities = peaks.Select(p => p.Intensity).ToArray();
             Array.Sort(intensities, 0, intensities.Length);
-            var refIntensity = intensities[(int)(0.8750 * intensities.Length)];
+            var refIndex = (int)(0.8750 * intensities.Length);
+            var refIntensity = intensities[refIndex];
             return refIntensity;
         }
 
