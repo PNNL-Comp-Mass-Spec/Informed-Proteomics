@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace InformedProteomics.TopDown.Scoring
             _productTolerance = productTolerance;
             FilteringWindowSize = filteringWindowSize;
             IsotopeOffsetTolerance = isotopeOffsetTolerance;
-            _ms2Scorer = new Dictionary<int, IScorer>();
+            _ms2Scorer = new ConcurrentDictionary<int, IScorer>();
             _comparer = comparer;
             _scoringGraphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
         }
@@ -76,10 +77,7 @@ namespace InformedProteomics.TopDown.Scoring
         {
             var scorer = GetScorer(scanNum);
             if (scorer == null) return;
-            lock (_ms2Scorer)
-            {
-                _ms2Scorer.Add(scanNum, scorer);                
-            }
+            _ms2Scorer.TryAdd(scanNum, scorer);
         }
 
         public IScorer GetScorer(int scanNum)
@@ -99,14 +97,14 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private readonly Dictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
+        private readonly ConcurrentDictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
         private readonly ILcMsRun _run;
         private readonly int _minProductCharge;
         private readonly int _maxProductCharge;
         private readonly Tolerance _productTolerance;
 
         /*
-              * Scorign based on deconvoluted spectrum
+              * Scoring based on deconvoluted spectrum
               */
         /*
         internal class DeconvScorer : IScorer
