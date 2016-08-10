@@ -30,11 +30,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
         }
 
-        public IonTypeFactory(IEnumerable<BaseIonType> baseIons, IEnumerable<NeutralLoss> neutralLosses, int maxCharge)
+        public IonTypeFactory(
+            IEnumerable<BaseIonType> baseIons, 
+            IEnumerable<NeutralLoss> neutralLosses,
+            int maxCharge,
+            bool removeRedundantIonTypes = true)
         {
             _baseIons = baseIons;
             _neutralLosses = neutralLosses;
             _maxCharge = maxCharge;
+            this.removeReduntantIonTypes = removeRedundantIonTypes;
             GenerateAllKnownIonTypes();
         }
 
