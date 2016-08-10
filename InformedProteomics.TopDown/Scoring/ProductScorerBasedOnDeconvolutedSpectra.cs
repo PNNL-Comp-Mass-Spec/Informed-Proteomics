@@ -101,7 +101,7 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         /*
-         * Scorign based on deconvoluted spectrum
+         * Scoring based on deconvoluted spectrum
          */
         internal class DeconvScorer : IScorer
         {

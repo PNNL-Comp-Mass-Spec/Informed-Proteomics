@@ -826,7 +826,8 @@ namespace InformedProteomics.TopDown.Execution
                 var prsms = sortedMatches[scanNum];
                 if (prsms == null) continue;
                 var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-                if (spec == null) return null;
+                if (spec == null || spec.Peaks.Length == 0)
+                    continue;
 
                 foreach (var match in prsms)
                 {

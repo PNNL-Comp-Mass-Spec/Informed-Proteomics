@@ -33,45 +33,58 @@ namespace InformedProteomics.TopDown.Scoring
             bool prefixHit, suffixHit;
             return GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition, out prefixHit, out suffixHit);
         }
-        
+
         public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition, out bool prefixHit, out bool suffixHit)
         {
             var score = 0.0;
-            
+
             prefixHit = false;
             suffixHit = false;
 
             foreach (var baseIonType in BaseIonTypes)
             {
-                var fragmentComposition = baseIonType.IsPrefix
-                              ? prefixFragmentComposition + baseIonType.OffsetComposition
-                              : suffixFragmentComposition + baseIonType.OffsetComposition;
-
-                if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
-
-                var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
-                var fragmentIonMass = fragmentComposition.Mass;
-                
-                var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
-
-                foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
+                try
                 {
-                    var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
-                    var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
-                    var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
-                    
-                    score += param.Count;
-                    score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
-                    score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
-                    score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
-                    score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+                    var fragmentComposition = baseIonType.IsPrefix
+                                  ? prefixFragmentComposition + baseIonType.OffsetComposition
+                                  : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                    if (baseIonType.IsPrefix) prefixHit = true;
-                    else suffixHit = true;
+                    if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz)
+                        continue;
+
+                    var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
+                    var fragmentIonMass = fragmentComposition.Mass;
+
+                    var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
+
+                    foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
+                    {
+                        var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
+                        var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
+                        var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
+
+                        score += param.Count;
+                        score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
+                        score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
+                        score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
+                        score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                        if (baseIonType.IsPrefix)
+                            prefixHit = true;
+                        else
+                            suffixHit = true;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(@"Error in CompositeScorer GetFragmentScore: " + ex.Message);
+                    throw;
+                }
+
             }
 
-            if (prefixHit && suffixHit) score += ScoreParam.ComplementaryIonCount;
+            if (prefixHit && suffixHit)
+                score += ScoreParam.ComplementaryIonCount;
             return score;
         }
 
@@ -90,7 +103,7 @@ namespace InformedProteomics.TopDown.Scoring
         public static double GetProbability(double score)
         {
             var eta = Math.Exp(ScoreParam.Beta0 + score);
-            return eta/(eta + 1);
+            return eta / (eta + 1);
         }
 
         internal static ScoreWeight ScoreParam; // score weights without mass error temrs for generating function evaluation
@@ -179,7 +192,7 @@ namespace InformedProteomics.TopDown.Scoring
         internal class IonScoreWeight
         {
             internal double Count;
-            
+
             internal double Intensity;
             internal double Corr;
             internal double Dist;

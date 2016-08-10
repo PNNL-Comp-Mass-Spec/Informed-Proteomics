@@ -69,7 +69,10 @@ namespace InformedProteomics.TopDown.Scoring
         public IScorer GetMs2Scorer(int scanNum)
         {
             IScorer scorer;
-            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;    
+            if (_ms2Scorer.TryGetValue(scanNum, out scorer))
+            {
+                return scorer;
+            }
             return null;
         }
     
@@ -83,7 +86,8 @@ namespace InformedProteomics.TopDown.Scoring
         public IScorer GetScorer(int scanNum)
         {
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-            if (spec == null) return null;
+            if (spec == null || spec.Peaks.Length == 0)
+                return null;
             var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
             return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
         }
