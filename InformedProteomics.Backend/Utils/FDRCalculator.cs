@@ -291,6 +291,18 @@ namespace InformedProteomics.Backend.Utils
 
             var errorBase = "Cannot compute " + targetStatistic + "; ";
 
+            if (!File.Exists(targetResultFilePath))
+            {
+                ErrorMessage = errorBase + "target file not found, " + Path.GetFileName(targetResultFilePath);
+                return false;
+            }
+
+            if (!File.Exists(decoyResultFilePath))
+            {
+                ErrorMessage = errorBase + "decoy file not found, " + Path.GetFileName(decoyResultFilePath);
+                return false;
+            }
+
             var targetData = File.ReadAllLines(targetResultFilePath);
             var decoyData = File.ReadAllLines(decoyResultFilePath);
 
