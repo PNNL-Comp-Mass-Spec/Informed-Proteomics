@@ -85,6 +85,7 @@
     <Compile Include="Database\InternalCleavageType.cs" />
     <Compile Include="Database\PeptideEnumerator.cs" />
     <Compile Include="Database\AnnotationAndOffset.cs" />
+    <Compile Include="Database\ProteinHashInfo.cs" />
     <Compile Include="Database\SearchableDatabase.cs" />
     <Compile Include="Data\Biology\Constants.cs" />
     <Compile Include="Data\Composition\Averagine.cs" />

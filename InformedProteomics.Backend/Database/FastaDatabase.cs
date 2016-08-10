@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
@@ -240,23 +241,31 @@ namespace InformedProteomics.Backend.Database
         public string GetProteinName(long offset)
         {
             var offsetKey = GetOffsetKey(offset);
-            return _names[offsetKey];
+            string proteinName;
+            if (_names.TryGetValue(offsetKey, out proteinName))
+                return proteinName;
+
+            return "UnknownProtein_Offset" + offset;
         }
 
         public string GetProteinDescription(long offset)
         {
             var offsetKey = GetOffsetKey(offset);
-            return _descriptions[offsetKey];
+
+            string proteinDescription;
+            if (_descriptions.TryGetValue(offsetKey, out proteinDescription))
+                return proteinDescription;
+
+            return "Unknown description, Offset " + offset;
         }
 
 
         public long? GetOffset(string name)
         {
             long offset;
-            if (!_nameToOffset.TryGetValue(name, out offset)) return null;
-            return offset;
-            //var offsetKey = GetOffsetKey(offset);
-            //return _descriptions[offsetKey];
+            if (!_nameToOffset.TryGetValue(name, out offset))
+                return null;
+            return offset;            
         }
 
         public string GetProteinDescription(string name)
@@ -280,6 +289,17 @@ namespace InformedProteomics.Backend.Database
             if (!_nameToOffset.TryGetValue(name, out offset)) return null;
 
             var length = _nameToLength[name];
+            return GetProteinSequence(offset, length);
+        }
+
+        /// <summary>
+        /// Return the protein sequence starting at the given offset, spanning the given length
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        private string GetProteinSequence(long offset, int length)
+        {
             return Encoding.GetString(_sequence, (int)(offset + 1), length);
         }
 
@@ -298,7 +318,7 @@ namespace InformedProteomics.Backend.Database
             return _lastWriteTimeHash;
         }
 
-        static internal bool CheckHashCodeBinaryFile(string filePath, int code)
+        internal static bool CheckHashCodeBinaryFile(string filePath, int code)
         {
             var dataFile = new FileInfo(filePath);
             if (dataFile.Length < 2 * sizeof(int))
@@ -321,7 +341,7 @@ namespace InformedProteomics.Backend.Database
             return false;
         }
 
-        static internal bool CheckHashCodeTextFile(string filePath, int code)
+        internal static bool CheckHashCodeTextFile(string filePath, int code)
         {
             var dataFile = new FileInfo(filePath);
             if (dataFile.Length < 1)
@@ -355,17 +375,23 @@ namespace InformedProteomics.Backend.Database
 
             return false;
         }
-
+        
         private readonly string _databaseFilePath;
         private readonly string _seqFilePath;
         private readonly string _annoFilePath;
-        private readonly int _lastWriteTimeHash;
+        private readonly int _lastWriteTimeHash;      
 
         private List<long> _offsetList;
         private IDictionary<string, int> _nameToLength; // name -> length
         private IDictionary<long, string> _names;   // offsetKey -> name
         private IDictionary<long, string> _descriptions;    // offsetKey -> description
         private IDictionary<string, long> _nameToOffset;    // name -> offsetKey
+
+        /// <summary>
+        /// Tracks duplicate names along with a count for each name
+        /// </summary>
+        /// <remarks>Used to auto-rename proteins</remarks>
+        private IDictionary<string, int> _duplicateNameCounts;
 
         private byte[] _sequence;
 
@@ -415,6 +441,10 @@ namespace InformedProteomics.Backend.Database
             if (File.Exists(_annoFilePath))
                 File.Delete(_annoFilePath);
 
+            // Keys are protein name
+            // Values track the number of times the name has been encountered, the number of residues, and a SHA1 hash of the residues
+            var proteinNamesAndStats = new Dictionary<string, ProteinHashInfo>(StringComparer.InvariantCultureIgnoreCase);
+
             using (var seqWriter = new BinaryWriter(File.Open(_seqFilePath, FileMode.CreateNew)))
             using (var annoWriter = new StreamWriter(_annoFilePath))
             {
@@ -429,7 +459,26 @@ namespace InformedProteomics.Backend.Database
                     var name = reader.ProteinName;
                     var description = reader.ProteinDescription;
                     var sequence = (char)Delimiter + reader.ProteinSequence;
-                    var length = reader.ProteinSequence.Length;
+                    var length = sequence.Length;
+
+                    var proteinInfoCurrent = new ProteinHashInfo(sequence);
+
+                    ProteinHashInfo proteinInfoCached;
+                    if (proteinNamesAndStats.TryGetValue(name, out proteinInfoCached))
+                    {
+                        // Duplicate name; either skip this protein or rename it
+                        if (proteinInfoCached.SequenceLength == proteinInfoCurrent.SequenceLength &&
+                            string.Equals(proteinInfoCached.SequenceHash, proteinInfoCurrent.SequenceHash))
+                        {
+                            // Duplicate protein; skip it
+                            continue;
+                        }
+
+                        name += "_Duplicate" + proteinInfoCached.ObservationCount.ToString("00");
+                        proteinInfoCached.ObservationCount++;                        
+                    }
+
+                    proteinNamesAndStats.Add(name, proteinInfoCurrent);
 
                     seqWriter.Write(Encoding.GetBytes(sequence));
 
@@ -459,7 +508,7 @@ namespace InformedProteomics.Backend.Database
                 reader.CloseFile();
             }
         }
-
+   
         private bool ReadSeqFile()
         {
             using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
@@ -480,6 +529,8 @@ namespace InformedProteomics.Backend.Database
             _descriptions = new Dictionary<long, string>();
             _nameToOffset = new Dictionary<string, long>();
 
+            _duplicateNameCounts= new Dictionary<string, int>();
+
             using (var reader = new StreamReader(_annoFilePath))
             {
                 string s;
@@ -492,11 +543,26 @@ namespace InformedProteomics.Backend.Database
                     _offsetList.Add(offset);
                     var length = int.Parse(token[1]);
                     var name = token[2];
-                    if (_nameToLength.ContainsKey(name))
+                    int lengthExistingEntry;
+                    if (_nameToLength.TryGetValue(name, out lengthExistingEntry))
                     {
-                        Console.WriteLine("Duplicate protein name; skipping: {0} at offset {1}", name, offset);
-                        continue;
+                        Console.WriteLine("Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
+                                          name, offset, Path.GetFileName(_annoFilePath));
+
+                        int duplicateSuffix;
+                        if (_duplicateNameCounts.TryGetValue(name, out duplicateSuffix))
+                        {
+                            duplicateSuffix++;
+                            _duplicateNameCounts[name] = duplicateSuffix;
+                        }
+                        else
+                        {
+                            duplicateSuffix = 1;
+                            _duplicateNameCounts.Add(name, duplicateSuffix);
+                        }
+                        name += "_Duplicate" + duplicateSuffix.ToString("00");
                     }
+
                     _nameToLength.Add(name, length);
                     _names.Add(offset, name);
                     _nameToOffset.Add(name, offset);
