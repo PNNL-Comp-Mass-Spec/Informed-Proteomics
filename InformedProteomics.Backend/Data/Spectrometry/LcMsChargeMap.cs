@@ -88,7 +88,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (maxScanNum > _run.MaxLcScan) maxScanNum = _run.MaxLcScan;
             if (repScanNum < minScanNum && repScanNum > maxScanNum) return;
 
-            
+            // Keys are elution time, values are scan number
             var registeredMs2Scans = new List<KeyValuePair<double, int>>();
 
             var repRt = _run.GetElutionTime(repScanNum);
