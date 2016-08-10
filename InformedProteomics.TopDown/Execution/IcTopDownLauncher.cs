@@ -142,6 +142,9 @@ namespace InformedProteomics.TopDown.Execution
 
         public bool TagBasedSearch { get; set; }
 
+        /// <summary>
+        /// Specific MS2 scan numbers to process
+        /// </summary>
         public IEnumerable<int> ScanNumbers { get; set; }
 
         /// <remarks>default 3</remarks>
@@ -205,7 +208,7 @@ namespace InformedProteomics.TopDown.Execution
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
-        private int[] _ms2ScanNums;
+        private List<int> _ms2ScanNums;
 
         public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
@@ -229,25 +232,32 @@ namespace InformedProteomics.TopDown.Execution
             swAll.Start();
             ErrorMessage = string.Empty;
 
-            progData.StepRange(5);
-            progData.Status = "Reading Fasta File";
-
-            // Target database
-            var targetDb = new FastaDatabase(DatabaseFilePath);
-            targetDb.Read();
-
             if (string.Equals(Path.GetExtension(SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
                 Console.Write(@"Reading pbf file...");
             else
                 Console.Write(@"Reading raw file...");
 
             progData.Status = "Reading spectra file";
-            progData.StepRange(10.0);
+            progData.StepRange(5.0);
             sw.Start();
 
             _run = PbfLcMsRun.GetLcMsRun(SpecFilePath, 0, 0, prog);
 
-            _ms2ScanNums = _run.GetScanNumbers(2).ToArray();
+            var minMs1Scan = int.MinValue;
+            var maxMs1Scan = int.MaxValue;
+
+            // Retrieve the list of MS2 scans
+            _ms2ScanNums = _run.GetScanNumbers(2).ToList();
+
+            if (ScanNumbers != null && ScanNumbers.Any())
+            {
+                // Filter the MS2 scans using ScanNumbers
+                _ms2ScanNums = _ms2ScanNums.Intersect(ScanNumbers).ToList();
+
+                minMs1Scan = _ms2ScanNums.Min() - 100;
+                maxMs1Scan = _ms2ScanNums.Max() + 100;
+            }
+           
             _isolationWindowTargetMz = new double[_run.MaxLcScan + 1];
             foreach (var ms2Scan in _ms2ScanNums)
             {
@@ -258,6 +268,16 @@ namespace InformedProteomics.TopDown.Execution
 
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+
+
+            progData.StepRange(10);
+            progData.Status = "Reading Fasta File";
+            Console.WriteLine(progData.Status);
+
+            // Target database
+            var targetDb = new FastaDatabase(DatabaseFilePath);
+            targetDb.Read();
+
 
             progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
@@ -272,6 +292,7 @@ namespace InformedProteomics.TopDown.Execution
                 if (!File.Exists(ms1FtFilePath))
                 {
                     Console.WriteLine(@"Running ProMex...");
+                    sw.Reset();
                     sw.Start();
                     var param = new LcMsFeatureFinderInputParameter
                     {
@@ -352,10 +373,13 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Stop();
                 Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-                _tagSearchEngine = new ScanBasedTagSearchEngine(_run, seqTagGen, new LcMsPeakMatrix(_run, ms1Filter), targetDb, ProductIonTolerance, AminoAcidSet,
-                                _ms2ScorerFactory2,
-                                ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
-                                MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);                
+                var peakMatrix = new LcMsPeakMatrix(_run, ms1Filter, minMs1Scan: minMs1Scan, maxMs1Scan: maxMs1Scan);
+                _tagSearchEngine = new ScanBasedTagSearchEngine(
+                    _run, seqTagGen, peakMatrix, 
+                    targetDb, ProductIonTolerance, AminoAcidSet,
+                    _ms2ScorerFactory2,
+                    ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
+                    MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);                
             }
 
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
@@ -577,7 +601,7 @@ namespace InformedProteomics.TopDown.Execution
             var sw = new Stopwatch();
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
-            Console.WriteLine(@"Estimated proteins: " + estimatedProteins);
+            Console.WriteLine(@"Estimated proteins: " + estimatedProteins.ToString("#,##0"));
 
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
@@ -686,6 +710,9 @@ namespace InformedProteomics.TopDown.Execution
                         if (ms2ScanNum > _ms2ScanNums.Last() || ms2ScanNum < _ms2ScanNums.First()) return;
 
                         var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
+                        if (scorer == null)
+                            return;
+
                         var score = seqGraph.GetFragmentScore(scorer);
                         var isoTargetMz = _isolationWindowTargetMz[ms2ScanNum];
                         if (!(isoTargetMz > 0)) return;
@@ -746,7 +773,7 @@ namespace InformedProteomics.TopDown.Execution
             var sw = new Stopwatch();
 
             // Rescore and Estimate #proteins for GF calculation
-            long estimatedProteins = scanNums.Length;
+            long estimatedProteins = scanNums.Count;
             Console.WriteLine(@"Number of spectra: " + estimatedProteins);
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
@@ -783,7 +810,8 @@ namespace InformedProteomics.TopDown.Execution
             if (_cachedScoreDistributions == null)
             {
                 _cachedScoreDistributions = new LinkedList<Tuple<double, ScoreDistribution>>[_run.MaxLcScan + 1];
-                foreach (var scanNum in _ms2ScanNums) _cachedScoreDistributions[scanNum] = new LinkedList<Tuple<double, ScoreDistribution>>();
+                foreach (var scanNum in _ms2ScanNums)
+                    _cachedScoreDistributions[scanNum] = new LinkedList<Tuple<double, ScoreDistribution>>();
             }
 
             var sw = new Stopwatch();
@@ -822,7 +850,7 @@ namespace InformedProteomics.TopDown.Execution
                 if (matches[scanNum] != null) estimatedProteins += matches[scanNum].Count;
             }
 
-            Console.WriteLine(@"Estimated matched proteins: " + estimatedProteins);
+            Console.WriteLine(@"Estimated matched proteins: " + estimatedProteins.ToString("#,##0"));
 
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%

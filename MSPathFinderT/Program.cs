@@ -49,8 +49,8 @@ namespace MSPathFinderT
                 return -1;
             }
 
-            // initialize parameters
-            var paramDic = new Dictionary<string, string>
+            // Initialize parameters
+            var paramDic = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
                 {
                     {"-s", null},
                     {"-d", null},
@@ -71,6 +71,7 @@ namespace MSPathFinderT
                     {"-feature", null},
                     {"-threads", "0"},
                     {"-tagSearch", "1"},
+                    {"-scansFile", null},
                 };
 
             for (var i = 0; i < args.Length / 2; i++)
@@ -124,7 +125,8 @@ namespace MSPathFinderT
                     //SearchModeInt = parameters.SearchModeInt,
                     SearchMode = parameters.SearchMode,
                     MaxNumThreads = parameters.MaxNumThreads,
-                    TagBasedSearch = parameters.TagBasedSearch
+                    TagBasedSearch = parameters.TagBasedSearch,
+                    ScanNumbers = parameters.ScanNumbers
                 };
                 
                 var success = topDownLauncher.RunSearch();
@@ -217,7 +219,8 @@ namespace MSPathFinderT
                 "\t[-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)\n" +
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
                 "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n" +
-                "\t[-threads MaxNumThreads] (maximum number of threads, default: 0 automatic setting)\n"
+                "\t[-threads MaxNumThreads] (maximum number of threads, default: 0 automatic setting)\n" +
+                "\t[-scansFile FilePath] (text file with MS2 scans to process)\n"
                 );
 
             // Wait for 1.5 seconds

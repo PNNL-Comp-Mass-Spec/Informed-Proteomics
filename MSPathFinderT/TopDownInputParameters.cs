@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
@@ -89,6 +90,12 @@ namespace MSPathFinderT
         public double MaxSequenceMass { get; set; }
         public string FeatureFilePath { get; set; }
         public int MaxNumThreads { get; set; }
+
+        /// <summary>
+        /// Specific MS2 scans to process
+        /// </summary>
+        public SortedSet<int> ScanNumbers { get; set; }
+
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
 
@@ -125,9 +132,15 @@ namespace MSPathFinderT
                 Console.WriteLine(searchMod);
             }
 
-            if (FeatureFilePath != null)
+            if (!string.IsNullOrWhiteSpace(FeatureFilePath))
             {
                 Console.WriteLine("Getting MS1 features from " + FeatureFilePath);
+            }
+
+            if (ScanNumbers != null && ScanNumbers.Any())
+            {
+                Console.WriteLine("Processing specific MS2 scans:");
+                Console.WriteLine(string.Join(", ", ScanNumbers));
             }
         }
 
@@ -207,27 +220,26 @@ namespace MSPathFinderT
             try
             {
                 var modFilePath = parameters["-mod"];
-
-                if (modFilePath != null)
-                {
-                    var parser = new ModFileParser(modFilePath);
-                    _searchModifications = parser.SearchModifications;
-                    _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
-
-                    if (_searchModifications == null)
-                        return "Error while parsing " + modFilePath;
-
-                    AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
-                }
-                else
-                {
-                    AminoAcidSet = new AminoAcidSet();
-                    _searchModifications = new SearchModification[0];
-                }
+                var errorMessage = LoadModsFile(modFilePath);
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                    return errorMessage;                
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception parsing the path for parameter -mod: " + ex.Message);
+                Console.WriteLine("Exception parsing the file for parameter -mod: " + ex.Message);
+                throw;
+            }
+
+            try
+            {
+                var scansFilePath = parameters["-scansFile"];
+                var errorMessage = LoadScansFile(scansFilePath);
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                    return errorMessage;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception parsing the file for parameter -scansFile: " + ex.Message);
                 throw;
             }
 
@@ -330,6 +342,14 @@ namespace MSPathFinderT
 
         static string CheckIsValid(Dictionary<string, string> parameters)
         {
+            var optionalKeys = new SortedSet<string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                "-mod",
+                "-o",
+                "-feature",
+                "-scansFile"
+            };
+
             foreach (var keyValuePair in parameters)
             {
                 var key = keyValuePair.Key;
@@ -337,8 +357,7 @@ namespace MSPathFinderT
 
                 try
                 {
-                    if (keyValuePair.Value == null && keyValuePair.Key != "-mod" && keyValuePair.Key != "-o" &&
-                        keyValuePair.Key != "-feature")
+                    if (string.IsNullOrWhiteSpace(keyValuePair.Value) && !optionalKeys.Contains(keyValuePair.Key))
                     {
                         return "Missing required parameter " + key;
                     }
@@ -391,9 +410,16 @@ namespace MSPathFinderT
                     }
                     else if (key.Equals("-mod"))
                     {
-                        if (value != null && !File.Exists(value))
+                        if (!string.IsNullOrWhiteSpace(value) && !File.Exists(value))
                         {
-                            return "File not found: " + value;
+                            return "-mod file not found: " + value;
+                        }
+                    }
+                    else if (key.Equals("-scansFile"))
+                    {
+                        if (!string.IsNullOrWhiteSpace(value) && !File.Exists(value))
+                        {
+                            return "-scansFile file not found: " + value;
                         }
                     }
                     else if (key.Equals("-feature"))
@@ -445,6 +471,70 @@ namespace MSPathFinderT
                 threads = ParallelizationUtils.NumPhysicalCores;
             }
             return threads;
+        }
+
+        private string LoadModsFile(string modFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(modFilePath))
+            {
+                AminoAcidSet = new AminoAcidSet();
+                _searchModifications = new SearchModification[0];
+                return string.Empty;
+            }
+
+            if (!File.Exists(modFilePath))
+            {
+                return "-mod file not found: " + modFilePath;
+            }
+
+            var parser = new ModFileParser(modFilePath);
+            _searchModifications = parser.SearchModifications;
+            _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
+
+            if (_searchModifications == null)
+                return "Error while parsing " + modFilePath;
+
+            AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
+            return string.Empty;
+        }
+
+        private string LoadScansFile(string scansFilePath)
+        {
+
+            if (string.IsNullOrWhiteSpace(scansFilePath))
+                return string.Empty;
+
+            if (!File.Exists(scansFilePath))
+            {
+                return "-scansFile not found: " + scansFilePath;
+            }
+
+            ScanNumbers = new SortedSet<int>();
+
+            var delimiters = new[] { ' ', '\t', ',' };
+
+            using (var reader = new StreamReader(new FileStream(scansFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var dataLine = reader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
+                        continue;
+
+                    var dataValues = dataLine.Split(delimiters);
+                    foreach (var value in dataValues)
+                    {
+                        int scanNumber;
+                        if (!int.TryParse(value, out scanNumber))
+                            continue;
+
+                        if (!ScanNumbers.Contains(scanNumber))
+                            ScanNumbers.Add(scanNumber);
+                    }
+                }
+            }
+
+            return string.Empty;
         }
     }
 }
