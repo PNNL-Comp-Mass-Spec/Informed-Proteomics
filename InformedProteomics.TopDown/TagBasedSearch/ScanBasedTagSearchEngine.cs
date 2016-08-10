@@ -209,6 +209,9 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     else
                     {
                         var proteinSequence = fastaDb.GetProteinSequence(proteinName);
+                        if (proteinSequence == null)
+                            proteinSequence = proteinName;
+
                         var matchedTagSet = new MatchedTagSet(proteinSequence, aaSet, tolerance, relaxedTolerance);
                         matchedTagSet.Add(matchedTag);
                         proteinsToTags.Add(proteinName, matchedTagSet);
