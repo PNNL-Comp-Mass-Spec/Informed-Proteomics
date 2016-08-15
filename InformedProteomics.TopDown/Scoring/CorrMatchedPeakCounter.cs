@@ -4,6 +4,8 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class CorrMatchedPeakCounter : AbstractFragmentScorer
     {
         public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7):
@@ -12,7 +14,9 @@ namespace InformedProteomics.TopDown.Scoring
             _corrScoreThreshold = corrScoreThreshold;
         }
 
-        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
 

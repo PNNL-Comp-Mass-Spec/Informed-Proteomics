@@ -6,6 +6,9 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using InformedProteomics.Backend.Data.Composition;
+    using InformedProteomics.Backend.Data.Sequence;
+
     public abstract class AbstractFragmentScorer : IScorer
     {
         protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7)
@@ -30,9 +33,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             RelativeIsotopeIntensityThreshold = relativeIsotopeIntensityThreshold;
         }
 
-        public abstract double GetFragmentScore(Composition.Composition prefixFragmentComposition, Composition.Composition suffixFragmentComposition);
+        public abstract double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null);
 
-        protected IntRange GetMinMaxChargeRange(Composition.Composition fragmentComposition)
+        protected IntRange GetMinMaxChargeRange(Composition fragmentComposition)
         {
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
             var fragmentIonMostAbuMass = fragmentComposition.Mass + Constants.C13MinusC12 * mostAbundantIsotopeIndex;
@@ -52,7 +57,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new IntRange(minCharge, maxCharge);
         }
 
-        protected IEnumerable<DeconvolutedPeak> FindMatchedPeaks(Composition.Composition fragmentComposition,
+        protected IEnumerable<DeconvolutedPeak> FindMatchedPeaks(Composition fragmentComposition,
                    double corrThreshold, double distThreshold)
         {
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -128,7 +133,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return null;
         }
         */
-        protected Peak[] FindMostIntensePeak(Composition.Composition fragmentComposition, double corrThreshold, double distThreshold, out int observedCharge, out double envelopeCorr, out double envelopeDist)
+        protected Peak[] FindMostIntensePeak(Composition fragmentComposition, double corrThreshold, double distThreshold, out int observedCharge, out double envelopeCorr, out double envelopeDist)
         {
             Peak[] intenseObservedPeaks = null;
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -194,6 +199,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
         }
-
     }
 }

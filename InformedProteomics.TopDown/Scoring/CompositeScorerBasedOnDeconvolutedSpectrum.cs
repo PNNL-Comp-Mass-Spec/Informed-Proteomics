@@ -9,6 +9,8 @@ using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class CompositeScorerBasedOnDeconvolutedSpectrum : CompositeScorer
     {
         public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, ProductSpectrum spec, Tolerance productTolerance, IMassBinning comparer)
@@ -70,7 +72,9 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
             var prefixHit = false;

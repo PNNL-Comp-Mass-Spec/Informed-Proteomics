@@ -24,13 +24,13 @@ namespace InformedProteomics.TopDown.Scoring
         public int MaxProductCharge { get; private set; }
         public Tolerance Tolerance { get; private set; }
         public double Ms2CorrThreshold { get; private set; }
-        
+
         public IcScores GetScores(Sequence sequence, int parentIoncharge, int ms2ScanNum)
         {
             double score;
             int nMatchedFragments;
             GetCompositeScores(sequence, parentIoncharge, ms2ScanNum, out score, out nMatchedFragments);
-            return new IcScores(nMatchedFragments, score, sequence.GetModificationString());            
+            return new IcScores(nMatchedFragments, score, sequence.GetModificationString());
         }
 
         public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
@@ -87,10 +87,10 @@ namespace InformedProteomics.TopDown.Scoring
 
             var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             if (spec == null) return;
-            
+
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
-            
+
             var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge+2));
             var cleavages = sequence.GetInternalCleavages();
             var cleavageIndex = 0;
@@ -109,7 +109,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 cleavageIndex++;
             }
-            
+
             var preContCount = 0;
             var sufContCount = 0;
             for (var i = 0; i < preFixIonCheck.Length - 1; i++)
@@ -135,13 +135,13 @@ namespace InformedProteomics.TopDown.Scoring
         public double Score { get; private set; } // this score is used to calculate p-value by generating function
 
         public string Modifications { get; private set; }
-        
+
         public override string ToString()
         {
             return string.Join("\t",
                 new[]
                 {
-                    NumMatchedFrags, Score, 
+                    NumMatchedFrags, Score,
                 });
         }
 
@@ -150,5 +150,5 @@ namespace InformedProteomics.TopDown.Scoring
             return "#MatchedFragments\tScore";
         }
     }
-   
+
 }

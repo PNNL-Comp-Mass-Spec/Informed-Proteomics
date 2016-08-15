@@ -11,6 +11,8 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class CompositeScorer : AbstractFragmentScorer
     {
         public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1)
@@ -28,7 +30,9 @@ namespace InformedProteomics.TopDown.Scoring
         public const double DistThreshold = 0.03;
         public double ReferencePeakIntensity { get; protected set; }
 
-        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             bool prefixHit, suffixHit;
             return GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition, out prefixHit, out suffixHit);

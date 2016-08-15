@@ -8,6 +8,8 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
@@ -108,7 +110,9 @@ namespace InformedProteomics.TopDown.Scoring
             private readonly double _prefixOffsetMass;
             private readonly double _suffixOffsetMass;
             private readonly HashSet<int> _ionMassBins;
-            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance)
+            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 if (deconvolutedSpectrum.ActivationMethod != ActivationMethod.ETD)
                 {
@@ -143,7 +147,9 @@ namespace InformedProteomics.TopDown.Scoring
                 return 0.0;
             }
 
-            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 var score = 0.0;
 
