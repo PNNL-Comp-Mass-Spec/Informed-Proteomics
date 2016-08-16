@@ -18,6 +18,7 @@ using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using PNNLOmics.Utilities;
+using TopDownTrainer;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -165,7 +166,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         /// <summary>
-        /// 0: all internal sequences, 
+        /// 0: all internal sequences,
         /// 1: #NCleavages <= Max OR Cleavages <= Max (Default)
         /// 2: 1: #NCleavages <= Max AND Cleavages <= Max
         /// </summary>
@@ -202,6 +203,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
+        private IFragmentScorerFactory fragmentScorerFactory;
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
@@ -310,6 +312,7 @@ namespace InformedProteomics.TopDown.Execution
             // pre-generate deconvoluted spectra for scoring
             _massBinComparer = new FilteredProteinMassBinning(AminoAcidSet, MaxSequenceMass+1000);
 
+            this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
             _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, AminoAcidSet,
                                                                MinProductIonCharge, MaxProductIonCharge, ProductIonTolerance);
             sw.Reset();
@@ -351,7 +354,7 @@ namespace InformedProteomics.TopDown.Execution
                 _tagSearchEngine = new ScanBasedTagSearchEngine(_run, seqTagGen, new LcMsPeakMatrix(_run, ms1Filter), targetDb, ProductIonTolerance, AminoAcidSet,
                                 _ms2ScorerFactory2,
                                 ScanBasedTagSearchEngine.DefaultMinMatchedTagLength,
-                                MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);                
+                                MaxSequenceMass, MinProductIonCharge, MaxProductIonCharge);
             }
 
             var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(SpecFilePath));
@@ -422,7 +425,7 @@ namespace InformedProteomics.TopDown.Execution
                     Console.WriteLine(@"Tag-based searching the decoy database");
                     sw.Start();
                     RunTagBasedSearch(decoyMatches, decoyDb, null, prog);
-                    Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);                    
+                    Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
                 }
                 progData.MaxPercentage = 95.0;
 
@@ -543,7 +546,7 @@ namespace InformedProteomics.TopDown.Execution
                         ModificationText = tagSequenceMatch.TagMatch.ModificationText,
                     };
 
-                    AddMatch(matches, ms2ScanNum, prsm);    
+                    AddMatch(matches, ms2ScanNum, prsm);
                 }
 
                 SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");
@@ -673,11 +676,12 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         if (ms2ScanNum > _ms2ScanNums.Last() || ms2ScanNum < _ms2ScanNums.First()) return;
 
-                        var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
-                        var score = seqGraph.GetFragmentScore(scorer);
                         var isoTargetMz = _isolationWindowTargetMz[ms2ScanNum];
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
+
+                        var scorer = this.fragmentScorerFactory.GetScorer(ms2ScanNum, sequenceMass, charge);
+                        var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
                         var sequence = protSequence.Substring(numNTermCleavages);

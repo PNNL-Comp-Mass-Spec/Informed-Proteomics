@@ -44,6 +44,9 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Numerics" />
+    <Reference Include="TopDownTrainer">
+      <HintPath>..\lib\TopDownTrainer\TopDownTrainer.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\DatabaseSequenceSpectrumMatch.cs" />

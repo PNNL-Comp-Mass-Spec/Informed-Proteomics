@@ -1,0 +1,2977 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MTDBFramework</name>
+    </assembly>
+    <members>
+        <member name="T:MTDBFramework.Algorithms.AlignmentCompleteArgs">
+            <summary>
+            Arguments for Alignment completion display
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.AlignmentCompleteArgs.#ctor(System.Collections.Generic.IEnumerable{PNNLOmics.Algorithms.Alignment.LcmsWarp.LcmsWarpAlignmentData})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="alignmentData"></param>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.AlignmentCompleteArgs.AlignmentData">
+            <summary>
+            Alignment data
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.AlignmentFilterFactory">
+            <summary>
+            Tools for establishing alignment filters
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.AlignmentFilterFactory.Create(MTDBFramework.Data.LcmsIdentificationTool,MTDBFramework.Data.Options)">
+            <summary>
+            Create an alignment filter
+            </summary>
+            <param name="tool">Format of input data</param>
+            <param name="options">Options</param>
+            <returns>Alignment filter</returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.MsAlignAlignmentFilter">
+            <summary>
+            Filter information for MSAlign format
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.ITargetFilter">
+            <summary>
+            Filter interface for alignment
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ITargetFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Whether an evidence should be filtered
+            </summary>
+            <param name="evidence"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.ITargetFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.MsAlignAlignmentFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.MsAlignAlignmentFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence"></param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.MsAlignAlignmentFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.MsgfPlusAlignmentFilter">
+            <summary>
+            Alignment Filtering for MSGF+ Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.MsgfPlusAlignmentFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.MsgfPlusAlignmentFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence"></param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.MsgfPlusAlignmentFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.XTandemAlignmentFilter">
+            <summary>
+            Alignment Filtering for XTandem Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.XTandemAlignmentFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.XTandemAlignmentFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence"></param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.XTandemAlignmentFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.SequestAlignmentFilter">
+            <summary>
+            Alignment Filtering for Sequest Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.SequestAlignmentFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.SequestAlignmentFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence"></param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.SequestAlignmentFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.SpectralTargetAligner">
+            <summary>
+            Target alignment for spectral data
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.ITargetAligner">
+            <summary>
+            Interface for target alignment
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.ITargetAligner.AlignTargets(System.Collections.Generic.List{MTDBFramework.Data.Evidence},System.Collections.Generic.List{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target alignment
+            </summary>
+            <param name="evidences">Evidences to align</param>
+            <param name="baseline">Baseline evidences</param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.SpectralTargetAligner.AlignTargets(System.Collections.Generic.List{MTDBFramework.Data.Evidence},System.Collections.Generic.List{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target alignment
+            </summary>
+            <param name="evidences">Evidences to align</param>
+            <param name="baseline">Baseline evidences</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Clustering.ITargetClusterer">
+            <summary>
+            Interface for target clustering
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Clustering.ITargetClusterer.Cluster(System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target clustering
+            </summary>
+            <param name="evidences"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Clustering.SequenceTargetClusterer">
+            <summary>
+            Target clustering using sequences
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Clustering.SequenceTargetClusterer.Cluster(System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target clustering
+            </summary>
+            <param name="evidences"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Clustering.SpectralTargetClusterer">
+            <summary>
+            Target clustering for Spectral Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Clustering.SpectralTargetClusterer.Cluster(System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform Target clustering
+            </summary>
+            <param name="evidences"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Clustering.TargetClustererFactory">
+            <summary>
+            Tools for clustering targets
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Clustering.TargetClustererFactory.Create(MTDBFramework.Algorithms.TargetWorkflowType)">
+            <summary>
+            Configure and return a Target Clusterer
+            </summary>
+            <param name="workflowType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.RetentionTimePrediction.IRetentionTimePredictor">
+            <summary>
+            Interface for Elution time prediction of a clean peptide sequence
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.RetentionTimePrediction.IRetentionTimePredictor.GetElutionTime(System.String)">
+            <summary>
+            Predicts the elution time of the clean peptide sequence.
+            </summary>
+            <param name="peptide">Clean peptide sequence</param>
+            <returns>The elution time of the clean peptide sequence</returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.RetentionTimePrediction.KangasPredictor">
+            <summary>
+            Normal Elution Time prediction using the KANGAS algorithm
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.RetentionTimePrediction.KangasPredictor.GetElutionTime(System.String)">
+            <summary>
+            Calculate the Elution Time
+            </summary>
+            <param name="peptide"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.RetentionTimePrediction.KrokhinPredictor">
+            <summary>
+            Normal Elution Time prediction using the KROKHIN algorithm
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.RetentionTimePrediction.KrokhinPredictor.GetElutionTime(System.String)">
+            <summary>
+            Calculate the Elution Time
+            </summary>
+            <param name="peptide"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.MtdbProcessor">
+            <summary>
+            Perform the data transform from an LCMS dataset to MTDB
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IProcessor">
+            <summary>
+            Interface for processing management
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IProcessor.AbortProcessing">
+            <summary>
+            Support thread cancellation
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.IProcessor.ProcessorOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.MtdbProcessor.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.MtdbProcessor.AbortProcessing">
+            <summary>
+            Allow for thread cancellation
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.MtdbProcessor.Process(System.Collections.Generic.IEnumerable{MTDBFramework.Data.LcmsDataSet},System.ComponentModel.BackgroundWorker)">
+            <summary>
+            Main work function - Transform LCMS Datasets into MTDB datasets
+            </summary>
+            <param name="dataSets"></param>
+            <param name="bWorker"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.MtdbProcessor.UpdateProgress(System.Int32,System.Int32,System.Single,System.String)">
+            <summary>
+            Progress handler
+            </summary>
+            <param name="current"></param>
+            <param name="total"></param>
+            <param name="percentComplete"></param>
+            <param name="currentTask"></param>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.MtdbProcessor.ProgressChanged">
+            <summary>
+            Progress event
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.MtdbProcessor.OnPercentProgressChanged(MTDBFramework.UI.PercentCompleteEventArgs)">
+            <summary>
+            Progress event handler
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="E:MTDBFramework.Algorithms.MtdbProcessor.AlignmentComplete">
+            <summary>
+            Event handler
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.MtdbProcessor.ProcessorOptions">
+            <summary>
+            Options accessor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner">
+            <summary>
+            Target alignment for peptides
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner.AlignTargets(System.Collections.Generic.List{MTDBFramework.Data.Evidence},System.Collections.Generic.List{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target alignment
+            </summary>
+            <param name="evidences">Evidences to align</param>
+            <param name="baseline">Baseline evidences</param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner.Options">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner.Regressor">
+            <summary>
+            Linear Regression Algorithm Data
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Algorithms.Alignment.PeptideTargetAligner.Predictor">
+            <summary>
+            RetentionTimePredictor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.ProteinTargetAligner">
+            <summary>
+            Target alignment for proteins
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.ProteinTargetAligner.AlignTargets(System.Collections.Generic.List{MTDBFramework.Data.Evidence},System.Collections.Generic.List{MTDBFramework.Data.Evidence})">
+            <summary>
+            Perform target alignment
+            </summary>
+            <param name="evidences">Evidences to align</param>
+            <param name="baseline">Baseline evidences</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictionType">
+            <summary>
+            Enumeration for the types of supported Retention time predictors
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictionType.KANGAS">
+            <summary>
+            KANGAS predictor
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictionType.KROKHIN">
+            <summary>
+            KROKHIN predictor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictorFactory">
+            <summary>
+            Determination and configuration of a Retention Time Predictor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictorFactory.CreatePredictor(MTDBFramework.Algorithms.RetentionTimePrediction.RetentionTimePredictionType)">
+            <summary>
+            Configure and return the appropriate Retention Time Predictor
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.TargetWorkflowType">
+            <summary>
+            Controlled vocabulary for target workflows
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.TargetWorkflowType.TOP_DOWN">
+            <summary>
+            Top-down workflow
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.TargetWorkflowType.BOTTOM_UP">
+            <summary>
+            Bottom-up workflow
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Algorithms.TargetWorkflowType.SPECTRAL">
+            <summary>
+            Spectral workflow
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.ConsensusProteinPair">
+            <summary>
+            Relation between a ConsensusTarget object and a ProteinInformation object for database use
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.ConsensusProteinPair.Equals(System.Object)">
+            <summary>
+            Overloaded equality comparison
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Database.ConsensusProteinPair.GetHashCode">
+            <summary>
+            Overloaded Hash
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.Consensus">
+            <summary>
+            ConsensusTarget object
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.Protein">
+            <summary>
+            ProteinInformation object
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.ConsensusId">
+            <summary>
+            ConsensusTarget Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.ProteinId">
+            <summary>
+            ProteinInformation Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.CleavageState">
+            <summary>
+            Cleavage State
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.TerminusState">
+            <summary>
+            Terminus State
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.ResidueStart">
+            <summary>
+            Residue Start Position
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.ConsensusProteinPair.ResidueEnd">
+            <summary>
+            Residue End Position
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.ConsensusProteinPairMap">
+            <summary>
+            NHibernate mapping for ConsensusProteinPair class
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.ConsensusProteinPairMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.ConsensusPtmPairMap">
+            <summary>
+            Fluent NHibernate mapping for ConsensusPtmPair class
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.ConsensusPtmPairMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.ConsensusTargetMap">
+            <summary>
+            This is our map for the ConsensusTarget class. Note the "Not.LazyLoad"
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.ConsensusTargetMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.DatabaseFactory">
+            <summary>
+            Configuration of NHibernate for working with a SQLite database
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Database.DatabaseFactory.DatabaseFile">
+            <summary>
+            The file to use for the database
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Database.DatabaseFactory.ReadOrAppend">
+            <summary>
+            Whether to read from/append to an existing file, or overwrite it
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.DatabaseFactory.CreateSessionFactory(MTDBFramework.Data.DatabaseType)">
+            <summary>
+            Configure and return a session factory for NHibernate
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Database.CustomForeignKeyConvention">
+            <summary>
+            Custom naming convention for foreign keys
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.CustomForeignKeyConvention.GetKeyName(FluentNHibernate.Member,System.Type)">
+            <summary>
+            Overloaded function to retrieve foreign key names
+            </summary>
+            <param name="property"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Database.OptionsMap">
+            <summary>
+            NHibernate mapping for the Options class
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.OptionsMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.ProteinInformationMap">
+            <summary>
+            NHibernate mapping for the ProteinInformation class
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.ProteinInformationMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.TargetDatasetMap">
+            <summary>
+            NHibernate mapping for the TargetDataSet class. Note the "Not.LazyLoad"
+            File path excluded because the information isn't relevant for if database
+            moves from one system to another (or if relevant file moves after writing)
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.TargetDatasetMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.EvidenceMap">
+            <summary>
+            NHibernate mapping for the Evidence class. Note the "Not.LazyLoad"
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.EvidenceMap.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.AnalysisJobItem">
+            <summary>
+            Data encapsulation for Analysis Jobs
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.ObservableObject">
+            <summary>
+            Super class for progress monitoring and notification
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.UI.ObservableObject.OnPropertyChanged(System.String)">
+            <summary>
+            Raises this object's PropertyChanged event.
+            </summary>
+            <param name="propertyName">The property that has a new value.</param>
+        </member>
+        <member name="E:MTDBFramework.UI.ObservableObject.PropertyChanged">
+            <summary>
+            Raised when a property on this object has a new value.
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.AnalysisJobItem.#ctor(System.String,MTDBFramework.Data.LcmsIdentificationTool)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="path"></param>
+            <param name="format"></param>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.Title">
+            <summary>
+            Title Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.FileName">
+            <summary>
+            FileName Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.BaseFolder">
+            <summary>
+            BaseFolder Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.FilePath">
+            <summary>
+            FilePath Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.Format">
+            <summary>
+            Format Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.DataSet">
+            <summary>
+            DataSet Accessor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.AnalysisJobItem.TargetCount">
+            <summary>
+            Accessor for count of targets
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.ConsensusPtmPair">
+            <summary>
+            Relation between a ConsensusTarget object and a PostTranslationalModification object for database use
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.ConsensusId">
+            <summary>
+            Id of the consensus target
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.PtmId">
+            <summary>
+            Id of the PostTranslationalModification
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.Location">
+            <summary>
+            Location in the peptide which was modified
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.Target">
+            <summary>
+            Consensus target this pair maps to
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusPtmPair.PostTranslationalModification">
+            <summary>
+            Post Translational Modification this pair maps to
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.ConsensusTarget">
+            <summary>
+            Store all information pertaining to a single consensus target
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ConsensusTarget.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ConsensusTarget.AddEvidence(MTDBFramework.Data.Evidence)">
+            <summary>
+            Add another evidence of the ConsensusTarget
+            </summary>
+            <param name="evidence"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.ConsensusTarget.AddProtein(MTDBFramework.Data.ProteinInformation)">
+            <summary>
+            Add another protein the ConsensusTarget occurs in
+            </summary>
+            <param name="protein"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.ConsensusTarget.CalculateStatistics">
+            <summary>
+            Calculate average mass and net and stdev mass and net for each Target.
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ConsensusTarget.CompareTo(System.Object)">
+            <summary>
+            Default comparer used when sorting for the tree view
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.PrefixResidue">
+            <summary>
+            The Prefix Residue
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.SuffixResidue">
+            <summary>
+            The Suffix Residue
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.ConsensusProtein">
+            <summary>
+            The ConsensusTarget/ProteinInformation relations
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.AverageNet">
+            <summary>
+            Average Elution Time
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.StdevNet">
+            <summary>
+            Elution Time Standard Deviation
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.PredictedNet">
+            <summary>
+            Predicted Elution Time
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.TheoreticalMonoIsotopicMass">
+            <summary>
+            Monoisotopic Mass - Theoretical
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Sequence">
+            <summary>
+            Peptide Sequence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.EncodedNumericSequence">
+            <summary>
+            Peptide Sequence with numeric modifications
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.EncodedNonNumericSequence">
+            <summary>
+            Peptide Sequence with non-numeric modifications
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.CleanSequence">
+            <summary>
+            Sequence for the peptide with all PTMs excluded.
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.StrippedSequence">
+            <summary>
+            Sequence for the peptide with all PTMs excluded and without pre and post residues
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Dataset">
+            <summary>
+            Dataset the Consensus target occurs in
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Evidences">
+            <summary>
+            Evidences of the ConsensusTarget
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Proteins">
+            <summary>
+            The Proteins the Consensus target occurs in
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Charges">
+            <summary>
+            The charges
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.Ptms">
+            <summary>
+            List of all Post-Translational Modifications observed in the ConsensusTarget
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.ModificationCount">
+            <summary>
+            Number of modifications that were observed
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.ModificationDescription">
+            <summary>
+            Descriptions for all observed modifications
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ConsensusTarget.MultiProteinCount">
+            <summary>
+            The number of proteins the ConsensusTarget occurs in
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.DatabaseType">
+            <summary>
+            Controlled vocabulary for database output
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.DatabaseType.Access">
+            <summary>
+            Microsoft Access DB
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.DatabaseType.SQLite">
+            <summary>
+            SQLite DB
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.DatabaseType.NotSaved">
+            <summary>
+            No database output
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.MsAlignResult">
+            <summary>
+            Addition properties for MSAlign input files
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.Evidence">
+            <summary>
+            Collection of data pertaining to a single peptide evidence
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.Evidence.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.Evidence.AddProtein(MTDBFramework.Data.ProteinInformation)">
+            <summary>
+            Add a protein to the list of proteins evidenced
+            </summary>
+            <param name="protein"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.Evidence.CleanSequence(System.String)">
+            <summary>
+            Extract the clean sequence
+            </summary>
+            <param name="sequence"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.Evidence.ToString">
+            <summary>
+            Overloaded string return
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Spectrum">
+            <summary>
+            Spectra data
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.DataSet">
+            <summary>
+            Dataset the evidence occurs in
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.PeptideInfo">
+            <summary>
+            Peptide that is evidenced
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Scan">
+            <summary>
+            Scan id number
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.AnalysisId">
+            <summary>
+            Analysis Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.MultiProteinCount">
+            <summary>
+            Number of proteins the evidenced peptide occurs in
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.MonoisotopicMass">
+            <summary>
+            Computed monoisotopic mass (uncharged, theoretical mass, including mods)
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.ObservedMonoisotopicMass">
+            <summary>
+            Observed monoisotopic (of the precursor if MS/MS)
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Parent">
+            <summary>
+            The evidenced protein
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Charge">
+            <summary>
+            Charge
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.ObservedNet">
+            <summary>
+            Observed Elution time
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.PredictedNet">
+            <summary>
+            Predicted Elution time
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Mz">
+            <summary>
+            Observed m/z (of the precursor if MS/MS)
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.SpecProb">
+            <summary>
+            SpecProb
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Sequence">
+            <summary>
+            Sequence that is evidenced
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.CleanPeptide">
+            <summary>
+            Clean peptide sequence - letters only
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.DelM">
+            <summary>
+            DelM
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.DelMPpm">
+            <summary>
+            DelMPpm
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.IsSeqInfoExist">
+            <summary>
+            Is Sequence Information Existing?
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.ModificationCount">
+            <summary>
+            Modifications occurring in sequence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.ModificationDescription">
+            <summary>
+            Description of modifications occurring in sequence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.SeqInfoMonoisotopicMass">
+            <summary>
+            Computed monoisotopic mass of the peptide sequence associated with this feature (uncharged, theoretical mass, including mods)
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.SeqWithNumericMods">
+            <summary>
+            Sequence containing numeric modifications
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.EncodedNonNumericSequence">
+            <summary>
+            Encoded sequence with modification data
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.NetShift">
+            <summary>
+            NET amount evidence was shifted by from LCMS Warp
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.DiscriminantValue">
+            <summary>
+            Discriminant score used in conjunction with spectral probability
+            for filtering evidences. QValue for MSGF+ and mzId files, LogPeptide
+            EValue for Xtandem, xCorr for Sequest, EValue for MSAlign
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Proteins">
+            <summary>
+            Proteins evidenced
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.Ptms">
+            <summary>
+            Post Translational Modifications in sequence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Evidence.NormalizedScore">
+            <summary>
+            Normalized score for the evidence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsAlignResult.EValue">
+            <summary>
+            MSAlign EValue
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.MsAlignTargetFilter">
+            <summary>
+            Target filtering for MSAlign Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.MsAlignTargetFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.MsAlignTargetFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence">Peptide evidence</param>
+            /// <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="M:MTDBFramework.Data.MsAlignTargetFilter.ShouldFilter(System.Double,System.Double)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="eValue">MSAlign EValue</param>
+            <param name="specProb">MSGF Spectral Probability</param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Data.MsAlignTargetFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.MsgfFilterType">
+            <summary>
+            Controlled vocabulary for target workflows
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.MsgfFilterType.SPECTRAL_PROBABILITY">
+            <summary>
+            Spectral probability filter
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.MsgfFilterType.Q_VALUE">
+            <summary>
+            Q Value filter
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.MsgfPlusResult">
+            <summary>
+            MSGF+ input storage for evidence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.Reference">
+            <summary>
+            Reference
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.NumTrypticEnds">
+            <summary>
+            Number of Tryptic Ends
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.DeNovoScore">
+            <summary>
+            DeNovo Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.MsgfScore">
+            <summary>
+            MSGF Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.SpecEValue">
+            <summary>
+            Spec E Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.RankSpecEValue">
+            <summary>
+            Rank Spec E Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.EValue">
+            <summary>
+            E Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.QValue">
+            <summary>
+            Q Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.PepQValue">
+            <summary>
+            Peptide Q Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusResult.IsotopeError">
+            <summary>
+            Isotope Error
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.MsgfPlusTargetFilter">
+            <summary>
+            Target Filtering for MSGF+ Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.MsgfPlusTargetFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.MsgfPlusTargetFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence">Peptide evidence</param>
+            /// <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="M:MTDBFramework.Data.MsgfPlusTargetFilter.ShouldFilter(System.Double,System.Double)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="qValue">MSGF+ QValue (aka FDR)</param>
+            <param name="specProb">MSGF+ Spectral Probability</param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Data.MsgfPlusTargetFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.PostTranslationalModification">
+            <summary>
+            Post Translational Modification data container
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.PostTranslationalModification.ToString">
+            <summary>
+            Overloaded string for debugging output
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Location">
+            <summary>
+            Modification Location
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Formula">
+            <summary>
+            Modification Formula
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Mass">
+            <summary>
+            Modification Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Name">
+            <summary>
+            Short name of the PTM
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.PostTranslationalModification.Parent">
+            <summary>
+            Target containing the modification
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.ProteinInformation">
+            <summary>
+            Protein information container
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ProteinInformation.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.ProteinInformation.Equals(System.Object)">
+            <summary>
+            Overloaded comparison
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.ProteinInformation.GetHashCode">
+            <summary>
+            Overloaded Hash
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.ProteinInformation.Equals(MTDBFramework.Data.ProteinInformation)">
+            <summary>
+            Comparison
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.ProteinInformation.CompareTo(System.Object)">
+            <summary>
+            Default comparer used when sorting for the tree view
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.Consensus">
+            <summary>
+            Consensus targets that use the protein
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.ProteinName">
+            <summary>
+            Protein Name
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.TerminusState">
+            <summary>
+            Terminus State
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.CleavageState">
+            <summary>
+            Cleavage State
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.ResidueStart">
+            <summary>
+            Residue Start Position
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.ResidueEnd">
+            <summary>
+            Residue End Position
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.ProteinInformation.ConsensusProtein">
+            <summary>
+            Consensus Protein data
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.LcmsIdentificationTool">
+            <summary>
+            Controlled vocabulary for LCMS formats
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.Sequest">
+            <summary>
+            Sequest
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.XTandem">
+            <summary>
+            XTandem
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.MSAlign">
+            <summary>
+            MSAlign
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.MsgfPlus">
+            <summary>
+            MSGF+
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.MZIdentML">
+            <summary>
+            MZIdentML
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.Raw">
+            <summary>
+            RAW
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.Description">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.LcmsIdentificationTool.NOT_SUPPORTED">
+            <summary>
+            Other, Unsupported type
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.Options">
+            <summary>
+            MTDBFramework configuration options
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.Options.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.Options.#ctor">
+            <summary>
+            Constructor to default values
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.DatabaseType">
+            <summary>
+            Format of saved Database
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.RegressionType">
+            <summary>
+            Regression
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.OptionsChanged">
+            <summary>
+            Options Changed
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.RegressionOrder">
+            <summary>
+            Regression Order
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.TargetFilterType">
+            <summary>
+            Target Filter Type
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.PredictorType">
+            <summary>
+            Retention Time Predictor Type
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaxModsForAlignment">
+            <summary>
+            Maximum mods for peptide alignment
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MinObservationsForExport">
+            <summary>
+            Minimum observations for export
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MinXCorrForAlignment">
+            <summary>
+            Minimum XCorr for Sequest Alignment
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaxLogEValForXTandemAlignment">
+            <summary>
+            Maximum LogEVal for XTandem Alignment
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaxLogEValForMsAlignAlignment">
+            <summary>
+            Maximum LogEVal for MSAlign Alignment
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MsgfQValue">
+            <summary>
+            MSGF FDR
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaxMsgfSpecProb">
+            <summary>
+            Maximum MSGF SpecProb
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaxRankForExport">
+            <summary>
+            Maximum Rank for export
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MinimumObservedNet">
+            <summary>
+            Minimum Observed Net for export
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MaximumObservedNet">
+            <summary>
+            Maximum Observed Net for export
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.Options.MsgfFilter">
+            <summary>
+            Filter type for MSGF+ analysis
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.SequestResult">
+            <summary>
+            Sequest input storage for evidence
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.SequestResult.CalculatePeptideProphetDiscriminantScore(MTDBFramework.Data.SequestResult)">
+            <summary>
+            Calculate the PeptideProphet Discriminant Score
+            </summary>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.ScanCount">
+            <summary>
+            Scan Count
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.XCorr">
+            <summary>
+            XCorr
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.DelCn">
+            <summary>
+            Delta CN
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.Sp">
+            <summary>
+            SP
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.Reference">
+            <summary>
+            Reference
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.DelCn2">
+            <summary>
+            Delta CN2
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.RankSp">
+            <summary>
+            Rank SP
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.RankXc">
+            <summary>
+            Rank XCorr
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.XcRatio">
+            <summary>
+            XCorr Ratio
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.PassFilt">
+            <summary>
+            Passed Filter
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.FScore">
+            <summary>
+            F Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.MScore">
+            <summary>
+            M Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestResult.NumTrypticEnds">
+            <summary>
+            Number of Tryptic Ends
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.SequestTargetFilter">
+            <summary>
+            Target filtering for Sequest workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.SequestTargetFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.SequestTargetFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence">Peptide evidence</param>
+            /// <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="M:MTDBFramework.Data.SequestTargetFilter.ShouldFilter(System.Double,System.Double)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="xcorr">Sequest XCorr</param>
+            /// <param name="specProb">MSGF+ SpecProb</param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Data.SequestTargetFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Algorithms.Alignment.TargetAlignmentFactory">
+            <summary>
+            Target alignment configuration
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Algorithms.Alignment.TargetAlignmentFactory.Create(MTDBFramework.Data.Options)">
+            <summary>
+            Configure and return the appropriate target aligner
+            </summary>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Database.TargetDataSet">
+            <summary>
+            Target dataset information
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDataSet.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDataSet.Path">
+            <summary>
+            Path only used to get the name of the data set for the database
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDataSet.Name">
+            <summary>
+            Gets or sets the name of the target dataset.
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDataSet.Tool">
+            <summary>
+            The input data format
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.TargetFilterFactory">
+            <summary>
+            Target filter determination and configuration
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.TargetFilterFactory.Create(MTDBFramework.Data.LcmsIdentificationTool,MTDBFramework.Data.Options)">
+            <summary>
+            Configure and return the appropriate target filter
+            </summary>
+            <param name="tool"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Database.TargetPeptideInfo">
+            <summary>
+            Peptide Information container
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.TargetPeptideInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetPeptideInfo.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetPeptideInfo.CleanPeptide">
+            <summary>
+            Clean Peptide Sequence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetPeptideInfo.Peptide">
+            <summary>
+            Peptide Sequence with Mod Symbols
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetPeptideInfo.PeptideWithNumericMods">
+            <summary>
+            Peptide Sequence with numeric mods
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetPeptideInfo.Evidences">
+            <summary>
+            Added Target List
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData">
+            <summary>
+            Class to hold all needed data read from unimod.xml (http://www.unimod.org/downloads.html)
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.UniModData.ModList">
+            <summary>
+            All needed modification data from unimod.xml, indexed by name
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.UniModData.Elements">
+            <summary>
+            All of the element data stored in unimod.xml, indexed by title (H, 2H, O, 18O, etc);
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.UniModData.AminoAcids">
+            <summary>
+            All of the Amino Acid data stored in unimod.xml, indexed by the letter used
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.Data.UniModData.ModBricks">
+            <summary>
+            All of the Modification Brick data stored in unimod.xml, indexed by title
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.#cctor">
+            <summary>
+            Initializer, called by the first time access to an item in UniModData
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.PopulateData">
+            <summary>
+            Read and parse a unimod format XML file from project resources
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadElements(System.Xml.XmlReader)">
+            <summary>
+            Handle the umod:elements element and child nodes
+            Called by Read (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the umod:elements element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadElement(System.Xml.XmlReader)">
+            <summary>
+            Handle a single umod:elem element
+            Called by ReadElements (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single umod:elem element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadModifications(System.Xml.XmlReader)">
+            <summary>
+            Handle a the umod:modifications element and child nodes
+            Called by Read (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the umod:modifications element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadModification(System.Xml.XmlReader)">
+            <summary>
+            Handle a single umod:mod element and child nodes
+            Called by ReadModifications (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single umod:mod element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadAminoAcids(System.Xml.XmlReader)">
+            <summary>
+            Handle the umod:amino_acids element and child nodes
+            Called by Read (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the umod:amino_acids element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadAminoAcid(System.Xml.XmlReader)">
+            <summary>
+            Handle a single umod:aa element and child nodes
+            Called by ReadAminoAcids (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single umod:aa element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadModBricks(System.Xml.XmlReader)">
+            <summary>
+            Handle the umod:mod_bricks element and child nodes
+            Called by Read (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the umod:mod_bricks element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadModBrick(System.Xml.XmlReader)">
+            <summary>
+            Handle a single umod:brick element and child nodes
+            Called by ReadModBricks (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single umod:brick element</param>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ReadFormula(System.Xml.XmlReader)">
+            <summary>
+            Read the chemical formula of an item from unimod.xml
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope containing the chemical formula</param>
+            <returns>List containing the chemical formula</returns>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData.ChemFormula">
+            <summary>
+            Class to facilitate working with chemical formulas
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.ToString">
+            <summary>
+            Overloaded string output
+            </summary>
+            <returns>Formatted chemical formula</returns>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.SymbolOutput(System.String)">
+            <summary>
+            Handle special formatting of chemical symbols
+            </summary>
+            <param name="symbol"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.GetElementCount(System.String)">
+            <summary>
+            Return the count of an element from the formula
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.GetElementCountWithIsotopes(System.String)">
+            <summary>
+            Return the count of an element (including isotopes) from the formula
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.#ctor">
+            <summary>
+            Initialize the symbol list
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ChemFormula.Add(System.String,System.Int32)">
+            <summary>
+            Add an item to the chemical formula
+            </summary>
+            <param name="symbol"></param>
+            <param name="number"></param>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData.Modification">
+            <summary>
+            Store the UNIMOD modification data - title, formula, etc.
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.Modification.#ctor(System.String,System.String,System.Double,System.Double,System.String,System.Int32,MTDBFramework.Data.UniModData.ChemFormula)">
+            <summary>
+            Populate a modification object with the appropriate data
+            </summary>
+            <param name="title">Modification title</param>
+            <param name="fullName">Modification full name</param>
+            <param name="monoMass">Modification monoisotopic mass</param>
+            <param name="avgMass">Modification average mass</param>
+            <param name="comp">Modifcation composition (UNIMOD style)</param>
+            <param name="id">UNIMOD record id for modification</param>
+            <param name="formula">Chemical formula of modification</param>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.Title">
+            <summary>
+            UNIMOD title - short name of modification
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.FullName">
+            <summary>
+            Full name of modification
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.MonoIsotopicMass">
+            <summary>
+            MonoIsotopic Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.AverageMass">
+            <summary>
+            Average Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.Composition">
+            <summary>
+            UNIMOD Composition - Includes Bricks
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.Id">
+            <summary>
+            UNIMOD record Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Modification.Formula">
+            <summary>
+            Chemical Formula
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData.Element">
+            <summary>
+            Store the element data read from unimod.xml
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.Element.#ctor(System.String,System.String,System.Double,System.Double)">
+            <summary>
+            Populate an element object with the appropriate data
+            </summary>
+            <param name="title">Unique symbol - includes isotope designation</param>
+            <param name="name">name</param>
+            <param name="avgMass">average mass</param>
+            <param name="monoMass">monoisotopic mass</param>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Element.Title">
+            <summary>
+            UNIMOD title - chemical symbol, may have isotope prefix
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Element.FullName">
+            <summary>
+            Full name of element
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Element.MonoIsotopicMass">
+            <summary>
+            MonoIsotopic Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.Element.AverageMass">
+            <summary>
+            Average Mass
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData.AminoAcid">
+            <summary>
+            Store the amino acid data from unimod.xml
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.AminoAcid.#ctor(System.String,System.String,System.String,System.Double,System.Double,MTDBFramework.Data.UniModData.ChemFormula)">
+            <summary>
+            Populate an AminoAcid object with the appropriate date
+            </summary>
+            <param name="title">Unique designation of Amino Acid, usually a single letter</param>
+            <param name="shortName">3 letter name</param>
+            <param name="fullName">full name</param>
+            <param name="monoMass">monoisotopic mass</param>
+            <param name="avgMass">average mass</param>
+            <param name="formula">Chemical formula</param>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.Title">
+            <summary>
+            1-letter abbreviation
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.ShortName">
+            <summary>
+            3-letter Abbreviation
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.FullName">
+            <summary>
+            Full name of Amino Acid
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.MonoIsotopicMass">
+            <summary>
+            MonoIsotopic Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.AverageMass">
+            <summary>
+            Average Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.AminoAcid.Formula">
+            <summary>
+            Chemical Formula
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.UniModData.ModBrick">
+            <summary>
+            Store the modification brick data from unimod.xml
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.UniModData.ModBrick.#ctor(System.String,System.String,System.Double,System.Double,MTDBFramework.Data.UniModData.ChemFormula)">
+            <summary>
+            Populate a mod brick object with the appropriate date
+            </summary>
+            <param name="title">Unique designation of mod brick, usually a single letter</param>
+            <param name="fullName">full name</param>
+            <param name="monoMass">monoisotopic mass</param>
+            <param name="avgMass">average mass</param>
+            <param name="formula">Chemical formula</param>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.ModBrick.Title">
+            <summary>
+            UNIMOD title - Brick name
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.ModBrick.FullName">
+            <summary>
+            Full name of modification brick
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.ModBrick.MonoIsotopicMass">
+            <summary>
+            MonoIsotopic Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.ModBrick.AverageMass">
+            <summary>
+            Average Mass
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.UniModData.ModBrick.Formula">
+            <summary>
+            Chemical Formula
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.XTandemResult">
+            <summary>
+            XTandem input storage for evidence
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.GroupId">
+            <summary>
+            Group Id
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.BScore">
+            <summary>
+            B Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.DeltaCn2">
+            <summary>
+            Delta CN2
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.LogIntensity">
+            <summary>
+            Log Intensity
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.LogPeptideEValue">
+            <summary>
+            Log Peptide E Value
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.NumberYIons">
+            <summary>
+            Number of Y Ions
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.NumberBIons">
+            <summary>
+            Number of B Ions
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.PeptideHyperscore">
+            <summary>
+            Peptide Hyperscore
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.YScore">
+            <summary>
+            Y Score
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemResult.NumTrypticEnds">
+            <summary>
+            Number of Tryptic Ends
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Data.XTandemTargetFilter">
+            <summary>
+            Target filtering for XTandem Workflows
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.XTandemTargetFilter.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.Data.XTandemTargetFilter.ShouldFilter(MTDBFramework.Data.Evidence)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="evidence">Peptide evidence</param>
+            /// <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="M:MTDBFramework.Data.XTandemTargetFilter.ShouldFilter(System.Double,System.Double)">
+            <summary>
+            Determine whether the given evidence should be filtered out
+            </summary>
+            <param name="logPepEValue">X!Tandem Log EValue</param>
+            <param name="specProb">MSGF+ SpecProb</param>
+            <returns>True if the evidence should be filtered out (i.e. does not pass filters); false to keep it</returns>
+        </member>
+        <member name="P:MTDBFramework.Data.XTandemTargetFilter.FilterOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.AnalysisJobDescriptionReader">
+            <summary>
+            Configuration of Analysis Job Descriptions
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.TableDataReaderBase`1">
+            <summary>
+            Essential functions for reading tables
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:MTDBFramework.IO.TableDataReaderBase`1.Delimiters">
+            <summary>
+            Delimiters present in the table
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.TableDataReaderBase`1.SetHeaderIndices(System.String)">
+            <summary>
+            Set header indices according to the actual header sequence from the analysis file
+            </summary>
+            <param name="actualHeader">The header line from the analysis file</param>
+        </member>
+        <member name="M:MTDBFramework.IO.TableDataReaderBase`1.ProcessLine(System.String)">
+            <summary>
+            Process one data line from the analysis file
+            </summary>
+            <param name="line">A data line from the analysis file</param>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobDescriptionReader.Read(System.String)">
+            <summary>
+            Read the job description data for an analysis job item
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobDescriptionReader.SetHeaderIndices(System.String)">
+            <summary>
+            Set the header indices
+            </summary>
+            <param name="actualHeader"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobDescriptionReader.ProcessLine(System.String)">
+            <summary>
+            Create an analysis job item from formatted string input
+            </summary>
+            <param name="line"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.PeptideCache">
+            <summary>
+            Peptide Cache
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PeptideCache.Clear">
+            <summary>
+            Clear the peptide cache
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PeptideCache.HasValue(System.String)">
+            <summary>
+            Query for existence of a peptide in the cache
+            </summary>
+            <param name="peptide"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.PeptideCache.TryGetValue(System.String,System.Double@)">
+            <summary>
+            If the peptide exists in the cache, returns its predictedNET 
+            </summary>
+            <param name="peptide"></param>
+            <param name="predictedNET"></param>
+            <returns>True if successful, false otherwise</returns>
+        </member>
+        <member name="M:MTDBFramework.IO.PeptideCache.Add(System.String,System.Double)">
+            <summary>
+            Add a peptide and its NET to the cache
+            </summary>
+            <param name="peptide"></param>
+            <param name="net"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PeptideCache.RetrieveValue(System.String)">
+            <summary>
+            Retrieves the predictedNET of peptide from the cache
+            </summary>
+            <param name="peptide"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.AnalysisReaderHelper">
+            <summary>
+            Analysis Reader Helper
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisReaderHelper.CalculateObservedNet(System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Calculate the observed NET values
+            </summary>
+            <param name="evidences"></param>
+            <remarks>Will use the MASIC scanstats.txt file or DeconTools scans.csv file if they are available</remarks>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisReaderHelper.CalculatePredictedNet(MTDBFramework.Algorithms.RetentionTimePrediction.IRetentionTimePredictor,System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Calculate the predicted NETs of the evidences
+            </summary>
+            <param name="predictor">Retention Time Predictor</param>
+            <param name="evidences">Evidences to process</param>
+            <remarks>
+            For each evidence, it passes the clean peptide sequence through the peptideCache alongside
+            the predictor to determine the predicted NET. If the peptide has been seen before, it has
+            already been added into a dictionary and so it simply looks up the relevant NET for the
+            peptide and returns that. Otherwise, it passes the peptide through the predictor's
+            GetElutionTime method, adds that value to the peptide cache with the sequence as the key
+            so that if it is seen again it will get the value faster.
+            </remarks>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisReaderHelper.ComputePeptideNET(System.String,MTDBFramework.Algorithms.RetentionTimePrediction.IRetentionTimePredictor)">
+            <summary>
+            Calculate the predicted NET of a single peptide
+            </summary>
+            <param name="peptide"></param>
+            <param name="predictor">Retention Time Predictor</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.AnalysisJobProcessor">
+            <summary>
+            Processing for analysis jobs
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobProcessor.AbortProcessing">
+            <summary>
+            Support thread cancellation
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobProcessor.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobProcessor.Process(System.Collections.Generic.IEnumerable{MTDBFramework.Data.AnalysisJobItem},System.ComponentModel.BackgroundWorker)">
+            <summary>
+            Process Analysis Job Items according to their individual file types
+            </summary>
+            <param name="analysisJobItems">Analysis Job Items</param>
+            <param name="bWorker"></param>
+            <returns>Processed Analysis Job Items</returns>
+        </member>
+        <member name="M:MTDBFramework.IO.AnalysisJobProcessor.OnProgressChanged(MTDBFramework.UI.MtdbProgressChangedEventArgs)">
+            <summary>
+            Event handler
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="P:MTDBFramework.IO.AnalysisJobProcessor.ProcessorOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="E:MTDBFramework.IO.AnalysisJobProcessor.ProgressChanged">
+            <summary>
+            Progress changed Event handler
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.DatasetPathUtility">
+            <summary>
+            Tools for working with dataset paths
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.DatasetPathUtility.CleanPath(System.String)">
+            <summary>
+            Get a clean dataset path
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.IPhrpReader">
+            <summary>
+            PHRP file reader interface
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.IPhrpReader.Read(System.String)">
+            <summary>
+            Read and process a file
+            </summary>
+            <param name="path">File to read and process</param>
+            <returns></returns>
+        </member>
+        <member name="P:MTDBFramework.IO.IPhrpReader.ReaderOptions">
+            <summary>
+            Options
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.ITargetDatabaseReader">
+            <summary>
+            Interface for Input file readers
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.ITargetDatabaseReader.Read(System.String)">
+            <summary>
+            Read function - read and process a file
+            </summary>
+            <param name="path">File to read and process</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.ITargetDatabaseWriter">
+            <summary>
+            Interface for MTDB database writing and monitoring
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.ITargetDatabaseWriter.Write(MTDBFramework.Database.TargetDatabase,MTDBFramework.Data.Options,System.String)">
+            <summary>
+            Write the data to the MTDB database
+            </summary>
+            <param name="database"></param>
+            <param name="options"></param>
+            <param name="path"></param>
+        </member>
+        <member name="E:MTDBFramework.IO.ITargetDatabaseWriter.ProgressChanged">
+            <summary>
+            Event Handler
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.ITextToDbConverter">
+            <summary>
+            Interface for converting text file to a database file
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.ITextToDbConverter.ConvertToDbFormat(System.String)">
+            <summary>
+            Interface for converting temporarily saved .txt files to database
+            at designated path
+            </summary>
+            <param name="path">Location of saved database</param>
+        </member>
+        <member name="T:MTDBFramework.IO.MsAlignPhrpReader">
+            <summary>
+            Summary Description for MSAlignPHRP Reader
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.PHRPReaderBase">
+            <summary>
+            Base class for file readers that are part of PHRP
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.PROGRESS_PCT_START">
+            <summary>
+            Progress status constant
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.PROGRESS_PCT_PEPTIDES_LOADED">
+            <summary>
+            Progress status constant
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.PROGRESS_PCT_COMPLETE">
+            <summary>
+            Progress status constant
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.DatasetCache">
+            <summary>
+            Data storage
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.NETPredictor">
+            <summary>
+            Elution time prediction
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.IO.PHRPReaderBase.AbortRequested">
+            <summary>
+            Allow thread cancellation
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.Read(System.String)">
+            <summary>
+            File Reader
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.AbortProcessing">
+            <summary>
+            Allow thread cancellation
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.ComputeNets(System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Calculate the Normal Elution Time
+            </summary>
+            <param name="results"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.InitializeReader(System.String)">
+            <summary>
+            PHRPReader configuration
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.StoreDatasetInfo(MTDBFramework.Data.Evidence,System.String)">
+            <summary>
+            Store Dataset Info
+            </summary>
+            <param name="result"></param>
+            <param name="dataFilePath"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.StoreDatasetInfo(MTDBFramework.Data.Evidence,PHRPReader.clsPHRPReader,System.String)">
+            <summary>
+            Store Dataset Info
+            </summary>
+            <param name="result"></param>
+            <param name="reader"></param>
+            <param name="dataFilePath"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.StoreDatasetInfo(MTDBFramework.Data.Evidence,System.String,System.String)">
+            <summary>
+            Store Dataset Info
+            </summary>
+            <param name="result"></param>
+            <param name="datasetName"></param>
+            <param name="dataFilePath"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.StoreProteinInfo(PHRPReader.clsPHRPReader,MTDBFramework.Data.Evidence)">
+            <summary>
+            Store Protein Info
+            </summary>
+            <param name="reader"></param>
+            <param name="result"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.StorePsmData(MTDBFramework.Data.Evidence,PHRPReader.clsPHRPReader,System.Double)">
+            <summary>
+            Store PSM Data
+            </summary>
+            <param name="result"></param>
+            <param name="reader"></param>
+            <param name="specProb"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.UpdateProgress(System.Single)">
+            <summary>
+            Progress Handler
+            </summary>
+            <param name="percentComplete"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.UpdateProgress(System.Single,System.String)">
+            <summary>
+            Progress Handler
+            </summary>
+            <param name="percentComplete"></param>
+            <param name="currentTask"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.PHRPReaderBase.OnProgressChanged(MTDBFramework.UI.PercentCompleteEventArgs)">
+            <summary>
+            Progress event handler
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="P:MTDBFramework.IO.PHRPReaderBase.ReaderOptions">
+            <summary>
+            ReaderOption
+            </summary>
+        </member>
+        <member name="E:MTDBFramework.IO.PHRPReaderBase.ProgressChanged">
+            <summary>
+            Progress event
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.MsgfPlusPhrpReader">
+            <summary>
+            Summary Description for MSGFPlusPHRP Reader
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.MsgfPlusPhrpReader.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Configure the options for MSGFPlusReader
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.MsgfPlusPhrpReader.Read(System.String)">
+            <summary>
+            Read and process a MSGF+ PHRP file
+            </summary>
+            <param name="path">MSGF+ file to read</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.MzIdentMlReader">
+            <summary>
+            Read and perform some processing on a MZIdentML file
+            Processes the data into an LCMS DataSet
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Initialize a MzIdentMlReader object
+            </summary>
+            <param name="options">Options used for the MSGFPlus Target Filter</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.Read(System.String)">
+            <summary>
+            Entry point for MZIdentMLReader, overriden from PHRPReaderBase
+            Read the MZIdentML file, map the data to MSGF+ data, compute the NETs, and return the LCMS DataSet
+            </summary>
+            <param name="path">Path to *.mzid/mzIdentML file</param>
+            <returns>LCMSDataSet</returns>
+            <remarks>
+            XML Reader parses an MZIdentML file, storing data as follows:
+              PeptideRef holds Peptide data, such as sequence, number, and type of modifications
+              Database Information holds the length of the peptide and the protein description 
+              Peptide Evidence holds the pre, post, start and end for the peptide for Tryptic End calculations.
+            The element that holds the most information is the Spectrum ID Item, which has the calculated mz,
+            experimental mz, charge state, MSGF raw score, Denovo score, MSGF SpecEValue, MSGF EValue, 
+            MSGF QValue, MSGR PepQValue, Scan number as well as which peptide it is and which evidences 
+            it has from the analysis run.
+            
+            After the XML Reader, it then goes through each Spectrum ID item and maps the appropriate values
+            to the appropriate variables as a MSGF+ result. If the result passes the filter for MSGF+, it
+            then adds the data for if there are modifications and adds the result to a running list of results.
+            When all the results are tabulated, it passes them through to the AnalysisHelper class to calculate
+            both the observed and the predicted NETs and then returns an LCMSDataSet of the results with the MZIdent tool
+            </remarks>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadMzIdentMl(System.Xml.XmlReader)">
+            <summary>
+            Read and parse a .mzid file, or mzIdentML
+            Files are commonly larger than 30 MB, so use a streaming reader instead of a DOM reader
+            </summary>
+            <param name="reader">XmlReader object for the file to be read</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadSequenceCollection(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the SequenceCollection element
+            Called by ReadMzIdentML (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single SequenceCollection element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadDbSequence(System.Xml.XmlReader)">
+            <summary>
+            Handle DBSequence element
+            Called by ReadSequenceCollection (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single DBSequence element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadPeptide(System.Xml.XmlReader)">
+            <summary>
+            Handle Peptide element
+            Called by ReadSequenceCollection (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single Peptide element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadPeptideEvidence(System.Xml.XmlReader)">
+            <summary>
+            Handle PeptideEvidence element
+            Called by ReadSequenceCollection (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single PeptideEvidence element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadDataCollection(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the DataCollection element
+            Called by ReadMzIdentML (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single DataCollection element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadInputs(System.Xml.XmlReader)">
+            <summary>
+            Handle child nodes of Inputs element
+            Called by ReadDataCollection (xml hierarchy)
+            Currently we are only working with the SpectraData child elements
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single AnalysisData element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadAnalysisData(System.Xml.XmlReader)">
+            <summary>
+            Handle child nodes of AnalysisData element
+            Called by ReadDataCollection (xml hierarchy)
+            Currently we are only working with the SpectrumIdentificationList child elements
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single AnalysisData element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadSpectrumIdentificationList(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of a SpectrumIdentificationList element
+            Called by ReadAnalysisData (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single SpectrumIdentificationList element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadSpectrumIdentificationResult(System.Xml.XmlReader)">
+            <summary>
+            Handle a single SpectrumIdentificationResult element and child nodes
+            Called by ReadSpectrumIdentificationList (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single SpectrumIdentificationResult element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.ReadSpectrumIdentificationItem(System.Xml.XmlReader)">
+            <summary>
+            Handle a single SpectrumIdentificationItem element and child nodes
+            Called by ReadSpectrumIdentificationResult (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single SpectrumIdentificationItem element</param>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.MapToMsgf(System.Collections.Generic.List{MTDBFramework.Data.MsgfPlusResult},System.String)">
+            <summary>
+            Map the results of a MZIdentML read to MSGF+
+            </summary>
+            <param name="results">Object to populate with the results of the Mapping</param>
+            <param name="path">Path to MZIdentML file</param>
+        </member>
+        <member name="T:MTDBFramework.IO.MzIdentMlReader.NativeIdConversion">
+            <summary>
+            Provides functionality to interpret a NativeID as a integer scan number
+            Code is ported from MSData.cpp in ProteoWizard
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.NativeIdConversion.TryGetScanNumberLong(System.String,System.Int64@)">
+            <summary>
+            Performs a "long.TryParse" on the interpreted scan number (single shot function)
+            </summary>
+            <param name="nativeId"></param>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.NativeIdConversion.TryGetScanNumberInt(System.String,System.Int32@)">
+            <summary>
+            Performs a "int.TryParse" on the interpreted scan number (single shot function)
+            </summary>
+            <param name="nativeId"></param>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.IO.MzIdentMlReader.NativeIdConversion.GetScanNumber(System.String)">
+            <summary>
+            Returns the integer-only portion of the nativeID that can be used for a scan number
+            If the nativeID cannot be interpreted, the original value is returned.
+            </summary>
+            <param name="nativeId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.SequestPhrpReader">
+            <summary>
+            Summary Description for SequestPHRP Reader
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.SequestPhrpReader.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Configure the options for SequestReader
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.SequestPhrpReader.Read(System.String)">
+            <summary>
+            Read and process a Sequest PHRP file
+            </summary>
+            <param name="path">Sequest file to read</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.SqLiteTargetDatabaseReader">
+            <summary>
+            Creates a target database from a SQLite formatted target database.
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.SqLiteTargetDatabaseReader.ReadDb(System.String)">
+            <summary>
+            Reads a target database from the path provided.
+            </summary>
+            <param name="path">Path to SQLite database file.</param>
+            <returns>Target Database</returns>
+        </member>
+        <member name="M:MTDBFramework.IO.SqLiteTargetDatabaseReader.Read(System.String)">
+            <summary>
+            Reads a LCMS Dataset from the path provided.
+            </summary>
+            <param name="path">Path to SQLite database file.</param>
+            <returns>Target Database</returns>
+        </member>
+        <member name="T:MTDBFramework.IO.SqLiteTargetDatabaseWriter">
+            <summary>
+            Writing to a SQLite MTDB
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.SqLiteTargetDatabaseWriter.Write(MTDBFramework.Database.TargetDatabase,MTDBFramework.Data.Options,System.String)">
+            <summary>
+            Write to the SQLite database
+            </summary>
+            <param name="database"></param>
+            <param name="options"></param>
+            <param name="path"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.SqLiteTargetDatabaseWriter.OnProgressChanged(MTDBFramework.UI.MtdbProgressChangedEventArgs)">
+            <summary>
+            Event Handler
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="E:MTDBFramework.IO.SqLiteTargetDatabaseWriter.ProgressChanged">
+            <summary>
+            Progress change reporting
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.IO.XTandemPhrpReader">
+            <summary>
+            Summary Description for XTandemPHRP Reader
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.XTandemPhrpReader.#ctor(MTDBFramework.Data.Options)">
+            <summary>
+            Configure the options for XTandemPhrpReader
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:MTDBFramework.IO.XTandemPhrpReader.Read(System.String)">
+            <summary>
+            Read and process a XTandem PHRP file
+            </summary>
+            <param name="path">XTandem file to read</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.IO.PhrpReaderFactory">
+            <summary>
+            Wrapper for reading input files, specifically PHRP-generated files
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.IO.PhrpReaderFactory.Create(System.String,MTDBFramework.Data.Options)">
+            <summary>
+            Entry point for creating an LCMS Dataset using the PHRP Reader.
+            </summary>
+            <remarks>
+            If the path ends with "msgfplus.mzid" or "mzid.gz" then it's an MZIdentML file, but if it's not, then
+            it determines the type of reader to return based on the extension of the file, using that to 
+            determine if it is a Sequest, XTandem, MSAlign or MSGF+ file
+            The if statement is due to the PHRP Reader not meaning to be used on .mzid files
+            </remarks>
+            <param name="path">File to be read</param>
+            <param name="options">Reader options</param>
+            <returns>An appropriate reader for the file</returns>
+        </member>
+        <member name="T:MTDBFramework.Data.LcmsDataSet">
+            <summary>
+            LCMS dataset
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.LcmsDataSet.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Data.LcmsDataSet.#ctor(System.Boolean)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="analyzed">Whether the dataset has already been analyzed</param>
+        </member>
+        <member name="M:MTDBFramework.Data.LcmsDataSet.#ctor(System.String,MTDBFramework.Data.LcmsIdentificationTool,System.Collections.Generic.IEnumerable{MTDBFramework.Data.Evidence})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="name">Name of dataset</param>
+            <param name="tool">Format of dataset</param>
+            <param name="evidences">Evidences in dataset</param>
+        </member>
+        <member name="P:MTDBFramework.Data.LcmsDataSet.Name">
+            <summary>
+            Name of the dataset
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.LcmsDataSet.Tool">
+            <summary>
+            Format of input data
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.LcmsDataSet.Evidences">
+            <summary>
+            Evidences in the dataset
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.LcmsDataSet.RegressionResult">
+            <summary>
+            Result of Linear Regression
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Data.LcmsDataSet.PreviouslyAnalyzed">
+            <summary>
+            Whether data has been previously analyzed
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.Database.TargetDatabase">
+            <summary>
+            Maintains information about targets and unique proteins.
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.TargetDatabase.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.Database.TargetDatabase.AddConsensusTarget(MTDBFramework.Data.ConsensusTarget)">
+            <summary>
+            Adds a target and its matching proteins to the database (unique)
+            </summary>
+            <param name="target"></param>
+        </member>
+        <member name="M:MTDBFramework.Database.TargetDatabase.ClearTargets">
+            <summary>
+            Clears an existing target and protein data
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDatabase.ConsensusTargets">
+            <summary>
+            All consensus targets
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Database.TargetDatabase.Proteins">
+            <summary>
+            All proteins
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.MtdbCreator">
+            <summary>
+            API for using MTDBCreator in other applications
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.MtdbCreator.CreateDB(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Create a MTDB with the given files
+            </summary>
+            <param name="paths">Paths to the files to process</param>
+            <param name="dbFileName">Name of MTDB to create</param>
+            <returns></returns>
+        </member>
+        <member name="M:MTDBFramework.MtdbCreator.LoadDB(System.String)">
+            <summary>
+            Load an existing MTDB database into a TargetDatabase
+            </summary>
+            <param name="path">Path to MTDB file</param>
+            <returns></returns>
+        </member>
+        <member name="T:MTDBFramework.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.Properties.Resources.unimod">
+             <summary>
+               Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+            &lt;!--Copyright (C) 2002-2006 Unimod; this information may be copied, distributed and/or--&gt;
+            &lt;!--modified under certain conditions, but it comes WITHOUT ANY WARRANTY; see the--&gt;
+            &lt;!--accompanying Design Science License for more details--&gt;
+            &lt;umod:unimod xmlns:umod=&quot;http://www.unimod.org/xmlns/schema/unimod_2&quot;
+                         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+                         xsi:schemaLocation=&quot;http://www.unimod.org/xmlns/schema/unimod_2 http://www.unimod. [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.AlignmentProgressChangedEventArgs">
+            <summary>
+            Arguments for Alignment Progress updates
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.UI.AlignmentProgressChangedEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current tasks completed</param>
+            <param name="total">Total task to complete</param>
+        </member>
+        <member name="P:MTDBFramework.UI.AlignmentProgressChangedEventArgs.Current">
+            <summary>
+            Current tasks completed
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.AlignmentProgressChangedEventArgs.Total">
+            <summary>
+            Total tasks to complete
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.AlignmentProgressChangedEventHandler">
+            <summary>
+            Event handler
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:MTDBFramework.UI.MtdbCreationProgressType">
+            <summary>
+            Controlled vocabulary for progress types
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbCreationProgressType.CONSENSUS_TARGET">
+            <summary>
+            Consensus Target
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbCreationProgressType.SEQUENCE">
+            <summary>
+            Sequence
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbCreationProgressType.PEPTIDE">
+            <summary>
+            Peptide
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbCreationProgressType.ANALYSIS_SOURCE">
+            <summary>
+            Analysis Sourder
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbCreationProgressType.COMMIT">
+            <summary>
+            Commit
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.MtdbProgressChangedEventArgs">
+            <summary>
+            Arguments for MTDB Progress Changed events
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.MtdbProgressChangedEventArgs.m_currentTask">
+            <summary>
+            Name of currently running task
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.UI.MtdbProgressChangedEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current tasks completed</param>
+            <param name="total">Total tasks to complete</param>
+        </member>
+        <member name="M:MTDBFramework.UI.MtdbProgressChangedEventArgs.#ctor(System.Int32,System.Int32,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current tasks completed</param>
+            <param name="total">Total tasks to complete</param>
+            <param name="currentTask">Name of the current task</param>
+        </member>
+        <member name="M:MTDBFramework.UI.MtdbProgressChangedEventArgs.#ctor(System.Int32,System.Int32,System.Object)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current tasks completed</param>
+            <param name="total">Total tasks to complete</param>
+            <param name="userObject">Object being processed</param>
+        </member>
+        <member name="M:MTDBFramework.UI.MtdbProgressChangedEventArgs.#ctor(System.Int32,System.Int32,System.String,System.Object)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current tasks completed</param>
+            <param name="total">Total tasks to complete</param>
+            <param name="currentTask">Name of the current task</param>
+            <param name="userObject">Object being processed</param>
+        </member>
+        <member name="P:MTDBFramework.UI.MtdbProgressChangedEventArgs.Current">
+            <summary>
+            Current tasks completed
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.MtdbProgressChangedEventArgs.Total">
+            <summary>
+            Total tasks to complete
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.MtdbProgressChangedEventArgs.CurrentTask">
+            <summary>
+            Name of currently running task
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.MtdbProgressChangedEventArgs.UserObject">
+            <summary>
+            Object that is currently running
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.MtdbProgressChangedEventHandler">
+            <summary>
+            Event handler
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:MTDBFramework.UI.PercentCompleteEventArgs">
+            <summary>
+            Arguments for percent completion display
+            </summary>
+        </member>
+        <member name="F:MTDBFramework.UI.PercentCompleteEventArgs.m_currentTask">
+            <summary>
+            Currently running task
+            </summary>
+        </member>
+        <member name="M:MTDBFramework.UI.PercentCompleteEventArgs.#ctor(System.Single)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="percentComplete">Percent complete</param>
+        </member>
+        <member name="M:MTDBFramework.UI.PercentCompleteEventArgs.#ctor(System.Single,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="percentComplete">Percent complete</param>
+            <param name="currentTask">Currently running task</param>
+        </member>
+        <member name="M:MTDBFramework.UI.PercentCompleteEventArgs.#ctor(System.Int32,System.Int32,System.Single,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="current">Current subtasks completed</param>
+            <param name="total">Total subtasks</param>
+            <param name="percentComplete">Percent complete</param>
+            <param name="currentTask">Currently running task</param>
+        </member>
+        <member name="P:MTDBFramework.UI.PercentCompleteEventArgs.Current">
+            <summary>
+            Current subtasks completed
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.PercentCompleteEventArgs.Total">
+            <summary>
+            Total subtasks
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.PercentCompleteEventArgs.PercentComplete">
+            <summary>
+            Percent completion
+            </summary>
+        </member>
+        <member name="P:MTDBFramework.UI.PercentCompleteEventArgs.CurrentTask">
+            <summary>
+            Name of currently running task
+            </summary>
+        </member>
+        <member name="T:MTDBFramework.UI.PercentCompleteEventHandler">
+            <summary>
+            Event handler
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+    </members>
+</doc>
