@@ -99,6 +99,7 @@
     <Compile Include="Data\Spectrometry\AbstractFragmentScorer.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedSpectrum.cs" />
+    <Compile Include="Data\Spectrometry\IFragmentScorerFactory.cs" />
     <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
