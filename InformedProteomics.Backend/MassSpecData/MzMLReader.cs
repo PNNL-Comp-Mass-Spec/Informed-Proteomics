@@ -1109,7 +1109,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Read and parse a .mzML file
         /// Files are commonly larger than 100 MB, so use a streaming reader instead of a DOM reader
-        /// Vary conditional, depending on configuration
+        /// Very conditional, depending on configuration
         /// </summary>
         private void ReadMzMl()
         {
