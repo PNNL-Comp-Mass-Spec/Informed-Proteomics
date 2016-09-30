@@ -12,12 +12,12 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Results;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using PNNLOmics.Utilities;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -169,8 +169,8 @@ namespace InformedProteomics.TopDown.Execution
 
         /// <summary>
         /// 0: all internal sequences, 
-        /// 1: #NCleavages <= Max OR Cleavages <= Max (Default)
-        /// 2: 1: #NCleavages <= Max AND Cleavages <= Max
+        /// 1: #NCleavages &lt;= Max OR Cleavages &lt;= Max (Default)
+        /// 2: 1: #NCleavages &lt;= Max AND Cleavages &lt;= Max
         /// </summary>
         /// <remarks>default 1</remarks>
         public int SearchModeInt
@@ -389,43 +389,11 @@ namespace InformedProteomics.TopDown.Execution
 
             progData.StepRange(60.0);
             progData.Status = "Running Target search";
+            List<DatabaseSearchResultData> targetSearchResults = null;
 
             if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Target) && !File.Exists(targetOutputFilePath))
             {
-                sw.Reset();
-                Console.Write(@"Reading the target database...");
-                sw.Start();
-                targetDb.Read();
-                sw.Stop();
-                Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
-                var targetMatches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
-
-                progData.MaxPercentage = 42.5;
-                if (TagBasedSearch)
-                {
-                    sw.Reset();
-                    Console.WriteLine(@"Tag-based searching the target database");
-                    sw.Start();
-                    RunTagBasedSearch(targetMatches, targetDb, null, prog);
-                    Console.WriteLine(@"Target database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-                }
-                progData.MaxPercentage = 60.0;
-
-                sw.Reset();
-                Console.WriteLine(@"Searching the target database");
-                sw.Start();
-                RunSearch(targetMatches, targetDb, ms1Filter, null, prog);
-                Console.WriteLine(@"Target database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
-                // calculate spectral e-value usign generating function
-                sw.Reset();
-                Console.WriteLine(@"Calculating spectral E-values for target-spectrum matches");
-                sw.Start();
-                var bestTargetMatches = RunGeneratingFunction(targetMatches);
-                WriteResultsToFile(bestTargetMatches, targetOutputFilePath, targetDb);
-                sw.Stop();
-                Console.WriteLine(@"Target-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                targetSearchResults = RunDatabaseSearch(targetDb, targetOutputFilePath, ms1Filter, "target", prog);
             }
             else if (File.Exists(targetOutputFilePath))
             {
@@ -434,44 +402,12 @@ namespace InformedProteomics.TopDown.Execution
 
             progData.StepRange(95.0); // total to 95%
             progData.Status = "Running Decoy search";
+            List<DatabaseSearchResultData> decoySearchResults = null;
 
             if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Decoy) && !File.Exists(decoyOutputFilePath))
             {
-                // Decoy database
-                sw.Reset();
-                sw.Start();
                 var decoyDb = targetDb.Decoy(null, true);
-
-                Console.Write(@"Reading the decoy database...");
-                decoyDb.Read();
-                Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
-                progData.MaxPercentage = 77.5;
-                var decoyMatches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
-                if (TagBasedSearch)
-                {
-                    sw.Reset();
-                    Console.WriteLine(@"Tag-based searching the decoy database");
-                    sw.Start();
-                    RunTagBasedSearch(decoyMatches, decoyDb, null, prog);
-                    Console.WriteLine(@"Decoy database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);                    
-                }
-                progData.MaxPercentage = 95.0;
-
-                sw.Reset();
-                Console.WriteLine(@"Searching the decoy database");
-                sw.Start();
-                RunSearch(decoyMatches, decoyDb, ms1Filter, null, prog);
-                Console.WriteLine(@"Decoy database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
-
-                // calculate spectral e-value usign generating function
-                sw.Reset();
-                Console.WriteLine(@"Calculating spectral E-values for decoy-spectrum matches");
-                sw.Start();
-                var bestDecoyMatches = RunGeneratingFunction(decoyMatches);
-                WriteResultsToFile(bestDecoyMatches, decoyOutputFilePath, decoyDb);
-                sw.Stop();
-                Console.WriteLine(@"Decoy-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+                decoySearchResults = RunDatabaseSearch(decoyDb, decoyOutputFilePath, ms1Filter, "decoy", prog);
             }
             else if (File.Exists(decoyOutputFilePath))
             {
@@ -483,7 +419,30 @@ namespace InformedProteomics.TopDown.Execution
             if (RunTargetDecoyAnalysis.HasFlag(DatabaseSearchMode.Both))
             {
                 // Add "Qvalue" and "PepQValue"
-                var fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                FdrCalculator fdrCalculator;
+                if (targetSearchResults == null && decoySearchResults == null)
+                {
+                    // Objects not populated, try to read in the files.
+                    fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                }
+                else if (targetSearchResults == null)
+                {
+                    // Target search skipped, read in the result file
+                    targetSearchResults = DatabaseSearchResultData.ReadResultsFromFile(targetOutputFilePath);
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                }
+                else if (decoySearchResults == null)
+                {
+                    // Decoy search skipped, read in the result file
+                    decoySearchResults = DatabaseSearchResultData.ReadResultsFromFile(decoyOutputFilePath);
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                }
+                else
+                {
+                    // Just use the objects
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                }
+
                 if (fdrCalculator.HasError())
                 {
                     ErrorMessage = fdrCalculator.ErrorMessage;
@@ -500,6 +459,58 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1:f2} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
 
             return true;
+        }
+
+        private List<DatabaseSearchResultData> RunDatabaseSearch(FastaDatabase searchDb, string outputFilePath, ISequenceFilter ms1Filter, string searchModeString, IProgress<ProgressData> progress)
+        {
+            var progressData = new ProgressData(progress);
+            var sw = new Stopwatch();
+            var searchModeStringCap = char.ToUpper(searchModeString[0]) + searchModeString.Substring(1);
+
+            sw.Reset();
+            sw.Start();
+            Console.WriteLine(@"Reading the {0} database...", searchModeString);
+            searchDb.Read();
+            sw.Stop();
+            Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
+
+            var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
+            progressData.StepRange(50);
+            if (TagBasedSearch)
+            {
+                sw.Reset();
+                Console.WriteLine(@"Tag-based searching the {0} database", searchModeString);
+                sw.Start();
+                var progTag = new Progress<ProgressData>(p =>
+                {
+                    progressData.StatusInternal = p.Status;
+                    progressData.Report(p.Percent);
+                });
+                RunTagBasedSearch(matches, searchDb, null, progTag);
+                Console.WriteLine(@"{1} database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap);
+            }
+            progressData.StepRange(100);
+
+            sw.Reset();
+            Console.WriteLine(@"Searching the {0} database", searchModeString);
+            sw.Start();
+            var prog = new Progress<ProgressData>(p =>
+            {
+                progressData.StatusInternal = p.Status;
+                progressData.Report(p.Percent);
+            });
+            RunSearch(matches, searchDb, ms1Filter, null, prog);
+            Console.WriteLine(@"{1} database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap);
+
+            // calculate spectral e-value using generating function
+            sw.Reset();
+            Console.WriteLine(@"Calculating spectral E-values for {0}-spectrum matches", searchModeString);
+            sw.Start();
+            var bestMatches = RunGeneratingFunction(matches);
+            var results = WriteResultsToFile(bestMatches, outputFilePath, searchDb);
+            sw.Stop();
+            Console.WriteLine(@"{1}-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap);
+            return results;
         }
 
         private int[] _tagMs2ScanNum;
@@ -929,60 +940,46 @@ namespace InformedProteomics.TopDown.Execution
             return nMatches;
         }
 
-        private double ExcelMinValue(double val)
+        private List<DatabaseSearchResultData> WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
         {
-            const double minExcelValue = 9.99E-308;
-            return Math.Max(val, minExcelValue);
+            var results = CreateResults(matches, database).ToList();
+            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, results, false);
+            return results;
         }
 
-        private void WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
+        private IEnumerable<DatabaseSearchResultData> CreateResults(DatabaseSequenceSpectrumMatch[] matches, FastaDatabase database)
         {
-            using (var writer = new StreamWriter(outputFilePath))
+            foreach (var scanNum in _ms2ScanNums)
             {
-                writer.WriteLine("Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
-                                 "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\t#MatchedFragments\tProbability\tSpecEValue\tEValue");
-
-                foreach(var scanNum in _ms2ScanNums)
+                var match = matches[scanNum];
+                if (match == null)
+                    continue;
+                
+                var start = database.GetOneBasedPositionInProtein(match.Offset) + 1 + match.NumNTermCleavages;
+                var proteinName = database.GetProteinName(match.Offset);
+                var result = new DatabaseSearchResultData()
                 {
-                    var match = matches[scanNum];
-                    if (match == null)
-                        continue;
+                    ScanNum = scanNum,
+                    Pre = match.Pre.ToString(),
+                    Sequence = match.Sequence,
+                    Post = match.Post.ToString(),
+                    Modifications = match.ModificationText,
+                    Composition = match.Ion.Composition.ToString(),
+                    ProteinName = proteinName,
+                    ProteinLength = database.GetProteinLength(proteinName),
+                    ProteinDescription = database.GetProteinDescription(match.Offset),
+                    Start = start,
+                    End = start + match.Sequence.Length - 1,
+                    Charge = match.Ion.Charge,
+                    MostAbundantIsotopeMz = match.Ion.GetMostAbundantIsotopeMz(),
+                    Mass = match.Ion.Composition.Mass,
+                    NumMatchedFragments = match.NumMatchedFragments,
+                    Probability = CompositeScorer.GetProbability(match.Score),
+                    SpecEValue = match.SpecEvalue,
+                    EValue = match.SpecEvalue * database.GetNumEntries(),
+                };
 
-                    var sequence = match.Sequence;
-                    var offset = match.Offset;
-                    var start = database.GetOneBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
-                    var end = start + sequence.Length - 1;
-                    var proteinName = database.GetProteinName(match.Offset);
-                    var protLength = database.GetProteinLength(proteinName);
-                    var ion = match.Ion;
-                    var proteinDescription = database.GetProteinDescription(match.Offset);
-                    var probability = CompositeScorer.GetProbability(match.Score);
-
-                    // Note for DblToString(value, 9, true), by having "9" and "true",
-                    // values between 100 and 999 Da will have 7 digits after the decimal place, and
-                    // values between 1000 and 9999 will have 6 digits after the decimal place
-                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}",
-                        scanNum,
-                        match.Pre,                 // Pre
-                        sequence,                  // Sequence
-                        match.Post,                // Post
-                        match.ModificationText,    // Modifications
-                        ion.Composition,           // Composition
-                        proteinName,               // ProteinName
-                        proteinDescription,        // ProteinDescription
-                        protLength,                // ProteinLength
-                        start,                     // Start position in protein
-                        end,                       // End position in protein
-                        ion.Charge,                // precursorCharge
-                        StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
-                        StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
-                        match.NumMatchedFragments,                                          // (Number of matched fragments)
-                        StringUtilities.DblToString(probability, 4),                        // Probability
-                        StringUtilities.DblToString(ExcelMinValue(match.SpecEvalue), 6, true, 0.001),                             // EValue; will be displayed using scientific notation if the value is less than 0.001
-                        StringUtilities.DblToString(ExcelMinValue(match.SpecEvalue * database.GetNumEntries()), 6, true, 0.001)   // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
-                        );
-
-                }
+                yield return result;
             }
         }
     }
