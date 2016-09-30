@@ -166,7 +166,7 @@ namespace InformedProteomics.Backend.Results
             {
                 return;
             }
-            if (headerLine.EndsWith(lastSetHeaderLine))
+            if (!string.IsNullOrWhiteSpace(lastSetHeaderLine) && headerLine.EndsWith(lastSetHeaderLine))
             {
                 return;
             }
@@ -348,29 +348,22 @@ namespace InformedProteomics.Backend.Results
             var results = new List<DatabaseSearchResultData>();
             using (var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                var header = stream.ReadLine();
                 string line;
-                if (string.IsNullOrWhiteSpace(header))
+                var isFirstLine = true;
+                while (!stream.EndOfStream && (line = stream.ReadLine()) != null)
                 {
-                    return null;
-                }
-                var headerTokens = header.Split('\t');
-                int temp;
-                if (int.TryParse(headerTokens[0], out temp))
-                {
-                    header = "";
-                    line = header;
-                }
-                else
-                {
-                    SetInputFileHeader(header);
-                    line = stream.ReadLine();
-                }
+                    if (isFirstLine)
+                    {
+                        isFirstLine = false;
+                        int test;
+                        if (!int.TryParse(line.Substring(0, 1), out test))
+                        {
+                            SetInputFileHeader(line);
+                            continue;
+                        }
+                    }
 
-                while (line != null)// && !stream.EndOfStream)
-                {
                     results.Add(new DatabaseSearchResultData(line));
-                    line = stream.ReadLine();
                 }
             }
             if (results.Count == 0)
