@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "Qvalue"
-            if (!CalculateQValues("", ""))
+            if (!CalculateQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculateQValues returned false";
@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "PepQvalue"
-            if (!CalculatePepQValues("", ""))
+            if (!CalculatePepQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculatePepQValues returned false";
@@ -67,7 +67,7 @@ namespace InformedProteomics.Backend.Utils
         }
 
         public FdrCalculator(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults, bool multiplePeptidesPerScan = false)
-        { 
+        {
             ErrorMessage = string.Empty;
 
             _multiplePeptidesPerScan = multiplePeptidesPerScan;
@@ -82,7 +82,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "Qvalue"
-            if (!CalculateQValues("", ""))
+            if (!CalculateQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculateQValues returned false";
@@ -90,7 +90,7 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "PepQvalue"
-            if (!CalculatePepQValues("", ""))
+            if (!CalculatePepQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculatePepQValues returned false";
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.Utils
             DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
         }
 
-        private bool CalculateQValues(string targetResultFilePath, string decoyResultFilePath)
+        private bool CalculateQValues()
         {
             // Order by EValue, then Probability, then take only the best scoring result for each scan number
             var distinctSorted = searchResults.OrderBy(r => r.EValue)
@@ -163,8 +163,8 @@ namespace InformedProteomics.Backend.Utils
 
             return true;
         }
-      
-        private bool CalculatePepQValues(string targetResultFilePath, string decoyResultFilePath)
+
+        private bool CalculatePepQValues()
         {
             IEnumerable<DatabaseSearchResultData> distinctSorting = searchResults.OrderBy(r => r.EValue).ThenByDescending(r => r.Probability);
             if (!_multiplePeptidesPerScan)
@@ -213,9 +213,7 @@ namespace InformedProteomics.Backend.Utils
             return true;
         }
 
-        private bool ReadTargetAndDecoy(
-            string targetResultFilePath,
-            string decoyResultFilePath)
+        private bool ReadTargetAndDecoy(string targetResultFilePath, string decoyResultFilePath)
         {
             var errorBase = "Cannot compute FDR Scores; ";
 
