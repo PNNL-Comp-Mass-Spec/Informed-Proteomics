@@ -181,6 +181,7 @@
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatch.cs" />
+    <Compile Include="Results\DatabaseSearchResultData.cs" />
     <Compile Include="SequenceTag\GraphEdge.cs" />
     <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
     <Compile Include="SequenceTag\SequenceTag.cs" />

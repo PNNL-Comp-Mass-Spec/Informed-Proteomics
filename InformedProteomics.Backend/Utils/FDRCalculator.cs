@@ -3,22 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Database;
-using PNNLOmics.Utilities;
+using InformedProteomics.Backend.Results;
 
 namespace InformedProteomics.Backend.Utils
 {
     public class FdrCalculator
     {
-        private IList<string> _headers;
-        private string[] _results;
         private readonly bool _multiplePeptidesPerScan;
-
-        private bool _hasEvalueColumn;
+        private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
+        private List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
 
         public int NumPsms { get; private set; }
         public int NumPeptides { get; private set; }
 
         public string ErrorMessage { get; private set; }
+
+        public List<DatabaseSearchResultData> SeachResults
+        {
+            get { return new List<DatabaseSearchResultData>(searchResults); }
+        }
+
+        public List<DatabaseSearchResultData> FilteredResults
+        {
+            get { return new List<DatabaseSearchResultData>(filteredResults); }
+        }
 
         /// <summary>
         /// Instantiate the FDR calculator
@@ -33,8 +41,17 @@ namespace InformedProteomics.Backend.Utils
 
             _multiplePeptidesPerScan = multiplePeptidesPerScan;
 
+            // Read the data and add it to the list
+            if (!ReadTargetAndDecoy(targetResultFilePath, decoyResultFilePath))
+            {
+                if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    ErrorMessage = "ReadTargetAndDecoy returned false in FdrCalculator";
+
+                return;
+            }
+
             // Add "Qvalue"
-            if (!CalculateQValues(targetResultFilePath, decoyResultFilePath))
+            if (!CalculateQValues("", ""))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculateQValues returned false";
@@ -42,8 +59,38 @@ namespace InformedProteomics.Backend.Utils
             }
 
             // Add "PepQvalue"
-            
-            if (!CalculatePepQValues(targetResultFilePath, decoyResultFilePath))
+            if (!CalculatePepQValues("", ""))
+            {
+                if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    ErrorMessage = "CalculatePepQValues returned false";
+            }
+        }
+
+        public FdrCalculator(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults, bool multiplePeptidesPerScan = false)
+        { 
+            ErrorMessage = string.Empty;
+
+            _multiplePeptidesPerScan = multiplePeptidesPerScan;
+
+            // Add the data to the list
+            if (!AddTargetAndDecoyData(targetResults, decoyResults))
+            {
+                if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    ErrorMessage = "AddTargetAndDecoy returned false in FdrCalculator";
+
+                return;
+            }
+
+            // Add "Qvalue"
+            if (!CalculateQValues("", ""))
+            {
+                if (string.IsNullOrWhiteSpace(ErrorMessage))
+                    ErrorMessage = "CalculateQValues returned false";
+                return;
+            }
+
+            // Add "PepQvalue"
+            if (!CalculatePepQValues("", ""))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
                     ErrorMessage = "CalculatePepQValues returned false";
@@ -57,74 +104,42 @@ namespace InformedProteomics.Backend.Utils
 
         public void WriteTo(string outputFilePath, bool includeDecoy = false)
         {
-            var sequenceIndex = _headers.IndexOf("ProteinName");
+            //var resultsToUse = searchResults;
+            var resultsToUse = filteredResults;
 
-            using (var writer = new StreamWriter(outputFilePath))
+            IEnumerable<DatabaseSearchResultData> resultsToWrite;
+            if (includeDecoy)
             {
-                writer.WriteLine(string.Join("\t", _headers));
-                foreach (var r in _results)
-                {
-                    if (!includeDecoy && r.Split('\t')[sequenceIndex].StartsWith(FastaDatabase.DecoyProteinPrefix))
-                    {
-                        continue;
-                    }
-                    writer.WriteLine(r);
-                }
+                resultsToWrite = resultsToUse;
             }
+            else
+            {
+                resultsToWrite = resultsToUse.Where(x => !x.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix));
+            }
+            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
         }
 
         private bool CalculateQValues(string targetResultFilePath, string decoyResultFilePath)
         {
-            string[] concatenated;
-            int scoreIndex;
-            int rawScoreIndex;
-
-            var success = ReadTargetAndDecoy("QValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex, out rawScoreIndex);
-
-            if (!success)
-            {
-                if (string.IsNullOrWhiteSpace(ErrorMessage))
-                    ErrorMessage = "ReadTargetAndDecoy returned false in CalculateQValues";
-
-                return false;
-            }
-
-            int scanNumIndex;
-            int proteinIndex;
-           
-            if (!GetColumnIndex("QValues", "Scan", out scanNumIndex))
-                return false;
-
-            if (!GetColumnIndex("QValues", "ProteinName", out proteinIndex))
-                return false;
-
-            var distinctSorted = (_hasEvalueColumn)
-                ? concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                    .Select(grp => grp.First())
-                    .ToArray()
-                : concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                    .Select(grp => grp.First())
-                    .ToArray();
+            // Order by EValue, then Probability, then take only the best scoring result for each scan number
+            var distinctSorted = searchResults.OrderBy(r => r.EValue)
+                .ThenByDescending(r => r.Probability)
+                .GroupBy(r => r.ScanNum)
+                .Select(grp => grp.First())
+                .ToArray();
 
             NumPsms = 0;
 
             // Calculate q values
-            _headers = _headers.Concat(new[] {"QValue"}).ToArray();
             var numDecoy = 0;
             var numTarget = 0;
             var fdr = new double[distinctSorted.Length];
             for (var i = 0; i < distinctSorted.Length; i++)
             {
-                var row = distinctSorted[i];
-                var columns = row.Split('\t');
-                var protein = columns[proteinIndex];
-                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) 
+                var result = distinctSorted[i];
+                if (result.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix))
                     numDecoy++;
-                else 
+                else
                     numTarget++;
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
@@ -139,86 +154,26 @@ namespace InformedProteomics.Backend.Utils
                     ++NumPsms;
             }
 
-            _results = distinctSorted.Select((r, i) => r + "\t" + StringUtilities.DblToString(qValue[i], 7)).ToArray();
+            for (var i = 0; i < distinctSorted.Length; i++)
+            {
+                distinctSorted[i].QValue = qValue[i];
+            }
+
+            filteredResults.AddRange(distinctSorted);
 
             return true;
         }
       
         private bool CalculatePepQValues(string targetResultFilePath, string decoyResultFilePath)
         {
-            string[] concatenated;
-            int scoreIndex;
-            int rawScoreIndex;
-
-            var success = ReadTargetAndDecoy("PepQValues", targetResultFilePath, decoyResultFilePath, out concatenated, out scoreIndex, out rawScoreIndex);
-
-            if (!success)
+            IEnumerable<DatabaseSearchResultData> distinctSorting = searchResults.OrderBy(r => r.EValue).ThenByDescending(r => r.Probability);
+            if (!_multiplePeptidesPerScan)
             {
-                if (string.IsNullOrWhiteSpace(ErrorMessage))
-                    ErrorMessage = "ReadTargetAndDecoy returned false in CalculateQValues";
-
-                return false;
+                distinctSorting = distinctSorting.GroupBy(r => r.ScanNum).Select(grp => grp.First());
             }
+            var distinctSorted = distinctSorting.GroupBy(r => r.SequenceWithEnds).Select(grp => grp.First()).ToArray();
 
-            int sequenceIndex;
-            int scanNumIndex;
-            int preIndex;
-            int postIndex;
-            int proteinIndex;
-
-            if (!GetColumnIndex("PepQValues", "Sequence", out sequenceIndex))
-                return false;
-
-            if (!GetColumnIndex("PepQValues", "Scan", out scanNumIndex))
-                return false;
-
-            if (!GetColumnIndex("PepQValues", "Pre", out preIndex))
-                return false;
-
-            if (!GetColumnIndex("PepQValues", "Post", out postIndex))
-                return false;
-
-            if (!GetColumnIndex("PepQValues", "ProteinName", out proteinIndex))
-                return false;
-
-            string[] distinctSorted;
-
-            if (_hasEvalueColumn)
-            {
-                distinctSorted = !_multiplePeptidesPerScan ?
-                                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                                .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                                    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                                    .Select(grp => grp.First())
-                                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                                    .Select(grp => grp.First())
-                                    .ToArray() :
-                                concatenated.OrderBy(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                                    .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                                    .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                                    .Select(grp => grp.First())
-                                    .ToArray();                
-            }
-            else
-            {
-                distinctSorted = !_multiplePeptidesPerScan ?
-                                               concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                                               .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                                                   .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanNumIndex]))
-                                                   .Select(grp => grp.First())
-                                                   .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                                                   .Select(grp => grp.First())
-                                                   .ToArray() :
-                                               concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
-                                                   .ThenByDescending(r => Convert.ToDouble(r.Split('\t')[rawScoreIndex]))
-                                                   .GroupBy(r => r.Split('\t')[preIndex] + r.Split('\t')[sequenceIndex] + r.Split('\t')[postIndex])
-                                                   .Select(grp => grp.First())
-                                                   .ToArray();                    
-            }
-            
-
-            // Calculate q values
-            _headers = _headers.Concat(new[] { "PepQValue" }).ToArray();
+            // Calculate pepq values
             var numDecoy = 0;
             var numTarget = 0;
             var fdr = new double[distinctSorted.Length];
@@ -226,16 +181,13 @@ namespace InformedProteomics.Backend.Utils
             for (var i = 0; i < distinctSorted.Length; i++)
             {
                 var row = distinctSorted[i];
-                var columns = row.Split('\t');
-                var protein = columns[proteinIndex];
-                var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
-                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) 
+                if (row.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix))
                     numDecoy++;
-                else 
+                else
                     numTarget++;
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
-                peptide[i] = annotation;
+                peptide[i] = row.SequenceWithEnds;
             }
 
             var pepQValue = new double[fdr.Length];
@@ -243,7 +195,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
                 pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
-                if (pepQValue[i] <= 0.01) 
+                if (pepQValue[i] <= 0.01)
                     ++NumPeptides;
             }
 
@@ -253,43 +205,19 @@ namespace InformedProteomics.Backend.Utils
                 annotationToPepQValue[peptide[i]] = pepQValue[i];
             }
 
-            for (var i = 0; i < _results.Length; i++)
+            foreach (var item in filteredResults)
             {
-                var columns = _results[i].Split('\t');
-                var annotation = columns[preIndex] + "." + columns[sequenceIndex] + "." + columns[postIndex];
-                _results[i] = _results[i] + "\t" + StringUtilities.DblToString(annotationToPepQValue[annotation], 7);
+                item.PepQValue = annotationToPepQValue[item.SequenceWithEnds];
             }
 
             return true;
         }
 
-
-        private bool GetColumnIndex(string targetStatistic, string columnName, out int columnIndex)
-        {
-            columnIndex = _headers.IndexOf(columnName);
-
-            if (columnIndex >= 0)
-            {
-                return true;
-            }
-
-            ErrorMessage = "Cannot compute " + targetStatistic + "; " + columnName + " column is missing";
-            return false;
-        }
-
         private bool ReadTargetAndDecoy(
-            string targetStatistic,
             string targetResultFilePath,
-            string decoyResultFilePath,
-            out string[] concatenated,
-            out int scoreIndex,
-            out int rawScoreIndex)
+            string decoyResultFilePath)
         {
-            scoreIndex = -1;
-            rawScoreIndex = -1;
-            concatenated = new string[0];
-
-            var errorBase = "Cannot compute " + targetStatistic + "; ";
+            var errorBase = "Cannot compute FDR Scores; ";
 
             if (!File.Exists(targetResultFilePath))
             {
@@ -303,79 +231,40 @@ namespace InformedProteomics.Backend.Utils
                 return false;
             }
 
-            var targetData = File.ReadAllLines(targetResultFilePath);
-            var decoyData = File.ReadAllLines(decoyResultFilePath);
+            var targetData = DatabaseSearchResultData.ReadResultsFromFile(targetResultFilePath);
+            var decoyData = DatabaseSearchResultData.ReadResultsFromFile(decoyResultFilePath);
 
-            if (targetData.Length < 1)
+            return AddTargetAndDecoyData(targetData, decoyData);
+        }
+
+        private bool AddTargetAndDecoyData(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults)
+        {
+            var errorBase = "Cannot compute FDR Scores; ";
+            if (targetResults == null || targetResults.Count < 1)
             {
                 ErrorMessage = errorBase + "target file is empty";
                 return false;
             }
 
-            if (decoyData.Length < 1)
+            if (decoyResults == null || decoyResults.Count < 1)
             {
                 ErrorMessage = errorBase + "decoy file is empty";
                 return false;
             }
 
-            var targetHeaders = targetData[0].Split('\t');
-            var decoyHeaders = decoyData[0].Split('\t');
+            searchResults = new List<DatabaseSearchResultData>();
+            searchResults.AddRange(decoyResults);
+            searchResults.AddRange(targetResults);
 
-            if (targetHeaders.Length != decoyHeaders.Length)
-            {
-                ErrorMessage = errorBase + "header count doesn't match between target and decoy file";
-                return false;
-            }
-
-            if (!targetHeaders.SequenceEqual(decoyHeaders))
-            {
-                ErrorMessage = errorBase + "Headers don't match between target and decoy file";
-                return false;
-            }
-
-            if (_headers == null)
-                _headers = targetHeaders;
-
-            concatenated = decoyData.Skip(1).Concat(targetData.Skip(1)).ToArray();
-            if (concatenated.Length == 0)
+            if (searchResults.Count == 0)
             {
                 // NOTE: The DMS Analysis Manager looks for the text "No results found"
                 // thus, do not change this message
-                ErrorMessage = "No results found; cannot compute " + targetStatistic;
-                return false;
-            }
-            
-            scoreIndex = _headers.IndexOf("EValue");
-            if (scoreIndex < 0)
-            {
-                scoreIndex = _headers.IndexOf("#MatchedFragments");
-                _hasEvalueColumn = false;
-            }
-            else
-            {
-                _hasEvalueColumn = true;
-            }
-
-            if (scoreIndex < 0)
-            {
-                ErrorMessage = errorBase + "EValue(Score) column is missing";
-                return false;
-            }
-
-            rawScoreIndex = _headers.IndexOf("Probability");
-            if (rawScoreIndex < 0)
-            {
-                rawScoreIndex = _headers.IndexOf("#MatchedFragments");
-            }
-
-            if (rawScoreIndex < 0)
-            {
-                ErrorMessage = errorBase + "#MatchedFragments column is missing";
+                ErrorMessage = "No results found; cannot compute FDR Scores";
                 return false;
             }
 
             return true;
         }
-
     }
 }
