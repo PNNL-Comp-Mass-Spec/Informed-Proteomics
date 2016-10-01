@@ -8,6 +8,8 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
@@ -75,7 +77,7 @@ namespace InformedProteomics.TopDown.Scoring
         public static Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold,
                                                        int isotopeOffsetTolerance, double filteringWindowSize = 1.1)
         {
-            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrThreshold);
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, 1.1, tolerance, corrThreshold);
             var peakList = new List<Peak>();
             var binHash = new HashSet<int>();
             foreach (var deconvolutedPeak in deconvolutedPeaks)
@@ -108,7 +110,9 @@ namespace InformedProteomics.TopDown.Scoring
             private readonly double _prefixOffsetMass;
             private readonly double _suffixOffsetMass;
             private readonly HashSet<int> _ionMassBins;
-            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance)
+            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 if (deconvolutedSpectrum.ActivationMethod != ActivationMethod.ETD)
                 {
@@ -143,7 +147,9 @@ namespace InformedProteomics.TopDown.Scoring
                 return 0.0;
             }
 
-            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 var score = 0.0;
 

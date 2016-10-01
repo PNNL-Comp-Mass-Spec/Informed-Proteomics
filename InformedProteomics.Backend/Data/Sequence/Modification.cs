@@ -57,8 +57,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification Get(string psiMsName)
         {
+            string lowerPsiMsName = psiMsName.ToLower();
             Modification mod;
-            if (NameToModMap.TryGetValue(psiMsName, out mod)) return mod;
+            if (NameToModMap.TryGetValue(lowerPsiMsName, out mod)) return mod;
             return null;
         }
 
@@ -89,6 +90,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification PyroGluQ = new Modification(28, new Composition.Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
         public static readonly Modification Methylation = new Modification(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl");
         public static readonly Modification Oxidation = new Modification(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
+        public static readonly Modification TriOxidation = new Modification(400, new Composition.Composition(0, 0, 0, 3, 0), "TriOxidation");
         public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
         public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
         public static readonly Modification Glutathione = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
@@ -118,7 +120,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                 PyroGluE,
                 PyroGluQ,
                 Methylation,
+                DiMethylation,
+                TriMethylation,
+                Cysteinyl,
                 Oxidation,
+                TriOxidation,
                 Itraq4Plex,
                 Tmt6Plex,
                 Glutathione,
@@ -149,7 +155,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
         {
-            var mod = Get(name);
+            string lowerName = name.ToLower();
+            var mod = Get(lowerName);
             if (mod != null) return mod;
 
             mod = new Modification(-1, composition, name);
@@ -159,10 +166,11 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification RegisterAndGetModification(string name, double mass)
         {
+            string lowerName = name.ToLower();
             var modList = GetFromMass(mass);
             if (modList != null && modList.Any()) return modList[0];
 
-            var mod = Get(name);
+            var mod = Get(lowerName);
             if (mod != null) return mod;
 
             mod = new Modification(-1, mass, name);
@@ -179,11 +187,14 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>Registered modification.</returns>
         public static Modification UpdateAndGetModification(string name, Composition.Composition composition)
         {
-            if (NameToModMap.ContainsKey(name)) NameToModMap.Remove(name);
+            // Names should be case-insensitive.
+            string lowerName = name.ToLower();
+            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
 
             var massStr = string.Format("{0:N3}", composition.Mass);
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
 
+            // Use original-cased name in modification object.
             var modification = new Modification(-1, composition, name);
             Register(modification);
 
@@ -199,7 +210,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>Registered modification.</returns>
         public static Modification UpdateAndGetModification(string name, double mass)
         {
-            if (NameToModMap.ContainsKey(name)) NameToModMap.Remove(name);
+            // Names should be case-insensitive.
+            string lowerName = name.ToLower();
+            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
 
             var massStr = string.Format("{0:N3}", mass);
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
@@ -218,7 +231,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="modification">The modification to remove.</param>
         public static void UnregisterModification(Modification modification)
         {
-            if (NameToModMap.ContainsKey(modification.Name)) NameToModMap.Remove(modification.Name);
+            var lowerName = modification.Name.ToLower();
+            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
 
             var massStr = string.Format("{0:N3}", modification.Mass);
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
@@ -226,7 +240,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static void Register(Modification modification)
         {
-            NameToModMap.Add(modification.Name, modification);
+            var lowerName = modification.Name.ToLower();
+            NameToModMap.Add(lowerName, modification);
             var massStr = string.Format("{0:N3}", modification.Composition.Mass);
             IList<Modification> modList;
             if (!MassToModMap.TryGetValue(massStr, out modList))

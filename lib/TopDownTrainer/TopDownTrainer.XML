@@ -1,0 +1,2443 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TopDownTrainer</name>
+    </assembly>
+    <members>
+        <member name="T:TopDownTrainer.AbstractIonSequence">
+            <summary>
+            AbstractIonSequence is an abstract class inheriting from AbstractProteinManipulator. It is able to
+            generate a list of ions of a specific cleavage point, charge, BaseIonType, and NeutralLoss for a
+            particular sequence or composition. AbstractIonSequence can also determine if a list of ions has
+            strong Pearson Correlation with a spectrum.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AbstractIonSequence.IonTypes">
+            <summary>
+            IonTypes this object contains. Genereated from BaseIonTypes and NeutralLosses with charge leq 50
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AbstractIonSequence.Tol">
+            <summary>
+            Tolerance for GetCorrScore
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AbstractIonSequence.MinScore">
+            <summary>
+            Threshold for GetCorrScore
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.#ctor(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Creates and AbstractIonSequence specifying BaseIonTypes, NeutralLosses, Tolerance,
+            and MinScore for GetCorrScore
+            </summary>
+            <param name="baseIonTypes">BaseIonTypes in question</param>
+            <param name="neutralLosses">NeutralLosses in question</param>
+            <param name="tol">Optional Tolerance for GetCorrScore (Default = 10)</param>
+            <param name="minScore">Optional threshold for GetCorrScore (Default = 0.7)</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.#ctor(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Creates and AbstractIonSequence specifying BaseIonTypes, NeutralLosses, Tolerance,
+            and MinScore for GetCorrScore
+            </summary>
+            <param name="dechargedIonTypes">IonTypes of charge 1 in question</param>
+            <param name="tol">Optional Tolerance for GetCorrScore (Default = 10)</param>
+            <param name="minScore">Optional threshold for GetCorrScore (Default = 0.7)</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.Init(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Initializes an AbstractIonSequence with IonTypes, a tolerance, and a minimum correlation score
+            </summary>
+            <param name="ionTypes">Collection of IonTypes for AbstractIonSequence</param>
+            <param name="tol">Tolerance for correlation in question</param>
+            <param name="minScore">Minimum correlation score in question</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIons(InformedProteomics.Backend.Data.Composition.Composition,InformedProteomics.Backend.Data.Sequence.AminoAcid,System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32)">
+            <summary>
+            Generates list of all possible ions of a protein from Iontypes
+            for a Composition, one basetype, one neutralloss, and a max charge.
+            </summary>
+            <param name="comp">Composition in question</param>
+            <param name="terminalResidue">Terminal residue for ion</param>
+            <param name="ionTypes">IonTypes to get Ions from</param>
+            <param name="baseType">BaseIonType in question</param>
+            <param name="neutralLoss">NeutralLoss in question</param>
+            <param name="charge">Charge of precursor</param>
+            <returns>List of ions from a set of Iontypes and a Composition for
+            a particular basetype, neutralloss, and max charge</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetCleavageIons(InformedProteomics.Backend.Data.Sequence.Sequence,System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32,System.Int32)">
+            <summary>
+            Generates list of all possible ions of a protein for one basetype, neutralloss, and cleavage point.
+            </summary>
+            <param name="seq">Sequence of residues for a protein.</param>
+            <param name="ionTypes">List of IonTypes of the same NeutralLoss and BaseIonType</param>
+            <param name="baseType">Specifies type of BaseTypeIon for output.</param>
+            <param name="neutralLoss">Neutral Loss for output.</param>
+            <param name="charge">Total charge of protein.</param>
+            <param name="clv">Cleavage point for ion in sequence</param>
+            <returns>List of ions from ionTypes for a sequence for one basetype, neutralloss, cleavage point,
+            and maxcharge</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIonListAtCleavage(InformedProteomics.Backend.Data.Sequence.Sequence,InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32,System.Int32)">
+            <summary>
+            Generates list of all possible ions of a protein for one basetype, neutralloss, and cleavage point.
+            </summary>
+            <param name="seq">Sequence of residues for a protein.</param>
+            <param name="baseType">Specifies type of BaseTypeIon for output.</param>
+            <param name="neutralLoss">Neutral Loss for output.</param>
+            <param name="charge">Total charge of protein.</param>
+            <param name="clv">Cleavage point for ion in sequence</param>
+            <returns>List of ions for a sequence for one basetype, neutralloss, cleavage point, and maxcharge</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIonTypes(InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32)">
+            <summary>
+            Creates a factory from a BaseIonType, a NeutralLoss, and max charge and outputs all IonTypes
+            </summary>
+            <param name="baseType">BaseIonType in question</param>
+            <param name="neutralLoss">NeutralLoss in question</param>
+            <param name="charge">Max Charge of IonTypes</param>
+            <returns>IEnumerable of IonTypes</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIonListAtCleavage_Static(InformedProteomics.Backend.Data.Sequence.Sequence,InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32,System.Int32)">
+            <summary>
+            Generates list of all possible ions of a protein for one basetype, neutralloss, and cleavage point.
+            </summary>
+            <param name="seq">Sequence of residues for a protein.</param>
+            <param name="baseType">Specifies type of BaseTypeIon for output.</param>
+            <param name="neutralLoss">Relevant Neutral Loss.</param>
+            <param name="charge">Total charge of protein.</param>
+            <param name="clv">Cleavage point for ion in sequence</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIonListForComposition(InformedProteomics.Backend.Data.Composition.Composition,InformedProteomics.Backend.Data.Sequence.AminoAcid,InformedProteomics.Backend.Data.Spectrometry.BaseIonType,InformedProteomics.Backend.Data.Spectrometry.NeutralLoss,System.Int32)">
+            <summary>
+            Generates list of all possible ions of a max charge of a composition for
+            one basetype and neutralLoss
+            </summary>
+            <param name="comp">Composition in question</param>
+            <param name="terminalResidue">Terminal AminoAcid for ion</param>
+            <param name="baseType">BaseIonType in question</param>
+            <param name="neutralLoss">NeutralLoss in question</param>
+            <param name="maxCharge">MaxCharge in question</param>
+            <returns>List of possible ions for composition</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.FindIons(System.Collections.Generic.List{InformedProteomics.Backend.Data.Biology.Ion},InformedProteomics.Backend.Data.Spectrometry.Spectrum)">
+            <summary>
+            Outputs whether or not the GetCorrScore of an Ion in the input list was above the threshold.
+            1 if there was such an ion, 0 otherwise.
+            </summary>
+            <param name="ionList">
+            List of Ions from a particular BaseIonType, NeutralLoss, and cleavage point
+            </param>
+            <param name="spectrum">Spectrum for ProteinScan that ionList came from</param>       
+            /// <returns>1 if GetCorrScore of an Ion in ionList was above MinScore; 0 otherwise</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetCleavageIonLists(InformedProteomics.Backend.Data.Sequence.Sequence,InformedProteomics.Backend.Data.Spectrometry.IonType,System.Int32)">
+            <summary>
+            Gets a collection of ion lists for every cleavage point of Sequence, an IonType, and a charge
+            </summary>
+            <param name="seq">Sequence in question</param>
+            <param name="ionType">IonType in question</param>
+            <param name="charge">Charge in question</param>
+            <returns>Collection of ion lists where each list is for each cleavage point of the input Sequence</returns>
+        </member>
+        <member name="M:TopDownTrainer.AbstractIonSequence.GetIntensityValue(InformedProteomics.Backend.Data.Spectrometry.IonType,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32,InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Spectrometry.Tolerance)">
+            <summary>
+            Updates the intensity dictionary for a pariticular ProteinScan by iterating through all IonTypes
+            and getting the average normalized intensity
+            </summary>
+            <param name="ionType">IonType in question</param>
+            <param name="seq">Sequence of ProteinScan in question</param>
+            <param name="charge">Charge in question</param>
+            <param name="spectrum">Spectrum in question</param>
+            <param name="tolerance">Tolerance in question</param>
+        </member>
+        <member name="T:TopDownTrainer.AbstractProteinManipulator">
+            <summary>
+            AbstractProteinManipulator is an abstract class that does computations on multiple ProteinScans.
+            AbstractIonSequence, IonSet, and PrecursorPeaks inherit from the class as they must take in multiple
+            ProteinScans.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.AbstractProteinManipulator.AddSequence(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32)">
+            <summary>
+            Adds ProteinScan to this object through ProteinScan properties: Spectrum, Sequence, Charge, Scan
+            </summary>
+            <param name="spectrum">ProteinScan's Spectrum</param>
+            <param name="sequence">ProteinScan's Sequence</param>
+            <param name="charge">ProteinScan's charge</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractProteinManipulator.AddSequence(TopDownTrainer.ProteinScan,InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Adds a sequence to this IonSet and updates dictionary according to which Ions have
+            high peak correlation scores.
+            </summary>
+            <param name="proteinScan">Protein sequence in the form of ProteinScan.</param>
+            <param name="tolerance">Optional Tolerance for deconvoluted spectrum (Default is 10 ppm)</param>
+            <param name="minScore">Optional minimum score for deconvoluted spectrum (Default is 0.7)</param>
+        </member>
+        <member name="M:TopDownTrainer.AbstractProteinManipulator.AddSequenceList(System.Collections.Generic.IEnumerable{TopDownTrainer.ProteinScan},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Adds a list of sequences to this IonSequence
+            </summary>
+            <param name="proteinScanList">List of protein sequences.</param>
+            <param name="tolerance">Optional Tolerance for deconvoluted spectrum (Default is 10 ppm)</param>
+            <param name="minScore">Optional minimum score for deconvoluted spectrum (Default is 0.7)</param>
+        </member>
+        <member name="T:TopDownTrainer.AnalysisMetrics">
+            <summary>
+            AnalysisMetrics stores error values from cross validation and histograms for target and decoy
+            sequence scores. It accumulates results from ValidationFoldResult.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AnalysisMetrics.AverageValidationError">
+            <summary>
+            Average validation error over cross validation folds
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AnalysisMetrics.AverageValidationVariance">
+            <summary>
+            Average validation variance over cross validation folds
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AnalysisMetrics.TargetHistogram">
+            <summary>
+            Histogram of target sequences
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AnalysisMetrics.DecoyHistogram">
+            <summary>
+            Histogram of decoy sequences
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.AnalysisMetrics.Folds">
+            <summary>
+            Number of folds of cross-validation (k)
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.#ctor(System.Double,System.Double,TopDownTrainer.ScoreHistogram,TopDownTrainer.ScoreHistogram,System.Int32)">
+            <summary>
+            Creates a new AnalysisMetrics objects containing error and variance from cross validation
+            </summary>
+            <param name="error">Average error from cross validation</param>
+            <param name="variance">Average variance from cross validation</param>
+            <param name="target">Histogram of target sequences</param>
+            <param name="decoy">Histogram of decoy sequences</param>
+            <param name="folds">Number of folds in cross-validation</param>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.#ctor">
+            <summary>
+            Empty AnalysisMetrics object
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.UpdateError(System.Double)">
+            <summary>
+            Adds a new error to this object and updates AverageValidationError. Called in Add
+            </summary>
+            <param name="addedError">New error to be added</param>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.Add(TopDownTrainer.ValidationFoldResult)">
+            <summary>
+            Updates fields by adding information about a ValidationFoldResult from cross validatoin
+            </summary>
+            <param name="result">ValidationFoldResult in question</param>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.Add(System.Collections.Concurrent.ConcurrentBag{TopDownTrainer.ValidationFoldResult})">
+            <summary>
+            Updates fields by adding information from ValidationFoldResults from cross validation
+            </summary>
+            <param name="bag">ConcurrentBag of ValidationFoldResults</param>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.DisplayHeaders">
+            <summary>
+            Returns a csv string of the properties that AnalysisMetrics has:
+            validation error and variance, and target and decoy histogram means.
+            </summary>
+            <returns>csv of properties</returns>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.GetHeaders">
+            <summary>
+            Returns a csv string of the properties that AnalysisMetrics has:
+            validation error and variance, and target and decoy histogram means.
+            </summary>
+            <returns>csv of properties</returns>
+        </member>
+        <member name="M:TopDownTrainer.AnalysisMetrics.ToString">
+            <summary>
+            Overriding the ToString method to print out a csv of average validation error,
+            average validation variance, and means of target and decoy histograms.
+            </summary>
+            <returns>string in csv format of validation error</returns>
+        </member>
+        <member name="T:TopDownTrainer.ComparisonPlots">
+            <summary>
+            Compares proportions and average normalized intensities between dissociations
+            Can also print out plots for only one dissociation
+            </summary>
+        </member>
+        <member name="T:TopDownTrainer.ComparisonPlots.Values">
+            <summary>
+            Enum specifying whether value is for found ions, total ions, or intensity
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.ComparisonPlots.Values.Found">
+            <summary>
+            Value representing found ions
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.ComparisonPlots.Values.Total">
+            <summary>
+            Value representing total ions
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.ComparisonPlots.Values.Intensity">
+            <summary>
+            Value representing intensity
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.GetBarChart(System.String,System.Collections.Generic.List{System.Double})">
+            <summary>
+            Returns a histogram of proportions vs. ion types
+            </summary>
+            <param name="title"></param>
+            <param name="props">Proportions for those IonTypes</param>
+            <returns>ScoreHistogram representing the proportion data</returns>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.GetComparisonPlots(System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double}},TopDownTrainer.ComparisonPlots.Values,System.Double,System.Double,System.Double)">
+            <summary>
+            Prints histogram of values vs IonTypes for two data types for a particular mass bin size
+            </summary>
+            <param name="outPath">Path to output file</param>
+            <param name="titles">Titles of data</param>
+            <param name="ionValueList">List of dictionaries whose keys are IonTypes and values are values</param>
+            <param name="type">Integer value 2 (found prop), 3 (total prop), or 4 (normalized intensity) specifying
+            which type of value the histograms will be made from</param>
+            <param name="threshold">Proportion threshold (Default is -1)</param>
+            <param name="minMass">Minimum mass for this bin of proteins (Default is -1)</param>
+            <param name="maxMass">Maximum mass for this bin of proteins (Default is -1)</param>
+            <throws>Exception if number of titles does not match number of dictionaries or 
+            the dictionaries have different numbers of keys</throws>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.PrintProportions(System.String,System.String,System.Collections.Generic.List{System.Collections.Generic.List{TopDownTrainer.ProteinScan}},System.Collections.Generic.List{System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double}})">
+            <summary>
+            Outputs all proportions from training on mass bins
+            </summary>
+            <param name="outputPath">Path to output</param>
+            <param name="title">Title for output file</param>
+            <param name="scanBins">Collection of List of doubles representing list of mass bins sorted by mass</param>
+            <param name="ionPropList">List of diciontaries from IonTypes to proportions</param>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.GetIonTypeComparisons(System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},System.Boolean,System.Double,InformedProteomics.Backend.Data.Spectrometry.Tolerance)">
+            <summary>
+            Gets a dictionary of IonTypes to proportions from an IonSet created on these parameters
+            </summary>
+            <param name="targetScans">List of target ProteinScans for a particular bin</param>
+            <param name="ionTypes">IonTypes to  look for</param>
+            <param name="found">Boolean value whether or not to output found proportions or total prop.</param>
+            <param name="minScore">Minimum Score for deconvoluted spectrum</param>
+            <param name="tolerance">Tolerance for deconvoluted spectrum</param>
+            <returns>Dictionary of IonTypes to proportions</returns>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.CompareIonTypes(System.String,System.Collections.Generic.List{System.String},System.Double,System.Double,System.Double)">
+            <summary>
+            Prints histogram of proportions vs IonTypes where proportions come from one or two training output files
+            </summary>
+            <param name="outPath">Path to output file</param>
+            <param name="trainingFiles">Training output files from which to get ion proportions</param>
+            <param name="threshold">Threshold for ion proportions (Default is -1, but becomes
+            1 / number of ions looked for if not specified)</param>
+            <param name="minMass">Minimum mass for this bin of proteins (Default is -1)</param>
+            <param name="maxMass">Maximum mass for this bin of proteins (Default is -1)</param>
+        </member>
+        <member name="M:TopDownTrainer.ComparisonPlots.CompareIonTypes(System.Collections.Generic.List{System.String},System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},System.Boolean,System.Double,System.Double,InformedProteomics.Backend.Data.Spectrometry.Tolerance)">
+            <summary>
+            Outputs histogram comparing ion proportions from different data sets.
+            </summary>
+            <param name="directoryPaths">Paths to directories of data</param>
+            <param name="outputPath">Path to where files should be outputted</param>
+            <param name="dataTypes">Datatypes in question</param>
+            <param name="ionTypes">IonTypes to look for</param>
+            <param name="found">Boolean value representing whether proportions are found or total</param>
+            <param name="threshold">Minimum threshold proportion for found ions</param>
+            <param name="minScore">Minimum Score for GetCorrScore</param>
+            <param name="tolerance">Tolerance</param>
+        </member>
+        <member name="M:TopDownTrainer.CompositionScorerFactory.GetScorer(InformedProteomics.Backend.Data.Spectrometry.ProductSpectrum,System.Double,System.Int32)">
+            <summary>
+            Get the composition scorer for the given spectrum, mass, and charge.
+            </summary>
+            <param name="spectrum">Original Spectrum of test data point</param>
+            <param name="precursorMass">Precursor mass of ion that compositions come from</param>
+            <param name="precursorCharge">Charge of precursor ion</param>
+            <returns></returns>
+        </member>
+        <member name="M:TopDownTrainer.CompositionScorerFactory.GetScorer(System.Int32,System.Double,System.Int32)">
+            <summary>
+            Get the composition scorer for the given spectrum, mass, and charge.
+            </summary>
+            <param name="scanNum">Original Spectrum of test data point</param>
+            <param name="precursorMass">Precursor mass of ion that compositions come from</param>
+            <param name="precursorCharge">Charge of precursor ion</param>
+        </member>
+        <member name="T:TopDownTrainer.CrossValidationOutput">
+            <summary>
+            Output of training on a mass bin
+            Stores the IonSet, PrecursorPeaks, best AnalysisMetrics, and LearningModel after regularization
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.MinMass">
+            <summary>
+            Minimum mass in this bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.MaxMass">
+            <summary>
+            Maximum mass in this bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.IonSetOutput">
+            <summary>
+            IonSet associated with training on this mass bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.Threshold">
+            <summary>
+            Threshold for found proportions of IonTypes for this mass bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.PrecursorPeaksOutput">
+            <summary>
+            PrecursorPeaks associated with training on this mass bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.AnalysisMetricsOutput">
+            <summary>
+            AnalysisMetrics associated with the best regularization value when training on this mass bin
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.BestRegularizationConstant">
+            <summary>
+            Regularization constant that gives best validation error
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.BestRegularizationError">
+            <summary>
+            Cross validation error for best regularization constant
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.CrossValidationOutput.Model">
+            <summary>
+            Weights of LearningModel for this mass bin
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.CrossValidationOutput.#ctor(System.Double,System.Double,TopDownTrainer.IonSet,System.Double,TopDownTrainer.PrecursorPeaks,TopDownTrainer.AnalysisMetrics,System.Double,System.Double,TopDownTrainer.LearningModel)">
+            <summary>
+            Makes a new CrossValidationOutput from information gotten during training on this mass bin
+            </summary>
+            <param name="min">Minimum mass of this bin</param>
+            <param name="max">Maximum  mass of this bin</param>
+            <param name="ionSet">IonSet associated with training on this bin</param>
+            <param name="threshold">Threshold representing threshold for found proportions</param>
+            <param name="prePeaks">PrecursorPeaks associated with training on this bin</param>
+            <param name="metrics">AnalysisMetrics associated with the best regularization when training</param>
+            <param name="regConstant">Regularization constant that gave lowest error value</param>
+            <param name="regError">Error that the best regularzation constant gave</param>
+            <param name="model">Learning model for this bin</param>
+        </member>
+        <member name="T:TopDownTrainer.DataMatrix">
+            <summary>
+            Stores data as a csv and a 2D array of doubles
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.DataMatrix.Csv">
+            <summary>
+            Data data as a csv and a 2D array of doubles
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.DataMatrix.Matrix">
+            <summary>
+            Array of the same data in Csv
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.DataMatrix.Header">
+            <summary>
+            String describing what the data is
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.DataMatrix.#ctor(System.String,System.Double[][],System.String)">
+            <summary>
+            Instantiates a new data matrix from a csv, 2D matrix of doubles and header string
+            </summary>
+            <param name="csv">Csv of data</param>
+            <param name="matrix">2D array of same data as in csv</param>
+            <param name="header">Header string describing data (Default is "")</param>
+        </member>
+        <member name="M:TopDownTrainer.DataMatrix.#ctor(TopDownTrainer.DataVector[],System.String)">
+            <summary>
+            Instantiates a new data matrix from an array of DataVectors and a header string
+            </summary>
+            <param name="vectors">Array of DataVectors from which to make the matrix</param>
+            <param name="header">Header string describing data (Default is "")</param>
+        </member>
+        <member name="M:TopDownTrainer.DataMatrix.SetMatrix(TopDownTrainer.DataVector[])">
+            <summary>
+            Sets Csv and Matrix to a concatenation of an array of DataVectors
+            </summary>
+            <param name="vectors">DataVectors in question</param>
+        </member>
+        <member name="T:TopDownTrainer.DataVector">
+            <summary>
+            Stores data as a csv and an array of doubles
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.DataVector.Csv">
+            <summary>
+            Data in csv form
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.DataVector.Vector">
+            <summary>
+            Array of the same data in Csv
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.DataVector.#ctor(System.String,System.Double[])">
+            <summary>
+            Instantiates a new DataMatrix with a csv and a vector of doubles
+            </summary>
+            <param name="csv">Csv in question</param>
+            <param name="vector">An array of the same data that is in the csv</param>
+        </member>
+        <member name="T:TopDownTrainer.InputOptions">
+            <summary>
+            InputOptions stores user specified command line arguments such as: path to directory, path to output,
+            list of BaseIonTypes, list of NeutralLosses, whether the spectra should be deconvoluted, tolerance level
+            for Pearson Correlation, minimum score threshold for Pearson Correlation, threshold proportion for found
+            ions, and number of mutations to convert a target sequence into a decoy.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.DirectoryPath">
+            <summary>
+            Path to directory of data files
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.OutputPath">
+            <summary>
+            Path to where files should be outputted
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.BaseIons">
+            <summary>
+            List of BaseIonTypes to look for
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.NeutralLosses">
+            <summary>
+            List of NeutralLosses to look for
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.Tol">
+            <summary>
+            Tolerance level for Pearson Correlation, cosine distance, and deconvoluted spectrum
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.MinScore">
+            <summary>
+            Minimum threshold for Pearson Correlation
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.FoundThreshold">
+            <summary>
+            Minimum threshold for proportion of found ions to include
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.InputOptions.NumberMutations">
+            <summary>
+            Number of mutations to make decoy sequences from targets
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.InputOptions.#ctor">
+            <summary>
+            Input options that can be modified by user
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.InputOptions.#ctor(System.String,System.String,System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},System.Int32,System.Double,System.Double,System.Int32)">
+            <summary>
+            Input options that were specified by user
+            </summary>
+            <param name="directoryPath">Path to file directory</param>
+            <param name="outPath">Path to where files should be outputted</param>
+            <param name="neutralLosses">NeutralLosses wanted</param>
+            <param name="isDeconvoluted">Whether or not the ion proportion spectrum should be deconvoluted</param>
+            <param name="tol">Tolerance ppm value</param>
+            <param name="minScore">Minimum threshold for GetCorrScore</param>
+            <param name="foundThreshold">Minimum threshold for finding ion proportions</param>
+            <param name="numMut">Number of mutations that decoy sequences are from targets</param>
+        </member>
+        <member name="T:TopDownTrainer.LinearCombinationFoldResult">
+            <summary>
+            LinearCombinationFoldResult implements ValidationFoldResult and keeps track of the range of scores 
+            from cross validation on an SVMModel.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationFoldResult.CrossValidationError">
+            <summary>
+            One fold of cross validation error for SVM
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationFoldResult.TargetScores">
+            <summary>
+            One fold of target scores for SVM
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationFoldResult.DecoyScores">
+            <summary>
+            One fold of decoy scores for SVM
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationFoldResult.Max">
+            <summary>
+            Maximum score after one fold
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationFoldResult.Min">
+            <summary>
+            Minimum score after one fold
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LinearCombinationFoldResult.#ctor(System.Double,System.Collections.Generic.List{System.Double},System.Collections.Generic.List{System.Double},System.Double,System.Double)">
+            <summary>
+            Stores information for a fold of cross validation such as error,
+            target and decoy scores, and max and min data points seen
+            </summary>
+            <param name="cvError">Cross validation error for this fold</param>
+            <param name="targetCombos">Unnormalized score of targets</param>
+            <param name="decoyCombos">Unnormalized score of decoys</param>
+            <param name="max">Max data point seen</param>
+            <param name="min">Min data point seen</param>
+        </member>
+        <member name="T:TopDownTrainer.LinearCombinationMetrics">
+            <summary>
+            LinearCombinationMetrics inherits from AnalysisMetrics and shifts the range of the score histograms
+            with respect to data from LinearCombinationFoldResults.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationMetrics.Max">
+            <summary>
+            Maximum score across all folds of cross validation on an SVM
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LinearCombinationMetrics.Min">
+            <summary>
+            Minimum score across all folds of cross validation on an SVM
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LinearCombinationMetrics.#ctor(System.Double,System.Double,TopDownTrainer.ScoreHistogram,TopDownTrainer.ScoreHistogram,System.Double,System.Double,System.Int32)">
+            <summary>
+            Initializes AnalysisMetrics for an SVM model after cross validation.
+            </summary>
+            <param name="avgError">Average cross validation error</param>
+            <param name="avgVariance">Average cross validation variance</param>
+            <param name="targetHist">Target histogram</param>
+            <param name="decoyHist">Decoy histogram</param>
+            <param name="max">Max data point</param>
+            <param name="min">Min data point</param>
+            <param name="folds">Number of cross validation folds</param>
+        </member>
+        <member name="M:TopDownTrainer.LinearCombinationMetrics.#ctor">
+            <summary>
+            Empty LinearCombinationMetrics object
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LinearCombinationMetrics.Add(System.Collections.Concurrent.ConcurrentBag{TopDownTrainer.ValidationFoldResult})">
+            <summary>
+            Updates fields by adding information from ValidationFoldResults from cross validation
+            </summary>
+            <param name="bag">ConcurrentBag of ValidationFoldResults</param>
+            <throws>ArgumentException if the ValidationFoldResult is not a LinearCombinationFoldResult
+            from an SVM</throws>
+        </member>
+        <member name="M:TopDownTrainer.LinearCombinationMetrics.ToString">
+            <summary>
+            Overriding the ToString method to print out a csv of average validation error,
+            average validation variance, average area under ROC curves, and means of target
+            and decoy histograms.
+            </summary>
+            <returns>string in csv format of validation error</returns>
+        </member>
+        <member name="T:TopDownTrainer.OutputProportionReader">
+            <summary>
+            Reads through a training output file using a StreamReader and modifies an input list of IonTypes.
+            Outputs a list of all IonTypes checked for in training
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.OutputProportionReader.ReadProportions(System.IO.StreamReader,TopDownTrainer.ComparisonPlots.Values)">
+            <summary>
+            Outputs a dictionary of IonTypes to proportions.
+            </summary>
+            <param name="sr">StreamReader that reads through a training output file</param>
+            <param name="type">Int valued 2 (found prop), 3 (total prop), 4 (intensity) specifying
+            which value to look for in the file</param>
+            <returns>A dictionary where keys are IonTypes and values are their
+            proportions or intensities depending on type</returns>
+        </member>
+        <member name="T:TopDownTrainer.ProbabilisticMetrics">
+            <summary>
+            ProbabilisticMetrics inherits from AnalysisMetrics and stores ROC curves from ProbabilisticFoldResults
+            coming from LogisticRegressionModels.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticMetrics.Rocs">
+            <summary>
+            Collection of ROC curves over all cross validation folds
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticMetrics.AverageAreaUnder">
+            <summary>
+            Average area under ROC curves Rocs
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.#ctor(System.Double,System.Double,System.Collections.Concurrent.ConcurrentBag{Accord.Statistics.Analysis.ReceiverOperatingCharacteristic},TopDownTrainer.ScoreHistogram,TopDownTrainer.ScoreHistogram,System.Int32)">
+            <summary>
+            Stores error metrics from cross validation such as average validation error,
+            ROC curves, and target and decoy histograms.
+            </summary>
+            <param name="avgError">Average cross validation error across all folds and number of cross validations</param>
+            <param name="avgVariance">Average cross validation variance across all folds and number of cross validations</param>
+            <param name="rocBag">Concurrent Bag of ROC curves generated during cross validations</param>
+            <param name="targetHist">Target Histogram generated during cross validations</param>
+            <param name="decoyHist">Decoy Histogram generated during cross validations</param>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.#ctor">
+            <summary>
+            Empty LogisticMetrics object
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.AverageArea">
+            <summary>
+            Sets average area under ROC curve property. Used in instantiation
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.UpdateArea(System.Double)">
+            <summary>
+            Adds a new area to this object and updates AverageAreaUnder. Called in Add
+            </summary>
+            <param name="addedArea">New area to be added</param>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.Add(TopDownTrainer.ValidationFoldResult)">
+            <summary>
+            Adds a new ValidationFoldResult that is a LogisticFoldResult and updates fields.
+            </summary>
+            <param name="result">ValidationFoldResult in question</param>
+            <throws>ArgumentException when result is not a LogisticFoldResult</throws>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.DisplayHeaders">
+            <summary>
+            Returns a csv string of the properties that AnalysisMetrics has:
+            validation error and variance, area under ROC, and target and decoy
+            histogram means.
+            </summary>
+            <returns>csv of properties</returns>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.GetHeaders">
+            <summary>
+            Returns a csv string of the properties that AnalysisMetrics has:
+            validation error and variance, area under ROC, and target and decoy
+            histogram means.
+            </summary>
+            <returns>csv of properties</returns>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticMetrics.ToString">
+            <summary>
+            Overriding the ToString method to print out a csv of average validation error,
+            average validation variance, average area under ROC curves, and means of target
+            and decoy histograms.
+            </summary>
+            <returns>string in csv format of validation error</returns>
+        </member>
+        <member name="T:TopDownTrainer.BinElement">
+            <summary>
+            BinElement stores a charge offset, a mass bin, and a Peak. This class is used in PrecursorPeaks 
+            to get and pass around peaks used for its average normalized intensity table.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.BinElement.ChargeOffset">
+            <summary>
+            Charge offset (0 to -4) of this peak
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.BinElement.Bucket">
+            <summary>
+            Mass bucket of this peak
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.BinElement.PeakElement">
+            <summary>
+            Peak
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.BinElement.#ctor(System.Int32,System.Int32,InformedProteomics.Backend.Data.Spectrometry.Peak)">
+            <summary>
+            Element for a bin for a precursor peak. The chargeoffset and bucket
+            correspond to the peakElement
+            </summary>
+            <param name="chargeOffset">Chargeoffset in question</param>
+            <param name="bucket">Bucket in question</param>
+            <param name="peakElement">Corresponding Peak for chargeoffset and bucket</param>
+        </member>
+        <member name="T:TopDownTrainer.CompositionScorer">
+            <summary>
+            CompositionScorer is a class that assigns a score to a prefix-suffix Composition pair based on
+            a LearningModel, a list of IonTypes, and a precursor ion.
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.CompositionScorer.Model">
+            <summary>
+            LearningModel from which score is generated
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.CompositionScorer.IonTypes">
+            <summary>
+            List of IonTypes above certain threshold to make FeatureVectors from
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.CompositionScorer.FilteredSpectrum">
+            <summary>
+            Spectrum with precursor ions filtered out
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.CompositionScorer.Charge">
+            <summary>
+            Charge of test point
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.CompositionScorer.#ctor(TopDownTrainer.LearningModel,System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.Spectrum,TopDownTrainer.PrecursorPeaks,System.Double,System.Int32)">
+            <summary>
+            Creates a new Composition Scorer from a learningmodel and data about test point
+            </summary>
+            <param name="model">LearningModel in question</param>
+            <param name="ionTypes">IonTypes of data from learning model that are above a threshold</param>
+            <param name="spectrum">Original Spectrum of test data point</param>
+            <param name="precursorPeaks">PrecursorPeaks that object to get peaks filtered by average
+            normalized intensity</param>
+            <param name="precursorMass">Precursor mass of ion that compositions come from</param>
+            <param name="charge">Charge of precursor ion</param>
+        </member>
+        <member name="M:TopDownTrainer.CompositionScorer.GetFragmentScore(InformedProteomics.Backend.Data.Composition.Composition,InformedProteomics.Backend.Data.Composition.Composition,InformedProteomics.Backend.Data.Sequence.AminoAcid,InformedProteomics.Backend.Data.Sequence.AminoAcid)">
+            <summary>
+            Calculates a feature vector for each IonType corresponding to either the prefix or suffix composition.
+            Gets the linear combination of the product of weights from the learning model and all of the
+            compositions' features.
+            </summary>
+            <param name="prefixComposition">Prefix Composition of test point</param>
+            <param name="suffixComposition">Suffix Composition of test point</param>
+            <returns>Linear combination as double value</returns>
+        </member>
+        <member name="T:TopDownTrainer.FeatureVector">
+            <summary>
+            FeatureVector calculates a vector of features for a BaseIonType, a NeutralLoss, and a Sequence or
+            Composition. Its features are normalized intensity, sum of Pearson Correlation scores, sum of mass
+            errors, and sum of cosines of peaks.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.Spec">
+            <summary>
+            Spectrum of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.Seq">
+            <summary>
+            Sequence of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.Comp">
+            <summary>
+            Composition of protein in question
+            Not used if Seq is given
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.NTerminalResidue">
+            <summary>
+            TerminalResidue of prefix composition in question
+            Not used if Seq is given
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.CTerminalResidue">
+            <summary>
+            TerminalResidue of xuffix composition in question
+            Not used if Seq is given
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.Charge">
+            <summary>
+            Charge of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.IonTypeFeature">
+            <summary>
+            IonType from which to make feature vector
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.Tol">
+            <summary>
+            Tolerance for Pearson Correlation and Cosine distance
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.RelativeIntensityThreshold">
+            <summary>
+            Intensity threshold for Cosine distance and isotope peaks
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.IsTarget">
+            <summary>
+            Whether or not this protein is a target
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.MaxIntensity">
+            <summary>
+            Intensity of maximum intensity peak of spectrum
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.NormalizedIntensity">
+            <summary>
+            Highest isotope intesnity observed normalized by maximum intensity in spectrum
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.SumPearsonCorr">
+            <summary>
+            Sum of Pearson Correlation scores for ions found for this IonType
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.SumMassError">
+            <summary>
+            Sum of mass error between observed and theoretical peaks in spectrum
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FeatureVector.SumPeakCosine">
+            <summary>
+            Sum of cosine peak distances between the Spectrum in question and ions tested
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.#ctor(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32,InformedProteomics.Backend.Data.Spectrometry.IonType,System.Boolean,InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Creates a FeatureVector of Normalized Intensity, Pearson Correlation Score, Mass Error, and Cosine
+            distance for a ProteinScan specified by its spectrum, sequence, and charge
+            </summary>
+            <param name="spec">Spectrum of ProteinScan in question</param>
+            <param name="seq">Sequence of ProteinScan in question</param>
+            <param name="charge">Charge of ProteinScan in question</param>
+            <param name="ionType">IonType in question</param>
+            <param name="isTarget">Optional boolean value of whether or not this sequence is a
+            target (Default = true)</param>
+            <param name="tol">Optional threshold for GetCorrScore (Default = 0.7)</param>
+            <param name="relativeIntensityThreshold">Optional intensity threshold for isotope peaks
+            and cosine (Default = 0.1)</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.#ctor(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Composition.Composition,InformedProteomics.Backend.Data.Spectrometry.IonType,InformedProteomics.Backend.Data.Sequence.AminoAcid,InformedProteomics.Backend.Data.Sequence.AminoAcid,System.Int32,InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Creates a FeatureVector of Normalized Intensity, Pearson Correlation Score, Mass Error, and
+            Peak Cosine Distance for Compositions of a protein
+            </summary>
+            <param name="spec">Spectrum of Composition</param>
+            <param name="composition">Composition in question</param>
+            <param name="ionType">IonType in question</param>
+            <param name="nTerminalResidue">AminoAcid that is the terminal residue of the prefix composition in question</param>
+            <param name="cTerminalResidue">AminoAcid that is the terminal residue of the suffix composition in question</param>
+            <param name="charge">Precursor charge</param>
+            <param name="tol">Tolerance level for GetCorrScore (Default = 0.7)</param>
+            <param name="relativeIntensityThreshold">Threshold for GetCorrScore (Default = 0.1)</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.SetMaxIntensity">
+            <summary>
+            Stores the maximum intensity over all peaks in spectrum Spec
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.UpdateNormalizedIntensity(System.Double)">
+            <summary>
+            Sets NormalizedIntensity feature
+            </summary>
+            <param name="highestIsotopeIntensity">Highest isotope intensity observed</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.UpdatePearsonCorr(System.Collections.Generic.List{InformedProteomics.Backend.Data.Biology.Ion})">
+            <summary>
+            Gets sum of Pearson Correlation Scores and sets SumPearsonCorr feature.
+            </summary>
+            <param name="ions">List of ions for which to calculate Pearson Correlation</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.UpdateMassError(System.Double)">
+            <summary>
+            Sets MassError feature.
+            </summary>
+            <param name="massError">Updated mass error</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.UpdatePeakCosine(System.Collections.Generic.List{InformedProteomics.Backend.Data.Biology.Ion})">
+            <summary>
+            Sets PeakCosine feature.
+            </summary>
+            <param name="ions">List of ions of which to check cosine similarity</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.GetIntensities(InformedProteomics.Backend.Data.Spectrometry.Peak[])">
+            <summary>
+            Gets list of peak intensities from list of peaks.
+            </summary>
+            <param name="peaks">List of peaks in question.</param>
+            <returns>Array of doubles that are intensities for peaks.</returns>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.PeakDist(System.Double[],System.Double[])">
+            <summary>
+            Finds euclidean distance between two arrays of peak intensities
+            </summary>
+            <param name="theoPeaks">Array of size n of peak intensities</param>
+            <param name="obsPeaks">Array of size n of peak intensities</param>
+            <returns>Distance between the list of peaks</returns>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.UpdateCompositionFeatures(System.Collections.Generic.List{InformedProteomics.Backend.Data.Biology.Ion})">
+            <summary>
+             Doozy of a method. 
+            
+            Collects all ions for IonTypeFeature at every cleavage point to find the sum of their
+            Pearson Correlation Scores.
+            
+            Also calculates theoretical and observed values for mass of each ion of IonType and
+            every cleavage point. These values are used to calculate mass error.
+            
+            Keeps running sum of distances between theoretical and observed peak intensities
+            for each ion IonType at each cleavage point.
+            </summary>
+            <param name="ionList">List of ions on which we update features</param>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.CompositionInit">
+            <summary>
+            Initializes composition using list of ions associated with Comp, TerminalResidue, IonType, and Charge
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.ProteinInit">
+            <summary>
+            Gets lists of ions for every cleavage of Seq
+            Updates features by calling UpdateCompositionFeatures
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.GetFeaturesString">
+            <summary>
+            Gets the features in csv format
+            </summary>
+            <returns>String representing all features in a csv</returns>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.NumFeatures">
+            <summary>
+            Gets the number of features in a FeatureVector
+            </summary>
+            <returns>int representing number of features</returns>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.GetFeatures">
+            <summary>
+            Gets the features in a double[]
+            </summary>
+            <returns>double[] of all feature  representing all features in a csv</returns>
+        </member>
+        <member name="M:TopDownTrainer.FeatureVector.GetFeatureHeaders(System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType})">
+            <summary>
+            Static method that returns the names of features for each type of IonType in input
+            </summary>
+            <param name="ionTypes">List of IonTypes in question</param>
+            <returns>csv of feature headers for each IonType in input</returns>
+        </member>
+        <member name="T:TopDownTrainer.DirectoryReader">
+            <summary>
+            DirectoryReaders read directories of files containing target or decoy sequences.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.DirectoryReader.GetInfo(System.String)">
+            <summary>
+            Gets id and raw files and whether or not this data is bottom up.
+            </summary>
+            <param name="directoryPath">Path to directory in question</param>
+            <returns>Tuple of type of id file, type of raw file, and boolean whether or not bottom up</returns>
+        </member>
+        <member name="M:TopDownTrainer.DirectoryReader.ReadTarget(System.String)">
+            <summary>
+            Reads files in DirectoryPath and outputs all ProteinScans in those files.
+            of Raw files.
+            </summary>
+            <throws>Throws an ArgumentException if the number of ID files does not match number of raw files</throws>
+            <returns>List of target ProteinScans that were in DirectoryPath files</returns>
+        </member>
+        <member name="M:TopDownTrainer.DirectoryReader.ReadDecoy(System.String)">
+            <summary>
+            Reads files in directoryPath and outputs all ProteinScans in those files.
+            </summary>
+            <param name="directoryPath">Path to directory in question</param>
+            <throws>Throws an ArgumentException if files are not either .tsv or .mzid</throws>
+            <returns>List of ProteinScans that were in DirectoryPath files</returns>
+        </member>
+        <member name="M:TopDownTrainer.DirectoryReader.ReadDecoyTopDown(System.String)">
+            <summary>
+            Generates list of decoy ProteinScans from top down data
+            </summary>
+            <param name="directoryPath">Path to directory in question</param>\
+            <throws>ArgumentException if numbers of id files and raw files don't match</throws>
+            <returns>List of decoy ProteinScans from top down data</returns>
+        </member>
+        <member name="T:TopDownTrainer.LearningModel">
+            <summary>
+            LearningModel is an abstract class that creates a statistical learning model from an input matrix
+            where rows are points and an output vector. It can perform k-fold cross-validation.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LearningModel.Input">
+            <summary>
+            2D array of input data where rows are points
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LearningModel.Output">
+            <summary>
+            Vector of output labels for input
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LearningModel.Type">
+            <summary>
+            Type of LearningModel (e.g. SVM)
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LearningModel.Regularizer">
+            <summary>
+            Regularization value for model
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LearningModel.Weights">
+            <summary>
+            Vector of weights of model
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.#ctor(System.Double[][],System.Double[],System.Double)">
+            <summary>
+            Creates a new LearningModel from an input matrix and its labels
+            </summary>
+            <param name="input">double[][] where rows are examples and columns are features</param>
+            <param name="output">double[] which is an array of labels for the input. Length is input.GetLength(0)</param>
+            <param name="regularization">Regularization value</param>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.#ctor(System.Double[])">
+            <summary>
+            A model that only contains weights. Used when importing from file
+            </summary>
+            <param name="weights">double[] of weights for model</param>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.#ctor">
+            <summary>
+            Empty LearningModel that subclasses can use
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.CorrectOutput">
+            <summary>
+            Converts the Output labels into the correct version for the model
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.SetType">
+            <summary>
+            Sets the name of the Learning Model, e.g. logit, svm
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.Initialize(System.Double)">
+            <summary>
+            Initializes learning model
+            </summary>
+            <param name="regularizer">Regularization value</param>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.Compute">
+            <summary>
+            Learns a model
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.SetWeights">
+            <summary>
+            Sets the weights of this model.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.GetMetricObject">
+            <summary>
+            Returns an AnalysisMetrics object corresponding to the inheriting class
+            </summary>
+            <returns>An AnalysisMetrics</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.GetTrainingError">
+            <summary>
+            Gets the training error for the model
+            </summary>
+            <returns>double representing training error</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.OutputComparisonValues">
+            <summary>
+            Gets output values of model that can be compared to validation set output
+            </summary>
+            <returns>double[] values that can be compared to validation set</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.GetError(System.Double[][],System.Double[])">
+            <summary>
+            Gets the mean squared validation error on some validation data
+            </summary>
+            <param name="valIns">double[][] of observed validation data points</param>
+            <param name="expectedOuts">double[] of expected validation data labels</param>
+            <returns>ValidationFoldResult object representing cross validation error and
+            target and decoy histograms</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.Create(System.Double[][],System.Double[],System.Double)">
+            <summary>
+            Creates a learning model of the same type as this object
+            </summary>
+            <param name="input">2D array of input data where rows are points</param>
+            <param name="output">Vector of output labels corresponding to input</param>
+            <param name="regularizer">Regularization value</param>
+            <returns>LearningModel from these data and labels</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.Analyze(System.Int32)">
+            <summary>
+            Gets metrics on this model such as k-fold cross validation using Brier Score, ROC curve, and AUC 
+            </summary>
+            <param name="k">Optional int for number of folds (Default is 10)</param>
+            <returns>AnalysisMetrics objects containing average error, variance, and mean of target and decoy
+            histograms</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.GetLinearCombination(System.Double[])">
+            <summary>
+            Gets a linear combination of this model's weights with the feature vector with a 1 prepended
+            for the intercept.
+            </summary>
+            <param name="featureVector">Array of doubles representing values of features</param>
+            <returns>Linear combination of weights and feature vector</returns>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.GetLinearCombinations(System.Double[][])">
+            <summary>
+            Gets linear combinations of this model's weights with the feature vectors with 1 prepended
+            for the intercept.
+            </summary>
+            <param name="featureVector">2D array of doubles representing values of features where each
+            row is a data point</param>
+            <returns>Array of linear combinations of weights and feature vectors</returns>
+        </member>
+        <member name="T:TopDownTrainer.ProbabilisticFoldResult">
+            <summary>
+            ProbabilisticFoldResult implements ValidationFoldResult and stores a ROC curve for the probabilities
+            from cross validation on a LogisticRegressionModel.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticFoldResult.CrossValidationError">
+            <summary>
+            Validation error after one fold of cross validation for logistic regression
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticFoldResult.TargetScores">
+            <summary>
+            Target probabilities after one fold of cross validation
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticFoldResult.DecoyScores">
+            <summary>
+            Decoy probabilities after one fold of cross validation
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProbabilisticFoldResult.Roc">
+            <summary>
+            ROC curve after one fold of cross validation
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProbabilisticFoldResult.#ctor(System.Double,Accord.Statistics.Analysis.ReceiverOperatingCharacteristic,System.Collections.Generic.List{System.Double},System.Collections.Generic.List{System.Double})">
+            <summary>
+            Stores information from a logistic regression cross validation fold
+            </summary>
+            <param name="cvError">Cross validation error</param>
+            <param name="roc">Roc curve from this fold</param>
+            <param name="targetProbs">Target probabilities</param>
+            <param name="decoyProbs">Decoy probabilities</param>
+        </member>
+        <member name="T:TopDownTrainer.LogisticRegressionModel">
+            <summary>
+            LogisticRegressionModel inherits from LearningModel and uses Accord.NET's LogisticRegressionAnalysis.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.LogisticRegressionModel.Lra">
+            <summary>
+            LogisticRegressionAnalysis object for logistic regression
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.#ctor(System.Double[][],System.Double[],System.Double)">
+            <summary>
+            Creates a new LogisticRegressionModel from input data and their labels
+            </summary>
+            <param name="input">double[][] where rows are datapoints</param>
+            <param name="output">double[] where each element corresponds to the label for the data point in input</param>
+            <param name="lambda">double the regularization constant lambda for logistic regression</param>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.#ctor(System.Double[])">
+            <summary>
+            A model that only contains weights. Used when importing from file
+            </summary>
+            <param name="weights">double[] of weights for model</param>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.CorrectOutput">
+            <summary>
+            Puts Output in a format that logistic regression understands, i.e., 1s and 0s
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.SetType">
+            <summary>
+            Sets the name of this model to be "logit"
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.Initialize(System.Double)">
+            <summary>
+            Initializes Lra as a LogisticRegressionAnalysis obect with Input and Output data
+            </summary>
+            <param name="lambda">Regularization lambda value</param>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.Compute">
+            <summary>
+            Runs logistic regression
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.SetWeights">
+            <summary>
+            Gets and sets the weights and intercept for the features of the data
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetMetricObject">
+            <summary>
+            Gets a new AnalysisMetrics object that logistic regression models use
+            </summary>
+            <returns>A new ProbabilisticMetrics object</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetTrainingError">
+            <summary>
+            Gets the mean squared training error for these data where expected value at i is
+            the probability 100*Output[i]
+            </summary>
+            <returns>double representing training error</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetProbability(TopDownTrainer.LogisticRegressionModel,System.Double[])">
+            <summary>
+            Gets the probabilities of the test point according to a LearningModel
+            </summary>
+            <param name="model">LearningModel in question</param>
+            <param name="testPoint">double[] which is the feature vector of a test point</param>
+            <returns>A probability for the test point</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetProbabilities(TopDownTrainer.LogisticRegressionModel,System.Double[][])">
+            <summary>
+            Gets the probabilities of rows of testIn according to a LearningModel
+            </summary>
+            <param name="model">LearningModel in question</param>
+            <param name="testIn">double[][] of test data points where rows are points</param>
+            <returns>An array of probabilities for each data point</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetProbability(System.Double[])">
+            <summary>
+            Gets probability of test data point for this model
+            </summary>
+            <param name="testPoint">double[] which represents features of test data point</param>
+            <returns>A probability for the test data point</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetProbabilities(System.Double[][])">
+            <summary>
+            Gets probabilities of rows of testIn for this model
+            </summary>
+            <param name="testIn">double[][] of test data points where rows are points</param>
+            <returns>An array of probabilities for each data point</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.OutputComparisonValues">
+            <summary>
+            Gets output values needed for cross validation.
+            </summary>
+            <returns>double[] of outputs scores for validation error of length Output.Length</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.Create(System.Double[][],System.Double[],System.Double)">
+            <summary>
+            Creates a new LogisticRegressionModel from input and output data
+            </summary>
+            <param name="input">Input data where rows are data points</param>
+            <param name="output">Output labels where each value is the label of the corresponding row of input</param>
+            <param name="lambda">Regularization value</param>
+            <returns>A new LearningModel that is a LogisticRegressionModel based on these data</returns>
+        </member>
+        <member name="M:TopDownTrainer.LogisticRegressionModel.GetError(System.Double[][],System.Double[])">
+            <summary>
+            Computes the output on a validation set and calculates mean squared error of the output of this model and
+            expectedOuts. This also stores the ROC curve generated and target and decoy probabilities
+            </summary>
+            <param name="valIns">Validation input in question where rows are points</param>
+            <param name="expectedOuts">Validation output where each point is the label of the corresponding row
+            in valIns</param>
+            <returns>Object that contains mean squared error, ROC curve, and target and decoy probabilities</returns>
+        </member>
+        <member name="T:TopDownTrainer.PrecursorPeaks">
+            <summary>
+            PrecursorPeaks inherits from AbstractProteinManipulator and stores a mass/charge offset table of
+            average normalized peak intensities for peaks within mass and charge offsets of precursor ions.
+            For every ProteinScan added, PrecursorPeaks updates all average normalized intensities.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.Daltons">
+            <summary>
+            Absolute value of number of Daltons away from precursor ion mass checked for
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.DaltonIncrement">
+            <summary>
+            Increment value between Daltons
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.NumBins">
+            <summary>
+            Number of mass bins checked
+            Determined by Daltons and DaltonIncrement
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.MaxChargeOffset">
+            <summary>
+            Maximum charge offset checked
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.Bins">
+            <summary>
+            2D table of mass and charge offset values where values are average normalized intensities
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.Threshold">
+            <summary>
+            Filter threshold for test point
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.PrecursorPeaks.NumSpectra">
+            <summary>
+            Number of spectra added so far
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double,System.Double,System.Int32,System.Double)">
+            <summary>
+            Creates a new PrecursorPeaks object that can take ProteinScans and find lists of peaks
+            </summary>
+            <param name="daltons">Optional number of daltons for massoffsets when adding a ProteinScan (Default = 30)</param>
+            <param name="daltonIncrement">Optional increment size to count from 0 to Daltons (Default = 1)</param>
+            <param name="maxChargeOffset">Optional maximum charge offset in question (Default = 4)</param>
+            <param name="threshold">Optional threshold to check for a test point (Default = 0.15)</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double[0:,0:],System.Double)" -->
+        <member name="M:TopDownTrainer.PrecursorPeaks.GetBinElements(InformedProteomics.Backend.Data.Spectrometry.Spectrum,System.Double,System.Int32)">
+            <summary>
+            Takes a ProteinScan and looks at Peaks within an m/z range determined by a
+            charge offset. Makes a 2d array of BinElements out of charge offsets, buckets
+            of peaks, and the peaks themselves.
+            </summary>
+            <param name="spectrum">Spectrum in question</param>
+            <param name="precursorChargelessMass">Unprotonated precursor mass</param>
+            <param name="maxCharge">Charge of ion</param>
+            <returns>2d array of BinElements for Peaks seen.</returns>
+        </member>
+        <member name="M:TopDownTrainer.PrecursorPeaks.AddSequence(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32)">
+            <summary>
+            Adds a protein sequence to this PrecursorPeaks and updates average normalized intensities
+            </summary>
+            <param name="spectrum">Spectrum for added protein</param>
+            <param name="seq">Sequence of protein</param>
+            <param name="maxCharge">Charge of protein</param>
+        </member>
+        <member name="M:TopDownTrainer.PrecursorPeaks.UpdateBins(System.Int32,System.Double[],System.Double)">
+            <summary>
+            Updates the average normalized intensities of Bins in AddSequence for a 
+            particular chargeOffset.
+            </summary>
+            <param name="chargeOffset">Charge offset in question</param>
+            <param name="intensities">Intensities seen during the iteration of chargeOffset</param>
+            <param name="maxIntensity">Maximum intensity seen in the spectrum</param>
+        </member>
+        <member name="M:TopDownTrainer.PrecursorPeaks.GetBinPercentages">
+            <summary>
+            Outputs 2D array of doubles that are percentage versions of Bins.
+            Divids each element of Bins by NumSpectra
+            </summary>
+            <returns>double[,] of proportions of times buckets were seen</returns>
+        </member>
+        <member name="M:TopDownTrainer.PrecursorPeaks.CheckThreshold(InformedProteomics.Backend.Data.Spectrometry.Spectrum,System.Double,System.Int32)">
+            <summary>
+            Checks all of the mass and charge offsets for the precursor ion of prScan
+            and outputs the list of Peaks that mapped to buckets below a threshold
+            </summary>
+            <param name="spectrum">Original Spectrum of peaks of which to check normalized intensity</param>
+            <param name="precursorChargelessMass">UnProtonated mass of precursor ion</param>
+            <param name="maxCharge">Charge of precursor ion</param>
+            <returns>New Spectrum of list of Peaks that mapped to buckets whose average
+            normalized intensity value was below Threshold</returns>
+        </member>
+        <member name="T:TopDownTrainer.ScoreData">
+            <summary>
+            ScoreData objects store probabilities of data points and those points' labels. This class also constructs
+            lists of target and decoy probabilities.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreData.Scores">
+            <summary>
+            Data scores
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreData.Labels">
+            <summary>
+            Data labels
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreData.TargetScores">
+            <summary>
+            List of scores for target data
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreData.DecoyScores">
+            <summary>
+            List of scores for decoy data
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ScoreData.#ctor(System.Double[],System.Double[])">
+            <summary>
+            Object storing target and decoy probabilities given data and their labels
+            </summary>
+            <param name="probs">Array of probabilities</param>
+            <param name="areTargets">Labels that are 1 if the corresponding probability in
+            probs is a target and 0 otherwise</param>
+        </member>
+        <member name="M:TopDownTrainer.ScoreData.Init">
+            <summary>
+            Separates probabilities into target and decoy
+            </summary>
+        </member>
+        <member name="T:TopDownTrainer.ScoreHistogram">
+            <summary>
+            ScoreHistogram bins a range of scores from cross validation and stores their mean. Collections of data
+            can be added to the histogram.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.Title">
+            <summary>
+            Title of histogram
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.NumBuckets">
+            <summary>
+            Number of buckets for data in histogram
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.Max">
+            <summary>
+            Maximum value data point in histogram
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.Min">
+            <summary>
+            Minimum value data point in histogram
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.BucketSize">
+            <summary>
+            Bucketsize of buckets for histogram
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.BucketCounts">
+            <summary>
+            List of numbers of data points in each bucket
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.NumPoints">
+            <summary>
+            Number of data points
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ScoreHistogram.Mean">
+            <summary>
+            Mean of histogram
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ScoreHistogram.#ctor(System.String,System.Int32,System.Collections.Generic.IEnumerable{System.Double},System.Double,System.Double)">
+            <summary>
+            Creates a new ScoreHistogram with a title and the ability to contain 20 buckets of data
+            with scores/values between 0 and 1
+            </summary>
+            <param name="title">Title of histogram</param>
+            <param name="numBuckets">Number of buckets (Default is 20)</param>
+            <param name="data">Optional list of data (Default = null)</param>
+            <param name="max">Upper limit on x axis</param>
+            <param name="min">Lower limit on x axis</param>
+        </member>
+        <member name="M:TopDownTrainer.ScoreHistogram.SetSize(System.Double,System.Double)">
+            <summary>
+            Sets the Maximum, Minimmum, and BucketSize for this histogram. Can be modified by an
+            outside class
+            </summary>
+            <param name="max">Max data point for this histogram</param>
+            <param name="min">Min data point for this histogram</param>
+        </member>
+        <member name="M:TopDownTrainer.ScoreHistogram.Add(System.Double)">
+            <summary>
+            Adds a single data point to histogram by incrementing count of bucket corresponding
+            to its value. Each double is a probability
+            </summary>
+            <param name="datum">Probability point to be added</param>
+        </member>
+        <member name="M:TopDownTrainer.ScoreHistogram.Add(System.Collections.Generic.IEnumerable{System.Double})">
+            <summary>
+            Adds data to histogram by incrementing count of bucket corresponding to value
+            of data. Each double of data is a probability
+            </summary>
+            <param name="data">Probability data in question</param>
+        </member>
+        <member name="M:TopDownTrainer.ScoreHistogram.Add(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{System.Double}})">
+            <summary>
+            Adds data that is in a list of lists. Used with ConcurrentBag during threading
+            of cross validation
+            </summary>
+            <param name="listOfLists">List of list of probabilities in question</param>
+        </member>
+        <member name="T:TopDownTrainer.Program">
+            <summary>
+            Program takes a directory of .tsv and .raw or .mzid and .mzML files for target sequences and files
+            labeled *decoy.tsv or *decoy.mzid for decoy sequences, parses argument options, and then creates and
+            trains a LearningModel from the data. Program outputs a file containing proportions of found ions,
+            a table of average normalized intensities, and weights of the LearningModel. The program also outputs
+            ROC curves if possible, a regularization error curve, and an analysis of the learning algorithm.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.Program.MyModel">
+            <summary>
+            Model used to make plots
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.Program.Main(System.String[])">
+            <summary>
+            Gets Ion Proportions and finds PrecursorPeaks
+            </summary>
+            <param name="args">Command line arguments</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.ParseArgs(System.String[])">
+            <summary>
+            Parses command line arguments.
+            </summary>
+            <param name="args">Command line arguments</param>
+            <returns>Parsed arguments</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetNeutralLosses(System.Collections.Generic.List{System.String})">
+            <summary>
+            Gets NeutralLosses from command line arguments
+            </summary>
+            <param name="neutralLossStrings">List of neutral losses as strings specified by user</param>
+            <returns>List of corresponding NeutralLosses</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetScanMassBins(System.String)">
+            <summary>
+            Returns binned list of ProteinScans
+            </summary>
+            <param name="directoryPath">Path to directory of ProteinScans that need to be binned</param>
+            <returns>ProteinScans binned by mass in a list</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetDecoyMassBins(System.String,System.Collections.Generic.List{System.Collections.Generic.List{TopDownTrainer.ProteinScan}})">
+            <summary>
+            Returns binned decoy ProteinScans
+            </summary>
+            <param name="directoryPath">Path to directory of decoy files</param>
+            <param name="scanBins">Binned ProteinScan list of target scans</param>
+            <returns>Binned decoy ProteinScan list of same size as scanBins</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.Train(System.String,System.String,System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},System.Int32,System.Double,System.Double,System.Int32)">
+            <summary>
+            Creates an IonSet, PrecursorPeaks, and FeatureVector objects and adds scans
+            from the directory at directoryPath.
+            
+            A file consisting of found proportions
+            from the Ionset, a table of charge/mass offsets from the PrecursorPeaks,
+            and the weights of a LearningModel is outputted.
+            
+            Another file is outputted, which is the concatentation of all FeatureVectors
+            for IonTypes that were more than threshold% of the found ions.
+            </summary>
+            <param name="directoryPath">Path to directory of data</param>
+            <param name="outputPath">Path to where files should be outputted</param>
+            <param name="baseIons">BaseIons in question</param>
+            <param name="neutralLosses">NeutralLosses in question</param>
+            <param name="tol">Tolerance</param>
+            <param name="minScore">Minimum Score for GetCorrScore</param>
+            <param name="threshold">Minimum threshold proportion for found ions</param>
+            <param name="numMut">Number of mutations for decoys from target sequences</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.TrainOnScans(System.String,System.String,System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double,System.Double,System.Int32)">
+            <summary>
+            Trains LearningModel on binned ProteinScans
+            </summary>
+            <param name="outputPath">Path to where files should be outputted</param>
+            <param name="title">Title for plots</param>
+            <param name="targetScans">List of target ProteinScans for a particular bin</param>
+            <param name="decoyScans">List of decoy ProteinScans for a particular bin</param>
+            <param name="baseIons">BaseIons in question</param>
+            <param name="neutralLosses">NeutralLosses in question</param>
+            <param name="tolerance">Tolerance</param>
+            <param name="minScore">Minimum Score for GetCorrScore</param>
+            <param name="threshold">Minimum threshold proportion for found ions</param>
+            <param name="numMut">Number of mutations for decoys from target sequences</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetProportionHeader">
+            <summary>
+            Outputs proportion header for proportion files
+            </summary>
+            <returns>String containing header for proportion information and offset mass</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GenerateIonProportions(TopDownTrainer.IonSet)">
+            <summary>
+            Gets csv of proportions of found ions from an IonSet
+            </summary>
+            <param name="ionSet">IonSet in question</param>
+            <returns>string representing each IonType and the percentages of found ions</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GenerateAllIonProportions(System.Collections.Generic.List{TopDownTrainer.IonSet})">
+            <summary>
+            Gets csv of mass errors and proportions of ions from IonSets
+            </summary>
+            <param name="ionSets">IonSets in question</param>
+            <returns>string representing each IonType and their mass errors and percentages of ions</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetPrecursorPeaksOutput(TopDownTrainer.PrecursorPeaks)">
+            <summary>
+            Makes a comma separated string of the elements of prePeaks' 2D array.
+            Also outputs 2D array of ints
+            </summary>
+            <param name="prePeaks">PrecursorPeaks in question</param>
+            <returns>Tuple of csv and ints representing precursor peaks table</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetDecoy(TopDownTrainer.ProteinScan,System.Int32)">
+            <summary>
+            Returns decoy ProteinScan based off of the input. Shuffles and mutates the input sequence.
+            </summary>
+            <param name="scan">Input ProteinScan in question</param>
+            <param name="numMut">Number of mutations for decoy sequence</param>
+            <returns>Decoy ProteinScan</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetProteinFeatureVector(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32,System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},TopDownTrainer.PrecursorPeaks,InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Boolean,System.Int32)">
+            <summary>
+            Helper function that gets protein feature vectors for targets and decoys
+            </summary>
+            <param name="spectrum">Spectrum of ProteinScan in question</param>
+            <param name="seq">Sequence of ProteinScan in question</param>
+            <param name="charge">Charge of ProteinScan in question</param>
+            <param name="ionTypes">List of IonTypes features are for</param>
+            <param name="prePeaks">PrecursorPeaks for filtering</param>
+            <param name="tol">Tolerance level for FeatureVector</param>
+            <param name="isTarget">Whether or not the sequence is a target</param>
+            <param name="row">Row where modification of matrix is being made</param>
+            <returns>Vector of features for a particular sequence in csv form</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GenerateFeatureMatrix(TopDownTrainer.PrecursorPeaks,System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Int32)">
+            <summary>
+            Gets the matrix of features where the rows are proteins and the columns are their featurevectors
+            </summary>
+            <param name="prePeaks">PrecursorPeaks in question</param>
+            <param name="scans">ProteinScans in question</param>
+            <param name="decoyScans">ProteinScans from decoy file</param>
+            <param name="ionTypes">IonTypes to get FeatureVectors for</param>
+            <param name="tol">Tolerance level for FeatureVectors</param>
+            <param name="numMut">Number of mutations for decoy proteins</param>
+            <returns>Tuple of csv representing each protein and its weights and the data version in matrix form</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.StandardizeData(System.Double[][]@)">
+            <summary>
+            Standardizes the columns of data to have mean 0 and std. dev. 1
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetWeightString(System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.IonType},TopDownTrainer.LearningModel)">
+            <summary>
+            Outputs csv file of an intercept value and weights for a list of doubles and corresponding ions
+            </summary>
+            <param name="ionsAboveThreshold">The ions that the weights are for</param>
+            <param name="learningModel">LearningModel from which to get weights</param>
+            <returns>string that is a csv explaining intercept and weights</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.ShowCurves(TopDownTrainer.AnalysisMetrics,System.String,System.String)">
+            <summary>
+            Outputs roc curves to a file at outPath
+            </summary>
+            <param name="metrics">AnalysisMetrics which will show ROC curves if it's Probabilistic</param>
+            <param name="title">Title for plots</param>
+            <param name="outPath">Absolute path to where the file should be outputted</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.AddCurve(Accord.Statistics.Analysis.ReceiverOperatingCharacteristic)">
+            <summary>
+            Adds a ROC curve to MyModel
+            </summary>
+            <param name="roc">ROC curve in question</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.CreateAnalysisPlots(TopDownTrainer.ScoreHistogram,TopDownTrainer.ScoreHistogram,System.String,System.String,TopDownTrainer.LearningModel)">
+            <summary>
+            Creates a png of a histogram using oxyplot showing a, hopefully, bimodal distribution of target
+            and decoy % threshold distributions
+            </summary>
+            <param name="targetHist">Target % distribution in question</param>
+            <param name="decoyHist">Decoy % distribution in question</param>
+            <param name="title">Title for plot</param>
+            <param name="outPath">Path to directory where histogram should be outputted as png.</param>
+            <param name="model">LearningModel on which analysis was done (Default is null)</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetHistogram(TopDownTrainer.ScoreHistogram)">
+            <summary>
+            Adds histogram to MyPlot
+            </summary>
+            <param name="hist">BaseHistogram in question</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetHeatMap(System.String,System.Double[0:,0:],System.String)">
+            <summary>
+            Gets heatmap of regularization data
+            </summary>
+            <param name="title">Title of for plot</param>
+            <param name="data">Regularization data in question</param>
+            <param name="outPath">Output path</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.RegularizationPlot(System.String,System.Collections.Generic.List{System.Double},System.Double[],System.String,TopDownTrainer.LearningModel)">
+            <summary>
+            Outputs plot of error vs. regularization values
+            </summary>
+            <param name="title">Title for plot</param>
+            <param name="regConstants">Regularization constants</param>
+            <param name="data">Errors in question where each index corresponds to the next regularization value.
+            Same size as constants</param>
+            <param name="outPath">Output path</param>
+            <param name="model">LearningModel in question</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.PrintTotalRegularization(System.Collections.Generic.List{TopDownTrainer.CrossValidationOutput},System.String)">
+            <summary>
+            Prints out a graph of regularization error vs. mass bin where mass is midpoint mass in bin
+            </summary>
+            <param name="cvos">CrossValidationOutputs in question</param>
+            <param name="outputPath">Path to output file</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.PrintAllProportions(System.Collections.Generic.List{TopDownTrainer.CrossValidationOutput},System.String)">
+            <summary>
+            Prints proportions from all mass bins next to each other for comparison
+            </summary>
+            <param name="cvos">Outputs from each mass bin in question</param>
+            <param name="outputPath">Path to output file</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.PrintTotalOutput(System.Collections.Generic.List{TopDownTrainer.CrossValidationOutput},System.String)">
+            <summary>
+            Outputs a file of proportions and analysis metrics.
+            </summary>
+            <param name="cvos">Outputs of cross validation from all mass bins</param>
+            <param name="outputPath">Path to file that is outputted</param>
+        </member>
+        <member name="M:TopDownTrainer.Program.PrintTrainingOutputFile(System.Collections.Generic.List{TopDownTrainer.CrossValidationOutput},System.String)">
+            <summary>
+            Outputs final training output file of ion proportions, precursor peaks, and model weights
+            </summary>
+            <param name="cvos"></param>
+            <param name="outputPath"></param>
+        </member>
+        <member name="T:TopDownTrainer.ProteinScanGenerator">
+            <summary>
+            ProteinScanGenerator creates ProteinScans from raw files and id files. It can read both top down and
+            bottom up data.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScanGenerator.Filenameid">
+            <summary>
+            Path to file of id file in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScanGenerator.Filenameraw">
+            <summary>
+            Path to file of raw file in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScanGenerator.AreTargets">
+            <summary>
+            Whether or not the proteins in this file are targets
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScanGenerator.QValue">
+            <summary>
+            Q-value threshold to look for
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScanGenerator.ProteinScans">
+            <summary>
+            List of ProteinScans from this file
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScanGenerator.#ctor(System.String,System.String,System.Boolean,System.Boolean,System.Double)">
+            <summary>
+            Creates new ProteinScanGenerator which gets initilized with some data and instantiates
+            a list of ProteinScans called ProteinScans
+            </summary>
+            <param name="filenameid">path to id file in question</param>
+            <param name="filenameraw">Path to raw file in question</param>
+            <param name="bottomUp">Ooolean whether or not the data is bottomup</param>
+            <param name="areTargets">Whether or not this data contains taret sequences (Default = true)</param>
+            <param name="qvalue">Optional double qvalue to check for in data (Default = 0.01)</param>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScanGenerator.Init(System.Boolean)">
+            <summary>
+            Initializes ProteinScans for TopDown or BottomUp data.
+            </summary>
+            <param name="bottomUp">Boolean whether or not the data is bottomup</param>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScanGenerator.ReadTopDown">
+            <summary>
+            Generates protein sequence, charge, and Spectrum from tsv and raw files
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScanGenerator.ReadBottomUp">
+            <summary>
+            Generates protein sequence, charge, and Spectrum from tsv and raw files
+            </summary>
+        </member>
+        <member name="T:TopDownTrainer.FileLoader">
+            <summary>
+            FileLoader is a wrapper for StreamReader.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.FileLoader.sr">
+            <summary>
+            StreamReader to read files
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.FileLoader.#ctor(System.String)">
+            <summary>
+            Loads files at filename
+            </summary>
+            <param name="filename">Path to file in question</param>
+        </member>
+        <member name="M:TopDownTrainer.FileLoader.LoadFile(System.String)">
+            <summary>
+            Loads file from filename path and outputs a StreamReader.
+            </summary>
+            <param name="filename">Path to file.</param>
+        </member>
+        <member name="T:TopDownTrainer.IonProportion">
+            <summary>
+            IonProportion stores counts for ions found and all ions looked for. IonSet has a dictionary with IonTypes
+            as keys and IonProportions as values. The IonProportion values store counts of found ions and all ions for
+            each IonType.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonProportion.FoundIons">
+            <summary>
+            Number of IonTypes found across each cleavage point
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonProportion.AllIons">
+            <summary>
+            Number of IonTypes looked for across each cleavage point
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.IonProportion.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a new IonProportion with FoundIons and AllIons specified
+            </summary>
+            <param name="foundIons">Number of Ions found</param>
+            <param name="allIons">Number of Ions looked for</param>
+        </member>
+        <member name="M:TopDownTrainer.IonProportion.#ctor">
+            <summary>
+            Creates a new empty IonProportion
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.IonProportion.Add(TopDownTrainer.IonProportion)">
+            <summary>
+            Adds two IonProportions together. This IonProportion's FoundIons and AllIons lists
+            are concatenated with the corresponding lists of the added object.
+            </summary>
+            <param name="added">IonProportion whose lists are to be added.</param>
+        </member>
+        <member name="M:TopDownTrainer.IonProportion.GetProportion">
+            <summary>
+            Gets the total proportion of Ions found for this IonProportion: Found / All
+            </summary>
+            <returns>Proportion of found Ions</returns>
+        </member>
+        <member name="T:TopDownTrainer.IonSet">
+            <summary>
+            IonSet inherits from AbstractIonSequence and keeps track of counts of ions that have high correlation
+            with their respective spectra. An IonSet can also generate a list of IonTypes whose ions for particular
+            BaseIonTypes and NeutralLosses have high correlations with their spectra.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonSet.IonToProp">
+            <summary>
+            Dictionary of IonTypes looked for to IonProportions
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonSet.FoundProps">
+            <summary>
+            Dictionary of IonTypes looked for, for each cleavage point, to number of sets of ions with
+            high Pearson Correlation to added Spectrum
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonSet.IntensityDict">
+            <summary>
+            Dictionary of IonTypes looked for to average normalized intensity of peaks for IonTypes
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonSet.TotalFound">
+            <summary>
+            Total number of IonTypes for each cleavage point looked for
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.#ctor(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Constructs an IonSet from BaseIonTypes and NeutralLosses.
+            IonToProp is a dictionary from IonTypes to their IonProportions (found / all)
+            FoundProps calculates proportions of IonTypes whose ions have high Pearson Correlation
+            tol and minscore are for finding peaks.
+            </summary>
+            <param name="baseIonTypes">List of BaseIonTypes in question</param>
+            <param name="neutralLosses">List of NeutralLosses in question</param>
+            <param name="tol">Optional (default = 10): Tolerance level</param>
+            <param name="minScore">Optional (default = 0.7): MinScore for peak correlation</param>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.#ctor(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
+            <summary>
+            Constructs an IonSet from BaseIonTypes and NeutralLosses.
+            IonToProp is a dictionary from IonTypes to their IonProportions (found / all)
+            FoundProps calculates proportions of IonTypes whose ions have high Pearson Correlation
+            tol and minscore are for finding peaks.
+            </summary>
+            <param name="ionTypes">IonTypes from which IonSet is created</param>
+            <param name="tol">Optional (default = 10): Tolerance level</param>
+            <param name="minScore">Optional (default = 0.7): MinScore for peak correlation</param>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.Init(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss})">
+            <summary>
+            Initializes IonSet dictionary where keys are iontypes and
+            values are empty IonProportions.
+            Also initializes FoundProps.
+            Not all IonTypes are valid, so they checked for and not added.
+            </summary>
+            <param name="baseIonTypes">BaseIonTypes in question</param>
+            <param name="neutralLosses">NeutralLosses in question</param>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.Init(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.IonType})">
+            <summary>
+            Initializes IonSet dictionary where keys are iontypes and
+            values are empty IonProportions.
+            Also initializes FoundProps.
+            Not all IonTypes are valid, so they checked for and not added.
+            </summary>
+            <param name="ionTypes">IonTypes in question</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.IonSet.AddSequence(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32)" -->
+        <member name="M:TopDownTrainer.IonSet.GetIonToPropKeysAboveThreshold(System.Double)">
+            <summary>
+            Gets the IonTypes in the dictionary, IonToProp, whose values map to IonProportions
+            that have proportions of foundIons greater or equal to the threshold input.
+            </summary>
+            <param name="threshold">Double between 0 and 1.</param>
+            <returns>List of IonType keys from IonToProp whose IonProportions had proportions
+            greater than the threshold</returns>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.GetIonTypesAboveThreshold(System.Double)">
+            <summary>
+            Similar to above, but for FoundProps:
+            Gets the IonTypes in the FoundProportions dictionary whose values are greater
+            or equal to the threshold input.
+            </summary>
+            <param name="threshold">Double between 0 and 1.</param>
+            <returns>List oF IonType key from FoundProps whose values were greather than threshold</returns>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.GetIonToPropDictionaryProportions">
+            <summary>
+            Outputs dictionary of IonTypes as keys and doubles as values.
+            The IonType keys are the ones from the dictionaries.
+            The double values are the proportion outputted from IonProportions
+            from the values of IonToProp.
+            </summary>
+            <returns>Dictionary where keys are IonTypes and values are proportions of IonProportions from
+            IonToProp</returns>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.GetFoundProportionsDictionary">
+            <summary>
+            Outputs dictionary of IonTypes as keys and doubles as values.
+            The IonType keys are the ones from the dictionaries.
+            The double values are the proportion outputted from IonProportions
+            from the values of IonToProp.
+            </summary>
+            <returns>Dictionary where keys are IonTypes and values are proportions gotten from
+            FoundProps and TotalFound</returns>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.GetFoundProportions">
+            <summary>
+            Gets list of proportions for each IonType looked for
+            </summary>
+            <returns>List of proportions</returns>
+        </member>
+        <member name="T:TopDownTrainer.ProteinScan">
+            <summary>
+            ProteinScan is an object used for storing proteins in the form of a Sequence, a charge, a scan number,
+            an LcMsRun, and whether the sequence is a target or decoy. A ProteinScan can be created from the
+            aforementioned values or a raw file, id file, and the desired protein's scan number.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.Sequence">
+            <summary>
+            Sequence of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.Charge">
+            <summary>
+            Charge of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.Scan">
+            <summary>
+            Scan number of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.Lcmsrun">
+            <summary>
+            LcMsRun of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.Score">
+            <summary>
+            Score of protein in question
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ProteinScan.IsTarget">
+            <summary>
+            Whether or not this protein is a target
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScan.#ctor(InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32,System.Int32,InformedProteomics.Backend.MassSpecData.LcMsRun,System.Double,System.Boolean)">
+            <summary>
+            Creates a new protein from a sequence, its charge, its scan number, and its LcMsRun
+            </summary>
+            <param name="sequence">Sequence of protein</param>
+            <param name="charge">Charge of protein</param>
+            <param name="scan">Scan number of protein</param>
+            <param name="lcmsrun">LcMsRun of protein</param>
+            <param name="score">Score of protein</param>
+            <param name="isTarget">Optional boolean whether or not this sequence is a target (Default is true)</param>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScan.#ctor(System.String,System.String,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Creates a ProteinScan from a file, its scan number, and boolean representing whether
+            or not the data is bottom up, boolean representing whether or not the scan is a target
+            </summary>
+            <param name="filenametsv">ID file in question</param>
+            <param name="filenameraw">Raw file in question</param>
+            <param name="scan">Scan number of protein in question</param>
+            <param name="bottomUp">Optional boolean whether or not this data is bottom up (Defulat is false)</param>
+            <param name="isTarget">Optional boolean whether or not this sequence is a target (Default is true)</param>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScan.GetProperties(System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Gets a sequence, charge, and score for a protein in a file at a particular scan number.
+            </summary>
+            <param name="filenameid">ID file for file in question</param>
+            <param name="filenameraw">Raw file for file in question</param>
+            <param name="scan">Scan number of protein</param>
+            <param name="bottomUp">Whether or not the data is bottom up</param>
+            <returns>Tuple of sequence and charge for protein</returns>
+        </member>
+        <member name="M:TopDownTrainer.ProteinScan.GetTopDown(System.String,System.Int32)">
+            <summary>
+            Generates protein sequence, charge, and score from id and raw files and scan number for TopDown Data.
+            </summary>
+            <param name="filename">Path to file in question</param>
+            <param name="scan">Scan number of protein in question</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.ProteinScan.GetBottomUp(System.String,System.String,System.Int32)" -->
+        <member name="M:TopDownTrainer.ProteinScan.CompareTo(TopDownTrainer.ProteinScan)">
+            <summary>
+            Returns positive number if this ProteinScan has a larger mass than scan
+            </summary>
+            <param name="scan">ProteinScan to compare to</param>
+            <returns>Integer where positive sign means this ProteinScan has larger mass than scan</returns>
+        </member>
+        <member name="T:TopDownTrainer.SequenceReader.ISequenceReader">
+            <summary>
+            Interface for protein/peptide sequence readers.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SequenceReader.ISequenceReader.Read(System.String)">
+            <summary>
+            Parse a protein/peptide sequence.
+            </summary>
+            <param name="sequence">The sequence as a string.</param>
+            <returns>The parsed sequence.</returns>
+        </member>
+        <member name="T:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader">
+            <summary>
+            Reader for protein/peptide sequences in the MS-GF+ style.
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader.AminoAcidSet">
+            <summary>
+            Standard amino acid set.
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader.trimAnnotations">
+            <summary>
+            A value indicating whether the n-terminal and c-terminal amino acids should be trimmed.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader.#cctor">
+            <summary>
+            Initializes static members of the <see cref="T:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader"/> class.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader"/> class.
+            </summary>
+            <param name="trimAnnotations">
+            A value indicating whether the n-terminal and c-terminal amino acids should be trimmed.
+            </param>
+        </member>
+        <member name="M:TopDownTrainer.SequenceReader.MsgfPlusSequenceReader.Read(System.String)">
+            <summary>
+            Parse a protein/peptide sequence in the MS-GF+ style.
+            </summary>
+            <param name="msgfPlusPeptideStr">The sequence as a string..</param>
+            <returns>The parsed sequence.</returns>
+        </member>
+        <member name="T:TopDownTrainer.SVMModel">
+            <summary>
+            SVMModel inherits from LearningModel and uses Accord.NET's SupportVectorMachine with the
+            ProbabilisticNewtonMethod optimization function.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.SVMModel.MachineKernel">
+            <summary>
+            Kernel for this SVM
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.SVMModel.Ksvm">
+            <summary>
+            SupportVectorMachine object for LearningModel
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.SVMModel.Optimizer">
+            <summary>
+            Optimization function to use on SVM
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.#ctor(System.Double[][],System.Double[],System.Double,Accord.Statistics.Kernels.IKernel)">
+            <summary>
+            Creates a new Support Vector Machine learning model
+            </summary>
+            <param name="input">2D array of doubles where each row is a point</param>
+            <param name="output">array of doubles where each value is the output of each point in input</param>
+            <param name="complexity">Optional double representing complexity of the model. Higher value is more
+            <param name="kernel">Kernel for this SVM</param>
+            complex (Default is -1, but uses ProbabilisticNewtonMethod default)</param>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.#ctor(System.Double[])">
+            <summary>
+            A model that only contains weights. Used when importing from file
+            </summary>
+            <param name="weights">double[] of weights for model</param>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.CorrectOutput">
+            <summary>
+            Changes the output to be +1 and -1
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.SetType">
+            <summary>
+            Sets the type of this model as SVM
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.OptimizerInit">
+            <summary>
+            Initilzies optimization function and sets kernel
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.Initialize(System.Double)">
+            <summary>
+            Sets the complexity of this model. If complexity is less than 0, then it is the default
+            complexity that the optimization function uses
+            </summary>
+            <param name="complexity">Complexity value in question. Higher is more complex</param>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetBoolOutput(System.Double[])">
+            <summary>
+            Gets the boolean output for some array of doubles. If the value is greater than 0, then true,
+            else false.
+            </summary>
+            <param name="output">array of doubles in question</param>
+            <returns>array of booleans that are true if output value is greater than 0 and false otherwise</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.Compute">
+            <summary>
+            Sets boolean Labels from Output values, then learns an SVM.
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.SetWeights">
+            <summary>
+            Sets Weights to be the weights of the SVM
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetMetricObject">
+            <summary>
+            Gets a new AnalysisMetrics object that svm models output.
+            </summary>
+            <returns>A LinearCombinationMetrics object</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetTrainingError">
+            <summary>
+            Compares the output of this model on Input with Output. Outputs mean squared error
+            of probabilities.
+            </summary>
+            <returns>double that is percentage of training points misclassified by svm</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.OutputComparisonValues">
+            <summary>
+            Gets output values needed for cross validation.
+            </summary>
+            <returns>double[] of outputs scores for validation error of length Output.Length</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetProbability(System.Double[])">
+            <summary>
+            Gets the prbability of this model on a testpoint
+            </summary>
+            <param name="testpoint">test point in question</param>
+            <returns>Probability of this test point according to this model</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetProbabilities(System.Double[][])">
+            <summary>
+            Gets probabilities of this model on an array of testpoints
+            </summary>
+            <param name="testpoints">2D array of doubles where each row is a test point</param>
+            <returns>Array of doubles where value is a probability corresponding to the rows of testpoints</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.GetError(System.Double[][],System.Double[])">
+            <summary>
+            Outputs a ValidationFoldResult consisting of cross validation error, and probabilities
+            for target and decoy points; compares this model on testIn with testOut during cross validation
+            </summary>
+            <param name="testIn">2D array of doubles where each row is a point</param>
+            <param name="testOut">Expected output of each point</param>
+            <returns>ValidationFoldResult that contains cross validation error, and scores</returns>
+        </member>
+        <member name="M:TopDownTrainer.SVMModel.Create(System.Double[][],System.Double[],System.Double)">
+            <summary>
+            Creates a new SVM model from input, output, and a complexity value
+            </summary>
+            <param name="input">2D array of doubles where each row is a point</param>
+            <param name="output">True output for input points</param>
+            <param name="complexity">Optional complexity value for the model (Default is -1)</param>
+            <returns>SVMModel generated from these inputs</returns>
+        </member>
+        <member name="T:TopDownTrainer.TrainingFileReader">
+            <summary>
+            TrainingFileReader reads the output file from Program and constructs a LearningModel from the
+            file's weights and a PrecursorPeaks object from the file's average normalized intensity table.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.TrainingFileReader.MassBins">
+            <summary>
+            Gets the list of lower bin edge for each mass bin.
+            This class expects that this list is sorted ascending.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.TrainingFileReader.IonTypes">
+            <summary>
+            IonTypes above a threshold, which are read from training file
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.TrainingFileReader.PrePeaks">
+            <summary>
+            PrecursorPeaks objects read from training file
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.TrainingFileReader.Models">
+            <summary>
+            LearningModels read from training file
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.#ctor(System.String,System.Double,System.Double)">
+            <summary>
+            Creates a new TrainingFileReader by reading information from input file and
+            setting and IonTypes list, a PrecusorPeaks, and a LearningModel
+            </summary>
+            <param name="trainingFilePath">string path to training file</param>
+            <param name="foundThreshold">Optional threshold for proportion of found IonTypes. If -1, then it uses 1 / #IonTypes</param>
+            <param name="intensityThreshold">Average normalized intensities above this threshold will be filtered out
+            (Default is 0.15)</param>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.ReadMassBinEdges(System.IO.StreamReader)">
+            <summary>
+            
+            </summary>
+            <param name="sr"></param>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.ReadProp(System.IO.StreamReader,System.Double)">
+            <summary>
+            Reads file and sets IonTypes
+            The StreamReader input will be now be set to read the Precursor Peaks table
+            </summary>
+            <param name="sr">StreamReader initialized on file</param>
+            <param name="threshold">Threshold for proportion of found IonTypes</param>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.ReadIntensity(System.IO.StreamReader,System.Double)">
+            <summary>
+            Reads file to set PrePeaks
+            </summary>
+            <param name="sr">StreamReader for input training file</param>
+            <param name="intensityThreshold">double representing intensity threshold</param>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.ReadModel(System.IO.StreamReader)">
+            <summary>
+            Reads file to get model
+            </summary>
+            <param name="sr">StreamReader for input training file</param>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.GetScorer(InformedProteomics.Backend.Data.Spectrometry.Spectrum,System.Double,System.Int32)">
+            <summary>
+            Get the composition scorer for the given spectrum, mass, and charge.
+            </summary>
+            <param name="spectrum">Original Spectrum of test data point</param>
+            <param name="precursorMass">Precursor mass of ion that compositions come from</param>
+            <param name="precursorCharge">Charge of precursor ion</param>
+            <returns></returns>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.Create(InformedProteomics.Backend.Data.Spectrometry.ActivationMethod,System.Boolean)">
+            <summary>
+            Gets the training file reader containing the scoring parameters for a given activation method.
+            </summary>
+            <param name="activationMethod"></param>
+            <param name="topDown">A value indicating whether the data is top-down or bottom-up data.</param>
+            <remarks>
+            This code makes the assumption that a dataset will contain only top-down data or only
+            bottom-up data, so after we create training parameters once, we only distinguish them by activation
+            method.
+            </remarks>
+            <returns>The training file reader containing the scoring parameters for the given activation method.</returns>
+        </member>
+        <member name="F:TopDownTrainer.TrainingFileReader.trainingFileReaderCache">
+            <summary>
+            Caches scoring parameters for the given activation method.
+            </summary>
+        </member>
+        <member name="T:TopDownTrainer.ValidationFoldResult">
+            <summary>
+            ValidationFoldResult is an interface for getting error and score results from cross validation.
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ValidationFoldResult.CrossValidationError">
+            <summary>
+            Cross validation error after one fold
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ValidationFoldResult.TargetScores">
+            <summary>
+            Target scores after one fold of cross validation
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.ValidationFoldResult.DecoyScores">
+            <summary>
+            Decoy scores after one fold of cross validation
+            </summary>
+        </member>
+    </members>
+</doc>

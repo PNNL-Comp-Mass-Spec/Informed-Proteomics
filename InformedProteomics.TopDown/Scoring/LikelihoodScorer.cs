@@ -10,6 +10,8 @@ using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.TopDown.Scoring
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class LikelihoodScorer : AbstractFragmentScorer
     {
         public const double CorrThreshold = 0.7;
@@ -36,7 +38,9 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
 
-        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
             foreach (var baseIonType in BaseIonTypes)

@@ -7,6 +7,8 @@ using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 
 namespace InformedProteomics.Scoring.BottomUp
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class ScoredSpectrum: IScorer
     {
         public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, double massWithH2O, Tolerance tolerance)
@@ -23,7 +25,9 @@ namespace InformedProteomics.Scoring.BottomUp
             return 0;
         }
 
-        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
 

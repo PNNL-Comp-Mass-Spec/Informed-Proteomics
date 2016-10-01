@@ -4,16 +4,21 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class IonTypeFactory
     {
 
-        public IonTypeFactory()
+        private bool removeReduntantIonTypes;
+
+        public IonTypeFactory(bool removeRedundantIonTypes = true)
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
                 NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
                 3   // up to charge 3
             )
         {
+            this.removeReduntantIonTypes = removeRedundantIonTypes;
         }
 
         public IonTypeFactory(int maxCharge)
@@ -25,11 +30,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
         }
 
-        public IonTypeFactory(IEnumerable<BaseIonType> baseIons, IEnumerable<NeutralLoss> neutralLosses, int maxCharge)
+        public IonTypeFactory(
+            IEnumerable<BaseIonType> baseIons, 
+            IEnumerable<NeutralLoss> neutralLosses,
+            int maxCharge,
+            bool removeRedundantIonTypes = true)
         {
             _baseIons = baseIons;
             _neutralLosses = neutralLosses;
             _maxCharge = maxCharge;
+            this.removeReduntantIonTypes = removeRedundantIonTypes;
             GenerateAllKnownIonTypes();
         }
 
@@ -43,6 +53,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IonType GetIonType(string name)
         {
             return _ionTypeMap[name];
+        }
+
+        public IonType GetIonType(BaseIonType baseIonType, int charge, NeutralLoss neutralLoss)
+        {
+            var ionTypeName = string.Format("{0}{1}{2}", baseIonType.Symbol, charge, neutralLoss.Name);
+            return _ionTypeMap[ionTypeName];
         }
 
         public IonType GetIonType(bool isPrefix, int charge, float offset)
@@ -72,6 +88,28 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Given a list of IonTypes of charge 1 and a charge value, a list of the same IonTypes of charge up to and
+        /// including charge are outputted.
+        /// </summary>
+        /// <param name="ionTypes">List of IonTypes of charge 1</param>
+        /// <param name="charge">IonTypes of charge up to and including charge will be outputted</param>
+        /// <returns>List of charged IonTypes</returns>
+        public static List<IonType> GetIonTypesFromDecharged(IEnumerable<IonType> ionTypes, int charge)
+        {
+            List<IonType> chargedIonTypes = new List<IonType>();
+            foreach (IonType ionType in ionTypes)
+            {
+                for (int ch = 1; ch <= charge; ch++)
+                {
+                    IonType chargedIonType = 
+                        new IonType(ionType.Name, ionType.OffsetComposition, ch, ionType.BaseIonType, ionType.NeutralLoss);
+                    chargedIonTypes.Add(chargedIonType);
+                }
+            }
+            return chargedIonTypes;
+        }
+
         public IEnumerable<IonType> GetAllKnownIonTypes()
         {
             return _ionTypeMap.Values.ToArray();
@@ -94,6 +132,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     foreach (var neutralLoss in _neutralLosses)
                     {
+                        if (this.removeReduntantIonTypes &&
+                            ((baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O) ||
+                            (baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O) ||
+                            (baseIonType == BaseIonType.YM1 && neutralLoss == NeutralLoss.NH3) ||
+                            ((baseIonType == BaseIonType.D || baseIonType == BaseIonType.W ||
+                            baseIonType == BaseIonType.V) && neutralLoss != NeutralLoss.NoLoss)))
+                        {
+                            continue;
+                        }
+
                         var name = baseIonType.Symbol + chargeStr + neutralLoss.Name;
                         var offsetComposition = baseIonType.OffsetComposition -
                                                         neutralLoss.Composition;

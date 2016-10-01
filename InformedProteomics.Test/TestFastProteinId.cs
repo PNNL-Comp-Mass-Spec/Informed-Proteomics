@@ -55,8 +55,7 @@ namespace InformedProteomics.Test
                 if (productSpec == null) continue;
 
                 productSpec.FilterNoise();
-                var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(productSpec, minCharge, maxCharge, 2, 1.1,
-                    tolerance, corrThreshold);
+                var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(productSpec.Peaks, minCharge, maxCharge, 2, 1.1, tolerance, corrThreshold);
 
                 if (deconvolutedPeaks == null) continue;
 

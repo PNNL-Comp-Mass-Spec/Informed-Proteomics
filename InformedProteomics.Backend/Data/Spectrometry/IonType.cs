@@ -5,6 +5,11 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using InformedProteomics.Backend.Data.Sequence;
+
     public class IonType
     {
         public string Name { get; private set; }
@@ -61,6 +66,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new Ion(cutComposition + OffsetComposition, Charge);
         }
 
+        public IEnumerable<Ion> GetPossibleIons(Composition.Composition cutComposition, AminoAcid terminalResidue)
+        {
+            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
+                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+                       .Select(comp => new Ion(comp, Charge));
+        }
+
+        public IEnumerable<Ion> GetPossibleIons(Sequence sequence)
+        {
+            var cutComposition = sequence.Composition;
+            var terminalResidue = IsPrefixIon ? sequence[sequence.Count - 1] : sequence[0];
+            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
+                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+                       .Select(comp => new Ion(comp, Charge));
+        } 
+
         public override string ToString()
         {
             return Name + "," + OffsetComposition + "," + _offsetMass +
@@ -97,22 +118,48 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new IonType(name, composition, charge, isPrefixIon);
         }
 
+        //public override bool Equals(object obj)
+        //{
+        //    var type = obj as IonType;
+        //    if (type != null)
+        //    {
+        //        var other = type;
+        //        return other.IsPrefixIon.Equals(IsPrefixIon) && other.OffsetComposition.Equals(OffsetComposition) &&
+        //               other.Charge == Charge;
+        //    }
+        //    return false;
+        //}
+
+        //public override int GetHashCode()
+        //{
+        //    //return IsPrefixIon.GetHashCode() + OffsetComposition.GetHashCode() + Charge.GetHashCode();
+
+        protected bool Equals(IonType other)
+        {
+            return /*string.Equals(this.Name, other.Name) &&*/ Charge == other.Charge && Equals(this.OffsetComposition, other.OffsetComposition) && this.IsPrefixIon == other.IsPrefixIon;
+        }
+
         public override bool Equals(object obj)
         {
-            var type = obj as IonType;
-            if (type != null)
-            {
-                var other = type;
-                return other.IsPrefixIon.Equals(IsPrefixIon) && other.OffsetComposition.Equals(OffsetComposition) &&
-                       other.Charge == Charge;
-            }
-            return false;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((IonType)obj);
         }
 
         public override int GetHashCode()
         {
-            return IsPrefixIon.GetHashCode()*OffsetComposition.GetHashCode()*Charge.GetHashCode();
+            unchecked
+            {
+                //var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
+                var hashCode = Charge;
+                hashCode = (hashCode * 397) ^ (this.OffsetComposition != null ? this.OffsetComposition.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.IsPrefixIon.GetHashCode();
+                return hashCode;
+            }
         }
+
+        //}
     }
   
 }

@@ -8,3 +8,4 @@
 /.vs
 MS1FeatureExtractor/rc/
 Installer/Output/
+*.DotSettings

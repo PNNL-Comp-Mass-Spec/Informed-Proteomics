@@ -15,7 +15,7 @@ using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class CompositeScorerFactory
+    public class CompositeScorerFactory : IFragmentScorerFactory
     {
         public CompositeScorerFactory(
             ILcMsRun run,
@@ -83,7 +83,12 @@ namespace InformedProteomics.TopDown.Scoring
             _ms2Scorer.TryAdd(scanNum, scorer);
         }
 
-        public IScorer GetScorer(int scanNum)
+        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0)
         {
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec == null || spec.Peaks.Length == 0)
