@@ -1111,6 +1111,11 @@ namespace InformedProteomics.TopDown.Execution
                     MassDelta = (float)mod.Modification.Mass,
                     Residues = mod.TargetResidue.ToString(),
                 };
+                // "*" is used for wildcard residue N-Term or C-Term modifications. mzIdentML standard says that "." should be used instead.
+                if (modObj.Residues.Contains("*"))
+                {
+                    modObj.Residues = modObj.Residues.Replace("*", ".");
+                }
                 // Really only using this for the modification name parsing for CVParams that exists with ModificationObj
                 var tempMod = new ModificationObj(CV.CVID.MS_unknown_modification, mod.Modification.Name, 0, modObj.MassDelta);
                 modObj.CVParams.Add(tempMod.CVParams.First());
