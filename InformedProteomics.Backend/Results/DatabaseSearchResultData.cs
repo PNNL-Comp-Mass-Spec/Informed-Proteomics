@@ -5,27 +5,104 @@ using PNNLOmics.Utilities;
 
 namespace InformedProteomics.Backend.Results
 {
+    /// <summary>
+    /// Container with utilities for reading/writing/storing database search results.
+    /// </summary>
     public class DatabaseSearchResultData
     {
+        /// <summary>
+        /// Scan number
+        /// </summary>
         public int ScanNum { get; set; }
+
+        /// <summary>
+        /// Pre residue
+        /// </summary>
         public string Pre { get; set; }
+
+        /// <summary>
+        /// Peptide sequence
+        /// </summary>
         public string Sequence { get; set; }
+
+        /// <summary>
+        /// Post residue
+        /// </summary>
         public string Post { get; set; }
+
+        /// <summary>
+        /// Name and location of modifications
+        /// </summary>
         public string Modifications { get; set; }
+
+        /// <summary>
+        /// Match elemental composition (including modifications)
+        /// </summary>
         public string Composition { get; set; }
+
+        /// <summary>
+        /// Name of Protein
+        /// </summary>
         public string ProteinName { get; set; }
+
+        /// <summary>
+        /// Protein Description
+        /// </summary>
         public string ProteinDescription { get; set; }
+
+        /// <summary>
+        /// Length of protein
+        /// </summary>
         public int ProteinLength { get; set; }
+
+        /// <summary>
+        /// Start index of sequence in protein
+        /// </summary>
         public int Start { get; set; }
+
+        /// <summary>
+        /// End index of sequence in protein
+        /// </summary>
         public int End { get; set; }
+
+        /// <summary>
+        /// Charge
+        /// </summary>
         public int Charge { get; set; }
+
+        /// <summary>
+        /// m/z of most abundant isotope
+        /// </summary>
         public double MostAbundantIsotopeMz { get; set; }
+
+        /// <summary>
+        /// Calculated mass (monoisotopic m/z)
+        /// </summary>
         public double Mass { get; set; }
+
+        /// <summary>
+        /// Number of matched fragments
+        /// </summary>
         public int NumMatchedFragments { get; set; }
+
+        /// <summary>
+        /// Match Probability
+        /// </summary>
         public double Probability { get; set; }
+
+        /// <summary>
+        /// SpecEValue
+        /// </summary>
         public double SpecEValue { get; set; }
+
+        /// <summary>
+        /// EValue
+        /// </summary>
         public double EValue { get; set; }
 
+        /// <summary>
+        /// QValue
+        /// </summary>
         public double QValue
         {
             get { return qValue; }
@@ -36,6 +113,9 @@ namespace InformedProteomics.Backend.Results
             }
         }
 
+        /// <summary>
+        /// PepQValue
+        /// </summary>
         public double PepQValue
         {
             get { return pepQValue; }
@@ -45,8 +125,15 @@ namespace InformedProteomics.Backend.Results
                 HasTdaScores = true;
             }
         }
+
+        /// <summary>
+        /// If the FDR scores (QValue and PepQValue) have been set
+        /// </summary>
         public bool HasTdaScores { get; private set; }
 
+        /// <summary>
+        /// The sequence, with the pre and post residues 
+        /// </summary>
         public string SequenceWithEnds
         {
             get
@@ -63,14 +150,18 @@ namespace InformedProteomics.Backend.Results
         private double qValue;
         private double pepQValue;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public DatabaseSearchResultData()
         {
             Pre = "-";
             Post = "-";
-            SpecEValue = double.MaxValue;
-            EValue = double.MaxValue;
-            qValue = double.MaxValue;
-            pepQValue = double.MaxValue;
+            // Set to int.MaxValue instead of double.MaxValue to avoid bloat in the output if the value hasn't been set.
+            SpecEValue = int.MaxValue;
+            EValue = int.MaxValue;
+            qValue = int.MaxValue;
+            pepQValue = int.MaxValue;
             HasTdaScores = false;
         }
 
@@ -84,13 +175,32 @@ namespace InformedProteomics.Backend.Results
             ParseTsvLine(line);
         }
 
+        /// <summary>
+        /// Header string for default TSV output, without FDR scores
+        /// </summary>
         public const string TsvHeaderString = "Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
                                               "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\t#MatchedFragments\tProbability\tSpecEValue\tEValue";
 
+        /// <summary>
+        /// Format string for default TSV output, without FDR scores
+        /// </summary>
         public const string TsvFormatString = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}";
+
+        /// <summary>
+        /// Header string for default TSV output, with FDR scores
+        /// </summary>
         public const string TdaTsvHeaderString = TsvHeaderString + "\tQValue\tPepQValue";
+
+        /// <summary>
+        /// Format string for default TSV output, with FDR scores
+        /// </summary>
         public const string TdaTsvFormatString = TsvFormatString + "\t{18}\t{19}";
 
+        /// <summary>
+        /// Get the header string for default TSV output, with columns added for FDR scores if addTdaScores is true
+        /// </summary>
+        /// <param name="addTdaScores"></param>
+        /// <returns></returns>
         public static string GetHeaderString(bool addTdaScores = false)
         {
             return addTdaScores ? TdaTsvHeaderString : TsvHeaderString;
@@ -331,6 +441,12 @@ namespace InformedProteomics.Backend.Results
             }
         }
 
+        /// <summary>
+        /// Write the resultData in TSV format to the specified path, possibly including FDR scores
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="resultData"></param>
+        /// <param name="includeTdaScores">If FDR scores should be output also</param>
         public static void WriteResultsToFile(string filePath, IEnumerable<DatabaseSearchResultData> resultData, bool includeTdaScores = false)
         {
             using (var stream = new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
@@ -343,6 +459,11 @@ namespace InformedProteomics.Backend.Results
             }
         }
 
+        /// <summary>
+        /// Read in result data from the specified TSV format file.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static List<DatabaseSearchResultData> ReadResultsFromFile(string filePath)
         {
             var results = new List<DatabaseSearchResultData>();

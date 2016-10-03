@@ -14,6 +14,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             // Initialization
             _modificationParams = new ModificationParams();
+            SearchModifications = new List<SearchModification>();
 
             _locationSpecificResidueMap = new Dictionary<SequenceLocation, Dictionary<char, AminoAcid>>();
             _locationSpecificResidueModMap = new Dictionary<SequenceLocation, Dictionary<char, int[]>>();
@@ -75,6 +76,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (searchModifications == null) return;
 
             var modifications = searchModifications as SearchModification[] ?? searchModifications.ToArray();
+            SearchModifications = new List<SearchModification>(modifications);
 
             // apply fixed modifications
             foreach (var searchModification in modifications)
@@ -153,6 +155,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// The list of search modifications provided via the mods file.
+        /// </summary>
+        public IEnumerable<SearchModification> SearchModifications { get; private set; }
 
         #endregion
         
