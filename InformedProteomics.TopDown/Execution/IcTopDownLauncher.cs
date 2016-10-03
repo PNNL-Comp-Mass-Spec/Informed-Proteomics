@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,10 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
+using PSI_Interface.CV;
+using PSI_Interface.IdentData;
+using PSI_Interface.IdentData.IdentDataObjs;
+using PSI_Interface.IdentData.mzIdentML;
 using TopDownTrainer;
 
 namespace InformedProteomics.TopDown.Execution
@@ -28,6 +33,7 @@ namespace InformedProteomics.TopDown.Execution
         public const string TargetFileNameEnding = "_IcTarget.tsv";
         public const string DecoyFileNameEnding = "_IcDecoy.tsv";
         public const string TdaFileNameEnding = "_IcTda.tsv";
+        public const string MzidFileNameEnding = ".mzid";
 
         public IcTopDownLauncher(
             string specFilePath,
@@ -387,6 +393,7 @@ namespace InformedProteomics.TopDown.Execution
             var targetOutputFilePath = Path.Combine(OutputDir, specFileName + TargetFileNameEnding);
             var decoyOutputFilePath = Path.Combine(OutputDir, specFileName + DecoyFileNameEnding);
             var tdaOutputFilePath = Path.Combine(OutputDir, specFileName + TdaFileNameEnding);
+            var mzidOutputFilePath = Path.Combine(OutputDir, specFileName + MzidFileNameEnding);
 
             progData.StepRange(60.0);
             progData.Status = "Running Target search";
@@ -452,6 +459,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
 
                 fdrCalculator.WriteTo(tdaOutputFilePath);
+                WriteResultsToMzid(fdrCalculator.FilteredResults, mzidOutputFilePath, targetDb, _run);
             }
             progData.Report(100.0);
 
@@ -975,11 +983,154 @@ namespace InformedProteomics.TopDown.Execution
                     NumMatchedFragments = match.NumMatchedFragments,
                     Probability = CompositeScorer.GetProbability(match.Score),
                     SpecEValue = match.SpecEvalue,
-                    EValue = match.SpecEvalue * database.GetNumEntries(),
+                    EValue = match.SpecEvalue * database.GetNumEntries()
                 };
 
                 yield return result;
             }
+        }
+
+        private void WriteResultsToMzid(IEnumerable<DatabaseSearchResultData> matches, string outputFilePath, FastaDatabase database, LcMsRun lcmsRun)
+        {
+            var datasetName = Path.GetFileNameWithoutExtension(outputFilePath);
+            var creator = new IdentDataCreator("MSPathFinder_" + datasetName, "MSPathFinder_" + datasetName);
+            var soft = creator.AddAnalysisSoftware("Software_1", "MSPathFinder", "1.3", CV.CVID.CVID_Unknown, "MSPathFinder");
+            var settings = creator.AddAnalysisSettings(soft, "Settings_1", CV.CVID.MS_ms_ms_search);
+            var searchDb = creator.AddSearchDatabase(database.GetFastaFilePath(), database.GetNumEntries(), Path.GetFileNameWithoutExtension(database.GetFastaFilePath()), CV.CVID.CVID_Unknown,
+                CV.CVID.MS_FASTA_format);
+
+            if (RunTargetDecoyAnalysis == DatabaseSearchMode.Both)
+            {
+                searchDb.CVParams.AddRange(new CVParamObj[]
+                {
+                    new CVParamObj() { Cvid = CV.CVID.MS_DB_composition_target_decoy, },
+                    new CVParamObj() { Cvid = CV.CVID.MS_decoy_DB_accession_regexp, Value = "^XXX", },
+                    //new CVParamObj() { Cvid = CV.CVID.MS_decoy_DB_type_reverse, },
+                    new CVParamObj() { Cvid = CV.CVID.MS_decoy_DB_type_randomized, },
+                });
+            }
+
+            // store the settings...
+            CreateMzidSettings(settings);
+
+            var path = SpecFilePath;
+            // TODO: fix this to match correctly to the original file - May need to modify the PBF format to add an input format specifier
+            var specData = creator.AddSpectraData(path, datasetName, CV.CVID.MS_Thermo_nativeID_format,
+                CV.CVID.MS_Thermo_RAW_format);
+
+            foreach (var match in matches)
+            {
+                var scanNum = match.ScanNum;
+                var spec = lcmsRun.GetSpectrum(scanNum, false);
+                var matchIon = new Ion(Composition.Parse(match.Composition), match.Charge);
+
+                var specIdent = creator.AddSpectrumIdentification(specData, spec.NativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
+                    match.Charge, 1, double.NaN);
+                specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
+                var pep = new PeptideObj(match.Sequence);
+
+                // Get the search modifications as they were passed into the AminoAcidSet constructor, so we can retrieve masses from them
+                var modDict = new Dictionary<string, Modification>();
+                foreach (var mod in AminoAcidSet.SearchModifications)
+                {
+                    modDict.Add(mod.Modification.Name, mod.Modification);
+                }
+                var modText = match.Modifications;
+                if (!string.IsNullOrWhiteSpace(modText))
+                {
+                    var mods = modText.Split(',');
+                    foreach (var mod in mods)
+                    {
+                        var tokens = mod.Split(' ');
+                        var modInfo = modDict[tokens[0]];
+                        var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, tokens[0], int.Parse(tokens[1]), modInfo.Mass);
+                        pep.Modifications.Add(modObj);
+                    }
+                }
+                specIdent.Peptide = pep;
+
+                var proteinName = match.ProteinName;
+                var protLength = match.ProteinLength;
+                var proteinDescription = match.ProteinDescription;
+                var dbSeq = new DbSequenceObj(searchDb, protLength, proteinName, proteinDescription);
+
+                var start = match.Start;
+                var end = match.End;
+                var pepEv = new PeptideEvidenceObj(dbSeq, pep, start, end, match.Pre, match.Post, false);
+                specIdent.AddPeptideEvidence(pepEv);
+
+                var probability = match.Probability;
+
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_compound_formula, Value = match.Composition, });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_SEQUEST_probability, Value = probability.ToString(CultureInfo.InvariantCulture), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture), });
+                if (match.HasTdaScores)
+                {
+                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture), });
+                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture), });
+                }
+            }
+
+            var identData = creator.GetIdentData();
+
+            MzIdentMlReaderWriter.Write(new MzIdentMLType(identData), outputFilePath);
+        }
+
+        private void CreateMzidSettings(SpectrumIdentificationProtocolObj settings)
+        {
+            settings.AdditionalSearchParams.Items.AddRange(new ParamBaseObj[]
+            {
+                new CVParamObj(CV.CVID.MS_parent_mass_type_mono),
+                new CVParamObj(CV.CVID.MS_fragment_mass_type_mono),
+                new UserParamObj() { Name = "TargetDecoyApproach", Value = (RunTargetDecoyAnalysis == DatabaseSearchMode.Both).ToString()},
+                new UserParamObj() { Name = "MinSequenceLength", Value = MinSequenceLength.ToString() }, 
+                new UserParamObj() { Name = "MaxSequenceLength", Value = MaxSequenceLength.ToString() }, 
+                new UserParamObj() { Name = "MaxNumNTermCleavages", Value = MaxNumNTermCleavages.ToString() }, 
+                new UserParamObj() { Name = "MaxNumCTermCleavages", Value = MaxNumCTermCleavages.ToString() }, 
+                new UserParamObj() { Name = "MinPrecursorIonCharge", Value = MinPrecursorIonCharge.ToString() }, 
+                new UserParamObj() { Name = "MaxPrecursorIonCharge", Value = MaxPrecursorIonCharge.ToString() }, 
+                new UserParamObj() { Name = "MinProductIonCharge", Value = MinProductIonCharge.ToString() }, 
+                new UserParamObj() { Name = "MaxProductIonCharge", Value = MaxProductIonCharge.ToString() }, 
+                new UserParamObj() { Name = "MinSequenceMass", Value = MinSequenceMass.ToString(CultureInfo.InvariantCulture) }, 
+                new UserParamObj() { Name = "MaxSequenceMass", Value = MaxSequenceMass.ToString(CultureInfo.InvariantCulture) }, 
+                new UserParamObj() { Name = "PrecursorIonTolerance", Value = PrecursorIonTolerance.ToString() }, 
+                new UserParamObj() { Name = "ProductIonTolerance", Value = ProductIonTolerance.ToString() }, 
+                new UserParamObj() { Name = "SearchMode", Value = SearchMode.ToString() }, 
+                new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = NumMatchesPerSpectrum.ToString() }, 
+                new UserParamObj() { Name = "TagBasedSearch", Value = TagBasedSearch.ToString() }, 
+            });
+
+            // Get the search modifications as they were passed into the AminoAcidSet constructor...
+            foreach (var mod in AminoAcidSet.SearchModifications)
+            {
+                var modObj = new SearchModificationObj()
+                {
+                    FixedMod = mod.IsFixedModification,
+                    MassDelta = (float)mod.Modification.Mass,
+                    Residues = mod.TargetResidue.ToString(),
+                };
+                // Really only using this for the modification name parsing for CVParams that exists with ModificationObj
+                var tempMod = new ModificationObj(CV.CVID.MS_unknown_modification, mod.Modification.Name, 0, modObj.MassDelta);
+                modObj.CVParams.Add(tempMod.CVParams.First());
+                settings.ModificationParams.Add(modObj);
+            }
+
+            // No enzyme for top-down search
+            //settings.Enzymes.Enzymes.Add(new EnzymeObj());
+
+            settings.ParentTolerances.AddRange(new CVParamObj[]
+            {
+                new CVParamObj(CV.CVID.MS_search_tolerance_plus_value, PrecursorIonTolerancePpm.ToString(CultureInfo.InvariantCulture)) { UnitCvid = CV.CVID.UO_parts_per_million },
+                new CVParamObj(CV.CVID.MS_search_tolerance_minus_value, PrecursorIonTolerancePpm.ToString(CultureInfo.InvariantCulture)) { UnitCvid = CV.CVID.UO_parts_per_million },
+            });
+            settings.FragmentTolerances.AddRange(new CVParamObj[]
+            {
+                new CVParamObj(CV.CVID.MS_search_tolerance_plus_value, ProductIonTolerancePpm.ToString(CultureInfo.InvariantCulture)) { UnitCvid = CV.CVID.UO_parts_per_million },
+                new CVParamObj(CV.CVID.MS_search_tolerance_minus_value, ProductIonTolerancePpm.ToString(CultureInfo.InvariantCulture)) { UnitCvid = CV.CVID.UO_parts_per_million },
+            });
+            settings.Threshold.Items.Add(new CVParamObj(CV.CVID.MS_no_threshold));
         }
     }
 }
