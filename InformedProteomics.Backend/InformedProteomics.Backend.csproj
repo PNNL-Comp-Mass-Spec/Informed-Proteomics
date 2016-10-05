@@ -64,6 +64,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MSIL\ProteinFileReader.dll</HintPath>
     </Reference>
+    <Reference Include="PSI_Interface">
+      <HintPath>..\lib\PSI_Interface\PSI_Interface.dll</HintPath>
+    </Reference>
     <Reference Include="pwiz_bindings_cli">
       <HintPath>..\lib\x64\pwiz_bindings_cli.dll</HintPath>
       <Private>False</Private>
@@ -183,6 +186,8 @@
     <Compile Include="Database\IndexedDatabase.cs" />
     <Compile Include="MassFeature\ProteinSpectrumMatch.cs" />
     <Compile Include="Results\DatabaseSearchResultData.cs" />
+    <Compile Include="Results\IdentificationExtensions.cs" />
+    <Compile Include="Results\ResultFileReader.cs" />
     <Compile Include="SequenceTag\GraphEdge.cs" />
     <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
     <Compile Include="SequenceTag\SequenceTag.cs" />

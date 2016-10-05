@@ -58,6 +58,7 @@
     <Compile Include="Execution\LcMsFeatureFinderInputParameter.cs" />
     <Compile Include="Execution\LcMsFeatureFinderLauncher.cs" />
     <Compile Include="Execution\MSAlignRescorer.cs" />
+    <Compile Include="Execution\MsPfParameters.cs" />
     <Compile Include="Execution\ProteoformSpectrumMatchContainer.cs" />
     <Compile Include="Execution\QuickProteinId.cs" />
     <Compile Include="Execution\SelectedMsMsFilter.cs" />

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using InformedProteomics.Backend.Data.Sequence;
 using PNNLOmics.Utilities;
+using PSI_Interface.IdentData;
 
 namespace InformedProteomics.Backend.Results
 {
@@ -492,6 +494,64 @@ namespace InformedProteomics.Backend.Results
                 return null;
             }
             return results;
+        }
+
+        /// <summary>
+        /// Read results from tsv file into group of objects from PSI_Interface
+        /// </summary>
+        /// <param name="idFilePath"></param>
+        /// <returns></returns>
+        public static SimpleMZIdentMLReader.SimpleMZIdentMLData ReadResultsFromFileToMzIdData(string idFilePath)
+        {
+            var databaseSearchResultData = ReadResultsFromFile(idFilePath);
+
+            var simpleMzIdentMLData = new SimpleMZIdentMLReader.SimpleMZIdentMLData(idFilePath);
+
+            foreach (var databaseSearchResult in databaseSearchResultData)
+            {
+                var peptide = new SimpleMZIdentMLReader.PeptideRef
+                {
+                    Sequence = databaseSearchResult.Sequence
+                };
+
+                var identification = new SimpleMZIdentMLReader.SpectrumIdItem
+                {
+                    Peptide = peptide,
+                    Charge = databaseSearchResult.Charge,
+                    ScanNum = databaseSearchResult.ScanNum,
+                    SpecEv = databaseSearchResult.SpecEValue,
+                };
+
+                // Parse modification
+                var modParts = databaseSearchResult.Modifications.Split(',');
+                if (modParts.Length > 0)
+                {
+                    foreach (var part in modParts)
+                    {
+                        var mod = part.Split(' ');
+                        if (mod.Length < 2)
+                        {
+                            continue;
+                        }
+
+                        var modName = mod[0];
+                        var modIndex = Convert.ToInt32(mod[1]);
+                        var ipMod = Modification.Get(modName);
+
+                        var modification = new SimpleMZIdentMLReader.Modification
+                        {
+                            Mass = ipMod.Mass,
+                            Tag = modName,
+                        };
+
+                        peptide.ModsAdd(modIndex, modification);
+                    }
+                }
+
+                simpleMzIdentMLData.Identifications.Add(identification);
+            }
+
+            return simpleMzIdentMLData;
         }
     }
 }
