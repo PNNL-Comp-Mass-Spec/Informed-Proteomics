@@ -116,7 +116,6 @@
     <Compile Include="Data\Spectrometry\Isotope.cs" />
     <Compile Include="Data\Spectrometry\LcMsMatchMap.cs" />
     <Compile Include="Data\Spectrometry\Protocol.cs" />
-    <Compile Include="Data\Spectrometry\SortedPeakSet.cs" />
     <Compile Include="Data\Spectrometry\PeptideSpectrumMatch.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
@@ -201,7 +200,6 @@
     <Compile Include="Utils\CubicSpline.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\FitScoreCalculator.cs" />
-    <Compile Include="Utils\GeneratingFunctionForSkyline.cs" />
     <Compile Include="Utils\IntRange.cs" />
     <Compile Include="Utils\IsotopicConcentrationTuner.cs" />
     <Compile Include="Utils\ListUtil.cs" />

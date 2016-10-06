@@ -39,11 +39,9 @@
   <ItemGroup>
     <Compile Include="BottomUp\DummyScorer.cs" />
     <Compile Include="BottomUp\Partition.cs" />
-    <Compile Include="BottomUp\PeptideScoringGraph.cs" />
     <Compile Include="BottomUp\ScoredSpectrum.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphNode.cs" />
-    <Compile Include="GeneratingFunction\ScoringGraph.cs" />
     <Compile Include="LikelihoodScoring\Data\LazyLcMsRun.cs" />
     <Compile Include="LikelihoodScoring\Data\RankedPeaks.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\DiaTsvReader.cs" />
@@ -86,7 +84,6 @@
     <Compile Include="TopDown\FilteredProteinMassBinning.cs" />
     <Compile Include="TopDown\IMassBinning.cs" />
     <Compile Include="TopDown\ProteinMassBinning.cs" />
-    <Compile Include="TopDown\ProteinScoringGraphFactory.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

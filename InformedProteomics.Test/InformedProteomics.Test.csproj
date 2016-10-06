@@ -94,9 +94,7 @@
     <Compile Include="TestFastProteinId.cs" />
     <Compile Include="TestFeatureBasedSearch.cs" />
     <Compile Include="TestIcBottomUp.cs" />
-    <Compile Include="Obsolete\TestIcIms.cs" />
     <Compile Include="TestIcTopDown.cs" />
-    <Compile Include="Obsolete\TestIMSScoring.cs" />
     <Compile Include="TestIprg.cs" />
     <Compile Include="TestLcMsFeatureAlignment.cs" />
     <Compile Include="TestLcMsFeatureFind.cs" />
