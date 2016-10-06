@@ -282,14 +282,14 @@
             Enum specifying whether value is for found ions, total ions, or intensity
             </summary>
         </member>
-        <member name="F:TopDownTrainer.ComparisonPlots.Values.Found">
-            <summary>
-            Value representing found ions
-            </summary>
-        </member>
         <member name="F:TopDownTrainer.ComparisonPlots.Values.Total">
             <summary>
             Value representing total ions
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.ComparisonPlots.Values.Found">
+            <summary>
+            Value representing found ions
             </summary>
         </member>
         <member name="F:TopDownTrainer.ComparisonPlots.Values.Intensity">
@@ -363,6 +363,18 @@
             <param name="threshold">Minimum threshold proportion for found ions</param>
             <param name="minScore">Minimum Score for GetCorrScore</param>
             <param name="tolerance">Tolerance</param>
+        </member>
+        <member name="T:TopDownTrainer.CompositionScorerFactory">
+            <summary>
+            Creates CompositionIonScorers from ProductSpectrum or scan number as well as precursor mass and charge
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.CompositionScorerFactory.#ctor(InformedProteomics.Backend.MassSpecData.ILcMsRun,System.Boolean)">
+            <summary>
+            Creates a new CompositionScorerFactory from an ILcMsRun for either topdown or bottom up data
+            </summary>
+            <param name="lcmsRun">ILcMsRun in question</param>
+            <param name="isTopDown">Whether or not the data is top down</param>
         </member>
         <member name="M:TopDownTrainer.CompositionScorerFactory.GetScorer(InformedProteomics.Backend.Data.Spectrometry.ProductSpectrum,System.Double,System.Int32)">
             <summary>
@@ -666,22 +678,13 @@
             </summary>
             <returns>string in csv format of validation error</returns>
         </member>
-        <member name="T:TopDownTrainer.OutputProportionReader">
+        <member name="T:TopDownTrainer.OutputIonSetReader">
             <summary>
             Reads through a training output file using a StreamReader and modifies an input list of IonTypes.
             Outputs a list of all IonTypes checked for in training
             </summary>
         </member>
-        <member name="M:TopDownTrainer.OutputProportionReader.ReadProportions(System.IO.StreamReader,TopDownTrainer.ComparisonPlots.Values)">
-            <summary>
-            Outputs a dictionary of IonTypes to proportions.
-            </summary>
-            <param name="sr">StreamReader that reads through a training output file</param>
-            <param name="type">Int valued 2 (found prop), 3 (total prop), 4 (intensity) specifying
-            which value to look for in the file</param>
-            <returns>A dictionary where keys are IonTypes and values are their
-            proportions or intensities depending on type</returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.OutputIonSetReader.ReadIonSet(System.IO.StreamReader)" -->
         <member name="T:TopDownTrainer.ProbabilisticMetrics">
             <summary>
             ProbabilisticMetrics inherits from AnalysisMetrics and stores ROC curves from ProbabilisticFoldResults
@@ -865,7 +868,7 @@
         </member>
         <member name="P:TopDownTrainer.FeatureVector.CTerminalResidue">
             <summary>
-            TerminalResidue of xuffix composition in question
+            TerminalResidue of suffix composition in question
             Not used if Seq is given
             </summary>
         </member>
@@ -1124,11 +1127,6 @@
             </summary>
             <param name="weights">double[] of weights for model</param>
         </member>
-        <member name="M:TopDownTrainer.LearningModel.#ctor">
-            <summary>
-            Empty LearningModel that subclasses can use
-            </summary>
-        </member>
         <member name="M:TopDownTrainer.LearningModel.CorrectOutput">
             <summary>
             Converts the Output labels into the correct version for the model
@@ -1147,7 +1145,12 @@
         </member>
         <member name="M:TopDownTrainer.LearningModel.Compute">
             <summary>
-            Learns a model
+            Learns a model and sets weights
+            </summary>
+        </member>
+        <member name="M:TopDownTrainer.LearningModel.Run">
+            <summary>
+            Runs the model
             </summary>
         </member>
         <member name="M:TopDownTrainer.LearningModel.SetWeights">
@@ -1291,7 +1294,7 @@
             </summary>
             <param name="lambda">Regularization lambda value</param>
         </member>
-        <member name="M:TopDownTrainer.LogisticRegressionModel.Compute">
+        <member name="M:TopDownTrainer.LogisticRegressionModel.Run">
             <summary>
             Runs logistic regression
             </summary>
@@ -1421,7 +1424,7 @@
             <param name="maxChargeOffset">Optional maximum charge offset in question (Default = 4)</param>
             <param name="threshold">Optional threshold to check for a test point (Default = 0.15)</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double[0:,0:],System.Double)" -->
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double[0:,0:],System.Double,System.Double,System.Double,System.Int32)" -->
         <member name="M:TopDownTrainer.PrecursorPeaks.GetBinElements(InformedProteomics.Backend.Data.Spectrometry.Spectrum,System.Double,System.Int32)">
             <summary>
             Takes a ProteinScan and looks at Peaks within an m/z range determined by a
@@ -1678,9 +1681,15 @@
             <param name="threshold">Minimum threshold proportion for found ions</param>
             <param name="numMut">Number of mutations for decoys from target sequences</param>
         </member>
-        <member name="M:TopDownTrainer.Program.GetProportionHeader">
+        <member name="M:TopDownTrainer.Program.GenerateProportionHeader(TopDownTrainer.IonSet)">
             <summary>
-            Outputs proportion header for proportion files
+            Outputs proportion header for proportion files from one IonSet
+            </summary>
+            <returns>String containing header for proportion information and offset mass</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GenerateProportionHeader(System.Collections.Generic.IEnumerable{TopDownTrainer.IonSet})">
+            <summary>
+            Outputs proportion header for proportion files for multiple IonSets
             </summary>
             <returns>String containing header for proportion information and offset mass</returns>
         </member>
@@ -1705,6 +1714,13 @@
             </summary>
             <param name="prePeaks">PrecursorPeaks in question</param>
             <returns>Tuple of csv and ints representing precursor peaks table</returns>
+        </member>
+        <member name="M:TopDownTrainer.Program.GetFeatureArray(System.String)">
+            <summary>
+            Reads in the Feature_Array.csv file into a matrix
+            </summary>
+            <param name="path">Path to directory containing Feature_Array.csv file</param>
+            <returns></returns>
         </member>
         <member name="M:TopDownTrainer.Program.GetDecoy(TopDownTrainer.ProteinScan,System.Int32)">
             <summary>
@@ -1956,9 +1972,9 @@
         </member>
         <member name="T:TopDownTrainer.IonSet">
             <summary>
-            IonSet inherits from AbstractIonSequence and keeps track of counts of ions that have high correlation
-            with their respective spectra. An IonSet can also generate a list of IonTypes whose ions for particular
-            BaseIonTypes and NeutralLosses have high correlations with their spectra.
+            IonSet inherits from AbstractIonSequence and keeps track of counts of ions that have peaks in or high correlation
+            with their respective spectra. An IonSet can also generate a list of IonTypes whose ion proportions are above
+            some threshold.
             </summary>
         </member>
         <member name="P:TopDownTrainer.IonSet.IonToProp">
@@ -1966,10 +1982,15 @@
             Dictionary of IonTypes looked for to IonProportions
             </summary>
         </member>
-        <member name="P:TopDownTrainer.IonSet.FoundProps">
+        <member name="P:TopDownTrainer.IonSet.TotalProps">
             <summary>
-            Dictionary of IonTypes looked for, for each cleavage point, to number of sets of ions with
-            high Pearson Correlation to added Spectrum
+            Dictionary of IonTypes to number of ions from that IonType found to number of ions from that
+            IonType looked for
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.IonSet.FoundDict">
+            <summary>
+            Dictionary of IonTypes looked for, for each cleavage point, to number of ions found in Spectrum
             </summary>
         </member>
         <member name="P:TopDownTrainer.IonSet.IntensityDict">
@@ -1981,6 +2002,16 @@
             <summary>
             Total number of IonTypes for each cleavage point looked for
             </summary>
+        </member>
+        <member name="M:TopDownTrainer.IonSet.#ctor(System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double},System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double},System.Int32,System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double})">
+            <summary>
+            Create new IonSet from three dictionaries. Used when reading in output files
+            </summary>
+            <param name="totalProps">Dictionary of IonTypes to number of ions of that IonType found to number of ions 
+            of that IonType looked for</param>
+            <param name="foundProps">Dictionary of IonTypes to proportion of ions of that IonType found</param>
+            <param name="totalFound">Total number of ions found</param>
+            <param name="intensityDict">Dictionary of IonTypes to average normalized intensity for that IonType</param>
         </member>
         <member name="M:TopDownTrainer.IonSet.#ctor(System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.IEnumerable{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double)">
             <summary>
@@ -2036,8 +2067,7 @@
         </member>
         <member name="M:TopDownTrainer.IonSet.GetIonTypesAboveThreshold(System.Double)">
             <summary>
-            Similar to above, but for FoundProps:
-            Gets the IonTypes in the FoundProportions dictionary whose values are greater
+            Gets the IonTypes in the FoundDict dictionary whose values are greater
             or equal to the threshold input.
             </summary>
             <param name="threshold">Double between 0 and 1.</param>
@@ -2053,15 +2083,14 @@
             <returns>Dictionary where keys are IonTypes and values are proportions of IonProportions from
             IonToProp</returns>
         </member>
-        <member name="M:TopDownTrainer.IonSet.GetFoundProportionsDictionary">
+        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.IonSet.GetFoundProportionsDictionary" -->
+        <member name="M:TopDownTrainer.IonSet.GetFoundDictFromProportions(System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double},System.Int32)">
             <summary>
-            Outputs dictionary of IonTypes as keys and doubles as values.
-            The IonType keys are the ones from the dictionaries.
-            The double values are the proportion outputted from IonProportions
-            from the values of IonToProp.
+            Creates a dictionary of number of found ions for each IonType from proportions and total
             </summary>
-            <returns>Dictionary where keys are IonTypes and values are proportions gotten from
-            FoundProps and TotalFound</returns>
+            <param name="foundProps">Dictionary of IonTypes to proportion found</param>
+            <param name="totalFound">Total number of ions found</param>
+            <returns>Dictionary of IonTypes to number of ions of that IonType found</returns>
         </member>
         <member name="M:TopDownTrainer.IonSet.GetFoundProportions">
             <summary>
@@ -2206,7 +2235,27 @@
             ProbabilisticNewtonMethod optimization function.
             </summary>
         </member>
-        <member name="P:TopDownTrainer.SVMModel.MachineKernel">
+        <member name="T:TopDownTrainer.SVMModel.KernelType">
+            <summary>
+            Type of Kernel for this SVM
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.SVMModel.KernelType.Linear">
+            <summary>
+            Linear Kernel
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.SVMModel.KernelType.Polynomial">
+            <summary>
+            Polynomial Kernel
+            </summary>
+        </member>
+        <member name="F:TopDownTrainer.SVMModel.KernelType.Gaussian">
+            <summary>
+            Gaussian Kernel
+            </summary>
+        </member>
+        <member name="P:TopDownTrainer.SVMModel.MachineKernelType">
             <summary>
             Kernel for this SVM
             </summary>
@@ -2221,7 +2270,7 @@
             Optimization function to use on SVM
             </summary>
         </member>
-        <member name="M:TopDownTrainer.SVMModel.#ctor(System.Double[][],System.Double[],System.Double,Accord.Statistics.Kernels.IKernel)">
+        <member name="M:TopDownTrainer.SVMModel.#ctor(System.Double[][],System.Double[],TopDownTrainer.SVMModel.KernelType,System.Double)">
             <summary>
             Creates a new Support Vector Machine learning model
             </summary>
@@ -2247,7 +2296,7 @@
             Sets the type of this model as SVM
             </summary>
         </member>
-        <member name="M:TopDownTrainer.SVMModel.OptimizerInit">
+        <member name="M:TopDownTrainer.SVMModel.SetKernel(TopDownTrainer.SVMModel.KernelType)">
             <summary>
             Initilzies optimization function and sets kernel
             </summary>
@@ -2267,7 +2316,7 @@
             <param name="output">array of doubles in question</param>
             <returns>array of booleans that are true if output value is greater than 0 and false otherwise</returns>
         </member>
-        <member name="M:TopDownTrainer.SVMModel.Compute">
+        <member name="M:TopDownTrainer.SVMModel.Run">
             <summary>
             Sets boolean Labels from Output values, then learns an SVM.
             </summary>
@@ -2321,7 +2370,7 @@
         </member>
         <member name="M:TopDownTrainer.SVMModel.Create(System.Double[][],System.Double[],System.Double)">
             <summary>
-            Creates a new SVM model from input, output, and a complexity value
+            Creates a new SVM model from input, output, and a complexity value. Uses same kernel as this object.
             </summary>
             <param name="input">2D array of doubles where each row is a point</param>
             <param name="output">True output for input points</param>
@@ -2373,15 +2422,24 @@
         </member>
         <member name="M:TopDownTrainer.TrainingFileReader.ReadProp(System.IO.StreamReader,System.Double)">
             <summary>
-            Reads file and sets IonTypes
+            Reads file
             The StreamReader input will be now be set to read the Precursor Peaks table
             </summary>
             <param name="sr">StreamReader initialized on file</param>
             <param name="threshold">Threshold for proportion of found IonTypes</param>
+            <returns>List of IonType keys from a dictionary whose values are greater than a threshold </returns>
+        </member>
+        <member name="M:TopDownTrainer.TrainingFileReader.ReadIntensity_Static(System.IO.StreamReader)">
+            <summary>
+            Reads file and outputs PrecursorPeaks
+            </summary>
+            <param name="sr">StreamReader for input training file</param>
+            <param name="intensityThreshold">double representing intensity threshold</param>
+            <returns>New PrecursorPeaks object read from StreamReader</returns>
         </member>
         <member name="M:TopDownTrainer.TrainingFileReader.ReadIntensity(System.IO.StreamReader,System.Double)">
             <summary>
-            Reads file to set PrePeaks
+            Updates PrePeaks
             </summary>
             <param name="sr">StreamReader for input training file</param>
             <param name="intensityThreshold">double representing intensity threshold</param>
@@ -2399,7 +2457,7 @@
             <param name="spectrum">Original Spectrum of test data point</param>
             <param name="precursorMass">Precursor mass of ion that compositions come from</param>
             <param name="precursorCharge">Charge of precursor ion</param>
-            <returns></returns>
+            <returns>IScorer from properties associated with the correct mass bin from output file</returns>
         </member>
         <member name="M:TopDownTrainer.TrainingFileReader.Create(InformedProteomics.Backend.Data.Spectrometry.ActivationMethod,System.Boolean)">
             <summary>
