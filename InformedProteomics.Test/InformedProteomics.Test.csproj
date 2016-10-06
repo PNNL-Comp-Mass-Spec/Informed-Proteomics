@@ -113,7 +113,6 @@
     <Compile Include="TestRankScore.cs" />
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
     <Compile Include="TestResults.cs" />
-    <Compile Include="TestSelectivityScore.cs" />
     <Compile Include="TestSequenceTagFinder.cs" />
     <Compile Include="TestSequenceTagMatching.cs" />
     <Compile Include="TestUtex.cs" />
@@ -177,10 +176,6 @@
     <ProjectReference Include="..\SAIS\SAIS.csproj">
       <Project>{da126245-858b-4084-ab86-54fe1e10772e}</Project>
       <Name>SAIS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SelectivityScore\SelectivityScore.csproj">
-      <Project>{19658c05-ef09-404d-959f-ef9a6029013b}</Project>
-      <Name>SelectivityScore</Name>
     </ProjectReference>
     <ProjectReference Include="..\MSPathFinderT\MSPathFinderT.csproj">
       <Project>{dfbecbac-7fda-4c78-9f4e-cc21c79a6db6}</Project>
