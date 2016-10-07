@@ -22,20 +22,22 @@ Source: InformedProteomics.Backend\bin\Release\MathNet.Numerics.dll             
 Source: SAIS\bin\Release\SAIS.dll                                                                                                                 ; DestDir: {app}
 
 ; Manually managed libraries
-Source: lib\MSIL\alglibnet2.dll                                                                                                                   ; DestDir: {app}
-Source: lib\MSIL\PNNLOmics.dll                                                                                                                    ; DestDir: {app}
-Source: lib\MSIL\ProteinFileReader.dll                                                                                                            ; DestDir: {app}
-Source: lib\MSIL\ThermoRawFileReader.dll                                                                                                       ; DestDir: {app}
+Source: lib\alglibnet2.dll                                                                                                                        ; DestDir: {app}
+Source: lib\PNNLOmics.dll                                                                                                                         ; DestDir: {app}
+Source: lib\ProteinFileReader.dll                                                                                                                 ; DestDir: {app}
+Source: lib\ThermoRawFileReader.dll                                                                                                               ; DestDir: {app}
+Source: lib\PSI_Interface\PSI_Interface.dll                                                                                                       ; DestDir: {app}
+Source: lib\PSI_Interface\Ionic.Zip.dll                                                                                                           ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
 Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}
 
-; InformedProteomics.Graphics
-Source: InformedProteomics.Graphics\bin\Release\InformedProteomics.Graphics.dll                                                                   ; DestDir: {app}
+; InformedProteomics.FeatureFinding Nuget libraries
+Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.dll                                                                                 ; DestDir: {app}
+Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.Wpf.dll                                                                             ; DestDir: {app}
 
-; InformedProteomics.Graphics Nuget libraries
-Source: InformedProteomics.Graphics\bin\Release\OxyPlot.dll                                                                                       ; DestDir: {app}
-Source: InformedProteomics.Graphics\bin\Release\OxyPlot.Wpf.dll                                                                                   ; DestDir: {app}
+; InformedProteomics.FeatureFinding libraries
+Source: InformedProteomics.FeatureFinding\bin\Release\InformedProteomics.FeatureFinding.dll                                                       ; DestDir: {app}
 
 ; InformedProteomics.Scoring
 Source: InformedProteomics.Scoring\bin\Release\InformedProteomics.Scoring.dll                                                                     ; DestDir: {app}
