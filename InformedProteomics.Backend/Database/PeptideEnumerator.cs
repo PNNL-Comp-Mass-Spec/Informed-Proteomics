@@ -26,6 +26,5 @@ namespace InformedProteomics.Backend.Database
 
         private readonly Enzyme _enzyme;
         private readonly int _ntt;
-
     }
 }

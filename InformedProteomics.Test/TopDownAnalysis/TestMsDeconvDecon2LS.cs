@@ -13,7 +13,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
 {
     public class TestMsDeconvDecon2LS
     {
-
         private string[] spikeDatasets = new string[]
         {
             "CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ",
@@ -33,7 +32,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
             "CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ"
         };
 
-        
         [Test]
         public void TestCptacSpikeIn()
         {
@@ -41,7 +39,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             const string rawFolder = @"D:\MassSpecFiles\CPTAC_spike_in\raw";
             var outFilePath = string.Format(@"{0}\aligned_features.tsv", featureFolder);
             var align = new LcMsFeatureAlignment(new LcMsFeatureAlignComparer(new Tolerance(10)));
-            
+
             for (var i = 0; i < spikeDatasets.Length; i++)
             {
                 var featureFilePath = string.Format(@"{0}\{1}.ms1ft", featureFolder, spikeDatasets[i]);
@@ -52,7 +50,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
-
 
                 if (!File.Exists(featureFilePath))
                 {
@@ -78,15 +75,12 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 //var features = LcMsFeatureAlignment.LoadProMexResult(i, featureFilePath, run);
 
                 //align.AddDataSet(i, features, run);
-
             }
             //align.AlignFeatures();
             //Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
             //align.RefineAbundance();
             //OutputAlignmentResult(align, outFilePath, spikeDatasets);
         }
-
-
 
         [Test]
         public void TestCptac10Replicates()
@@ -97,19 +91,18 @@ namespace InformedProteomics.Test.TopDownAnalysis
             var align = new LcMsFeatureAlignment(new LcMsFeatureAlignComparer(new Tolerance(10)));
 
             var dataNames = new string[10];
-            for (var i = 0; i < 10; i++) 
+            for (var i = 0; i < 10; i++)
             {
                 dataNames[i] = string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i+1);
                 var featureFilePath = string.Format(@"{0}\{1}_isos.tsv", featureFolder, dataNames[i]);
-                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataNames[i]);    
-                
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataNames[i]);
+
                 if (!File.Exists(rawFile))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
 
-                
                 if (!File.Exists(featureFilePath))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", featureFilePath);
@@ -119,7 +112,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, featureFilePath, run);
 
                 align.AddDataSet(i, features, run);
-                
             }
             align.AlignFeatures();
             Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
@@ -145,7 +137,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             {
                 var features = alignedFeatureList[i];
                 var minMaxNet = TestLcMsFeatureAlignment.GetMinMaxNet(features);
-                writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
+                writer.Write(@"{0}\t{1:0.00000}\t{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
 
                 for (var j = 0; j < align.CountDatasets; j++)
                 {

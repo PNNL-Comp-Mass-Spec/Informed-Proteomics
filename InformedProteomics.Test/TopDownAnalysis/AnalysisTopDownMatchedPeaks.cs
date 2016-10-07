@@ -41,7 +41,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
                         var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
 
-
                         // representative peak intensity
                         var ionPeakIntensity = observedPeaks[mostAbundantIsotopeIndex].Intensity;
 
@@ -59,13 +58,9 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         var mostAbundantIsotopeMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
                         var errorPpm = ((observedPeaks[mostAbundantIsotopeIndex].Mz - mostAbundantIsotopeMz)/
                                         mostAbundantIsotopeMz)*1e6;
-
-
                     }
                 }
-
             }
-
         }
 
         private const double RelativeIsotopeIntensityThreshold = 0.7;
@@ -76,6 +71,5 @@ namespace InformedProteomics.Test.TopDownAnalysis
             BaseIonTypesCid = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesEtd = new[] { BaseIonType.C, BaseIonType.Z };
         }
-
     }
 }

@@ -341,7 +341,7 @@ namespace InformedProteomics.DIA.Search
                 if (!match.IsValid || match.Protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) continue;
 
                 _msGfMatches.Add(match);
-            }                
+            }
             _msGfMatches.Sort();
         }
 
@@ -462,7 +462,6 @@ namespace InformedProteomics.DIA.Search
             SpecEValueColNum = -1;
             QValueColNum = -1;
             PepQValueColNum = -1;
-
 
             for (var i = 0; i < token.Length; i++)
             {

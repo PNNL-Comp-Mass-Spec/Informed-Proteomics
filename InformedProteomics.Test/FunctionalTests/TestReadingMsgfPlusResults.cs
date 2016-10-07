@@ -17,7 +17,7 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-           
+
             const string filePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSGFPlusResultTMT10.tsv";
             if (!File.Exists(filePath))
             {

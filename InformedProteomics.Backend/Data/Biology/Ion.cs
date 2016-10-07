@@ -122,6 +122,5 @@ namespace InformedProteomics.Backend.Data.Biology
             var monoIsotopeMass = isotopeMass - isotopeIndex * Constants.C13MinusC12;
             return monoIsotopeMass;
         }
-
     }
 }

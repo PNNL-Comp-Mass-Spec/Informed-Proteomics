@@ -8,7 +8,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
     public class IonTypeFactory
     {
-
         private bool removeReduntantIonTypes;
 
         public IonTypeFactory(bool removeRedundantIonTypes = true)
@@ -31,7 +30,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         public IonTypeFactory(
-            IEnumerable<BaseIonType> baseIons, 
+            IEnumerable<BaseIonType> baseIons,
             IEnumerable<NeutralLoss> neutralLosses,
             int maxCharge,
             bool removeRedundantIonTypes = true)
@@ -102,7 +101,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 for (int ch = 1; ch <= charge; ch++)
                 {
-                    IonType chargedIonType = 
+                    IonType chargedIonType =
                         new IonType(ionType.Name, ionType.OffsetComposition, ch, ionType.BaseIonType, ionType.NeutralLoss);
                     chargedIonTypes.Add(chargedIonType);
                 }
@@ -150,6 +149,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
             }
         }
-
     }
 }

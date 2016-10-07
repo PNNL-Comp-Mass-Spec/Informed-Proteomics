@@ -110,7 +110,7 @@ namespace InformedProteomics.Test
             var scorer = new InformedBottomUpScorer(run, aaSet, 1, 2, new Tolerance(10));
             //var refinedScore = scorer.GetScores(AminoAcid.PeptideNTerm, seqStr, AminoAcid.PeptideCTerm, composition,
             //    charge, ms2ScanNum);
-//            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);            
+//            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);
         }
 
         [Test]
@@ -198,8 +198,6 @@ namespace InformedProteomics.Test
             }
             Console.WriteLine("SuccessRage: {0}, {1}/{2}", numSurvived/(float)numPsms, numSurvived, numPsms);
         }
-
-
 
         [Test]
         public void TestPeptideLevelStats()
@@ -308,7 +306,7 @@ namespace InformedProteomics.Test
             if (!File.Exists(ipaResultPath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, methodName);
-            }            
+            }
 
             var parser = new TsvFileParser(ipaResultPath);
             var ipaPeptides = parser.GetPeptides(0.005).Select(p => p.Replace("C+57.021", "C"));

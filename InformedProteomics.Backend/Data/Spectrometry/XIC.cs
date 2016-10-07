@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Utils;
 
-
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class Xic: List<XicPoint>
@@ -11,11 +10,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         //public int Min { get; private set; }
         //public int Max { get; private set; }
 
-    	private static readonly SavitzkyGolaySmoother Smoother;
+        private static readonly SavitzkyGolaySmoother Smoother;
         static Xic()
-		{
-			Smoother = new SavitzkyGolaySmoother(9, 2);
-		}
+        {
+            Smoother = new SavitzkyGolaySmoother(9, 2);
+        }
 
         public double GetCorrelation(Xic other)
         {
@@ -99,72 +98,72 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return apexScan;
         }
 
-		public int GetNearestApexScanNum(int scanNumber, bool performSmoothing = true)
-		{
-			// If there are not very many points, just return the global apex
-			if (Count < 6) return GetApexScanNum();
+        public int GetNearestApexScanNum(int scanNumber, bool performSmoothing = true)
+        {
+            // If there are not very many points, just return the global apex
+            if (Count < 6) return GetApexScanNum();
 
-			var xicPointList = new List<XicPoint>();
+            var xicPointList = new List<XicPoint>();
 
-			if(performSmoothing)
-			{
-				double[] intensityValues = this.Select(x => x.Intensity).ToArray();
-				intensityValues = Smoother.Smooth(intensityValues);
+            if(performSmoothing)
+            {
+                double[] intensityValues = this.Select(x => x.Intensity).ToArray();
+                intensityValues = Smoother.Smooth(intensityValues);
 
-				for(var i = 0; i < Count; i++)
-				{
-					xicPointList.Add(new XicPoint(this[i].ScanNum, this[i].Mz, intensityValues[i]));
-				}
-			}
-			else
-			{
-				xicPointList = this;
-			}
+                for(var i = 0; i < Count; i++)
+                {
+                    xicPointList.Add(new XicPoint(this[i].ScanNum, this[i].Mz, intensityValues[i]));
+                }
+            }
+            else
+            {
+                xicPointList = this;
+            }
 
-			// Find the XIC Point that is closest to the input scan number
-			var searchPoint = new XicPoint(scanNumber, 0, 0);
-			int indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
-			indexOfClosestScan = indexOfClosestScan < 0 ? ~indexOfClosestScan : indexOfClosestScan;
-		    if (indexOfClosestScan >= xicPointList.Count) indexOfClosestScan = xicPointList.Count - 1;
-			XicPoint closestXicPoint = xicPointList[indexOfClosestScan];
+            // Find the XIC Point that is closest to the input scan number
+            var searchPoint = new XicPoint(scanNumber, 0, 0);
+            int indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
+            indexOfClosestScan = indexOfClosestScan < 0 ? ~indexOfClosestScan : indexOfClosestScan;
+            if (indexOfClosestScan >= xicPointList.Count) indexOfClosestScan = xicPointList.Count - 1;
+            XicPoint closestXicPoint = xicPointList[indexOfClosestScan];
 
-			// Figure out if we want to search for an apex by moving left or right
-			bool moveRight;
-			if (indexOfClosestScan <= 1) moveRight = true;
-			else if (indexOfClosestScan >= xicPointList.Count - 2) moveRight = false;
-			else if (xicPointList[indexOfClosestScan + 1].Intensity > closestXicPoint.Intensity) moveRight = true;
-			else moveRight = false;
+            // Figure out if we want to search for an apex by moving left or right
+            bool moveRight;
+            if (indexOfClosestScan <= 1) moveRight = true;
+            else if (indexOfClosestScan >= xicPointList.Count - 2) moveRight = false;
+            else if (xicPointList[indexOfClosestScan + 1].Intensity > closestXicPoint.Intensity) moveRight = true;
+            else moveRight = false;
 
-			// Check to the right
-			if(moveRight)
-			{
-				if (indexOfClosestScan + 1 >= xicPointList.Count) return GetApexScanNum();
-				double previousIntensity = xicPointList[indexOfClosestScan + 1].Intensity;
+            // Check to the right
+            if(moveRight)
+            {
+                if (indexOfClosestScan + 1 >= xicPointList.Count) return GetApexScanNum();
+                double previousIntensity = xicPointList[indexOfClosestScan + 1].Intensity;
 
-				for (int i = indexOfClosestScan + 2; i < xicPointList.Count; i++)
-				{
-					double currentIntensity = xicPointList[i].Intensity;
-					if (currentIntensity < previousIntensity) return xicPointList[i-1].ScanNum;
-					previousIntensity = currentIntensity;
-				}
-			}
-			// Check to the left
-			else
-			{
-				if (indexOfClosestScan - 1 < 0) return GetApexScanNum();
-				double previousIntensity = this[indexOfClosestScan - 1].Intensity;
+                for (int i = indexOfClosestScan + 2; i < xicPointList.Count; i++)
+                {
+                    double currentIntensity = xicPointList[i].Intensity;
+                    if (currentIntensity < previousIntensity) return xicPointList[i-1].ScanNum;
+                    previousIntensity = currentIntensity;
+                }
+            }
+            // Check to the left
+            else
+            {
+                if (indexOfClosestScan - 1 < 0) return GetApexScanNum();
+                double previousIntensity = this[indexOfClosestScan - 1].Intensity;
 
-				for (int i = indexOfClosestScan - 2; i >= 0; i--)
-				{
-					double currentIntensity = this[i].Intensity;
-					if (currentIntensity < previousIntensity) return this[i+1].ScanNum;
-					previousIntensity = currentIntensity;
-				}
-			}
+                for (int i = indexOfClosestScan - 2; i >= 0; i--)
+                {
+                    double currentIntensity = this[i].Intensity;
+                    if (currentIntensity < previousIntensity) return this[i+1].ScanNum;
+                    previousIntensity = currentIntensity;
+                }
+            }
 
-			// I don't think it is possible, but if we make it this far, then we should just return the apex of the whole XIC because a single peak was not discovered
-			return GetApexScanNum();
-		}
+            // I don't think it is possible, but if we make it this far, then we should just return the apex of the whole XIC because a single peak was not discovered
+            return GetApexScanNum();
+        }
 
         /// <summary>
         /// Display the chromatogram

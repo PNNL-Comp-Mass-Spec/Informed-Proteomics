@@ -53,5 +53,4 @@ namespace InformedProteomics.Backend.MassFeature
             return false;
         }
     }
-
 }

@@ -147,16 +147,16 @@ namespace InformedProteomics.Test
             // Parallelizing AnnotationsAndOffsetsNoEnzyme, yield returns: 79.6, 94, 60, 60 seconds
             //
             // 3MB
-            // serial: 
-            // Parallel2: 107, 
+            // serial:
+            // Parallel2: 107,
             //
             // 6MB
-            // serial: 
-            // Parallel2: 
+            // serial:
+            // Parallel2:
             //
             // 15MB
-            // serial: 
-            // Parallel2: 
+            // serial:
+            // Parallel2:
             //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
             //using (var fout = new StreamWriter(ofstream))
             //{
@@ -374,7 +374,7 @@ namespace InformedProteomics.Test
             var parallelQuery =
                 numbers.AsParallel().Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
 
-            //            var primes = parallelQuery.ToArray();
+            //var primes = parallelQuery.ToArray();
         }
 
         [Test]
@@ -395,6 +395,5 @@ namespace InformedProteomics.Test
 
             //var primes = serialQuery.ToArray();
         }
-
     }
 }

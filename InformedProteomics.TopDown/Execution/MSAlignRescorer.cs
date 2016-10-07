@@ -59,6 +59,5 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private static readonly AminoAcidSet AASet = new AminoAcidSet();
-
     }
 }

@@ -30,13 +30,13 @@ namespace InformedProteomics.Backend.Utils
                 bc += Math.Sqrt(p * q);
             }
 
-            return -Math.Log(bc);            
+            return -Math.Log(bc);
         }
-        
+
         public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
             if (k >= n) return 1.0d;
-            
+
             var pValue = Hypergeometric.CDF(n, k, n1, k1);
             if (upperTailProb) pValue = 1 - pValue;
             else pValue = Math.Min(pValue, 1 - pValue);
@@ -53,15 +53,15 @@ namespace InformedProteomics.Backend.Utils
             //var sigU = Math.Sqrt(n1*n2*(n1 + n2 + 1)/12);
             var logSigU = 0.5 * (Math.Log(n1) + Math.Log(n2) + Math.Log(n1 + n2 + 1) - Math.Log(12));
             var sigU = Math.Exp(logSigU);
-            
+
             var pValue = Normal.CDF(meanU, sigU, u1);
-            
+
             if (upperTailProb) pValue = 1 - pValue;
             else pValue = Math.Min(pValue, 1 - pValue);
 
             return Math.Abs(pValue); //negative tiny value
         }
-        
+
         /*
         public static double GetPearsonCorrelation(double[] v1, double[] v2)
         {
@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.Utils
         public static Tuple<double, double> GetDistanceAndCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1) count = v1.Length;
-            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return new Tuple<double, double>(0d, 0d); 
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return new Tuple<double, double>(0d, 0d);
 
             var s1 = 0d;
             var s2 = 0d;
@@ -117,9 +117,9 @@ namespace InformedProteomics.Backend.Utils
 
             if (!(s1 > 0) || !(s2 > 0))
             {
-                return new Tuple<double, double>(1d, 0d); 
+                return new Tuple<double, double>(1d, 0d);
             }
-            
+
             var m1 = s1 / count;
             var m2  = s2 / count;
 
@@ -136,7 +136,7 @@ namespace InformedProteomics.Backend.Utils
                 var e2 = v2[v2Index + i];
                 var d1 = e1 - m1;
                 var d2 = e2 - m2;
-                
+
                 cov += d1 * d2;
                 c1 += d1 * d1;
                 c2 += d2 * d2;
@@ -148,13 +148,12 @@ namespace InformedProteomics.Backend.Utils
 
             if (c1 > 0 && c2 > 0 && cov > 0)
             {
-                corr = cov / Math.Sqrt(c1 * c2);    
+                corr = cov / Math.Sqrt(c1 * c2);
             }
             var dist = -Math.Log(bc);
 
             return new Tuple<double, double>(dist, corr);
         }
-
 
         public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {

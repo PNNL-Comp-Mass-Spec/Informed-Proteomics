@@ -50,7 +50,7 @@ namespace InformedProteomics.Test.FunctionalTests
             var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);
             for (var i = 0; i < matchedPeaks.Length; i++)
             {
-                Console.WriteLine(@"{0}	{1}	{2}	{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
+                Console.WriteLine(@"{0}\t{1}\t{2}\t{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
             }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
             var cosine = spec.GetConsineScore(ion, new Tolerance(15), 0.1);
@@ -63,7 +63,6 @@ namespace InformedProteomics.Test.FunctionalTests
             Assert.True(Math.Abs(fitScore - 0.181194589537041) < 0.0001);
             Assert.True(Math.Abs(cosine - 0.917609346566222) < 0.0001);
             Assert.True(Math.Abs(corr - 0.808326778009839) < 0.0001);
-
         }
 
         [Test]
@@ -159,14 +158,14 @@ namespace InformedProteomics.Test.FunctionalTests
                     Console.WriteLine(@"Fit=" + result);
 
                 if (result < smallestFit)
-                    smallestFit = result;                
+                    smallestFit = result;
             }
 
             Console.WriteLine(@"SmallestFit=" + smallestFit);
             Assert.IsTrue(smallestFit > 0.94);
 
             sw.Stop();
-            
+
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }

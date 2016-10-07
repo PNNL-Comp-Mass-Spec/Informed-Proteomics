@@ -13,7 +13,6 @@ namespace InformedProteomics.DIA.Scoring
     {
         public OldRankScorer(string paramFilePath) : this(paramFilePath, false)
         {
-            
         }
 
         public OldRankScorer(string paramFilePath, bool verbose)

@@ -50,7 +50,6 @@ namespace InformedProteomics.Test.Obsolete
                               );
         }
 
-
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void RunIpa()
@@ -248,7 +247,7 @@ namespace InformedProteomics.Test.Obsolete
                     //        else if (spikedInPeptide.EndsWith(peptide)) suffix.Add(spikedInPeptide + "\t" + peptide + "\t" + match.ScanNum);
                     //    }
                     //}
-                }                
+                }
             }
 
             //Console.WriteLine("*********Prefix");
@@ -303,7 +302,6 @@ namespace InformedProteomics.Test.Obsolete
             {
                 Console.WriteLine("{0}-{1}\t{2}\t{3}", 400+i*125, 525+i*125, hist[i], hist[i] / (float)sum);
             }
-
         }
     }
 }

@@ -40,7 +40,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     for (var scanNum = scanRange.Min; scanNum <= scanRange.Max; scanNum++)
                     {
-                        
                         if (scanNum < run.MinLcScan || scanNum > run.MaxLcScan) continue;
                         if (run.GetMsLevel(scanNum) == 2)
                         {

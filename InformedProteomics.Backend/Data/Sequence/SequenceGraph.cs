@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             const char delimiter = (char)FastaDatabase.Delimiter;
             if (annotation == null || !Regex.IsMatch(annotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"]$")) return null;
-            
+
             var nTerm = annotation[0] == FastaDatabase.Delimiter
                                   ? AminoAcid.ProteinNTerm
                                   : AminoAcid.PeptideNTerm;
@@ -49,12 +49,13 @@ namespace InformedProteomics.Backend.Data.Sequence
             return seqGraph.IsValid ? seqGraph : null;
         }
 
-        public AminoAcidSet AminoAcidSet 
+        public AminoAcidSet AminoAcidSet
         {
-            get { return _aminoAcidSet; } 
+            get { return _aminoAcidSet; }
         }
-        public ModificationParams ModificationParams 
-        { 
+
+        public ModificationParams ModificationParams
+        {
             get { return _modificationParams; }
         }
 
@@ -62,7 +63,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int NumNTermCleavages { get; private set; }
 
         /// <summary>
-        /// Gets the number of possible compositions of the current sequence 
+        /// Gets the number of possible compositions of the current sequence
         /// </summary>
         /// <returns>the number of possible compositions</returns>
         public int GetNumProteoformCompositions()
@@ -71,7 +72,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Gets the number of distinct compositions of the current sequence 
+        /// Gets the number of distinct compositions of the current sequence
         /// </summary>
         /// <returns>the number of possible compositions</returns>
         public int GetNumDistinctSequenceCompositions()
@@ -83,7 +84,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             return compositions.Count;
         }
-        
+
         /// <summary>
         /// Gets all possible compositions of the current sequence
         /// </summary>
@@ -98,7 +99,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             return compositions;
         }
-        
+
         /// <summary>
         /// Gets number of possible proteoforms
         /// </summary>
@@ -107,7 +108,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             return _graph[_index].Length;
         }
-        
+
         public double GetNumProteoformSequencesByNumMods(int nDynMods)
         {
             if (nDynMods < 1 || nDynMods > ModificationParams.MaxNumDynModsPerSequence) return 0;
@@ -125,7 +126,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             return nProteoforms;
         }
-        
+
         /// <summary>
         /// Get number of possible proteoform sequences for the speicified modification combination
         /// </summary>
@@ -159,8 +160,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             return _countTable[_index][modIndex];
         }
+
         private double[][] _countTable;
-      
+
         public void CleaveNTerm()
         {
             _index = _index - 3;
@@ -322,13 +324,13 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             _nodeComposition = new Composition.Composition[_maxSeqIndex][]; //, _modificationParams.NumModificationCombinations];
             _compNodeComposition = new Composition.Composition[_maxSeqIndex][]; //, _modificationParams.NumModificationCombinations];
-            
+
             for (var i = 0; i < _maxSeqIndex; i++)
             {
                 _compNodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
                 _nodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
             }
-            
+
             NumNTermCleavages = 0;
             IsValid = true;
             SetNTerminalAminoAcid(nTerm);
@@ -419,7 +421,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var node = _graph[seqIndex][modIndex];
                 _nodeComposition[seqIndex][modIndex] = _suffixComposition[seqIndex] +
                                   _modificationParams.GetModificationCombination(node.ModificationCombinationIndex).Composition;
-
             }
             return _nodeComposition[seqIndex][modIndex];
         }
@@ -462,8 +463,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                                                                             suffixFragmentComposition);
                     curNodeScore = nodeScore[seqIndex][modIndex];
                 }
-
-            }            
+            }
 
             var prevNodeScore = 0.0;
             if (node.GetPrevNodeIndices().Any())
@@ -477,7 +477,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                     if (prevScore > prevNodeScore)
                         prevNodeScore = prevScore;
                 }
-
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
             // ReSharper disable PossibleInvalidOperationException
@@ -624,7 +623,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         public int ModificationCombinationIndex { get; private set; }
-        
+
         private int[] _prevNodeIndices;
         private int _count;
 
@@ -636,9 +635,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
             if(_count >= _prevNodeIndices.Length)
             {
-                Array.Resize(ref _prevNodeIndices, _prevNodeIndices.Length * 2); 
+                Array.Resize(ref _prevNodeIndices, _prevNodeIndices.Length * 2);
             }
-            _prevNodeIndices[_count++] = prevNodeIndex; 
+            _prevNodeIndices[_count++] = prevNodeIndex;
 
             return true;
         }
@@ -651,5 +650,4 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
     }
-
 }

@@ -50,7 +50,7 @@ namespace InformedProteomics.Test.FunctionalTests
             TestUtils.ShowStarting(methodName);
 
             //            Console.WriteLine(Convert.ToDouble("0"));
-            const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt";            
+            const string filePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrScores_SBEP.txt";
             if (!File.Exists(filePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
@@ -298,7 +298,7 @@ namespace InformedProteomics.Test.FunctionalTests
                     writer.WriteLine(string.Join("\t", parser.GetHeaders().ToArray(), 0, 15) + "\tScore\tEValue");
 
                     var lines = new string[parser.NumData];
-                    
+
                     //for (var i = 0; i < parser.NumData; i++)
                     Parallel.For(0, parser.NumData, i =>
                     {
@@ -331,7 +331,7 @@ namespace InformedProteomics.Test.FunctionalTests
                         //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
                         lock (lines)
                         {
-                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);    
+                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
                         }
                         //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
                     });
@@ -363,6 +363,5 @@ namespace InformedProteomics.Test.FunctionalTests
             fdrCalculator.WriteTo(tdaResultPath);
             Console.WriteLine("Done");
         }
-
     }
 }

@@ -144,7 +144,7 @@ namespace InformedProteomics.Test
                 break;
             }
         }
-        
+
         [Test]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
@@ -220,12 +220,11 @@ namespace InformedProteomics.Test
                     var nTermMass = protein.GetMass(0, matchedTag.StartIndex);
                     var cTermMass = protein.GetMass(matchedTag.EndIndex, protein.Count);
                     Console.WriteLine("\t{0} ({1})\t{2}\t{3} ({4})\t{5}\t{6}\t{7}",
-                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass), 
-                        seq, 
-                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass), 
+                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass),
+                        seq,
+                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass),
                         matchedTag.StartIndex,
                         matchedTag.IsNTermFlankingMassReliable, matchedTag.IsCTermFlankingMassReliable);
-
                 }
             }
         }
@@ -301,7 +300,6 @@ namespace InformedProteomics.Test
                 resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
             var idMassList = idList.Select(id => id.Mass).ToList();
             var idFlag = new bool[idList.Count];
-
 
             // Parse sequence tags
             var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
@@ -456,7 +454,6 @@ namespace InformedProteomics.Test
                     Console.WriteLine(idList[i].Scan);
                 }
             }
-
 
 //            Console.WriteLine(string.Join(",", filter.GetMatchingMs2ScanNums(8115.973001)));
 //

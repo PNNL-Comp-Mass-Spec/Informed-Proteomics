@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 
-
 namespace InformedProteomics.Backend.MassFeature
 {
     public class LcMsEnvelopeComparer : INodeComparer<ObservedIsotopeEnvelope>
@@ -27,7 +26,5 @@ namespace InformedProteomics.Backend.MassFeature
 
             return true;
         }
-
-
     }
 }

@@ -97,7 +97,6 @@ namespace MSPathFinder
             }
         }
 
-
         private static void PrintUsageInfo(string errorMessage = null)
         {
             if (!string.IsNullOrWhiteSpace(errorMessage))

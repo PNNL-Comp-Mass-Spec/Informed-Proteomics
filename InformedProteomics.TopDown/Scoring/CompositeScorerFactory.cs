@@ -28,7 +28,6 @@ namespace InformedProteomics.TopDown.Scoring
             )
             : this(run, comparer, aaSet, minProductCharge, maxProductCharge, new Tolerance(productTolerancePpm), isotopeOffsetTolerance, filteringWindowSize)
         {
-            
         }
 
         public CompositeScorerFactory(
@@ -50,10 +49,10 @@ namespace InformedProteomics.TopDown.Scoring
             _comparer = comparer;
             _scoringGraphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
         }
-        
+
         private readonly IMassBinning _comparer;
         private readonly ProteinScoringGraphFactory _scoringGraphFactory;
-        
+
         public double FilteringWindowSize { get; private set; }    // 1.1
         public int IsotopeOffsetTolerance { get; private set; }   // 2
 
@@ -65,7 +64,7 @@ namespace InformedProteomics.TopDown.Scoring
             //var deconvSpec = deconvScorer.Ms2Spectrum as DeconvolutedSpectrum;
             return _scoringGraphFactory.CreateScoringGraph(deconvScorer, precursorMass);
         }
-        
+
         public IScorer GetMs2Scorer(int scanNum)
         {
             IScorer scorer;
@@ -75,7 +74,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
             return null;
         }
-    
+
         public void DeconvonluteProductSpectrum(int scanNum)
         {
             var scorer = GetScorer(scanNum);
@@ -96,7 +95,7 @@ namespace InformedProteomics.TopDown.Scoring
             var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
             return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
         }
-     
+
         public void WriteToFile(string outputFilePath)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
@@ -126,7 +125,7 @@ namespace InformedProteomics.TopDown.Scoring
             private readonly ActivationMethod _activationMethod;
             public readonly double RefIntensity;
 
-            internal DeconvScorer(DeconvolutedSpectrum deconvolutedSpectrum, Tolerance productTolerance, IMassBinning comparer, 
+            internal DeconvScorer(DeconvolutedSpectrum deconvolutedSpectrum, Tolerance productTolerance, IMassBinning comparer,
                 double refIntensity)
             {
                 DeconvolutedProductSpectrum = deconvolutedSpectrum;
@@ -144,7 +143,7 @@ namespace InformedProteomics.TopDown.Scoring
                     _prefixOffsetMass = BaseIonType.C.OffsetComposition.Mass;
                     _suffixOffsetMass = BaseIonType.Z.OffsetComposition.Mass;
                 }
-                
+
                 //_ionMassChkBins = new BitArray(comparer.NumberOfBins);
                 _massBinToPeakMap = new Dictionary<int, DeconvolutedPeak>();
 
@@ -182,7 +181,6 @@ namespace InformedProteomics.TopDown.Scoring
                         if (minMass < prevBinMass && prevBinMass < maxMass) UpdateDeconvPeak(prevBinNum, p as DeconvolutedPeak); //_ionMassChkBins[prevBinNum] = true;
                         else break;
                     }
-
                 }
             }
 
@@ -210,10 +208,9 @@ namespace InformedProteomics.TopDown.Scoring
                     DeconvolutedPeak existingPeak;
                     if (_massBinToPeakMap.TryGetValue(prefixBin, out existingPeak))
                     {
-                       
                     }
                 }
-                
+
                 var suffixMass = suffixFragmentComposition.Mass + _suffixOffsetMass;
                 var suffixBin = _comparer.GetBinNumber(suffixMass);
                 if (suffixBin >= 0 && suffixBin < _comparer.NumberOfBins)
@@ -229,7 +226,7 @@ namespace InformedProteomics.TopDown.Scoring
                         score += intScore;
                         score += corrScore;
                         score += distScore;
-                    }                    
+                    }
                 }
                 return score;
             }

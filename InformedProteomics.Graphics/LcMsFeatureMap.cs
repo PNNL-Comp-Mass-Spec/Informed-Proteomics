@@ -24,9 +24,9 @@ namespace InformedProteomics.Graphics
         /// <param name="minMass">Minimum mass</param>
         /// <param name="maxMass">Maximum mass</param>
         public LcMsFeatureMap(LcMsRun run, IEnumerable<LcMsFeature> features, string title, double minMass, double maxMass) :
-            this(features, title, 
-            minMass, maxMass, 
-            Math.Max(run.GetElutionTime(run.MinLcScan) - 5, 0), 
+            this(features, title,
+            minMass, maxMass,
+            Math.Max(run.GetElutionTime(run.MinLcScan) - 5, 0),
             run.GetElutionTime(run.MaxLcScan) + 5)
         {
         }
@@ -42,9 +42,8 @@ namespace InformedProteomics.Graphics
         /// <param name="maxTime">Maximum time (minutes)</param>
         public LcMsFeatureMap(IEnumerable<LcMsFeature> features, string title, double minMass, double maxMass, double minTime, double maxTime)
         {
-      
             _features = features;
-            
+
             // Initialize x and y axes.
             var yAxis = new LinearAxis
             {
@@ -66,7 +65,6 @@ namespace InformedProteomics.Graphics
                 Maximum = maxTime
             };
 
-
             // Initialize feature map.
             _featureMap = new PlotModel { Title = title, TitleFontSize = 30 };
             _featureMap.Axes.Add(xAxis);
@@ -81,17 +79,16 @@ namespace InformedProteomics.Graphics
                 Text = string.Format("Number of LCMS features = {0}", _features.Count()),
                 FontSize = 25,
             };
-            
+
             _featureMap.Annotations.Add(annotation);
         }
 
         public LcMsFeatureMap(LcMsRun run, string ms1FtPath, double minMass, double maxMass)
-            : this(run, 
-            LcMsFeatureAlignment.LoadProMexResult(0, ms1FtPath, run, minMass, maxMass), 
-            Path.GetFileNameWithoutExtension(ms1FtPath), 
+            : this(run,
+            LcMsFeatureAlignment.LoadProMexResult(0, ms1FtPath, run, minMass, maxMass),
+            Path.GetFileNameWithoutExtension(ms1FtPath),
             minMass, maxMass)
         {
-
         }
 
         public void SaveImage(string imgPath, int nColors = 30)
@@ -117,7 +114,6 @@ namespace InformedProteomics.Graphics
 
         public int GetTableIndex(double abundance, double[] breakTable)
         {
-
             if (abundance <= breakTable[0]) return 0;
             if (abundance > breakTable[breakTable.Length - 1]) return -1;
             for (var i = 1; i < breakTable.Length; i++)
@@ -129,13 +125,11 @@ namespace InformedProteomics.Graphics
 
         public OxyColor GetColor(int value, int nColors)
         {
-
             if (value == -1) return OxyColor.FromHsv(0, 1, 1);
             var delta = 240.0 / (360.0 * (nColors));
             var hue = (240.0 / 360.0) - (delta * (value));
             return OxyColor.FromHsv(hue, 1, 1);
         }
-
 
         public double[] GetColorBreaksTable(int nColors, IEnumerable<LcMsFeature> features)
         {

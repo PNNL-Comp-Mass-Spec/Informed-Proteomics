@@ -14,7 +14,6 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestLcMsMap
     {
-        
         [Test]
         public void TestMs1Filter()
         {
@@ -25,7 +24,6 @@ namespace InformedProteomics.Test
             const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string ms1FtFileName = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             const string idFilePath =  @"D:\MassSpecFiles\training\IcTda\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
-
 
             if (!File.Exists(specFilePath))
             {
@@ -48,7 +46,7 @@ namespace InformedProteomics.Test
                 var matchingMass = ms1ftFilter.GetMatchingMass(ms2ScanNum);
                 n += matchingMass.Count();
             }
-            
+
             Console.WriteLine("{0} / {1}", n, ms2ScanNums.Count);
             /*
             var tsvReader = new TsvFileParser(idFilePath);
@@ -68,8 +66,6 @@ namespace InformedProteomics.Test
                 var mod = tsvReader.GetData("Modifications")[i];
                 var nMatched = int.Parse(tsvReader.GetData("#MatchedFragments")[i]);
 
-                
-
                 var hit = false;
                 foreach (var ms2Scan in ms1ftFilter.GetMatchingMs2ScanNums(mass))
                 {
@@ -86,7 +82,7 @@ namespace InformedProteomics.Test
                 }
             }*/
         }
-        
+
         /*
         public void TestCalculatingNumBins()
         {

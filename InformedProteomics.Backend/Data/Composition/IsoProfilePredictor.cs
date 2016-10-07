@@ -87,7 +87,7 @@ namespace InformedProteomics.Backend.Data.Composition
         public IsoProfilePredictor(
                                    double[] probC,
                                    double[] probH,
-                                   double[] probN, 
+                                   double[] probN,
                                    double[] probO,
                                    double[] probS,
                                    double relativeIntensityThreshold = 0.1,
@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
             if (_possibleIsotopeCombinations == null)
             {
-                ComputePossibleIsotopeCombinations(MaxNumIsotopes, ProbC.Length - 1);   
+                ComputePossibleIsotopeCombinations(MaxNumIsotopes, ProbC.Length - 1);
             }
         }
 
@@ -114,7 +114,6 @@ namespace InformedProteomics.Backend.Data.Composition
         public static readonly double[] DefaultProbO = { 0.99757, 0.00038, 0.00205, 0 };
         public static readonly double[] DefaultProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
 
-
         public double[] ProbC { get; private set; }
         public double[] ProbH { get; private set; }
         public double[] ProbN { get; private set; }
@@ -123,7 +122,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
         private static int[][][] _possibleIsotopeCombinations;
 
-        private static void ComputePossibleIsotopeCombinations(int max, int maxIsotopeNumberInElement = 3) // called just once. 
+        private static void ComputePossibleIsotopeCombinations(int max, int maxIsotopeNumberInElement = 3) // called just once.
         {
             var comb = new List<int[]>[max + 1];
             comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };

@@ -13,13 +13,13 @@ namespace InformedProteomics.Backend.MassFeature
         {
             _tolerance = tolerance;
         }
-            
+
         public bool SameCluster(LcMsPeakCluster f1, LcMsPeakCluster f2)
         {
             var massTh = _tolerance.GetToleranceAsTh(f1.RepresentativeMass);
             var massDiff = Math.Abs(f1.RepresentativeMass - f2.RepresentativeMass);
             if (massDiff > massTh) return false;
-            
+
             // close in elution time
             if (f1.CoElutedByNet(f2, 0.01)) return true;
             return false;
@@ -67,5 +67,4 @@ namespace InformedProteomics.Backend.MassFeature
         }
         private readonly Tolerance _tolerance;
     }*/
-
 }

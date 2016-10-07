@@ -98,9 +98,8 @@ namespace InformedProteomics.TopDown.Execution
             }
             else
             {
-                Console.WriteLine("MS1 features file {0}", ExistingFeaturesFilePath); 
+                Console.WriteLine("MS1 features file {0}", ExistingFeaturesFilePath);
             }
-
         }
 
         private static bool Str2Bool(string value)

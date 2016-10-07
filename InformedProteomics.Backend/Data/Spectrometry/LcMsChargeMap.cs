@@ -99,7 +99,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     var isolationWindowTargetMz = isolationWindow.IsolationWindowTargetMz;
                     var charge = (int)Math.Round(monoIsotopicMass / isolationWindowTargetMz);
-                    
+
                     //if (charge < minCharge || charge > maxCharge) continue;
 
                     var mz = Ion.GetIsotopeMz(monoIsotopicMass, charge,
@@ -111,7 +111,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     }
                 }
             }
-            
+
             // determine bit array
             var bitArray = new BitArray(_run.MaxLcScan - _run.MinLcScan + 1);
             foreach (var e in registeredMs2Scans.OrderBy(x => x.Key).Take(_maxNumMs2ScansPerMass))
@@ -156,6 +156,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly Dictionary<int, BitArray> _map;
         private readonly MzComparerWithBinning _comparer;
-
     }
 }

@@ -140,15 +140,15 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
                 ms2ScanNums.AddRange(GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
-                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum && 
-                        (activationMethod == ActivationMethod.Unknown || 
+                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum &&
+                        (activationMethod == ActivationMethod.Unknown ||
                         ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod)))
                         ;
             }
             var summedSpec = GetSummedSpectrum(ms2ScanNums);
             return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
         }
-        
+
         /*
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, Ms1Feature range,
             ActivationMethod activationMethod = ActivationMethod.Unknown)
@@ -272,7 +272,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
             var ms1ScanNums = GetMs1ScanVector();
             _ms1ScanNumToIndex = new int[MaxLcScan + 1];
-            for (var i = 0; i < ms1ScanNums.Length; i++) 
+            for (var i = 0; i < ms1ScanNums.Length; i++)
                 _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
 
             return _ms1ScanNumToIndex;
@@ -359,10 +359,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public abstract Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz);
 
-
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
-        /// Only XicPeaks around the targetScanNum are returned 
+        /// Only XicPeaks around the targetScanNum are returned
         /// </summary>
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
@@ -380,7 +379,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
-        /// Only XicPeaks around the targetScanNum are returned 
+        /// Only XicPeaks around the targetScanNum are returned
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>

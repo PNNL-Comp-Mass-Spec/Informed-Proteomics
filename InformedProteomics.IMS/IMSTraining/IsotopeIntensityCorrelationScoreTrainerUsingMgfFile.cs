@@ -94,12 +94,12 @@ namespace InformedProteomics.IMS.IMSTraining
 
             for (var i = 0; i < c1.Length; i++)
             {
-                var i1 = maxIndex + i; 
+                var i1 = maxIndex + i;
                 var i2 = -FeatureNode.OffsetFromMonoIsotope + maxIndex + i;
                 c1[i] = observed[Math.Min(i1, observed.Count -1)].Intensity;
                 c2[i] = i2 < 0 ? 0 : theoretical[Math.Min(i2, theoretical.Length-1)];
             }
-        //    Console.WriteLine(c1.Length);
+            //Console.WriteLine(c1.Length);
             return SubScoreFactory.CorrToIntForIsotopeScore(SimpleMath.GetCorrelation(c1, c2));
         }
     }

@@ -27,12 +27,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return ScanNum - other.ScanNum;
         }
 
-		public bool Equals(XicPoint other)
-		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return other.ScanNum == ScanNum && Math.Abs(other.Mz - Mz) < 0.001 && Math.Abs(other.Intensity - Intensity) < 0.001;
-		}
+        public bool Equals(XicPoint other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other.ScanNum == ScanNum && Math.Abs(other.Mz - Mz) < 0.001 && Math.Abs(other.Intensity - Intensity) < 0.001;
+        }
 
         public override string ToString()
         {
@@ -40,26 +40,26 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != typeof(XicPoint)) return false;
-			return Equals((XicPoint)obj);
-		}
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof(XicPoint)) return false;
+            return Equals((XicPoint)obj);
+        }
 
-		public override int GetHashCode()
-		{
-			return ScanNum;
-		}
+        public override int GetHashCode()
+        {
+            return ScanNum;
+        }
 
-		public static bool operator ==(XicPoint left, XicPoint right)
-		{
-			return Equals(left, right);
-		}
+        public static bool operator ==(XicPoint left, XicPoint right)
+        {
+            return Equals(left, right);
+        }
 
-		public static bool operator !=(XicPoint left, XicPoint right)
-		{
-			return !Equals(left, right);
-		}
+        public static bool operator !=(XicPoint left, XicPoint right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

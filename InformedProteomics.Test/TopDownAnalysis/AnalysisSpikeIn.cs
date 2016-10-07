@@ -15,7 +15,6 @@ using InformedProteomics.TopDown.Execution;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 
-
 namespace InformedProteomics.Test.TopDownAnalysis
 {
     public class AnalysisSpikeIn
@@ -38,7 +37,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             "CPTAC_Intact_Spike_10x_4_27Apr15_Bane_14-09-01RZ",
             "CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ"
         };
-        
+
         public const string Ms1FtFolder = @"\\protoapps\UserData\Jungkap\Quant";
         public const string MsPfFolder = @"\\protoapps\UserData\Jungkap\Quant\MSPF";
         public const string RawFolder = @"\\protoapps\UserData\Jungkap\Quant";
@@ -70,7 +69,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
             private readonly Tolerance _tolerance;
         }
 
-
         [Test]
         public void TestFeatureAlignment()
         {
@@ -78,7 +76,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             //const string outFolder = @"\\protoapps\UserData\Jungkap\CompRef\aligned";
             var runLabels = new string[] { "1x1", "1x2", "1x3", "1x4", "1x5", "5x1", "5x2", "5x3", "5x4", "5x5", "10x1", "10x2", "10x3", "10x4", "10x5", };
             var nDataset = runLabels.Length;
-            
+
             var prsmReader = new ProteinSpectrumMatchReader();
             var tolerance = new Tolerance(10);
             var alignment = new LcMsFeatureAlignment(new SpikeInFeatureComparer(tolerance));
@@ -249,8 +247,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 writer.Write("\n");
             }
             writer.Close();
-
         }
-
     }
 }

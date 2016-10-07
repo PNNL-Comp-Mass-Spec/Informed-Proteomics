@@ -65,7 +65,6 @@ namespace InformedProteomics.Backend.Database
             IsDecoy = isDecoy;
         }
 
-
         /// <summary>
         /// Get the Decoy version of this database (create it if missing)
         /// </summary>
@@ -259,13 +258,12 @@ namespace InformedProteomics.Backend.Database
             return "Unknown description, Offset " + offset;
         }
 
-
         public long? GetOffset(string name)
         {
             long offset;
             if (!_nameToOffset.TryGetValue(name, out offset))
                 return null;
-            return offset;            
+            return offset;
         }
 
         public string GetProteinDescription(string name)
@@ -375,11 +373,11 @@ namespace InformedProteomics.Backend.Database
 
             return false;
         }
-        
+
         private readonly string _databaseFilePath;
         private readonly string _seqFilePath;
         private readonly string _annoFilePath;
-        private readonly int _lastWriteTimeHash;      
+        private readonly int _lastWriteTimeHash;
 
         private List<long> _offsetList;
         private IDictionary<string, int> _nameToLength; // name -> length
@@ -475,7 +473,7 @@ namespace InformedProteomics.Backend.Database
                         }
 
                         name += "_Duplicate" + proteinInfoCached.ObservationCount.ToString("00");
-                        proteinInfoCached.ObservationCount++;                        
+                        proteinInfoCached.ObservationCount++;
                     }
 
                     proteinNamesAndStats.Add(name, proteinInfoCurrent);
@@ -508,7 +506,7 @@ namespace InformedProteomics.Backend.Database
                 reader.CloseFile();
             }
         }
-   
+
         private bool ReadSeqFile()
         {
             using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))

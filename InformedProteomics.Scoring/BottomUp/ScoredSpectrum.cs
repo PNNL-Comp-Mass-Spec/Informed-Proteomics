@@ -121,6 +121,4 @@ namespace InformedProteomics.Scoring.BottomUp
 
         internal int Rank { get; private set; }
     }
-
-
 }

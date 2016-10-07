@@ -20,7 +20,6 @@ namespace InformedProteomics.Scoring.BottomUp
         public float NeutralPeptideMass { get; private set; }
         public int SegmentIndex { get; private set; }
 
-
         public int CompareTo(Partition other)
         {
             if (Charge < other.Charge)

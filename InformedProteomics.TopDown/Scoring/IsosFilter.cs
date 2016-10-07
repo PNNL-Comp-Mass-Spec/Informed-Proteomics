@@ -45,7 +45,7 @@ namespace InformedProteomics.TopDown.Scoring
             var maxMass = 0.0;
             for (var i = 0; i < monoMassArr.Length; i++)
             {
-                if (fitArray != null && fitArray[i] > _fitScoreThreshold || chargeArray[i] <= 1) 
+                if (fitArray != null && fitArray[i] > _fitScoreThreshold || chargeArray[i] <= 1)
                     continue;
 
                 featureCountFiltered++;

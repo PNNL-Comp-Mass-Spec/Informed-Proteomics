@@ -20,8 +20,6 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestSequenceTagMatching
     {
-
-
         [Test]
         public void TestSearchWithTagGeneration()
         {
@@ -63,11 +61,8 @@ namespace InformedProteomics.Test
                 Console.Write(match.Sequence);
                 Console.WriteLine("\t{0}\t{1}\t{2}", match.TagMatch.StartIndex, match.TagMatch.EndIndex, match.TagMatch.Mass);
             }
-
-
         }
-        
-        
+
         [Test]
         public void TestTagBasedSearchForLewy()
         {
@@ -101,7 +96,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
 
-            var aaSet = new AminoAcidSet(modsFilePath);            
+            var aaSet = new AminoAcidSet(modsFilePath);
 
             TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
@@ -133,8 +128,7 @@ namespace InformedProteomics.Test
 
             var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
-          
-            
+
             var fastaDb = new FastaDatabase(fastaFilePath);
             var tolerance = new Tolerance(10);
             var aaSet = new AminoAcidSet(modsFilePath);
@@ -155,11 +149,8 @@ namespace InformedProteomics.Test
 
                 Console.WriteLine("-----------------------------------------------------------------------");
             }
-
         }
 
-        
-        
         [Test]
         public void TestTagBasedSearch()
         {
@@ -209,7 +200,7 @@ namespace InformedProteomics.Test
             TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
 
-        private void TestTagBasedSearch(LcMsRun run, 
+        private void TestTagBasedSearch(LcMsRun run,
             FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
         {
             var engine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)), new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
@@ -322,7 +313,7 @@ namespace InformedProteomics.Test
             }
 
             var hist = new Dictionary<int, int>();
-            
+
             var scanSet = new HashSet<int>();
             HashSet<string> proteinSetForThisScan = null;
             var prevScan = -1;
@@ -387,7 +378,7 @@ namespace InformedProteomics.Test
                 if (hist.TryGetValue(numMatches, out numOcc)) hist[numMatches] = numOcc + 1;
                 else hist.Add(numMatches, 1);
             }
-            
+
             Console.WriteLine("AvgNumMatches: {0}", totalNumMatches/(float)scanSet.Count);
             Console.WriteLine("Histogram:");
             foreach (var entry in hist.OrderBy(e => e.Key))
@@ -538,7 +529,7 @@ namespace InformedProteomics.Test
                         {
                             var seqStr = fastaDb.GetProteinSequence(protName);
                             var oriSeq = new Sequence(seqStr, AminoAcidSet.GetStandardAminoAcidSet());
-                            
+
                             var startIdx = 0;
                             while (true)
                             {
@@ -547,7 +538,7 @@ namespace InformedProteomics.Test
                                 if (idx < 0) break; //no matching
 
                                 //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
-                                var nClv = (nTerminal) ? 2 : 1; 
+                                var nClv = (nTerminal) ? 2 : 1;
 
                                 for (var j = 0; j < nClv; j++)
                                 {
@@ -564,7 +555,7 @@ namespace InformedProteomics.Test
 
                                     if (massDiff > 2000) break;
                                 }
-                                
+
                                 startIdx = idx + tag.Length;
                             }
                         }
@@ -578,6 +569,5 @@ namespace InformedProteomics.Test
                 Console.WriteLine(@"Done");
             }
         }
-
     }
 }

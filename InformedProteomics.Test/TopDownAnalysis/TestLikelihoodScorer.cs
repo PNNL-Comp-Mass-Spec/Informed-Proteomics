@@ -19,7 +19,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
 {
     class TestLikelihoodScorer
     {
-        
         public void TestLoadTariningParam()
         {
             //const string paramPath = @"D:\MassSpecFiles\training\IdScoring\likelihoodTable";
@@ -47,9 +46,9 @@ namespace InformedProteomics.Test.TopDownAnalysis
             Modification.RegisterAndGetModification(Modification.TriMethylation.Name, Modification.TriMethylation.Composition);
             Modification.RegisterAndGetModification("Trioxidation", new Composition(0, 0, 0, 3, 0));
             var aaSet = new AminoAcidSet(@"D:\MassSpecFiles\training\Mods.txt");
-            
+
             var n = 0;
-            
+
             for (var d = 0; d < TrainSetFileLists.Length; d++)
             {
                 var dataset = TrainSetFileLists[d];
@@ -57,16 +56,16 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
                 var decoyFile = string.Format(@"{0}\{1}_IcDecoy.tsv", idFileFolder, dataname);
                 var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
-                
+
                 if (!File.Exists(idFile)) continue;
-                
+
                 var prsmReader = new ProteinSpectrumMatchReader(0.01);
                 var prsmList = prsmReader.LoadIdentificationResult(idFile);
 
                 var minScore = prsmList.Last().Score;
                 var decoyMatches = prsmReader.ReadMsPathFinderResult(decoyFile, int.MaxValue, 1, Math.Max(minScore - 5, 10));
                 var run = PbfLcMsRun.GetLcMsRun(dataset);
-                
+
                 var spectrumMatchSet = LcMsFeatureTrain.CollectTrainSet(dataset, idFile);
                 Console.WriteLine(spectrumMatchSet.Count);
                 var writer = new StreamWriter(string.Format(@"{0}\{1}_target.tsv", outFileFolder, dataname));
@@ -126,12 +125,11 @@ namespace InformedProteomics.Test.TopDownAnalysis
             var minMz = ms2Spec.Peaks.First().Mz;
             var maxMz = ms2Spec.Peaks.Last().Mz;
 
-
             var cleavageIndex = 0;
 
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
-            
+
             foreach (var c in cleavages)
             {
                 var prefixHit = false;
@@ -185,7 +183,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
                             var mostAbuPeakMz = Ion.GetIsotopeMz(curFragMass, charge, mostAbundantIsotopeIndex);
                             curObsIonMassError = (Math.Abs(mostAbuPeak.Mz - mostAbuPeakMz) / mostAbuPeakMz) * 1e6;
-                            
+
                             //var curObsIonMass = Ion.GetMonoIsotopicMass(mostAbuPeak.Mz, charge, mostAbundantIsotopeIndex);
                             //curObsIonMassError = (Math.Abs(curFragMass - curObsIonMass) / curFragMass) * 1e6;
                         }
@@ -203,7 +201,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         if (baseIonType.IsPrefix) prefixHit = true;
                         else suffixHit = true;
                     }
-                    
+
                     //if (!ionMatch) continue;
                 }
 
@@ -233,27 +231,27 @@ namespace InformedProteomics.Test.TopDownAnalysis
             writer.Write("\t");
             writer.Write(nComplementaryFrags);
             writer.Write("\t");
-            
+
             writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", prefixStat.Count, preContCount, prefixStat.Intensity, prefixStat.Corr, prefixStat.Dist, prefixStat.MassError);
             writer.Write("\t");
             writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", suffixStat.Count, sufContCount, suffixStat.Intensity, suffixStat.Corr, suffixStat.Dist, suffixStat.MassError);
             writer.Write("\n");
         }
-        
+
         private void GetNodeStatistics(bool isDecoy, ProductSpectrum ms2Spec, Sequence sequence, StreamWriter writer) //, StreamWriter mzErrorWriter)
         {
             if (ms2Spec == null) return;
             if (sequence == null) return;
             //var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity) * 0.01;
             //refIntensity = Math.Min(ms2Spec.Peaks.Select(p => p.Intensity).Median(), refIntensity);
-            
+
             var BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             var BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
             var tolerance = new Tolerance(15);
             var minCharge = 1;
             var maxCharge = 20;
             var baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
-            
+
             var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity);
 
             var activationMethodFlag = ms2Spec.ActivationMethod == ActivationMethod.ETD ? 1 : 2;
@@ -270,7 +268,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             var prevSuffixObsIonIntensity = 0d;
 
             var nComplementaryFrags = 0;
-            
+
             var cleavageIndex = 0;
 
             foreach (var c in cleavages)
@@ -300,11 +298,11 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         if (isotopePeaks == null) continue;
 
                         var distCorr = AbstractFragmentScorer.GetDistCorr(ion, isotopePeaks);
-                        
+
                         if (distCorr.Item2 < 0.7 && distCorr.Item1 > 0.07) continue;
                         var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
                         var mostAbuPeak = isotopePeaks[mostAbundantIsotopeIndex];
-                        
+
                         var summedIntensity = isotopePeaks.Where(p => p != null).Sum(p => p.Intensity);
                         var intScore = summedIntensity/refIntensity;
                         //var intScore = mostAbuPeak.Intensity / medIntensity;
@@ -326,7 +324,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         bothObs = false;
                         continue;
                     }
-
 
                     writer.Write(activationMethodFlag);
                     writer.Write("\t");
@@ -351,8 +348,8 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
                     writer.Write("{0:0.000}", (Math.Abs(curFragMass - curObsIonMass)/curFragMass)*1e6);
                     writer.Write("\n");
-                    
-                    // mz error output 
+
+                    // mz error output
                     /*
                     if (baseIonType.IsPrefix && prevPrefixFragMass > 0 & prevPrefixObsIonMass > 0)
                     {
@@ -375,7 +372,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         prevPrefixObsIonMass = curObsIonMass;
                         prevPrefixObsIonCharge = curObsIonCharge;
                         prevPrefixObsIonIntensity = curObsIonIntensity;
-                        //Array.Copy(curObsIonMass, prevPrefixObsIonMass, curObsIonMass.Length);    
+                        //Array.Copy(curObsIonMass, prevPrefixObsIonMass, curObsIonMass.Length);
                     }
                     else
                     {
@@ -383,14 +380,12 @@ namespace InformedProteomics.Test.TopDownAnalysis
                         prevSuffixObsIonMass = curObsIonMass;
                         prevSuffixObsIonCharge = curObsIonCharge;
                         prevSuffixObsIonIntensity = curObsIonIntensity;
-                        //Array.Copy(curObsIonMass, prevSuffixObsIonMass, curObsIonMass.Length);    
+                        //Array.Copy(curObsIonMass, prevSuffixObsIonMass, curObsIonMass.Length);
                     }
-                    
                 }
-                
+
                 if (bothObs)
                 {
-
                     //pairWriter.Write("{0}\t{1}\t", prevPrefixObsIonIntensity, prevSuffixObsIonIntensity);
                     nComplementaryFrags++;
                 }
@@ -480,15 +475,12 @@ namespace InformedProteomics.Test.TopDownAnalysis
             return observedPeaks;
         }
 
-
-
-
         public static string[] TrainSetFileLists = new string[]
             {
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",// top-down datasets
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",
-                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",                
+                @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep3_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep4_15Jan15_Bane_C2-14-08-02RZ.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep5_15Jan15_Bane_C2-14-08-02RZ.pbf",
@@ -507,7 +499,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 @"D:\MassSpecFiles\test\NewQC_LongSep_29Sep14_141001104925.pbf",
                 @"D:\MassSpecFiles\training\raw\YS_Shew_testHCD_CID.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_2\yufeng_column_test2.pbf",
-                
+
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone41.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone43.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone44.pbf",
@@ -516,15 +508,8 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone47.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone49.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\MZ20150529DS_histone50.pbf",
-                
+
                 //@"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3\Lewy_intact_01.pbf"
             };
-
-
-
-
     }
-
-
-
 }

@@ -11,7 +11,7 @@ namespace InformedProteomics.TopDown.Scoring
     public class Ms1IsotopeCorrFilter: ISequenceFilter
     {
         public Ms1IsotopeCorrFilter(
-            LcMsRun run, 
+            LcMsRun run,
             int minCharge = 3, int maxCharge = 30,
             double ppmTolerance = 15,
             double corrThreshold = 0.5,

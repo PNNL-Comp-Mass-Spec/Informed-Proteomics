@@ -125,8 +125,6 @@ namespace InformedProteomics.Test
             }
         }
 
-
-
         // Read Configuration file
         private void InitTest(ConfigFileReader reader)
         {

@@ -29,7 +29,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 ShowErrorMessage(fe.Message);
                 return;
-            }            
+            }
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace InformedProteomics.TopDown.Execution
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
                 !MassSpecDataReaderFactory.IsADirectoryDataset(Parameters.InputPath))
             {
-                errorCode = ProcessDirectory(Parameters.InputPath);                
+                errorCode = ProcessDirectory(Parameters.InputPath);
             }
             else
             {
@@ -57,7 +57,7 @@ namespace InformedProteomics.TopDown.Execution
                     ShowErrorMessage(@"File extension not supported, " + Parameters.InputPath);
                     return -1;
                 }
-                
+
                 errorCode = ProcessFile(Parameters.InputPath);
             }
 
@@ -99,7 +99,6 @@ namespace InformedProteomics.TopDown.Execution
 
         private bool MsRawFile(string specFilePath)
         {
-            
             var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
 
@@ -205,7 +204,6 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
-            
 
             // write result files
             var tsvWriter = new StreamWriter(ms1FeaturesFilePath);
@@ -217,7 +215,7 @@ namespace InformedProteomics.TopDown.Execution
                 csvWriter = new StreamWriter(outCsvFilePath);
                 csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
             }
-            
+
             var filteredFeatures = container.GetFilteredFeatures(featureFinder);
             var featureId = 0;
             foreach (var feature in filteredFeatures)
@@ -300,7 +298,7 @@ namespace InformedProteomics.TopDown.Execution
             var run = PbfLcMsRun.GetLcMsRun(pbfFilePath);
 
             CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
-            
+
             return 0;
         }
 
@@ -338,7 +336,7 @@ namespace InformedProteomics.TopDown.Execution
 
             sb.AppendFormat("\t{0:0}", 0);
             sb.AppendFormat("\t{0:0.00}", 0);
-            
+
             sb.AppendFormat("\t{0:0.0}", feature.MinElutionTime);
             sb.AppendFormat("\t{0:0.0}", feature.MaxElutionTime);
             sb.AppendFormat("\t{0:0.0}", feature.ElutionLength);
@@ -400,7 +398,6 @@ namespace InformedProteomics.TopDown.Execution
 
                 sb.AppendFormat("\t{0:0.000}", feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.EvenCharge]);
                 sb.AppendFormat("\t{0:0.000}", feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.OddCharge]);
-
             }
 
             return sb.ToString();
@@ -411,11 +408,10 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine(@"----------------------------------------------------------");
             Console.WriteLine(@"Error: " + errorMessage);
             Console.WriteLine(@"----------------------------------------------------------");
-
         }
         public static readonly string[] TsvHeader = new string[]
         {
-            "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", 
+            "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge",
             "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "ApexScanNum", "ApexIntensity",
             "MinElutionTime", "MaxElutionTime", "ElutionLength", "Envelope", "LikelihoodRatio"
@@ -423,14 +419,13 @@ namespace InformedProteomics.TopDown.Execution
 
         public static readonly string[] TsvExtraScoreHeader = new string[]
         {
-            "BestEvenCharge", "BestOddCharge", 
-            "CorrEvenCharge", "CorrOddCharge", 
+            "BestEvenCharge", "BestOddCharge",
+            "CorrEvenCharge", "CorrOddCharge",
             "IntensityEvenCharge", "IntensityOddCharge",
             "SummedCorrEvenCharge", "SummedCorrOddCharge",
             "SummedIntensityEvenCharge", "SummedIntensityOddCharge",
             "XicCorrBetCharges1", "XicCorrBetCharges2",
-            "AbundanceRatioEvenCharge", "AbundanceRatioOddCharge", 
+            "AbundanceRatioEvenCharge", "AbundanceRatioOddCharge",
         };
-
     }
 }

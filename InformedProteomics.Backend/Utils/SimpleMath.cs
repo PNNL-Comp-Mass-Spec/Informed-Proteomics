@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.Utils
             LogCombinations.Add(new Tuple<int, int>(n, k), sum);
             return sum;
         }
-        
+
         public static int[][] GetCombinationsWithRepetition(int n, int length)
         {
             if (n <= 0)
@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Utils
         static public double GetKLDivergence(double[] P, double[] Q)
         {
             var ret = P.Select((t, i) => t*(Math.Log(t) - Math.Log(Q[i]))).Sum();
-           
+
             return ret;
         }
     }

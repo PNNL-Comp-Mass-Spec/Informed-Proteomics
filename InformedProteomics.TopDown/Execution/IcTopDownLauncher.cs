@@ -265,7 +265,7 @@ namespace InformedProteomics.TopDown.Execution
                 minMs1Scan = _ms2ScanNums.Min() - 100;
                 maxMs1Scan = _ms2ScanNums.Max() + 100;
             }
-           
+
             _isolationWindowTargetMz = new double[_run.MaxLcScan + 1];
             foreach (var ms2Scan in _ms2ScanNums)
             {
@@ -277,7 +277,6 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-
             progData.StepRange(10);
             progData.Status = "Reading Fasta File";
             Console.WriteLine(progData.Status);
@@ -285,7 +284,6 @@ namespace InformedProteomics.TopDown.Execution
             // Target database
             var targetDb = new FastaDatabase(DatabaseFilePath);
             targetDb.Read();
-
 
             progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
@@ -548,7 +546,6 @@ namespace InformedProteomics.TopDown.Execution
 
             return annotationsAndOffsets;
         }
-
 
         private void RunTagBasedSearch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, FastaDatabase db,
                                         CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
@@ -961,7 +958,7 @@ namespace InformedProteomics.TopDown.Execution
                 var match = matches[scanNum];
                 if (match == null)
                     continue;
-                
+
                 var start = database.GetOneBasedPositionInProtein(match.Offset) + 1 + match.NumNTermCleavages;
                 var proteinName = database.GetProteinName(match.Offset);
                 var result = new DatabaseSearchResultData()
@@ -1085,21 +1082,21 @@ namespace InformedProteomics.TopDown.Execution
                 new CVParamObj(CV.CVID.MS_parent_mass_type_mono),
                 new CVParamObj(CV.CVID.MS_fragment_mass_type_mono),
                 new UserParamObj() { Name = "TargetDecoyApproach", Value = (RunTargetDecoyAnalysis == DatabaseSearchMode.Both).ToString()},
-                new UserParamObj() { Name = "MinSequenceLength", Value = MinSequenceLength.ToString() }, 
-                new UserParamObj() { Name = "MaxSequenceLength", Value = MaxSequenceLength.ToString() }, 
-                new UserParamObj() { Name = "MaxNumNTermCleavages", Value = MaxNumNTermCleavages.ToString() }, 
-                new UserParamObj() { Name = "MaxNumCTermCleavages", Value = MaxNumCTermCleavages.ToString() }, 
-                new UserParamObj() { Name = "MinPrecursorIonCharge", Value = MinPrecursorIonCharge.ToString() }, 
-                new UserParamObj() { Name = "MaxPrecursorIonCharge", Value = MaxPrecursorIonCharge.ToString() }, 
-                new UserParamObj() { Name = "MinProductIonCharge", Value = MinProductIonCharge.ToString() }, 
-                new UserParamObj() { Name = "MaxProductIonCharge", Value = MaxProductIonCharge.ToString() }, 
-                new UserParamObj() { Name = "MinSequenceMass", Value = MinSequenceMass.ToString(CultureInfo.InvariantCulture) }, 
-                new UserParamObj() { Name = "MaxSequenceMass", Value = MaxSequenceMass.ToString(CultureInfo.InvariantCulture) }, 
-                new UserParamObj() { Name = "PrecursorIonTolerance", Value = PrecursorIonTolerance.ToString() }, 
-                new UserParamObj() { Name = "ProductIonTolerance", Value = ProductIonTolerance.ToString() }, 
-                new UserParamObj() { Name = "SearchMode", Value = SearchMode.ToString() }, 
-                new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = NumMatchesPerSpectrum.ToString() }, 
-                new UserParamObj() { Name = "TagBasedSearch", Value = TagBasedSearch.ToString() }, 
+                new UserParamObj() { Name = "MinSequenceLength", Value = MinSequenceLength.ToString() },
+                new UserParamObj() { Name = "MaxSequenceLength", Value = MaxSequenceLength.ToString() },
+                new UserParamObj() { Name = "MaxNumNTermCleavages", Value = MaxNumNTermCleavages.ToString() },
+                new UserParamObj() { Name = "MaxNumCTermCleavages", Value = MaxNumCTermCleavages.ToString() },
+                new UserParamObj() { Name = "MinPrecursorIonCharge", Value = MinPrecursorIonCharge.ToString() },
+                new UserParamObj() { Name = "MaxPrecursorIonCharge", Value = MaxPrecursorIonCharge.ToString() },
+                new UserParamObj() { Name = "MinProductIonCharge", Value = MinProductIonCharge.ToString() },
+                new UserParamObj() { Name = "MaxProductIonCharge", Value = MaxProductIonCharge.ToString() },
+                new UserParamObj() { Name = "MinSequenceMass", Value = MinSequenceMass.ToString(CultureInfo.InvariantCulture) },
+                new UserParamObj() { Name = "MaxSequenceMass", Value = MaxSequenceMass.ToString(CultureInfo.InvariantCulture) },
+                new UserParamObj() { Name = "PrecursorIonTolerance", Value = PrecursorIonTolerance.ToString() },
+                new UserParamObj() { Name = "ProductIonTolerance", Value = ProductIonTolerance.ToString() },
+                new UserParamObj() { Name = "SearchMode", Value = SearchMode.ToString() },
+                new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = NumMatchesPerSpectrum.ToString() },
+                new UserParamObj() { Name = "TagBasedSearch", Value = TagBasedSearch.ToString() },
             });
 
             // Get the search modifications as they were passed into the AminoAcidSet constructor...

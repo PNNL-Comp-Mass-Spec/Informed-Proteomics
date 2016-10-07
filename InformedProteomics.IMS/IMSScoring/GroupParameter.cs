@@ -12,22 +12,21 @@ namespace InformedProteomics.IMS.IMSScoring
         public int LocationIndex { get; private set; }
         public int FlankingResidueIndex { get; private set; }
         public int Charge { get; private set; }
-        
+
         private const int MaxCharge = 3;
         private const int MinCharge = 2;
-        private static Dictionary<Tuple<char, char>, int> flankingIndexDictionary = new Dictionary<Tuple<char, char>, int>(); 
+        private static Dictionary<Tuple<char, char>, int> flankingIndexDictionary = new Dictionary<Tuple<char, char>, int>();
 
         public GroupParameter(Composition cutComposition, char nTermAA, char cTermAA, Ion precursorIon)
         {
             MassIndex = GetMassIndex(precursorIon.Composition);
             Charge = Math.Max(MinCharge, Math.Min(precursorIon.Charge, MaxCharge));
             LocationIndex = GetLocationIndex(precursorIon.Composition, cutComposition);
-            FlankingResidueIndex =  GetFlankingResidueIndex(nTermAA, cTermAA); 
+            FlankingResidueIndex =  GetFlankingResidueIndex(nTermAA, cTermAA);
         }
 
         public GroupParameter(Ion precursorIon) : this(precursorIon.Composition, ' ', ' ', precursorIon)
         {
-            
         }
 
         internal GroupParameter(int massIndex, int locationIndex, int flankingResidueIndex, int charge)
@@ -41,7 +40,7 @@ namespace InformedProteomics.IMS.IMSScoring
         public GroupParameter GetPrecursorGroupParameter()
         {
             return new GroupParameter(MassIndex, int.MinValue, int.MinValue, Charge);
-        } 
+        }
 
         public static GroupParameter Parse(string s)
         {
@@ -133,8 +132,6 @@ namespace InformedProteomics.IMS.IMSScoring
             return index;
         }
 
-       
-
         static private readonly int[,] ResidueTable =
         {
             {0, 5, 15, 9, 0, 0, 9, 4, 7, 11, 11, 5, 0, 0, 2, 13, 13, 0, 0, 11},
@@ -158,6 +155,5 @@ namespace InformedProteomics.IMS.IMSScoring
             {0, 5, 15, 9, 0, 0, 9, 4, 7, 11, 11, 5, 0, 0, 2, 13, 13, 0, 0, 11},
             {10, 5, 10, 9, 10, 10, 9, 4, 7, 11, 11, 5, 10, 10, 2, 10, 10, 10, 10, 11}
         };
-
     }
 }

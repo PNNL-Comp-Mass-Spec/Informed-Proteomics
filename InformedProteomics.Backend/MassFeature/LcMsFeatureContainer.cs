@@ -8,7 +8,6 @@ using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.MassFeature
 {
-    
     public class LcMsFeatureContainer
     {
         public LcMsFeatureContainer(List<Ms1Spectrum> ms1Spectra, LcMsFeatureLikelihood scorer, INodeComparer<LcMsPeakCluster> mergeComparer)
@@ -17,9 +16,8 @@ namespace InformedProteomics.Backend.MassFeature
             _spectra = ms1Spectra;
             _scorer = scorer;
             _mergeComparer = mergeComparer;
-
         }
-        
+
         public bool Add(LcMsPeakCluster newFeature)
         {
             if (newFeature.Score < _scorer.ScoreThreshold) return false;
@@ -86,7 +84,7 @@ namespace InformedProteomics.Backend.MassFeature
                 foreach (var peak in newFeature.GetMinorPeaks())
                 {
                     peak.TagMinorPeakOf(newFeature);
-                }                
+                }
             }
         }
 
@@ -116,17 +114,16 @@ namespace InformedProteomics.Backend.MassFeature
             //Console.WriteLine("# of generated connected components = {0};  Elapsed Time = {1:0.000} sec", ret.Count, elapsed);
             return ret;
         }
-      
 
         private List<LcMsPeakCluster> MergeFeatures(LcMsPeakMatrix featureFinder, List<LcMsPeakCluster> features)
         {
             //foreach (var f in _featureList) f.ActivateAllPeaks();
             var featureSet = new NodeSet<LcMsPeakCluster>();
             featureSet.AddRange(features);
-            
+
             var connectedFeatureSet = featureSet.ConnnectedComponents(_mergeComparer);
             var mergedFeatures = new List<LcMsPeakCluster>();
-            
+
             foreach (var fSet in connectedFeatureSet)
             {
                 if (fSet.Count == 1)
@@ -145,7 +142,10 @@ namespace InformedProteomics.Backend.MassFeature
                     foreach (var f in fSet)
                     {
                         var newFeature = featureFinder.GetLcMsPeakCluster(f.RepresentativeMass, minCharge, maxCharge, minScan, maxScan);
-                        if (newFeature != null && (maxScoredCluster == null || newFeature.Score > maxScoredCluster.Score)) maxScoredCluster = newFeature;    
+                        if (newFeature != null && (maxScoredCluster == null || newFeature.Score > maxScoredCluster.Score))
+                        {
+                            maxScoredCluster = newFeature;
+                        }
 
                         if (f.Score > maxScore)
                         {
@@ -184,7 +184,6 @@ namespace InformedProteomics.Backend.MassFeature
             return false;
         }
 
-
         private IList<LcMsPeakCluster> RemoveOverlappedFeatures(SortedSet<LcMsPeakCluster> featureSet)
         {
             var outFeatures = new List<LcMsPeakCluster>();
@@ -209,7 +208,7 @@ namespace InformedProteomics.Backend.MassFeature
                             outFeatures.Add(f);
                             continue;
                         }
-                        
+
                         tempList.Add(f);
                     }
                 }
@@ -233,7 +232,6 @@ namespace InformedProteomics.Backend.MassFeature
             return outFeatures;
         }
 
-     
         private SortedSet<LcMsPeakCluster> GetConnectedFeatures(ref int startIndex)
         {
             var neighbors = new Queue<LcMsPeakCluster>();
@@ -267,12 +265,12 @@ namespace InformedProteomics.Backend.MassFeature
         public int NumberOfFeatures { get { return _featureList.Count; } }
 
         private readonly LcMsFeatureLikelihood _scorer;
-        
+
         private readonly List<LcMsPeakCluster> _featureList;
 
         private readonly List<Ms1Spectrum> _spectra;
         private readonly INodeComparer<LcMsPeakCluster> _mergeComparer;
-        
+
         private class LcMsFeatureScoreComparer : IComparer<LcMsPeakCluster>
         {
             public int Compare(LcMsPeakCluster x, LcMsPeakCluster y)
@@ -280,6 +278,5 @@ namespace InformedProteomics.Backend.MassFeature
                 return (y.Score.CompareTo(x.Score));
             }
         }
-
     }
 }

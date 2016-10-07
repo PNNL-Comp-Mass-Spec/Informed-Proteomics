@@ -21,7 +21,7 @@ namespace InformedProteomics.IMS.IMS
         {
         }
 
-        public ImsDataCached(string filePath, double minPrecursorMz, double maxPrecursorMz, 
+        public ImsDataCached(string filePath, double minPrecursorMz, double maxPrecursorMz,
             double minFragmentMz, double maxFragmentMz, Tolerance precursorTolerance, Tolerance fragmentTolerance)
             : base(filePath)
         {
@@ -67,7 +67,7 @@ namespace InformedProteomics.IMS.IMS
         }
 
         /// <summary>
-        /// Extracts the fragment feature within the boundary of the precursorFeature 
+        /// Extracts the fragment feature within the boundary of the precursorFeature
         /// </summary>
         /// <param name="fragmentMz"></param>
         /// <param name="precursorFeature"></param>
@@ -126,7 +126,6 @@ namespace InformedProteomics.IMS.IMS
 
         private void WriteFeatures(bool isPrecursor)
         {
-            
         }
 
         private int CreateFeaturesMultiThreading(bool isPrecursor)
@@ -164,7 +163,7 @@ namespace InformedProteomics.IMS.IMS
             {
                 return curFeatureSet;
             }
-            
+
             var recoveredMz = GetMzFromBin(mzBin);
             var featureSet = isPrecursor ?
                                  GetFeatures(recoveredMz, PrecursorTolerance, DataReader.FrameType.MS1)
@@ -179,7 +178,7 @@ namespace InformedProteomics.IMS.IMS
             const float portionIntersectioinThreshold = 0.1f; // added by Kyowon - testing
             int bestIntersectionArea = 0;
             var precursorBoundary = precursorFeature.GetBoundary();
-            
+
             // TODO: this may not be optimal
             var features = GetFeatures(mz, isPrecursor);
             foreach (var feature in features)

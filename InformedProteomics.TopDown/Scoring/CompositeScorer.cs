@@ -84,7 +84,6 @@ namespace InformedProteomics.TopDown.Scoring
                     Console.WriteLine(@"Error in CompositeScorer GetFragmentScore: " + ex.Message);
                     throw;
                 }
-
             }
 
             if (prefixHit && suffixHit)

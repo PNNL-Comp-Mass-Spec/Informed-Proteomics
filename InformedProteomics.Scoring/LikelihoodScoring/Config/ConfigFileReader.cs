@@ -91,7 +91,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             Read(fileName);
         }
 
-
         /*
          * getNodes() return a list of all the nodes with a particular
          * header tag.

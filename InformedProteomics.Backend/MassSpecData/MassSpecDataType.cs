@@ -8,7 +8,7 @@ namespace InformedProteomics.Backend.MassSpecData
     public enum MassSpecDataType
     {
         XCaliburRun,
-		MzMLFile,
+        MzMLFile,
         PbfFile,
         Unknown,
     }

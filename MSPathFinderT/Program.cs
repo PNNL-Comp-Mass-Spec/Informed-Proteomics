@@ -100,7 +100,6 @@ namespace MSPathFinderT
 
             foreach (var specFilePath in parameters.SpecFilePaths)
             {
-                
                 var topDownLauncher = new IcTopDownLauncher(
                     specFilePath,
                     parameters.DatabaseFilePath,
@@ -128,7 +127,7 @@ namespace MSPathFinderT
                     TagBasedSearch = parameters.TagBasedSearch,
                     ScanNumbers = parameters.ScanNumbers
                 };
-                
+
                 var success = topDownLauncher.RunSearch();
 
                 if (success)
@@ -154,7 +153,7 @@ namespace MSPathFinderT
 
                 if (errorCode == 0)
                 {
-                    // This is the first error encountered; update the error code 
+                    // This is the first error encountered; update the error code
                     // (though we will continue processing the next file if there is one)
                     errorCode = -Math.Abs(errorMsg.GetHashCode());
                     if (errorCode == 0)
@@ -179,14 +178,11 @@ namespace MSPathFinderT
                     return -1;
                 else
                     return errorCode;
-
-            }            
+            }
 #endif
 
             return errorCode;
-
         }
-
 
         private static void PrintUsageInfo(string errorMessage = null)
         {
@@ -226,6 +222,5 @@ namespace MSPathFinderT
             // Wait for 1.5 seconds
             System.Threading.Thread.Sleep(1500);
         }
-
     }
 }

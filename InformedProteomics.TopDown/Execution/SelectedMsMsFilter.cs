@@ -9,7 +9,7 @@ namespace InformedProteomics.TopDown.Execution
     using InformedProteomics.Backend.Data.Spectrometry;
     public class SelectedMsMsFilter : ISequenceFilter
     {
-        private readonly List<int> ms2Scans; 
+        private readonly List<int> ms2Scans;
 
         public SelectedMsMsFilter(IEnumerable<int> ms2scans)
         {

@@ -16,9 +16,9 @@ namespace InformedProteomics.Test.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
-            
+
             const string rawFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2014_3\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
- 
+
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);

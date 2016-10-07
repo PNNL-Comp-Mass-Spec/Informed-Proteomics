@@ -8,7 +8,6 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SequenceTag;
 
-
 namespace InformedProteomics.TopDown.Quantification
 {
     public class UnidentifiedFeatureAnalysis
@@ -16,8 +15,8 @@ namespace InformedProteomics.TopDown.Quantification
         /*
          * This is a class that Jung Kap asked me to complete to analyze unidentified features from a cross tab file
          * This class checks to see for each feature how many spectrum contained it, from the spectrum how many tags were genereated, and then
-         * how many of those tags exist in our data base. 
-         * 
+         * how many of those tags exist in our data base.
+         *
          */
         public UnidentifiedFeatureAnalysis(string[] rawFiles, string crossTabFile, string databaseFile)
         {
@@ -69,11 +68,11 @@ namespace InformedProteomics.TopDown.Quantification
 
         /**
          * This prints two files:
-         * 
-         * 1) a general file that looks at each feature and gives the spectrum match count, tag count and database hit count 
-         * 2) a more specific file that matches a featuer to a scan # and then the mz and charge value being looked at. 
-         * 
-         * Format is specific to data Jung gave me 
+         *
+         * 1) a general file that looks at each feature and gives the spectrum match count, tag count and database hit count
+         * 2) a more specific file that matches a featuer to a scan # and then the mz and charge value being looked at.
+         *
+         * Format is specific to data Jung gave me
          */
         public void PrintAnalysisToFile(string outputFolder)
         {
@@ -104,10 +103,8 @@ namespace InformedProteomics.TopDown.Quantification
                 tsv.Append(line);
             }
             File.WriteAllText(outputFolder + "featureDetails.tsv",tsv.ToString());
-
         }
 
-        
         public void DoAnalysis()
         {
             InitilizeMatrix(_spectrumMatchesMatrix);
@@ -133,7 +130,6 @@ namespace InformedProteomics.TopDown.Quantification
                     _dataBaseHitMatrix[j][i] = hitCount;
                 }
             }
-
         }
 
         private List<ProductSpectrum> GetMatchedSpectrums(LcMsRun run, IList<int> ms2List ,Tuple<int,double, double, double, double,double> feature, int fileIndex)
@@ -148,13 +144,13 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var scanElutionTime = run.GetElutionTime(ms2List[i]);
                 if (scanElutionTime < minElution || scanElutionTime > maxElution) continue;
-                
+
                 var spectrum = run.GetSpectrum(ms2List[i]) as ProductSpectrum;
                 var window = spectrum.IsolationWindow;
                 var minMz = window.MinMz - .5;
                 var maxMz = window.MaxMz + .5;
                 var mzTable = GetFeatureMassTable(mass);
-                 
+
                 for (var j = 0; j < mzTable.Length; j++)
                 {
                     var mz = mzTable[j];
@@ -164,7 +160,6 @@ namespace InformedProteomics.TopDown.Quantification
                     break;
                 }
                 _identifiedFeatures[featureId][fileIndex] = det;
-
             }
             return spectrumList;
         }
@@ -189,7 +184,7 @@ namespace InformedProteomics.TopDown.Quantification
         private int TagsInDatabase(List<SequenceTag> tags)
         {
             var hits = 0;
-            if (tags.Count == 0) return hits; 
+            if (tags.Count == 0) return hits;
             for (var i = 0; i < tags.Count; i++)
             {
                 var index = _searchableDB.Search(tags[i].Sequence);
@@ -205,7 +200,6 @@ namespace InformedProteomics.TopDown.Quantification
                 matrix[i] = new int[_rawFiles.Length];
             }
         }
-
 
         private void GetFilteredFeatures(string filterFile)
         {
@@ -229,16 +223,15 @@ namespace InformedProteomics.TopDown.Quantification
             return Enumerable.Range(2, chargeLimit - 1).Select(x => ((mass + x) / x)).ToArray();
         }
 
-
         private readonly string _databaseFile;
         private readonly string[] _rawFiles;
         private readonly string _crossTabFile;
         private string _filteredFile;
         private SearchableDatabase _searchableDB;
         private readonly List<Tuple<int,double, double, double,double,double>> _filteredFeatures;
-        private Tuple<int, double, int>[][] _identifiedFeatures; 
+        private Tuple<int, double, int>[][] _identifiedFeatures;
         private int[][] _spectrumMatchesMatrix;
         private int[][] _tagsGeneratedMatrix;
-        private int[][] _dataBaseHitMatrix;   
+        private int[][] _dataBaseHitMatrix;
     }
 }

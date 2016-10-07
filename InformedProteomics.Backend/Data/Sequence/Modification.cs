@@ -30,7 +30,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Modification()
         {
-            
         }
 
         public override int GetHashCode()
@@ -177,7 +176,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             Register(mod);
             return mod;
         }
-        
+
         // Added by Chris
         /// <summary>
         /// Register a new modification or update existing modification.

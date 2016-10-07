@@ -4,7 +4,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 {
     public class TagMatch
     {
-        public TagMatch(int startIndex, int endIndex, int matchedTagLength, 
+        public TagMatch(int startIndex, int endIndex, int matchedTagLength,
             int charge, double nTermScore, double cTermScore, double mass, ModificationCombination modifications, string modificationText)
         {
             StartIndex = startIndex;

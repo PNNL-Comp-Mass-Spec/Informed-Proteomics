@@ -34,7 +34,6 @@ namespace InformedProteomics.Backend.MassFeature
 
         public double Mass { get { return this.Select(item => item.Mass).Median(); } }
 
-
         public void SetDataId(int dataid)
         {
             DataId = dataid;
@@ -54,8 +53,7 @@ namespace InformedProteomics.Backend.MassFeature
             return false;
         }
     }
-    
-    
+
     public class ProteinSpectrumMatch : IEquatable<ProteinSpectrumMatch>, IComparable<ProteinSpectrumMatch>
     {
         public ProteinSpectrumMatch(string sequence, int scanNum, double mass, int charge, string protName, string protDesc, int firstResidue, int lastResidue, double score, SearchTool searchTool = SearchTool.Unknown)
@@ -93,7 +91,7 @@ namespace InformedProteomics.Backend.MassFeature
         public int LastResidue { get; private set; }
         public double Score { get; private set; }
         public string SequenceText { get; internal set; }
-        
+
         public string Modifications { get; internal set; }
 
         public SearchTool SearchToolType { get; private set; }
@@ -105,11 +103,11 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 return SequenceText.Equals(other.SequenceText);
             }
-            
+
             var massDiff = Math.Abs(Mass - other.Mass);
-            var tol = new Tolerance(10);                
+            var tol = new Tolerance(10);
             if (massDiff < tol.GetToleranceAsTh(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue) return true;
-            
+
             return false;
         }
 
@@ -138,13 +136,7 @@ namespace InformedProteomics.Backend.MassFeature
             }
             // todo : MsAlign
 
-
             return null;
         }
-
-
-      
-
-
     }
 }

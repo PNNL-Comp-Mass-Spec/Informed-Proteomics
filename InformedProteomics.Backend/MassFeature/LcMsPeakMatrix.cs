@@ -15,10 +15,10 @@ namespace InformedProteomics.Backend.MassFeature
     public class LcMsPeakMatrix
     {
         public LcMsPeakMatrix(
-            LcMsRun run, 
-            ISequenceFilter ms1Filter, 
-            LcMsFeatureLikelihood scorer = null, 
-            int minScanCharge = 1, 
+            LcMsRun run,
+            ISequenceFilter ms1Filter,
+            LcMsFeatureLikelihood scorer = null,
+            int minScanCharge = 1,
             int maxScanCharge = 60,
             int maxThreadCount = 0,
             int minMs1Scan = int.MinValue,
@@ -27,14 +27,14 @@ namespace InformedProteomics.Backend.MassFeature
         {
             _ms1Filter = ms1Filter;
         }
-        
+
         public LcMsPeakMatrix(
-            LcMsRun run, 
-            LcMsFeatureLikelihood scorer = null, 
-            int minScanCharge = 1, 
-            int maxScanCharge = 60, 
-            int maxThreadCount = 0, 
-            int minMs1Scan = int.MinValue, 
+            LcMsRun run,
+            LcMsFeatureLikelihood scorer = null,
+            int minScanCharge = 1,
+            int maxScanCharge = 60,
+            int maxThreadCount = 0,
+            int minMs1Scan = int.MinValue,
             int maxMs1Scan = int.MaxValue)
         {
             Run = run;
@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.MassFeature
             _corrProfileAcrossCharge = new double[NRows];
             _intensityAcrossCharge = new double[NRows];
             _summedEnvelopeColRange = new int[NRows, 2];
-            
+
             _featureMatrix = null;
             Comparer = new MzComparerWithBinning(27); // 16ppm
             _scorer = scorer;
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.MassFeature
         }
 
         private readonly ISequenceFilter _ms1Filter;
-        private readonly LcMsFeatureLikelihood _scorer;        
+        private readonly LcMsFeatureLikelihood _scorer;
         public IList<LcMsPeakCluster> FindFeatures(int binNumber)
         {
             var features = GetLcMs1PeakClusters(binNumber);
@@ -126,7 +126,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             var minCol = ms1ScanNumToIndex[targetMinScanNum];
             var maxCol = ms1ScanNumToIndex[targetMaxScanNum];
-            
+
             // 2) determine charge state range and elution period
             var range = DetermineFeatureRange(targetMass, row, minCol, maxCol);
 
@@ -146,10 +146,10 @@ namespace InformedProteomics.Backend.MassFeature
             feature.UpdateScore(Ms1Spectra);
             if (_scorer != null) feature.Score = _scorer.GetScore(feature);
             else feature.Score = 0d;
-           
+
             // 5) determine abundance
             SetAbundanceByAuc(ref feature);
-           
+
             return feature;
         }
 
@@ -175,7 +175,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             // 3) collect envelopes
             var feature = CollectLcMsPeaks(targetMass, minRow, maxRow, minCol, maxCol, true);
-            
+
             if (feature == null) return null;
 
             // 4) scoring
@@ -185,7 +185,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             // 5) determine abundance
             SetAbundanceByAuc(ref feature);
-          
+
             return feature;
         }
 
@@ -232,7 +232,7 @@ namespace InformedProteomics.Backend.MassFeature
             var simCutoff = GetDistanceCorrelationThreshold(minRow, maxRow, minCol, maxCol);
             var bcCutoff = Math.Max(0.07, simCutoff.Item1);
             var corrCutoff = Math.Min(0.7, simCutoff.Item2);
-            
+
             var xic = new double[maxCol - minCol + 1 + 18];
             const int xicStartIndex = 9;
 
@@ -244,7 +244,7 @@ namespace InformedProteomics.Backend.MassFeature
                     _featureMatrix[envelope.Charge - _targetMinCharge][envCol].CorrelationCoeff < corrCutoff) continue;
                 xic[envCol - minCol + xicStartIndex] += envelope.Abundance;
             }
-            
+
             var smoothedXic = Smoother.Smooth(xic);
             var abundance = 0d;
             var apexScanNum = feature.MinScanNum;
@@ -339,7 +339,7 @@ namespace InformedProteomics.Backend.MassFeature
 
         public LcMsRun Run;
         public readonly List<Ms1Spectrum> Ms1Spectra;
-        
+
         public readonly int MinSearchCharge;
         public readonly int MaxSearchCharge;
         public int MaxSearchChargeLength { get { return NRows;  } }
@@ -366,7 +366,7 @@ namespace InformedProteomics.Backend.MassFeature
         private int[] _cols;
         private TheoreticalIsotopeEnvelope _theoreticalEnvelope;
         private readonly List<KeyValuePair<double, ObservedIsotopeEnvelope>> _seedEnvelopes;
-        
+
         private void SetTargetMass(double targetMass)
         {
             /*var chargeLowerBound = Math.Ceiling(targetMass / Run.MaxMs1Mz);
@@ -382,7 +382,7 @@ namespace InformedProteomics.Backend.MassFeature
             _rows = Enumerable.Range(0, _targetMaxCharge - _targetMinCharge + 1).ToArray();
             _theoreticalEnvelope = new TheoreticalIsotopeEnvelope(targetMass, MaxEnvelopeLength, RelativeIsotopePeakIntensityThreshold);
         }
-        
+
         private double _targetMass;
         private int _targetMinCharge;
         private int _targetMaxCharge;
@@ -406,10 +406,10 @@ namespace InformedProteomics.Backend.MassFeature
             InitFeatureMatrix();
 
             SetTargetMass(targetMass);
-            
+
             var observedRows        = new BitArray(NRows);
             var observedCols        = new BitArray(NColumns);
-            
+
             var mostAbuInternalIdx = _theoreticalEnvelope.IndexOrderByRanking[0];
             var totalElutionLength = Run.GetElutionTime(Run.MaxLcScan);
             var elutionSamplingHalfLen = Math.Max(Math.Min(totalElutionLength * 0.003, 5.0), 0.5);
@@ -420,13 +420,13 @@ namespace InformedProteomics.Backend.MassFeature
 
             var minMs1Mz = _ms1PeakList.First().Mz;
             var maxMs1Mz = _ms1PeakList.Last().Mz;
-            
+
             var nPeaksCutoff = NumberOfPeaksCutoff;
             var bcSeedCutoff = GetSeedBcDistThreshold();
             var corrSeedCutoff = GetSeedCorrThreshold();
             var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
-            
+
             var options = new ParallelOptions();
             if (_maxThreadCount > 0) options.MaxDegreeOfParallelism = _maxThreadCount;
             _seedEnvelopes.Clear();
@@ -436,7 +436,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var charge = row + _targetMinCharge;
 
                 for (var col = 0; col < NColumns; col++) _featureMatrix[row][col].Init();
-               
+
                 for (var k = 0; k < _theoreticalEnvelope.Size; k++)
                 {
                     var i = _theoreticalEnvelope.IndexOrderByRanking[k];
@@ -468,7 +468,7 @@ namespace InformedProteomics.Backend.MassFeature
                             if (!(_featureMatrix[row][col].AccurateMass > 0)) continue;
                             var expectedPeakMz = Ion.GetIsotopeMz(_featureMatrix[row][col].AccurateMass, charge, isotopeIndex);
                             if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > tolerance.GetToleranceAsTh(ms1Peak.Mz)) continue;
-                            
+
                             // in case of existing isotope peaks, select peaks maximizing envelope similairty
                             if (_featureMatrix[row][col].EnvelopePeaks[i] != null)
                             {
@@ -482,7 +482,7 @@ namespace InformedProteomics.Backend.MassFeature
                                     var bc1 = _theoreticalEnvelope.GetBhattacharyyaDistance(_featureMatrix[row][col].EnvelopePeaks);
                                     _featureMatrix[row][col].EnvelopePeaks[i] = ms1Peak;
                                     var bc2 = _theoreticalEnvelope.GetBhattacharyyaDistance(_featureMatrix[row][col].EnvelopePeaks);
-                                    if (bc1 < bc2) _featureMatrix[row][col].EnvelopePeaks[i] = tmpPeak;                                    
+                                    if (bc1 < bc2) _featureMatrix[row][col].EnvelopePeaks[i] = tmpPeak;
                                 }
                             }
                             else
@@ -513,13 +513,12 @@ namespace InformedProteomics.Backend.MassFeature
                             _featureMatrix[row][col].AccurateMass = inferredAccurateMass;
                         }
                     }
-
                 }
 
                 for (var col = 0; col < NColumns; col++)
                 {
                     if (!(_featureMatrix[row][col].Exist)) continue;
-                    
+
                     if (_featureMatrix[row][col].CountActivePeaks >= nPeaksCutoff)
                     {
                         var corr = _theoreticalEnvelope.GetPearsonCorrelation(_featureMatrix[row][col].EnvelopePeaks);
@@ -529,7 +528,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                         if (!observedRows[row]) observedRows[row] = true;
                         if (!observedCols[col]) observedCols[col] = true;
-                        
+
                         // collect seed envelopes
                         var mostAbuPeak = _featureMatrix[row][col].EnvelopePeaks[mostAbuInternalIdx];
                         if (mostAbuPeak != null && (bcDist < bcSeedCutoff || corr < corrSeedCutoff))
@@ -574,7 +573,7 @@ namespace InformedProteomics.Backend.MassFeature
                 return 6;
             }
         }
-      
+
         private IList<LcMsPeakCluster> GetLcMs1PeakClusters(int binNumber)
         {
             const int chargeNeighborGap = 4;
@@ -588,7 +587,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
             var tempEnvelope2 = new double[_theoreticalEnvelope.Size];
-            
+
             var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
@@ -598,7 +597,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 var row = seed.Charge - _targetMinCharge;
                 var col = ms1ScanNumToIndex[seed.ScanNum];
-                
+
                 if (_featureMatrix[row][col].CheckedOutFlag) continue;
 
                 var mostAbuMz = _theoreticalEnvelope.GetIsotopeMz(seed.Charge, mostAbuInternalIndex);
@@ -611,7 +610,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 var chargeCheck = CorrectChargeState(seed, Ms1Spectra[col]);
                 if (!chargeCheck) continue;
-                
+
                 var seedMass = _featureMatrix[row][col].AccurateMass;
                 var massTol = tolerance.GetToleranceAsTh(seedMass);
                 var newCluster = new LcMsPeakCluster(Run, seed);
@@ -648,13 +647,13 @@ namespace InformedProteomics.Backend.MassFeature
                             if (_featureMatrix[i][j].CheckedOutFlag) continue;
                             if (!(_featureMatrix[i][j].AccurateMass > 0)) continue;
                             if (Math.Abs(seedMass - _featureMatrix[i][j].AccurateMass) > massTol) continue;
-                            
+
                             Array.Copy(tempEnvelope, tempEnvelope2, tempEnvelope2.Length);
 
                             _featureMatrix[i][j].EnvelopePeaks.SumEnvelopeTo(tempEnvelope);
                             var newDivergence = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
                             var newCorrelation = _theoreticalEnvelope.GetPearsonCorrelation(tempEnvelope);
-                            
+
                             if (_featureMatrix[i][j].DivergenceDist < 0.02 ||_featureMatrix[i][j].CorrelationCoeff > 0.7 || newDivergence < summedBcDist || newCorrelation > summedCorr)
                             {
                                 var envelope = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass,
@@ -694,7 +693,7 @@ namespace InformedProteomics.Backend.MassFeature
                     SetCheckOutFlag(newCluster.MinCharge - _targetMinCharge, newCluster.MaxCharge - _targetMinCharge, ms1ScanNumToIndex[newCluster.MinScanNum], ms1ScanNumToIndex[newCluster.MaxScanNum], true);
                 }
             }
-            return clusters;            
+            return clusters;
         }
 
         private void SetCheckOutFlag(int minRow, int maxRow, int minCol, int maxCol, bool flag)
@@ -702,7 +701,7 @@ namespace InformedProteomics.Backend.MassFeature
             for(var i = minRow; i <= maxRow; i++)
                 for (var j = minCol; j <= maxCol; j++) _featureMatrix[i][j].CheckedOutFlag = flag;
         }
-        
+
         private Tuple<double, double> GetDistanceCorrelationThreshold(int minRow, int maxRow, int minCol, int maxCol)
         {
             var distList = new List<double>();
@@ -736,7 +735,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             var bcCutoff = GetSeedBcDistThreshold();
             var corrCutoff = GetSeedCorrThreshold();
-            
+
             for (var i = minRow; i <= maxRow; i++)
             {
                 for (var j = minCol; j <= maxCol; j++)
@@ -752,7 +751,7 @@ namespace InformedProteomics.Backend.MassFeature
                             _featureMatrix[i][j].DivergenceDist = _theoreticalEnvelope.GetBhattacharyyaDistance(peaks); ;
                             _featureMatrix[i][j].AccurateMass = targetMass;
                             _featureMatrix[i][j].CorrelationCoeff = _theoreticalEnvelope.GetPearsonCorrelation(peaks); ;
-                            Array.Copy(peaks, _featureMatrix[i][j].EnvelopePeaks, peaks.Length);    
+                            Array.Copy(peaks, _featureMatrix[i][j].EnvelopePeaks, peaks.Length);
                         }
                     }
 
@@ -774,10 +773,9 @@ namespace InformedProteomics.Backend.MassFeature
 
             var cluster = new LcMsPeakCluster(Run, bestEnvelope);
             cluster.AddEnvelopes(minRow + _targetMinCharge, maxRow + _targetMinCharge, ms1ScanNums[minCol], ms1ScanNums[maxCol], envelopes);
-            
+
             return cluster;
         }
-
 
         private double GetBcDistThreshold()
         {
@@ -785,7 +783,7 @@ namespace InformedProteomics.Backend.MassFeature
             if (_targetMass > 25000) return 0.1;
             if (_targetMass > 15000) return 0.08;
             if (_targetMass > 5000) return 0.06;
-            
+
             return 0.03;
         }
 
@@ -797,7 +795,7 @@ namespace InformedProteomics.Backend.MassFeature
             if (_targetMass > 5000) return 0.6;
             return 0.7;
         }
-        
+
         private double GetSeedBcDistThreshold()
         {
             if (_targetMass > 45000) return 0.3;
@@ -828,7 +826,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             if (_rows.Length < 2 || _cols.Length < 1) return null;
 
-            // expand seed min/max col when the period is too short            
+            // expand seed min/max col when the period is too short
             var elutionSamplingPeriod = Math.Max(Math.Min(Run.GetElutionTime(Run.MaxLcScan) * 0.003, 5.0), 0.5);
             var tempWindow = GetElutionWindow((int)(0.5*(seedMinCol+seedMaxCol)), elutionSamplingPeriod);
             for (var t = seedMinCol - 1; t >= tempWindow.Item1; t--)
@@ -847,7 +845,6 @@ namespace InformedProteomics.Backend.MassFeature
             var bcDistList = new List<double>();
             var corrList = new List<double>();
 
-
             var options = new ParallelOptions();
             if (_maxThreadCount > 0) options.MaxDegreeOfParallelism = _maxThreadCount;
 
@@ -858,12 +855,12 @@ namespace InformedProteomics.Backend.MassFeature
 
                 _intensityAcrossCharge[i] = summedEnvelope.Sum();
             });
-            
+
             foreach (var i in _rows)
             {
                 if (_corrProfileAcrossCharge[i] < corrCutoff && _distProfileAcrossCharge[i] > bcCutoff) continue;
                 bcDistList.Add(_distProfileAcrossCharge[i]);
-                corrList.Add(_corrProfileAcrossCharge[i]);                
+                corrList.Add(_corrProfileAcrossCharge[i]);
             }
 
             var minCol = seedMinCol;
@@ -912,7 +909,7 @@ namespace InformedProteomics.Backend.MassFeature
                     bestCharge[chargeIdx] = charge;
                 }
             }
-            
+
             if (bestCharge[0] == 0 && bestCharge[1] == 0) return null;
 
             // only one charge? there should be another....force to cover neighboring charge states
@@ -965,7 +962,7 @@ namespace InformedProteomics.Backend.MassFeature
             var smoothedXic = Smoother.Smooth(xic);
             var apexCol = -1;
             var apexIntensity = 0d;
-            
+
             //for (var j = minCol; j <= maxCol; j++)
             for (var j = xicStartIndex; j <= xicEndIndex; j++)
             {
@@ -977,12 +974,12 @@ namespace InformedProteomics.Backend.MassFeature
             }
 
             if (apexCol < 0) return null;
-            
+
             ////////////////// 1) First Half
             var ms1ScanNums = Run.GetMs1ScanVector();
             var oneSigIntensity = apexIntensity * Math.Exp(-1);
             var threeSigIntensity = apexIntensity * Math.Exp(-4.5);
-            
+
             // estimate sigma for Gaussian shaped elution profile for the first half
             var elutionStartColByOneSigma = apexCol;
             for (var j = apexCol - 1; j >= 0; j--)
@@ -1035,7 +1032,7 @@ namespace InformedProteomics.Backend.MassFeature
                     }
                 }
                 if (needBreak) break;
-                    
+
                 elutionStartCol = j;
             }
 
@@ -1054,7 +1051,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 elutionEndColByTwoSigma = j;
                 if (Run.GetElutionTime(ms1ScanNums[j]) -  Run.GetElutionTime(ms1ScanNums[apexCol]) > 2 * oneSigPeriod) break;
-                
+
                 var needBreak = true;
                 for (var k = j + 1; k <= j + 3; k++)
                 {
@@ -1083,7 +1080,6 @@ namespace InformedProteomics.Backend.MassFeature
                 var elutionLen = Run.GetElutionTime(ms1ScanNums[j]) - Run.GetElutionTime(ms1ScanNums[apexCol]);
                 if (elutionLen > 3 && elutionLen > 8 * oneSigPeriod) break;
 
-                
                     var needBreak = true;
                     for (var k = j + 1; k <= j + 3; k++)
                     {
@@ -1101,7 +1097,7 @@ namespace InformedProteomics.Backend.MassFeature
 
                 elutionEndCol = j;
             }
-            
+
             return new Tuple<int, int, int, int>(minRow, maxRow, elutionStartCol, elutionEndCol);
         }
 
@@ -1113,7 +1109,7 @@ namespace InformedProteomics.Backend.MassFeature
             var summedEnvelope = new double[_theoreticalEnvelope.Size];
             var seedCol = -1;
             var seedDist = 10.0d;
-            
+
             var newMinCol = minCol;
             var newMaxCol = maxCol;
             //var tolerance = new Tolerance(5);
@@ -1125,7 +1121,7 @@ namespace InformedProteomics.Backend.MassFeature
                 if (!_featureMatrix[row][j].Exist) continue;
                 if (_featureMatrix[row][j].CheckedOutFlag) continue;
                 if (Math.Abs(targetMass - _featureMatrix[row][j].AccurateMass) > massTol) continue;
-                
+
                 var bcDist = _featureMatrix[row][j].DivergenceDist;
                 if (bcDist > seedDist) continue;
 
@@ -1133,7 +1129,6 @@ namespace InformedProteomics.Backend.MassFeature
                 //if (signalToNoiseRatio < 3) continue;
                 seedCol = j;
                 seedDist = bcDist;
-                
             }
 
             var summedBcDist = 1.0d;
@@ -1146,7 +1141,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             // going forward
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
-            
+
             var n = 0;
             for(var col = seedCol; col < NColumns; col++)
             {
@@ -1268,19 +1263,19 @@ namespace InformedProteomics.Backend.MassFeature
                     {
                         Array.Copy(summedEnvelope, tempEnvelope, tempEnvelope.Length);
                         n++;
-                    }                    
+                    }
                 }
             }
-            
+
             _corrProfileAcrossCharge[row] = summedCorr;
             _distProfileAcrossCharge[row] = summedBcDist;
 
             _summedEnvelopeColRange[row, 0] = newMinCol;
             _summedEnvelopeColRange[row, 1] = newMaxCol;
-            
+
             return summedEnvelope;
         }
-        
+
         private bool CorrectChargeState(ObservedIsotopeEnvelope envelope, Ms1Spectrum spectrum)
         {
             if (envelope.Charge > 20) return true; //high charge (> +20), just pass
@@ -1289,7 +1284,7 @@ namespace InformedProteomics.Backend.MassFeature
             var peakStartIndex = envelope.MinMzPeak.IndexInSpectrum;
             var peakEndIndex = envelope.MaxMzPeak.IndexInSpectrum;
             var intensityThreshold = envelope.HighestIntensity * 0.15;
-            
+
             var nPeaks = 0;
             for (var i = peakStartIndex; i <= peakEndIndex; i++)
             {
@@ -1309,22 +1304,22 @@ namespace InformedProteomics.Backend.MassFeature
             var maxCheckCharge = Math.Min(envelope.Charge * 5 + 1, 60);
             var maxDeltaMz = Constants.C13MinusC12 / minCheckCharge + mzTol;
             var nChargeGaps = new int[maxCheckCharge - minCheckCharge + 1];
-            
+
             for (var i = peakStartIndex; i <= peakEndIndex; i++)
             {
                 if (!(peaks[i].Intensity > intensityThreshold)) continue;
-                
+
                 for (var j = i + 1; j <= peakEndIndex; j++)
                 {
                     if (!(peaks[j].Intensity > intensityThreshold)) continue;
-                    
+
                     var deltaMz = peaks[j].Mz - peaks[i].Mz;
 
                     if (deltaMz > maxDeltaMz) break;
 
                     if (Math.Abs(deltaMz - mzTol) < float.Epsilon)
                     {
-                        // Peaks are too close together; continue 
+                        // Peaks are too close together; continue
                         continue;
                     }
 
@@ -1346,7 +1341,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             return true;
         }
-        
+
         private Tuple<int, int> GetElutionWindow(int refCol, double halfWindowSize, int minScanCount = 5)
         {
             var maxCol = (int)Math.Min(minScanCount + refCol, _cols.Last());
@@ -1384,7 +1379,7 @@ namespace InformedProteomics.Backend.MassFeature
             if (mass < 1000) return new Tuple<int, int>(MinSearchCharge, Math.Min(MinSearchCharge + MaxSearchChargeLength - 1, 5));
             if (mass < 2500) return new Tuple<int, int>(MinSearchCharge, Math.Min(MinSearchCharge + MaxSearchChargeLength - 1, 10));
             if (mass > 40000) return new Tuple<int, int>(MaxSearchCharge - MaxSearchChargeLength + 1, MaxSearchCharge);
-            
+
             const double c1 = 8.52456367162247e-09;
             const double c2 = 0.000389353356727307;
             const double c3 = -1.50236827038509;
@@ -1408,7 +1403,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             return new Tuple<int, int>(minCharge, maxCharge);
         }
-        
+
         internal class LcMsPeakMatrixCell
         {
             internal double CorrelationCoeff;
@@ -1417,7 +1412,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             internal readonly Ms1Peak[] EnvelopePeaks;
             internal bool CheckedOutFlag;
-            
+
             internal LcMsPeakMatrixCell(int maxPeaks)
             {
                 EnvelopePeaks = new Ms1Peak[maxPeaks];
@@ -1445,7 +1440,7 @@ namespace InformedProteomics.Backend.MassFeature
             {
                 get { return EnvelopePeaks.Count(p => p != null && p.Active); }
             }
-            
+
             internal double Intensity
             {
                 get { return EnvelopePeaks.Where(envelopePeak => envelopePeak != null && envelopePeak.Active).Sum(envelopePeak => envelopePeak.Intensity); }

@@ -98,7 +98,7 @@ namespace PbfGen
                     PrintUsageInfo("Invalid output file directory: " + specFilePath);
                     return -1;
                 }
-                
+
                 if (!Directory.Exists(outputDir))
                 {
                     if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
@@ -108,7 +108,6 @@ namespace PbfGen
                     }
                     Directory.CreateDirectory(outputDir);
                 }
-
             }
             catch (Exception ex)
             {
@@ -150,7 +149,6 @@ namespace PbfGen
                     var run = new PbfLcMsRun(rawFilePath, reader, pbfFilePath, 0, 0, progress);
                     Console.WriteLine();
                 }
-
 
                 Console.WriteLine("PbfFormatVersion: {0}", PbfLcMsRun.FileFormatId);
                 return 0;

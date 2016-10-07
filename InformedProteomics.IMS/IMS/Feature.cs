@@ -8,7 +8,7 @@ namespace InformedProteomics.IMS.IMS
     {
         public ushort ScanLcStart { get; private set; }// 100
         public byte ScanLcLength { get; private set; }// 5 -> 100-104
-        public byte ScanLcRepOffset { get; private set; }// to highest point 
+        public byte ScanLcRepOffset { get; private set; }// to highest point
         public ushort ScanImsStart { get; private set; }
         public byte ScanImsLength { get; private set; }
         public byte ScanImsRepOffset { get; private set; }

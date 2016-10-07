@@ -71,7 +71,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>mass spectrum</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
-
             var scanInfo = GetScanInfo(scanNum);
 
             // default empty arrays, if peak data not requested.
@@ -81,7 +80,6 @@ namespace InformedProteomics.Backend.MassSpecData
             if (includePeaks)
             {
                 _msfileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
-                
             }
 
             var elutionTime = RtFromScanNum(scanNum);
@@ -111,7 +109,7 @@ namespace InformedProteomics.Backend.MassSpecData
             };
             return productSpec;
         }
-  
+
         /// <summary>
         /// Reads the precursor information of the specified scan
         /// </summary>
@@ -155,11 +153,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return _minLcScan;
         }
 
-
         public int ReadMsLevel(int scanNum)
         {
             int msLevel;
-            if (_msLevel.TryGetValue(scanNum, out msLevel)) 
+            if (_msLevel.TryGetValue(scanNum, out msLevel))
                 return msLevel;
 
             var scanInfo = GetScanInfo(scanNum);
@@ -185,7 +182,6 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly int _numSpectra;
         private readonly Dictionary<int, int> _msLevel;
 
-
         /// <summary>
         /// Reads the isolation window target m/z
         /// </summary>
@@ -195,9 +191,9 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             // string scanFilterString = null;
             // _msfileReader.GetFilterForScanNum(scanNum, ref scanFilterString);
-            
+
             var scanInfo = GetScanInfo(scanNum);
-            
+
             var isolationTargetMz = -1.0;
             if (!string.IsNullOrWhiteSpace(scanInfo.FilterText))
             {
@@ -205,7 +201,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return isolationTargetMz;
         }
-     
+
         private PrecursorInfo ReadPrecursorInfoFromTrailerExtra(int scanNum)
         {
             if (ReadMsLevel(scanNum) == 1) return null;
@@ -216,18 +212,18 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var scanInfo = GetScanInfo(scanNum);
             string valueText;
-            
+
             if (scanInfo.TryGetScanEvent("Monoisotopic M/Z:", out valueText))
             {
                 monoIsotopicMz = Convert.ToDouble(valueText);
-                if (monoIsotopicMz == 0.0) 
+                if (monoIsotopicMz == 0.0)
                     monoIsotopicMz = null;
             }
 
             if (scanInfo.TryGetScanEvent("Charge State:", out valueText))
             {
                 charge = Convert.ToInt32(valueText);
-                if (charge == 0) 
+                if (charge == 0)
                     charge = null;
             }
 
@@ -280,7 +276,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>activation method</returns>
         private ActivationMethod GetActivationMethod(int scanNum)
         {
-
             var scanInfo = GetScanInfo(scanNum);
 
             switch (scanInfo.ActivationType)
@@ -316,7 +311,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public void Close()
         {
             if (_msfileReader != null)
-                _msfileReader.CloseRawFile();                
+                _msfileReader.CloseRawFile();
         }
     }
 }

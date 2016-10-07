@@ -19,7 +19,6 @@ namespace InformedProteomics.Backend.Data.Biology
 
         public Atom()
         {
-            
         }
 
         public string Code { get; set; }

@@ -184,7 +184,7 @@ namespace InformedProteomics.Backend.MassSpecData
             public readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
             public readonly Dictionary<long, long> OffsetsMapInt = new Dictionary<long, long>();
             public readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
-            public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>(); 
+            public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
 
             public void AddOffset(string idRef, string offset)
             {
@@ -1442,7 +1442,6 @@ namespace InformedProteomics.Backend.MassSpecData
                                  */
                                 switch (innerReader.GetAttribute("accession"))
                                 {
-
                                     case "MS:1000768":
                                         // name="Thermo nativeID format"
                                         _instrument = Instrument.Thermo_RAW_format;
@@ -1598,7 +1597,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             reader.Close();
         }
-        
+
         /// <summary>
         /// Handle the cvParam element
         /// </summary>
@@ -1810,11 +1809,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     continue;
                 }
                 //////////////////////////////////////////////////////////////////////////////////////
-                /// 
+                ///
                 /// MS1 Spectra: only need Spectrum data: scanNum, MSLevel, ElutionTime, mzArray, IntensityArray
-                /// 
+                ///
                 /// MS2 Spectra: use ProductSpectrum; adds ActivationMethod and IsolationWindow
-                /// 
+                ///
                 //////////////////////////////////////////////////////////////////////////////////////
                 switch (reader.Name)
                 {
@@ -1945,7 +1944,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     intensities = bda;
                 }
             }
-            
+
             if (!centroided && includePeaks)
             {
                 // Centroid spectrum
@@ -2007,7 +2006,7 @@ namespace InformedProteomics.Backend.MassSpecData
             spectrum.ElutionTime = scan.StartTime;
             spectrum.NativeId = nativeId;
             spectrum.TotalIonCurrent = tic;
-            
+
             return spectrum;
         }
         #endregion
@@ -2443,7 +2442,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                      *   e.g.: MS:1000422 (high-energy collision-induced dissociation)
                                      *   e.g.: MS:1000433 (low-energy collision-induced dissociation)
                                      *   et al.
-                                     *   
+                                     *
                                      *   e.g.: MS:1000133 "collision-induced dissociation"
                                      *   e.g.: MS:1000134 "plasma desorption"
                                      *   e.g.: MS:1000135 "post-source decay"
@@ -2835,7 +2834,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /*********************************************************************************************************************************************
          * TODO: Flesh out the algorithm/double check it, etc.
          * Do some more work here.
-         * 
+         *
          ********************************************************************************************************************************************/
         private byte[] DecompressZLib(byte[] compressedBytes, int expectedBytes)
         {

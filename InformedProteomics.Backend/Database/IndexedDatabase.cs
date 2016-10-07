@@ -144,7 +144,6 @@ namespace InformedProteomics.Backend.Database
                             ? annotation
                             : annotation[1 + numNTermCleavage] + "." + annotation.Substring(2 + numNTermCleavage);
                         yield return new AnnotationAndOffset(offset + numNTermCleavage, cleavedAnnotation);
-
                     }
                     ++numNTermCleavage;
                 }
@@ -199,7 +198,7 @@ namespace InformedProteomics.Backend.Database
                             yield return buffer[i];
                         }
                     }
-                }                
+                }
             }
             else
             {
@@ -384,11 +383,11 @@ namespace InformedProteomics.Backend.Database
                 seqBuild.Clear();
                 seqBuild.Append(seqArr[0] + ".");
 
-                if (enzymaticResidues != null)  
+                if (enzymaticResidues != null)
                 {
                     var ntt = 0;
                     var nmc = 0;
-                    if (!isNTermEnzyme) // C-term enzyme 
+                    if (!isNTermEnzyme) // C-term enzyme
                     {
                         if (isCleavable[seqArr[0]]) ++ntt;
                         if (ntt < numTolerableTermini-1) continue;
@@ -487,7 +486,7 @@ namespace InformedProteomics.Backend.Database
                 isStandardAminoAcid[residue] = true;
             }
 
-            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for 
+            // Try to get the number of physical cores in the system - requires System.Management.dll and a WMI query, but the performance penalty for
             // using the number of logical processors in a hyperthreaded system is significant, and worse than the penalty for using fewer than all physical cores.
             if (threads <= 0 || threads > ParallelizationUtils.NumPhysicalCores)
             {
@@ -515,11 +514,11 @@ namespace InformedProteomics.Backend.Database
             var seqBuild = new StringBuilder(seqArr.Length + 3);
             seqBuild.Append(seqArr[0] + ".");
 
-            if (enzymaticResidues != null)  
+            if (enzymaticResidues != null)
             {
                 var ntt = 0;
                 var nmc = 0;
-                if (!isNTermEnzyme) // C-term enzyme 
+                if (!isNTermEnzyme) // C-term enzyme
                 {
                     if (isCleavable[seqArr[0]]) ++ntt;
                     if (!(ntt < numTolerableTermini-1))
@@ -582,7 +581,6 @@ namespace InformedProteomics.Backend.Database
                         yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                     }
                 }
-
             }
         }
 
@@ -659,7 +657,7 @@ namespace InformedProteomics.Backend.Database
             //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
             var suffixArray = new int[sequence.Length-1];
             SAIS.sufsort(sequence, suffixArray, sequence.Length-1);
-            
+
             var prevIndex = sequence.Length - 1;
 
             var pLcp = new byte[suffixArray.Length];
@@ -732,7 +730,7 @@ namespace InformedProteomics.Backend.Database
 
         //            if (enzymaticResidues != null)
         //            {
-        //                if (!isNTermEnzyme) // C-term enzyme 
+        //                if (!isNTermEnzyme) // C-term enzyme
         //                {
         //                    if (isCleavable[seqArr[0]]) ++ntt;
         //                    if (ntt < numTolerableTermini - 1) continue;
@@ -755,7 +753,6 @@ namespace InformedProteomics.Backend.Database
         //                }
         //                else // N-term enzyme
         //                {
-
         //                }
         //            }
         //            else // no enzyme
@@ -772,8 +769,6 @@ namespace InformedProteomics.Backend.Database
         //    return NumSequences(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
         //                       enzyme.IsNTerm);
         //}
-
-
     }
 
     internal class SequenceLcpAndOffset

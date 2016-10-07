@@ -33,7 +33,7 @@ namespace InformedProteomics.Test.FunctionalTests
 
             const int scanNum = 5927;
             const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
-            
+
             const string modStr = "";
 
             var idFile = string.Format(@"{0}\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv", idFileFolder);
@@ -44,7 +44,6 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
-
 
             const int maxCharge = 20;
             const int minCharge = 1;
@@ -92,7 +91,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 var graph = graphFactory.CreateScoringGraph(scorer, proteinMass);
                 stopwatch.Stop();
                 Console.WriteLine(@"node generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-                
+
                 stopwatch.Reset();
                 stopwatch.Start();
                 var gf = new GeneratingFunction(graph);
@@ -103,13 +102,13 @@ namespace InformedProteomics.Test.FunctionalTests
                 var scoreDist = gf.GetScoreDistribution();
 
                 Console.WriteLine("{0}-{1}", scoreDist.MinScore, scoreDist.MaxScore);
-                
+
                 for (var score = 45; score <= gf.MaximumScore; score++)
                 {
                     var specEvalue = gf.GetSpectralEValue(score);
                     Console.WriteLine("{0} : {1}", score, specEvalue);
                 }
-               
+
             stopwatch2.Stop();
             Console.WriteLine(@"TOTAL computing generation function = {0:0.000} sec", (stopwatch2.ElapsedMilliseconds) / 1000.0d);
         }
@@ -123,7 +122,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 NumberOfBins = GetBinNumber(MaxMass) - GetBinNumber(MinMass) + 1;
                 Filtered = false;
             }
-            
+
             public int GetBinNumber(double mass)
             {
                 return Constants.GetBinNumHighPrecision(mass);
@@ -138,7 +137,6 @@ namespace InformedProteomics.Test.FunctionalTests
             public double GetMassStart(int binNumber)
             {
                 return 0.5*(GetMass(binNumber - 1) + GetMass(binNumber));
-
             }
 
             public double GetMassEnd(int binNumber)
@@ -169,7 +167,4 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(scores);
         }*/
     }
-
-
-
 }

@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.MassFeature
             _featureCompare = featureCompare;
         }
 
-        public LcMsFeatureAlignment(IList<string> featureFileList, IEnumerable<LcMsRun> runList, INodeComparer<LcMsFeature> featureCompare) 
+        public LcMsFeatureAlignment(IList<string> featureFileList, IEnumerable<LcMsRun> runList, INodeComparer<LcMsFeature> featureCompare)
             : this(featureCompare)
         {
             _runList.AddRange(runList);
@@ -34,7 +34,7 @@ namespace InformedProteomics.Backend.MassFeature
             }
             _featureList.Sort(new FeatureMassComparer());
         }
-        
+
         public void AddDataSet(int dataId, List<LcMsFeature> features, LcMsRun run)
         {
             //RawFileList.Add(rawFilePath);
@@ -42,9 +42,9 @@ namespace InformedProteomics.Backend.MassFeature
             features.Sort(new FeatureMassComparer());
             _featureSetList.Add(dataId, features);
             _featureList.AddRange(features);
-            _featureList.Sort(new FeatureMassComparer());        
+            _featureList.Sort(new FeatureMassComparer());
         }
-        
+
         /*
         public static List<LcMsFeature> LoadProMexResult(string featureFilePath)
         {
@@ -74,7 +74,7 @@ namespace InformedProteomics.Backend.MassFeature
             var repScans = tsvReader.GetData("RepScan");
             var repMzs = tsvReader.GetData("RepMz");
             var scores = tsvReader.GetData("LikelihoodRatio");
-            
+
             for (var i = 0; i < tsvReader.NumData; i++)
             {
                 var abundance = double.Parse(abu[i]);
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var minScan = int.Parse(minScans[i]);
                 var maxScan = int.Parse(maxScans[i]);
                 var fid = int.Parse(featureIds[i]);
-                
+
                 var repCharge = (repCharges != null) ? int.Parse(repCharges[i]) : (int)Math.Round(0.5*(minCharge + maxCharge));
                 var repMz = (repMzs != null) ? double.Parse(repMzs[i]) : (repMass / repCharge) + Constants.Proton;
                 var repScanNum = (repScans != null) ? int.Parse(repScans[i]) : minScan;
@@ -172,7 +172,7 @@ namespace InformedProteomics.Backend.MassFeature
                 else
                     _alignedFeatures[j][dataSetIndex] = ft;*/
 
-                progressData.Report(j, this.CountAlignedFeatures);    
+                progressData.Report(j, this.CountAlignedFeatures);
             }
 
             featureFinder = null;
@@ -194,7 +194,7 @@ namespace InformedProteomics.Backend.MassFeature
                 //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
         }
-        
+
         public int CountDatasets { get { return _runList.Count; } }
         public int CountAlignedFeatures { get { return (_alignedFeatures == null) ? 0 : _alignedFeatures.Count; } }
         /*
@@ -206,7 +206,7 @@ namespace InformedProteomics.Backend.MassFeature
                 var featureInfo = GetRepresentativeFeature(features);
                 featureInfoList.Add(featureInfo);
             }
-            
+
             for (var i = 0; i < alignedFeatures.Count; i++)
             {
                 var features = alignedFeatures[i];
@@ -244,7 +244,6 @@ namespace InformedProteomics.Backend.MassFeature
                 }
             }
         }*/
-
 
         /*
         public void RefineAbundance()
@@ -296,14 +295,14 @@ namespace InformedProteomics.Backend.MassFeature
                         minScanNum = _alignedFeatures[j][i].MinScanNum;
                         maxScanNum = _alignedFeatures[j][i].MaxScanNum;
                     }
-                    
+
                     var feature = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
                     //if (feature == null || feature.Score < -10)
                     if (feature == null)
                     {
                         feature = featureFinder.CollectLcMsPeaksWithNoise(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
                     }
-                    _alignedFeatures[j][i] = feature;    
+                    _alignedFeatures[j][i] = feature;
                 }
                 Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
@@ -359,7 +358,6 @@ namespace InformedProteomics.Backend.MassFeature
             return ret;
         }
 
-
         private LcMsFeature GetRepresentativeFeature(IList<LcMsFeature> features)
         {
             foreach (var f in features)
@@ -412,7 +410,7 @@ namespace InformedProteomics.Backend.MassFeature
         private List<LcMsFeature> GetAlignedFeatures(ref HashSet<int> component, List<int>[] adjList)
         {
             var nDataSet = CountDatasets;
-            
+
             // find seed node
             var minScoreNode = 0;
             var minScore = 0d;
@@ -455,12 +453,11 @@ namespace InformedProteomics.Backend.MassFeature
                     minScoreNode = idx1;
                 }
             }
-            
+
             var chkDataset = new bool[nDataSet];
-            
 
             var centroid = _featureList[minScoreNode];
-            
+
             //for(var i = 0; i < nDataSet; i++) linkedIdx[i] = -1;
             //linkedIdx[centroid.DataSetId] = minScoreNode;
             //score[centroid.DataSetId] = 0;
@@ -485,7 +482,7 @@ namespace InformedProteomics.Backend.MassFeature
                     {
                         if (idx1 == idx2 || !adjList[idx1].Contains(idx2)) continue;
                         var f2 = _featureList[idx2];
-                        
+
                         if (chkDataset[f2.DataSetId]) continue;
 
                         var netDiff = NetDiff(centroid, f2);
@@ -500,18 +497,17 @@ namespace InformedProteomics.Backend.MassFeature
 
                 // pick closest node to current cluster
                 nodeSet.Add(minScoreNode);
-                
+
                 chkDataset[_featureList[minScoreNode].DataSetId] = true;
 
                 if (nodeSet.Count == component.Count) break;
             }
-            
+
             var alignedFeatures = new List<LcMsFeature>(nodeSet.Select(idx => _featureList[idx]));
             component.ExceptWith(nodeSet);
 
             return alignedFeatures;
         }
-
 
         private List<List<int>> GetConnectedComponents(List<int>[] adjList)
         {
@@ -544,11 +540,9 @@ namespace InformedProteomics.Backend.MassFeature
                 }
                 //groupedFeaters.Add(featureSet);
                 nodeSetList.Add(nodeSet);
-
             }
             return nodeSetList;
         }
-
 
         private double NetDiff(LcMsFeature f1, LcMsFeature f2)
         {
@@ -573,7 +567,5 @@ namespace InformedProteomics.Backend.MassFeature
                 return (x.Mass.CompareTo(y.Mass));
             }
         }
-
-
     }
 }

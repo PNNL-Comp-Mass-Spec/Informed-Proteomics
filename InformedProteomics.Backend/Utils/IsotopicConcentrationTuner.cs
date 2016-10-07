@@ -80,7 +80,7 @@ namespace InformedProteomics.Backend.Utils
 
         /// <summary>
         /// Try to find the best concentration of the selected isotope
-        /// by stepping through the concentrations and fitting a theoretical 
+        /// by stepping through the concentrations and fitting a theoretical
         /// isotopic profile to the provided observed peaks.
         /// </summary>
         /// <param name="progress">The progress reporter.</param>
@@ -178,7 +178,7 @@ namespace InformedProteomics.Backend.Utils
             var averagine = new Averagine();
 
             return averagine.GetTheoreticalIsotopeProfileInst(
-                                this.Mass, 
+                                this.Mass,
                                 this.Charge,
                                 this.RelativeIntensityThreshold,
                                 isoProfilePredictor);
@@ -277,7 +277,7 @@ namespace InformedProteomics.Backend.Utils
         public class IsotopeConcentrationCorrelationCurve
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="IsotopeConcentrationCorrelationCurve" />. 
+            /// Initializes a new instance of the <see cref="IsotopeConcentrationCorrelationCurve" />.
             /// </summary>
             public IsotopeConcentrationCorrelationCurve()
             {
@@ -289,7 +289,7 @@ namespace InformedProteomics.Backend.Utils
             /// Gets or sets the curve showing isotope concentration vs pearson correlation with fit to observed peaks.
             /// </summary>
             public List<ConcentrationCorrelationPoint> DataPoints { get; set; }
-            
+
             /// <summary>
             /// The concentration with the best fit with observed peaks.
             /// </summary>

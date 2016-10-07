@@ -68,7 +68,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         private AminoAcidSet(ModFileParser modFileParser)
             : this(modFileParser.SearchModifications, modFileParser.MaxNumDynModsPerSequence)
         {
-            
         }
 
         public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence): this()
@@ -149,7 +148,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                     _locationSpecificResidueModMap[loc].Add(residue, modIndexArr);
                 }
             }
-
         }
 
         #endregion
@@ -162,7 +160,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public IEnumerable<SearchModification> SearchModifications { get; private set; }
 
         #endregion
-        
+
         public AminoAcid GetAminoAcid(char residue)
         {
             return GetAminoAcid(residue, SequenceLocation.Everywhere);
@@ -237,7 +235,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     }
                     Console.WriteLine();
                 }
-            }            
+            }
         }
 
         public Composition.Composition[] GetUniqueCompositions()
@@ -281,7 +279,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static AminoAcidSet GetStandardAminoAcidSetWithCarboamidomethylCys()
         {
-            return _standardAminoAcidSetWithCarboamidomethylCys ?? 
+            return _standardAminoAcidSetWithCarboamidomethylCys ??
                 (_standardAminoAcidSetWithCarboamidomethylCys = new AminoAcidSet(Modification.Carbamidomethylation));
         }
 
@@ -345,7 +343,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
     public class ModifiedAminoAcid: AminoAcid
     {
-        public ModifiedAminoAcid(AminoAcid aa, Modification modification) 
+        public ModifiedAminoAcid(AminoAcid aa, Modification modification)
             : base(aa.Residue, aa.Name+"+"+modification.Name, aa.Composition+modification.Composition)
         {
             var modAa = aa as ModifiedAminoAcid;

@@ -9,7 +9,6 @@ namespace InformedProteomics.Backend.Utils
 {
     public class ProbabilityDistributionCalculator
     {
-
         public ProbabilityDistributionCalculator()
         {
             _massBins = Enumerable.Range(0, 31).Select(x => 500 + x * 1000).ToArray();
@@ -77,7 +76,7 @@ namespace InformedProteomics.Backend.Utils
             }
             File.WriteAllText(outputLocation, tsv.ToString());
         }
-  
+
         public void AddObservations(IEnumerable<double[]> observations)
         {
             foreach (var obs in observations)
@@ -98,7 +97,7 @@ namespace InformedProteomics.Backend.Utils
                         maxMass = int.MaxValue;
                     }
 
-                    if(obsMass >= minMass && obsMass <= maxMass) _densityEstimators[i].AddObservation(obs); 
+                    if(obsMass >= minMass && obsMass <= maxMass) _densityEstimators[i].AddObservation(obs);
                 }
             }
         }
@@ -110,7 +109,6 @@ namespace InformedProteomics.Backend.Utils
                 kernel.ClearObservations();
             }
         }
-
 
         private readonly int[] _massBins;
         private readonly KernelDensityEstimator[] _densityEstimators;

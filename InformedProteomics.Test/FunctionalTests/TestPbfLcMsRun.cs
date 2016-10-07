@@ -33,10 +33,10 @@ namespace InformedProteomics.Test.FunctionalTests
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-  
+
             var outputFilePath = PbfLcMsRun.GetPbfFileName(TestRawFilePath);
             var pbf = new PbfLcMsRun(TestRawFilePath, null, outputFilePath);
-            
+
             Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -127,13 +127,12 @@ namespace InformedProteomics.Test.FunctionalTests
                 20, 19, 22, 16, 12, 06, 18, 28, 23, 27, 29, 36, 30, 37, 38, 33,
                 46, 40, 45, 44, 41, 34, 13, 43, 31, 32, 39, 42, 47, 35, 50, 48, 51, 49
             };
-            
+
             //const string pbfPath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2014_3";
             //const string ms1ftPAth = @"\\proto-5\VOrbiETD02\2014_3\Lewy_intact_02\PMX201503271049_Auto{0}";
 
             for (var i = 0; i < 51; i++)
             {
-
                 var id = string.Format("00{0}", did[i]);
                 id = id.Substring(id.Length - 2);
                 var j = jobid[i];
@@ -233,7 +232,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 if (numPeptides == 100000) break;
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -319,7 +318,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 //Assert.True(xic1.Equals(xic2));
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
@@ -333,7 +332,7 @@ namespace InformedProteomics.Test.FunctionalTests
                 rafRun.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Console.WriteLine(@"Done");
@@ -368,10 +367,9 @@ namespace InformedProteomics.Test.FunctionalTests
             var numBinsProcessed = 0;
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-               
                 var mzStart = comparer.GetMzStart(binNum);
                 var mzEnd = comparer.GetMzEnd(binNum);
-                
+
                 var vec1 = run.GetFullPrecursorIonExtractedIonChromatogramVector(mzStart, mzEnd);
 
                 if (++numBinsProcessed % 2500 == 0)
@@ -441,7 +439,6 @@ namespace InformedProteomics.Test.FunctionalTests
                     {
                         misMatchCount++;
                     }
-                                               
                 }
 
                 if (misMatchCount <= 0 || positiveCount == 0)
@@ -463,7 +460,6 @@ namespace InformedProteomics.Test.FunctionalTests
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Assert.IsTrue(warnCount < 10, "Too many Xic mismatch warnings: {0}", warnCount);
-
         }
 
         [Test]

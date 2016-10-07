@@ -42,23 +42,21 @@ namespace InformedProteomics.Test
             }
 
             // Configure amino acid set
-            
+
             var aminoAcidList = new List<AminoAcid>();
             foreach (var aa in AminoAcid.StandardAminoAcidArr)
             {
                 aminoAcidList.Add(aa);
                 aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Acetylation));
                 aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Oxidation));
-
             }
-
 
             //const int MaxTags = 100000;
             var tsvParser = new TsvFileParser(TestResultFile);
             var headerList = tsvParser.GetHeaders();
             var tsvData = tsvParser.GetAllData();
             var ms2ScanNumbers = tsvData["Scan"];
-        
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
             var nSpec = 0;
             var nHitSpec = 0;
@@ -69,7 +67,7 @@ namespace InformedProteomics.Test
                 var scanNum = Int32.Parse(ms2ScanNumbers[i]);
 
                 //if (scanNum != 4672) continue;
-                
+
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
                 int tsvIndex = ms2ScanNumbers.FindIndex(x => Int32.Parse(x) == scanNum);
@@ -92,7 +90,6 @@ namespace InformedProteomics.Test
                 {
                     if (seqStr.Contains(seqTagStr.Sequence)) //|| seqStr.Contains(Reverse(tagStr)))
                     {
-
                         //var idx = seqStr.IndexOf(seqTagStr.Sequence);
 
                         //seqStr.Substring(0, idx)
@@ -110,9 +107,9 @@ namespace InformedProteomics.Test
                         */
                         if (seqStr.Contains(seqTagStr.Sequence)) nHit++;
                     }
-                    nTags++;                    
+                    nTags++;
                 }
-                
+
                 nSpec++;
                 if (nHit > 0) nHitSpec++;
 
@@ -128,7 +125,5 @@ namespace InformedProteomics.Test
             Array.Reverse(charArray);
             return new string(charArray);
         }
-        
-        
     }
 }

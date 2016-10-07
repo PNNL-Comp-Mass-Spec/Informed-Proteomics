@@ -25,7 +25,6 @@ namespace InformedProteomics.Test
             TestUtils.ShowStarting(methodName);
 
             //const string resultFile = @"H:\Research\IPRG2015\Submissions\Submission_32080.xlsx";
-
         }
 
         [Test]

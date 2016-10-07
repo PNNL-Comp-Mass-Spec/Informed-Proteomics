@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.Utils
                     else
                     {
                         s.AppendFormat(formatString, array[i][j]);
-                    }                    
+                    }
                 }
                 s.Append("\n");
             }
@@ -111,7 +111,6 @@ namespace InformedProteomics.Backend.Utils
 
             for (var i = 1; i < a.Count; i++)
             {
-
                 if (a[i] >= curSum + a[i])
                 {
                     curStart = i;
@@ -134,6 +133,7 @@ namespace InformedProteomics.Backend.Utils
 
             return sum;
         }
+
         // Kadane's algorithm
         public static double MaxSumSubarray(IList<double> a, out int start, out int len)
         {
@@ -147,7 +147,6 @@ namespace InformedProteomics.Backend.Utils
 
             for (var i = 1; i < a.Count; i++)
             {
-
                 if (a[i] >= curSum + a[i])
                 {
                     curStart = i;
@@ -169,7 +168,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return sum;
-        }      
-
+        }
     }
 }

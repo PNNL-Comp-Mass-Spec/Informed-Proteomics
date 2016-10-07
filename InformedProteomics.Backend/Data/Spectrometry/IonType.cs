@@ -22,9 +22,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly double _offsetMass;    // duplication but stored for performance
 
         internal IonType(
-            string name, 
+            string name,
             Composition.Composition offsetComposition,
-            int charge, 
+            int charge,
             BaseIonType baseIonType,
             NeutralLoss neutralLoss
             )
@@ -80,7 +80,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return this.BaseIonType.GetPossibleCompositions(terminalResidue)
                        .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
                        .Select(comp => new Ion(comp, Charge));
-        } 
+        }
 
         public override string ToString()
         {
@@ -88,23 +88,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                    "," + Charge + "," + IsPrefixIon;
         }
 
-		/// <summary>
-		/// Returns ion name with ion index (e.g. y++4-H2O => charge 2 y4 - H2O)
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		public string GetName(int index)
-		{
-			String chargeStr;
-			if (Charge == 1) chargeStr = "";
-			else
-			{
-				var builder = new StringBuilder(Charge);
-				for (var i = 0; i < Charge; i++) builder.Append("+");
-				chargeStr = builder.ToString();
-			}
-			return BaseIonType.Symbol + index + chargeStr + NeutralLoss.Name;
-		}
+        /// <summary>
+        /// Returns ion name with ion index (e.g. y++4-H2O => charge 2 y4 - H2O)
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public string GetName(int index)
+        {
+            String chargeStr;
+            if (Charge == 1) chargeStr = "";
+            else
+            {
+                var builder = new StringBuilder(Charge);
+                for (var i = 0; i < Charge; i++) builder.Append("+");
+                chargeStr = builder.ToString();
+            }
+            return BaseIonType.Symbol + index + chargeStr + NeutralLoss.Name;
+        }
 
         [Obsolete("IonType object should be generated through IonTypeFactory")]
         public static IonType Parse(string s)
@@ -161,5 +161,4 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         //}
     }
-  
 }

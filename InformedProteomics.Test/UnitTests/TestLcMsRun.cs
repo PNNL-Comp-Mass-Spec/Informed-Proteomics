@@ -96,8 +96,6 @@ namespace InformedProteomics.Test.UnitTests
             Console.WriteLine(run.GetNextScanNum(20025));
         }
 
-        
-
         public void TestParsingSpectrumFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -190,7 +188,6 @@ namespace InformedProteomics.Test.UnitTests
 
             Assert.IsTrue(Math.Abs(spec.Peaks[1000].Mz - 974.17694091796875) < 0.0001, "Invalid m/z for peak at index 1000");
             Assert.IsTrue(Math.Abs(spec.Peaks[1000].Intensity - 678.13824462890625) < 0.01, "Invalid intensity for peak at index 1000");
-
         }
 
         //[Test]
@@ -345,7 +342,6 @@ namespace InformedProteomics.Test.UnitTests
             var run = PbfLcMsRun.GetLcMsRun(filePath);
             Console.WriteLine(run.MaxLcScan);
         }
-
 
         [Test]
         public void TestReadingBrukerDaltonDataSet()

@@ -17,7 +17,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public SearchModification()
         {
-            
         }
 
         public Modification Modification { get; set; }
@@ -26,11 +25,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         public bool IsFixedModification { get; set; }
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3},{4}", 
-                Modification.Composition, 
-                TargetResidue, 
-                (IsFixedModification ? "fix" : "opt"), 
-                Location, 
+            return string.Format("{0},{1},{2},{3},{4}",
+                Modification.Composition,
+                TargetResidue,
+                (IsFixedModification ? "fix" : "opt"),
+                Location,
                 Modification.Name
                 );
         }

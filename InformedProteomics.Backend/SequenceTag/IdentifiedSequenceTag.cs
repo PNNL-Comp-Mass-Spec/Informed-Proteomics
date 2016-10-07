@@ -58,7 +58,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return sb.ToString();
         }
 
-
         private static readonly AminoAcidSet aaSet = new AminoAcidSet();
         public static Sequence GenerateSequence(String seqStr, String modStr)
         {
@@ -96,5 +95,4 @@ namespace InformedProteomics.Backend.SequenceTag
             return sequence;
         }
     }
-
 }

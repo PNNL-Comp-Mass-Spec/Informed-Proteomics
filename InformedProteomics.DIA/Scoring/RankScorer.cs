@@ -13,7 +13,6 @@ namespace InformedProteomics.DIA.Scoring
     {
         public RankScorer(string paramFilePath) : this(paramFilePath, false)
         {
-            
         }
 
         public RankScorer(string paramFilePath, bool verbose)
@@ -93,7 +92,7 @@ namespace InformedProteomics.DIA.Scoring
                 //}
 
                 //// Partition information
-                //if (verbose) Console.WriteLine("Partition Information"); 
+                //if (verbose) Console.WriteLine("Partition Information");
                 //var numPartitions = reader.ReadInt32();
                 //_numSegments = reader.ReadInt32();
                 //_partitionSet = new SortedSet<Partition>();
@@ -128,7 +127,7 @@ namespace InformedProteomics.DIA.Scoring
                 //        _precursorOffMap[charge] = offList;
                 //    }
                 //    offList.Add(new PrecursorOffsetFrequency(reducedCharge, offset, frequency, tolerance));
-                //    if (verbose) Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", 
+                //    if (verbose) Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
                 //        charge, reducedCharge, offset, tolerance, frequency);
                 //}
 

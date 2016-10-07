@@ -102,7 +102,7 @@ namespace MSPathFinderT
         public void Display()
         {
             Console.WriteLine("MaxThreads: " + MaxNumThreads);
-            
+
             foreach (var specFilePath in SpecFilePaths)
             {
                 Console.WriteLine("SpectrumFilePath: " + specFilePath);
@@ -179,7 +179,6 @@ namespace MSPathFinderT
 
         public string Parse(Dictionary<string, string> parameters)
         {
-
             var message = CheckIsValid(parameters);
             if (message != null)
                 return message;
@@ -222,7 +221,7 @@ namespace MSPathFinderT
                 var modFilePath = parameters["-mod"];
                 var errorMessage = LoadModsFile(modFilePath);
                 if (!string.IsNullOrWhiteSpace(errorMessage))
-                    return errorMessage;                
+                    return errorMessage;
             }
             catch (Exception ex)
             {
@@ -244,7 +243,7 @@ namespace MSPathFinderT
             }
 
             var currentParameter = string.Empty;
-           
+
             try
             {
                 currentParameter = "-feature";
@@ -260,7 +259,7 @@ namespace MSPathFinderT
 
                 currentParameter = "-t";
                 PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
-                
+
                 currentParameter = "-f";
                 ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
 
@@ -399,7 +398,6 @@ namespace MSPathFinderT
                     }
                     else if (key.Equals("-o"))
                     {
-
                     }
                     else if (key.Equals("-threads"))
                     {
@@ -444,7 +442,6 @@ namespace MSPathFinderT
                             return "Invalid value (" + value + ") for the parameter " + key;
                         }
                     }
-
                 }
                 catch (Exception)
                 {
@@ -500,7 +497,6 @@ namespace MSPathFinderT
 
         private string LoadScansFile(string scansFilePath)
         {
-
             if (string.IsNullOrWhiteSpace(scansFilePath))
                 return string.Empty;
 

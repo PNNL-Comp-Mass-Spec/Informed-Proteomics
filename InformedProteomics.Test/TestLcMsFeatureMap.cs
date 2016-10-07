@@ -9,11 +9,9 @@ using NUnit.Framework;
 
 namespace InformedProteomics.Test
 {
-
     [TestFixture]
     class TestLcMsFeatureMap
     {
-
         [Test]
         [STAThread]
         public void TestFeatureMapGeneration()
@@ -27,7 +25,6 @@ namespace InformedProteomics.Test
 
             var map = new LcMsFeatureMap(testFile,185);
             map.SaveImage(outputFile + "test.png",100);
-        } 
-
+        }
     }
 }

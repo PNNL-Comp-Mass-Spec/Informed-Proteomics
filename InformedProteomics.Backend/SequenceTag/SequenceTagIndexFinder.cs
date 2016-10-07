@@ -15,13 +15,11 @@ namespace InformedProteomics.Backend.SequenceTag
 {
     public class SequenceTagIndexFinder
     {
-
         public SequenceTagIndexFinder(Tolerance tolerance, int minCharge, int maxCharge)
         {
             _tolerance = tolerance;
             _minCharge = minCharge;
             _maxCharge = maxCharge;
-
         }
 
         public Tuple<int, int, int, int, string, string> GetLongestSequence(ProductSpectrum spectrum, Sequence sequence)
@@ -56,13 +54,10 @@ namespace InformedProteomics.Backend.SequenceTag
                                  : c.SuffixComposition + baseIonType.OffsetComposition;
                     for (var charge = _minCharge; charge <= _maxCharge; charge++)
                     {
-
                         var ion = new Ion(fragmentComposition, charge);
                         if (_spectrum.GetCorrScore(ion, _tolerance, RelativeIsotopeIntensityThreshold) < .7) continue;
                         if (baseIonType.IsPrefix) prefixValueArr[cleavageIndex] = 1;
                         else suffixValueArr[cleavageIndex] = 1;
-
-
                     }
                 }
                 cleavageIndex++;
@@ -79,7 +74,6 @@ namespace InformedProteomics.Backend.SequenceTag
                 {
                     if (_sequence[i] is ModifiedAminoAcid) continue;
                     prefixSequenceArr[i] = 1;
-
                 }
             }
 
@@ -91,8 +85,6 @@ namespace InformedProteomics.Backend.SequenceTag
                     suffixSequenceArr[i + 1] = 1;
                 }
             }
-
-
 
             var prefixSubString = FindLongestSubstring(prefixSequenceArr);
             var prefixStartIndex = -1;
@@ -132,7 +124,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return new Tuple<int, int, int, int, string, string>(prefixStartIndex, prefixEndIndex, suffixStartIndex, suffixEndIndex, prefixSequence, suffixSequence);
         }
 
-
         private readonly Tolerance _tolerance;
         private readonly int _minCharge;
         private readonly int _maxCharge;
@@ -143,7 +134,6 @@ namespace InformedProteomics.Backend.SequenceTag
 
         private ProductSpectrum _spectrum;
         private Sequence _sequence;
-
 
         /*private double GetSequenceRankSum(List<Peak> seqPeaks, int[] rankArr, double[] peakInt)
         {
@@ -178,7 +168,7 @@ namespace InformedProteomics.Backend.SequenceTag
             var startIndex = start - 1;
             var endIndex = end - 1;
             var peaks = new List<Peak>();
-           
+
             for (var i = startIndex; i <= endIndex; i++)
             {
                 if (i > prefixPeaks.Length) continue;
@@ -197,7 +187,7 @@ namespace InformedProteomics.Backend.SequenceTag
             var startIndex = start - 1;
             var endIndex = end - 1;
             var peaks = new List<Peak>();
-            
+
             for (var i = startIndex; i <= endIndex; i++)
             {
                 if (i > suffixPeaks.Length-1) continue;

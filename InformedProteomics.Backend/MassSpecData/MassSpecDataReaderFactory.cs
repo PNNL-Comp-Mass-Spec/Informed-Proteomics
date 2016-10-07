@@ -151,7 +151,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the directory that contains the dataset; it will back out of subdirectories of folder-type datasets 
+        /// Gets the directory that contains the dataset; it will back out of subdirectories of folder-type datasets
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -288,7 +288,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     new Tuple<string, string[]>("Shimadzu", new[] { ".lcd" }),
                     new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
                 };
-            }   
+            }
         }
 
         /// <summary>

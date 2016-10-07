@@ -6,12 +6,11 @@ namespace InformedProteomics.Backend.MassFeature
     public class LcMsFeature
     {
         public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance)
-            : this(repMass, repCharge, repMz, repScanNum, abundance, 
+            : this(repMass, repCharge, repMz, repScanNum, abundance,
             repCharge, repCharge, repScanNum, repScanNum, 0, 0)
         {
-            
         }
-        
+
         public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance,
             int minCharge, int maxCharge, int minScan, int maxScan,
             double minElution, double maxElution, double minNet = 0, double maxNet = 0)
@@ -29,7 +28,7 @@ namespace InformedProteomics.Backend.MassFeature
 
             MinElutionTime = minElution;
             MaxElutionTime = maxElution;
-            
+
             MaxNet = maxNet;
             MinNet = minNet;
 
@@ -39,11 +38,11 @@ namespace InformedProteomics.Backend.MassFeature
         public int DataSetId
         {
             get { return ProteinSpectrumMatches.DataId; }
-            set { ProteinSpectrumMatches.SetDataId(value); } 
+            set { ProteinSpectrumMatches.SetDataId(value); }
         }
 
         public int FeatureId { get; set; }
-        
+
         public int MinCharge { get; protected set; }
         public int MaxCharge { get; protected set; }
         public int ChargeLength { get { return MaxCharge - MinCharge + 1; } }
@@ -71,7 +70,7 @@ namespace InformedProteomics.Backend.MassFeature
         public double MaxElutionTime { get { return (Run == null) ? _maxElution : Run.GetElutionTime(MaxScanNum); } }
         public double ElutionTime { get { return 0.5*(MinElutionTime + MaxElutionTime); } }
         public double ElutionLength { get { return MaxElutionTime - MinElutionTime; } }
-        
+
         public double MaxNet { get { return (Run == null) ? 0 : MaxElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double MinNet { get { return (Run == null) ? 0 : MinElutionTime / Run.GetElutionTime(Run.MaxLcScan); } }
         public double NetLength { get { return (Run == null) ? 0 : MaxNet - MinNet; } }
@@ -103,7 +102,6 @@ namespace InformedProteomics.Backend.MassFeature
             return 0d;
         }
 
-
         public double CoElutionNetLength(LcMsFeature other)
         {
             if (other.MaxNet >= MinNet && other.MaxNet<= MaxNet)
@@ -127,7 +125,7 @@ namespace InformedProteomics.Backend.MassFeature
             if (other.MinElutionTime - tolTime < MaxElutionTime && MaxElutionTime < other.MaxElutionTime + tolTime) return true;
             return false;
         }
-        
+
         public bool CoElutedByNet(LcMsFeature other, double tolNet = 0d)
         {
             if (MinNet - tolNet < other.MinNet && other.MinNet < MaxNet + tolNet) return true;
@@ -155,9 +153,9 @@ namespace InformedProteomics.Backend.MassFeature
 
         public override string ToString()
         {
-            return RepresentativeMass.ToString("0.0") + " Da, " + 
-                RepresentativeCharge + "+, " + 
-                RepresentativeMz.ToString("0.0") + " m/z, scan " + 
+            return RepresentativeMass.ToString("0.0") + " Da, " +
+                RepresentativeCharge + "+, " +
+                RepresentativeMz.ToString("0.0") + " m/z, scan " +
                 RepresentativeScanNum;
         }
     }

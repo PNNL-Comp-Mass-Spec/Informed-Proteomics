@@ -36,7 +36,7 @@ namespace InformedProteomics.Test.UnitTests
             Console.WriteLine("Matched indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern)));
             Console.WriteLine("Protein indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern).Select(i => db.GetOneBasedPositionInProtein(i))));
             sw.Stop();
-            
+
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -62,7 +62,7 @@ namespace InformedProteomics.Test.UnitTests
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -88,7 +88,7 @@ namespace InformedProteomics.Test.UnitTests
                 Console.WriteLine(annotationAndOffset.Annotation);
             }
             sw.Stop();
-            
+
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
@@ -128,7 +128,6 @@ namespace InformedProteomics.Test.UnitTests
             //var numPeptides =
             //    indexedDb.AnnotationsAndOffsets(7, 40, 2, 2, Enzyme.Trypsin).LongCount();
 
-
             //var numPeptides = indexedDb.AnnotationsAndOffsets(6, 40, 2, 2, Enzyme.Trypsin).LongCount();
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(30, 250, 0).LongCount();
             //    .Select(annotationAndSequence => annotationAndSequence.Annotation.Length - 4)
@@ -167,7 +166,7 @@ namespace InformedProteomics.Test.UnitTests
             var both = 0L;
             var nTermOnly = 0L;
             var cTermOnly = 0L;
-            
+
             foreach (
                 var annotationAndOffset in
                     indexedDb.IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue,
@@ -190,8 +189,8 @@ namespace InformedProteomics.Test.UnitTests
                         {
                             ++cTermOnly;
                         }
-                        var anno = numNTermCleavage == 0 
-                            ? annotation 
+                        var anno = numNTermCleavage == 0
+                            ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
                         Console.WriteLine(anno);
                     }
@@ -250,10 +249,10 @@ namespace InformedProteomics.Test.UnitTests
                 var annotation = peptideAnnotationAndOffset.Annotation;
                 var offset = peptideAnnotationAndOffset.Offset;
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
-                    annotation, 
-                    offset, 
-                    db.GetProteinName(offset), 
-                    db.GetProteinLength(db.GetProteinName(offset)), 
+                    annotation,
+                    offset,
+                    db.GetProteinName(offset),
+                    db.GetProteinLength(db.GetProteinName(offset)),
                     db.GetOneBasedPositionInProtein(offset)+1);
             }
         }

@@ -159,8 +159,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         }
 
         private Spectrum _spectrum;
-        private readonly LazyLcMsRun _lcms; 
+        private readonly LazyLcMsRun _lcms;
         private List<Composition> _prefixes;
-        private List<Composition> _suffixes; 
+        private List<Composition> _suffixes;
     }
 }

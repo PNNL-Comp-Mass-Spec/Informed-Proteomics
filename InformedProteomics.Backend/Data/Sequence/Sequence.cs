@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             var aaList = new List<AminoAcid>();
-            
+
             for (var i=0; i<sequence.Length; i++)
             {
                 var residue = sequence[i];

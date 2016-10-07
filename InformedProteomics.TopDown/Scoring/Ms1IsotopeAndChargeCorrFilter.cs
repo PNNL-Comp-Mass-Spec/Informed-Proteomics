@@ -170,7 +170,7 @@ namespace InformedProteomics.TopDown.Scoring
                     }
 
                     var chargeCorr = Math.Max(corrPlusOneCharge, corrMinusOneCharge);
-                    if (chargeCorr < _chargeCorrThresholdThreshold) continue;                               
+                    if (chargeCorr < _chargeCorrThresholdThreshold) continue;
                 }
 
                 _lcMsMatchMap.SetMatches(monoIsotopicMass, xicThisPeak[0].ScanNum, xicThisPeak[xicThisPeak.Count-1].ScanNum);

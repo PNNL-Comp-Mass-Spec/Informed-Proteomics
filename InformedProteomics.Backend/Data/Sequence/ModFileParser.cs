@@ -26,7 +26,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public int MaxNumDynModsPerSequence
         {
-            get { return _maxNumDynModsPerSequence;  }
+            get { return _maxNumDynModsPerSequence; }
         }
 
         private readonly string _modFilePath;
@@ -39,7 +39,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (token.Length != 5) return null;
 
             // Composition
-
             var compStr = token[0].Trim();
             var composition = Composition.Composition.ParseFromPlainString(compStr) ??
                               Composition.Composition.Parse(compStr);

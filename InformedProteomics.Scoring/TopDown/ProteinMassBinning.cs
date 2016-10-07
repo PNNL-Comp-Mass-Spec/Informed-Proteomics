@@ -24,7 +24,7 @@ namespace InformedProteomics.Scoring.TopDown
 
         public int GetBinNumber(double mass)
         {
-            var binNumber = _mzComparer.GetBinNumber(mass); 
+            var binNumber = _mzComparer.GetBinNumber(mass);
             if (_padZeroMassBin)
             {
                 if (binNumber == 0) return 0;
@@ -70,7 +70,7 @@ namespace InformedProteomics.Scoring.TopDown
         private readonly int _minBinIndex;
         private readonly int _maxBinIndex;
         private readonly bool _padZeroMassBin;
-        
+
         public int NumberOfBins { get; private set; }
         public double MaxMass { get; private set; }
         public double MinMass { get; private set; }

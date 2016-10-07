@@ -34,7 +34,7 @@ namespace InformedProteomics.Test.Obsolete
             var precursorTolerance = new Tolerance(10);
             const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.fasta";
             //const string dbFilePath = @"..\..\..\TestFiles\sprot.Ecoli.2012_07.icdecoy.KR.fasta";
-            
+
             //const string dbFilePath = @"..\..\..\TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             // const string dbFilePath =
             //    @"C:\cygwin\home\kims336\Data\TopDown\ID_003558_56D73071.fasta";
@@ -84,7 +84,6 @@ namespace InformedProteomics.Test.Obsolete
 
             foreach (var protAnnotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsets(minLength, maxLength))
             {
-
                 ++numProteins;
                 //if (numProteins > 2000) break;
 
@@ -95,11 +94,10 @@ namespace InformedProteomics.Test.Obsolete
 
                 //Console.WriteLine(protAnnotation);
 
-
                 var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotationAndOffset.Annotation);
-                
+
                 //Console.WriteLine(seqGraph.GetSequenceCompositions()[0]);
-                
+
                 if (seqGraph == null) continue;
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
@@ -114,8 +112,6 @@ namespace InformedProteomics.Test.Obsolete
                         var score = scorer.GetScore();
 
                         Console.WriteLine(score);
-
-
                     }
                 }
             }
@@ -144,7 +140,6 @@ namespace InformedProteomics.Test.Obsolete
             var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
 
-
             var searchModifications = new List<SearchModification>
                 {
                     //pyroGluQ,
@@ -163,10 +158,10 @@ namespace InformedProteomics.Test.Obsolete
 
             while ((s=reader.ReadLine())!=null)
             {
-                if (s.StartsWith("Data_file_name	")) 
-                { 
+                if (s.StartsWith("Data_file_name\t"))
+                {
                     writer.WriteLine(s+"\tScore");
-                    continue; 
+                    continue;
                 }
                 var token = s.Split('\t');
                 var annotation = token[13];
@@ -179,15 +174,13 @@ namespace InformedProteomics.Test.Obsolete
                 }
 
                 var protCompositions = seqGraph.GetSequenceCompositions();
-                
+
                 var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance, null);
                 var score = scorer.GetScore();
 
                 writer.WriteLine(s+"\t"+score);
                 Console.WriteLine(score);
-
             }
-            
 
             writer.Close();
             reader.Close();
@@ -209,7 +202,6 @@ namespace InformedProteomics.Test.Obsolete
             var cysteinylC = new SearchModification(Modification.Cysteinyl, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
 
-            
             var searchModifications = new List<SearchModification>
                 {
                     //pyroGluQ,
@@ -221,7 +213,6 @@ namespace InformedProteomics.Test.Obsolete
             //var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
             var aaSet = new AminoAcidSet(searchModifications, 0);
 
-            
             var precursorTolerance = new Tolerance(10);
             //Console.WriteLine(aaSet.GetAminoAcid('C').GetComposition());
             // Create a sequence graph
@@ -232,7 +223,7 @@ namespace InformedProteomics.Test.Obsolete
           //  TopDownScorer.MaxCharge = 60;
           //  TopDownScorer.MinCharge = 3;
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
-            
+
             foreach (var protComposition in seqGraph.GetSequenceCompositions())
             {
                 var mostAbundantIsotopeIndex = protComposition.GetMostAbundantIsotopeZeroBasedIndex();

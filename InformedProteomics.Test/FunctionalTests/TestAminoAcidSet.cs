@@ -15,7 +15,6 @@ namespace InformedProteomics.Test.FunctionalTests
             var aaSet = new AminoAcidSet(modFilePath);
             //aaSet.Display();
 
-
             //SequenceLocation.ProteinNTerm
             var residue = AminoAcid.ProteinNTerm.Residue;
             var location = SequenceLocation.ProteinNTerm;
@@ -39,9 +38,8 @@ namespace InformedProteomics.Test.FunctionalTests
                 //Console.Write("\t" + _modificationParams.GetModification(modIndex));
             }
 
-
             //foreach (var aa in AminoAcid.StandardAminoAcidArr)
-            
+            //{
                 /*
                 var keys = _locationSpecificResidueMap[location].Keys.ToArray();
                 Array.Sort(keys);
@@ -54,10 +52,8 @@ namespace InformedProteomics.Test.FunctionalTests
                         Console.Write("\t" + _modificationParams.GetModification(modIndex));
                     }
                     Console.WriteLine();
-                }
-            }     */            
-
-
+                }*/
+            //}
         }
 
         [Ignore("File Missing, test obsolete, or long test")]

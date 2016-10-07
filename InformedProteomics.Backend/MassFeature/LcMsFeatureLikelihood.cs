@@ -32,9 +32,8 @@ namespace InformedProteomics.Backend.MassFeature
             ScoreThreshold = likelihoodThreshold;
         }
 
-     
         public readonly double ScoreThreshold;
-        
+
         public double GetScore(LcMsPeakCluster feature)
         {
             var mi = (int)Math.Round((feature.Mass - _massBins[0]) / (_massBins[1] - _massBins[0]));
@@ -105,14 +104,14 @@ namespace InformedProteomics.Backend.MassFeature
             }
             return table;
         }
-        
+
         private double[][] LoadTable(string fname)
         {
             if (!File.Exists(fname)) throw new FileNotFoundException("Missing score datafile: " + fname);
-            
+
             var parser = new TsvFileParser(fname);
             var table = new double[_massBins.Length][];
-            
+
             for (var i = 0; i < _massBins.Length; i++)
             {
                 table[i] = new double[NumberOfBins];
@@ -125,7 +124,7 @@ namespace InformedProteomics.Backend.MassFeature
             }
             return table;
         }
-        
+
         private readonly double[][] _distScoreTable;
         private readonly double[][] _corrScoreTable;
         private readonly double[][] _intScoreTable;
@@ -140,7 +139,5 @@ namespace InformedProteomics.Backend.MassFeature
         private readonly double[][] _abuScoreTable;
 
         private readonly double[] _massBins;
-
-
     }
 }

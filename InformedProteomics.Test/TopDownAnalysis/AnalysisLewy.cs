@@ -10,8 +10,6 @@ using InformedProteomics.Backend.MassSpecData;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 
-
-
 namespace InformedProteomics.Test.TopDownAnalysis
 {
     class AnalysisLewy
@@ -58,13 +56,11 @@ namespace InformedProteomics.Test.TopDownAnalysis
             return ret.Where(prsm => prsm != null).ToList();
         }
 
-
         [Test]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\Lewy\aligned\promex_crosstab_temp.tsv";
-            
-            
+
             //CPTAC_Intact_CR32A_24Aug15_Bane_15-02-06-RZ
             var prsmReader = new ProteinSpectrumMatchReader();
             var tolerance = new Tolerance(10);
@@ -81,7 +77,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var prsmList1 = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                 var prsmList2 = prsmReader.LoadIdentificationResult(mspFile2, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                 prsmList1.AddRange(prsmList2);
-                
+
                 var prsmList = MergePrsm(prsmList1);
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1FtFile, run);
 
@@ -111,19 +107,18 @@ namespace InformedProteomics.Test.TopDownAnalysis
             alignment.AlignFeatures();
 
             Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
-            
+
             for (var i = 0; i < NdataSet; i++)
             {
                 alignment.FillMissingFeatures(i);
                 Console.WriteLine("{0} has been processed", GetDataSetNames(i));
             }
-            
+
             OutputCrossTabWithId(outFilePath, alignment);
         }
 
         public void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment)
         {
-
             var writer = new StreamWriter(outputFilePath);
 
             writer.Write("MonoMass");
@@ -167,7 +162,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
             for (var i = 0; i < NdataSet; i++)
             {
-                var dataName = GetDataSetNames(i); 
+                var dataName = GetDataSetNames(i);
                 writer.Write("\t");
                 writer.Write(dataName + "_SpectraCount");
             }
@@ -243,7 +238,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
             writer.Close();
         }
-
 
         [Test]
         public void CountTagMatches()
@@ -323,7 +317,6 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 */
                 //foreach(var directories
             }
-
         }
 
         [Test]
@@ -367,10 +360,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var filePath = string.Format(@"{0}\{1}_IcTsv.zip", newMspDir, dataName);
                 var destFilePath = string.Format(@"{0}\{1}_IcTsv.zip", destPath, dataName);
                 File.Copy(filePath, destFilePath);
-
-                
             }
-
         }
         /*
         [Test]
@@ -395,7 +385,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
             var featureFinder = new LcMsPeakMatrix(run, scorer);
 
             var comparer = new MzComparerWithBinning(28);
-            
+
             var minSearchMassBin = comparer.GetBinNumber(14458);
             var maxSearchMassBin = comparer.GetBinNumber(14584);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
@@ -447,7 +437,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 Console.Write("\t");
                 Console.Write(string.Join("\t", bestChargeEnv));
                 Console.Write("\n");
-            }            
+            }
         }*/
     }
 }

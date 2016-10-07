@@ -10,18 +10,18 @@ namespace ProMex
         {
             FileName = fileName;
             _delimeter = delimiter;
-			
-			_fileReader = new StreamReader(fileName);
+
+            _fileReader = new StreamReader(fileName);
             var line = _fileReader.ReadLine();
             _header = line.Split(_delimeter);
         }
 
-		public void Close()
-		{
-			_fileReader.Close();
-		}
+        public void Close()
+        {
+            _fileReader.Close();
+        }
         public string FileName { get; private set; }
-        
+
         public IList<string> GetHeaders()
         {
             return _header;
@@ -34,19 +34,19 @@ namespace ProMex
 
         private readonly string[] _header;
         private readonly char _delimeter;
-		private readonly StreamReader _fileReader;
-		
-		public int LineCounter { get; private set; }
+        private readonly StreamReader _fileReader;
+
+        public int LineCounter { get; private set; }
 
         public IEnumerable<string[]> ReadLine()
         {
             // parse header
             //var firstRow = true;
-			string line;
+            string line;
             while((line = _fileReader.ReadLine()) != null)
             {
                 var token = line.Split(_delimeter);
-				LineCounter++;
+                LineCounter++;
                 if (token.Length == _header.Length) yield return token;
             }
         }

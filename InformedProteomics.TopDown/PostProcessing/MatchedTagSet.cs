@@ -10,7 +10,7 @@ namespace InformedProteomics.TopDown.PostProcessing
 {
     public class MatchedTagSet
     {
-        public MatchedTagSet(string sequence, 
+        public MatchedTagSet(string sequence,
             AminoAcidSet aminoAcidSet, Tolerance tolerance, Tolerance relaxedTolerance)
         {
             _sequence = sequence;
@@ -116,7 +116,6 @@ namespace InformedProteomics.TopDown.PostProcessing
             return true;
         }
 
-
         // startIndex: inclusive, endIndex: exclusive
         // This method is inefficient
         private double GetSequenceMass(int startIndex, int endIndex)
@@ -151,7 +150,7 @@ namespace InformedProteomics.TopDown.PostProcessing
             NumReliableCTermFlankingMasses = tag.IsPrefix ? 0 : 1;
         }
 
-        public MatchedTag(int startIndex, int endIndex, double nTermFlankingMass, double cTermFlankingMass, 
+        public MatchedTag(int startIndex, int endIndex, double nTermFlankingMass, double cTermFlankingMass,
             int numMergedSequenceTags, int numReliableNTermFlankingMasses, int numReliableCTermFlankingMasses)
         {
             StartIndex = startIndex;
@@ -225,7 +224,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                 }
             }
             EndIndex = newEndIndex;
-            
+
             ++NumMergedSequenceTags;
 
             return this;

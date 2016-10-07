@@ -28,7 +28,7 @@ namespace InformedProteomics.Backend.SequenceTag
             for (var i = 0; i < nodeCount; i++)
             {
                 _adjList[i] = new List<T>();
-            }            
+            }
         }
 
         public void AddEdge(T edge)
@@ -92,7 +92,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return (from t in _adjList from edge in t where edge.Node2 == node select edge).ToList();
         }
 
-
         public List<List<int>> ConnnectedComponents()
         {
             /*
@@ -141,7 +140,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return componentSet;
         }
 
-
         protected virtual bool ProcessPath(IEnumerable<T> edges)
         {
             foreach (var edge in edges)
@@ -160,7 +158,7 @@ namespace InformedProteomics.Backend.SequenceTag
 
         protected bool StopFindPath;
         protected readonly Stack<T> EdgeList = new Stack<T>();
-        
+
         protected bool[] NodeVisitFlag;
         protected int MaxTagLen;
         public void FindPaths(int node, bool firstCall = true, T e = null)
@@ -190,7 +188,7 @@ namespace InformedProteomics.Backend.SequenceTag
 
             if (e != null) EdgeList.Push(e);
             NodeVisitFlag[node] = true;
-            
+
             var flag = false;
             foreach(var edge in OutEdges(node))
             {
@@ -201,14 +199,14 @@ namespace InformedProteomics.Backend.SequenceTag
                     FindPaths(edge.Node2, false, edge);
                 }
             }
-            
+
             if(!flag)
             {
                 var t = ProcessPath(EdgeList.Reverse());
                 if (t == false) return;
             }
             NodeVisitFlag[node] = false;
-            
+
             if (EdgeList.Count > 0) EdgeList.Pop();
         }
     }

@@ -19,7 +19,6 @@ namespace InformedProteomics.IMS.IMSScoring
         private const double LowScoreForLcImsScore = -.5;
         private const double HighScoreForLcImsScore = 1.5;
 
-
         //TODO : ims, lc corr score should be dependent on ratio scores..
 
         private readonly Dictionary<GroupParameter, List<IonType>> _ionTypeDictionary;
@@ -28,7 +27,7 @@ namespace InformedProteomics.IMS.IMSScoring
         private readonly Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioTargetProbDictionary; // trained
         private readonly Dictionary<GroupParameter, Dictionary<Tuple<int, int>, Dictionary<int, double>>> _ratioDecoyProbDictionary; // trained
 
-        private Dictionary<GroupParameter, Dictionary<int, double>> _lcCorrScoreDictionary; 
+        private Dictionary<GroupParameter, Dictionary<int, double>> _lcCorrScoreDictionary;
         private readonly Dictionary<GroupParameter, Dictionary<int, double>> _lcCorrTargetProbDictionary;
         private readonly Dictionary<GroupParameter, Dictionary<int, double>> _lcCorrDecoyProbDictionary;
 
@@ -40,7 +39,7 @@ namespace InformedProteomics.IMS.IMSScoring
 
         private readonly Dictionary<GroupParameter, double> _noIonScore; // trained
 
-        private readonly Dictionary<GroupParameter, Dictionary<IonType, int>> _ionTypeIndexDictionary; 
+        private readonly Dictionary<GroupParameter, Dictionary<IonType, int>> _ionTypeIndexDictionary;
 
         public SubScoreFactory(string filePath)
         {
@@ -61,7 +60,6 @@ namespace InformedProteomics.IMS.IMSScoring
 
             _noIonScore = new Dictionary<GroupParameter, double>();
 
-            
             Read(filePath);
 
             _ionTypeIndexDictionary = new Dictionary<GroupParameter, Dictionary<IonType, int>>();
@@ -75,9 +73,7 @@ namespace InformedProteomics.IMS.IMSScoring
                     _ionTypeIndexDictionary[gp][ions[i]] = i;
                 }
             }
-
         }
-
 
         private void Read(string filePath)
         {
@@ -85,7 +81,7 @@ namespace InformedProteomics.IMS.IMSScoring
             var isotopeIntensityCorrTargetProbDictionary = new Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>>();
             var isotopeIntensityCorrDecoyProbDictionary = new Dictionary<GroupParameter, Dictionary<int, Dictionary<int, double>>>();
             var isotopeIntensityCorrProbDictionary = isotopeIntensityCorrTargetProbDictionary;
-            
+
             var noIonTargetProbDictionary = new Dictionary<GroupParameter, double>();
             var noIonDecoyProbDictionary = new Dictionary<GroupParameter, double>();
             var noIonProbDictionary = noIonTargetProbDictionary;
@@ -186,9 +182,9 @@ namespace InformedProteomics.IMS.IMSScoring
                         if (groupParameter == null) continue;
                         noIonProbDictionary[groupParameter] = double.Parse(s);
                     }
-                } 
+                }
             }
-            
+
             foreach (var k in noIonTargetProbDictionary.Keys)
             {
                 _noIonScore[k] = GetLogLRScore(noIonTargetProbDictionary[k], noIonDecoyProbDictionary[k]);
@@ -259,13 +255,13 @@ namespace InformedProteomics.IMS.IMSScoring
         {
             double prob1 = 1, prob2 = 1;
             var si = _ionTypeIndexDictionary[groupParameter];
-            var ionTypeIndices = new Tuple<int, int> ( si[ionType], si[ionType1]); 
+            var ionTypeIndices = new Tuple<int, int> ( si[ionType], si[ionType1]);
             if(_ratioTargetProbDictionary.ContainsKey(groupParameter))
             {
                 prob1 = prob1 * _ratioTargetProbDictionary[groupParameter][ionTypeIndices][ratio];
                 prob2 = prob2 * _ratioDecoyProbDictionary[groupParameter][ionTypeIndices][ratio];
             }
-           
+
             return GetKLDivergence(prob1, prob2);
         }
 
@@ -287,7 +283,7 @@ namespace InformedProteomics.IMS.IMSScoring
             {
                 if (1 - m > corr)
                     break;
-                m = m * CorrIntScoreFactorForIsotopeScore; // 
+                m = m * CorrIntScoreFactorForIsotopeScore; //
             }
             return score;
         }
@@ -300,7 +296,7 @@ namespace InformedProteomics.IMS.IMSScoring
             {
                 if (1 - m > corr)
                     break;
-                m = m * CorrIntScoreFactorForIsotopeScoreForPrecursor; // 
+                m = m * CorrIntScoreFactorForIsotopeScoreForPrecursor; //
             }
             return score;
         }
@@ -313,7 +309,7 @@ namespace InformedProteomics.IMS.IMSScoring
             {
                 if (1 - m > corr)
                     break;
-                m = m * CorrIntScoreFactorForLcImsScore; // 
+                m = m * CorrIntScoreFactorForLcImsScore; //
             }
             return score;
         }

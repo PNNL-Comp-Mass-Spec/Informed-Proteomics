@@ -134,7 +134,7 @@ namespace InformedProteomics.Backend.Results
         public bool HasTdaScores { get; private set; }
 
         /// <summary>
-        /// The sequence, with the pre and post residues 
+        /// The sequence, with the pre and post residues
         /// </summary>
         public string SequenceWithEnds
         {

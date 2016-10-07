@@ -37,7 +37,7 @@ namespace InformedProteomics.Test.FunctionalTests
                                                 new Tuple<Atom, short>(Atom.Get("13C"), 3)
                                             });
 
-            // Testing GetHashCode() and Equals() 
+            // Testing GetHashCode() and Equals()
             Assert.IsTrue(comp2.Equals(comp4));
             Assert.IsTrue(comp2.GetHashCode() == comp4.GetHashCode());
             Assert.IsTrue(comp2.Equals(comp2 + Composition.Zero));

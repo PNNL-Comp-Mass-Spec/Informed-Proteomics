@@ -32,12 +32,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }*/
         }
 
-
         public DeconvolutedPeak(Peak mzPeak, int charge, double corr = 0, double dist = 0)
             : this(charge * (mzPeak.Mz - Constants.Proton), mzPeak.Intensity, charge, corr, dist)
         {
         }
-
 
         public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
         public double MzWithoutAdductIonMass { get { return Mass / Charge; } }
@@ -56,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public Peak[] ObservedPeaks { get; private set; }
         //private readonly HashSet<Peak> _isotopePeaks;
     }
-    
+
     /*
     public class DeconvolutedPeak: IComparable<DeconvolutedPeak>
     {
@@ -125,6 +123,4 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return !Equals(left, right);
         }
     }*/
-
-
 }

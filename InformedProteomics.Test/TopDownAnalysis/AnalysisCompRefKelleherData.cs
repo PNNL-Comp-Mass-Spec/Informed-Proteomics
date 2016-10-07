@@ -12,12 +12,10 @@ using InformedProteomics.TopDown.Execution;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 
-
 namespace InformedProteomics.Test.TopDownAnalysis
 {
     class AnalysisCompRefKelleherData
     {
-
         public List<string> GetDataSetNamesStudy3(int fraction1, int fraction2)
         {
             var i = fraction1;
@@ -71,7 +69,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 }
             }
         }
-        
+
         [Test]
         public void FindMissingLcMsFeatures()
         {
@@ -143,16 +141,15 @@ namespace InformedProteomics.Test.TopDownAnalysis
                 var minScan = run.GetPrevScanNum(match.ScanNum, 1);
                 var maxScan = run.GetNextScanNum(match.ScanNum, 1);
                 var feature = featureFinder.GetLcMsPeakCluster(match.Mass, match.Charge, minScan, maxScan);
-                
+
                 if (feature == null) continue;
-                
+
                 tsvWriter.WriteLine("{0}\t{1}", featureId, LcMsFeatureFinderLauncher.GetString(feature, false));
                 featureId++;
             }
-            
-            tsvWriter.Close();            
-        }
 
+            tsvWriter.Close();
+        }
 
         [Test]
         public void AnalysisStudy3()
@@ -175,10 +172,7 @@ namespace InformedProteomics.Test.TopDownAnalysis
                     Console.WriteLine("############ {0}-{1} has been completed", frac1, frac2);
                 }
             }
-
         }
-
-        
 
         public void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)
         {
@@ -241,8 +235,5 @@ namespace InformedProteomics.Test.TopDownAnalysis
 
             AnalysisCompRef.OutputCrossTabWithId(outFilePath, alignment, datasets.ToArray());
         }
-
-
-
     }
 }

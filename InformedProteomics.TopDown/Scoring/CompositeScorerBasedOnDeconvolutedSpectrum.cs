@@ -54,7 +54,6 @@ namespace InformedProteomics.TopDown.Scoring
                     if (minMass < prevBinMass && prevBinMass < maxMass) UpdateDeconvPeak(prevBinNum, p as DeconvolutedPeak); //_ionMassChkBins[prevBinNum] = true;
                     else break;
                 }
-
             }
         }
 
@@ -128,7 +127,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var prefixIonMass = peak.Mass;
                 var prefixFragmentMass = prefixIonMass - prefixOffsetMass;
                 var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
-                
+
                 if (binIndex >= 0 && binIndex < numNodes)
                     prefixFragScores[binIndex] = GetMatchedIonPeakScore(true, peak);
 
@@ -162,5 +161,4 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly Dictionary<int, DeconvolutedPeak> _massBinToPeakMap;
         private readonly IMassBinning _comparer;
     }
-
 }

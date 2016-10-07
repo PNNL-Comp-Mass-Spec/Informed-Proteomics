@@ -7,7 +7,6 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
-
 namespace InformedProteomics.TopDown.Scoring
 {
     public class MatchedPeakPostScorer
@@ -22,7 +21,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double ComputeScore(ProductSpectrum ms2Spec, Sequence sequence)
         {
-            
             _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
             _sequence = sequence;
             _ms2Spec = ms2Spec;
@@ -49,7 +47,7 @@ namespace InformedProteomics.TopDown.Scoring
         private const double RelativeIsotopeIntensityThreshold = 0.8;
         private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         private static readonly MzComparerWithBinning Comparer;
-        
+
         private int[] _peakRanking;
         private ProductSpectrum _ms2Spec;
         private Sequence _sequence;
@@ -81,7 +79,6 @@ namespace InformedProteomics.TopDown.Scoring
             return 50;
         }
 
-
         private void FindMatchedPeaks()
         {
             var cleavages = _sequence.GetInternalCleavages();
@@ -91,7 +88,7 @@ namespace InformedProteomics.TopDown.Scoring
             _nTheoreticalIonPeaks = 0;
             _nObservedIonPeaks = 0;
 
-            int index = 0; // cleavage index 
+            int index = 0; // cleavage index
             foreach (var c in cleavages)
             {
                 foreach (var baseIonType in _baseIonTypes)

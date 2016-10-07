@@ -99,7 +99,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, decoyResultPath);
             }
 
-            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);         
+            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);
             if (fdrCalculator.HasError())
             {
                 throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
@@ -168,7 +168,7 @@ namespace InformedProteomics.Test
             var scanArray = icrToolsparser.GetData("scan_num").Select(s => Convert.ToInt32(s)).ToArray();
             var fitArray = icrToolsparser.GetData("fit").Select(Convert.ToDouble).ToArray();
             var peakList = fitArray.Where(fit => fit < fitScoreThreshold).Select((fit, i) => new Peak(monoMassArr[i], scanArray[i])).OrderBy(p => p.Mz).ToList();
-            Console.WriteLine("FitScoreThreshold: {0}", fitScoreThreshold); 
+            Console.WriteLine("FitScoreThreshold: {0}", fitScoreThreshold);
             Console.WriteLine("NumFeatures: {0}", peakList.Count);
             //var peakList = monoMassArr.Select((mass, i) => new Peak(mass, scanArray[i])).OrderBy(p => p.Mz).ToList();
             var massTolerance = new Tolerance(10);

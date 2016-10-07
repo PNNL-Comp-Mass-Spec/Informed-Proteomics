@@ -18,7 +18,6 @@ namespace InformedProteomics.Backend.Data.Composition
         public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
         public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
-
         #region Constructors
 
         public Composition(int c, int h, int n, int o, int s, int p)
@@ -208,7 +207,6 @@ namespace InformedProteomics.Backend.Data.Composition
             return true;
         }
 
-
         #region Operators
 
         protected Composition AddComposition(Composition c)
@@ -253,7 +251,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
             var newComposition = new Composition(numC, numH, numN, numO, numS, numP, additionalElements);
 
-            return newComposition;              
+            return newComposition;
         }
 
         public Composition Add(Composition c)
@@ -449,7 +447,6 @@ namespace InformedProteomics.Backend.Data.Composition
         private static readonly int NominalMassS = Atom.Get("S").NominalMass;
         private static readonly int NominalMassP = Atom.Get("P").NominalMass;
         #endregion
-
     }
 }
 

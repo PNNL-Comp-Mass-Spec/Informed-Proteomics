@@ -24,9 +24,9 @@ namespace InformedProteomics.Test
             const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Quant";
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
             string outFilePath = string.Format(@"{0}\aligned_features2.tsv", ms1ftFolder);
-            
+
             var fileEntries = Directory.GetFiles(ms1ftFolder);
-            
+
             var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
             /*var dataset = new String[]
@@ -73,24 +73,23 @@ namespace InformedProteomics.Test
 
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }
-        
-        
+
         [Test]
         public void TestCptac10Replicates()
         {
             const string ms1ftFolder = @"D:\MassSpecFiles\CPTAC_rep10";
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1";
             string outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
-            
+
             //var fileEntries = Directory.GetFiles(ms1ftFolder);
             //var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             //dataset.Sort();
             var dataset = new List<string>();
             for (var i = 1; i <= 10; i++) dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
-            
+
             var rawFiles = new List<string>();
             var ms1FtFiles = new List<string>();
-            
+
             foreach (string datasetName in dataset)
             {
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, datasetName);
@@ -152,7 +151,6 @@ namespace InformedProteomics.Test
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }
 
-
         [Test]
         public void TestTempCompRefLcMsFeatureAlign()
         {
@@ -171,7 +169,7 @@ namespace InformedProteomics.Test
                 var writer =
                     new StreamWriter(string.Format(@"D:\MassSpecFiles\CompRef\MsPathFinderMerged\{0}_IcTda.tsv",
                         dataset[i]));
-                
+
                 writer.Write("Scan");
                 writer.Write("\t");
                 writer.Write("Sequence");
@@ -193,7 +191,6 @@ namespace InformedProteomics.Test
                 writer.Write("QValue");
                 writer.Write("\n");
 
-
                 var path1 = string.Format(@"D:\MassSpecFiles\CompRef\MsPathFinder\{0}_IcTda.tsv", dataset[i]);
                 var parser1 = new TsvFileParser(path1);
                 OutputMergedResult(writer, parser1, fastaDb);
@@ -204,7 +201,7 @@ namespace InformedProteomics.Test
                 writer.Close();
             }
         }
-        
+
         private void OutputMergedResult(StreamWriter writer, TsvFileParser parser, FastaDatabase fastaDb)
         {
             var scoreColumn = parser.GetData("#MatchedFragments") ?? parser.GetData("Score");
@@ -217,7 +214,7 @@ namespace InformedProteomics.Test
                 var mass = double.Parse(parser.GetData("Mass")[i]);
                 var protName = parser.GetData("ProteinName")[i];
                 var protDesc = fastaDb.GetProteinDescription(protName);
-                
+
                 var firstResId = int.Parse(parser.GetData("Start")[i]);
                 var lastResId = int.Parse(parser.GetData("End")[i]);
                 var score = double.Parse(scoreColumn[i]);
@@ -245,7 +242,6 @@ namespace InformedProteomics.Test
                 writer.Write(qvalue);
                 writer.Write("\n");
             }
-
         }
 
         private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, List<string> rawFiles, bool isTemp = true)
@@ -279,7 +275,7 @@ namespace InformedProteomics.Test
                 var features = alignedFeatureList[i];
                 var minMaxNet = GetMinMaxNet(features);
 
-                writer.Write(@"{0}	{1:0.00000}	{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
+                writer.Write(@"{0}\t{1:0.00000}\t{2:0.00000}", minMaxNet.Item1, minMaxNet.Item3, minMaxNet.Item4);
 
                 for (var j = 0; j < align.CountDatasets; j++)
                 {
@@ -287,7 +283,7 @@ namespace InformedProteomics.Test
                     writer.Write("\t");
                     writer.Write(feature != null ? feature.Abundance : 0d);
                 }
-                
+
                 for (var j = 0; j < align.CountDatasets; j++)
                 {
                     var feature = features[j];
@@ -322,7 +318,7 @@ namespace InformedProteomics.Test
             {
                 var dataSetName = Path.GetFileNameWithoutExtension(rawFiles[i]);
                 //writer.Write("\t{0}", dataSetName);
-                // now output results!!                
+                // now output results!!
                 var ms1ftFilePath = String.Format(@"{0}\{1}.aligned.ms1ft", outDirectory, dataSetName);
                 var writer2 = new StreamWriter(ms1ftFilePath);
                 writer2.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
@@ -349,11 +345,10 @@ namespace InformedProteomics.Test
             Console.WriteLine("# of aligned features = {0}", align.CountAlignedFeatures);
             var tempOutPath = outFilePath + ".tmp";
             OutputAlignmentResult(align, tempOutPath, rawFiles, true);
-            
+
             align.RefineAbundance();
             OutputAlignmentResult(align, outFilePath, rawFiles, false);
         }
-
 
         private Tuple<int, int> GetMinMaxMs1ScanNum(LcMsRun run, double minTime, double maxTime)
         {
@@ -376,7 +371,7 @@ namespace InformedProteomics.Test
             }
             return new Tuple<int, int>(minScanNum, maxScanNum);
         }
-      
+
         public static Tuple<double, int, double, double> GetMinMaxNet(IList<LcMsFeature> features)
         {
             //var minNet = 1.0d;
@@ -408,6 +403,5 @@ namespace InformedProteomics.Test
             //return new Tuple<double, int, double, double>(mass, charge, minNet, maxNet);
             return new Tuple<double, int, double, double>(mass, charge, minElutionTime, maxElutionTime);
         }
-
     }
 }

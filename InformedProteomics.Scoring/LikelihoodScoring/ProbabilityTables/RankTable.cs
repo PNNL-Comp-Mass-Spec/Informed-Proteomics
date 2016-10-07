@@ -155,7 +155,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <summary>
         /// Creates a two dimensional array of all rank probabilities.
         /// </summary>
-        /// <returns>Two dimensional array where the first dimension are ranks 
+        /// <returns>Two dimensional array where the first dimension are ranks
         /// and the second dimension are ion types.</returns>
         public Probability<IonType>[,] GetProbabilities()
         {

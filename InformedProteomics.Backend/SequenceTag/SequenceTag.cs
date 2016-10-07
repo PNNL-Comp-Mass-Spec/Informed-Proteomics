@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.SequenceTag
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
         }
     }
-    
+
     /*
     public class SequenceTag : List<SequenceTagGraphEdge>
     {
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.SequenceTag
             _tolerance = tolerance;
             GetTagStrings();
         }
-  
+
         public void Merge(HashSet<string> tagStrings)
         {
             foreach (var str in tagStrings) TagStrings.Add(str);
@@ -176,7 +176,7 @@ namespace InformedProteomics.Backend.SequenceTag
             }
             return TagStrings;
         }
-       
+
         public static string Reverse(string s)
         {
             char[] charArray = s.ToCharArray();
@@ -184,7 +184,6 @@ namespace InformedProteomics.Backend.SequenceTag
             return new string(charArray);
         }
 
-        
           public bool Equals(SequenceTag other)
           {
               return HashString.Equals(other.HashString);
@@ -208,8 +207,6 @@ namespace InformedProteomics.Backend.SequenceTag
               if (obj.GetType() != this.GetType()) return false;
               return Equals((SequenceTag)obj);
           }
-
     }
-*/
-
+    */
 }

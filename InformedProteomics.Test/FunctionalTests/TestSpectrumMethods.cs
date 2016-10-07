@@ -25,7 +25,7 @@ namespace InformedProteomics.Test.FunctionalTests
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
-            
+
             //const int scanNum = 17338;
             const double relativeIntensity = 0.1;
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);

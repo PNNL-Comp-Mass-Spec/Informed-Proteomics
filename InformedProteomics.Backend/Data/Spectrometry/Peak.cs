@@ -43,35 +43,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return mzCompare;
         }
 
-    	public bool Equals(Peak other)
-    	{
-    		if (ReferenceEquals(null, other)) return false;
-    		if (ReferenceEquals(this, other)) return true;
-			return Math.Abs(Mz - other.Mz) < 1e-9;
-    	}
+        public bool Equals(Peak other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Math.Abs(Mz - other.Mz) < 1e-9;
+        }
 
-    	public override bool Equals(object obj)
-    	{
-    		if (ReferenceEquals(null, obj)) return false;
-    		if (ReferenceEquals(this, obj)) return true;
-    		if (obj.GetType() != typeof (Peak)) return false;
-    		return Equals((Peak) obj);
-    	}
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (Peak)) return false;
+            return Equals((Peak) obj);
+        }
 
-    	public override int GetHashCode()
-    	{
-    		return Mz.GetHashCode();
-    	}
+        public override int GetHashCode()
+        {
+            return Mz.GetHashCode();
+        }
 
-    	public static bool operator ==(Peak left, Peak right)
-    	{
-    		return Equals(left, right);
-    	}
+        public static bool operator ==(Peak left, Peak right)
+        {
+            return Equals(left, right);
+        }
 
-    	public static bool operator !=(Peak left, Peak right)
-    	{
-    		return !Equals(left, right);
-    	}
+        public static bool operator !=(Peak left, Peak right)
+        {
+            return !Equals(left, right);
+        }
     }
 
     public class LcMsPeak : Peak, IComparable<LcMsPeak>
@@ -110,7 +110,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     {
         public int Compare(Peak x, Peak y)
         {
-	        return y.Intensity.CompareTo(x.Intensity);
+            return y.Intensity.CompareTo(x.Intensity);
         }
     }
 
@@ -277,14 +277,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new Tolerance(ppm);
         }
 
-        public int Ppm 
+        public int Ppm
         {
             get
             {
                 var numBits = sizeof(double) * 8 - _numShifts;
                 var ppm = (int)(16 * Math.Pow(2, 27 - numBits));
                 return ppm;
-            } 
+            }
         }
 
         public readonly int NumBits;

@@ -13,7 +13,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             Score = nodeScore;
             _edgeList = null;
         }
-        
+
         public void AddEdge(ScoringGraphEdge edge)
         {
             if (_edgeList == null) _edgeList = new List<ScoringGraphEdge>();
@@ -30,7 +30,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                 }
             }
         }
-        
+
         public readonly int Score;
         private List<ScoringGraphEdge> _edgeList;
     }

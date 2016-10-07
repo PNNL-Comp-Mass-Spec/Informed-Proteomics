@@ -9,7 +9,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void Read(string filePath)
         {
-            
         }
 
         public int GetMissingXicScore(int charge)

@@ -26,7 +26,6 @@
 
 namespace SuffixArray
 {
-
   internal interface BaseArray
   {
     int this[int i]
@@ -576,5 +575,4 @@ namespace SuffixArray
       return pidx + 1;
     }
   }
-
 }

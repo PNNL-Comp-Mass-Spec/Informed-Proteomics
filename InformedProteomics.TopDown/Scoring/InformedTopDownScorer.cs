@@ -79,7 +79,6 @@ namespace InformedProteomics.TopDown.Scoring
             return new IcScores(nMatchedFragments, score, modifications);
         }
 
-
         public void GetCompositeScores(Sequence sequence, int parentIoncharge, int ms2ScanNum, out double score, out int nMatchedFragments)
         {
             score = 0d;
@@ -150,5 +149,4 @@ namespace InformedProteomics.TopDown.Scoring
             return "#MatchedFragments\tScore";
         }
     }
-
 }

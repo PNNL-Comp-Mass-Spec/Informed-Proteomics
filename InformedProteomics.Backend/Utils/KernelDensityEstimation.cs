@@ -9,7 +9,6 @@ namespace InformedProteomics.Backend.Utils
 {
     public class KernelDensityEstimator
     {
-
         public KernelDensityEstimator()
         {
             _observations = new List<double[]>();
@@ -32,7 +31,7 @@ namespace InformedProteomics.Backend.Utils
                 Console.WriteLine("Cannot have more points then there are elements in an observation");
                 return null;
             }
-           
+
             for (var j = 0; j < x.Length; j++)
             {
                 var sum = 0.0;
@@ -43,7 +42,7 @@ namespace InformedProteomics.Backend.Utils
                 }
                 x[j] = c*sum;
             }
-             
+
             return x;
         }
 
@@ -76,6 +75,5 @@ namespace InformedProteomics.Backend.Utils
         }
 
         private readonly List<double[]> _observations;
-
     }
 }

@@ -26,7 +26,6 @@ namespace InformedProteomics.IMS.IMSScoring
             return SimpleMath.GetCorrelation(lims, rims);
         }
 
-
         static private double[] GetTruncatedLc(Feature feature, Rectangle intersection)
         {
             var sp = intersection.Left - feature.ScanLcStart;

@@ -25,10 +25,10 @@ namespace InformedProteomics.Backend.MassFeature
                 var q = other.Probability[i];
                 bc += Math.Sqrt(p * q);
             }
-            
+
             if (!(bc > 0)) return MaxBhattacharyyaDistance;
 
-            return -Math.Log(bc);            
+            return -Math.Log(bc);
         }
 
         public double GetBhattacharyyaDistance(Ms1Peak[] isotopePeaks)
@@ -130,7 +130,6 @@ namespace InformedProteomics.Backend.MassFeature
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }
 
-
         public double GetPearsonCorrelation(double[] intensities)
         {
             var m1 = 1.0 / Size;
@@ -160,6 +159,5 @@ namespace InformedProteomics.Backend.MassFeature
 
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }
-
     }
 }

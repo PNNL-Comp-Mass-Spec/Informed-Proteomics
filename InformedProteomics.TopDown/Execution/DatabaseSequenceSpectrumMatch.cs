@@ -12,8 +12,8 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class DatabaseSequenceSpectrumMatch: IComparable<DatabaseSequenceSpectrumMatch>
     {
-        public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset, 
-            int numNTermCleavages, ModificationCombination modifications, Ion ion, double score, 
+        public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset,
+            int numNTermCleavages, ModificationCombination modifications, Ion ion, double score,
             bool isDecoy,
             double specEvalue = 0.0)
         {

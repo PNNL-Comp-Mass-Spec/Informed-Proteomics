@@ -14,7 +14,7 @@ namespace InformedProteomics.IMS.IMSTraining
         {
             return Parse(fileName, int.MaxValue);
         }
-        
+
         public static List<MSMSSpectrum> Parse(string fileName, int maxNumberOfSpectra)
         {
             var  spectra = new List<MSMSSpectrum>();
@@ -74,8 +74,7 @@ namespace InformedProteomics.IMS.IMSTraining
                     precursorMz = double.Parse(p[0]);
                 }
             }
-            return new MSMSSpectrum(charge, precursorMz, annotation, peaks);   
+            return new MSMSSpectrum(charge, precursorMz, annotation, peaks);
         }
-
     }
 }

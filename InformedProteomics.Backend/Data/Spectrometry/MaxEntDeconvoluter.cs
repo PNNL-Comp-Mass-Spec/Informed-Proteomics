@@ -7,13 +7,12 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.MassFeature;
 using MathNet.Numerics.Statistics;
 
-
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class MaxEntDeconvoluter
     {
         /// <summary>
-        /// MaxEnt deconvolution algorithm constructor 
+        /// MaxEnt deconvolution algorithm constructor
         /// </summary>
         /// <param name="tolerance">tolerance</param>
         /// <param name="massBinning">mass binning interface</param>
@@ -89,7 +88,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var mass = GetAveragingMass(collectedPeaks);
                 var charges = collectedPeaks.Select(p => p.Charge).ToArray();
                 var abundance = collectedPeaks.Sum(p => p.Intensity);
-                
+
                 /*
                 var maxChg = charges.Max();
                 var minChg = charges.Min();
@@ -140,7 +139,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var minCharge = (int)Math.Max(_minCharge, Math.Ceiling(mass / (maxMz - Constants.Proton)));
             var maxCharge = (int)Math.Min(_maxCharge, Math.Floor(mass / (minMz - Constants.Proton)));
-       
+
             for (var charge = minCharge; charge < maxCharge; charge++)
             {
                 var mz = mass / charge + Constants.Proton;
@@ -174,7 +173,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     var denominator = (double)iPeak.Charge / jPeak.Charge;
                     var numerator = Math.Abs(denominator - jPeak.MzWithoutAdductIonMass / iPeak.MzWithoutAdductIonMass);
                     weights[i] += Math.Pow(numerator / denominator, WeightingIndex);
-
                 }
                 weights[i] *= (maxCharge - minCharge);
             }
@@ -182,7 +180,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return weights;
         }
 
-        
         private const double WeightingIndex = 2;
         private readonly Tolerance _tolerance;
         private readonly double _minMass;
@@ -192,6 +189,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly MzComparerWithBinning _massBinning;
         private readonly Spectrum _spectrum;
         private DeconvolutedSpectrum _deconvolutedSpectrum;
-
     }
 }

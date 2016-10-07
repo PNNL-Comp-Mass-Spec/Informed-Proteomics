@@ -41,7 +41,7 @@ namespace InformedProteomics.TopDown.Scoring
         public readonly double MinBinCenter;
         public readonly int BinCount;
     }
-    
+
     public class LikelihoodScoringModel
     {
         public LikelihoodScoringModel(string dataPath)
@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring
             var reader = new StreamReader(scorePath);
             LoadIonTypeScoreTable(reader);
             reader.Close();
-            
+
             scorePath = Path.Combine(dataPath, "MassScore.txt");
             reader = new StreamReader(scorePath);
             LoadMassScoreTable(reader);
@@ -109,10 +109,10 @@ namespace InformedProteomics.TopDown.Scoring
         public double GetNodeScore(ActivationMethod activationMethod, bool isPrefix, double fragmentIonMass, DeconvolutedPeak matchedPeak, double refIntensity)
         {
             var massErrorPpm = 1e6 * ((matchedPeak.Mass - fragmentIonMass) / fragmentIonMass);
-            return GetNodeScore(activationMethod, isPrefix, fragmentIonMass, matchedPeak.Charge, matchedPeak.Corr, matchedPeak.Dist, matchedPeak.Intensity / refIntensity, massErrorPpm);   
+            return GetNodeScore(activationMethod, isPrefix, fragmentIonMass, matchedPeak.Charge, matchedPeak.Corr, matchedPeak.Dist, matchedPeak.Intensity / refIntensity, massErrorPpm);
         }
-        
-        public double GetNodeScore(ActivationMethod activationMethod, bool isPrefix, double fragmentIonMass, int fragmentIonCharge, 
+
+        public double GetNodeScore(ActivationMethod activationMethod, bool isPrefix, double fragmentIonMass, int fragmentIonCharge,
             double corrScore, double distScore, double intensityScore, double massErrorPpm)
         {
             var score = GetNodeScoreWithoutMassError(activationMethod, isPrefix, fragmentIonMass, fragmentIonCharge, corrScore,
@@ -155,7 +155,7 @@ namespace InformedProteomics.TopDown.Scoring
         {
             return isPrefix ? 0 : 1;
         }
- 
+
         public int GetIonTypeIndex(BaseIonType ionType)
         {
             return GetIonTypeIndex(ionType.IsPrefix);
@@ -180,7 +180,6 @@ namespace InformedProteomics.TopDown.Scoring
             return charge - 1;
         }
 
-
         private void LoadIonTypeScoreTable(StreamReader reader)
         {
             for (var i = 0; i < ActivationBinLength; i++)
@@ -193,7 +192,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var token = line.Split('\t');
 
                 for (var j = 0; j < IonTypeBinLength; j++) IonTypeScoreTable[a][j] = GetBoundedLkScore(token[j]);
-            }            
+            }
         }
 
         private void LoadMassScoreTable(StreamReader reader)
@@ -206,7 +205,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var tokens = line.Split(',');
 
                 if (tokens.Length != 2) break;
-                
+
                 var a = GetActivationMethodIndex(tokens[0]);
                 var t = GetIonTypeIndex(tokens[1]);
 
@@ -233,7 +232,7 @@ namespace InformedProteomics.TopDown.Scoring
                 for (var j = 0; j < ChargeBinLength; j++) ChargeScoreTable[m][j] = GetBoundedLkScore(token[j]);
             }
         }
-       
+
         private void LoadPeakScoreTable(StreamReader reader, double[][][] table)
         {
             var binLen = table[0][0].Length;
@@ -245,7 +244,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 var tokens = line.Split(',');
                 if (tokens.Length != 2) break;
-                
+
                 var c = GetChargeIndex(int.Parse(tokens[0]));
                 var m = MassBinning.GetBinIndex(double.Parse(tokens[1]));
 
@@ -260,7 +259,7 @@ namespace InformedProteomics.TopDown.Scoring
         {
             return Math.Max(Math.Min(double.Parse(scoreStr), ScoreUpperBound), ScoreLowerBound);
         }
-        
+
         private const double ScoreLowerBound = -1.5;
         private const double ScoreUpperBound = 1.5;
 
@@ -278,11 +277,11 @@ namespace InformedProteomics.TopDown.Scoring
         private static readonly double[][][] MassScoreTable;
 
         private static readonly double[][] ChargeScoreTable;
-        
+
         private static readonly double[][][] CorrScoreTable;
         private static readonly double[][][] DistScoreTable;
         private static readonly double[][][] IntensityScoreTable;
-        
+
         static LikelihoodScoringModel()
         {
             MassBinning = new DiscretizedNumber(100, 15000, 100);
@@ -293,13 +292,13 @@ namespace InformedProteomics.TopDown.Scoring
 
             IonTypeScoreTable = new double[ActivationBinLength][];
             MassScoreTable = new double[ActivationBinLength][][];
-            
+
             ChargeScoreTable = new double[MassBinning.BinCount][];
             for (var i = 0; i < MassBinning.BinCount; i++)
             {
                 ChargeScoreTable[i] = new double[ChargeBinLength];
             }
-            
+
             CorrScoreTable = new double[ChargeBinLength][][];
             DistScoreTable = new double[ChargeBinLength][][];
             IntensityScoreTable = new double[ChargeBinLength][][];
@@ -331,6 +330,4 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
     }
-
-   
 }

@@ -109,7 +109,7 @@ namespace MSPathFinder
                     {
                         writer.WriteLine("Modification\t" + searchMod);
                     }
-                }                
+                }
             }
         }
 
@@ -131,7 +131,7 @@ namespace MSPathFinder
             DatabaseFilePath = parameters["-d"];
 
             var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
-            
+
             if (!Directory.Exists(outputDir))
             {
                 if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
@@ -274,7 +274,7 @@ namespace MSPathFinder
                     }
                     if (!File.Exists(value))
                     {
-                        return "File not found." + value + "!"; 
+                        return "File not found." + value + "!";
                     }
                     var extension = Path.GetExtension(value).ToLower();
                     if (!extension.Equals(".fa") && !extension.Equals(".fasta"))
@@ -284,7 +284,6 @@ namespace MSPathFinder
                 }
                 else if (key.Equals("-o"))
                 {
-
                 }
                 else if (key.Equals("-mod"))
                 {

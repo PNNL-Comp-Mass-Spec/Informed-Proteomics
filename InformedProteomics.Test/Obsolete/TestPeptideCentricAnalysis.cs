@@ -177,7 +177,7 @@ namespace InformedProteomics.Test.Obsolete
             const string outputFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
 
             var postProcessor = new MsGfPostProcessor(specFiles, resultPath, new Tolerance(20), new Tolerance(10));
-            var numId = postProcessor.PostProcessing(outputFilePath); 
+            var numId = postProcessor.PostProcessing(outputFilePath);
 
             Console.WriteLine("NumId: {0}", numId);
         }
@@ -209,7 +209,7 @@ namespace InformedProteomics.Test.Obsolete
 
             var postProcessor = new MsGfPostProcessor(specFilePath, resultPath, new Tolerance(5), new Tolerance(3));
             var numId = postProcessor.PostProcessing(outputFilePath);
-            
+
             Console.WriteLine("NumId: {0}", numId);
         }
 
@@ -256,7 +256,6 @@ namespace InformedProteomics.Test.Obsolete
 
             Console.WriteLine("NumId: {0}", numId);
         }
-
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
@@ -393,13 +392,13 @@ namespace InformedProteomics.Test.Obsolete
             const string resultFilePath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary - Copy.tsv";
             var histSpecEValue = new float[2,500];
             const int specEValueBinningConstant = 10;
-            
+
             var histMsGfScore = new float[2,1000];
             const int minMsGfScore = -100;
             var numOccs = new[] {0, 0};
             MsGfPlusHeaderInformation headerInfo = null;
             var prevScanNum = new[] {-1, -1};
-            
+
             foreach (var line in File.ReadLines(resultFilePath))
             {
                 if (line.StartsWith("#"))
@@ -455,7 +454,7 @@ namespace InformedProteomics.Test.Obsolete
                     histSpecEValue[i, j] /= numOccs[i];
                 }
             }
-            
+
             Console.WriteLine("specEValueX <- c({0});", string.Join(",", specEValueArr));
             Console.WriteLine("specEValueHistTarget <- c({0});", string.Join(",", Slice(histSpecEValue, 0)));
             Console.WriteLine("specEValueHistDecoy <- c({0});", string.Join(",", Slice(histSpecEValue, 1)));
@@ -583,7 +582,7 @@ namespace InformedProteomics.Test.Obsolete
                     //{
                     //    var isotopeRatio = xic.GetSumIntensities() / baseIntensity / isotope.Item2;
                     //    var correlation = xic.GetCorrelation(baseXic);
-                        
+
                     //    if (isotopeRatio > 0.8 && isotopeRatio < 1.2
                     //        && correlation > 0.8)
                     //    {

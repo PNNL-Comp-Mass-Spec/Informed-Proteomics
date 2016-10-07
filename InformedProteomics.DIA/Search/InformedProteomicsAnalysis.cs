@@ -17,14 +17,13 @@ namespace InformedProteomics.DIA.Search
             IEnumerable<string> peptideEnumerator,
             AminoAcidSet aminoAcidSet): this(run, peptideEnumerator, aminoAcidSet, 1, 3)
         {
-            
         }
 
         public InformedProteomicsAnalysis(
-            InMemoryLcMsRun run, 
-            IEnumerable<string> peptideEnumerator, 
-            AminoAcidSet aminoAcidSet, 
-            int minCharge, 
+            InMemoryLcMsRun run,
+            IEnumerable<string> peptideEnumerator,
+            AminoAcidSet aminoAcidSet,
+            int minCharge,
             int maxCharge)
         {
             Run = run;

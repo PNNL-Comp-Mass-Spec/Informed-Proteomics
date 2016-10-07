@@ -16,10 +16,10 @@
             if (IsScoreCalculated) return Score;
            // Console.WriteLine(this + " " + IsotopeCorrelation);
             var isotopeScore = _scoringParams.GetIsotopeIntensityCorrelationScoreForPrecursor(IsotopeCorrelation, GroupParameter);
-            
+
             //var lcScore = _scoringParams.GetLcCorrelationScore(LcCorrelation, GroupParameter);
             //var imsScore = _scoringParams.GetImsCorrelationScore(ImsCorrelation, GroupParameter);
-           
+
             //Score = lcScore + imsScore + isotopeScore;
             Score = isotopeScore;
             IsScoreCalculated = true;

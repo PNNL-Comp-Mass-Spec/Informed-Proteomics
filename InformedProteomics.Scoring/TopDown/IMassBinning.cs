@@ -19,6 +19,5 @@ namespace InformedProteomics.Scoring.TopDown
         int NumberOfBins { get; }
 
         bool Filtered { get; }
-
     }
 }

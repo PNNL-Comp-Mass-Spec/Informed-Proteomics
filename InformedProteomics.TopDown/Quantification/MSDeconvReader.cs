@@ -6,7 +6,6 @@ namespace InformedProteomics.TopDown.Quantification
 {
     public class MSDeconvReader
     {
-
         public MSDeconvReader(double minMass = Double.MinValue, double maxMass = Double.MaxValue, int minCharge = Int32.MinValue, int maxCharge = int.MaxValue, int minScan = Int32.MinValue, int maxScan = Int32.MaxValue)
         {
             MinMass = minMass;
@@ -52,7 +51,6 @@ namespace InformedProteomics.TopDown.Quantification
                         if (msLevel == 2) file.ReadLine();
                         continue;
                     }
-                    
                 }
                 //Process line
                 if (isInfoLine)
@@ -83,7 +81,7 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var line = lineList[i].Split(',');
                 var node = GetDeconvLineDecon2Ls(line);
-                if (node != null) nodeList.Add(node);             
+                if (node != null) nodeList.Add(node);
             }
 
             return nodeList;
@@ -126,6 +124,5 @@ namespace InformedProteomics.TopDown.Quantification
         public double MinScanNum { get; set; }
         public double MaxScanNum { get; set; }
         public int MsLevel { get; set; }
-
     }
 }

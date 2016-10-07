@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             Active = true;
         }
-        
+
         public void TagMajorPeakOf(LcMsPeakCluster feature)
         {
             //if (_majorTaggedFeatures == null) _majorTaggedFeatures = new List<LcMsPeakCluster>();
@@ -58,15 +58,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     Array.Resize(ref _majorTaggedFeatures, _majorTaggedFeatures.Length * 2);
                 }
-                _majorTaggedFeatures[_countMajorTaggedFeatures++] = feature;                 
+                _majorTaggedFeatures[_countMajorTaggedFeatures++] = feature;
             }
-
         }
         public void TagMinorPeakOf(LcMsPeakCluster feature)
         {
             //if (_minorTaggedFeatures == null) _minorTaggedFeatures = new List<LcMsPeakCluster>();
             //_minorTaggedFeatures.Add(feature);
-            if (_minorTaggedFeatures == null) 
+            if (_minorTaggedFeatures == null)
             {
                 _minorTaggedFeatures = new LcMsPeakCluster[2];
                 _minorTaggedFeatures[_countMinorTaggedFeatures++] = feature;
@@ -77,7 +76,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     Array.Resize(ref _minorTaggedFeatures, _minorTaggedFeatures.Length * 2);
                 }
-                _minorTaggedFeatures[_countMinorTaggedFeatures++] = feature; 
+                _minorTaggedFeatures[_countMinorTaggedFeatures++] = feature;
             }
         }
 
@@ -105,8 +104,5 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private LcMsPeakCluster[] _majorTaggedFeatures;
         private int _countMajorTaggedFeatures;
-
-
     }
-   
 }

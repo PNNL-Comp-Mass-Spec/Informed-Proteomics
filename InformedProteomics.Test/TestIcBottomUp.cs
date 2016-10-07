@@ -202,7 +202,6 @@ namespace InformedProteomics.Test
             }
         }
 
-
         public void TestMaccoss(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

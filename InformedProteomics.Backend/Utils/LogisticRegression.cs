@@ -11,12 +11,10 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Integration;
 
-
 namespace InformedProteomics.Backend.Utils
 {
     public class LogisticRegression
     {
-
         public double[] ComputeWeights(double[][] obsMatrix, int[] classVector, double[] weights = null)
         {
             var dataMatrix = new double[obsMatrix.Length][];
@@ -51,7 +49,6 @@ namespace InformedProteomics.Backend.Utils
 
         private double[] GradientDescent(double[][] observed, double[] wVector, double learningRate)
         {
-
             var updatedWVector = new double[wVector.Length];
             wVector.CopyTo(updatedWVector,0);
             for (var i = 0; i < observed.Length; i++)
@@ -117,7 +114,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return (correctCount >= neededCorrect ? true : false);
-
         }
 
         private int GetClassification(double x)

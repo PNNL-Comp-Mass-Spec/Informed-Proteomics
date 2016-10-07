@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             AminoAcid aminoAcid)
         {
             if (aminoAcid == null) return possibleOffsets['*'].Select(off => new CompositionWithDeltaMass(off));
-            var key = possibleOffsets.ContainsKey(aminoAcid.Residue) ? aminoAcid.Residue : '*'; 
+            var key = possibleOffsets.ContainsKey(aminoAcid.Residue) ? aminoAcid.Residue : '*';
             return possibleOffsets[key].Select(offset => new CompositionWithDeltaMass(offset) - aminoAcid.Composition);
         }
     }

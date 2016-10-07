@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
 
             var tags = tagFinder.GetAllSequenceTagString();
-          
+
             lock (_ms2ScanToTagMap)
             {
                 _ms2ScanToTagMap[ms2ScanNum] = tags;
@@ -85,6 +85,5 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly int _minTagLen;
         private readonly int _maxTagLen;
         private readonly Dictionary<int, IList<SequenceTag>> _ms2ScanToTagMap;
-        
     }
 }
