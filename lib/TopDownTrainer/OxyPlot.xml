@@ -1109,11 +1109,6 @@
             Gets or sets the actual logarithmic minimum value of the axis.
             </summary>
         </member>
-        <member name="M:OxyPlot.Axes.LogarithmicAxis.CoerceActualMaxMin">
-            <summary>
-            Coerces the actual maximum and minimum values.
-            </summary>
-        </member>
         <member name="M:OxyPlot.Axes.LogarithmicAxis.GetTickValues(System.Collections.Generic.IList{System.Double}@,System.Collections.Generic.IList{System.Double}@,System.Collections.Generic.IList{System.Double}@)">
             <summary>
             Gets the coordinates used to draw ticks and tick labels (numbers or category names).
@@ -1263,6 +1258,11 @@
             </summary>
             <param name="x">The value to transform.</param>
             <returns>The transformed value.</returns>
+        </member>
+        <member name="M:OxyPlot.Axes.LogarithmicAxis.CoerceActualMaxMin">
+            <summary>
+            Coerces the actual maximum and minimum values.
+            </summary>
         </member>
         <member name="T:OxyPlot.Axes.RangeColorAxis">
             <summary>
@@ -1436,6 +1436,11 @@
             Mantissa function.
             </summary>
         </member>
+        <member name="F:OxyPlot.Axes.Axis.ThresholdRound">
+            <summary>
+            Rounds a value if the difference between the rounded value and the original value is less than 1e-6.
+            </summary>
+        </member>
         <member name="F:OxyPlot.Axes.Axis.offset">
             <summary>
             The offset.
@@ -1551,6 +1556,11 @@
         <member name="P:OxyPlot.Axes.Axis.ClipTitle">
             <summary>
             Gets or sets a value indicating whether to clip the axis title. The default value is <c>true</c>.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Axes.Axis.CropGridlines">
+            <summary>
+            Gets or sets a value indicating whether to crop gridlines with perpendicular axes Start/EndPositions. The default value is <c>false</c>.
             </summary>
         </member>
         <member name="P:OxyPlot.Axes.Axis.DataMaximum">
@@ -1732,6 +1742,13 @@
             <summary>
             Gets or sets the interval between minor ticks. The default value is <c>double.NaN</c>.
             </summary>
+        </member>
+        <member name="P:OxyPlot.Axes.Axis.MinorTicklineColor">
+            <summary>
+            Gets or sets the color of the minor ticks. The default value is <see cref="F:OxyPlot.OxyColors.Automatic"/>.
+            </summary>
+            <remarks>If the value is <see cref="F:OxyPlot.OxyColors.Automatic"/>, the value of
+            <see cref="P:OxyPlot.Axes.Axis.TicklineColor"/> will be used.</remarks>
         </member>
         <member name="P:OxyPlot.Axes.Axis.MinorTickSize">
             <summary>
@@ -2118,6 +2135,13 @@
             Resets the current values.
             </summary>
             <remarks>The current values may be modified during update of max/min and rendering.</remarks>
+        </member>
+        <member name="M:OxyPlot.Axes.Axis.GetDefaultStringFormat">
+            <summary>
+            Gets the default format string.
+            </summary>
+            <returns>A format string.</returns>
+            <remarks>This format string is used if the StringFormat is not set.</remarks>
         </member>
         <member name="M:OxyPlot.Axes.Axis.PostInverseTransform(System.Double)">
             <summary>
@@ -2892,6 +2916,14 @@
             </summary>
             <param name="plotArea">The plot area.</param>
         </member>
+        <member name="M:OxyPlot.Axes.DateTimeAxis.GetDefaultStringFormat">
+            <summary>
+            Gets the default string format.
+            </summary>
+            <returns>
+            The format string.
+            </returns>
+        </member>
         <member name="M:OxyPlot.Axes.DateTimeAxis.FormatValueOverride(System.Double)">
             <summary>
             Formats the value to be used on the axis.
@@ -3141,6 +3173,14 @@
             </summary>
             <param name="x">The coordinate.</param>
             <returns>The value.</returns>
+        </member>
+        <member name="M:OxyPlot.Axes.TimeSpanAxis.GetDefaultStringFormat">
+            <summary>
+            Gets the default format string.
+            </summary>
+            <returns>
+            The default format string.
+            </returns>
         </member>
         <member name="M:OxyPlot.Axes.TimeSpanAxis.FormatValueOverride(System.Double)">
             <summary>
@@ -3449,6 +3489,21 @@
             </summary>
             <param name="axis">The axis.</param>
             <param name="axisPosition">The axis position.</param>
+        </member>
+        <member name="M:OxyPlot.Axes.HorizontalAndVerticalAxisRenderer.AddSegments(System.Collections.Generic.List{OxyPlot.ScreenPoint},System.Collections.Generic.List{OxyPlot.Axes.Axis},System.Boolean,System.Boolean,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Adds segments to <paramref name="segments"/> array. 
+            If <paramref name="cropGridlines"/> is true, then lines will be cropped with <paramref name="perpAxes"/> lists axes.
+            </summary>
+            <param name="segments">The target segments.</param>
+            <param name="perpAxes">Perpendicular axes list.</param>
+            <param name="isHorizontal">True, if current axis is horizontal.</param>
+            <param name="cropGridlines">True, if gridlines should be cropped.</param>
+            <param name="transformedValue">Starting point position.</param>
+            <param name="plotAreaLeft">Plot area left position.</param>
+            <param name="plotAreaRight">Plot area right position.</param>
+            <param name="plotAreaTop">Plot area top position.</param>
+            <param name="plotAreaBottom">Plot area bottom position.</param>
         </member>
         <member name="M:OxyPlot.Axes.HorizontalAndVerticalAxisRenderer.GetRotatedAlignments(System.Double,System.Double,OxyPlot.HorizontalAlignment@,OxyPlot.VerticalAlignment@)">
             <summary>
@@ -7356,6 +7411,11 @@
             Gets or sets the last visible window start position in second data points collection.
             </summary>
         </member>
+        <member name="P:OxyPlot.Series.AreaSeries.IsPoints2Defined">
+            <summary>
+            Gets a value indicating whether Points2 collection was defined by user.
+            </summary>
+        </member>
         <member name="M:OxyPlot.Series.AreaSeries.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
             <summary>
             Gets the nearest point.
@@ -7388,25 +7448,83 @@
             Updates the maximum and minimum values of the series.
             </summary>
         </member>
-        <member name="M:OxyPlot.Series.AreaSeries.RenderChunkedPoints(System.Collections.Generic.List{OxyPlot.DataPoint},System.Collections.Generic.List{System.Collections.Generic.List{OxyPlot.ScreenPoint}},System.Int32,System.Double,OxyPlot.IRenderContext,OxyPlot.OxyRect,System.Double,System.Boolean,OxyPlot.OxyColor)">
+        <member name="M:OxyPlot.Series.AreaSeries.RenderChunkedPoints(OxyPlot.Series.AreaSeries.AreaRenderContext)">
             <summary>
-            Renders data points from the specified index to the specified maximum x, skipping NaN values.
+            Renders data points skipping NaN values.
             </summary>
-            <param name="actualPoints">Points list.</param>
-            <param name="chunksOfPoints">A list where chunks will be placed.</param>
-            <param name="startIndex">The start index of the points to render.</param>
-            <param name="maximumX">The maximum X coordinate to render.</param>
-            <param name="rc">Render context</param>
-            <param name="clippingRect">Clipping rectangle.</param>
-            <param name="minDistSquared">Minimal distance squared.</param>
-            <param name="reverse">Reverse points.</param>
-            <param name="color">Stroke color.</param>
+            <param name="context">Area rendering context.</param>
+            <returns>The list of chunks.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.AreaSeries.RenderScreenPoints(OxyPlot.Series.AreaSeries.AreaRenderContext,System.Collections.Generic.List{OxyPlot.ScreenPoint})">
+            <summary>
+            Renders a chunk of points on the screen.
+            </summary>
+            <param name="context">Render context.</param>
+            <param name="points">Screen points.</param>
+            <returns>The list of resampled points.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.AreaSeries.GetPointX(OxyPlot.DataPoint)">
+            <summary>
+            Gets the x coordinate of a DataPoint.
+            </summary>
+            <param name="point">Data point.</param>
+            <returns>X coordinate.</returns>
         </member>
         <member name="M:OxyPlot.Series.AreaSeries.GetConstantPoints2">
             <summary>
             Gets the points when <see cref="P:ConstantY2" /> is used.
             </summary>
             <returns>A sequence of <see cref="T:DataPoint"/>.</returns>
+        </member>
+        <member name="T:OxyPlot.Series.AreaSeries.AreaRenderContext">
+            <summary>
+            Holds parameters for point rendering.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.Points">
+            <summary>
+            Gets or sets source data points.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.WindowStartIndex">
+            <summary>
+            Gets or sets start index of a visible window.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.XMax">
+            <summary>
+            Gets or sets maximum visible X coordinate.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.RenderContext">
+            <summary>
+            Gets or sets render context.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.ClippingRect">
+            <summary>
+            Gets or sets clipping rectangle.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.MinDistSquared">
+            <summary>
+            Gets or sets minimum squared distance between points.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.Reverse">
+            <summary>
+            Gets or sets a value indicating whether to reverse the points.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.Color">
+            <summary>
+            Gets or sets line color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.AreaSeries.AreaRenderContext.DashArray">
+            <summary>
+            Gets or sets line dash array.
+            </summary>
         </member>
         <member name="T:OxyPlot.Series.LabelPlacement">
             <summary>
@@ -9226,9 +9344,24 @@
             Represents a two-color area series.
             </summary>
         </member>
-        <member name="F:OxyPlot.Series.TwoColorAreaSeries.points2">
+        <member name="F:OxyPlot.Series.TwoColorAreaSeries.defaultColor2">
             <summary>
-            The second list of points representing limit line.
+            The default second color.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.TwoColorAreaSeries.abovePoints">
+            <summary>
+            The collection of points above the limit.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.TwoColorAreaSeries.belowPoints">
+            <summary>
+            The collection of points below the limit.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.TwoColorAreaSeries.markerStartIndex">
+            <summary>
+            Start index of a visible rendering window for markers.
             </summary>
         </member>
         <member name="M:OxyPlot.Series.TwoColorAreaSeries.#ctor">
@@ -9236,29 +9369,47 @@
             Initializes a new instance of the <see cref = "T:OxyPlot.Series.TwoColorAreaSeries" /> class.
             </summary>
         </member>
-        <member name="P:OxyPlot.Series.TwoColorAreaSeries.Fill">
-            <summary>
-            Gets or sets the area fill color above the limit line.
-            </summary>
-            <value>The fill above the limit line.</value>
-        </member>
         <member name="P:OxyPlot.Series.TwoColorAreaSeries.Fill2">
             <summary>
             Gets or sets the area fill color below the limit line.
             </summary>
             <value>The fill below the limit line.</value>
         </member>
-        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActualFill">
-            <summary>
-            Gets the actual fill color above the limit line.
-            </summary>
-            <value>The actual fill above the limit line.</value>
-        </member>
-        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActuallFill2">
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActualFill2">
             <summary>
             Gets the actual fill color below the limit line.
             </summary>
             <value>The actual fill below the limit line.</value>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActualColor2">
+            <summary>
+            Gets the actual second color.
+            </summary>
+            <value>The actual color.</value>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.Dashes2">
+            <summary>
+            Gets or sets the dash array for the rendered line that is below the limit (overrides <see cref="T:OxyPlot.LineStyle" />).
+            </summary>
+            <value>The dash array.</value>
+            <remarks>If this is not <c>null</c> it overrides the <see cref="T:OxyPlot.LineStyle" /> property.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.LineStyle2">
+            <summary>
+            Gets or sets the line style for the part of the line that is below the limit.
+            </summary>
+            <value>The line style.</value>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActualLineStyle2">
+            <summary>
+            Gets the actual line style for the part of the line that is below the limit.
+            </summary>
+            <value>The line style.</value>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.ActualDashArray2">
+            <summary>
+            Gets the actual dash array for the line that is below the limit.
+            </summary>
         </member>
         <member name="P:OxyPlot.Series.TwoColorAreaSeries.MarkerFill2">
             <summary>
@@ -9271,6 +9422,11 @@
             Gets or sets the marker stroke which is below the limit line. The default is <c>OxyColors.Automatic</c>.
             </summary>
             <value>The marker stroke.</value>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.Limit">
+            <summary>
+            Gets or sets a baseline for the series.
+            </summary>
         </member>
         <member name="M:OxyPlot.Series.TwoColorAreaSeries.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
             <summary>
@@ -9286,22 +9442,71 @@
             </summary>
             <param name="rc">The rendering context.</param>
         </member>
-        <member name="M:OxyPlot.Series.TwoColorAreaSeries.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
+        <member name="M:OxyPlot.Series.TwoColorAreaSeries.SetDefaultValues">
             <summary>
-            Renders the legend symbol for the line series on the
-            specified rendering context.
+            Sets the default values.
             </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="legendBox">The bounding rectangle of the legend box.</param>
         </member>
         <member name="M:OxyPlot.Series.TwoColorAreaSeries.UpdateData">
             <summary>
             The update data.
             </summary>
         </member>
-        <member name="M:OxyPlot.Series.TwoColorAreaSeries.UpdateMaxMin">
+        <member name="M:OxyPlot.Series.TwoColorAreaSeries.RenderScreenPoints(OxyPlot.Series.AreaSeries.AreaRenderContext,System.Collections.Generic.List{OxyPlot.ScreenPoint})">
             <summary>
-            Updates the maximum and minimum values of the series.
+            Renders a chunk of points on the screen.
+            </summary>
+            <param name="context">Render context.</param>
+            <param name="points">Screen points.</param>
+            <returns>The list of resampled points.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.TwoColorAreaSeries.SplitPoints(System.Collections.Generic.List{OxyPlot.DataPoint})">
+            <summary>
+            Splits a collection of points into two collections based on their Y value.
+            </summary>
+            <param name="source">A collection of points to split.</param>
+        </member>
+        <member name="M:OxyPlot.Series.TwoColorAreaSeries.GetConstantScreenPoints2(System.Collections.Generic.List{OxyPlot.ScreenPoint},System.Double)">
+            <summary>
+            Gets the screen points when baseline is used.
+            </summary>
+            <param name="source">The list of polygon screen points.</param>
+            <param name="baseline">Baseline Y value for the polygon.</param>
+            <returns>A sequence of <see cref="T:DataPoint"/>.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.TwoColorAreaSeries.GetInterpolatedX(OxyPlot.DataPoint,OxyPlot.DataPoint,System.Double)">
+            <summary>
+            Gets interpolated X coordinate for given Y on a straight line
+            between two points.
+            </summary>
+            <param name="a">First point.</param>
+            <param name="b">Second point.</param>
+            <param name="y">Y coordinate.</param>
+            <returns>Corresponding X coordinate.</returns>
+        </member>
+        <member name="T:OxyPlot.Series.TwoColorAreaSeries.TwoColorAreaRenderContext">
+            <summary>
+            Render context for two color area plot.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.TwoColorAreaRenderContext.Baseline">
+            <summary>
+            Gets or sets area baseline value.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.TwoColorAreaRenderContext.Fill">
+            <summary>
+            Gets or sets polygon fill color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.TwoColorAreaRenderContext.MarkerFill">
+            <summary>
+            Gets or sets marker fill color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.TwoColorAreaSeries.TwoColorAreaRenderContext.MarkerStroke">
+            <summary>
+            Gets or sets marker stroke color.
             </summary>
         </member>
         <member name="T:OxyPlot.Series.XYAxisSeries">
@@ -10147,7 +10352,7 @@
             Updates the maximum and minimum values of the series.
             </summary>
         </member>
-        <member name="M:OxyPlot.Series.LineSeries.RenderPoints(OxyPlot.IRenderContext,OxyPlot.OxyRect,System.Collections.Generic.ICollection{OxyPlot.DataPoint})">
+        <member name="M:OxyPlot.Series.LineSeries.RenderPoints(OxyPlot.IRenderContext,OxyPlot.OxyRect,System.Collections.Generic.IList{OxyPlot.DataPoint})">
             <summary>
             Renders the points as line, broken line and markers.
             </summary>
@@ -10155,15 +10360,17 @@
             <param name="clippingRect">The clipping rectangle.</param>
             <param name="points">The points to render.</param>
         </member>
-        <member name="M:OxyPlot.Series.LineSeries.ExtractNextContiguousLineSegment(System.Collections.Generic.IEnumerator{OxyPlot.DataPoint},System.Nullable{OxyPlot.ScreenPoint}@,System.Collections.Generic.List{OxyPlot.ScreenPoint},System.Collections.Generic.List{OxyPlot.ScreenPoint})">
+        <member name="M:OxyPlot.Series.LineSeries.ExtractNextContiguousLineSegment(System.Collections.Generic.IList{OxyPlot.DataPoint},System.Int32@,System.Nullable{OxyPlot.ScreenPoint}@,System.Double,System.Collections.Generic.List{OxyPlot.ScreenPoint},System.Collections.Generic.List{OxyPlot.ScreenPoint})">
             <summary>
             Extracts a single contiguous line segment beginning with the element at the position of the enumerator when the method
             is called. Initial invalid data points are ignored.
             </summary>
-            <param name="pointEnumerator">The enumerator to use to traverse the collection. The enumerator must be on a valid element.</param>
+            <param name="pointIdx">Current point index</param>
             <param name="previousContiguousLineSegmentEndPoint">Initially set to null, but I will update I won't give a broken line if this is null</param>
+            <param name="xmax">Maximum visible X value</param>
             <param name="broken">place to put broken segment</param>
             <param name="contiguous">place to put contiguous segment</param>
+            <param name="points">Points collection</param>
             <returns>
               <c>true</c> if line segments are extracted, <c>false</c> if reached end.
             </returns>
@@ -12456,7 +12663,7 @@
             <param name="tolerance">The tolerance.</param>
             <returns>A list of screen points.</returns>
         </member>
-        <member name="M:OxyPlot.CanonicalSplineHelper.Segment(System.Collections.Generic.IList{OxyPlot.ScreenPoint},OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,System.Double,System.Double,System.Double)">
+        <member name="M:OxyPlot.CanonicalSplineHelper.Segment(System.Collections.Generic.IList{OxyPlot.ScreenPoint},OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,OxyPlot.ScreenPoint,System.Double,System.Double,System.Double,System.Int32)">
             <summary>
             The segment.
             </summary>
@@ -12468,6 +12675,7 @@
             <param name="t1">The t 1.</param>
             <param name="t2">The t 2.</param>
             <param name="tolerance">The tolerance.</param>
+            <param name="maxSegments">The maximum number of segments. Default is <c>1000</c>.</param>
         </member>
         <member name="T:OxyPlot.FontWeights">
             <summary>

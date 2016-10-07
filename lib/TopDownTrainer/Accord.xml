@@ -359,6 +359,574 @@
             </summary>
             
         </member>
+        <member name="T:Accord.Collections.BinaryNode`1">
+            <summary>
+              Tree node for binary trees.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+        </member>
+        <member name="M:Accord.Collections.BinaryNode`1.Equals(`0)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+            </returns>
+            
+        </member>
+        <member name="P:Accord.Collections.BinaryNode`1.Left">
+            <summary>
+              Gets or sets the left subtree of this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.BinaryNode`1.Right">
+            <summary>
+              Gets or sets the right subtree of this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.BinaryNode`1.IsLeaf">
+            <summary>
+              Gets whether this node is a leaf (has no children).
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.BinaryTree`1">
+            <summary>
+              Base class for binary trees.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+        </member>
+        <member name="M:Accord.Collections.BinaryTree`1.GetEnumerator">
+            <summary>
+              Returns an enumerator that iterates through the tree.
+            </summary>
+            
+            <returns>
+              An <see cref="T:System.Collections.IEnumerator"/> object 
+              that can be used to iterate through the collection.
+            </returns>
+            
+        </member>
+        <member name="M:Accord.Collections.BinaryTree`1.Traverse(Accord.Collections.BinaryTraversalMethod{`0})">
+            <summary>
+              Traverse the tree using a <see cref="T:Accord.Collections.TreeTraversal">tree traversal
+              method</see>. Can be iterated with a foreach loop.
+            </summary>
+            
+            <param name="method">The tree traversal method. Common methods are
+            available in the <see cref="T:Accord.Collections.TreeTraversal"/>static class.</param>
+            
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> object which can be used to
+            traverse the tree using the chosen traversal method.</returns>
+            
+        </member>
+        <member name="M:Accord.Collections.BinaryTree`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+              Returns an enumerator that iterates through the tree.
+            </summary>
+            
+            <returns>
+              An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            </returns>
+            
+        </member>
+        <member name="P:Accord.Collections.BinaryTree`1.Root">
+            <summary>
+              Gets the root node of this tree.
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.PriorityOrder">
+            <summary>
+              Priority order for <see cref="T:Accord.Collections.PriorityQueue`1"/>.
+            </summary>
+            
+        </member>
+        <member name="F:Accord.Collections.PriorityOrder.Minimum">
+            <summary>
+              Minimum order. In Minimum Priority Queues, items with smaller
+              priority numbers receive higher priority and are the ones that will
+              be dequeued first (i.e. similar to NICE number in UNIX systems).
+            </summary>
+            
+        </member>
+        <member name="F:Accord.Collections.PriorityOrder.Maximum">
+            <summary>
+              MAximum order. In Maximum Priority Queues, items with higher
+              priority numbers receive higher priority and are the ones that will
+              be dequeued first.
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.PriorityQueue`1">
+            <summary>
+              Priority queue.
+            </summary>
+            
+            <typeparam name="T">The values in the queue.</typeparam>
+            
+            <remarks>
+              The code for this class has been based on the original "High-speed Priority Queue"
+              project originally developed by Daniel "Blue Raja" Pflughoeft. It was originally
+              shared under a free MIT license, as shown below:
+              <code>
+                 The MIT License (MIT)
+                   
+                 Copyright (c) 2013 Daniel "BlueRaja" Pflughoeft
+                 https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+                   
+                 Permission is hereby granted, free of charge, to any person obtaining a copy
+                 of this software and associated documentation files (the "Software"), to deal
+                 in the Software without restriction, including without limitation the rights
+                 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                 copies of the Software, and to permit persons to whom the Software is
+                 furnished to do so, subject to the following conditions:
+                 
+                 The above copyright notice and this permission notice shall be included in
+                 all copies or substantial portions of the Software.
+                 
+                 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+                 THE SOFTWARE.
+              </code>
+            </remarks>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.#ctor(System.Int32,Accord.Collections.PriorityOrder)">
+            <summary>
+              Initializes a new instance of the <see cref="T:Accord.Collections.PriorityQueue`1"/> class.
+            </summary>
+            
+            <param name="capacity">The initial capacity for the queue.</param>
+            <param name="order">The sort order for the queue. If set to <see cref="F:Accord.Collections.PriorityOrder.Minimum"/>, 
+              items that have a smaller priority number are the next to be dequeued. If set to 
+              <see cref="F:Accord.Collections.PriorityOrder.Maximum"/>, items with larger priority numbers are the ones
+              with higher priority and will be the next to be dequeued. Default is <see cref="F:Accord.Collections.PriorityOrder.Minimum"/>.</param>
+            
+            <exception cref="T:System.InvalidOperationException">New queue size cannot be smaller than 1.</exception>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Clear">
+            <summary>
+              Removes every node from the queue. This is an O(1) operation.
+            </summary>
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Contains(Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+                Returns whether the given node is in the queue. This is an O(1) operation.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Enqueue(`0,System.Double)">
+            <summary>
+              Enqueue a node to the priority queue. Lower values are placed in front.
+              Ties are broken by first-in-first-out. This is an O(log n) operation.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.HasHigherPriority(System.Int32,System.Int32)">
+            <summary>
+              Returns true if 'higher' has higher priority than 'lower', false otherwise. Note that
+              calling HasHigherPriority(node, node) (ie. both arguments the same node) will return false.
+            </summary>
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Dequeue">
+            <summary>
+              Removes the head of the queue (node with minimum priority; ties are broken by order
+              of insertion), and returns it. This is an O(log n) operation.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Resize(System.Int32)">
+            <summary>
+              Resize the queue so it can accept more nodes.  All currently enqueued nodes are kept.
+              Attempting to decrease the queue size to a size too small to hold the existing nodes
+              results in undefined behavior. This is an O(n) operation.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.UpdatePriority(Accord.Collections.PriorityQueueNode{`0}@,System.Double)">
+            <summary>
+              This method must be called on a node every time its priority changes while it is in the queue.  
+              <b>Forgetting to call this method will result in a corrupted queue!</b>. This is an O(log n) operation.
+            </summary>
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.Remove(Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+              Removes a node from the queue. The node does not need to be the head of the
+              queue. This is an O(log n) operation.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.GetEnumerator">
+            <summary>
+              Returns an enumerator that iterates through the collection.
+            </summary>
+            
+            <returns>
+              A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+            </returns>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.ToArray(System.Boolean)">
+            <summary>
+              Returns an array containing the items in this list, 
+              optionally in in priority order.
+            </summary>
+            
+            <param name="sorted">Whether to return the items in priority order.</param>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.IsValidQueue">
+            <summary>
+              Checks to make sure the queue is still in a valid state.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueue`1.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents this instance.
+            </returns>
+        </member>
+        <member name="P:Accord.Collections.PriorityQueue`1.Count">
+            <summary>
+              Gets the number of nodes in the queue. This is an O(1) operation.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueue`1.Capacity">
+            <summary>
+              Gets the current capacity of this queue.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueue`1.Order">
+            <summary>
+              Gets or sets the <see cref="T:Accord.Collections.PriorityOrder">ordering of this priority queue</see>. 
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueue`1.First">
+            <summary>
+              Returns the head of the queue, without removing it (use Dequeue() for that).
+              If the queue is empty, behavior is undefined. This is an O(1) operation.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueue`1.IsReadOnly">
+            <summary>
+              Gets a value indicating whether this instance is read only (returns false).
+            </summary>
+            
+            <value>
+              Returns <c>false</c>, as instances of this class are not read only.
+            </value>
+            
+        </member>
+        <member name="T:Accord.Collections.PriorityQueueNode`1">
+            <summary>
+              Represents the node of a priority queue.
+            </summary>
+            
+            <typeparam name="T">The type for the values stored in the queue.</typeparam>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.#ctor(`0,System.Double,System.Int32,System.Int64)">
+            <summary>
+              Initializes a new instance of the <see cref="T:Accord.Collections.PriorityQueueNode`1"/> struct.
+            </summary>
+            
+            <param name="value">The value to store in the node.</param>
+            <param name="priority">A double value representing the priority for the node.</param>
+            <param name="index">The index of the node in the priority queue.</param>
+            <param name="insertionIndex">The original index of the node in the priority queue, at time of first insertion.</param>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.Equals(System.Object)">
+            <summary>
+              Determines whether the specified <see cref="T:System.Object"/>, is equal to this instance.
+            </summary>
+            
+            <param name="obj">The <see cref="T:System.Object"/> to compare with this instance.</param>
+            
+            <returns>
+              <c>true</c> if the specified <see cref="T:System.Object"/> is equal to this instance; otherwise, <c>false</c>.
+            </returns>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.GetHashCode">
+            <summary>
+              Returns a hash code for this instance.
+            </summary>
+            
+            <returns>
+              A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+            </returns>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.Equals(Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.CompareTo(Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+            Compares the current object with another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero This object is equal to <paramref name="other" />. Greater than zero This object is greater than <paramref name="other" />.
+            </returns>
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.op_Equality(Accord.Collections.PriorityQueueNode{`0},Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+              Implements the equals operator.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.op_Inequality(Accord.Collections.PriorityQueueNode{`0},Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+              Implements the not equals operator.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.op_GreaterThan(Accord.Collections.PriorityQueueNode{`0},Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+              Implements the greater than operator.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.op_LessThan(Accord.Collections.PriorityQueueNode{`0},Accord.Collections.PriorityQueueNode{`0})">
+            <summary>
+              Implements the less than operator.
+            </summary>
+            
+        </member>
+        <member name="F:Accord.Collections.PriorityQueueNode`1.Empty">
+            <summary>
+              Gets an instance representing an empty node.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.PriorityQueueNode`1.ToString">
+            <summary>
+              Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            
+            <returns>
+              A <see cref="T:System.String"/> that represents this instance.
+            </returns>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueueNode`1.Priority">
+            <summary>
+              Gets a double-value representing the 
+              current priority for the node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueueNode`1.Value">
+            <summary>
+              Gets or sets the current value associated with this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueueNode`1.InsertionIndex">
+            <summary>
+              Gets the original position at which this node was inserted.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueueNode`1.QueueIndex">
+            <summary>
+              Gets the current position of this node in its containing queue.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.PriorityQueueNode`1.IsEmpty">
+            <summary>
+              Gets a value indicating whether this node is empty (does not belong to any queue).
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.Tree`1">
+            <summary>
+              Base class for tree structures.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+        </member>
+        <member name="M:Accord.Collections.Tree`1.GetEnumerator">
+            <summary>
+              Returns an enumerator that iterates through the collection.
+            </summary>
+            
+            <returns>
+              A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+            </returns>
+            
+        </member>
+        <member name="M:Accord.Collections.Tree`1.Traverse(Accord.Collections.TraversalMethod{`0})">
+            <summary>
+              Traverse the tree using a <see cref="T:Accord.Collections.TreeTraversal">tree traversal
+              method</see>. Can be iterated with a foreach loop.
+            </summary>
+            
+            <param name="method">The tree traversal method. Common methods are
+            available in the <see cref="T:Accord.Collections.TreeTraversal"/>static class.</param>
+            
+            <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> object which can be used to
+            traverse the tree using the chosen traversal method.</returns>
+            
+        </member>
+        <member name="M:Accord.Collections.Tree`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+              Returns an enumerator that iterates through the tree.
+            </summary>
+            
+            <returns>
+              An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            </returns>
+            
+        </member>
+        <member name="P:Accord.Collections.Tree`1.Root">
+            <summary>
+              Gets the root node of this tree.
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.TreeNode`1">
+            <summary>
+              Tree node with arbitrary number of children.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeNode`1.#ctor(System.Int32)">
+            <summary>
+              Initializes a new instance of the <see cref="T:Accord.Collections.TreeNode`1"/> class.
+            </summary>
+            
+            <param name="index">The index of this node in the children collection of its parent node.</param>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.Parent">
+            <summary>
+              Gets or sets the parent of this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.Index">
+            <summary>
+              Gets or sets the index of this node in the
+              collection of children nodes of its parent.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.Children">
+            <summary>
+              Gets or sets the collection of child nodes
+              under this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.Next">
+            <summary>
+              Gets the next sibling of this node (the node
+              immediately next to it in its parent's collection).
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.Previous">
+            <summary>
+              Gets the previous sibling of this node.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Collections.TreeNode`1.IsLeaf">
+            <summary>
+              Gets whether this node is a leaf (has no children).
+            </summary>
+            
+        </member>
+        <member name="T:Accord.Collections.BinaryTraversalMethod`1">
+            <summary>
+              Tree enumeration method delegate.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+            <param name="tree">The binary tree to be traversed.</param>
+            
+            <returns>An enumerator traversing the tree.</returns>
+            
+        </member>
+        <member name="T:Accord.Collections.TraversalMethod`1">
+            <summary>
+              Tree enumeration method delegate.
+            </summary>
+            
+            <typeparam name="TNode">The class type for the nodes of the tree.</typeparam>
+            
+            <returns>An enumerator traversing the tree.</returns>
+            
+        </member>
+        <member name="T:Accord.Collections.TreeTraversal">
+            <summary>
+              Static class with tree traversal methods.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeTraversal.BreadthFirst``1(Accord.Collections.BinaryTree{``0})">
+            <summary>
+              Breadth-first tree traversal method.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeTraversal.PreOrder``1(Accord.Collections.BinaryTree{``0})">
+            <summary>
+              Pre-order tree traversal method.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeTraversal.InOrder``1(Accord.Collections.BinaryTree{``0})">
+            <summary>
+              In-order tree traversal method.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeTraversal.PostOrder``1(Accord.Collections.BinaryTree{``0})">
+            <summary>
+              Post-order tree traversal method.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Collections.TreeTraversal.DepthFirst``1(Accord.Collections.Tree{``0})">
+            <summary>
+              Depth-first tree traversal method.
+            </summary>
+            
+        </member>
         <member name="T:Accord.Diagnostics.Debug">
             <summary>
               Temporary internal framework class for handling debug assertions
@@ -366,7 +934,7 @@
             </summary>
             
         </member>
-        <member name="M:Accord.Diagnostics.Debug.Assert(System.Boolean)">
+        <member name="M:Accord.Diagnostics.Debug.Assert(System.Boolean,System.String)">
             <summary>
               Throws an exception if a condition is false.
             </summary>
@@ -576,7 +1144,7 @@
               of one-hot vectors.
             </summary>
             
-            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelGenerativeClassifier`1"/>.</returns>
+            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1"/>.</returns>
             
         </member>
         <member name="T:Accord.MachineLearning.IMulticlassClassifier">
@@ -586,7 +1154,7 @@
             </summary>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassScoreClassifier`2">
             <summary>
               Common interface for score-based multi-class classifiers. A multi-class
               classifier can predict to which class an instance belongs based
@@ -598,7 +1166,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`2.Distance(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`2.Score(`0[],`1[]@)">
             <summary>
               Predicts a class label for each input vector, returning a
               numerical score measuring the strength of association of the
@@ -610,7 +1178,7 @@
               vector, as predicted by the classifier.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`2.Distance(`0[],`1[]@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`2.Score(`0[],`1[]@,System.Double[])">
             <summary>
               Predicts a class label for each input vector, returning a
               numerical score measuring the strength of association of the
@@ -624,7 +1192,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassOutDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassOutScoreClassifier`2">
             <summary>
               Common interface for score-based multi-class classifiers. A multi-class
               classifier can predict to which class an instance belongs based
@@ -636,7 +1204,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelOutDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelOutScoreClassifier`2">
             <summary>
               Common interface for score-based multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once
@@ -647,7 +1215,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelScoreClassifier`2">
             <summary>
               Common interface for score-based multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once
@@ -658,7 +1226,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`2.Distances(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`2.Scores(`0[],`1[]@)">
             <summary>
               Predicts a class label vector for each input vector, returning a
               numerical score measuring the strength of association of the input vector
@@ -671,7 +1239,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`2.Distances(`0[],`1[]@,System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`2.Scores(`0[],`1[]@,System.Double[][])">
             <summary>
               Predicts a class label vector for each input vector, returning a
               numerical score measuring the strength of association of the input vector
@@ -686,7 +1254,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutDistanceClassifier`2.Distances(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelOutScoreClassifier`2.Scores(`0,`1@)">
              <summary>
                Predicts a class label vector for the given input vector, returning a
                numerical score measuring the strength of association of the input vector
@@ -697,7 +1265,7 @@
              <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutDistanceClassifier`2.Distances(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelOutScoreClassifier`2.Scores(`0,`1@,System.Double[])">
             <summary>
               Predicts a class label vector for the given input vector, returning a
               numerical score measuring the strength of association of the input vector
@@ -710,7 +1278,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassOutDistanceClassifier`2.Distance(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMulticlassOutScoreClassifier`2.Score(`0,`1@)">
             <summary>
               Predicts a class label for the input vector, returning a
               numerical score measuring the strength of association of the
@@ -721,7 +1289,7 @@
             <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassRefDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassRefScoreClassifier`2">
             <summary>
               Common interface for score-based multi-class classifiers. A multi-class
               classifier can predict to which class an instance belongs based
@@ -733,7 +1301,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelRefDistanceClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelRefScoreClassifier`2">
             <summary>
               Common interface for score-based multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once
@@ -744,7 +1312,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefDistanceClassifier`2.Distances(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelRefScoreClassifier`2.Scores(`0,`1@)">
             <summary>
               Predicts a class label vector for the given input vector, returning a
               numerical score measuring the strength of association of the input vector
@@ -757,7 +1325,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefDistanceClassifier`2.Distances(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelRefScoreClassifier`2.Scores(`0,`1@,System.Double[])">
             <summary>
               Predicts a class label vector for the given input vector, returning a
               numerical score measuring the strength of association of the input vector
@@ -772,7 +1340,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassDistanceClassifier`1">
+        <member name="T:Accord.MachineLearning.IMulticlassScoreClassifier`1">
             <summary>
               Common interface for score-based multi-class classifiers. A multi-class
               classifier can predict to which class an instance belongs based
@@ -783,7 +1351,7 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelDistanceClassifier`1">
+        <member name="T:Accord.MachineLearning.IMultilabelScoreClassifier`1">
             <summary>
               Common interface for score-based multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once
@@ -793,7 +1361,7 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distance(`0,System.Int32)">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Score(`0,System.Int32)">
             <summary>
               Computes a numerical score measuring the association between
               the given <paramref name="input"/> vector and a given 
@@ -804,7 +1372,7 @@
             <param name="classIndex">The index of the class whose score will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distance(`0[],System.Int32[])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Score(`0[],System.Int32[])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and the 
@@ -816,7 +1384,7 @@
               input vector whose scores will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distance(`0[],System.Int32[],System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Score(`0[],System.Int32[],System.Double[])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and the 
@@ -830,7 +1398,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distance(`0[],System.Int32)">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Score(`0[],System.Int32)">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and the 
@@ -841,7 +1409,7 @@
             <param name="classIndex">The index of the class whose score will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distance(`0[],System.Int32,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Score(`0[],System.Int32,System.Double[])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and the 
@@ -854,7 +1422,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distances(`0)">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Scores(`0)">
             <summary>
               Computes a numerical score measuring the association between
               the given <paramref name="input"/> vector and each class.
@@ -863,7 +1431,7 @@
             <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distances(`0,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Scores(`0,System.Double[])">
             <summary>
               Computes a numerical score measuring the association between
               the given <paramref name="input"/> vector and each class.
@@ -874,7 +1442,7 @@
               avoiding unnecessary memory allocations.</param>
               
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distances(`0[])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Scores(`0[])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and each
@@ -884,7 +1452,7 @@
             <param name="input">A set of input vectors.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelDistanceClassifier`1.Distances(`0[],System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelScoreClassifier`1.Scores(`0[],System.Double[][])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and each
@@ -896,7 +1464,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`1.Distance(`0)">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`1.Score(`0)">
             <summary>
               Computes a numerical score measuring the association between
               the given <paramref name="input"/> vector and its most strongly
@@ -906,7 +1474,7 @@
             <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`1.Distance(`0[])">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`1.Score(`0[])">
             <summary>
               Computes a numerical score measuring the association between
               each of the given <paramref name="input"/> vectors and their
@@ -916,7 +1484,7 @@
             <param name="input">A set of input vectors.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`1.Distance(`0[],System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`1.Score(`0[],System.Double[])">
              <summary>
                Computes a numerical score measuring the association between
                each of the given <paramref name="input"/> vectors and their
@@ -928,17 +1496,17 @@
                avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassDistanceClassifier`1.ToMultilabel">
+        <member name="M:Accord.MachineLearning.IMulticlassScoreClassifier`1.ToMultilabel">
             <summary>
               Views this instance as a multi-label distance classifier,
               giving access to more advanced methods, such as the prediction
               of one-hot vectors.
             </summary>
             
-            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelDistanceClassifier`1"/>.</returns>
+            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelScoreClassifier`1"/>.</returns>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-class classifiers. A multi-class
               classifier can predicts a class label based on an input instance vector.
@@ -948,7 +1516,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`2.Probability(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`2.Probability(`0[],`1[]@)">
             <summary>
               Predicts a class label for each input vector, returning the
               probability that each vector belongs to its predicted class.
@@ -960,7 +1528,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`2.Probability(`0[],`1[]@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`2.Probability(`0[],`1[]@,System.Double[])">
             <summary>
               Predicts a class label for each input vector, returning the
               probability that each vector belongs to its predicted class.
@@ -974,7 +1542,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`2.LogLikelihood(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`2.LogLikelihood(`0[],`1[]@)">
             <summary>
               Predicts a class label for each input vector, returning the
               log-likelihood that each vector belongs to its predicted class.
@@ -986,7 +1554,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`2.LogLikelihood(`0[],`1[]@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`2.LogLikelihood(`0[],`1[]@,System.Double[])">
             <summary>
               Predicts a class label for each input vector, returning the
               log-likelihood that each vector belongs to its predicted class.
@@ -1000,7 +1568,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassOutGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassOutLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-class classifiers. A multi-class
               classifier can predicts a class label based on an input instance vector.
@@ -1010,7 +1578,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelOutGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelOutLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once,
@@ -1021,7 +1589,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once.
@@ -1031,7 +1599,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`2.Probabilities(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`2.Probabilities(`0[],`1[]@)">
             <summary>
               Predicts a class label vector for each input vector, returning the
               probabilities of the input vector belonging to each possible class.
@@ -1041,7 +1609,7 @@
             <param name="decision">The labels predicted by the classifier.</param>
               
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`2.Probabilities(`0[],`1[]@,System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`2.Probabilities(`0[],`1[]@,System.Double[][])">
             <summary>
               Predicts a class label vector for each input vector, returning the
               probabilities of the input vector belonging to each possible class.
@@ -1053,7 +1621,7 @@
               avoiding unnecessary memory allocations.</param>
               
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`2.LogLikelihoods(`0[],`1[]@)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`2.LogLikelihoods(`0[],`1[]@)">
             <summary>
               Predicts a class label vector for each input vector, returning the
               log-likelihoods of the input vector belonging to each possible class.
@@ -1063,7 +1631,7 @@
             <param name="decision">The labels predicted by the classifier.</param>
               
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`2.LogLikelihoods(`0[],`1[]@,System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`2.LogLikelihoods(`0[],`1[]@,System.Double[][])">
             <summary>
               Predicts a class label vector for each input vector, returning the
               log-likelihoods of the input vector belonging to each possible class.
@@ -1075,7 +1643,7 @@
               avoiding unnecessary memory allocations.</param>
               
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutGenerativeClassifier`2.Probabilities(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelOutLikelihoodClassifier`2.Probabilities(`0,`1@)">
             <summary>
               Predicts a class label vector for the given input vector, returning the
               probabilities of the input vector belonging to each possible class.
@@ -1087,7 +1655,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutGenerativeClassifier`2.Probabilities(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelOutLikelihoodClassifier`2.Probabilities(`0,`1@,System.Double[])">
             <summary>
               Predicts a class label vector for the given input vector, returning the
               probabilities of the input vector belonging to each possible class.
@@ -1101,7 +1669,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutGenerativeClassifier`2.LogLikelihoods(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelOutLikelihoodClassifier`2.LogLikelihoods(`0,`1@)">
             <summary>
               Predicts a class label vector for the given input vector, returning the
               log-likelihoods of the input vector belonging to each possible class.
@@ -1113,7 +1681,7 @@
               will create a new array.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelOutGenerativeClassifier`2.LogLikelihoods(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelOutLikelihoodClassifier`2.LogLikelihoods(`0,`1@,System.Double[])">
             <summary>
               Predicts a class label vector for the given input vector, returning the
               log-likelihoods of the input vector belonging to each possible class.
@@ -1127,7 +1695,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassOutGenerativeClassifier`2.Probability(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMulticlassOutLikelihoodClassifier`2.Probability(`0,`1@)">
              <summary>
                Predicts a class label for the given input vector, returning the
                probability that the input vector belongs to its predicted class.
@@ -1137,7 +1705,7 @@
              <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassOutGenerativeClassifier`2.LogLikelihood(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMulticlassOutLikelihoodClassifier`2.LogLikelihood(`0,`1@)">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                log-likelihood that the input vector belongs to its predicted class.
@@ -1147,7 +1715,7 @@
              <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassRefGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMulticlassRefLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-class classifiers. A multi-class
               classifier can predicts a class label based on an input instance vector.
@@ -1157,7 +1725,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int.</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelRefGenerativeClassifier`2">
+        <member name="T:Accord.MachineLearning.IMultilabelRefLikelihoodClassifier`2">
             <summary>
               Common interface for generative multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once,
@@ -1168,7 +1736,7 @@
             <typeparam name="TClasses">The data type for the class labels. Default is int[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefGenerativeClassifier`2.Probabilities(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelRefLikelihoodClassifier`2.Probabilities(`0,`1@)">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                probabilities of the input vector belonging to each possible class.
@@ -1178,7 +1746,7 @@
              <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefGenerativeClassifier`2.Probabilities(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelRefLikelihoodClassifier`2.Probabilities(`0,`1@,System.Double[])">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                probabilities of the input vector belonging to each possible class.
@@ -1190,7 +1758,7 @@
                avoiding unnecessary memory allocations.</param>
              
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefGenerativeClassifier`2.LogLikelihoods(`0,`1@)">
+        <member name="M:Accord.MachineLearning.IMultilabelRefLikelihoodClassifier`2.LogLikelihoods(`0,`1@)">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                log-likelihoods of the input vector belonging to each possible class.
@@ -1200,7 +1768,7 @@
              <param name="decision">The class label predicted by the classifier.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelRefGenerativeClassifier`2.LogLikelihoods(`0,`1@,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelRefLikelihoodClassifier`2.LogLikelihoods(`0,`1@,System.Double[])">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                log-likelihoods of the input vector belonging to each possible class.
@@ -1212,7 +1780,7 @@
                avoiding unnecessary memory allocations.</param>
              
         </member>
-        <member name="T:Accord.MachineLearning.IMulticlassGenerativeClassifier`1">
+        <member name="T:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1">
             <summary>
               Common interface for generative multi-class classifiers. A multi-class
               classifier can predicts a class label based on an input instance vector.
@@ -1221,7 +1789,7 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.IMultilabelGenerativeClassifier`1">
+        <member name="T:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1">
             <summary>
               Common interface for generative multi-label classifiers. A multi-label
               classifier can predict the occurrence of multiple class labels at once,
@@ -1231,7 +1799,7 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probability(`0,System.Int32)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probability(`0,System.Int32)">
             <summary>
               Computes the probability that the given input vector
               belongs to the specified <paramref name="classIndex"/>.
@@ -1241,7 +1809,7 @@
             <param name="classIndex">The index of the class whose score will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probability(`0[],System.Int32[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probability(`0[],System.Int32[])">
             <summary>
               Computes the probability that the given input vectors
               belongs to each class specified in <paramref name="classIndex"/>.
@@ -1252,31 +1820,7 @@
               input vector whose scores will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probability(`0[],System.Int32[],System.Double[])">
-            <summary>
-              Computes the probability that the given input vectors
-              belongs to each class specified in <paramref name="classIndex"/>.
-            </summary>
-            
-            <param name="input">A set of input vectors.</param>
-            <param name="classIndex">The class indices associated with each
-              input vector whose scores will be computed.</param>
-            <param name="result">An array where the distances will be stored,
-              avoiding unnecessary memory allocations.</param>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probability(`0[],System.Int32)">
-            <summary>
-              Computes the probability that the given input vectors
-              belongs to each class specified in <paramref name="classIndex"/>.
-            </summary>
-            
-            <param name="input">A set of input vectors.</param>
-            <param name="classIndex">The class indices associated with each
-              input vector whose scores will be computed.</param>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probability(`0[],System.Int32,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probability(`0[],System.Int32[],System.Double[])">
             <summary>
               Computes the probability that the given input vectors
               belongs to each class specified in <paramref name="classIndex"/>.
@@ -1289,7 +1833,31 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihood(`0,System.Int32)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probability(`0[],System.Int32)">
+            <summary>
+              Computes the probability that the given input vectors
+              belongs to each class specified in <paramref name="classIndex"/>.
+            </summary>
+            
+            <param name="input">A set of input vectors.</param>
+            <param name="classIndex">The class indices associated with each
+              input vector whose scores will be computed.</param>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probability(`0[],System.Int32,System.Double[])">
+            <summary>
+              Computes the probability that the given input vectors
+              belongs to each class specified in <paramref name="classIndex"/>.
+            </summary>
+            
+            <param name="input">A set of input vectors.</param>
+            <param name="classIndex">The class indices associated with each
+              input vector whose scores will be computed.</param>
+            <param name="result">An array where the distances will be stored,
+              avoiding unnecessary memory allocations.</param>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihood(`0,System.Int32)">
             <summary>
               Computes the log-likelihood that the given input vector
               belongs to the specified <paramref name="classIndex"/>.
@@ -1299,7 +1867,7 @@
             <param name="classIndex">The index of the class whose score will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihood(`0[],System.Int32[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihood(`0[],System.Int32[])">
             <summary>
               Computes the log-likelihood that the given input vectors
               belongs to each class specified in <paramref name="classIndex"/>.
@@ -1310,31 +1878,7 @@
               input vector whose scores will be computed.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihood(`0[],System.Int32[],System.Double[])">
-            <summary>
-              Computes the log-likelihood that the given input vectors
-              belongs to each class specified in <paramref name="classIndex"/>.
-            </summary>
-            
-            <param name="input">A set of input vectors.</param>
-            <param name="classIndex">The class indices associated with each
-              input vector whose scores will be computed.</param>
-            <param name="result">An array where the distances will be stored,
-              avoiding unnecessary memory allocations.</param>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihood(`0[],System.Int32)">
-            <summary>
-              Computes the log-likelihood that the given input vectors
-              belongs to each class specified in <paramref name="classIndex"/>.
-            </summary>
-            
-            <param name="input">A set of input vectors.</param>
-            <param name="classIndex">The class indices associated with each
-              input vector whose scores will be computed.</param>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihood(`0[],System.Int32,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihood(`0[],System.Int32[],System.Double[])">
             <summary>
               Computes the log-likelihood that the given input vectors
               belongs to each class specified in <paramref name="classIndex"/>.
@@ -1347,7 +1891,31 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihoods(`0)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihood(`0[],System.Int32)">
+            <summary>
+              Computes the log-likelihood that the given input vectors
+              belongs to each class specified in <paramref name="classIndex"/>.
+            </summary>
+            
+            <param name="input">A set of input vectors.</param>
+            <param name="classIndex">The class indices associated with each
+              input vector whose scores will be computed.</param>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihood(`0[],System.Int32,System.Double[])">
+            <summary>
+              Computes the log-likelihood that the given input vectors
+              belongs to each class specified in <paramref name="classIndex"/>.
+            </summary>
+            
+            <param name="input">A set of input vectors.</param>
+            <param name="classIndex">The class indices associated with each
+              input vector whose scores will be computed.</param>
+            <param name="result">An array where the distances will be stored,
+              avoiding unnecessary memory allocations.</param>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihoods(`0)">
             <summary>
               Computes the log-likelihood that the given input 
               vector belongs to each of the possible classes.
@@ -1356,7 +1924,7 @@
             <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihoods(`0,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihoods(`0,System.Double[])">
             <summary>
               Computes the log-likelihood that the given input 
               vector belongs to each of the possible classes.
@@ -1367,7 +1935,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihoods(`0[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihoods(`0[])">
             <summary>
               Computes the log-likelihoods that the given input 
               vectors belongs to each of the possible classes.
@@ -1376,7 +1944,7 @@
             <param name="input">A set of input vectors.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.LogLikelihoods(`0[],System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.LogLikelihoods(`0[],System.Double[][])">
             <summary>
               Computes the log-likelihoods that the given input 
               vectors belongs to each of the possible classes.
@@ -1387,7 +1955,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probabilities(`0)">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probabilities(`0)">
             <summary>
               Computes the probabilities that the given input 
               vector belongs to each of the possible classes.
@@ -1396,7 +1964,7 @@
             <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probabilities(`0,System.Double[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probabilities(`0,System.Double[])">
             <summary>
               Computes the probabilities that the given input 
               vector belongs to each of the possible classes.
@@ -1407,7 +1975,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probabilities(`0[])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probabilities(`0[])">
             <summary>
               Computes the probabilities that the given input 
               vectors belongs to each of the possible classes.
@@ -1416,7 +1984,7 @@
             <param name="input">A set of input vectors.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMultilabelGenerativeClassifier`1.Probabilities(`0[],System.Double[][])">
+        <member name="M:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1.Probabilities(`0[],System.Double[][])">
             <summary>
               Computes the probabilities that the given input 
               vectors belongs to each of the possible classes.
@@ -1427,7 +1995,7 @@
               avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.Probability(`0)">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.Probability(`0)">
              <summary>
                Predicts a class label for the given input vector, returning the
                probability that the input vector belongs to its predicted class.
@@ -1436,7 +2004,7 @@
              <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.Probability(`0[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.Probability(`0[])">
              <summary>
                Predicts a class label for the given input vectors, returning the
                probability that the input vector belongs to its predicted class.
@@ -1445,7 +2013,7 @@
              <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.Probability(`0[],System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.Probability(`0[],System.Double[])">
              <summary>
                Predicts a class label for the given input vectors, returning the
                probability that the input vector belongs to its predicted class.
@@ -1456,7 +2024,7 @@
                avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.LogLikelihood(`0)">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.LogLikelihood(`0)">
              <summary>
                Predicts a class label vector for the given input vector, returning the
                log-likelihood that the input vector belongs to its predicted class.
@@ -1465,7 +2033,7 @@
              <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.LogLikelihood(`0[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.LogLikelihood(`0[])">
              <summary>
                Predicts a class label vector for the given input vectors, returning the
                log-likelihood that the input vector belongs to its predicted class.
@@ -1474,7 +2042,7 @@
              <param name="input">The input vector.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.LogLikelihood(`0[],System.Double[])">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.LogLikelihood(`0[],System.Double[])">
              <summary>
                Predicts a class label vector for the given input vectors, returning the
                log-likelihood that the input vector belongs to its predicted class.
@@ -1485,14 +2053,14 @@
                avoiding unnecessary memory allocations.</param>
             
         </member>
-        <member name="M:Accord.MachineLearning.IMulticlassGenerativeClassifier`1.ToMultilabel">
+        <member name="M:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1.ToMultilabel">
             <summary>
               Views this instance as a multi-label generative classifier,
               giving access to more advanced methods, such as the prediction
               of one-hot vectors.
             </summary>
             
-            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelGenerativeClassifier`1"/>.</returns>
+            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMultilabelLikelihoodClassifier`1"/>.</returns>
             
         </member>
         <member name="T:Accord.MachineLearning.IMultilabelClassifier">
@@ -1530,7 +2098,7 @@
             </summary>
             
         </member>
-        <member name="T:Accord.MachineLearning.IBinaryDistanceClassifier`1">
+        <member name="T:Accord.MachineLearning.IBinaryScoreClassifier`1">
             <summary>
               Common interface for score-based binary classifiers. A binary classifier can
               predict whether or not an instance belongs to a class based on a decision score
@@ -1541,17 +2109,17 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IBinaryDistanceClassifier`1.ToMulticlass">
+        <member name="M:Accord.MachineLearning.IBinaryScoreClassifier`1.ToMulticlass">
             <summary>
               Views this instance as a multi-class distance classifier,
               giving access to more advanced methods, such as the prediction
               of integer labels.
             </summary>
             
-            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMulticlassDistanceClassifier`1"/>.</returns>
+            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMulticlassScoreClassifier`1"/>.</returns>
             
         </member>
-        <member name="T:Accord.MachineLearning.IBinaryGenerativeClassifier`1">
+        <member name="T:Accord.MachineLearning.IBinaryLikelihoodClassifier`1">
             <summary>
               Common interface for generative binary classifiers. A binary classifier can
               predict whether or not an instance belongs to a class, while at the same time
@@ -1562,14 +2130,342 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="M:Accord.MachineLearning.IBinaryGenerativeClassifier`1.ToMulticlass">
+        <member name="M:Accord.MachineLearning.IBinaryLikelihoodClassifier`1.ToMulticlass">
             <summary>
               Views this instance as a multi-class generative classifier,
               giving access to more advanced methods, such as the prediction
               of integer labels.
             </summary>
             
-            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMulticlassGenerativeClassifier`1"/>.</returns>
+            <returns>This instance seen as an <see cref="T:Accord.MachineLearning.IMulticlassLikelihoodClassifier`1"/>.</returns>
+            
+        </member>
+        <member name="T:Accord.MachineLearning.ITagger`1">
+            <summary>
+              Common interface for generative observation sequence taggers. A sequence
+              tagger can predict the class label of each individual observation in a 
+              input sequence vector.
+            </summary>
+            
+            <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
+            
+        </member>
+        <member name="T:Accord.MachineLearning.ILikelihoodTagger`1">
+            <summary>
+              Common interface for generative observation sequence taggers. A sequence
+              tagger can predict the class label of each individual observation in a 
+              input sequence vector.
+            </summary>
+            
+            <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
+            
+        </member>
+        <member name="T:Accord.MachineLearning.IScoreTagger`1">
+            <summary>
+            Common interface for observation sequence taggers.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequence"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[],System.Double[][])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequence"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[],System.Int32[]@)">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequence"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[],System.Int32[]@,System.Double[][])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequence"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[][])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequences"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[][],System.Double[][][])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequences"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[][],System.Int32[][]@)">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequences"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IScoreTagger`1.Scores(`0[][],System.Int32[][]@,System.Double[][][])">
+            <summary>
+              Computes numerical scores measuring the association between
+              each of the given <paramref name="sequences"/> vectors and each
+              possible class.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[])">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[],System.Int32[]@)">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[][])">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[][],System.Double[])">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[][],System.Int32[][]@)">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probability(`0[][],System.Int32[][]@,System.Double[])">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[])">
+            <summary>
+              Predicts a the probability that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[],System.Int32[]@)">
+            <summary>
+              Predicts a the log-likelihood that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[][])">
+            <summary>
+              Predicts a the log-likelihood that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[][],System.Double[])">
+            <summary>
+              Predicts a the log-likelihood that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[][],System.Int32[][]@)">
+            <summary>
+              Predicts a the log-likelihood that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihood(`0[][],System.Int32[][]@,System.Double[])">
+            <summary>
+              Predicts a the log-likelihood that the sequence vector 
+              has been generated by this log-likelihood tagger.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[],System.Double[][])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[],System.Int32[]@)">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[],System.Int32[]@,System.Double[][])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[],System.Double[][])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[],System.Int32[]@)">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[],System.Int32[]@,System.Double[][])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[][])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[][],System.Double[][][])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[][],System.Int32[][]@)">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.Probabilities(`0[][],System.Int32[][]@,System.Double[][][])">
+            <summary>
+              Predicts a the probabilities for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[][])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[][],System.Double[][][])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[][],System.Int32[][]@)">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.ILikelihoodTagger`1.LogLikelihoods(`0[][],System.Int32[][]@,System.Double[][][])">
+            <summary>
+              Predicts a the log-likelihood for each of the observations in 
+              the sequence vector assuming each of the possible states in the
+              tagger model.
+            </summary>
+            
+        </member>
+        <member name="T:Accord.MachineLearning.IMultipleTransform`2">
+            <summary>
+              Common interface for data transformation algorithms. Examples of transformations include
+              <see cref="T:Accord.MachineLearning.IClassifier`2">classifiers</see>, <see cref="T:Accord.MachineLearning.IRegression`2">regressions</see>
+              and other machine learning techniques.
+            </summary>
+            
+            <typeparam name="TInput">The type for the output data that enters in the model. Default is double[].</typeparam>
+            <typeparam name="TOutput">The type for the input data that exits from the model. Default is double[].</typeparam>
+            
+        </member>
+        <member name="M:Accord.MachineLearning.IMultipleTransform`2.Transform(`0[],`1)">
+            <summary>
+              Applies the transformation to a set of input vectors,
+              producing an associated set of output vectors.
+            </summary>
+            
+            <param name="input">The input data to which
+              the transformation should be applied.</param>
+            <param name="result">The location to where to store the
+              result of this transformation.</param>
+            
+            <returns>The output generated by applying this
+              transformation to the given input.</returns>
             
         </member>
         <member name="T:Accord.MachineLearning.ITransform`1">
@@ -1654,72 +2550,16 @@
             <typeparam name="TInput">The data type for the input data. Default is double[].</typeparam>
             
         </member>
-        <member name="T:Accord.MachineLearning.TransformBase`2">
+        <member name="T:Accord.MachineLearning.IGenerative`1">
             <summary>
-              Base class for data transformation algorithms.
-            </summary>
-            
-            <typeparam name="TInput">The type for the output data that enters in the model. Default is double[].</typeparam>
-            <typeparam name="TOutput">The type for the input data that exits from the model. Default is double[].</typeparam>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.TransformBase`2.Transform(`0)">
-            <summary>
-              Applies the transformation to an input, producing an associated output.
-            </summary>
-            
-            <param name="input">The input data to which the transformation should be applied.</param>
-            
-            <returns>The output generated by applying this transformation to the given input.</returns>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.TransformBase`2.Transform(`0[])">
-            <summary>
-              Applies the transformation to a set of input vectors,
-              producing an associated set of output vectors.
-            </summary>
-            
-            <param name="input">The input data to which
-              the transformation should be applied.</param>
-            
-            <returns>The output generated by applying this
-              transformation to the given input.</returns>
-            
-        </member>
-        <member name="M:Accord.MachineLearning.TransformBase`2.Transform(`0[],`1[])">
-            <summary>
-              Applies the transformation to an input, producing an associated output.
-            </summary>
-            
-            <param name="input">The input data to which the transformation should be applied.</param>
-            <param name="result">The location to where to store the result of this transformation.</param>
-            
-            <returns>The output generated by applying this transformation to the given input.</returns>
-            
-        </member>
-        <member name="P:Accord.MachineLearning.TransformBase`2.NumberOfInputs">
-            <summary>
-              Gets the number of inputs accepted by the model.
+              Common interface for generative models.
             </summary>
             
         </member>
-        <member name="P:Accord.MachineLearning.TransformBase`2.NumberOfOutputs">
+        <member name="M:Accord.MachineLearning.IGenerative`1.LogLikelihood(`0)">
             <summary>
-              Gets the number of outputs generated by the model.
-            </summary>
-            
-        </member>
-        <member name="T:Accord.MachineLearning.TransformBase`1">
-            <summary>
-              Base class for data transformation algorithms.
-            </summary>
-            
-            <typeparam name="TInput">The type for the output data that enters in the model. Default is double[].</typeparam>
-            
-        </member>
-        <member name="T:Accord.MachineLearning.TransformBase">
-            <summary>
-              Base class for data transformation algorithms.
+            Predicts the probability that the input sample
+            has been generated by this generative model.
             </summary>
             
         </member>
@@ -4513,13 +5353,6 @@
             </summary>
             
         </member>
-        <member name="P:Accord.Collections.RedBlackTree`1.Root">
-            <summary>
-              Gets the <see cref="T:Accord.Collections.RedBlackTreeNode`1">
-              root node</see> of this red-black tree.
-            </summary>
-            
-        </member>
         <member name="P:Accord.Collections.RedBlackTree`1.Comparer">
             <summary>
               Gets the <see cref="T:System.Collections.Generic.IComparer`1"/> for this red black tree.
@@ -4953,6 +5786,36 @@
             </summary>
             
         </member>
+        <member name="M:Accord.ExtensionMethods.Write``1(System.IO.BinaryWriter,``0[])">
+            <summary>
+              Reads a <c>struct</c> from a stream.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.Write``1(System.IO.BinaryWriter,``0[][])">
+            <summary>
+              Reads a <c>struct</c> from a stream.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.Write``1(System.IO.BinaryWriter,``0[0:,0:])">
+            <summary>
+              Reads a <c>struct</c> from a stream.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.ReadJagged``1(System.IO.BinaryReader,System.Int32,System.Int32)">
+            <summary>
+              Reads a <c>struct</c> from a stream.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.ReadMatrix``1(System.IO.BinaryReader,System.Int32,System.Int32)">
+            <summary>
+              Reads a <c>struct</c> from a stream.
+            </summary>
+            
+        </member>
         <member name="M:Accord.ExtensionMethods.GetPosition(System.IO.StreamReader)">
             <summary>
               Gets the underlying buffer position for a StreamReader.
@@ -5013,6 +5876,24 @@
               A copy of str in which the format items have been replaced by
               the string representation of the corresponding objects in args.
             </returns>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.IsEqual``2(System.Collections.Generic.IDictionary{``0,``1},System.Collections.Generic.IDictionary{``0,``1})">
+            <summary>
+              Checks whether two dictionaries have the same contents.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.HasMethod(System.Object,System.String)">
+            <summary>
+              Checks whether an object implements a method with the given name.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.ExtensionMethods.HasMethod``1(System.String)">
+            <summary>
+              Checks whether a type implements a method with the given name.
+            </summary>
             
         </member>
         <member name="T:Accord.ConvergenceException">
@@ -5933,21 +6814,17 @@
             </summary>
             
         </member>
+        <member name="M:Accord.Collections.RedBlackTreeNode`1.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents this instance.
+            </returns>
+        </member>
         <member name="P:Accord.Collections.RedBlackTreeNode`1.Parent">
             <summary>
               Gets or sets a reference to this node's parent node.
-            </summary>
-            
-        </member>
-        <member name="P:Accord.Collections.RedBlackTreeNode`1.Right">
-            <summary>
-              Gets or sets a reference to this node's right child.
-            </summary>
-            
-        </member>
-        <member name="P:Accord.Collections.RedBlackTreeNode`1.Left">
-            <summary>
-              Gets or sets a reference to this node's left child.
             </summary>
             
         </member>
@@ -6218,6 +7095,12 @@
             <summary>
               Gets or sets the vector of values indicating which non-zero
               value happens at each position indicated in <see cref="P:Accord.Math.Sparse`1.Indices"/>.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Math.Sparse`1.Length">
+            <summary>
+              Gets the number of non-zero elements in the sparse vector.
             </summary>
             
         </member>

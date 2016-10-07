@@ -3424,6 +3424,157 @@
             Synchronizes the series in the internal model.
             </summary>
         </member>
+        <member name="T:OxyPlot.Wpf.FlowDocumentReportWriter">
+            <summary>
+            Provides an XPS report writer.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.FlowDocumentReportWriter.doc">
+            <summary>
+            The document.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.FlowDocumentReportWriter.disposed">
+            <summary>
+            The disposed flag.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.FlowDocumentReportWriter" /> class.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.FlowDocumentReportWriter.FlowDocument">
+            <summary>
+            Gets the FlowDocument.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.FlowDocumentReportWriter.Style">
+            <summary>
+            Gets or sets the report style.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.Print">
+            <summary>
+            Prints the document.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.Save(System.String,System.Double,System.Double)">
+            <summary>
+            Saves the document.
+            </summary>
+            <param name="filename">The filename.</param>
+            <param name="width">The width.</param>
+            <param name="height">The height.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteDrawing(OxyPlot.Reporting.DrawingFigure)">
+            <summary>
+            Writes a drawing.
+            </summary>
+            <param name="d">The drawing.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteEquation(OxyPlot.Reporting.Equation)">
+            <summary>
+            Writes an equation.
+            </summary>
+            <param name="equation">The equation.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteHeader(OxyPlot.Reporting.Header)">
+            <summary>
+            Writes a header.
+            </summary>
+            <param name="h">The header.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteImage(OxyPlot.Reporting.Image)">
+            <summary>
+            Writes an image.
+            </summary>
+            <param name="i">The image.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteParagraph(OxyPlot.Reporting.Paragraph)">
+            <summary>
+            Writes a paragraph.
+            </summary>
+            <param name="pa">The paragraph.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WritePlot(OxyPlot.Reporting.PlotFigure)">
+            <summary>
+            Writes a plot.
+            </summary>
+            <param name="plot">The plot.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteReport(OxyPlot.Reporting.Report,OxyPlot.Reporting.ReportStyle)">
+            <summary>
+            Writes a report.
+            </summary>
+            <param name="report">The report.</param>
+            <param name="reportStyle">The style.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.WriteTable(OxyPlot.Reporting.Table)">
+            <summary>
+            Writes a table.
+            </summary>
+            <param name="t">The t.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.SetStyle(System.Windows.Documents.TextElement,OxyPlot.Reporting.ParagraphStyle)">
+            <summary>
+            The set style.
+            </summary>
+            <param name="run">The run.</param>
+            <param name="s">The s.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.AddPageBody(System.Windows.Documents.DocumentPaginator,System.Int32,System.Windows.Controls.Canvas,System.Windows.Thickness)">
+            <summary>
+            Adds a page body.
+            </summary>
+            <param name="sourceFlowDocPaginator">The source flow document paginator.</param>
+            <param name="pageNumber">The page number.</param>
+            <param name="pageCanvas">The page canvas.</param>
+            <param name="margins">The margins.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.AddPageToDocument(System.Windows.Documents.FixedDocument,System.Windows.Controls.Canvas,System.Windows.Size)">
+            <summary>
+            Adds a page to the document.
+            </summary>
+            <param name="fixedDocument">The fixed document.</param>
+            <param name="pageCanvas">The page canvas.</param>
+            <param name="pageSize">The page size.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.BuildFixedDocument(System.Windows.Documents.DocumentPaginator,System.Windows.Size,System.Windows.Thickness)">
+            <summary>
+            Builds the fixed document.
+            </summary>
+            <param name="sourceFlowDocPaginator">The source flow doc paginator.</param>
+            <param name="size">The size.</param>
+            <param name="margins">The margins.</param>
+            <returns>The document.</returns>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.CreateFixedDocument(System.Windows.Size)">
+            <summary>
+            Creates the fixed document.
+            </summary>
+            <param name="size">The size.</param>
+            <returns>The document.</returns>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.CreateParagraph(System.String,OxyPlot.Reporting.ParagraphStyle)">
+            <summary>
+            Creates a paragraph.
+            </summary>
+            <param name="text">The text.</param>
+            <param name="style">The style.</param>
+            <returns>A paragraph.</returns>
+        </member>
+        <member name="M:OxyPlot.Wpf.FlowDocumentReportWriter.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
         <member name="T:OxyPlot.Wpf.LinearBarSeries">
             <summary>
             This is a WPF wrapper of OxyPlot.Series.LinearBarSeries
@@ -3785,6 +3936,254 @@
             <param name="series">
             The series.
             </param>
+        </member>
+        <member name="T:OxyPlot.Wpf.PieSeries">
+            <summary>
+            This is a wrapper of OxyPlot.PieSeries.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.StrokeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.Stroke"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.StrokeThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.StrokeThickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.DiameterProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.Diameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.InnerDiameterProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.InnerDiameter"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.StartAngleProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.StartAngle"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.AngleSpanProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.AngleSpan"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.AngleIncrementProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.AngleIncrement"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.LegendFormatProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.LegendFormat"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.OutsideLabelFormatProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.OutsideLabelFormat"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.InsideLabelColorProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.InsideLabelColor"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.InsideLabelFormatProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.InsideLabelFormat"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.InsideLabelPositionProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.InsideLabelPosition"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.AreInsideLabelsAngledProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.AreInsideLabelsAngled"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.TickDistanceProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.TickDistance"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.TickRadialLengthProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.TickRadialLength"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.TickHorizontalLengthProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.TickHorizontalLength"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.TickLabelDistanceProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.TickLabelDistance"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.ExplodedDistanceProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.ExplodedDistance"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.LabelFieldProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.LabelField"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.ValueFieldProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.ValueField"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.ColorFieldProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.ColorField"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.PieSeries.IsExplodedFieldProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.PieSeries.IsExplodedField"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.PieSeries.#cctor">
+            <summary>
+            Initializes static members of the <see cref="T:OxyPlot.Wpf.PieSeries"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.PieSeries.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.PieSeries"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.PieSeries.CreateModel">
+            <summary>
+            Creates the underlying model.
+            </summary>
+            <returns>A series.</returns>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.Stroke">
+            <summary>
+            Gets or sets the stroke color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.StrokeThickness">
+            <summary>
+            Gets or sets the stroke thickness.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.Diameter">
+            <summary>
+            Gets or sets the diameter.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.InnerDiameter">
+            <summary>
+            Gets or sets the inner diameter.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.StartAngle">
+            <summary>
+            Gets or sets the start angle.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.AngleSpan">
+            <summary>
+            Gets or sets the angle span.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.AngleIncrement">
+            <summary>
+            Gets or sets the angle increment.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.LegendFormat">
+            <summary>
+            Gets or sets the legend format.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.OutsideLabelFormat">
+            <summary>
+            Gets or sets the outside label format.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.InsideLabelColor">
+            <summary>
+            Gets or sets the color of the inside labels.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.InsideLabelFormat">
+            <summary>
+            Gets or sets the inside label format.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.InsideLabelPosition">
+            <summary>
+            Gets or sets the inside label position.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.AreInsideLabelsAngled">
+            <summary>
+            Gets or sets a value indicating whether inside labels are angled.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.TickDistance">
+            <summary>
+            Gets or sets the distance from the edge of the pie slice to the tick line.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.TickRadialLength">
+            <summary>
+            Gets or sets the length of the radial part of the tick line.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.TickHorizontalLength">
+            <summary>
+            Gets or sets the length of the horizontal part of the tick.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.TickLabelDistance">
+            <summary>
+            Gets or sets the distance from the tick line to the outside label.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.ExplodedDistance">
+            <summary>
+            Gets or sets the exploded distance.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.LabelField">
+            <summary>
+            Gets or sets the name of the property containing the label.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.ValueField">
+            <summary>
+            Gets or sets the name of the property containing the value.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.ColorField">
+            <summary>
+            Gets or sets the name of the property containing the color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.PieSeries.IsExplodedField">
+            <summary>
+            Gets or sets the name of the property indicating whether the item
+            is exploded.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.PieSeries.SynchronizeProperties(OxyPlot.Series.Series)">
+            <summary>
+            Synchronizes the properties of this object with the underlying series object.
+            </summary>
+            <param name="series">The series.</param>
         </member>
         <member name="T:OxyPlot.Wpf.ScatterSeries`1">
             <summary>
@@ -4376,14 +4775,24 @@
             The WPF wrapper for OxyPlot.TwoColorAreaSeries.
             </summary>
         </member>
-        <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.FillProperty">
+        <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.Dashes2Property">
             <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.TwoColorAreaSeries.Fill"/> dependency property.
+            Identifies the <see cref="P:OxyPlot.Wpf.TwoColorAreaSeries.Dashes2"/> dependency property.
             </summary>
         </member>
         <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.Fill2Property">
             <summary>
             Identifies the <see cref="P:OxyPlot.Wpf.TwoColorAreaSeries.Fill2"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.LineStyle2Property">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.TwoColorAreaSeries.LineStyle2"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.LimitProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.TwoColorAreaSeries.Limit"/> dependency property.
             </summary>
         </member>
         <member name="F:OxyPlot.Wpf.TwoColorAreaSeries.MarkerFill2Property">
@@ -4401,9 +4810,9 @@
             Initializes a new instance of the <see cref = "T:OxyPlot.Wpf.TwoColorAreaSeries" /> class.
             </summary>
         </member>
-        <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.Fill">
+        <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.Dashes2">
             <summary>
-            Gets or sets Fill above the limit line.
+            Gets or sets the dash array for the rendered line that is below the limit (overrides <see cref="T:OxyPlot.LineStyle" />).
             </summary>
         </member>
         <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.Fill2">
@@ -4419,6 +4828,16 @@
         <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.MarkerStroke2">
             <summary>
             Gets or sets Marker Stroke which is below the limit line.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.LineStyle2">
+            <summary>
+            Gets or sets the line style for the part of the line that is below the limit.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.TwoColorAreaSeries.Limit">
+            <summary>
+            Gets or sets a baseline for the series.
             </summary>
         </member>
         <member name="M:OxyPlot.Wpf.TwoColorAreaSeries.SynchronizeProperties(OxyPlot.Series.Series)">
@@ -5112,6 +5531,84 @@
             </summary>
             <remarks>The tracker control will be added/removed from the Tracker overlay as necessary.
             The DataContext of the tracker will be set to a TrackerHitResult with the current tracker data.</remarks>
+        </member>
+        <member name="T:OxyPlot.Wpf.XpsExporter">
+            <summary>
+            Provides functionality to export plots to xps.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.XpsExporter" /> class.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.XpsExporter.Width">
+            <summary>
+            Gets or sets the width of the output document.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.XpsExporter.Height">
+            <summary>
+            Gets or sets the height of the output document.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.XpsExporter.Background">
+            <summary>
+            Gets or sets the background color.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.XpsExporter.TextFormattingMode">
+            <summary>
+            Gets or sets the text formatting mode.
+            </summary>
+            <value>The text formatting mode.</value>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Export(OxyPlot.IPlotModel,System.String,System.Double,System.Double,OxyPlot.OxyColor)">
+            <summary>
+            Exports the specified plot model to an xps file.
+            </summary>
+            <param name="model">The model.</param>
+            <param name="fileName">The file name.</param>
+            <param name="width">The width.</param>
+            <param name="height">The height.</param>
+            <param name="background">The background color.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Export(OxyPlot.IPlotModel,System.IO.Stream,System.Double,System.Double)">
+            <summary>
+            Exports the specified <see cref="T:OxyPlot.PlotModel" /> to the specified <see cref="T:System.IO.Stream" />.
+            </summary>
+            <param name="model">The model.</param>
+            <param name="stream">The stream.</param>
+            <param name="width">The width.</param>
+            <param name="height">The height.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Print(OxyPlot.IPlotModel,System.Double,System.Double)">
+            <summary>
+            Prints the specified plot model.
+            </summary>
+            <param name="model">The model.</param>
+            <param name="width">The width (using the actual media width if set to NaN).</param>
+            <param name="height">The height (using the actual media height if set to NaN).</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Export(OxyPlot.IPlotModel,System.IO.Stream)">
+            <summary>
+            Exports the specified <see cref="T:OxyPlot.PlotModel" /> to the specified <see cref="T:System.IO.Stream" />.
+            </summary>
+            <param name="model">The model.</param>
+            <param name="stream">The stream.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Print(OxyPlot.IPlotModel)">
+            <summary>
+            Prints the specified plot model.
+            </summary>
+            <param name="model">The model.</param>
+        </member>
+        <member name="M:OxyPlot.Wpf.XpsExporter.Write(OxyPlot.IPlotModel,System.Windows.Xps.XpsDocumentWriter)">
+            <summary>
+            Write the specified <see cref="T:OxyPlot.IPlotModel" /> to the specified <see cref="T:System.Windows.Xps.XpsDocumentWriter" />.
+            </summary>
+            <param name="model">The model.</param>
+            <param name="writer">The document writer.</param>
         </member>
         <member name="T:OxyPlot.Wpf.AreaSeries">
             <summary>
