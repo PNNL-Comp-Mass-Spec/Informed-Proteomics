@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.Clustering;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
-using InformedProteomics.FeatureFinding.MassFeature;
+using InformedProteomics.FeatureFinding.Scoring;
 
 namespace InformedProteomics.TopDown.Execution
 {

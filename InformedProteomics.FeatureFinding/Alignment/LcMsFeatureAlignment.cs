@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.FeatureDetection;
+using InformedProteomics.FeatureFinding.Scoring;
+using InformedProteomics.FeatureFinding.Util;
 using MathNet.Numerics.Statistics;
 using Constants = InformedProteomics.Backend.Data.Biology.Constants;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Alignment
 {
     public class LcMsFeatureAlignment
     {

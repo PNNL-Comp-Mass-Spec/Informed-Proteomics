@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.FeatureFinding.Clustering;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.Scoring;
+using InformedProteomics.FeatureFinding.Util;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.FeatureDetection
 {
     public class LcMsFeatureContainer
     {

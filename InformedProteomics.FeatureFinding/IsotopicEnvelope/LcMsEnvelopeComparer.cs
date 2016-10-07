@@ -1,6 +1,7 @@
 ﻿using System;
+using InformedProteomics.FeatureFinding.Util;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 {
     public class LcMsEnvelopeComparer : INodeComparer<ObservedIsotopeEnvelope>
     {

@@ -4,9 +4,11 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.Util;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.FeatureDetection
 {
     public class LcMsPeakMatrixLowResolution
     {

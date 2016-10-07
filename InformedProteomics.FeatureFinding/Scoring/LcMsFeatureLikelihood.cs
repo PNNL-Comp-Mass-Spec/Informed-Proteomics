@@ -2,8 +2,9 @@
 using System.IO;
 using System.Reflection;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding.Clustering;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Scoring
 {
     public class LcMsFeatureLikelihood
     {
@@ -17,17 +18,17 @@ namespace InformedProteomics.FeatureFinding.MassFeature
                 idx++;
             }
 
-            _distScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.DistScore.tsv");
-            _corrScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.CorrScore.tsv");
-            _intScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.IntScore.tsv");
+            _distScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.DistScore.tsv");
+            _corrScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.CorrScore.tsv");
+            _intScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.IntScore.tsv");
 
-            _distScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.SummedDistScore.tsv");
-            _corrScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.SummedCorrScore.tsv");
-            _intScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.SummedIntScore.tsv");
+            _distScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.SummedDistScore.tsv");
+            _corrScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.SummedCorrScore.tsv");
+            _intScoreTableSummed = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.SummedIntScore.tsv");
 
-            _abuScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.AbuScore.tsv");
-            _xicScoreTable1 = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.XicCorrScore1.tsv");
-            _xicScoreTable2 = LoadTableFromResource("InformedProteomics.FeatureFinding.MassFeature.ScoringData.XicCorrScore2.tsv");
+            _abuScoreTable = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.AbuScore.tsv");
+            _xicScoreTable1 = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.XicCorrScore1.tsv");
+            _xicScoreTable2 = LoadTableFromResource("InformedProteomics.FeatureFinding.ScoringData.XicCorrScore2.tsv");
 
             ScoreThreshold = likelihoodThreshold;
         }

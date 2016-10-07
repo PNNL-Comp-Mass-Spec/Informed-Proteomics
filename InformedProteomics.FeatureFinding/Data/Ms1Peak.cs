@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.FeatureFinding.Clustering;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Data
 {
     public class Ms1Peak : Peak
     {

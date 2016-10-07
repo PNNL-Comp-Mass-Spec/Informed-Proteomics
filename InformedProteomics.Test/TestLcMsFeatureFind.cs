@@ -11,7 +11,9 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.FeatureFinding.MassFeature;
+using InformedProteomics.FeatureFinding.Clustering;
+using InformedProteomics.FeatureFinding.FeatureDetection;
+using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.Scoring.TopDown;
 using NUnit.Framework;
 

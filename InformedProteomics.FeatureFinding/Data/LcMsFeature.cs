@@ -1,6 +1,7 @@
 ﻿using System;
+using InformedProteomics.FeatureFinding.SpectrumMatching;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.Data
 {
     public class LcMsFeature
     {

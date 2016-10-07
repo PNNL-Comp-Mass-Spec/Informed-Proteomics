@@ -7,9 +7,14 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding.Clustering;
+using InformedProteomics.FeatureFinding.Data;
+using InformedProteomics.FeatureFinding.IsotopicEnvelope;
+using InformedProteomics.FeatureFinding.Scoring;
 using MathNet.Numerics.Statistics;
+using Ms1Peak = InformedProteomics.FeatureFinding.Data.Ms1Peak;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.FeatureDetection
 {
     public class LcMsPeakMatrix
     {

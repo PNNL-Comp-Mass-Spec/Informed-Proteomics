@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchSet : List<ProteinSpectrumMatch>
     {

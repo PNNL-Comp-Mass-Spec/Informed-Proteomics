@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.Data;
 
-namespace InformedProteomics.FeatureFinding.MassFeature
+namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMathMap
     {
