@@ -151,10 +151,6 @@
       <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
       <Name>InformedProteomics.FeatureFinding</Name>
     </ProjectReference>
-    <ProjectReference Include="..\InformedProteomics.Graphics\InformedProteomics.Graphics.csproj">
-      <Project>{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}</Project>
-      <Name>InformedProteomics.Graphics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.IMS\InformedProteomics.IMS.csproj">
       <Project>{6c14df30-e8f9-43ba-8e12-3c3aa9e1ccaa}</Project>
       <Name>InformedProteomics.IMS</Name>
