@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.Backend.SequenceTag
+namespace InformedProteomics.TopDown.SequenceTag
 {
     public class SequenceTagIndexFinder
     {

@@ -6,7 +6,6 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
@@ -104,7 +103,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             }
         }
 
-        private IEnumerable<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
+        private IEnumerable<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag.SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
         {
             // Match tags against the database
             var proteinsToTags = GetProteinToMatchedTagsMap(tags, _searchableDb, _aaSet, _tolerance, _tolerance);
@@ -181,7 +180,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         }
 
         public static Dictionary<string, MatchedTagSet> GetProteinToMatchedTagsMap(
-            IEnumerable<SequenceTag> tags,
+            IEnumerable<SequenceTag.SequenceTag> tags,
             SearchableDatabase searchableDb,
             AminoAcidSet aaSet,
             Tolerance tolerance,

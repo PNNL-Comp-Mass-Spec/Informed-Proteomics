@@ -6,7 +6,7 @@ using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
+using InformedProteomics.TopDown.SequenceTag;
 
 namespace InformedProteomics.TopDown.Quantification
 {
@@ -164,9 +164,9 @@ namespace InformedProteomics.TopDown.Quantification
             return spectrumList;
         }
 
-        private List<SequenceTag> GetTags(List<ProductSpectrum> spectrums)
+        private List<SequenceTag.SequenceTag> GetTags(List<ProductSpectrum> spectrums)
         {
-            var tagDict = new Dictionary<string,SequenceTag>();
+            var tagDict = new Dictionary<string,SequenceTag.SequenceTag>();
             if (spectrums.Count == 0) return tagDict.Values.ToList();
             foreach (var spect in spectrums)
             {
@@ -181,7 +181,7 @@ namespace InformedProteomics.TopDown.Quantification
             return tagDict.Values.ToList();
         }
 
-        private int TagsInDatabase(List<SequenceTag> tags)
+        private int TagsInDatabase(List<SequenceTag.SequenceTag> tags)
         {
             var hits = 0;
             if (tags.Count == 0) return hits;

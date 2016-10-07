@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace InformedProteomics.Backend.SequenceTag
+namespace InformedProteomics.TopDown.SequenceTag
 {
     public class GraphEdge : IEquatable<GraphEdge>
     {

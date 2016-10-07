@@ -10,8 +10,8 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
-using InformedProteomics.Backend.SequenceTag;
 
 namespace InformedProteomics.Test
 {

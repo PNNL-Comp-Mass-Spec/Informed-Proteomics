@@ -162,13 +162,6 @@
     <Compile Include="Results\DatabaseSearchResultData.cs" />
     <Compile Include="Results\IdentificationExtensions.cs" />
     <Compile Include="Results\ResultFileReader.cs" />
-    <Compile Include="SequenceTag\GraphEdge.cs" />
-    <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
-    <Compile Include="SequenceTag\SequenceTag.cs" />
-    <Compile Include="SequenceTag\SequenceTagFinder.cs" />
-    <Compile Include="SequenceTag\SequenceTagGraph.cs" />
-    <Compile Include="SequenceTag\SequenceTagGraphEdge.cs" />
-    <Compile Include="SequenceTag\SequenceTagIndexFinder.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />

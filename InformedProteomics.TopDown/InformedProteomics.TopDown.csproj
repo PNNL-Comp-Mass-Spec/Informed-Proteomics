@@ -92,6 +92,13 @@
     <Compile Include="Scoring\SubScoreFactory.cs" />
     <Compile Include="Scoring\TopDownScorer.cs" />
     <Compile Include="Scoring\TopDownTrainer.cs" />
+    <Compile Include="SequenceTag\GraphEdge.cs" />
+    <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
+    <Compile Include="SequenceTag\SequenceTag.cs" />
+    <Compile Include="SequenceTag\SequenceTagFinder.cs" />
+    <Compile Include="SequenceTag\SequenceTagGraph.cs" />
+    <Compile Include="SequenceTag\SequenceTagGraphEdge.cs" />
+    <Compile Include="SequenceTag\SequenceTagIndexFinder.cs" />
     <Compile Include="TagBasedSearch\FeatureBasedTagSearchEngine.cs" />
     <Compile Include="TagBasedSearch\ISequenceTagFinder.cs" />
     <Compile Include="TagBasedSearch\ScanBasedTagSearchEngine.cs" />
