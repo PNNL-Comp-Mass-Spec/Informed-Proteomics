@@ -16,7 +16,6 @@ using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
-using InformedProteomics.Backend.MassFeature;
 
 namespace InformedProteomics.Test.FunctionalTests
 {

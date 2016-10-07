@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding.MassFeature;
 using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
 namespace InformedProteomics.Test.TopDownAnalysis

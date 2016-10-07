@@ -6,7 +6,6 @@ using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.MassFeature;
 
 namespace InformedProteomics.Backend.SequenceTag
 {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.MassFeature;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.Backend.Data.Spectrometry
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class Ms1Spectrum : Spectrum
     {

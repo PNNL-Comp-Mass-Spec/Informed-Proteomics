@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.MassFeature;
-using MathNet.Numerics.Statistics;
+using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace InformedProteomics.Backend.Data.Spectrometry
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class MaxEntDeconvoluter
     {

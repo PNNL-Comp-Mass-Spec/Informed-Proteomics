@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Graphics
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIS", "SAIS\SAIS.csproj", "{DA126245-858B-4084-AB86-54FE1E10772E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj", "{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -102,6 +104,10 @@ Global
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|x64.Build.0 = Debug|Any CPU
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Release|x64.ActiveCfg = Release|Any CPU
 		{DA126245-858B-4084-AB86-54FE1E10772E}.Release|x64.Build.0 = Release|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

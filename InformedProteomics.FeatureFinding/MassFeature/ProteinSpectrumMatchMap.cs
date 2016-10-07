@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
-using MathNet.Numerics.Integration;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class ProteinSpectrumMathMap
     {

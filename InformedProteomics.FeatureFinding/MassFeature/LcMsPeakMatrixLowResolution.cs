@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class LcMsPeakMatrixLowResolution
     {

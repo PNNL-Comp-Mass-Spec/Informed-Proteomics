@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using InformedProteomics.Backend.MassFeature;
+using InformedProteomics.Backend.Data.Spectrometry;
 
-namespace InformedProteomics.Backend.Data.Spectrometry
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class Ms1Peak : Peak
     {
@@ -16,21 +13,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Active = true;
             _countMinorTaggedFeatures = 0;
             _countMajorTaggedFeatures = 0;
-        }
-
-        public Ms1Peak()
-        {
-            Active = true;
-            _countMinorTaggedFeatures = 0;
-            _countMajorTaggedFeatures = 0;
-        } // For use in generics
-
-        // For setting values in generics
-        internal void SetMzIntensityIndices(double mz, double intensity, int indexInSpec, ushort ms1SpecIndex)
-        {
-            SetMzAndIntensity(mz, intensity);
-            IndexInSpectrum = indexInSpec;
-            Ms1SpecIndex = ms1SpecIndex;
         }
 
         public void InActivate()
@@ -95,7 +77,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public int IndexInSpectrum { get; private set; }
         public bool Active { get; private set; }
-        public ushort Ms1SpecIndex { get; set; }
+        public int Ms1SpecIndex { get; set; }
         //private List<LcMsPeakCluster> _minorTaggedFeatures;
         //private List<LcMsPeakCluster> _majorTaggedFeatures;
 

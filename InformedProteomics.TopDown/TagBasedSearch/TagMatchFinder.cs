@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassFeature;
+using InformedProteomics.FeatureFinding.MassFeature;
 using InformedProteomics.TopDown.PostProcessing;
 
 namespace InformedProteomics.TopDown.TagBasedSearch

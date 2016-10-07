@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
-using pwiz.CLI.msdata;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class Ms1Feature
     {

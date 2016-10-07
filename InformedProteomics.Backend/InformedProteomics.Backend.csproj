@@ -108,9 +108,6 @@
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
     <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
-    <Compile Include="Data\Spectrometry\MaxEntDeconvoluter.cs" />
-    <Compile Include="Data\Spectrometry\Ms1Peak.cs" />
-    <Compile Include="Data\Spectrometry\Ms1Spectrum.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
     <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
     <Compile Include="Data\Spectrometry\Isotope.cs" />
@@ -133,27 +130,6 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
-    <Compile Include="MassFeature\LcMsFeatureAlignComparer.cs" />
-    <Compile Include="MassFeature\INodeComparer.cs" />
-    <Compile Include="MassFeature\IsotopeEnvelope.cs" />
-    <Compile Include="MassFeature\LcMsEnvelopeComparer.cs" />
-    <Compile Include="MassFeature\LcMsFeature.cs" />
-    <Compile Include="MassFeature\LcMsFeatureAlignment.cs" />
-    <Compile Include="MassFeature\LcMsFeatureContainer.cs" />
-    <Compile Include="MassFeature\LcMsFeatureLikelihood.cs" />
-    <Compile Include="MassFeature\LcMsFeatureMergeComparer.cs" />
-    <Compile Include="MassFeature\LcMsFeatureTrain.cs" />
-    <Compile Include="MassFeature\LcMsPeakMatrixLowResolution.cs" />
-    <Compile Include="MassFeature\LcMsPeakCluster.cs" />
-    <Compile Include="MassFeature\LcMsPeakScorer.cs" />
-    <Compile Include="MassFeature\LcMsPeakMatrix.cs" />
-    <Compile Include="MassFeature\Ms1Feature.cs" />
-    <Compile Include="MassFeature\NodeSet.cs" />
-    <Compile Include="MassFeature\ObservedIsotopeEnvelope.cs" />
-    <Compile Include="MassFeature\ProteinSpectrumMatchAlignment.cs" />
-    <Compile Include="MassFeature\ProteinSpectrumMatchMap.cs" />
-    <Compile Include="MassFeature\ProteinSpectrumMatchReader.cs" />
-    <Compile Include="MassFeature\TheoreticalIsotopeEnvelope.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />
     <Compile Include="MassSpecData\MzMLReader.cs" />
@@ -183,7 +159,6 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="MassFeature\ProteinSpectrumMatch.cs" />
     <Compile Include="Results\DatabaseSearchResultData.cs" />
     <Compile Include="Results\IdentificationExtensions.cs" />
     <Compile Include="Results\ResultFileReader.cs" />
@@ -219,15 +194,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="MassFeature\ScoringData\AbuScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\CorrScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\DistScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\IntScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\SummedCorrScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\SummedDistScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\SummedIntScore.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\XicCorrScore1.tsv" />
-    <EmbeddedResource Include="MassFeature\ScoringData\XicCorrScore2.tsv" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -264,6 +230,7 @@
       <Name>SAIS</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
@@ -10,7 +9,7 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Statistics;
 
-namespace InformedProteomics.Backend.MassFeature
+namespace InformedProteomics.FeatureFinding.MassFeature
 {
     public class LcMsPeakMatrix
     {
@@ -748,9 +747,9 @@ namespace InformedProteomics.Backend.MassFeature
 
                         if (peaks.Count(p => p != null) > 0)
                         {
-                            _featureMatrix[i][j].DivergenceDist = _theoreticalEnvelope.GetBhattacharyyaDistance(peaks); ;
+                            _featureMatrix[i][j].DivergenceDist = _theoreticalEnvelope.GetBhattacharyyaDistance(peaks);
                             _featureMatrix[i][j].AccurateMass = targetMass;
-                            _featureMatrix[i][j].CorrelationCoeff = _theoreticalEnvelope.GetPearsonCorrelation(peaks); ;
+                            _featureMatrix[i][j].CorrelationCoeff = _theoreticalEnvelope.GetPearsonCorrelation(peaks);
                             Array.Copy(peaks, _featureMatrix[i][j].EnvelopePeaks, peaks.Length);
                         }
                     }

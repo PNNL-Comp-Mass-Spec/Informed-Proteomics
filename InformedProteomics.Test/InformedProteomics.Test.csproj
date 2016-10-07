@@ -147,6 +147,10 @@
       <Project>{16db0078-9a4c-41d8-9356-4205f03ae04a}</Project>
       <Name>InformedProteomics.DIA</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.Graphics\InformedProteomics.Graphics.csproj">
       <Project>{24FE608E-3B0C-4A6B-84EF-CAFE09B9E366}</Project>
       <Name>InformedProteomics.Graphics</Name>
