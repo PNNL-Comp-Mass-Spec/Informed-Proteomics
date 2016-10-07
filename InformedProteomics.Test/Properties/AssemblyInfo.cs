@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PNNL")]
 [assembly: AssemblyProduct("InformedProteomics.Test")]
-[assembly: AssemblyCopyright("Copyright © PNNL 2012")]
+[assembly: AssemblyCopyright("Copyright © PNNL 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -10,6 +10,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -37,7 +38,7 @@ namespace InformedProteomics.Test
         public void IonFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\IonFreqConfig.ini";
 

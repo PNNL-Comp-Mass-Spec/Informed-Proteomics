@@ -44,6 +44,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIS", "SAIS\SAIS.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj", "{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.Base", "InformedProteomics.Tests.Base\InformedProteomics.Tests.Base.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.FunctionalTests", "InformedProteomics.Tests.FunctionalTests\InformedProteomics.Tests.FunctionalTests.csproj", "{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.UnitTests", "InformedProteomics.Tests.UnitTests\InformedProteomics.Tests.UnitTests.csproj", "{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.DevTests", "InformedProteomics.Tests.DevTests\InformedProteomics.Tests.DevTests.csproj", "{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -102,6 +110,22 @@ Global
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|x64.Build.0 = Debug|Any CPU
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|x64.ActiveCfg = Release|Any CPU
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|x64.Build.0 = Release|Any CPU
+		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8EDF4429-251A-416D-BB68-93F227191BCF}.Debug|x64.Build.0 = Debug|Any CPU
+		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|x64.ActiveCfg = Release|Any CPU
+		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|x64.Build.0 = Release|Any CPU
+		{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F}.Debug|x64.Build.0 = Debug|Any CPU
+		{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F}.Release|x64.ActiveCfg = Release|Any CPU
+		{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F}.Release|x64.Build.0 = Release|Any CPU
+		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19}.Release|x64.Build.0 = Release|Any CPU
+		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Debug|x64.Build.0 = Debug|Any CPU
+		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Release|x64.ActiveCfg = Release|Any CPU
+		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

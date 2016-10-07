@@ -10,6 +10,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
@@ -23,7 +24,7 @@ namespace InformedProteomics.Test
         public void TestForManyMods()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dbFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta";
             var indexedDb = new IndexedDatabase(new FastaDatabase(dbFilePath));
@@ -45,7 +46,7 @@ namespace InformedProteomics.Test
         public void TestForVlad()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
             const string dbFilePath = @"D:\Research\Data\Vlad\database\ID_004221_1C042A1F.fasta";
@@ -106,7 +107,7 @@ namespace InformedProteomics.Test
         public void TestForYufeng()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // QC_Shew
             const string specFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
@@ -169,7 +170,7 @@ namespace InformedProteomics.Test
         public void TestForSbepData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             //// Salmonella
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\SBEP_STM_001_02272012_Aragon.raw";
@@ -216,7 +217,7 @@ namespace InformedProteomics.Test
         public void TestForAaronData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\raw\MTB_intact_1.raw";
             const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\database\ID_003121_998584F8.fasta";
@@ -259,7 +260,7 @@ namespace InformedProteomics.Test
         public void TestForJiaData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // QC_Shew
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
@@ -313,7 +314,7 @@ namespace InformedProteomics.Test
         public void TestForQcShew()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // QC_Shew
             const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
@@ -353,7 +354,7 @@ namespace InformedProteomics.Test
             bool? tda, int searchMode)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int minSequenceLength = 21; // 7
             const int maxSequenceLength = 500; // 1000
@@ -382,7 +383,7 @@ namespace InformedProteomics.Test
             bool? tda, int searchMode)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // Search parameters
             const int maxNumNTermCleavages = 1; // 30
@@ -423,7 +424,7 @@ namespace InformedProteomics.Test
         public void TestPrSm()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
             //const string annotation =
@@ -486,7 +487,7 @@ namespace InformedProteomics.Test
         public void TestMsAlignRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             const string msAlignResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
@@ -512,7 +513,7 @@ namespace InformedProteomics.Test
         public void TestIcRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             //const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             //const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re.icdresult";

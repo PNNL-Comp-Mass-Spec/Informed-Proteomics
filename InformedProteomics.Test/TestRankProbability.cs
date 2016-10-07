@@ -7,6 +7,7 @@ using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -18,7 +19,7 @@ namespace InformedProteomics.Test
         public void RankProbability()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string configurationFile = @"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini";
             if (!File.Exists(configurationFile))

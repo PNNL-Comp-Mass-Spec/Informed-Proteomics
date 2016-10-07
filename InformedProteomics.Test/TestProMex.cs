@@ -16,6 +16,7 @@ using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.Training;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
@@ -30,7 +31,7 @@ namespace InformedProteomics.Test
         public void CollectTrainingSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string idFileFolder = @"D:\MassSpecFiles\training\IdResult";
             const string outFileFolder = @"D:\MassSpecFiles\training\FilteredIdResult";
@@ -100,7 +101,7 @@ namespace InformedProteomics.Test
         public void ExtractLcMsFeaturesForTrainingSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string idFileFolder = @"D:\MassSpecFiles\training\FilteredIdResult";
             if (!Directory.Exists(idFileFolder))
@@ -325,7 +326,7 @@ namespace InformedProteomics.Test
         public void TestMs1EvidenceScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string TestRawFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01.pbf";
             if (!File.Exists(TestRawFile))
@@ -360,7 +361,7 @@ namespace InformedProteomics.Test
         public void TestPredictPTMfromMs1ft()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string resultFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             if (!File.Exists(resultFilePath))
@@ -420,7 +421,7 @@ namespace InformedProteomics.Test
         public void TestGeneratingMs1FeatureFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
             if (!File.Exists(specFilePath))
@@ -464,7 +465,7 @@ namespace InformedProteomics.Test
         {
             Console.WriteLine("Testing Working");
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
             const string rawFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string testFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
             const string outputFile = @"D:\MassSpecFiles\training\raw\";
@@ -477,7 +478,7 @@ namespace InformedProteomics.Test
         public void TestProMexFilter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             if (!File.Exists(specFilePath))
@@ -503,7 +504,7 @@ namespace InformedProteomics.Test
         public void TestFeatureExampleForFigure()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
             //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";

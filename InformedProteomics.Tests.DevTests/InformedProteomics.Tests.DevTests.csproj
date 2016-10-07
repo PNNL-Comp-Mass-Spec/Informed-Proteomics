@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InformedProteomics.Tests.DevTests</RootNamespace>
+    <AssemblyName>InformedProteomics.Tests.DevTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.3.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Obsolete\TestEdrn.cs" />
+    <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
+    <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestIprg.cs" />
+    <Compile Include="TestLcMsCaching.cs" />
+    <Compile Include="TestLcMsFeatureFind.cs" />
+    <Compile Include="TestLcMsMap.cs" />
+    <Compile Include="TestMisc.cs" />
+    <Compile Include="TestMultiThreading.cs" />
+    <Compile Include="TestUtex.cs" />
+    <Compile Include="TestYufengData.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisCompRef.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisCompRefKelleherData.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisLewy.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisSpikeIn.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisTopDownMatchedPeaks.cs" />
+    <Compile Include="TopDownAnalysis\TestLcMsFeatureAlignment.cs" />
+    <Compile Include="TopDownAnalysis\TestLikelihoodScorer.cs" />
+    <Compile Include="TopDownAnalysis\TestMsDeconvDecon2LS.cs" />
+    <Compile Include="UnidentifiedFeatureAnalysisTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
+      <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
+      <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.DIA\InformedProteomics.DIA.csproj">
+      <Project>{16db0078-9a4c-41d8-9356-4205f03ae04a}</Project>
+      <Name>InformedProteomics.DIA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Tests.Base\InformedProteomics.Tests.Base.csproj">
+      <Project>{8edf4429-251a-416d-bb68-93f227191bcf}</Project>
+      <Name>InformedProteomics.Tests.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
+      <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
+      <Name>InformedProteomics.TopDown</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PNNLOmicsElementData.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
