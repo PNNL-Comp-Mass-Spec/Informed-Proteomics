@@ -38,7 +38,7 @@
     </Reference>
     <Reference Include="PNNLOmics, Version=1.1.5714.31155, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MSIL\PNNLOmics.dll</HintPath>
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="PSI_Interface">
       <HintPath>..\lib\PSI_Interface\PSI_Interface.dll</HintPath>

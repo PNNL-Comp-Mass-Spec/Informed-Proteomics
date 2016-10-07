@@ -58,17 +58,17 @@
     </Reference>
     <Reference Include="PNNLOmics, Version=1.1.5714.31155, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MSIL\PNNLOmics.dll</HintPath>
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="ProteinFileReader, Version=1.1.4405.25759, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MSIL\ProteinFileReader.dll</HintPath>
+      <HintPath>..\lib\ProteinFileReader.dll</HintPath>
     </Reference>
     <Reference Include="PSI_Interface">
       <HintPath>..\lib\PSI_Interface\PSI_Interface.dll</HintPath>
     </Reference>
     <Reference Include="pwiz_bindings_cli">
-      <HintPath>..\lib\x64\pwiz_bindings_cli.dll</HintPath>
+      <HintPath>..\lib\pwiz_bindings_cli.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -80,7 +80,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="ThermoRawFileReader">
-      <HintPath>..\lib\MSIL\ThermoRawFileReader.dll</HintPath>
+      <HintPath>..\lib\ThermoRawFileReader.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

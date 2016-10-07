@@ -36,7 +36,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PNNLOmics">
-      <HintPath>..\lib\MSIL\PNNLOmics.dll</HintPath>
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
