@@ -131,7 +131,7 @@
             <param name="ionList">
             List of Ions from a particular BaseIonType, NeutralLoss, and cleavage point
             </param>
-            <param name="spectrum">Spectrum for ProteinScan that ionList came from</param>       
+            <param name="spectrum">Spectrum for ProteinScan that ionList came from</param>
             /// <returns>1 if GetCorrScore of an Ion in ionList was above MinScore; 0 otherwise</returns>
         </member>
         <member name="M:TopDownTrainer.AbstractIonSequence.GetCleavageIonLists(InformedProteomics.Backend.Data.Sequence.Sequence,InformedProteomics.Backend.Data.Spectrometry.IonType,System.Int32)">
@@ -317,7 +317,7 @@
             <param name="threshold">Proportion threshold (Default is -1)</param>
             <param name="minMass">Minimum mass for this bin of proteins (Default is -1)</param>
             <param name="maxMass">Maximum mass for this bin of proteins (Default is -1)</param>
-            <throws>Exception if number of titles does not match number of dictionaries or 
+            <throws>Exception if number of titles does not match number of dictionaries or
             the dictionaries have different numbers of keys</throws>
         </member>
         <member name="M:TopDownTrainer.ComparisonPlots.PrintProportions(System.String,System.String,System.Collections.Generic.List{System.Collections.Generic.List{TopDownTrainer.ProteinScan}},System.Collections.Generic.List{System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double}})">
@@ -589,7 +589,7 @@
         </member>
         <member name="T:TopDownTrainer.LinearCombinationFoldResult">
             <summary>
-            LinearCombinationFoldResult implements ValidationFoldResult and keeps track of the range of scores 
+            LinearCombinationFoldResult implements ValidationFoldResult and keeps track of the range of scores
             from cross validation on an SVMModel.
             </summary>
         </member>
@@ -761,7 +761,7 @@
         </member>
         <member name="T:TopDownTrainer.BinElement">
             <summary>
-            BinElement stores a charge offset, a mass bin, and a Peak. This class is used in PrecursorPeaks 
+            BinElement stores a charge offset, a mass bin, and a Peak. This class is used in PrecursorPeaks
             to get and pass around peaks used for its average normalized intensity table.
             </summary>
         </member>
@@ -996,19 +996,19 @@
             <returns>Distance between the list of peaks</returns>
         </member>
         <member name="M:TopDownTrainer.FeatureVector.UpdateCompositionFeatures(System.Collections.Generic.List{InformedProteomics.Backend.Data.Biology.Ion})">
-            <summary>
-             Doozy of a method. 
+             <summary>
+              Doozy of a method.
             
-            Collects all ions for IonTypeFeature at every cleavage point to find the sum of their
-            Pearson Correlation Scores.
+             Collects all ions for IonTypeFeature at every cleavage point to find the sum of their
+             Pearson Correlation Scores.
             
-            Also calculates theoretical and observed values for mass of each ion of IonType and
-            every cleavage point. These values are used to calculate mass error.
+             Also calculates theoretical and observed values for mass of each ion of IonType and
+             every cleavage point. These values are used to calculate mass error.
             
-            Keeps running sum of distances between theoretical and observed peak intensities
-            for each ion IonType at each cleavage point.
-            </summary>
-            <param name="ionList">List of ions on which we update features</param>
+             Keeps running sum of distances between theoretical and observed peak intensities
+             for each ion IonType at each cleavage point.
+             </summary>
+             <param name="ionList">List of ions on which we update features</param>
         </member>
         <member name="M:TopDownTrainer.FeatureVector.CompositionInit">
             <summary>
@@ -1196,7 +1196,7 @@
         </member>
         <member name="M:TopDownTrainer.LearningModel.Analyze(System.Int32)">
             <summary>
-            Gets metrics on this model such as k-fold cross validation using Brier Score, ROC curve, and AUC 
+            Gets metrics on this model such as k-fold cross validation using Brier Score, ROC curve, and AUC
             </summary>
             <param name="k">Optional int for number of folds (Default is 10)</param>
             <returns>AnalysisMetrics objects containing average error, variance, and mean of target and decoy
@@ -1446,7 +1446,7 @@
         </member>
         <member name="M:TopDownTrainer.PrecursorPeaks.UpdateBins(System.Int32,System.Double[],System.Double)">
             <summary>
-            Updates the average normalized intensities of Bins in AddSequence for a 
+            Updates the average normalized intensities of Bins in AddSequence for a
             particular chargeOffset.
             </summary>
             <param name="chargeOffset">Charge offset in question</param>
@@ -1646,25 +1646,25 @@
             <returns>Binned decoy ProteinScan list of same size as scanBins</returns>
         </member>
         <member name="M:TopDownTrainer.Program.Train(System.String,System.String,System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},System.Int32,System.Double,System.Double,System.Int32)">
-            <summary>
-            Creates an IonSet, PrecursorPeaks, and FeatureVector objects and adds scans
-            from the directory at directoryPath.
+             <summary>
+             Creates an IonSet, PrecursorPeaks, and FeatureVector objects and adds scans
+             from the directory at directoryPath.
             
-            A file consisting of found proportions
-            from the Ionset, a table of charge/mass offsets from the PrecursorPeaks,
-            and the weights of a LearningModel is outputted.
+             A file consisting of found proportions
+             from the Ionset, a table of charge/mass offsets from the PrecursorPeaks,
+             and the weights of a LearningModel is outputted.
             
-            Another file is outputted, which is the concatentation of all FeatureVectors
-            for IonTypes that were more than threshold% of the found ions.
-            </summary>
-            <param name="directoryPath">Path to directory of data</param>
-            <param name="outputPath">Path to where files should be outputted</param>
-            <param name="baseIons">BaseIons in question</param>
-            <param name="neutralLosses">NeutralLosses in question</param>
-            <param name="tol">Tolerance</param>
-            <param name="minScore">Minimum Score for GetCorrScore</param>
-            <param name="threshold">Minimum threshold proportion for found ions</param>
-            <param name="numMut">Number of mutations for decoys from target sequences</param>
+             Another file is outputted, which is the concatentation of all FeatureVectors
+             for IonTypes that were more than threshold% of the found ions.
+             </summary>
+             <param name="directoryPath">Path to directory of data</param>
+             <param name="outputPath">Path to where files should be outputted</param>
+             <param name="baseIons">BaseIons in question</param>
+             <param name="neutralLosses">NeutralLosses in question</param>
+             <param name="tol">Tolerance</param>
+             <param name="minScore">Minimum Score for GetCorrScore</param>
+             <param name="threshold">Minimum threshold proportion for found ions</param>
+             <param name="numMut">Number of mutations for decoys from target sequences</param>
         </member>
         <member name="M:TopDownTrainer.Program.TrainOnScans(System.String,System.String,System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{TopDownTrainer.ProteinScan},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.BaseIonType},System.Collections.Generic.List{InformedProteomics.Backend.Data.Spectrometry.NeutralLoss},InformedProteomics.Backend.Data.Spectrometry.Tolerance,System.Double,System.Double,System.Int32)">
             <summary>
@@ -2007,7 +2007,7 @@
             <summary>
             Create new IonSet from three dictionaries. Used when reading in output files
             </summary>
-            <param name="totalProps">Dictionary of IonTypes to number of ions of that IonType found to number of ions 
+            <param name="totalProps">Dictionary of IonTypes to number of ions of that IonType found to number of ions
             of that IonType looked for</param>
             <param name="foundProps">Dictionary of IonTypes to proportion of ions of that IonType found</param>
             <param name="totalFound">Total number of ions found</param>
@@ -2415,10 +2415,10 @@
             (Default is 0.15)</param>
         </member>
         <member name="M:TopDownTrainer.TrainingFileReader.ReadMassBinEdges(System.IO.StreamReader)">
-            <summary>
+             <summary>
             
-            </summary>
-            <param name="sr"></param>
+             </summary>
+             <param name="sr"></param>
         </member>
         <member name="M:TopDownTrainer.TrainingFileReader.ReadProp(System.IO.StreamReader,System.Double)">
             <summary>
