@@ -1,5 +1,9 @@
 ﻿namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class Tolerance
     {
         private readonly double _value;
@@ -52,6 +56,27 @@
         public override string ToString()
         {
             return string.Format("{0}{1}", _value, _unit);
+        }
+
+        public static Tolerance Parse(string tolStr)
+        {
+            tolStr = tolStr.ToLower();
+            var units = System.Enum.GetValues(typeof(ToleranceUnit)).Cast<ToleranceUnit>();
+            var unit = units.FirstOrDefault(u => tolStr.Contains(u.ToString().ToLower()));
+            var index = tolStr.IndexOf(unit.ToString().ToLower(), StringComparison.Ordinal);
+            if (index < 0)
+            {
+                return null;
+            }
+
+            var valueStr = tolStr.Substring(0, index);
+            var unitStr = tolStr.Substring(index, tolStr.Length - index);
+            if (string.IsNullOrEmpty(valueStr) || string.IsNullOrEmpty(unitStr))
+            {
+                return null;
+            }
+
+            return new Tolerance(Convert.ToDouble(valueStr), (ToleranceUnit)Enum.Parse(typeof(ToleranceUnit), unitStr));
         }
     }
 }

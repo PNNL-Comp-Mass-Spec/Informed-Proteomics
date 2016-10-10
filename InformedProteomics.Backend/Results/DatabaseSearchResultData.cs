@@ -548,6 +548,27 @@ namespace InformedProteomics.Backend.Results
                     }
                 }
 
+                var proteinAccessions = databaseSearchResult.ProteinName.Split(',');
+                foreach (var accession in proteinAccessions)
+                {
+                    var dbSequence = new SimpleMZIdentMLReader.DatabaseSequence
+                    {
+                        Accession = accession.Trim(),
+                        ProteinDescription = databaseSearchResult.ProteinDescription
+                    };
+                    var peptideEvidence = new SimpleMZIdentMLReader.PeptideEvidence
+                    {
+                        DbSeq = dbSequence,
+                        Pre = databaseSearchResult.Pre,
+                        Post = databaseSearchResult.Post,
+                        PeptideRef = identification.Peptide,
+                        Start = databaseSearchResult.Start,
+                        End = databaseSearchResult.End,
+                    };
+
+                    identification.PepEvidence.Add(peptideEvidence);
+                }
+
                 simpleMzIdentMLData.Identifications.Add(identification);
             }
 
