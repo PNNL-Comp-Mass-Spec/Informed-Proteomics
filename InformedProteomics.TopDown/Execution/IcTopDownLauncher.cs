@@ -991,7 +991,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             var datasetName = Path.GetFileNameWithoutExtension(outputFilePath);
             var creator = new IdentDataCreator("MSPathFinder_" + datasetName, "MSPathFinder_" + datasetName);
-            var soft = creator.AddAnalysisSoftware("Software_1", "MSPathFinder", "1.3", CV.CVID.CVID_Unknown, "MSPathFinder");
+            var soft = creator.AddAnalysisSoftware("Software_1", "MSPathFinder", System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString(), CV.CVID.MS_MSPathFinder, "MSPathFinder");
             var settings = creator.AddAnalysisSettings(soft, "Settings_1", CV.CVID.MS_ms_ms_search);
             var searchDb = creator.AddSearchDatabase(database.GetFastaFilePath(), database.GetNumEntries(), Path.GetFileNameWithoutExtension(database.GetFastaFilePath()), CV.CVID.CVID_Unknown,
                 CV.CVID.MS_FASTA_format);
@@ -1059,15 +1059,17 @@ namespace InformedProteomics.TopDown.Execution
                 var probability = match.Probability;
 
                 specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_compound_formula, Value = match.Composition, });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_SEQUEST_probability, Value = probability.ToString(CultureInfo.InvariantCulture), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture), });
+                //specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture), });
                 if (match.HasTdaScores)
                 {
-                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture), });
-                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MS_GF_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture), });
+                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture), });
+                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture), });
                 }
+                // MS-GF+ similarity: find/add isotope error?
+                // MS-GF+ similarity: find/add assumed dissociation method?
             }
 
             var identData = creator.GetIdentData();

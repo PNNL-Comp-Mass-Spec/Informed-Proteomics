@@ -7921,8 +7921,8 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_residue_pair_level_global_FDR">
             <summary>Estimation of the global false discovery rate of residue-pairs in cross-linking experiments.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_higher_energy_beam_type_collision_induced_dissociation">
-            <summary>A supplemental collision-induced dissociation process wherein the projectile ion has the translational energy higher than approximately 1000 eV.</summary>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_beam_type_collision_induced_dissociation">
+            <summary>A supplemental collision-induced dissociation process that occurs in a beam-type collision cell in addition to another primary type of dissociation.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_collision_induced_dissociation">
             <summary>The dissociation of an ion after supplemental collisional excitation.</summary>
@@ -8004,6 +8004,27 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_protein_group_level_result_list_statistic">
             <summary>Attrbiute of an entire list of protein groups.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Pegasus_BT">
+            <summary>LECO bench-top GC time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder">
+            <summary>PNNL top-down/bottom-up analysis software for identifying peptides and proteoforms in fragmentation mass spectra.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_SpecEValue">
+            <summary>MSPathFinder spectral E-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_EValue">
+            <summary>MSPathFinder E-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_QValue">
+            <summary>MSPathFinder Q-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_PepQValue">
+            <summary>MSPathFinder peptide-level Q-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_RawScore">
+            <summary>MSPathFinder raw score.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_unimod_root_node">
             <summary>The root node of the unimod modifications ontology.</summary>
@@ -12081,6 +12102,45 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Glu__pyro_Glu_Methyl_2H_2_13C_1_">
             <summary>Pyro-Glu from E + Methylation Medium.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_LRGG_methyl">
+            <summary>LeumethylArgGlyGly.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_LRGG_dimethyl">
+            <summary>LeudimethylArgGlyGly.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Biotin_tyramide">
+            <summary>Biotin-Phenol.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tris">
+            <summary>Tris adduct causes 104 Da addition at asparagine-succinimide intermediate.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_IASD">
+            <summary>Iodoacetamide derivative of stilbene (reaction product with thiol).</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_NP40">
+            <summary>NP-40 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tween20">
+            <summary>Tween 20 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tween80">
+            <summary>Tween 80 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Triton">
+            <summary>Triton synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Brij35">
+            <summary>Brij 35 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Brij58">
+            <summary>Brij 58 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_beta_FNA">
+            <summary>Î’-Funaltrexamine.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_dHex_1_Hex_7_HexNAc_4_">
+            <summary>Fucosylated biantennary + 2 alphaGal.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_pato_OBSOLETE">
             <summary>Description not provided</summary>
@@ -19151,7 +19211,7 @@
             <summary>An angular shape quality inhering in a bearer by virtue of the bearer's having two angles in its length giving the bearer the form of the letter W.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_ornamentation">
-            <summary>A surface feature shape quality inhering in a bearer by virtue of the degree of the bearer's  highly topographical with ridges, pits, rugosity or other surface structures.</summary>
+            <summary>A surface feature shape quality inhering in a bearer by virtue of the degree of the bearer's highly topographical with ridges, pits, rugosity or other surface structures.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_ornamented">
             <summary>A surface feature shape in which the bearer's surface is highly topographical with ridges, pits, rugosity or other surface structures.</summary>
@@ -19193,13 +19253,13 @@
             <summary>A structural quality inhering in a bearer by virtue of the bearer bring gradually worn away.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_carpel_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a carpel.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a carpel.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_corymb_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's architecture bearing resemblence to a corymb type of inflorescence.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's architecture bearing resemblence to a corymb type of inflorescence.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_inflorescence_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's similarity to the appearance of an inflorescence.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's similarity to the appearance of an inflorescence.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_leaf_like">
             <summary>A structural quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a leaf.</summary>
@@ -19605,6 +19665,21 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_quality_of_an_aerosol">
             <summary>A physical quality inhering in an entity by virtue of the bearer's solid or liquid constituents being suspended in a gas.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_C_shaped">
+            <summary>A concave 3-D shape quality inhering in a bearer by virtue of the bearer's being shaped in the form of the letter C.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_J_shaped">
+            <summary>A concave 3-D shape quality inhering in a bearer by virtue of the bearer's being shaped in the form of the letter J.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_combustibility">
+            <summary>The propensity of a material to undergo combustion. Combustion encompasses smouldering and flaming combustion. Combustibility is usually applied to solids.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_increased_combustibility">
+            <summary>An increase in combustibility.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_decreased_combustibility">
+            <summary>An decrease in combustibility.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_genotypic_sex">
             <summary>A biological sex quality inhering in an individual based upon genotypic composition of sex chromosomes.</summary>
@@ -27935,6 +28010,12 @@
             If the modification location is unknown e.g. for PMF data, this attribute should be omitted.
             (See mzIdentML specification, version 1.1.0)</remarks>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.SequenceWithNumericMods">
+            <summary>
+            Peptide sequence with numeric mods but without a prefix or suffix residue
+            For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
+            </summary>
+        </member>
         <member name="T:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence">
             <summary>
             Peptide result information
@@ -27972,6 +28053,12 @@
             Peptide and modification information
             </summary>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence.SequenceWithNumericMods">
+            <summary>
+            Peptide sequence with numeric mods and prefix/suffix residues
+            For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
+            </summary>
+        </member>
         <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence.DbSeq">
             <summary>
             Protein information
@@ -27998,6 +28085,26 @@
             Path to the mzid file
             </summary>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.SpectrumFile">
+            <summary>
+            Name of the spectrum file used for the search
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftware">
+            <summary>
+            Get the name of the analysis software
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareCvAccession">
+            <summary>
+            Get the Controlled Vocabulary accession of the analysis software, if available
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareVersion">
+            <summary>
+            Get the version of the analysis software, if provided
+            </summary>
+        </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.Read(System.String)">
             <summary>
             Entry point for SimpleMZIdentMLReader
@@ -28022,6 +28129,20 @@
             Files are commonly larger than 30 MB, so use a streaming reader instead of a DOM reader
             </summary>
             <param name="reader">XmlReader object for the file to be read</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftwareList(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftwareList element
+            Called by ReadMzIdentML (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single AnalysisSoftwareList element</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftware(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftware element
+            Called by ReadAnalysisSoftwareList (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the AnalysisSoftware element</param>
         </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadSequenceCollection(System.Xml.XmlReader)">
             <summary>
