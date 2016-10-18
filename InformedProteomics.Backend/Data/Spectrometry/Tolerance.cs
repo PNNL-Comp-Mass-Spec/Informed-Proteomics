@@ -76,7 +76,22 @@
                 return null;
             }
 
-            return new Tolerance(Convert.ToDouble(valueStr), (ToleranceUnit)Enum.Parse(typeof(ToleranceUnit), unitStr));
+            ToleranceUnit tolUnit;
+            switch (unitStr)
+            {
+                case "da":
+                    tolUnit = ToleranceUnit.Da;
+                    break;
+                case "th":
+                    tolUnit = ToleranceUnit.Th;
+                    break;
+                case "ppm":
+                default:
+                    tolUnit = ToleranceUnit.Ppm;
+                    break;
+            }
+
+            return new Tolerance(Convert.ToDouble(valueStr), tolUnit);
         }
     }
 }

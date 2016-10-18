@@ -133,6 +133,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         if (this.removeReduntantIonTypes &&
                             ((baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O) ||
+                            (baseIonType == BaseIonType.C && neutralLoss == NeutralLoss.NH3) ||
                             (baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O) ||
                             (baseIonType == BaseIonType.YM1 && neutralLoss == NeutralLoss.NH3) ||
                             ((baseIonType == BaseIonType.D || baseIonType == BaseIonType.W ||
