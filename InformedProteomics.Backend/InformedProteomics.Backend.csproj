@@ -130,6 +130,7 @@
     <Compile Include="Data\Spectrometry\IScorer.cs" />
     <Compile Include="Data\Spectrometry\Xic.cs" />
     <Compile Include="Data\Spectrometry\XicPoint.cs" />
+    <Compile Include="MassSpecData\DPbfLcMsRun.cs" />
     <Compile Include="MassSpecData\LcMsRun.cs" />
     <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />
     <Compile Include="MassSpecData\MzMLReader.cs" />
@@ -223,7 +224,6 @@
       <Name>SAIS</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

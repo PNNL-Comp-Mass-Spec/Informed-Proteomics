@@ -374,7 +374,7 @@ namespace MSPathFinderT
                         if (Directory.Exists(value)) continue;
                         var extension = Path.GetExtension(value);
                         if (!Path.GetExtension(value).ToLower().Equals(".raw") &&
-                            !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtension))
+                            !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtensionConst))
                         {
                             return "Invalid extension for the parameter " + key + " (" + extension + ")";
                         }

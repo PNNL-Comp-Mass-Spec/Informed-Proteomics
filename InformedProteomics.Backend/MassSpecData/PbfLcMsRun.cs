@@ -9,7 +9,18 @@ namespace InformedProteomics.Backend.MassSpecData
 {
     public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
     {
-        public const string FileExtension = ".pbf";
+        /// <summary>
+        /// File extension
+        /// </summary>
+        public const string FileExtensionConst = ".pbf";
+        protected virtual string FileExtensionVirtual { get { return FileExtensionConst; } }
+
+        /// <summary>
+        /// File extension - overrideable. Returns <see cref="FileExtensionConst"/> for current type. See <see cref="FileExtensionConst"/> for static access.
+        /// </summary>
+        public string FileExtension { get { return FileExtensionVirtual; } }
+
+        public virtual bool ContainsChromatograms { get { return true; } }
 
         // This constant should be incremented by 1 if the binary file format is changed
         public const int FileFormatId = 150605;
@@ -31,7 +42,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static string GetPbfFileName(string specFileName)
         {
-            return MassSpecDataReaderFactory.ChangeExtension(specFileName, FileExtension);
+            return MassSpecDataReaderFactory.ChangeExtension(specFileName, FileExtensionConst);
         }
 
         /// <summary>
@@ -119,7 +130,7 @@ namespace InformedProteomics.Backend.MassSpecData
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
             IProgress<ProgressData> progress = null)
         {
-            if (specFilePath.ToLower().EndsWith(PbfLcMsRun.FileExtension))
+            if (specFilePath.ToLower().EndsWith(PbfLcMsRun.FileExtensionConst))
             {
                 return specFilePath;
             }
@@ -199,8 +210,22 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>The default path to the pbf file, unless a valid pbf file exists at the temp path</returns>
         public static string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath)
         {
+            return GetCheckPbfFilePath(specFilePath, out pbfPath, out fileName, out tempPath, FileExtensionConst);
+        }
+
+        /// <summary>
+        /// Gets valid possible pbf file paths
+        /// </summary>
+        /// <param name="specFilePath">Path to the spectra file</param>
+        /// <param name="pbfPath">Path to the default pbf file (in the same folder as the spectra file dataset)</param>
+        /// <param name="fileName"></param>
+        /// <param name="tempPath"></param>
+        /// <param name="extension">The extension expected for the pbf file</param>
+        /// <returns>The default path to the pbf file, unless a valid pbf file exists at the temp path</returns>
+        protected internal static string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath, string extension)
+        {
             // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
-            pbfPath = PbfLcMsRun.GetPbfFileName(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath));
+            pbfPath = MassSpecDataReaderFactory.ChangeExtension(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath), extension);
             fileName = Path.GetFileName(pbfPath);
             if (String.IsNullOrEmpty(fileName))
             {
@@ -226,8 +251,121 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Constructors
 
+        /// <summary>
+        /// Constructor for opening a PBF file
+        /// </summary>
+        /// <param name="specFileName"></param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
         public PbfLcMsRun(string specFileName, double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
         {
+            _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
+            _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
+
+            OpenPbfFile(specFileName);
+        }
+
+        /// <summary>
+        /// Constructor for creating and/or opening a PBF file
+        /// </summary>
+        /// <param name="specFileName"></param>
+        /// <param name="msdr"></param>
+        /// <param name="pbfFileName"></param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        /// <param name="progress"></param>
+        public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
+            double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null)
+        {
+            _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
+            _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
+
+            GetPbfFile(specFileName, msdr, pbfFileName, progress);
+        }
+
+        /// <summary>
+        /// Constructor for creating and/or opening a PBF file
+        /// </summary>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        protected internal PbfLcMsRun(double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0)
+        {
+            _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
+            _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
+        }
+
+        protected internal void GetPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfFileName, IProgress<ProgressData> progress)
+        {
+            string pbfPath2, fileName, tempPath;
+            var pbfPath = GetCheckPbfFilePath(specFileName, out pbfPath2, out fileName, out tempPath);
+            if (!string.IsNullOrWhiteSpace(pbfFileName))
+            {
+                pbfPath = pbfFileName;
+            }
+
+            bool isCurrent;
+            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent)
+            {
+                // Use regular construction
+                if (!specFileName.EndsWith(FileExtension))
+                {
+                    specFileName = pbfPath;
+                }
+
+                OpenPbfFile(specFileName);
+                return;
+            }
+
+            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress);
+        }
+
+        /// <summary>
+        /// Code for writing a PBF file. Should only be called from a constructor.
+        /// </summary>
+        /// <param name="specFileName"></param>
+        /// <param name="msdr"></param>
+        /// <param name="pbfPath"></param>
+        /// <param name="tempPath"></param>
+        /// <param name="progress"></param>
+        protected internal void BuildPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfPath, string tempPath, IProgress<ProgressData> progress)
+        {
+            if (msdr == null)
+            {
+                msdr = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
+            }
+            NumSpectra = msdr.NumSpectra;
+
+            try
+            {
+                _rawFilePath = specFileName;
+                PbfFilePath = pbfPath;
+                using (var writer =
+                        new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
+                {
+                    WriteToPbf(msdr, writer, progress);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                PbfFilePath = tempPath;
+                using (var writer =
+                        new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
+                {
+                    WriteToPbf(msdr, writer, progress);
+                }
+            }
+            _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+
+            CreatePrecursorNextScanMap();
+        }
+
+        /// <summary>
+        /// Code for opening a PBF file. Should only be called from the constructors.
+        /// </summary>
+        /// <param name="specFileName"></param>
+        protected internal void OpenPbfFile(string specFileName)
+        {
+            PbfFilePath = specFileName;
             var specFile = new FileInfo(specFileName);
             if (!specFile.Exists)
             {
@@ -240,9 +378,6 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             _reader = new BinaryReader(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
-
-            _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
-            _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
             lock (_filelock)
             {
@@ -279,101 +414,6 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             NumSpectra = _scanNumToSpecOffset.Count;
-
-            CreatePrecursorNextScanMap();
-        }
-
-        public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
-            double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null)
-        {
-            string pbfPath2, fileName, tempPath;
-            string pbfPath = GetCheckPbfFilePath(specFileName, out pbfPath2, out fileName, out tempPath);
-            if (!string.IsNullOrWhiteSpace(pbfFileName))
-            {
-                pbfPath = pbfFileName;
-            }
-            bool isCurrent;
-            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent)
-            {
-                // Use regular construction
-                if (!specFileName.EndsWith(FileExtension))
-                {
-                    specFileName = pbfPath;
-                }
-                PbfFilePath = specFileName;
-                var specFile = new FileInfo(specFileName);
-                if (!specFile.Exists)
-                {
-                    throw new FileNotFoundException("File not found by PbfLcMsRun", specFile.FullName);
-                }
-
-                if (specFile.Length < 28)
-                {
-                    throw new FormatException("Illegal pbf file (too small)!");
-                }
-
-                _reader = new BinaryReader(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
-
-                _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
-                _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
-
-                lock (_filelock)
-                {
-                    if (ReadMetaInfo() == false)
-                    {
-                        throw new FormatException("Illegal pbf file format!");
-                    }
-                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramBegin, SeekOrigin.Begin);
-                    _minMs1Mz = _reader.ReadDouble();
-
-                    if (_offsetPrecursorChromatogramEnd - NumBytePeak < 0)
-                    {
-                        throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is < 0)");
-                    }
-
-                    if (_offsetPrecursorChromatogramEnd - NumBytePeak >= specFile.Length)
-                    {
-                        throw new FormatException("Corrupt pbf file (_offsetPrecursorChromatogramEnd is past the end of the file)");
-                    }
-
-                    _reader.BaseStream.Seek(_offsetPrecursorChromatogramEnd - NumBytePeak, SeekOrigin.Begin);
-                    _maxMs1Mz = _reader.ReadDouble();
-                }
-
-                NumSpectra = _scanNumToSpecOffset.Count;
-
-                CreatePrecursorNextScanMap();
-                return;
-            }
-
-            if (msdr == null)
-            {
-                msdr = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
-            }
-            NumSpectra = msdr.NumSpectra;
-            _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
-            _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
-
-            try
-            {
-                _rawFilePath = specFileName;
-                PbfFilePath = pbfPath;
-                using (var writer =
-                        new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
-                {
-                    WriteToPbf(msdr, writer, progress);
-                }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                PbfFilePath = tempPath;
-                using (var writer =
-                        new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
-                {
-                    WriteToPbf(msdr, writer, progress);
-                }
-            }
-            _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             CreatePrecursorNextScanMap();
         }
@@ -1147,6 +1187,12 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Pbf Creation
 
+        /// <summary>
+        /// Bulk of code to write a PBF file. Protected internal to support DPbfLcMsRun.
+        /// </summary>
+        /// <param name="msdr"></param>
+        /// <param name="writer"></param>
+        /// <param name="progress"></param>
         private void WriteToPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             ScanNumToMsLevel = new Dictionary<int, int>(msdr.NumSpectra + 1);
@@ -1243,7 +1289,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor ion chromatogram (MS1 spectra)
             _offsetPrecursorChromatogramBegin = writer.BaseStream.Position;
 
-            if (ms1PeakCount > 0)
+            if (ms1PeakCount > 0 && ContainsChromatograms)
             {
                 progressData.Status = "Writing precursor chromatogram";
                 if (ms2PeakCount > 0)
@@ -1271,7 +1317,7 @@ namespace InformedProteomics.Backend.MassSpecData
             _offsetProductChromatogramBegin = writer.BaseStream.Position;
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin;
 
-            if (ms2PeakCount > 0)
+            if (ms2PeakCount > 0 && ContainsChromatograms)
             {
                 progressData.Status = "Writing product chromatogram";
                 progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size, on standard LCMS file
@@ -1384,7 +1430,7 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.Report(99.9); // Metadata: Approximately 0.2% of total file size
 
             var prevOffset = offsetBeginMetaInformation;
-            if (ms1PeakCount > 0)
+            if (ms1PeakCount > 0 && ContainsChromatograms)
             {
                 for (var i = _chromMzIndexToOffset.Length - 2; i >= 0; i--)
                 {

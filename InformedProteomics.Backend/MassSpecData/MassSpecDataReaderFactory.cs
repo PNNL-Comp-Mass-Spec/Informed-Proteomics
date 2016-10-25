@@ -31,6 +31,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 case MassSpecDataType.PbfFile:
                     reader = new PbfLcMsRun(filePath);
                     break;
+                case MassSpecDataType.DeconvolutedPbfFile:
+                    reader = new DPbfLcMsRun(filePath);
+                    break;
                 case MassSpecDataType.Unknown:
                     if (_pwizAvailable)
                     {
@@ -69,6 +72,10 @@ namespace InformedProteomics.Backend.MassSpecData
             if (lower.EndsWith(".pbf"))
             {
                 return MassSpecDataType.PbfFile;
+            }
+            if (lower.EndsWith(".dpbf"))
+            {
+                return MassSpecDataType.DeconvolutedPbfFile;
             }
 
             return MassSpecDataType.Unknown;
