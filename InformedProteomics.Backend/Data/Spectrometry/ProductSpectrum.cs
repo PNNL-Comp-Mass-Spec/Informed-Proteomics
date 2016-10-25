@@ -12,6 +12,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
         }
 
+        public ProductSpectrum(int scanNum) : base(scanNum)
+        {
+        }
+
         public ActivationMethod ActivationMethod { get; set; }
         public IsolationWindow IsolationWindow { get; set; }
 

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -38,7 +41,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="fileName"></param>
         /// <param name="tempPath"></param>
         /// <returns>The default path to the pbf file, unless a valid pbf file exists at the temp path</returns>
-        public new static string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath)
+        public override string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath)
         {
             return GetCheckPbfFilePath(specFilePath, out pbfPath, out fileName, out tempPath, FileExtensionConst);
         }
@@ -71,6 +74,126 @@ namespace InformedProteomics.Backend.MassSpecData
             : base(precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold)
         {
             GetPbfFile(specFileName, msdr, pbfFileName, progress);
+        }
+
+        // Must reflect all changes to WriteSpectrum
+        protected internal override Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
+        {
+            var scanNum = reader.ReadInt32();
+            var c = new char[NativeIdLength];
+            reader.Read(c, 0, NativeIdLength);
+            var nativeId = (new string(c)).Trim();
+            var msLevel = reader.ReadByte();
+            var elutionTime = reader.ReadDouble();
+            var tic = reader.ReadSingle();
+
+            DeconvolutedSpectrum spec;
+
+            double? precursorMass = reader.ReadDouble();
+            if (precursorMass == 0.0) precursorMass = null;
+            int? precursorCharge = reader.ReadInt32();
+            if (precursorCharge == 0) precursorCharge = null;
+            var activationMethod = (ActivationMethod)reader.ReadByte();
+            var isolationWindowTargetMz = reader.ReadDouble();
+            var isolationWindowLowerOffset = reader.ReadDouble();
+            var isolationWindowUpperOffset = reader.ReadDouble();
+
+            var peakList = new List<DeconvolutedPeak>();
+            var numPeaks = reader.ReadInt32();
+
+            for (var i = 0; i < numPeaks; i++)
+            {
+                var mz = reader.ReadDouble();
+                var intensity = reader.ReadSingle();
+                var charge = reader.ReadInt32();
+                var corr = reader.ReadSingle();
+                var dist = reader.ReadSingle();
+                peakList.Add(new DeconvolutedPeak(mz, intensity, charge, corr, dist));
+            }
+
+            spec = new DeconvolutedSpectrum(peakList, scanNum)
+            {
+                ActivationMethod = activationMethod,
+                IsolationWindow = new IsolationWindow(
+                    isolationWindowTargetMz,
+                    isolationWindowLowerOffset,
+                    isolationWindowUpperOffset,
+                    precursorMass,
+                    precursorCharge
+                    )
+            };
+            spec.MsLevel = msLevel;
+            spec.ElutionTime = elutionTime;
+            spec.NativeId = nativeId;
+            spec.TotalIonCurrent = tic;
+            return spec;
+        }
+
+        // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
+        protected internal override void WriteSpectrum(Spectrum specIn, BinaryWriter writer)
+        {
+            var spec = specIn as DeconvolutedSpectrum;
+            if (spec == null)
+            {
+                throw new ArgumentException("Input spectrum must be DeconvolutedSpectrum!");
+            }
+
+            // scan number: 4
+            writer.Write(spec.ScanNum);
+
+            // NativeID: 50
+            // pad or truncate to keep in limit (may have to change in future...)
+            writer.Write(spec.NativeId.PadRight(NativeIdLength).ToCharArray(0, NativeIdLength), 0, NativeIdLength);
+
+            // ms level: 1
+            writer.Write(Convert.ToByte(spec.MsLevel));
+
+            // elution time: 4
+            writer.Write(spec.ElutionTime);
+
+            // Total Ion Current: 4
+            writer.Write(Convert.ToSingle(spec.TotalIonCurrent));
+
+            var isolationWindow = spec.IsolationWindow;
+            // precursor mass: 8
+            writer.Write(isolationWindow.MonoisotopicMz ?? 0.0);
+            // precursor charge: 4
+            writer.Write(isolationWindow.Charge ?? 0);
+            // Activation method: 1
+            writer.Write((byte)spec.ActivationMethod);
+            // Isolation window target m/z: 8
+            writer.Write(isolationWindow.IsolationWindowTargetMz);
+            // Isolation window lower offset: 8
+            writer.Write(isolationWindow.IsolationWindowLowerOffset);
+            // Isolation window upper offset: 8
+            writer.Write(isolationWindow.IsolationWindowUpperOffset);
+
+            // Guarantee sorted peaks.
+            //var peaks = spec.Peaks.ToList();
+            Array.Sort(spec.Peaks);
+            //peaks.Sort();
+            // Number of peaks: 4
+            writer.Write(spec.Peaks.Length);
+            //writer.Write(peaks.Count);
+            foreach (var peakIn in spec.Peaks)
+            //foreach (var peak in peaks)
+            {
+                var peak = peakIn as DeconvolutedPeak;
+                if (peak == null)
+                {
+                    throw new ArgumentException("Input spectrum peaks array must contain only DeconvolutedPeaks!");
+                }
+                // m/z: 8
+                writer.Write(peak.Mz);
+                // intensity: 4
+                writer.Write(Convert.ToSingle(peak.Intensity));
+                // charge: 4
+                writer.Write(peak.Charge);
+                // correlation: 4
+                writer.Write(Convert.ToSingle(peak.Corr));
+                // distance: 4
+                writer.Write(Convert.ToSingle(peak.Dist));
+            }
         }
     }
 }

@@ -208,7 +208,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="fileName"></param>
         /// <param name="tempPath"></param>
         /// <returns>The default path to the pbf file, unless a valid pbf file exists at the temp path</returns>
-        public static string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath)
+        public virtual string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath)
         {
             return GetCheckPbfFilePath(specFilePath, out pbfPath, out fileName, out tempPath, FileExtensionConst);
         }
@@ -222,7 +222,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="tempPath"></param>
         /// <param name="extension">The extension expected for the pbf file</param>
         /// <returns>The default path to the pbf file, unless a valid pbf file exists at the temp path</returns>
-        protected internal static string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath, string extension)
+        protected internal string GetCheckPbfFilePath(string specFilePath, out string pbfPath, out string fileName, out string tempPath, string extension)
         {
             // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
             pbfPath = MassSpecDataReaderFactory.ChangeExtension(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath), extension);
@@ -418,6 +418,11 @@ namespace InformedProteomics.Backend.MassSpecData
             CreatePrecursorNextScanMap();
         }
 
+        [Obsolete("Only here for compatibility purposes with the obsolete WriteAsPbf function", true)]
+        private PbfLcMsRun()
+        {
+        }
+
         #endregion
 
         #region Member Variables
@@ -425,7 +430,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public string PbfFilePath { get; private set; }
         private string _rawFilePath;
         private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
-        private const int NativeIdLength = 50;
+        protected internal const int NativeIdLength = 50;
 
         private readonly object _filelock = new object();
         private BinaryReader _reader;
@@ -799,10 +804,10 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // Must reflect all changes to WriteSpectrum
-        private static Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
+        protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
         {
             var scanNum = reader.ReadInt32();
-            string nativeId = String.Empty;
+            var nativeId = string.Empty;
             if (fileFormatId > 150604)
             {
                 var c = new char[NativeIdLength];
@@ -864,7 +869,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
-        public static void WriteSpectrum(Spectrum spec, BinaryWriter writer)
+        protected internal virtual void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
             writer.Write(spec.ScanNum);
@@ -893,11 +898,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Activation method: 1
                 writer.Write((byte)productSpec.ActivationMethod);
                 // Isolation window target m/z: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowTargetMz);
+                writer.Write(isolationWindow.IsolationWindowTargetMz);
                 // Isolation window lower offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowLowerOffset);
+                writer.Write(isolationWindow.IsolationWindowLowerOffset);
                 // Isolation window upper offset: 8
-                writer.Write(productSpec.IsolationWindow.IsolationWindowUpperOffset);
+                writer.Write(isolationWindow.IsolationWindowUpperOffset);
             }
 
             // Guarantee sorted peaks.
@@ -954,7 +959,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return data;
         }
 
-        private static List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
+        private List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
         {
             var peakList = new List<Peak>();
             var numPeaks = reader.ReadInt32();
@@ -1010,6 +1015,7 @@ namespace InformedProteomics.Backend.MassSpecData
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
+            var pbfLcMsRun = new PbfLcMsRun();
             long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
@@ -1037,7 +1043,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     scanNumToIsolationWindow[scanNum - imlr.MinLcScan] = productSpec.IsolationWindow;
                     countMS2Spec++;
                 }
-                PbfLcMsRun.WriteSpectrum(spec, writer);
+                pbfLcMsRun.WriteSpectrum(spec, writer);
             }
 
             // Precursor ion chromatogram (MS1 spectra)
@@ -1231,7 +1237,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 counter++;
                 // Store offset, and write spectrum now
                 _scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
-                PbfLcMsRun.WriteSpectrum(spec, writer);
+                WriteSpectrum(spec, writer);
 
                 // Handle other metadata stuff.
                 var maxMz = double.MinValue;
