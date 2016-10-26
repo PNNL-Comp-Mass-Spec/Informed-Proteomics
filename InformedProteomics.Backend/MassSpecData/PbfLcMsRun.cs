@@ -1368,7 +1368,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     float minMz = 0;
                     float maxMz = 0;
 
-                    if (scan.ScanNum - MinLcScan < 0 || scan.ScanNum - MinLcScan >= scanNumToIsolationWindow.Count)
+                    if (!scanNumToIsolationWindow.ContainsKey(scan.ScanNum))
                     {
                         if (!warnedInvalidScanNum)
                         {

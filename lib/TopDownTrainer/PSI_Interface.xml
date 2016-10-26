@@ -49,6 +49,14 @@
             Mapping from CV to CV term accession to CV term enum
             </summary>
         </member>
+        <member name="M:PSI_Interface.CV.CV.CvidIsA(PSI_Interface.CV.CV.CVID,PSI_Interface.CV.CV.CVID)">
+            <summary>
+            Returns true if child has an IsA relationship with parent
+            </summary>
+            <param name="child"></param>
+            <param name="parent"></param>
+            <returns></returns>
+        </member>
         <member name="T:PSI_Interface.CV.CV.CVInfo">
             <summary>
             Primary identifying information about a particular CV
@@ -689,7 +697,7 @@
             <summary>Bruker Daltonics' autoflex TOF/TOF MS: MALDI TOF.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Auto_Spec_Ultima_NT">
-            <summary>Waters AutoSpec Ultima NT MS.</summary>
+            <summary>Waters magnetic sector based AutoSpec Ultima NT MS.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_BioTOF_II">
             <summary>Bruker Daltonics' BioTOF II: ESI TOF.</summary>
@@ -805,17 +813,17 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Q_Tof_micro">
             <summary>Waters oa-ToF based Q-Tof micro.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_Q_Tof_ultima">
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Q_Tof_Ultima">
             <summary>Waters oa-ToF based Q-Tof Ultima.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_QSTAR">
             <summary>Applied Biosystems/MDS SCIEX QSTAR MS.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_quattro_micro">
-            <summary>Waters oa-ToF based micro.</summary>
+            <summary>Waters (triple) quadrupole based micro.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_Quattro_UItima">
-            <summary>Waters oa-ToF based Ultima.</summary>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Quattro_Ultima">
+            <summary>Waters (triple) quadrupole based Ultima.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Surveyor_MSQ">
             <summary>ThermoFinnigan Surveyor MSQ MS.</summary>
@@ -5197,8 +5205,8 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_nanoACQUITY_UPLC">
             <summary>Waters LC-system nanoACQUITY UPLC.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_nanoACQUITY_UPLC_System_with_Technology">
-            <summary>Waters LC-system nanoACQUITY UPLC System with Technology.</summary>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_nanoACQUITY_UPLC_System_with_1D_Technology">
+            <summary>Waters LC-system nanoACQUITY UPLC System with 1D Technology.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_nanoACQUITY_UPLC_with_HDX_Technology">
             <summary>Waters LC-system nanoACQUITY UPLC with HDX Technology.</summary>
@@ -5264,7 +5272,7 @@
             <summary>Waters quadrupole based Acquity TQD.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Quattro_micro_GC">
-            <summary>Waters quadrupole based Quattro micro GC.</summary>
+            <summary>Waters (triple) quadrupole based Quattro micro GC.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Xevo_TQ_MS">
             <summary>Waters quadrupole based Xevo TQ MS.</summary>
@@ -5281,8 +5289,8 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Empower">
             <summary>Waters Empower software for liquid chromatography and mass spectrometry acquisition.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_Unify">
-            <summary>Waters Unify software for liquid chromatography and mass spectrometry acquisition.</summary>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_UNIFY">
+            <summary>Waters UNIFY software for liquid chromatography and mass spectrometry acquisition.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_travelling_wave_ion_mobility_mass_spectrometer_OBSOLETE">
             <summary>OBSOLETE An ion mobility mass spectrometry technique based on the superimposition of travelling voltage waves on a radially-confining RF voltage in a gas-filled, stacked-ring ion guide.</summary>
@@ -6719,7 +6727,7 @@
             <summary>Waters oa-ToF based Xevo G2-S QTof.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_AutoSpec_Premier">
-            <summary>Waters AutoSpec Premier.</summary>
+            <summary>Waters AutoSpec Premier magnetic sector instrument.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Pegasus_III">
             <summary>LECO nominal mass resolution time-of-flight GC mass spectrometer.</summary>
@@ -7921,8 +7929,8 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_residue_pair_level_global_FDR">
             <summary>Estimation of the global false discovery rate of residue-pairs in cross-linking experiments.</summary>
         </member>
-        <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_higher_energy_beam_type_collision_induced_dissociation">
-            <summary>A supplemental collision-induced dissociation process wherein the projectile ion has the translational energy higher than approximately 1000 eV.</summary>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_beam_type_collision_induced_dissociation">
+            <summary>A supplemental collision-induced dissociation process that occurs in a beam-type collision cell in addition to another primary type of dissociation.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_supplemental_collision_induced_dissociation">
             <summary>The dissociation of an ion after supplemental collisional excitation.</summary>
@@ -8004,6 +8012,45 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.MS_protein_group_level_result_list_statistic">
             <summary>Attrbiute of an entire list of protein groups.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Pegasus_BT">
+            <summary>LECO bench-top GC time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder">
+            <summary>PNNL top-down/bottom-up analysis software for identifying peptides and proteoforms in fragmentation mass spectra.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_SpecEValue">
+            <summary>MSPathFinder spectral E-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_EValue">
+            <summary>MSPathFinder E-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_QValue">
+            <summary>MSPathFinder Q-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_PepQValue">
+            <summary>MSPathFinder peptide-level Q-value.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MSPathFinder_RawScore">
+            <summary>MSPathFinder raw score.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_SYNAPT_G2_Si">
+            <summary>Waters Corporation SYNAPT G2-Si orthogonal acceleration time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_MALDI_SYNAPT_G2_Si">
+            <summary>Waters Corporation MALDI SYNAPT G2-Si orthogonal acceleration time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Vion_IMS_QTof">
+            <summary>Waters Corporation Vion IMS QTof orthogonal acceleration time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Xevo_G2_XS_Tof">
+            <summary>Waters Corporation Xevo G2 XS Tof orthogonal acceleration time-of-flight mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Xevo_TQ_XS">
+            <summary>Waters Corporation Xevo TQ-XS triple quadrupole mass spectrometer.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Xevo_TQ_S_micro">
+            <summary>Waters Corporation Xevo TQ-S micro triple quadrupole mass spectrometer.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_unimod_root_node">
             <summary>The root node of the unimod modifications ontology.</summary>
@@ -12081,6 +12128,45 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Glu__pyro_Glu_Methyl_2H_2_13C_1_">
             <summary>Pyro-Glu from E + Methylation Medium.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_LRGG_methyl">
+            <summary>LeumethylArgGlyGly.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_LRGG_dimethyl">
+            <summary>LeudimethylArgGlyGly.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Biotin_tyramide">
+            <summary>Biotin-Phenol.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tris">
+            <summary>Tris adduct causes 104 Da addition at asparagine-succinimide intermediate.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_IASD">
+            <summary>Iodoacetamide derivative of stilbene (reaction product with thiol).</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_NP40">
+            <summary>NP-40 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tween20">
+            <summary>Tween 20 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Tween80">
+            <summary>Tween 80 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Triton">
+            <summary>Triton synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Brij35">
+            <summary>Brij 35 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_Brij58">
+            <summary>Brij 58 synthetic polymer terminus.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_beta_FNA">
+            <summary>Î’-Funaltrexamine.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_dHex_1_Hex_7_HexNAc_4_">
+            <summary>Fucosylated biantennary + 2 alphaGal.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_pato_OBSOLETE">
             <summary>Description not provided</summary>
@@ -19151,7 +19237,7 @@
             <summary>An angular shape quality inhering in a bearer by virtue of the bearer's having two angles in its length giving the bearer the form of the letter W.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_ornamentation">
-            <summary>A surface feature shape quality inhering in a bearer by virtue of the degree of the bearer's  highly topographical with ridges, pits, rugosity or other surface structures.</summary>
+            <summary>A surface feature shape quality inhering in a bearer by virtue of the degree of the bearer's highly topographical with ridges, pits, rugosity or other surface structures.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_ornamented">
             <summary>A surface feature shape in which the bearer's surface is highly topographical with ridges, pits, rugosity or other surface structures.</summary>
@@ -19193,13 +19279,13 @@
             <summary>A structural quality inhering in a bearer by virtue of the bearer bring gradually worn away.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_carpel_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a carpel.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a carpel.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_corymb_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's architecture bearing resemblence to a corymb type of inflorescence.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's architecture bearing resemblence to a corymb type of inflorescence.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_inflorescence_like">
-            <summary>A  quality inhering in a bearer by virtue of the bearer's similarity to the appearance of an inflorescence.</summary>
+            <summary>A quality inhering in a bearer by virtue of the bearer's similarity to the appearance of an inflorescence.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_leaf_like">
             <summary>A structural quality inhering in a bearer by virtue of the bearer's similarity to the appearance of a leaf.</summary>
@@ -19605,6 +19691,21 @@
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_quality_of_an_aerosol">
             <summary>A physical quality inhering in an entity by virtue of the bearer's solid or liquid constituents being suspended in a gas.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_C_shaped">
+            <summary>A concave 3-D shape quality inhering in a bearer by virtue of the bearer's being shaped in the form of the letter C.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_J_shaped">
+            <summary>A concave 3-D shape quality inhering in a bearer by virtue of the bearer's being shaped in the form of the letter J.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_combustibility">
+            <summary>The propensity of a material to undergo combustion. Combustion encompasses smouldering and flaming combustion. Combustibility is usually applied to solids.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_increased_combustibility">
+            <summary>An increase in combustibility.</summary>
+        </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.PATO_decreased_combustibility">
+            <summary>An decrease in combustibility.</summary>
         </member>
         <member name="F:PSI_Interface.CV.CV.CVID.PATO_genotypic_sex">
             <summary>A biological sex quality inhering in an individual based upon genotypic composition of sex chromosomes.</summary>
@@ -27935,6 +28036,12 @@
             If the modification location is unknown e.g. for PMF data, this attribute should be omitted.
             (See mzIdentML specification, version 1.1.0)</remarks>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.SequenceWithNumericMods">
+            <summary>
+            Peptide sequence with numeric mods but without a prefix or suffix residue
+            For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
+            </summary>
+        </member>
         <member name="T:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence">
             <summary>
             Peptide result information
@@ -27972,6 +28079,12 @@
             Peptide and modification information
             </summary>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence.SequenceWithNumericMods">
+            <summary>
+            Peptide sequence with numeric mods and prefix/suffix residues
+            For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
+            </summary>
+        </member>
         <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence.DbSeq">
             <summary>
             Protein information
@@ -27998,6 +28111,26 @@
             Path to the mzid file
             </summary>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.SpectrumFile">
+            <summary>
+            Name of the spectrum file used for the search
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftware">
+            <summary>
+            Get the name of the analysis software
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareCvAccession">
+            <summary>
+            Get the Controlled Vocabulary accession of the analysis software, if available
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareVersion">
+            <summary>
+            Get the version of the analysis software, if provided
+            </summary>
+        </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.Read(System.String)">
             <summary>
             Entry point for SimpleMZIdentMLReader
@@ -28022,6 +28155,20 @@
             Files are commonly larger than 30 MB, so use a streaming reader instead of a DOM reader
             </summary>
             <param name="reader">XmlReader object for the file to be read</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftwareList(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftwareList element
+            Called by ReadMzIdentML (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single AnalysisSoftwareList element</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftware(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftware element
+            Called by ReadAnalysisSoftwareList (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the AnalysisSoftware element</param>
         </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadSequenceCollection(System.Xml.XmlReader)">
             <summary>
@@ -28150,6 +28297,46 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
+        <member name="M:PSI_Interface.MSData.MSDataList`1.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSDataList`1.op_Implicit(`0[])~PSI_Interface.MSData.MSDataList{`0}">
+            <summary>
+            Convert array to list
+            </summary>
+            <param name="items"></param>
+            <returns></returns>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSDataList`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Create array from IEnumerable
+            </summary>
+            <param name="items"></param>
+        </member>
+        <member name="P:PSI_Interface.MSData.MSDataList`1.MsData">
+            <summary>
+            Reference to root object
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.MSDataList`1.DefaultArrayLength">
+            <summary>
+            Default length of binary data array
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSDataList`1.Add(`0)">
+            <summary>
+            Add an item
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSDataList`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Add a group of items
+            </summary>
+            <param name="items"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.MSData">
             <summary>
             mzML mzMLType
@@ -28212,6 +28399,23 @@
             Required Attribute
             string
         </member>
+        <member name="M:PSI_Interface.MSData.MSData.#ctor(System.Boolean)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="createTranslator"></param>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSData.DefaultCV">
+            <summary>
+            Configure the default CV library
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.MSData.#ctor(PSI_Interface.MSData.mzML.mzMLType)">
+            <summary>
+            Translating Constructor from a mzMLType object
+            </summary>
+            <param name="mzML"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.CVInfo">
             <summary>
             mzML CVType
@@ -28246,6 +28450,18 @@
             Required Attribute
             anyURI
         </member>
+        <member name="M:PSI_Interface.MSData.CVInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.CVInfo.#ctor(PSI_Interface.MSData.mzML.CVType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="cv"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.DataProcessingInfo">
             <summary>
             mzML DataProcessingType
@@ -28272,6 +28488,18 @@
             Required Attribute
             ID
         </member>
+        <member name="M:PSI_Interface.MSData.DataProcessingInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.DataProcessingInfo.#ctor(PSI_Interface.MSData.mzML.DataProcessingType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="dp"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ProcessingMethodInfo">
             <summary>
             mzML ProcessingMethodType
@@ -28292,6 +28520,18 @@
             <remarks>This attribute must reference the 'id' of the appropriate SoftwareType.</remarks>
             Required Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.ProcessingMethodInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ProcessingMethodInfo.#ctor(PSI_Interface.MSData.mzML.ProcessingMethodType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="pm"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.ParamGroup">
             <summary>
@@ -28315,6 +28555,18 @@
         </member>
         <member name="P:PSI_Interface.MSData.ParamGroup.UserParams">
             min 0, max unbounded
+        </member>
+        <member name="M:PSI_Interface.MSData.ParamGroup.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ParamGroup.#ctor(PSI_Interface.MSData.mzML.ParamGroupType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="pg"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.ReferenceableParamGroup">
             <summary>
@@ -28341,6 +28593,18 @@
             Required Attribute
             ID
         </member>
+        <member name="M:PSI_Interface.MSData.ReferenceableParamGroup.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ReferenceableParamGroup.#ctor(PSI_Interface.MSData.mzML.ReferenceableParamGroupType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="rpg"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ReferenceableParamGroupRef">
             <summary>
             mzML ReferenceableParamGroupRefType
@@ -28360,6 +28624,18 @@
             Required Attribute
             IDREF
         </member>
+        <member name="M:PSI_Interface.MSData.ReferenceableParamGroupRef.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ReferenceableParamGroupRef.#ctor(PSI_Interface.MSData.mzML.ReferenceableParamGroupRefType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="rpgr"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.CVParam">
             <summary>
             mzML CVParamType
@@ -28373,6 +28649,11 @@
             mzML CVParamType
             </summary>
             <remarks>This element holds additional data or annotation. Only controlled values are allowed here.</remarks>
+        </member>
+        <member name="P:PSI_Interface.MSData.CVParam.Cvid">
+            <summary>
+            CV term enum
+            </summary>
         </member>
         <member name="P:PSI_Interface.MSData.CVParam.CVRef">
             <remarks>A reference to the CV 'id' attribute as defined in the cvList in this mzML file.</remarks>
@@ -28393,6 +28674,18 @@
             <remarks>The value for the parameter; may be absent if not appropriate, or a numeric or symbolic value, or may itself be CV (legal values for a parameter should be enumerated and defined in the ontology).</remarks>
             Optional Attribute
             string
+        </member>
+        <member name="M:PSI_Interface.MSData.CVParam.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.CVParam.#ctor(PSI_Interface.MSData.mzML.CVParamType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="cvp"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.UserParam">
             <summary>
@@ -28429,6 +28722,18 @@
             Optional Attribute
             string
         </member>
+        <member name="M:PSI_Interface.MSData.UserParam.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.UserParam.#ctor(PSI_Interface.MSData.mzML.UserParamType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="up"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ParamBase">
             <summary>
             ParamBase
@@ -28442,6 +28747,11 @@
             ParamBase
             </summary>
             <remarks>Base type for CVParam and UserParam to reduce code duplication.</remarks>
+        </member>
+        <member name="P:PSI_Interface.MSData.ParamBase.UnitCvid">
+            <summary>
+            CV term enum for the units
+            </summary>
         </member>
         <member name="P:PSI_Interface.MSData.ParamBase.UnitCVRef">
             <remarks>If a unit term is referenced, this attribute must refer to the CV 'id' attribute defined in the cvList in this mzML file.</remarks>
@@ -28457,6 +28767,17 @@
             <remarks>An optional CV name for the unit accession number, if any (e.g., 'electron volt' for 'UO:0000266' ).</remarks>
             Optional Attribute
             string
+        </member>
+        <member name="M:PSI_Interface.MSData.ParamBase.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ParamBase.#ctor(PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.Precursor">
             <summary>
@@ -28499,6 +28820,18 @@
             Optional Attribute
             string
         </member>
+        <member name="M:PSI_Interface.MSData.Precursor.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Precursor.#ctor(PSI_Interface.MSData.mzML.PrecursorType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="p"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.BinaryDataArray">
             <summary>
             mzML BinaryDataArrayType
@@ -28516,8 +28849,68 @@
             <remarks>The structure into which encoded binary data goes. Byte ordering is always little endian (Intel style). 
             Computers using a different endian style must convert to/from little endian when writing/reading mzML</remarks>
         </member>
+        <member name="T:PSI_Interface.MSData.BinaryDataArray.ArrayType">
+            <summary>
+            Type of data in the binary data array
+            </summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.m_z">
+            <summary>m/z data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.intensity">
+            <summary>intensity data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.charge">
+            <summary>charge data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.signal_to_noise">
+            <summary>signal to noise data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.time">
+            <summary>time data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.wavelength">
+            <summary>wavelength data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.non_standard_data">
+            <summary>other data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.flow_rate">
+            <summary>flow rate data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.pressure">
+            <summary>pressure data</summary>
+        </member>
+        <member name="F:PSI_Interface.MSData.BinaryDataArray.ArrayType.temperature">
+            <summary>temperature data</summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.BinaryDataArray.Data">
+            <summary>
+            Array of data, in the form of doubles
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.BinaryDataArray.DataType">
+            <summary>
+            Type of data in the array
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.BinaryDataArray.DataWidth">
+            <summary>
+            byte width of the data in the array - 4 bytes or 8 bytes
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.BinaryDataArray.IsCompressed">
+            <summary>
+            If the binary data form of the array is compressed
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.MSData.BinaryDataArray.DataLength">
+            <summary>
+            Length of the data array
+            </summary>
+        </member>
         <member name="P:PSI_Interface.MSData.BinaryDataArray.Binary">
-            <remarks>The actual base64 encoded binary data. The byte order is always 'little endian'.</remarks>
+            <summary>The actual base64 encoded binary data. The byte order is always 'little endian'.</summary>
             base64Binary
         </member>
         <member name="P:PSI_Interface.MSData.BinaryDataArray.ArrayLength">
@@ -28532,6 +28925,19 @@
             <remarks>This optional attribute may reference the 'id' attribute of the appropriate dataProcessing.</remarks>
             Optional Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.BinaryDataArray.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.BinaryDataArray.#ctor(PSI_Interface.MSData.mzML.BinaryDataArrayType,PSI_Interface.MSData.MSData,System.Int32)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="bda"></param>
+            <param name="instance"></param>
+            <param name="defaultArrayLength"></param>
         </member>
         <member name="T:PSI_Interface.MSData.ScanList">
             <summary>
@@ -28549,6 +28955,18 @@
         </member>
         <member name="P:PSI_Interface.MSData.ScanList.Scan">
             min 1, max unbounded
+        </member>
+        <member name="M:PSI_Interface.MSData.ScanList.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ScanList.#ctor(PSI_Interface.MSData.mzML.ScanListType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sl"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.Scan">
             <summary>
@@ -28588,6 +29006,18 @@
             Optional Attribute
             IDREF
         </member>
+        <member name="M:PSI_Interface.MSData.Scan.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Scan.#ctor(PSI_Interface.MSData.mzML.ScanType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="s"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.SpectrumList">
             <summary>
             mzML SpectrumListType
@@ -28611,6 +29041,18 @@
             This attribute is required because the minimum amount of data processing that any format will undergo is "conversion to mzML".</remarks>
             Required Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.SpectrumList.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SpectrumList.#ctor(PSI_Interface.MSData.mzML.SpectrumListType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sl"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.Spectrum">
             <summary>
@@ -28673,6 +29115,18 @@
             Optional Attribute
             IDREF
         </member>
+        <member name="M:PSI_Interface.MSData.Spectrum.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Spectrum.#ctor(PSI_Interface.MSData.mzML.SpectrumType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="s"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.Product">
             <summary>
             mzML ProductType
@@ -28690,6 +29144,18 @@
         <member name="P:PSI_Interface.MSData.Product.IsolationWindow">
             <remarks>This element captures the isolation (or 'selection') window configured to isolate one or more ions.</remarks>
             min 0, max 1
+        </member>
+        <member name="M:PSI_Interface.MSData.Product.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Product.#ctor(PSI_Interface.MSData.mzML.ProductType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="p"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.Run">
             <summary>
@@ -28744,6 +29210,18 @@
         <member name="P:PSI_Interface.MSData.Run.StartTimeStampSpecified">
             "Ignored" Attribute - only used to signify existence of valid value in startTimeStamp
         </member>
+        <member name="M:PSI_Interface.MSData.Run.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Run.#ctor(PSI_Interface.MSData.mzML.RunType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="r"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ChromatogramList">
             <summary>
             mzML ChromatogramListType
@@ -28768,6 +29246,18 @@
             This attribute is required because the minimum amount of data processing that any format will undergo is "conversion to mzML".</remarks>
             Required Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.ChromatogramList.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ChromatogramList.#ctor(PSI_Interface.MSData.mzML.ChromatogramListType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="cl"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.Chromatogram">
             <summary>
@@ -28812,6 +29302,18 @@
             Optional Attribute
             IDREF
         </member>
+        <member name="M:PSI_Interface.MSData.Chromatogram.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Chromatogram.#ctor(PSI_Interface.MSData.mzML.ChromatogramType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="c"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ScanSettingsInfo">
             <summary>
             mzML ScanSettingsType
@@ -28839,6 +29341,18 @@
             Required Attribute
             ID
         </member>
+        <member name="M:PSI_Interface.MSData.ScanSettingsInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ScanSettingsInfo.#ctor(PSI_Interface.MSData.mzML.ScanSettingsType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="ss"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.SourceFileRef">
             <summary>
             mzML SourceFileRefType
@@ -28857,6 +29371,18 @@
             <remarks>This attribute must reference the 'id' of the appropriate sourceFile.</remarks>
             Required Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.SourceFileRef.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SourceFileRef.#ctor(PSI_Interface.MSData.mzML.SourceFileRefType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sfr"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.SoftwareInfo">
             <summary>
@@ -28881,6 +29407,18 @@
             <remarks>The software version.</remarks>
             Required Attribute
             string
+        </member>
+        <member name="M:PSI_Interface.MSData.SoftwareInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SoftwareInfo.#ctor(PSI_Interface.MSData.mzML.SoftwareType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="s"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.InstrumentConfigurationInfo">
             <summary>
@@ -28920,6 +29458,18 @@
             Optional Attribute
             IDREF
         </member>
+        <member name="M:PSI_Interface.MSData.InstrumentConfigurationInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.InstrumentConfigurationInfo.#ctor(PSI_Interface.MSData.mzML.InstrumentConfigurationType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="ic"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.ComponentList">
             <summary>
             mzML ComponentListType
@@ -28946,6 +29496,18 @@
             <remarks>A detector component.</remarks>
             min 1, max unbounded
         </member>
+        <member name="M:PSI_Interface.MSData.ComponentList.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.ComponentList.#ctor(PSI_Interface.MSData.mzML.ComponentListType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="cl"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.Component">
             <summary>
             mzML ComponentType
@@ -28963,6 +29525,18 @@
             have the lower order number, and the TOF the higher number of the two).</remarks>
             Required Attribute
             integer
+        </member>
+        <member name="M:PSI_Interface.MSData.Component.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.Component.#ctor(PSI_Interface.MSData.mzML.ComponentType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="c"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.SourceComponent">
             <summary>
@@ -28984,6 +29558,18 @@
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.SourceComponent.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SourceComponent.#ctor(PSI_Interface.MSData.mzML.SourceComponentType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sc"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.AnalyzerComponent">
             <summary>
             mzML AnalyzerComponentType
@@ -29003,6 +29589,18 @@
             <remarks>This element must be used to describe an Analyzer Component Type. 
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.AnalyzerComponent.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.AnalyzerComponent.#ctor(PSI_Interface.MSData.mzML.AnalyzerComponentType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="ac"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.DetectorComponent">
             <summary>
@@ -29024,6 +29622,18 @@
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.DetectorComponent.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.DetectorComponent.#ctor(PSI_Interface.MSData.mzML.DetectorComponentType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="dc"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.SoftwareRef">
             <summary>
             mzML SoftwareRefType
@@ -29042,6 +29652,18 @@
             <remarks>This attribute must be used to reference the 'id' attribute of a software element.</remarks>
             Required Attribute
             IDREF
+        </member>
+        <member name="M:PSI_Interface.MSData.SoftwareRef.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SoftwareRef.#ctor(PSI_Interface.MSData.mzML.SoftwareRefType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sr"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.SampleInfo">
             <summary>
@@ -29066,6 +29688,18 @@
             <remarks>An optional name for the sample description, mostly intended as a quick mnemonic.</remarks>
             Optional Attribute
             string
+        </member>
+        <member name="M:PSI_Interface.MSData.SampleInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SampleInfo.#ctor(PSI_Interface.MSData.mzML.SampleType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="s"></param>
+            <param name="instance"></param>
         </member>
         <member name="T:PSI_Interface.MSData.SourceFileInfo">
             <summary>
@@ -29096,6 +29730,18 @@
             Required Attribute
             anyURI
         </member>
+        <member name="M:PSI_Interface.MSData.SourceFileInfo.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.SourceFileInfo.#ctor(PSI_Interface.MSData.mzML.SourceFileType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="sf"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.FileDescription">
             <summary>
             mzML FileDescriptionType
@@ -29122,6 +29768,18 @@
         <member name="P:PSI_Interface.MSData.FileDescription.ContactInfo">
             min 0, max unbounded
         </member>
+        <member name="M:PSI_Interface.MSData.FileDescription.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:PSI_Interface.MSData.FileDescription.#ctor(PSI_Interface.MSData.mzML.FileDescriptionType,PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a mzMLType child object
+            </summary>
+            <param name="fd"></param>
+            <param name="instance"></param>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.mzMLType">
             <summary>
             mzML mzMLType
@@ -29136,6 +29794,12 @@
             <remarks>This is the root element for the Proteomics Standards Initiative (PSI) mzML schema, which 
             is intended to capture the use of a mass spectrometer, the data generated, and 
             the initial processing of that data (to the level of the peak list)</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.mzMLType.#ctor(PSI_Interface.MSData.MSData)">
+            <summary>
+            Translating Constructor from a MSData object
+            </summary>
+            <param name="msData"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.mzMLType.cvList">
             <remarks/>
@@ -29173,6 +29837,11 @@
         <member name="P:PSI_Interface.MSData.mzML.mzMLType.version">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.mzMLType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.CVListType">
             <summary>
             mzML CVListType
@@ -29184,11 +29853,22 @@
             </summary>
             <remarks>Container for one or more controlled vocabulary definitions.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.CVInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="ocvList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.CVListType.cv">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.CVListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.CVType">
             <summary>
@@ -29200,6 +29880,12 @@
             mzML CVType
             </summary>
             <remarks>Information about an ontology or CV source and a short 'lookup' tag to refer to.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVType.#ctor(PSI_Interface.MSData.CVInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="cv"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.CVType.id">
             <remarks/>
@@ -29213,6 +29899,11 @@
         <member name="P:PSI_Interface.MSData.mzML.CVType.URI">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.DataProcessingListType">
             <summary>
             mzML DataProcessingListType
@@ -29224,11 +29915,22 @@
             </summary>
             <remarks>List and descriptions of data processing applied to this data.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.DataProcessingListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.DataProcessingInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="dpList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.DataProcessingListType.dataProcessing">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.DataProcessingListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.DataProcessingListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.DataProcessingType">
             <summary>
@@ -29241,11 +29943,22 @@
             </summary>
             <remarks>Description of the way in which a particular software was used.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.DataProcessingType.#ctor(PSI_Interface.MSData.DataProcessingInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="dp"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.DataProcessingType.processingMethod">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.DataProcessingType.id">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.DataProcessingType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ProcessingMethodType">
             <summary>
@@ -29256,11 +29969,22 @@
             mzML ProcessingMethodType
             </summary>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProcessingMethodType.#ctor(PSI_Interface.MSData.ProcessingMethodInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="process"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ProcessingMethodType.order">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ProcessingMethodType.softwareRef">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProcessingMethodType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ParamGroupType">
             <summary>
@@ -29273,6 +29997,12 @@
             </summary>
             <remarks>Structure allowing the use of a controlled (cvParam) or uncontrolled vocabulary (userParam), or a reference to a predefined set of these in this mzML file (paramGroupRef).</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ParamGroupType.#ctor(PSI_Interface.MSData.ParamGroup)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="pg"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ParamGroupType.referenceableParamGroupRef">
             <remarks/>
         </member>
@@ -29281,6 +30011,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ParamGroupType.userParam">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ParamGroupType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ReferenceableParamGroupListType">
             <summary>
@@ -29293,11 +30028,22 @@
             </summary>
             <remarks>Container for a list of referenceableParamGroups</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.ReferenceableParamGroup})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="rpgList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ReferenceableParamGroupListType.referenceableParamGroup">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ReferenceableParamGroupListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ReferenceableParamGroupType">
             <summary>
@@ -29310,6 +30056,12 @@
             </summary>
             <remarks>A collection of CVParam and UserParam elements that can be referenced from elsewhere in this mzML document by using the 'paramGroupRef' element in that location to reference the 'id' attribute value of this element.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupType.#ctor(PSI_Interface.MSData.ReferenceableParamGroup)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="rpg"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ReferenceableParamGroupType.cvParam">
             <remarks/>
         </member>
@@ -29318,6 +30070,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ReferenceableParamGroupType.id">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ReferenceableParamGroupRefType">
             <summary>
@@ -29330,8 +30087,19 @@
             </summary>
             <remarks>A reference to a previously defined ParamGroup, which is a reusable container of one or more cvParams.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupRefType.#ctor(PSI_Interface.MSData.ReferenceableParamGroupRef)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="rpgr"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ReferenceableParamGroupRefType.ref">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ReferenceableParamGroupRefType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.CVParamType">
             <summary>
@@ -29343,6 +30111,12 @@
             mzML CVParamType
             </summary>
             <remarks>This element holds additional data or annotation. Only controlled values are allowed here.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVParamType.#ctor(PSI_Interface.MSData.CVParam)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="cvp"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.CVParamType.cvRef">
             <remarks/>
@@ -29365,6 +30139,11 @@
         <member name="P:PSI_Interface.MSData.mzML.CVParamType.unitName">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.CVParamType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.UserParamType">
             <summary>
             mzML UserParamType
@@ -29379,6 +30158,12 @@
             <remarks>Uncontrolled user parameters (essentially allowing free text). 
             Before using these, one should verify whether there is an appropriate 
             CV term available, and if so, use the CV term instead</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.UserParamType.#ctor(PSI_Interface.MSData.UserParam)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="up"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.UserParamType.name">
             <remarks/>
@@ -29398,6 +30183,11 @@
         <member name="P:PSI_Interface.MSData.mzML.UserParamType.unitCvRef">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.UserParamType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.PrecursorListType">
             <summary>
             mzML PrecursorListType
@@ -29409,11 +30199,22 @@
             </summary>
             <remarks>List and descriptions of precursor isolations to the spectrum currently being described, ordered.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.PrecursorListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.Precursor})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="precursors"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.PrecursorListType.precursor">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.PrecursorListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.PrecursorListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.PrecursorType">
             <summary>
@@ -29425,6 +30226,12 @@
             mzML PrecursorType
             </summary>
             <remarks>The method of precursor ion selection and activation</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.PrecursorType.#ctor(PSI_Interface.MSData.Precursor)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="precursor"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.PrecursorType.isolationWindow">
             <remarks/>
@@ -29444,6 +30251,11 @@
         <member name="P:PSI_Interface.MSData.mzML.PrecursorType.externalSpectrumID">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.PrecursorType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.SelectedIonListType">
             <summary>
             mzML SelectedIonListType
@@ -29455,11 +30267,22 @@
             </summary>
             <remarks>The list of selected precursor ions.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SelectedIonListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.ParamGroup})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="siList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SelectedIonListType.selectedIon">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SelectedIonListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SelectedIonListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.BinaryDataArrayListType">
             <summary>
@@ -29472,11 +30295,22 @@
             </summary>
             <remarks>List of binary data arrays.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.BinaryDataArrayListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.BinaryDataArray})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="bdal"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.BinaryDataArrayListType.binaryDataArray">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.BinaryDataArrayListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.BinaryDataArrayListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.BinaryDataArrayType">
             <summary>
@@ -29491,6 +30325,12 @@
             <remarks>The structure into which encoded binary data goes. Byte ordering is always little endian (Intel style). 
             Computers using a different endian style must convert to/from little endian when writing/reading mzML</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.BinaryDataArrayType.#ctor(PSI_Interface.MSData.BinaryDataArray)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="bda"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.BinaryDataArrayType.binary">
             <remarks/>
         </member>
@@ -29503,6 +30343,11 @@
         <member name="P:PSI_Interface.MSData.mzML.BinaryDataArrayType.encodedLength">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.BinaryDataArrayType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ScanListType">
             <summary>
             mzML ScanListType
@@ -29514,11 +30359,22 @@
             </summary>
             <remarks>List and descriptions of scans.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanListType.#ctor(PSI_Interface.MSData.ScanList)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="scans"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanListType.scan">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ScanType">
             <summary>
@@ -29530,6 +30386,12 @@
             mzML ScanType
             </summary>
             <remarks>Scan or acquisition from original raw file used to create this peak list, as specified in sourceF</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanType.#ctor(PSI_Interface.MSData.Scan)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="scan"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanType.scanWindowList">
             <remarks/>
@@ -29546,6 +30408,11 @@
         <member name="P:PSI_Interface.MSData.mzML.ScanType.instrumentConfigurationRef">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ScanWindowListType">
             <summary>
             mzML ScanWindowListType
@@ -29557,11 +30424,22 @@
             </summary>
             <remarks></remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanWindowListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.ParamGroup})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="swList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanWindowListType.scanWindow">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanWindowListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanWindowListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SpectrumListType">
             <summary>
@@ -29574,6 +30452,12 @@
             </summary>
             <remarks>List and descriptions of spectra.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SpectrumListType.#ctor(PSI_Interface.MSData.SpectrumList)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="specList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SpectrumListType.spectrum">
             <remarks/>
         </member>
@@ -29582,6 +30466,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SpectrumListType.defaultDataProcessingRef">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SpectrumListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SpectrumType">
             <summary>
@@ -29595,6 +30484,12 @@
             </summary>
             <remarks>The structure that captures the generation of a peak list (including the underlying acquisitions). 
             Also describes some of the parameters for the mass spectrometer for a given acquisition (or list of acquisitions).</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SpectrumType.#ctor(PSI_Interface.MSData.Spectrum)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="spectrum"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SpectrumType.scanList">
             <remarks/>
@@ -29626,6 +30521,11 @@
         <member name="P:PSI_Interface.MSData.mzML.SpectrumType.sourceFileRef">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SpectrumType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ProductListType">
             <summary>
             mzML ProductListType
@@ -29637,11 +30537,22 @@
             </summary>
             <remarks>List and descriptions of product isolations to the spectrum currently being described, ordered.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProductListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.Product})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="products"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ProductListType.product">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ProductListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProductListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ProductType">
             <summary>
@@ -29654,8 +30565,19 @@
             </summary>
             <remarks>The method of product ion selection and activation in a precursor ion scan</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProductType.#ctor(PSI_Interface.MSData.Product)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="product"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ProductType.isolationWindow">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ProductType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.RunType">
             <summary>
@@ -29667,6 +30589,12 @@
             mzML RunType
             </summary>
             <remarks>A run in mzML should correspond to a single, consecutive and coherent set of scans on an instrument.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.RunType.#ctor(PSI_Interface.MSData.Run)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="run"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.RunType.spectrumList">
             <remarks/>
@@ -29692,6 +30620,11 @@
         <member name="P:PSI_Interface.MSData.mzML.RunType.startTimeStampSpecified">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.RunType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ChromatogramListType">
             <summary>
             mzML ChromatogramListType
@@ -29703,6 +30636,12 @@
             </summary>
             <remarks>List of chromatograms.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ChromatogramListType.#ctor(PSI_Interface.MSData.ChromatogramList)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="chromList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ChromatogramListType.chromatogram">
             <remarks/>
         </member>
@@ -29711,6 +30650,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ChromatogramListType.defaultDataProcessingRef">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ChromatogramListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ChromatogramType">
             <summary>
@@ -29722,6 +30666,12 @@
             mzML ChromatogramType
             </summary>
             <remarks>A single Chromatogram</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ChromatogramType.#ctor(PSI_Interface.MSData.Chromatogram)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="chromatogram"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ChromatogramType.precursor">
             <remarks/>
@@ -29744,6 +30694,11 @@
         <member name="P:PSI_Interface.MSData.mzML.ChromatogramType.dataProcessingRef">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ChromatogramType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ScanSettingsListType">
             <summary>
             mzML ScanSettingListType
@@ -29755,11 +30710,22 @@
             </summary>
             <remarks>List with the descriptions of the acquisition settings applied prior to the start of data acquisition.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanSettingsListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.ScanSettingsInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="ssList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanSettingsListType.scanSettings">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanSettingsListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanSettingsListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.ScanSettingsType">
             <summary>
@@ -29772,6 +30738,12 @@
             </summary>
             <remarks>Description of the acquisition settings of the instrument prior to the start of the run.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanSettingsType.#ctor(PSI_Interface.MSData.ScanSettingsInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="settings"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanSettingsType.sourceFileRefList">
             <remarks/>
         </member>
@@ -29780,6 +30752,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ScanSettingsType.id">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ScanSettingsType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SourceFileRefListType">
             <summary>
@@ -29790,11 +30767,22 @@
             mzML SourceFileRefListType
             </summary>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileRefListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.SourceFileRef})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sfrList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileRefListType.sourceFileRef">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileRefListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileRefListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SourceFileRefType">
             <summary>
@@ -29807,8 +30795,19 @@
             </summary>
             <remarks></remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileRefType.#ctor(PSI_Interface.MSData.SourceFileRef)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sfr"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileRefType.ref">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileRefType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.TargetListType">
             <summary>
@@ -29821,11 +30820,22 @@
             </summary>
             <remarks>Target list (or 'inclusion list') configured prior to the run.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.TargetListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.ParamGroup})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="oTargetList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.TargetListType.target">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.TargetListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.TargetListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SoftwareListType">
             <summary>
@@ -29838,11 +30848,22 @@
             </summary>
             <remarks>List and descriptions of software used to acquire and/or process the data in this mzML file.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.SoftwareInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="scanList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SoftwareListType.software">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SoftwareListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SoftwareType">
             <summary>
@@ -29855,11 +30876,22 @@
             </summary>
             <remarks>Software information</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareType.#ctor(PSI_Interface.MSData.SoftwareInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="software"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SoftwareType.id">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SoftwareType.version">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.InstrumentConfigurationListType">
             <summary>
@@ -29880,11 +30912,22 @@
             the "instrument model" term is used to indicate the unknown 
             instrument in the instrumentConfiguration.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.InstrumentConfigurationListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.InstrumentConfigurationInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="icList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.InstrumentConfigurationListType.instrumentConfiguration">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.InstrumentConfigurationListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.InstrumentConfigurationListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.InstrumentConfigurationType">
             <summary>
@@ -29903,6 +30946,12 @@
             For hybrid instruments, such as an LTQ-FT, there must be one configuration for each permutation of 
             the components that is used in the document. For software configuration, use a ReferenceableParamGroup element</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.InstrumentConfigurationType.#ctor(PSI_Interface.MSData.InstrumentConfigurationInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="ic"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.InstrumentConfigurationType.componentList">
             <remarks/>
         </member>
@@ -29915,6 +30964,11 @@
         <member name="P:PSI_Interface.MSData.mzML.InstrumentConfigurationType.scanSettingsRef">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.InstrumentConfigurationType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ComponentListType">
             <summary>
             mzML ComponentListType
@@ -29925,6 +30979,12 @@
             mzML ComponentListType
             </summary>
             <remarks>List with the different components used in the mass spectrometer. At least one source, one mass analyzer and one detector need to be specified.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ComponentListType.#ctor(PSI_Interface.MSData.ComponentList)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="comp"></param>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.ComponentListType.source">
             <remarks/>
@@ -29938,6 +30998,11 @@
         <member name="P:PSI_Interface.MSData.mzML.ComponentListType.count">
             <remarks/>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ComponentListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.ComponentType">
             <summary>
             mzML ComponentType
@@ -29947,8 +31012,19 @@
             mzML ComponentType
             </summary>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.ComponentType.#ctor(PSI_Interface.MSData.Component)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="comp"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.ComponentType.order">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.ComponentType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SourceComponentType">
             <summary>
@@ -29965,6 +31041,17 @@
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceComponentType.#ctor(PSI_Interface.MSData.SourceComponent)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sc"></param>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceComponentType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.AnalyzerComponentType">
             <summary>
             mzML AnalyzerComponentType
@@ -29979,6 +31066,17 @@
             <remarks>This element must be used to describe an Analyzer Component Type. 
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.AnalyzerComponentType.#ctor(PSI_Interface.MSData.AnalyzerComponent)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="ac"></param>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.AnalyzerComponentType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.DetectorComponentType">
             <summary>
@@ -29995,6 +31093,17 @@
             This is a PRIDE3-specific modification of the core MzML schema that does not 
             have any impact on the base schema validation.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.DetectorComponentType.#ctor(PSI_Interface.MSData.DetectorComponent)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="dc"></param>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.DetectorComponentType.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="T:PSI_Interface.MSData.mzML.SoftwareRefType">
             <summary>
             mzML SoftwareRefType
@@ -30006,8 +31115,19 @@
             </summary>
             <remarks>Reference to a previously defined software element</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareRefType.#ctor(PSI_Interface.MSData.SoftwareRef)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sr"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SoftwareRefType.ref">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SoftwareRefType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SampleListType">
             <summary>
@@ -30020,11 +31140,22 @@
             </summary>
             <remarks>List and descriptions of samples.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SampleListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.SampleInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="oSampleList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SampleListType.sample">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SampleListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SampleListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SampleType">
             <summary>
@@ -30037,11 +31168,22 @@
             </summary>
             <remarks>Expansible description of the sample used to generate the dataset, named in sampleName.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SampleType.#ctor(PSI_Interface.MSData.SampleInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sample"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SampleType.id">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SampleType.name">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SampleType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SourceFileListType">
             <summary>
@@ -30054,11 +31196,22 @@
             </summary>
             <remarks>List and descriptions of the source files this mzML document was generated or derived from</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileListType.#ctor(System.Collections.Generic.List{PSI_Interface.MSData.SourceFileInfo})">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sfList"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileListType.sourceFile">
             <remarks/>
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileListType.count">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileListType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.SourceFileType">
             <summary>
@@ -30071,6 +31224,12 @@
             </summary>
             <remarks>Description of the source file, including location and type.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileType.#ctor(PSI_Interface.MSData.SourceFileInfo)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="sf"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileType.id">
             <remarks/>
         </member>
@@ -30079,6 +31238,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.SourceFileType.location">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.SourceFileType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.FileDescriptionType">
             <summary>
@@ -30091,6 +31255,12 @@
             </summary>
             <remarks>Information pertaining to the entire mzML file (i.e. not specific to any part of the data set) is stored here.</remarks>
         </member>
+        <member name="M:PSI_Interface.MSData.mzML.FileDescriptionType.#ctor(PSI_Interface.MSData.FileDescription)">
+            <summary>
+            Translating Constructor from a MSData child object
+            </summary>
+            <param name="fd"></param>
+        </member>
         <member name="P:PSI_Interface.MSData.mzML.FileDescriptionType.fileContent">
             <remarks/>
         </member>
@@ -30099,6 +31269,11 @@
         </member>
         <member name="P:PSI_Interface.MSData.mzML.FileDescriptionType.contact">
             <remarks/>
+        </member>
+        <member name="M:PSI_Interface.MSData.mzML.FileDescriptionType.#ctor">
+            <summary>
+            Constructor
+            </summary>
         </member>
         <member name="T:PSI_Interface.MSData.mzML.OffsetType">
             <remarks/>
@@ -30160,855 +31335,66 @@
         <member name="P:PSI_Interface.MSData.mzML.indexedmzML.fileChecksum">
             <remarks/>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet">
-             <summary>
-            Represents a strongly typed in-memory cache of data.
+        <member name="T:PSI_Interface.MSData.mzML.MzMLReader">
+            <summary>
+            Read a mzML file into a mzMLType object
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.mzMLDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="M:PSI_Interface.MSData.mzML.MzMLReader.#ctor(System.String,System.Int32)">
+            <summary>
+            Constructor
             </summary>
+            <param name="path"></param>
+            <param name="bufferSize"></param>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="P:PSI_Interface.MSData.mzML.MzMLReader.MzMLType">
+            <summary>
+            Schema of the file being read
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="M:PSI_Interface.MSData.mzML.MzMLReader.Read">
+            <summary>
+            Read the file specified in the constructor, and return the object
             </summary>
+            <returns></returns>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileDescriptionDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="T:PSI_Interface.MSData.mzML.MzMLSchemaType">
+            <summary>
+            Supported schema formats for MzML
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileContentDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="F:PSI_Interface.MSData.mzML.MzMLSchemaType.MzML">
+            <summary>
+            MzML schema
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupRefDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="F:PSI_Interface.MSData.mzML.MzMLSchemaType.IndexedMzML">
+            <summary>
+            Indexed MzML wrapper schema
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvParamDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="T:PSI_Interface.MSData.mzML.MzMLWriter">
+            <summary>
+            Functions for writing a mzMLType object to file
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.userParamDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="M:PSI_Interface.MSData.mzML.MzMLWriter.#ctor(System.String,System.Int32)">
+            <summary>
+            Constructor
             </summary>
+            <param name="path"></param>
+            <param name="bufferSize"></param>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="P:PSI_Interface.MSData.mzML.MzMLWriter.MzMLType">
+            <summary>
+            Whether to write plain mzML or IndexedMzML
             </summary>
         </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
+        <member name="M:PSI_Interface.MSData.mzML.MzMLWriter.Write(PSI_Interface.MSData.mzML.mzMLType)">
+            <summary>
+            Write the supplied object to the file specified in the constructor
             </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.contactDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.componentListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.analyzerDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.detectorDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareRefDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.processingMethodDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.runDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.isolationWindowDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.activationDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.mzMLRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileDescriptionRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileContentRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupRefRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvParamRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.userParamRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.contactRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.componentListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.analyzerRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.detectorRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareRefRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.processingMethodRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.runRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.isolationWindowRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.activationRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.mzMLRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileDescriptionRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.fileContentRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupRefRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.cvParamRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.userParamRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.contactRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.referenceableParamGroupRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sampleRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanSettingsRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceFileRefRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.targetRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.instrumentConfigurationRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.componentListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.sourceRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.analyzerRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.detectorRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.softwareRefRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.dataProcessingRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.processingMethodRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.runRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.spectrumRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.scanWindowRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.precursorRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.isolationWindowRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.selectedIonRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.activationRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.productRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.binaryDataArrayRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.MzMLDataSet.chromatogramRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet">
-             <summary>
-            Represents a strongly typed in-memory cache of data.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexedmzMLDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexListDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.offsetDataTable">
-             <summary>
-            Represents the strongly named DataTable class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexedmzMLRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexListRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.offsetRow">
-             <summary>
-            Represents strongly named DataRow class.
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexedmzMLRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexListRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.indexRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
-        </member>
-        <member name="T:PSI_Interface.MSData.mzML_DataSet.IndexedMzMLDataSet.offsetRowChangeEvent">
-             <summary>
-            Row event argument class
-            </summary>
+            <param name="mzMLData"></param>
         </member>
         <member name="T:PSI_Interface.MSData.SimpleMzMLReader">
             <summary>
