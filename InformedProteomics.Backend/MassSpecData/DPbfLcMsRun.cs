@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // Must reflect all changes to WriteSpectrum
-        protected internal override Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
+        protected internal override Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
             var scanNum = reader.ReadInt32();
             var c = new char[NativeIdLength];

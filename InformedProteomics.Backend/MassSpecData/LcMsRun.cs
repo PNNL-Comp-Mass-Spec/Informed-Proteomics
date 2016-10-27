@@ -21,6 +21,8 @@ namespace InformedProteomics.Backend.MassSpecData
         public int MinMsLevel { get; protected set; }
         public int MaxMsLevel { get; protected set; }
 
+        public IEnumerable<int> AllScanNumbers { get { return this.ScanNumToMsLevel.Select(x => x.Key); } }
+
         public abstract double MinMs1Mz { get; }
         public abstract double MaxMs1Mz { get; }
 
@@ -189,7 +191,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>precursor scan number or 0 for MS1</returns>
         public int GetPrecursorScanNum(int scanNum)
         {
-            return _precursorScan[scanNum - MinLcScan];
+            if (_precursorScan.ContainsKey(scanNum))
+            {
+                return _precursorScan[scanNum];
+            }
+            return 0;
         }
 
         /// <summary>
@@ -199,7 +205,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number or MaxLc for MS1</returns>
         public int GetNextScanNum(int scanNum)
         {
-            return _nextScan[scanNum - MinLcScan];
+            if (_nextScan.ContainsKey(scanNum))
+            {
+                return _nextScan[scanNum];
+            }
+            return MaxLcScan;
         }
 
         /// <summary>
@@ -210,11 +220,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>previous scan number at the specified level</returns>
         public int GetPrevScanNum(int scanNum, int msLevel)
         {
-            for (var curScanNum = scanNum - 1; curScanNum >= MinLcScan; curScanNum--)
-            {
-                if (GetMsLevel(curScanNum) == msLevel) return curScanNum;
-            }
-            return MinLcScan - 1;
+            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key < scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MinLcScan - 1, 0)).Max(x => x.Key);
         }
 
         /// <summary>
@@ -225,14 +231,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number at the specified level</returns>
         public int GetNextScanNum(int scanNum, int msLevel)
         {
-            for (var curScanNum = scanNum + 1; curScanNum <= MaxLcScan; curScanNum++)
-            {
-                if (GetMsLevel(curScanNum) == msLevel)
-                {
-                    return curScanNum;
-                }
-            }
-            return MaxLcScan + 1;
+            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key > scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MaxLcScan + 1, 0)).Min(x => x.Key);
         }
 
         /// <summary>
@@ -242,12 +241,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>scan numbers of the specified msLevel</returns>
         public IList<int> GetScanNumbers(int msLevel)
         {
-            var scanNumbers = new List<int>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
-            {
-                if (GetMsLevel(scanNum) == msLevel) scanNumbers.Add(scanNum);
-            }
-            return scanNumbers;
+            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel).Select(x => x.Key).ToList();
         }
 
         private int[] _ms1ScanVector;
@@ -501,7 +495,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
                 if (productSpec == null) continue;
@@ -513,7 +507,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public double GetMinIsolationWindowWidth()
         {
             var minWidth = Double.MaxValue;
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
                 if (productSpec == null) continue;
@@ -569,13 +563,13 @@ namespace InformedProteomics.Backend.MassSpecData
         protected Dictionary<int, double> ScanNumElutionTimeMap;
         protected bool? IsDiaOrNull;
 
-        private int[] _precursorScan;
-        private int[] _nextScan;
+        private Dictionary<int, int> _precursorScan;
+        private Dictionary<int, int> _nextScan;
 
         protected void CreatePrecursorNextScanMap()
         {
-            _precursorScan = new int[MaxLcScan - MinLcScan + 1];
-            _nextScan = new int[MaxLcScan - MinLcScan + 1];
+            _precursorScan = new Dictionary<int, int>(NumSpectra + 1);
+            _nextScan = new Dictionary<int, int>(NumSpectra + 1);
 
             var precursorMap = new Dictionary<int, int>();
             var nextScanMap = new Dictionary<int, int>();
@@ -586,51 +580,73 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var prevMsLevel = int.MinValue;
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            var prevScanNum = -1;
+            foreach (var scan in this.ScanNumToMsLevel.OrderBy(x => x.Key))
             {
-                var index = scanNum - MinLcScan;
+                var scanNum = scan.Key;
+                var msLevel = scan.Value;
 
-                var msLevel = GetMsLevel(scanNum);
                 if (msLevel == 0) continue; // corrupted scan
+
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
                 {
-                    _precursorScan[index] = _precursorScan[index - 1];
+                    if (prevScanNum > -1)
+                    {
+                        // We shouldn't encounter this, but better safe than sorry.
+                        _precursorScan[scanNum] = MinLcScan;
+                    }
+                    else
+                    {
+                        _precursorScan[scanNum] = _precursorScan[prevScanNum];
+                    }
                 }
                 else if (msLevel > prevMsLevel)
                 {
-                    _precursorScan[index] = scanNum - 1;
+                    _precursorScan[scanNum] = scanNum - 1;
                     precursorMap[msLevel] = scanNum - 1;
                 }
                 else // msLevel < prevMsLevel
                 {
-                    _precursorScan[index] = precursorMap[msLevel];
+                    _precursorScan[scanNum] = precursorMap[msLevel];
                 }
                 prevMsLevel = msLevel;
+                prevScanNum = scanNum;
             }
 
             var nextMsLevel = int.MinValue;
-            for (var scanNum = MaxLcScan; scanNum >= MinLcScan; scanNum--)
+            var nextScanNum = int.MaxValue;
+            foreach (var scan in this.ScanNumToMsLevel.OrderByDescending(x => x.Key))
             {
-                var index = scanNum - MinLcScan;
-                var msLevel = GetMsLevel(scanNum);
+                var scanNum = scan.Key;
+                var msLevel = scan.Value;
+
                 if (msLevel == 0) continue; // corrupted scan
 
                 // determine next scan
                 if (msLevel == nextMsLevel)
                 {
-                    _nextScan[index] = _nextScan[index + 1];
+                    if (nextScanNum < int.MaxValue)
+                    {
+                        // We shouldn't encounter this, but better safe than sorry.
+                        _nextScan[scanNum] = MaxLcScan;
+                    }
+                    else
+                    {
+                        _nextScan[scanNum] = _nextScan[nextScanNum];
+                    }
                 }
                 else if (msLevel > nextMsLevel)
                 {
-                    _nextScan[index] = scanNum + 1;
+                    _nextScan[scanNum] = scanNum + 1;
                     nextScanMap[msLevel] = scanNum + 1;
                 }
                 else // msLevel < prevMsLevel
                 {
-                    _nextScan[index] = nextScanMap[msLevel];
+                    _nextScan[scanNum] = nextScanMap[msLevel];
                 }
                 nextMsLevel = msLevel;
+                nextScanNum = scanNum;
             }
         }
 

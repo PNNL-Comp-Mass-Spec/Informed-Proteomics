@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -23,7 +24,8 @@ namespace InformedProteomics.Tests.UnitTests
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestRawFilePath, 10000, 10100);
-            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            foreach (var scanNum in run.AllScanNumbers)
             {
                 var isolationWindow = run.GetIsolationWindow(scanNum);
                 if (isolationWindow != null)
@@ -47,12 +49,14 @@ namespace InformedProteomics.Tests.UnitTests
 
             var msLevel = new Dictionary<int, int>();
 
-            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            foreach (var scanNum in run.AllScanNumbers)
             {
                 msLevel[scanNum] = run.GetMsLevel(scanNum);
             }
 
-            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            foreach (var scanNum in run.AllScanNumbers)
             {
                 var spec = run.GetSpectrum(scanNum);
                 Assert.True(spec.MsLevel == msLevel[scanNum]);
@@ -71,7 +75,8 @@ namespace InformedProteomics.Tests.UnitTests
                     Assert.True(run.GetPrecursorScanNum(scanNum) == precursorScanNum);
 
                     var nextScanNum = run.MaxLcScan+1;
-                    for (var nextScan = scanNum + 1; nextScan <= run.MaxLcScan; nextScan++)
+                    //for (var nextScan = scanNum + 1; nextScan <= run.MaxLcScan; nextScan++)
+                    foreach (var nextScan in run.AllScanNumbers.Where(x => x > scanNum))
                     {
                         if (run.GetMsLevel(nextScan) == 1)
                         {

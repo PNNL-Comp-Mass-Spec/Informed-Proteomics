@@ -62,12 +62,14 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             Console.WriteLine(@"Loading .pbf into memory");
 
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
+            //var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
+            var run = new InMemoryLcMsRun(MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0, 0);
 
             Console.WriteLine(@"Comparing spectra between .pbf and in-memory spectra");
 
             // spectrum comparison
-            for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
+            foreach (var scanNum in run.AllScanNumbers)
             {
                 var spec1 = run.GetSpectrum(scanNum);
                 var spec2 = pbfRun.GetSpectrum(scanNum);
@@ -360,7 +362,8 @@ namespace InformedProteomics.Tests.FunctionalTests
             const double maxMz = 2000.0;    // 2000.0
             var minBinNum = comparer.GetBinNumber(minMz);
             var maxBinNum = comparer.GetBinNumber(maxMz);
-            var scanCount = run.MaxLcScan - run.MinLcScan + 1;
+            //var scanCount = run.MaxLcScan - run.MinLcScan + 1;
+            var scanCount = run.NumSpectra;
 
             var sw = new Stopwatch();
             sw.Start();

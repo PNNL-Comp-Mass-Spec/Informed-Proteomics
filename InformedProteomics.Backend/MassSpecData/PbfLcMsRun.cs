@@ -23,13 +23,13 @@ namespace InformedProteomics.Backend.MassSpecData
         public virtual bool ContainsChromatograms { get { return true; } }
 
         // This constant should be incremented by 1 if the binary file format is changed
-        public const int FileFormatId = 150605;
+        public const int FileFormatId = 150606;
         private const int EarliestSupportedFileFormatId = 150604;
 
         /** File format id history
          * 150604: Earliest supported, has all data needed by InformedProteomics projects
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
-         * 
+         * 150606: Added ScanNum to the output in the metadata section to support skipped scans
          */
 
         #region Public static functions
@@ -566,7 +566,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return xic;
             }
 
-            var scanToXicPoint = new XicPoint[MaxLcScan - MinLcScan + 1];
+            var scanToXicPoint = new XicPoint[NumSpectra + 1];
             foreach (var xicPoint in xic)
             {
                 var prev = scanToXicPoint[xicPoint.ScanNum - MinLcScan];
@@ -723,8 +723,13 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
             var minMsLevel = int.MaxValue;
             var maxMsLevel = int.MinValue;
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            var scanNum = MinLcScan;
+            while (scanNum <= MaxLcScan)
             {
+                if (_fileFormatId > 150605)
+                {
+                    scanNum = _reader.ReadInt32();
+                }
                 var msLevel = _reader.ReadInt32();
                 if (msLevel < minMsLevel) minMsLevel = msLevel;
                 if (msLevel > maxMsLevel) maxMsLevel = msLevel;
@@ -755,6 +760,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
                 _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
+                // Increment for the check, and for file formats <= 150605
+                scanNum++;
             }
 
             MinMsLevel = minMsLevel;
@@ -770,17 +777,24 @@ namespace InformedProteomics.Backend.MassSpecData
                 IsolationMzBinToScanNums[binNum] = scanNumList;
             }
 
-            var minIndex = _reader.ReadInt32();
-            var maxIndex = _reader.ReadInt32();
-            _chromMzIndexToOffset = new long[maxIndex - minIndex + 2];
-
-            for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
+            _minMzIndex = _reader.ReadInt32();
+            _maxMzIndex = _reader.ReadInt32();
+            // _maxMzIndex is less than _minMzIndex if there is no MS1 chromatogram data
+            if (_maxMzIndex >= _minMzIndex)
             {
-                _chromMzIndexToOffset[i] = _reader.ReadInt64();
+                _chromMzIndexToOffset = new long[_maxMzIndex - _minMzIndex + 2];
+
+                for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
+                {
+                    _chromMzIndexToOffset[i] = _reader.ReadInt64();
+                }
+
+                _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
             }
-            _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
-            _minMzIndex = minIndex;
-            _maxMzIndex = maxIndex;
+            else
+            {
+                _chromMzIndexToOffset = new long[0];
+            }
 
             return true;
         }
@@ -796,7 +810,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
                 {
-                    var spec = ReadSpectrum(_reader, _fileFormatId, includePeaks);
+                    var spec = ReadSpectrum(_reader, includePeaks);
                     return spec;
                 }
                 return null;
@@ -804,11 +818,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // Must reflect all changes to WriteSpectrum
-        protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, int fileFormatId, bool includePeaks = true)
+        protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
             var scanNum = reader.ReadInt32();
             var nativeId = string.Empty;
-            if (fileFormatId > 150604)
+            if (_fileFormatId > 150604)
             {
                 var c = new char[NativeIdLength];
                 reader.Read(c, 0, NativeIdLength);
@@ -817,7 +831,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var msLevel = reader.ReadByte();
             var elutionTime = reader.ReadDouble();
             double tic = -1;
-            if (fileFormatId > 150604)
+            if (_fileFormatId > 150604)
             {
                 tic = reader.ReadSingle();
             }
@@ -835,7 +849,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var isolationWindowTargetMz = reader.ReadDouble();
                 var isolationWindowLowerOffset = reader.ReadDouble();
                 var isolationWindowUpperOffset = reader.ReadDouble();
-                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
+                var peakList = ReadPeakList(reader, out calcTic, includePeaks);
                 if (tic < 0)
                 {
                     tic = calcTic;
@@ -854,7 +868,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                var peakList = ReadPeakList(reader, fileFormatId, out calcTic, includePeaks);
+                var peakList = ReadPeakList(reader, out calcTic, includePeaks);
                 if (tic < 0)
                 {
                     tic = calcTic;
@@ -959,7 +973,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return data;
         }
 
-        private List<Peak> ReadPeakList(BinaryReader reader, int fileFormatId, out double tic, bool includePeaks = true)
+        private List<Peak> ReadPeakList(BinaryReader reader, out double tic, bool includePeaks = true)
         {
             var peakList = new List<Peak>();
             var numPeaks = reader.ReadInt32();
@@ -970,7 +984,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (!includePeaks)
             {
                 // first the number of peaks, then 12 bytes per peak (mz, double, 8 bytes, then intensity, single, 4 bytes)
-                if (fileFormatId < 150605)
+                if (_fileFormatId < 150605)
                 {
                     // Read for calculating the tic
                     for (var i = 0; i < numPeaks; i++)
@@ -1003,7 +1017,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region WriteAsPbf (obsolete)
 
-        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
+        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
@@ -1012,7 +1026,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process")]
+        [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             var pbfLcMsRun = new PbfLcMsRun();
@@ -1358,6 +1372,7 @@ namespace InformedProteomics.Backend.MassSpecData
             foreach (var scan in scanMetadata)
             {
                 var msLevel = scan.MsLevel;
+                writer.Write(scan.ScanNum);
                 writer.Write(scan.MsLevel);
                 writer.Write(scan.ElutionTime);
                 ScanNumToMsLevel[scan.ScanNum] = scan.MsLevel;
