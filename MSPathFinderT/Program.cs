@@ -100,7 +100,7 @@ namespace MSPathFinderT
 
             foreach (var specFilePath in parameters.SpecFilePaths)
             {
-                var topDownLauncher = new IcTopDownLauncher(
+                var topDownOptions = new MsPfParameters(
                     specFilePath,
                     parameters.DatabaseFilePath,
                     parameters.OutputDir,
@@ -120,13 +120,15 @@ namespace MSPathFinderT
                     PrecursorIonTolerancePpm = parameters.PrecursorIonTolerancePpm,
                     ProductIonTolerancePpm = parameters.ProductIonTolerancePpm,
                     //RunTargetDecoyAnalysisBool = parameters.TdaBool,
-                    RunTargetDecoyAnalysis = parameters.Tda,
+                    TargetDecoySearchMode = parameters.Tda,
                     //SearchModeInt = parameters.SearchModeInt,
-                    SearchMode = parameters.SearchMode,
+                    InternalCleavageMode = parameters.SearchMode,
                     MaxNumThreads = parameters.MaxNumThreads,
                     TagBasedSearch = parameters.TagBasedSearch,
                     ScanNumbers = parameters.ScanNumbers
                 };
+
+                var topDownLauncher = new IcTopDownLauncher(topDownOptions);
 
                 var success = topDownLauncher.RunSearch();
 
