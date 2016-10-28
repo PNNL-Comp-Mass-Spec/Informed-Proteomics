@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
+//using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -349,6 +349,7 @@ namespace InformedProteomics.Test
             Console.WriteLine(yIon.GetMz(0));
         }
 
+        /*
         [Test]
         public void TestIsotopomerProfile()
         {
@@ -374,6 +375,7 @@ namespace InformedProteomics.Test
 
             Console.Write(sb.ToString());
         }
+        */
 
         [Test]
         public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
@@ -403,6 +405,7 @@ namespace InformedProteomics.Test
             }
         }
 
+        /*
         [Test]
         public void TestTimeToComputeIsotopomerProfiles()
         {
@@ -437,6 +440,7 @@ namespace InformedProteomics.Test
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
+        */
 
         [Test]
         public void TestReadingPnnlOmicsXmlFile()

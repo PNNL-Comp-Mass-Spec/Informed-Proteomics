@@ -10,7 +10,7 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
-using InformedProteomics.DIA.Search;
+//using InformedProteomics.DIA.Search;
 using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
@@ -114,6 +114,7 @@ namespace InformedProteomics.Test
 //            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);
         }
 
+        /*
         [Test]
         public void TestInitialScoring()
         {
@@ -199,6 +200,7 @@ namespace InformedProteomics.Test
             }
             Console.WriteLine("SuccessRage: {0}, {1}/{2}", numSurvived/(float)numPsms, numSurvived, numPsms);
         }
+        */
 
         [Test]
         public void TestPeptideLevelStats()

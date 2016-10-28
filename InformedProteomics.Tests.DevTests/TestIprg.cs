@@ -9,7 +9,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.DIA.Search;
+//using InformedProteomics.DIA.Search;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
@@ -244,6 +244,7 @@ namespace InformedProteomics.Tests.DevTests
             }
         }
 
+        /*
         [Test]
         public void GenerateMagnusAbrfSpecCountAllProteins()
         {
@@ -502,6 +503,7 @@ namespace InformedProteomics.Tests.DevTests
                 Console.WriteLine();
             }
         }
+        */
 
         [Test]
         public void CreateTargetList()

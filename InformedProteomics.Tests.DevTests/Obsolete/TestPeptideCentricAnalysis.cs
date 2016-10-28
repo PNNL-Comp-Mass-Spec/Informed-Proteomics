@@ -9,7 +9,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.DIA.Search;
+//using InformedProteomics.DIA.Search;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
@@ -134,6 +134,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             }
         }
 
+        /*
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void RunPeptideCentricAnalysis()
@@ -149,6 +150,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             TestQExactiveDdaDataPostProcessingPerFile();
         }
 
+        
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void TestQExactiveDdaDataPostProcessing()
@@ -257,6 +259,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             Console.WriteLine("NumId: {0}", numId);
         }
+        */
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
@@ -295,6 +298,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                               vennDiagram.Set2Only.Count + vennDiagram.Intersection.Count);
         }
 
+        /*
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void ProcessPemmrData()
@@ -311,6 +315,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             Console.WriteLine("NumId: {0}", numId);
         }
+        */
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
@@ -356,6 +361,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             }
         }
 
+        /*
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void ProcessMhcData()
@@ -462,6 +468,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             Console.WriteLine("#NumTargetOccs: {0}", numOccs[0]);
             Console.WriteLine("#NumDecoyOccs: {0}", numOccs[1]);
         }
+        */
 
         public static IEnumerable<float> Slice(float[,] histArray, int targetIndex)
         {

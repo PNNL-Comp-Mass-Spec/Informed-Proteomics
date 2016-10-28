@@ -10,7 +10,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.DIA.Search;
+//using InformedProteomics.DIA.Search;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
@@ -51,6 +51,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                               );
         }
 
+        /*
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void RunIpa()
@@ -102,6 +103,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 Console.WriteLine();
             }
         }
+        */
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
@@ -143,6 +145,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             Console.WriteLine("NumIdentifiedPeptides: {0}", numIdentifiedPeptides);
         }
 
+        /*
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
         public void GeneratePrmInfo()
@@ -259,6 +262,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             Console.WriteLine("\t{0}", numPeptides);
         }
+        */
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
