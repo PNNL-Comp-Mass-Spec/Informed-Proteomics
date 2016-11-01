@@ -301,6 +301,15 @@ namespace InformedProteomics.Backend.MassSpecData
             if (spec.MsLevel > trackingInfo.MaxMsLevel) trackingInfo.MaxMsLevel = spec.MsLevel;
         }
 
+        public override void Close()
+        {
+        }
+
+        public override bool TryMakeRandomAccessCapable()
+        {
+            return true;
+        }
+
         public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
 
         public override double MinMs1Mz { get { return _ms1PeakList[0].Mz; } }

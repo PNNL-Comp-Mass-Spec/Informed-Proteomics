@@ -7,7 +7,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public class PbfLcMsRun: LcMsRun, IMassSpecDataReader
+    public class PbfLcMsRun: LcMsRun
     {
         /// <summary>
         /// File extension
@@ -294,6 +294,15 @@ namespace InformedProteomics.Backend.MassSpecData
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
         }
 
+        [Obsolete("Only here for compatibility purposes with the obsolete WriteAsPbf function", true)]
+        private PbfLcMsRun()
+        {
+        }
+
+        #endregion
+
+        #region Constructor support functions
+
         protected internal void GetPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfFileName, IProgress<ProgressData> progress)
         {
             string pbfPath2, fileName, tempPath;
@@ -418,9 +427,25 @@ namespace InformedProteomics.Backend.MassSpecData
             CreatePrecursorNextScanMap();
         }
 
-        [Obsolete("Only here for compatibility purposes with the obsolete WriteAsPbf function", true)]
-        private PbfLcMsRun()
+        public static bool CheckFileFormatVersion(string filePath, out bool isCurrent)
         {
+            isCurrent = false;
+            var pbfFile = new FileInfo(filePath);
+            if (!pbfFile.Exists || pbfFile.Length < sizeof(int))
+                return false;
+
+            var fs = new FileStream(pbfFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using (var reader = new BinaryReader(fs))
+            {
+                fs.Seek(-1 * sizeof(int), SeekOrigin.End);
+
+                var fileFormatId = reader.ReadInt32();
+                if (fileFormatId > FileFormatId && fileFormatId < EarliestSupportedFileFormatId)
+                    return false;
+                if (fileFormatId == FileFormatId)
+                    isCurrent = true;
+            }
+            return true;
         }
 
         #endregion
@@ -467,43 +492,12 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region IMassSpecDataReader implementation
 
-        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
-        {
-            return GetSpectrum(scanNum, includePeaks);
-        }
-
-        public bool TryMakeRandomAccessCapable()
+        public override bool TryMakeRandomAccessCapable()
         {
             return true;
         }
 
-        public IEnumerable<Spectrum> ReadAllSpectra()
-        {
-            return _scanNumToSpecOffset.OrderBy(e => e.Key).Select(e => ReadSpectrum(e.Value));
-        }
-
-        public static bool CheckFileFormatVersion(string filePath, out bool isCurrent)
-        {
-            isCurrent = false;
-            var pbfFile = new FileInfo(filePath);
-            if (!pbfFile.Exists || pbfFile.Length < sizeof(int))
-                return false;
-
-            var fs = new FileStream(pbfFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using (var reader = new BinaryReader(fs))
-            {
-                fs.Seek(-1 * sizeof(int), SeekOrigin.End);
-
-                var fileFormatId = reader.ReadInt32();
-                if (fileFormatId > FileFormatId && fileFormatId < EarliestSupportedFileFormatId)
-                    return false;
-                if (fileFormatId == FileFormatId)
-                    isCurrent = true;
-            }
-            return true;
-        }
-
-        public void Close()
+        public override void Close()
         {
             _reader.Close();
         }

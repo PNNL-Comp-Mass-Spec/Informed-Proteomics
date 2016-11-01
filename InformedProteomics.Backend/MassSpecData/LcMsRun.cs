@@ -8,7 +8,7 @@ using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public abstract class LcMsRun: ILcMsRun
+    public abstract class LcMsRun: ILcMsRun, IMassSpecDataReader
     {
         public const int NumUniqueIsolationWindowThresholdForDia = 1000;
         public const double IsolationWindowBinningFactor = 10;
@@ -42,6 +42,24 @@ namespace InformedProteomics.Backend.MassSpecData
             HigherPrecursorChromatogramCacheSize = 0;
             LowerPrecursorChromatogramCacheSize = 0;
         }
+
+        #region IMassSpecDataReader
+
+        public abstract void Close();
+
+        public IEnumerable<Spectrum> ReadAllSpectra()
+        {
+            return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
+        }
+
+        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return GetSpectrum(scanNum, includePeaks);
+        }
+
+        public abstract bool TryMakeRandomAccessCapable();
+
+        #endregion
 
         #region Spectra and scan operations
 
