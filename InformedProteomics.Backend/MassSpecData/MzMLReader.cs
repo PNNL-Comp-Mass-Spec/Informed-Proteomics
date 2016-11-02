@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -412,7 +413,7 @@ namespace InformedProteomics.Backend.MassSpecData
             Unknown
         };
 
-        private Instrument _instrument;
+        //private Instrument _instrument;
 
         private class BinaryDataArray
         {
@@ -441,7 +442,9 @@ namespace InformedProteomics.Backend.MassSpecData
         public MzMLReader(string filePath, bool randomAccess = false, bool tryReducingMemoryUsage = true)
         {
             _filePath = filePath;
-            _instrument = Instrument.Unknown;
+            //_instrument = Instrument.Unknown;
+            NativeIdFormat = CV.CVID.CVID_Unknown;
+            NativeFormat = CV.CVID.CVID_Unknown;
             _version = MzML_Version.mzML1_1_0;
             _randomAccess = randomAccess;
             _reduceMemoryUsage = tryReducingMemoryUsage;
@@ -515,6 +518,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 return (int)_numSpectra;
             }
         }
+
+        public CV.CVID NativeIdFormat { get; private set; }
+        public CV.CVID NativeFormat { get; private set; }
 
         public bool TryMakeRandomAccessCapable()
         {
@@ -1350,7 +1356,8 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.MoveToContent();
             //int count = Convert.ToInt32(reader.GetAttribute("count"));
             reader.ReadStartElement("sourceFileList"); // Throws exception if we are not at the "sourceFileList" tag.
-            while (reader.ReadState == ReadState.Interactive && _instrument == Instrument.Unknown)
+            //while (reader.ReadState == ReadState.Interactive && _instrument == Instrument.Unknown)
+            while (reader.ReadState == ReadState.Interactive && (NativeIdFormat == CV.CVID.CVID_Unknown || NativeFormat == CV.CVID.CVID_Unknown))
             {
                 // Handle exiting out properly at EndElement tags
                 if (reader.NodeType != XmlNodeType.Element)
@@ -1440,7 +1447,29 @@ namespace InformedProteomics.Backend.MassSpecData
                                  *   e.g.: MS:1002441 "Andi-MS format"
                                  *   et al.
                                  */
-                                switch (innerReader.GetAttribute("accession"))
+                                var cv = innerReader.GetAttribute("cvRef");
+                                var accession = innerReader.GetAttribute("accession");
+                                if (string.IsNullOrWhiteSpace(cv))
+                                {
+                                    cv = "MS";
+                                }
+                                if (cv.ToUpper().Contains("PSI"))
+                                {
+                                    cv = "MS";
+                                }
+                                if (CV.TermAccessionLookup[cv].ContainsKey(accession))
+                                {
+                                    var cvid = CV.TermAccessionLookup[cv][accession];
+                                    if (CV.CvidIsA(cvid, CV.CVID.MS_native_spectrum_identifier_format))
+                                    {
+                                        NativeIdFormat = cvid;
+                                    }
+                                    else if (CV.CvidIsA(cvid, CV.CVID.MS_mass_spectrometer_file_format))
+                                    {
+                                        NativeFormat = cvid;
+                                    }
+                                }
+                                /*switch (innerReader.GetAttribute("accession"))
                                 {
                                     case "MS:1000768":
                                         // name="Thermo nativeID format"
@@ -1511,7 +1540,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     case "MS:1002303":
                                         // name="Bruker Container nativeID format"
                                         break;
-                                }
+                                }*/
                                 innerReader.Read(); // Consume the cvParam element (no child nodes)
                                 break;
                             case "userParam":

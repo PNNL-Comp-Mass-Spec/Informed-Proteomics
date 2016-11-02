@@ -5,6 +5,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Statistics;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -51,6 +52,9 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
         }
+
+        public CV.CVID NativeIdFormat { get; protected set; }
+        public CV.CVID NativeFormat { get; protected set; }
 
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {

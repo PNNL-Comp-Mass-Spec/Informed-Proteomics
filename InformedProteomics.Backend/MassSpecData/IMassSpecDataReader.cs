@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -34,5 +35,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <returns>true if is random access capable, false if not</returns>
         bool TryMakeRandomAccessCapable();
+
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
+        CV.CVID NativeIdFormat { get; }
+
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
+        CV.CVID NativeFormat { get; }
     }
 }

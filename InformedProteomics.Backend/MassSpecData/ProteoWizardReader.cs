@@ -69,6 +69,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return _pwizReader.ReadAllSpectra();
         }
 
+        public PSI_Interface.CV.CV.CVID NativeIdFormat
+        {
+            get { return _pwizReader.NativeIdFormat; }
+        }
+
+        public PSI_Interface.CV.CV.CVID NativeFormat
+        {
+            get { return _pwizReader.NativeFormat; }
+        }
+
         public bool TryMakeRandomAccessCapable()
         {
             return _pwizReader.TryMakeRandomAccessCapable();
@@ -605,6 +615,46 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 LoadPwizReader();
                 return _numSpectra;
+            }
+        }
+
+        public PSI_Interface.CV.CV.CVID NativeIdFormat
+        {
+            get
+            {
+                foreach (var file in _dataFile.fileDescription.sourceFiles)
+                {
+                    foreach (var cvParam in file.cvParams)
+                    {
+                        if (CV.cvIsA(cvParam.cvid, CVID.MS_nativeID_format))
+                        {
+                            var cvInt = (int) cvParam.cvid;
+                            var format = (PSI_Interface.CV.CV.CVID) cvInt;
+                            return format;
+                        }
+                    }
+                }
+                return PSI_Interface.CV.CV.CVID.CVID_Unknown;
+            }
+        }
+
+        public PSI_Interface.CV.CV.CVID NativeFormat
+        {
+            get
+            {
+                foreach (var file in _dataFile.fileDescription.sourceFiles)
+                {
+                    foreach (var cvParam in file.cvParams)
+                    {
+                        if (CV.cvIsA(cvParam.cvid, CVID.MS_mass_spectrometer_file_format))
+                        {
+                            var cvInt = (int)cvParam.cvid;
+                            var format = (PSI_Interface.CV.CV.CVID)cvInt;
+                            return format;
+                        }
+                    }
+                }
+                return PSI_Interface.CV.CV.CVID.CVID_Unknown;
             }
         }
 

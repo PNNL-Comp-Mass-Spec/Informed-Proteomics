@@ -984,9 +984,23 @@ namespace InformedProteomics.TopDown.Execution
             CreateMzidSettings(settings);
 
             var path = Options.SpecFilePath;
+            var run = lcmsRun as PbfLcMsRun;
+            if (run != null)
+            {
+                var rawPath = run.RawFilePath;
+                if (!string.IsNullOrWhiteSpace(rawPath))
+                {
+                    path = rawPath;
+                }
+            }
             // TODO: fix this to match correctly to the original file - May need to modify the PBF format to add an input format specifier
-            var specData = creator.AddSpectraData(path, datasetName, CV.CVID.MS_Thermo_nativeID_format,
-                CV.CVID.MS_Thermo_RAW_format);
+            // TODO: Should probably? request a CV Term for the PBF format?
+            var nativeIdFormat = lcmsRun.NativeIdFormat;
+            if (nativeIdFormat == CV.CVID.CVID_Unknown)
+            {
+                nativeIdFormat = CV.CVID.MS_scan_number_only_nativeID_format;
+            }
+            var specData = creator.AddSpectraData(path, datasetName, nativeIdFormat, lcmsRun.NativeFormat);
 
             foreach (var match in matches)
             {
@@ -994,7 +1008,12 @@ namespace InformedProteomics.TopDown.Execution
                 var spec = lcmsRun.GetSpectrum(scanNum, false);
                 var matchIon = new Ion(Composition.Parse(match.Composition), match.Charge);
 
-                var specIdent = creator.AddSpectrumIdentification(specData, spec.NativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
+                var nativeId = spec.NativeId;
+                if (string.IsNullOrWhiteSpace(spec.NativeId))
+                {
+                    nativeId = "scan=" + spec.ScanNum;
+                }
+                var specIdent = creator.AddSpectrumIdentification(specData, nativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
                     match.Charge, 1, double.NaN);
                 specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
                 var pep = new PeptideObj(match.Sequence);

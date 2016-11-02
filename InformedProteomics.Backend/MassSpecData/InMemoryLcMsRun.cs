@@ -186,6 +186,8 @@ namespace InformedProteomics.Backend.MassSpecData
             };
 
             NumSpectra = massSpecDataReader.NumSpectra;
+            NativeIdFormat = massSpecDataReader.NativeIdFormat;
+            NativeFormat = massSpecDataReader.NativeFormat;
 
             progressData.StepRange(95.0);
 

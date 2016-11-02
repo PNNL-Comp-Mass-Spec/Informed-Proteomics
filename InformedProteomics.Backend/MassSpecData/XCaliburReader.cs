@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
+using PSI_Interface.CV;
 using ThermoRawFileReader;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -61,6 +62,16 @@ namespace InformedProteomics.Backend.MassSpecData
         public bool TryMakeRandomAccessCapable()
         {
             return true;
+        }
+
+        public CV.CVID NativeIdFormat
+        {
+            get { return CV.CVID.MS_Thermo_nativeID_format; }
+        }
+
+        public CV.CVID NativeFormat
+        {
+            get { return CV.CVID.MS_Thermo_RAW_format; }
         }
 
         /// <summary>

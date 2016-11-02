@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -23,13 +24,14 @@ namespace InformedProteomics.Backend.MassSpecData
         public virtual bool ContainsChromatograms { get { return true; } }
 
         // This constant should be incremented by 1 if the binary file format is changed
-        public const int FileFormatId = 150606;
+        public const int FileFormatId = 150607;
         private const int EarliestSupportedFileFormatId = 150604;
 
         /** File format id history
          * 150604: Earliest supported, has all data needed by InformedProteomics projects
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
          * 150606: Added ScanNum to the output in the metadata section to support skipped scans
+         * 150607: Added the name/path of the source file, and the format of the native id
          */
 
         #region Public static functions
@@ -343,10 +345,12 @@ namespace InformedProteomics.Backend.MassSpecData
                 msdr = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
             }
             NumSpectra = msdr.NumSpectra;
+            RawFilePath = specFileName;
+            NativeIdFormat = msdr.NativeIdFormat;
+            NativeFormat = msdr.NativeFormat;
 
             try
             {
-                _rawFilePath = specFileName;
                 PbfFilePath = pbfPath;
                 using (var writer =
                         new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
@@ -453,7 +457,9 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Member Variables
 
         public string PbfFilePath { get; private set; }
-        private string _rawFilePath;
+
+        public string RawFilePath { get; private set; }
+        private const int RawFilePathLength = 200;
         private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
         protected internal const int NativeIdLength = 50;
 
@@ -693,6 +699,9 @@ namespace InformedProteomics.Backend.MassSpecData
             // Backup 10 bytes
             _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
 
+            // Temporarily store position (used to read raw file name, if available)
+            var offsetDataPos = _reader.BaseStream.Position;
+
             // Read the byte offset of the start of the precursor chromatogram
             _offsetPrecursorChromatogramBegin = _reader.ReadInt64();
 
@@ -790,6 +799,70 @@ namespace InformedProteomics.Backend.MassSpecData
                 _chromMzIndexToOffset = new long[0];
             }
 
+
+            if (_fileFormatId > 150606)
+            {
+                _reader.BaseStream.Seek(offsetDataPos - RawFilePathLength - sizeof(int) * 2, SeekOrigin.Begin);
+                var c = new char[RawFilePathLength];
+                _reader.Read(c, 0, RawFilePathLength);
+                RawFilePath = (new string(c)).Trim();
+                NativeFormat = (CV.CVID)_reader.ReadInt32();
+                NativeIdFormat = (CV.CVID)_reader.ReadInt32();
+            }
+            else
+            {
+                RawFilePath = string.Empty;
+                NativeIdFormat = CV.CVID.CVID_Unknown;
+                NativeFormat = CV.CVID.CVID_Unknown;
+
+                // Take a guess at the Native ID Format, based on the native ID format of the first spectrum...
+                var nativeId = GetSpectrum(MinLcScan, false).NativeId;
+                if (string.IsNullOrWhiteSpace(nativeId))
+                {
+                    // We don't know, and can't guess with any accuracy.
+                    NativeIdFormat = CV.CVID.CVID_Unknown;
+                    NativeFormat = CV.CVID.CVID_Unknown;
+                }
+                else if (nativeId.StartsWith("controllerType="))
+                {
+                    NativeIdFormat = CV.CVID.MS_Thermo_nativeID_format;
+                    NativeFormat = CV.CVID.MS_Thermo_RAW_format;
+                }
+                else if (nativeId.StartsWith("scanId="))
+                {
+                    NativeIdFormat = CV.CVID.MS_Agilent_MassHunter_nativeID_format;
+                    NativeFormat = CV.CVID.MS_Agilent_MassHunter_format;
+                }
+                else if (nativeId.StartsWith("scan="))
+                {
+                    // Could be one of multiple - BrukerAgilentYep, BrukerBaf, ScanNumberOnly
+                    // Just going to set BrukerBaf, since it seems more likely at current time than BrukerAgilentYep or ScanNumberOnly
+                    NativeIdFormat = CV.CVID.MS_Bruker_BAF_nativeID_format;
+                    NativeFormat = CV.CVID.MS_Bruker_BAF_format;
+                }
+                else if (nativeId.StartsWith("frame="))
+                {
+                    NativeIdFormat = CV.CVID.MS_UIMF_nativeID_format;
+                    NativeFormat = CV.CVID.MS_UIMF_format;
+                }
+                else if (nativeId.StartsWith("function="))
+                {
+                    NativeIdFormat = CV.CVID.MS_Waters_nativeID_format;
+                    NativeFormat = CV.CVID.MS_Waters_raw_format;
+                }
+                else if (nativeId.StartsWith("sample="))
+                {
+                    NativeIdFormat = CV.CVID.MS_WIFF_nativeID_format;
+                    NativeFormat = CV.CVID.MS_ABI_WIFF_format;
+                }
+                else if (nativeId.StartsWith("index="))
+                {
+                    NativeIdFormat = CV.CVID.MS_multiple_peak_list_nativeID_format;
+                    NativeFormat = CV.CVID.MS_Mascot_MGF_format;
+                }
+                // Include others if deemed necessary...
+            }
+
             return true;
         }
 
@@ -812,6 +885,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // Must reflect all changes to WriteSpectrum
+        // reader is passed in because this function should be called within a lock to prevent reading/writing errors
         protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
             var scanNum = reader.ReadInt32();
@@ -877,6 +951,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
+        // writer is passed in because this function should be called within a lock to prevent reading/writing errors
         protected internal virtual void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
             // scan number: 4
@@ -1462,6 +1537,21 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
             }
+
+            // RawFilePath: 200
+            // pad or truncate to keep in limit (may have to change in future...)
+            if (RawFilePath.Length <= RawFilePathLength)
+            {
+                // Length is within limit. Write the whole thing with padding.
+                writer.Write(RawFilePath.PadRight(RawFilePathLength).ToCharArray(0, RawFilePathLength), 0, RawFilePathLength);
+            }
+            else
+            {
+                // Length is beyond limit. Write only the file name, with padding.
+                writer.Write(Path.GetFileName(RawFilePath).PadRight(RawFilePathLength).ToCharArray(0, RawFilePathLength), 0, RawFilePathLength);
+            }
+            writer.Write((int)NativeFormat);
+            writer.Write((int)NativeIdFormat);
 
             writer.Write(_offsetPrecursorChromatogramBegin); // 8
             writer.Write(_offsetProductChromatogramBegin); // 8
