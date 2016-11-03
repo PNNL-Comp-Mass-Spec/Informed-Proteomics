@@ -7,18 +7,20 @@
         /// <summary>
         /// File extensions supported by the results reader.
         /// </summary>
-        public static readonly string[] SupportedResultsFiles = { ".mzid", ".mzid.gz", "_IcTda.tsv" };
+        public static readonly string[] SupportedResultsFiles = { ".mzid", ".mzid.gz", "_ictda.tsv" };
 
         public static SimpleMZIdentMLReader.SimpleMZIdentMLData ReadResultFile(string filePath)
         {
             SimpleMZIdentMLReader.SimpleMZIdentMLData results = null;
 
-            if (filePath.EndsWith(".mzid") || filePath.EndsWith(".mzid.gz"))
+            var lowerFilePath = filePath.ToLower();
+
+            if (lowerFilePath.EndsWith(".mzid") || lowerFilePath.EndsWith(".mzid.gz"))
             {
                 var mzidReader = new SimpleMZIdentMLReader();
                 results = mzidReader.Read(filePath);
             }
-            else if (filePath.EndsWith("_IcTda.tsv"))
+            else if (lowerFilePath.EndsWith("_ictda.tsv"))
             {
                 results = DatabaseSearchResultData.ReadResultsFromFileToMzIdData(filePath);
             }

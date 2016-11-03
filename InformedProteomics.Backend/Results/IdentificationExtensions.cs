@@ -1,5 +1,7 @@
 ﻿namespace InformedProteomics.Backend.Results
 {
+    using System;
+
     using InformedProteomics.Backend.Data.Sequence;
 
     using PSI_Interface.IdentData;
@@ -13,7 +15,7 @@
 
             foreach (var mod in peptide.Mods)
             {
-                var seqIndex = mod.Key - 1;
+                var seqIndex = Math.Max(0, mod.Key - 1);
                 var mzidMod = mod.Value;
 
                 var modification = Modification.Get(mzidMod.Tag);
