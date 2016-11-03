@@ -7,35 +7,84 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     public class LcmsRunDeconvoluter : IMassSpecDataReader
     {
+        /// <summary>
+        /// MassSpec data reader to read raw spectra from.
+        /// </summary>
         private readonly IMassSpecDataReader dataReader;
 
+        /// <summary>
+        /// Spectrum deconvoluter.
+        /// </summary>
         private readonly Deconvoluter deconvoluter;
 
-        private readonly double corrScoreThreshold;
+        /// <summary>
+        /// The MS levels (ex MS1, MS2, etc) to extract spectra for.
+        /// </summary>
+        private readonly HashSet<int> msLevelSet;
 
-        private readonly List<int> msLevels;
+        /// <summary>
+        /// The maximum number of threads the deconvoluter can use.
+        /// </summary>
+        private readonly int maxDegreeOfParallelism;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class.
+        /// This constructor creates an instance with multiple MSLevels for default (MS1 and MS2).
+        /// </summary>
+        /// <param name="dataReader">MassSpec data reader to read raw spectra from.</param>
+        /// <param name="deconvoluter">Spectrum deconvoluter.</param>
+        /// <param name="msLevels">The MS levels (ex MS1, MS2, etc) to extract spectra for.</param>
+        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use.</param>
         public LcmsRunDeconvoluter(
                     IMassSpecDataReader dataReader,
                     Deconvoluter deconvoluter,
-                    double corrScoreThreshold = 0.7)
+                    IEnumerable<int> msLevels = null,
+                    int maxDegreeOfParallelism = 1)
         {
             this.deconvoluter = deconvoluter;
             this.dataReader = dataReader;
-            this.corrScoreThreshold = corrScoreThreshold;
+            this.maxDegreeOfParallelism = maxDegreeOfParallelism;
+            this.msLevelSet = msLevels == null ? new HashSet<int> { 1, 2 } : new HashSet<int>(msLevels);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class.
+        /// This constructor creates an instance with a single MSLevel
+        /// </summary>
+        /// <param name="dataReader">MassSpec data reader to read raw spectra from.</param>
+        /// <param name="deconvoluter">Spectrum deconvoluter.</param>
+        /// <param name="msLevel">The MS level (ex MS1, MS2, etc) to extract spectra for.</param>
+        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use.</param>
+        public LcmsRunDeconvoluter(
+            IMassSpecDataReader dataReader,
+            Deconvoluter deconvoluter,
+            int msLevel,
+            int maxDegreeOfParallelism = 1)
+            : this(dataReader, deconvoluter, new HashSet<int> { msLevel }, maxDegreeOfParallelism)
+        {
+        }
+
+        /// <summary>
+        /// Gets all spectra.
+        /// Deconvolutes spectra in parallel as it reads them.
+        /// </summary>
+        /// <returns>Deconvoluted spectra.</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
-            var spectra = this.dataReader.ReadAllSpectra();
             return this.dataReader.ReadAllSpectra()
-                    .Where(spec => spec.MsLevel == 2)
-                    .AsParallel()
-                    .AsOrdered()
-                    .WithDegreeOfParallelism(6)
-                    .Select(spec => this.deconvoluter.GetCombinedDeconvolutedSpectrum(spec));
+                       .Where(spec => this.msLevelSet.Contains(spec.MsLevel))
+                       .AsParallel()
+                       .AsOrdered()
+                       .WithDegreeOfParallelism(this.maxDegreeOfParallelism)
+                       .Select(spec => this.deconvoluter.GetCombinedDeconvolutedSpectrum(spec));
         }
 
+        /// <summary>
+        /// Returns the spectrum specified by the scan number and deconvolutes it.
+        /// </summary>
+        /// <param name="scanNum">The scan to deconvolute.</param>
+        /// <param name="includePeaks">Should it be deconvoluted?</param>
+        /// <returns>Deconvoluted spectrum.</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             var spectrum = this.dataReader.ReadMassSpectrum(scanNum, includePeaks);
@@ -47,15 +96,26 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return spectrum;
         }
 
+        /// <summary>
+        /// Gets the number of spectra in the file.
+        /// </summary>
         public int NumSpectra => this.dataReader.NumSpectra;
 
+        /// <summary>
+        /// Close the reader.
+        /// </summary>
         public void Close()
         {
+            this.dataReader.Close();
         }
 
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public bool TryMakeRandomAccessCapable()
         {
-            return true;
+            return this.dataReader.TryMakeRandomAccessCapable();
         }
 
         /// <summary>
