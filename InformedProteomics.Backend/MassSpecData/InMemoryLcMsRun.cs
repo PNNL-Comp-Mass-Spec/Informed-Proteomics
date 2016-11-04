@@ -307,6 +307,11 @@ namespace InformedProteomics.Backend.MassSpecData
         {
         }
 
+        public override void Dispose()
+        {
+            // We don't hold any file handles or unmanaged memory, so do nothing.
+        }
+
         public override bool TryMakeRandomAccessCapable()
         {
             return true;

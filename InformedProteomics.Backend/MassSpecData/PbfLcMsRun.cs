@@ -508,6 +508,11 @@ namespace InformedProteomics.Backend.MassSpecData
             _reader.Close();
         }
 
+        public override void Dispose()
+        {
+            _reader.Dispose();
+        }
+
         #endregion
 
         #region LcMsRun Public function overrides

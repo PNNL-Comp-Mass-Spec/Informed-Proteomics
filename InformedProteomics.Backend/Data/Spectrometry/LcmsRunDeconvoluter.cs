@@ -110,6 +110,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
+        /// Cleans up the reader
+        /// </summary>
+        public void Dispose()
+        {
+            this.dataReader.Dispose();
+        }
+
+        /// <summary>
         /// Try to make the reader random access capable
         /// </summary>
         /// <returns>true if is random access capable, false if not</returns>

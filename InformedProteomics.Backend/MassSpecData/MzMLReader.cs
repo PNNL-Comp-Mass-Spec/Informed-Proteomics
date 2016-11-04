@@ -11,7 +11,7 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public sealed class MzMLReader: IMassSpecDataReader, IDisposable
+    public sealed class MzMLReader: IMassSpecDataReader
     {
         #region Private Members
         private string _filePath;

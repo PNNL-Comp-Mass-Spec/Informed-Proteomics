@@ -324,5 +324,11 @@ namespace InformedProteomics.Backend.MassSpecData
             if (_msfileReader != null)
                 _msfileReader.CloseRawFile();
         }
+
+        public void Dispose()
+        {
+            if (_msfileReader != null)
+                _msfileReader.CloseRawFile();
+        }
     }
 }

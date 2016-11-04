@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation.
     /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be
     /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.</remarks>
-    public sealed class ProteoWizardReader: IMassSpecDataReader, IDisposable
+    public sealed class ProteoWizardReader: IMassSpecDataReader
     {
         #region Static stateful data
 
@@ -266,7 +266,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard. If there are DLL resolving
     /// problems when trying to use it, add the ProteoWizardAssemblyResolver to the AppDomain.CurrentDomain.AssemblyResolve
     /// event before first instantiating the class.</remarks>
-    internal sealed class ProteoWizardReaderImplementation : IMassSpecDataReader, IDisposable
+    internal sealed class ProteoWizardReaderImplementation : IMassSpecDataReader
     {
         #region AssemblyResolverHandler for finding ProteoWizard dlls
 

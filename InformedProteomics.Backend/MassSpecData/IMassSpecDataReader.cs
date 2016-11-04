@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
 using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public interface IMassSpecDataReader
+    public interface IMassSpecDataReader : IDisposable
     {
         /// <summary>
         /// Gets all spectra

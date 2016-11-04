@@ -48,6 +48,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public abstract void Close();
 
+        public abstract void Dispose();
+
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
