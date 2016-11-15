@@ -103,12 +103,14 @@ namespace InformedProteomics.Backend.MassSpecData
             int scanStart = 0,
             int scanEnd = 0)
         {
-            return new InMemoryLcMsRun(new PbfLcMsRun(specFilePath, specReader, "", precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress),
-                precursorSignalToNoiseRatioThreshold,
-                productSignalToNoiseRatioThreshold,
-                progress,
-                scanStart,
-                scanEnd);
+            return
+                new InMemoryLcMsRun(
+                    new PbfLcMsRun(specFilePath, specReader, "", precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress),
+                    precursorSignalToNoiseRatioThreshold,
+                    productSignalToNoiseRatioThreshold,
+                    progress,
+                    scanStart,
+                    scanEnd);
         }
 
         /// <summary>
@@ -149,13 +151,24 @@ namespace InformedProteomics.Backend.MassSpecData
                 precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="massSpecDataReader">data reader; will be closed when reading is done unless otherwise specified</param>
+        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
+        /// <param name="productSignalToNoiseRatioThreshold"></param>
+        /// <param name="progress"></param>
+        /// <param name="scanStart"></param>
+        /// <param name="scanEnd"></param>
+        /// <param name="keepDataReaderOpen">if true, massSpecDataReader will be left open; otherwise it will be closed</param>
         public InMemoryLcMsRun(
             IMassSpecDataReader massSpecDataReader,
             double precursorSignalToNoiseRatioThreshold,
             double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null,
             int scanStart = 0,
-            int scanEnd = 0)
+            int scanEnd = 0,
+            bool keepDataReaderOpen = false)
         {
             ScanNumElutionTimeMap = new Dictionary<int, double>();
             ScanNumToMsLevel = new Dictionary<int, int>();
@@ -168,83 +181,94 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Read all spectra
 
-            var progressData = new ProgressData(progress)
+            try
             {
-                Status = "Reading spectra from file"
-            };
-
-            var trackingInfo = new SpectrumTrackingInfo
-            {
-                NumSpectra = massSpecDataReader.NumSpectra,
-                PrecursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold,
-                ProductSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold,
-                SpecRead = 0,
-                MinScanNum = int.MaxValue,
-                MaxScanNum = int.MinValue,
-                MinMsLevel = int.MaxValue,
-                MaxMsLevel = int.MinValue
-            };
-
-            NumSpectra = massSpecDataReader.NumSpectra;
-            NativeIdFormat = massSpecDataReader.NativeIdFormat;
-            NativeFormat = massSpecDataReader.NativeFormat;
-
-            progressData.StepRange(95.0);
-
-            if (scanStart > 0 && scanEnd >= scanStart)
-            {
-                for (var scanNum = scanStart; scanNum <= scanEnd; scanNum++)
+                var progressData = new ProgressData(progress)
                 {
-                    var spec = massSpecDataReader.ReadMassSpectrum(scanNum);
-                    progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
-                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
+                    Status = "Reading spectra from file"
+                };
+
+                var trackingInfo = new SpectrumTrackingInfo
+                {
+                    NumSpectra = massSpecDataReader.NumSpectra,
+                    PrecursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold,
+                    ProductSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold,
+                    SpecRead = 0,
+                    MinScanNum = int.MaxValue,
+                    MaxScanNum = int.MinValue,
+                    MinMsLevel = int.MaxValue,
+                    MaxMsLevel = int.MinValue
+                };
+
+                NumSpectra = massSpecDataReader.NumSpectra;
+                NativeIdFormat = massSpecDataReader.NativeIdFormat;
+                NativeFormat = massSpecDataReader.NativeFormat;
+
+                progressData.StepRange(95.0);
+
+                if (scanStart > 0 && scanEnd >= scanStart)
+                {
+                    for (var scanNum = scanStart; scanNum <= scanEnd; scanNum++)
+                    {
+                        var spec = massSpecDataReader.ReadMassSpectrum(scanNum);
+                        progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
+                        HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
+                    }
+                }
+                else
+                {
+                    foreach (var spec in massSpecDataReader.ReadAllSpectra())
+                    {
+                        progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
+                        HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
+                    }
+                }
+
+                progressData.Status = "Processing Isolation Bins";
+                progressData.IsPartialRange = false;
+                progressData.Report(95.1);
+
+                foreach (var entry in isolationMzBinToScanNums)
+                {
+                    var binNum = entry.Key;
+                    entry.Value.Sort();
+                    var scanNumList = entry.Value.ToArray();
+                    IsolationMzBinToScanNums[binNum] = scanNumList;
+                }
+
+                _ms1PeakList.Sort();
+                //_ms2PeakList.Sort();
+
+                progressData.Report(99.5);
+
+                // Read MS levels and precursor information
+
+                MinLcScan = trackingInfo.MinScanNum;
+                MaxLcScan = trackingInfo.MaxScanNum;
+
+                MinMsLevel = trackingInfo.MinMsLevel;
+                MaxMsLevel = trackingInfo.MaxMsLevel;
+
+                //var precursorMap = new Dictionary<int, int>();
+                //var nextScanMap = new Dictionary<int, int>();
+                //
+                //for (var msLevel = MinMsLevel; msLevel <= maxMsLevel; msLevel++)
+                //{
+                //    precursorMap[msLevel] = 0;
+                //    nextScanMap[msLevel] = MaxLcScan + 1;
+                //}
+                //progressData.Report(99.8);
+
+                progressData.Report(100.0);
+            }
+            finally
+            {
+                if (!keepDataReaderOpen)
+                {
+                    massSpecDataReader.Dispose();
                 }
             }
-            else
-            {
-                foreach (var spec in massSpecDataReader.ReadAllSpectra())
-                {
-                    progressData.Report(trackingInfo.SpecRead, trackingInfo.NumSpectra);
-                    HandleSpectrum(ref trackingInfo, isolationMzBinToScanNums, spec);
-                }
-            }
 
-            progressData.Status = "Processing Isolation Bins";
-            progressData.IsPartialRange = false;
-            progressData.Report(95.1);
-
-            foreach (var entry in isolationMzBinToScanNums)
-            {
-                var binNum = entry.Key;
-                entry.Value.Sort();
-                var scanNumList = entry.Value.ToArray();
-                IsolationMzBinToScanNums[binNum] = scanNumList;
-            }
-
-            _ms1PeakList.Sort();
-            //_ms2PeakList.Sort();
-
-            progressData.Report(99.5);
-
-            // Read MS levels and precursor information
-
-            MinLcScan = trackingInfo.MinScanNum;
-            MaxLcScan = trackingInfo.MaxScanNum;
-
-            MinMsLevel = trackingInfo.MinMsLevel;
-            MaxMsLevel = trackingInfo.MaxMsLevel;
-
-            //var precursorMap = new Dictionary<int, int>();
-            //var nextScanMap = new Dictionary<int, int>();
-            //
-            //for (var msLevel = MinMsLevel; msLevel <= maxMsLevel; msLevel++)
-            //{
-            //    precursorMap[msLevel] = 0;
-            //    nextScanMap[msLevel] = MaxLcScan + 1;
-            //}
-            //progressData.Report(99.8);
-
-            progressData.Report(100.0);
             CreatePrecursorNextScanMap();
         }
 

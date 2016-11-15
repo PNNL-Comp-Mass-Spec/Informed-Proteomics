@@ -68,12 +68,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
+        /// <param name="keepDataReaderOpen"></param>
         public DPbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
             double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0,
-            IProgress<ProgressData> progress = null)
+            IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false)
             : base(precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold)
         {
-            GetPbfFile(specFileName, msdr, pbfFileName, progress);
+            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen);
         }
 
         // Must reflect all changes to WriteSpectrum

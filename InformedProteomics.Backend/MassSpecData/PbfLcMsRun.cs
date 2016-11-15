@@ -82,7 +82,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// 
         /// </summary>
         /// <param name="specFilePath"></param>
-        /// <param name="specReader"></param>
+        /// <param name="specReader">Data reader; if not a PbfLcMsRun, it will be closed when pbf file creation is finished</param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
@@ -276,13 +276,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
+        /// <param name="keepDataReaderOpen">use 'true' if the data reader should not be closed when finished creating the PBF file</param>
         public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
-            double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null)
+            double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false)
         {
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
-            GetPbfFile(specFileName, msdr, pbfFileName, progress);
+            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen);
         }
 
         /// <summary>
@@ -305,7 +306,15 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Constructor support functions
 
-        protected internal void GetPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfFileName, IProgress<ProgressData> progress)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="specFileName"></param>
+        /// <param name="msdr"></param>
+        /// <param name="pbfFileName"></param>
+        /// <param name="progress"></param>
+        /// <param name="keepDataReaderOpen"></param>
+        protected internal void GetPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfFileName, IProgress<ProgressData> progress, bool keepDataReaderOpen = false)
         {
             string pbfPath2, fileName, tempPath;
             var pbfPath = GetCheckPbfFilePath(specFileName, out pbfPath2, out fileName, out tempPath);
@@ -324,10 +333,14 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
 
                 OpenPbfFile(specFileName);
+                if (!keepDataReaderOpen)
+                {
+                    msdr.Dispose();
+                }
                 return;
             }
 
-            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress);
+            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress, keepDataReaderOpen);
         }
 
         /// <summary>
@@ -338,7 +351,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="pbfPath"></param>
         /// <param name="tempPath"></param>
         /// <param name="progress"></param>
-        protected internal void BuildPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfPath, string tempPath, IProgress<ProgressData> progress)
+        /// <param name="keepDataReaderOpen"></param>
+        protected internal void BuildPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfPath, string tempPath, IProgress<ProgressData> progress, bool keepDataReaderOpen = false)
         {
             if (msdr == null)
             {
@@ -353,7 +367,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 PbfFilePath = pbfPath;
                 using (var writer =
-                        new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
+                    new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
                     WriteToPbf(msdr, writer, progress);
                 }
@@ -362,9 +376,16 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 PbfFilePath = tempPath;
                 using (var writer =
-                        new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
+                    new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
                     WriteToPbf(msdr, writer, progress);
+                }
+            }
+            finally
+            {
+                if (!keepDataReaderOpen)
+                {
+                    msdr.Dispose();
                 }
             }
             _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
