@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <remarks>This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation.
     /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be
     /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.</remarks>
-    public sealed class ProteoWizardReader: IMassSpecDataReader
+    public sealed class ProteoWizardReader : IMassSpecDataReader
     {
         #region Static stateful data
 
@@ -64,41 +64,72 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region IMassSpecDataReader implementation
 
+        /// <summary>
+        /// Gets all spectra
+        /// </summary>
+        /// <returns>all spectra</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             return _pwizReader.ReadAllSpectra();
         }
 
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
         public PSI_Interface.CV.CV.CVID NativeIdFormat
         {
             get { return _pwizReader.NativeIdFormat; }
         }
 
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
         public PSI_Interface.CV.CV.CVID NativeFormat
         {
             get { return _pwizReader.NativeFormat; }
         }
 
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public bool TryMakeRandomAccessCapable()
         {
             return _pwizReader.TryMakeRandomAccessCapable();
         }
 
-        public Spectrum ReadMassSpectrum(int scanIndex, bool includePeaks = true)
+        /// <summary>
+        /// Returns the spectrum specified by the scan number.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
-            return _pwizReader.ReadMassSpectrum(scanIndex, includePeaks);
+            return _pwizReader.ReadMassSpectrum(scanNum, includePeaks);
         }
 
+        /// <summary>
+        /// Close the reader
+        /// </summary>
         public void Close()
         {
             _pwizReader.Dispose();
         }
 
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra
         {
             get { return _pwizReader.NumSpectra; }
         }
 
+        /// <summary>
+        /// Close the file
+        /// </summary>
         public void Dispose()
         {
             _pwizReader.Dispose();
@@ -116,16 +147,16 @@ namespace InformedProteomics.Backend.MassSpecData
             get
             {
                 return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf"
-                    + "|Thermo .RAW|*.raw"
-                    + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                    + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
-                    + "|MGF[.gz]|*.mgf;*.mgf.gz"
-                    + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
-                    + "|AB Sciex .wiff|*.wiff"
-                    + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
-                    + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
-                    + "|Shimadzu lcd|*.lcd"
-                    + "|UIMF|*.uimf"
+                       + "|Thermo .RAW|*.raw"
+                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                       + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
+                       + "|MGF[.gz]|*.mgf;*.mgf.gz"
+                       + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
+                       + "|AB Sciex .wiff|*.wiff"
+                       + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
+                       + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
+                       + "|Shimadzu lcd|*.lcd"
+                       + "|UIMF|*.uimf"
                     ;
             }
         }
@@ -164,10 +195,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public static List<string> SupportedDirectoryTypes
         {
-            get
-            {
-                return new List<string>() {".d", ".raw"};
-            }
+            get { return new List<string>() {".d", ".raw"}; }
         }
 
         public static List<string> BrukerFiles
@@ -413,7 +441,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Check for a x86 ProteoWizard environment variable
                 pwizPath = Environment.GetEnvironmentVariable("ProteoWizard_x86");
 
-                if(string.IsNullOrEmpty(pwizPath) && !Environment.Is64BitOperatingSystem)
+                if (string.IsNullOrEmpty(pwizPath) && !Environment.Is64BitOperatingSystem)
                 {
                     pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
                 }
@@ -427,7 +455,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard";
             }
 
-            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgPwiz) && new DirectoryInfo(dmsProgPwiz).GetFiles(TargetDllName).Length > 0)
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgPwiz) &&
+                new DirectoryInfo(dmsProgPwiz).GetFiles(TargetDllName).Length > 0)
             {
                 return dmsProgPwiz;
             }
@@ -466,27 +495,59 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Look for subfolders whose names start with ProteoWizard, for example "ProteoWizard 3.0.9490"
-            var subFolders = pwizFolder.GetDirectories("ProteoWizard*");
+            var subFolders = pwizFolder.GetDirectories("ProteoWizard*").ToList();
 
-            if (subFolders.Length <= 0)
+            if (subFolders.Count <= 0)
             {
                 return null;
             }
 
-            var folderNames = subFolders.Select(subFolder => subFolder.FullName).ToList();
-
-            folderNames.Sort();
-            folderNames.Reverse(); // reverse the sort order - this should give us the highest installed version of ProteoWizard first
-
-            foreach (var folder in folderNames)
+            // Try to sort by version, it properly handles the version rolling over powers of 10 (but string sorting does not)
+            var byVersion = new List<Tuple<System.Version, DirectoryInfo>>();
+            foreach (var folder in subFolders)
             {
-                if (new DirectoryInfo(folder).GetFiles(TargetDllName).Length > 0)
+                try
                 {
-                    return folder;
+                    // Just ignoring the directory here if it has no version
+                    var version = System.Version.Parse(folder.Name.Trim().Split(' ').Last());
+                    byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version, folder));
+                }
+                catch (Exception)
+                {
+                    // Do nothing...
+                }
+            }
+            if (byVersion.Count > 0)
+            {
+                byVersion.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                byVersion.Reverse();
+                var subFoldersOrig = subFolders.ToArray();
+                subFolders = byVersion.Select(x => x.Item2).ToList();
+                // Guarantee that any folder where we couldn't parse a version is in the list, but at the end.
+                foreach (var folder in subFoldersOrig)
+                {
+                    if (!subFolders.Contains(folder))
+                    {
+                        subFolders.Add(folder);
+                    }
+                }
+            }
+            else
+            {
+                // Sorting by version failed, try the old method.
+                subFolders.Sort((x, y) => x.FullName.CompareTo(y.FullName));
+                subFolders.Reverse(); // reverse the sort order - this should give us the highest installed version of ProteoWizard first
+            }
+
+            foreach (var folder in subFolders)
+            {
+                if (folder.GetFiles(TargetDllName).Length > 0)
+                {
+                    return folder.FullName;
                 }
             }
             // If the above failed, return the highest version installed
-            return folderNames[0];
+            return subFolders[0].FullName;
         }
 
         static ProteoWizardReaderImplementation()
@@ -600,6 +661,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region IMassSpecDataReader implementation
 
+        /// <summary>
+        /// Gets all spectra
+        /// </summary>
+        /// <returns>all spectra</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             LoadPwizReader();
@@ -609,6 +674,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra
         {
             get
@@ -618,10 +686,15 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
         public PSI_Interface.CV.CV.CVID NativeIdFormat
         {
             get
             {
+                LoadPwizReader();
                 foreach (var file in _dataFile.fileDescription.sourceFiles)
                 {
                     foreach (var cvParam in file.cvParams)
@@ -638,10 +711,15 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
         public PSI_Interface.CV.CV.CVID NativeFormat
         {
             get
             {
+                LoadPwizReader();
                 foreach (var file in _dataFile.fileDescription.sourceFiles)
                 {
                     foreach (var cvParam in file.cvParams)
@@ -658,15 +736,25 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public bool TryMakeRandomAccessCapable()
         {
             return true;
         }
 
-        public Spectrum ReadMassSpectrum(int scanIndex, bool includePeaks = true)
+        /// <summary>
+        /// Returns the spectrum specified by the scan number.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             LoadPwizReader();
-            return ReadSpectrum(scanIndex, includePeaks);
+            return ReadSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>
@@ -787,11 +875,17 @@ namespace InformedProteomics.Backend.MassSpecData
             };
         }
 
+        /// <summary>
+        /// Close the file
+        /// </summary>
         public void Close()
         {
             _dataFile.Dispose();
         }
 
+        /// <summary>
+        /// Close the file
+        /// </summary>
         public void Dispose()
         {
             _dataFile.Dispose();
