@@ -15,6 +15,8 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         #region Private Members
         private string _filePath;
+        private CV.CVID _nativeIdFormat = CV.CVID.CVID_Unknown;
+        private CV.CVID _nativeFormat = CV.CVID.CVID_Unknown;
         private Stream _file = null;
         private StreamReader _fileReader = null;
         private XmlReader _xmlReaderForYield = null;
@@ -443,8 +445,8 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _filePath = filePath;
             //_instrument = Instrument.Unknown;
-            NativeIdFormat = CV.CVID.CVID_Unknown;
-            NativeFormat = CV.CVID.CVID_Unknown;
+            _nativeIdFormat = CV.CVID.CVID_Unknown;
+            _nativeFormat = CV.CVID.CVID_Unknown;
             _version = MzML_Version.mzML1_1_0;
             _randomAccess = randomAccess;
             _reduceMemoryUsage = tryReducingMemoryUsage;
@@ -504,29 +506,67 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Public interface functions
 
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra
         {
             get
             {
-                if (!_haveMetaData)
-                {
-                    var tempBool = _reduceMemoryUsage; // Set a flag to avoid reading the entire file before returning.
-                    ReadMzMl(); // Read the index and metadata so that the offsets get populated
-                    // The number of spectra is an attribute in the spectrumList tag
-                    _reduceMemoryUsage = tempBool;
-                }
+                RequireMetadata();
                 return (int)_numSpectra;
             }
         }
 
-        public CV.CVID NativeIdFormat { get; private set; }
-        public CV.CVID NativeFormat { get; private set; }
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
+        public CV.CVID NativeIdFormat
+        {
+            get
+            {
+                RequireMetadata();
+                return _nativeIdFormat;
+            }
+        }
 
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
+        public CV.CVID NativeFormat
+        {
+            get
+            {
+                RequireMetadata();
+                return _nativeFormat;
+            }
+        }
+
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public bool TryMakeRandomAccessCapable()
         {
             _randomAccess = true;
             ConfigureFileHandles(); // Reopen the files
             return true;
+        }
+
+        /// <summary>
+        /// Read the file-level metadata from the mzML file, without reading any spectra
+        /// </summary>
+        private void RequireMetadata()
+        {
+            if (!_haveMetaData)
+            {
+                var tempBool = _reduceMemoryUsage; // Set a flag to avoid reading the entire file before returning.
+                ReadMzMl(); // Read the index and metadata so that the offsets get populated
+                            // The number of spectra is an attribute in the spectrumList tag
+                _reduceMemoryUsage = tempBool;
+            }
         }
 
         /// <summary>
@@ -538,21 +578,11 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (!_randomAccess)
             {
-                // Apparently the only way to effectively cascade yield return?
-                // If it works properly, it should be basically invisible
-                foreach (var spec in ReadAllSpectraNonRandom())
-                {
-                    yield return spec;
-                }
+                return ReadAllSpectraNonRandom();
             }
             else
             {
-                // Apparently the only way to effectively cascade yield return?
-                // If it works properly, it should be basically invisible
-                foreach (var spec in ReadAllSpectraRandom())
-                {
-                    yield return spec;
-                }
+                return ReadAllSpectraRandom();
             }
         }
 
@@ -1357,7 +1387,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //int count = Convert.ToInt32(reader.GetAttribute("count"));
             reader.ReadStartElement("sourceFileList"); // Throws exception if we are not at the "sourceFileList" tag.
             //while (reader.ReadState == ReadState.Interactive && _instrument == Instrument.Unknown)
-            while (reader.ReadState == ReadState.Interactive && (NativeIdFormat == CV.CVID.CVID_Unknown || NativeFormat == CV.CVID.CVID_Unknown))
+            while (reader.ReadState == ReadState.Interactive && (_nativeIdFormat == CV.CVID.CVID_Unknown || _nativeFormat == CV.CVID.CVID_Unknown))
             {
                 // Handle exiting out properly at EndElement tags
                 if (reader.NodeType != XmlNodeType.Element)
@@ -1462,11 +1492,11 @@ namespace InformedProteomics.Backend.MassSpecData
                                     var cvid = CV.TermAccessionLookup[cv][accession];
                                     if (CV.CvidIsA(cvid, CV.CVID.MS_native_spectrum_identifier_format))
                                     {
-                                        NativeIdFormat = cvid;
+                                        _nativeIdFormat = cvid;
                                     }
                                     else if (CV.CvidIsA(cvid, CV.CVID.MS_mass_spectrometer_file_format))
                                     {
-                                        NativeFormat = cvid;
+                                        _nativeFormat = cvid;
                                     }
                                 }
                                 /*switch (innerReader.GetAttribute("accession"))
