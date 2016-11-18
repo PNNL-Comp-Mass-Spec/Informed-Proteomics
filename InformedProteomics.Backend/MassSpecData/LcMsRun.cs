@@ -46,18 +46,58 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region IMassSpecDataReader
 
+        /// <summary>
+        /// Close the reader
+        /// </summary>
         public abstract void Close();
 
+        /// <summary>
+        /// Properly dispose of all unmanaged resources (specifically, file handles)
+        /// </summary>
         public abstract void Dispose();
 
+        /// <summary>
+        /// Gets all spectra
+        /// </summary>
+        /// <returns>all spectra</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
         }
 
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
         public CV.CVID NativeIdFormat { get; protected set; }
+
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
         public CV.CVID NativeFormat { get; protected set; }
 
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public abstract string FilePath { get; protected set; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public abstract string SrcFileChecksum { get; protected set; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public abstract string FileFormatVersion { get; protected set; }
+
+        /// <summary>
+        /// Returns the spectrum specified by the scan number.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             return GetSpectrum(scanNum, includePeaks);

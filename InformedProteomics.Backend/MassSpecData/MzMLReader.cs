@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -14,7 +15,10 @@ namespace InformedProteomics.Backend.MassSpecData
     public sealed class MzMLReader: IMassSpecDataReader
     {
         #region Private Members
-        private string _filePath;
+
+        private readonly string _filePath;
+        private string _srcFileChecksum = string.Empty;
+        private string _fileFormatVersion = string.Empty;
         private CV.CVID _nativeIdFormat = CV.CVID.CVID_Unknown;
         private CV.CVID _nativeFormat = CV.CVID.CVID_Unknown;
         private Stream _file = null;
@@ -32,7 +36,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private string _unzippedFilePath = string.Empty;
         private bool _randomAccess = false;
         private bool _allRead = false;
-        private XmlReaderSettings _xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
+        private readonly XmlReaderSettings _xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
         private Encoding _encoding = null;
         private readonly List<Spectrum> _spectra = new List<Spectrum>();
         #endregion
@@ -445,8 +449,6 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _filePath = filePath;
             //_instrument = Instrument.Unknown;
-            _nativeIdFormat = CV.CVID.CVID_Unknown;
-            _nativeFormat = CV.CVID.CVID_Unknown;
             _version = MzML_Version.mzML1_1_0;
             _randomAccess = randomAccess;
             _reduceMemoryUsage = tryReducingMemoryUsage;
@@ -553,6 +555,39 @@ namespace InformedProteomics.Backend.MassSpecData
             _randomAccess = true;
             ConfigureFileHandles(); // Reopen the files
             return true;
+        }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public string FilePath
+        {
+            get { return _unzippedFilePath; }
+        }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string SrcFileChecksum
+        {
+            get
+            {
+                RequireMetadata();
+                return _srcFileChecksum;
+            }
+        }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string FileFormatVersion
+        {
+            get
+            {
+                RequireMetadata();
+                return _fileFormatVersion;
+            }
         }
 
         /// <summary>
@@ -900,6 +935,41 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// Read the Checksum from the indexedmzML data
+        /// </summary>
+        private void ReadChecksum()
+        {
+            using (var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1))
+            using (var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8, true, 65536))
+            {
+                try
+                {
+                    var testPos = stream.Length - 500;
+                    stream.Position = testPos;
+                    streamReader.DiscardBufferedData();
+                    var data = streamReader.ReadToEnd();
+                    var pos = data.IndexOf("<fileChecksum", StringComparison.InvariantCultureIgnoreCase);
+                    if (pos >= 0)
+                    {
+                        data = data.Substring(pos);
+                        pos = data.IndexOf('>') + 1;
+                        data = data.Substring(pos);
+                        pos = data.IndexOf('<');
+                        data = data.Substring(0, pos);
+                        if (data.Length == 40)
+                        {
+                            _srcFileChecksum = data;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Dropping errors - if this doesn't work, we'll just checksum the whole file.
+                }
+            }
+        }
+        
+        /// <summary>
         /// Handle the child nodes of the run element
         /// Called by IndexMzMl (xml hierarchy)
         /// </summary>
@@ -1172,8 +1242,18 @@ namespace InformedProteomics.Backend.MassSpecData
                     // run to the end of the file (using stream.position = stream.length) and jump backwards to read the index first, and then read the file for needed data
                     ReadIndexFromEnd();
                 }
+                ReadChecksum();
                 reader = reader.ReadSubtree();
                 reader.MoveToContent();
+            }
+            if (string.IsNullOrWhiteSpace(_srcFileChecksum))
+            {
+                using (var fs = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var sha1 = new SHA1Managed())
+                {
+                    var hash = sha1.ComputeHash(fs);
+                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                }
             }
             string schemaName = reader.GetAttribute("xsi:schemaLocation");
             // We automatically assume it uses the mzML_1.1.0 schema. Check for the old version.
@@ -1182,6 +1262,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 _version = MzML_Version.mzML1_0_0;
             }
+            _fileFormatVersion = reader.GetAttribute("version");
             // Consume the mzML root tag
             // Throws exception if we are not at the "mzML" tag.
             // This is a critical error; we want to stop processing for this file if we encounter this error

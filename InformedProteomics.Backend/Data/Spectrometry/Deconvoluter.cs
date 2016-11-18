@@ -186,6 +186,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         if (p != null)
                         {
+                            bestPeak.ObservedPeakIndices.Add(p.Item2);
                             peakUsed[p.Item2] = true;
                         }
                     }

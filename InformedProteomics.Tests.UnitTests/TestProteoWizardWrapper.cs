@@ -21,6 +21,8 @@ namespace InformedProteomics.Tests.UnitTests
             var reader = new ProteoWizardReader(TestRawFilePath);
             reader.ReadMassSpectrum(1);
 
+            System.Console.WriteLine("NumSpectra: {0}", reader.NumSpectra);
+
             //}
             //catch (FileNotFoundException e)
             //{

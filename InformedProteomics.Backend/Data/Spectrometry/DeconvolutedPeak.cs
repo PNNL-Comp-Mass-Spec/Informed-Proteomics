@@ -30,6 +30,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _isotopePeaks.Add(peak);
                 SummedIntensity += peak.Intensity;
             }*/
+            ObservedPeakIndices = new List<int>();
         }
 
         public DeconvolutedPeak(Peak mzPeak, int charge, double corr = 0, double dist = 0)
@@ -53,6 +54,25 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public Peak[] ObservedPeaks { get; private set; }
         //private readonly HashSet<Peak> _isotopePeaks;
+
+        /// <summary>
+        /// Used for retrieving Observed peaks when reading from a .dpbf file, in conjunction with a .pbf file.
+        /// </summary>
+        internal List<int> ObservedPeakIndices { get; private set; }
+
+        /// <summary>
+        /// Uses the peaks in spec to find and set the <see cref="ObservedPeaks"/> according to the indices in <see cref="ObservedPeakIndices"/>
+        /// </summary>
+        /// <param name="spec"></param>
+        internal void SetObservedPeaksFromSpectrum(Spectrum spec)
+        {
+            var peaks = new List<Peak>();
+            foreach (var index in ObservedPeakIndices)
+            {
+                peaks.Add(spec.Peaks[index]);
+            }
+            ObservedPeaks = peaks.ToArray();
+        }
     }
 
     /*

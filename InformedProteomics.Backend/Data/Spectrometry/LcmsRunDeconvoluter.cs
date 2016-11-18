@@ -133,9 +133,31 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public CV.CVID NativeIdFormat => this.dataReader.NativeIdFormat;
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// The Native Format of the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
         /// </summary>
         public CV.CVID NativeFormat => this.dataReader.NativeFormat;
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public string FilePath => this.dataReader.FilePath;
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string SrcFileChecksum
+        {
+            get
+            {
+                var run = this.dataReader as PbfLcMsRun;
+                return run != null ? run.PbfFileChecksum : this.dataReader.SrcFileChecksum;
+            }
+        }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string FileFormatVersion => this.dataReader.FileFormatVersion;
     }
 }

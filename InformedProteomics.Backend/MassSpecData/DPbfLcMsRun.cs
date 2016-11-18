@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
@@ -77,6 +78,42 @@ namespace InformedProteomics.Backend.MassSpecData
             GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen);
         }
 
+        /// <summary>
+        /// Reads a Spectrum from the DPBF file with isotope peaks populated
+        /// </summary>
+        /// <param name="fullData">The file used to create the DPBF file (throws <see cref="ArgumentException"/> if it is not) - PBF file preferred.</param>
+        /// <param name="scanNum">The scan to read</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">If the checksum of the source file does not match the checksum stored in the DPBF file</exception>
+        public DeconvolutedSpectrum GetSpectrumWithIsotopePeaks(IMassSpecDataReader fullData, int scanNum)
+        {
+            if (this.SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun && this.SrcFileChecksum != ((PbfLcMsRun)fullData).PbfFileChecksum))
+            {
+                throw new ArgumentException("Supplied file was not used to create this DPBF file!", nameof(fullData));
+            }
+
+            var spec = GetSpectrum(scanNum, true) as DeconvolutedSpectrum;
+            if (spec == null)
+            {
+                return null;
+            }
+
+            var pbfSpec = fullData.ReadMassSpectrum(scanNum, true);
+
+            foreach (var peakBase in spec.Peaks)
+            {
+                var peak = peakBase as DeconvolutedPeak;
+                if (peak == null)
+                {
+                    continue;
+                }
+
+                peak.SetObservedPeaksFromSpectrum(pbfSpec);
+            }
+
+            return spec;
+        }
+
         // Must reflect all changes to WriteSpectrum
         protected internal override Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
@@ -87,8 +124,6 @@ namespace InformedProteomics.Backend.MassSpecData
             var msLevel = reader.ReadByte();
             var elutionTime = reader.ReadDouble();
             var tic = reader.ReadSingle();
-
-            DeconvolutedSpectrum spec;
 
             double? precursorMass = reader.ReadDouble();
             if (precursorMass == 0.0) precursorMass = null;
@@ -109,10 +144,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 var charge = reader.ReadInt32();
                 var corr = reader.ReadSingle();
                 var dist = reader.ReadSingle();
-                peakList.Add(new DeconvolutedPeak(mz, intensity, charge, corr, dist));
+                var peak = new DeconvolutedPeak(mz, intensity, charge, corr, dist);
+                var isoPeakCount = (int)reader.ReadByte();
+                peak.ObservedPeakIndices.Capacity = isoPeakCount;
+                for (var j = 0; j < isoPeakCount; j++)
+                {
+                    peak.ObservedPeakIndices.Add(reader.ReadUInt16());
+                }
+                peakList.Add(peak);
             }
 
-            spec = new DeconvolutedSpectrum(peakList, scanNum)
+            var spec = new DeconvolutedSpectrum(peakList, scanNum)
             {
                 ActivationMethod = activationMethod,
                 IsolationWindow = new IsolationWindow(
@@ -194,7 +236,37 @@ namespace InformedProteomics.Backend.MassSpecData
                 writer.Write(Convert.ToSingle(peak.Corr));
                 // distance: 4
                 writer.Write(Convert.ToSingle(peak.Dist));
+
+                // Output indices of isotope peaks where index (in PbfLcMsRun) is < 65535
+                var isotopePeaksInRange = peak.ObservedPeakIndices.Where(x => x >= ushort.MinValue && x <= ushort.MaxValue).ToList();
+                if (isotopePeaksInRange.Count != peak.ObservedPeakIndices.Count)
+                {
+                    WarnOnce(WriteWarnings.PeakIndexCannotBeStored, "Cannot output all observed peaks for some peaks - more than 65535 peaks in observed spectrum");
+                }
+                // Count of isotope peaks, as byte: 1
+                writer.Write((byte)isotopePeaksInRange.Count);
+                // Output indices, as unsigned shorts
+                foreach (var index in isotopePeaksInRange)
+                {
+                    writer.Write((ushort) index);
+                }
             }
+        }
+
+        private enum WriteWarnings
+        {
+            PeakIndexCannotBeStored
+        }
+        private readonly List<WriteWarnings> warningTracker = new List<WriteWarnings>();
+
+        private void WarnOnce(WriteWarnings code, string message)
+        {
+            if (warningTracker.Contains(code))
+            {
+                return;
+            }
+            warningTracker.Add(code);
+            System.Console.WriteLine("WARNING: {0}!");
         }
     }
 }

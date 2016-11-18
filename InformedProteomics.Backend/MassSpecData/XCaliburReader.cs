@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
 using PSI_Interface.CV;
@@ -23,6 +24,15 @@ namespace InformedProteomics.Backend.MassSpecData
             if (!dataFile.Exists)
                 throw new FileNotFoundException("Thermo .raw file not found: " + filePath, dataFile.FullName);
 
+            FilePath = filePath;
+
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var sha1 = new SHA1Managed())
+            {
+                var hash = sha1.ComputeHash(fs);
+                SrcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+            }
+
             _msfileReader.OpenRawFile(filePath);
 
             _minLcScan = 1;
@@ -30,6 +40,8 @@ namespace InformedProteomics.Backend.MassSpecData
             _maxLcScan = _numSpectra;
 
             _msLevel = new Dictionary<int, int>();
+
+            FileFormatVersion = _msfileReader.FileInfo.VersionNumber.ToString();
         }
 
         /// <summary>
@@ -73,6 +85,21 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get { return CV.CVID.MS_Thermo_RAW_format; }
         }
+
+        /// <summary>
+        /// Path to the file
+        /// </summary>
+        public string FilePath { get; private set; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the raw file
+        /// </summary>
+        public string SrcFileChecksum { get; private set; }
+
+        /// <summary>
+        /// Version of the file format
+        /// </summary>
+        public string FileFormatVersion { get; private set; }
 
         /// <summary>
         /// Reads the mass spectrum with the specified scanNum from the raw file

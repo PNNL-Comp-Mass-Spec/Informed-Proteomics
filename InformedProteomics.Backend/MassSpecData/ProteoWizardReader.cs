@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using System.Security.Cryptography;
 using InformedProteomics.Backend.Data.Spectrometry;
 using pwiz.CLI.analysis;
 using pwiz.CLI.cv;
@@ -133,6 +134,30 @@ namespace InformedProteomics.Backend.MassSpecData
         public void Dispose()
         {
             _pwizReader.Dispose();
+        }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public string FilePath
+        {
+            get { return _pwizReader.FilePath; }
+        }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string SrcFileChecksum
+        {
+            get { return _pwizReader.SrcFileChecksum; }
+        }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string FileFormatVersion
+        {
+            get { return _pwizReader.FileFormatVersion; }
         }
 
         #endregion
@@ -613,14 +638,13 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardAssemblyResolver;
 
-            _filePath = ProteoWizardReader.CheckForDirectoryDataset(filePath);
+            FilePath = ProteoWizardReader.CheckForDirectoryDataset(filePath);
         }
 
         #endregion
 
         #region Private members and functions
 
-        private readonly string _filePath;
         private bool _loaded = false;
         private int _numSpectra = 0;
 
@@ -630,6 +654,8 @@ namespace InformedProteomics.Backend.MassSpecData
         // Continuous Wavelet Transform peak picker - high-quality peak picking, may be slow with some high-res data.
         private readonly string _cwtCentroiding = "peakPicking cwt snr=1.0 peakSpace=0.1 msLevel=1-";
         private readonly List<string> _filters = new List<string>();
+        private string _fileFormatVersion = string.Empty;
+        private string _srcFileChecksum = string.Empty;
         private void LoadPwizReader()
         {
             if (_loaded)
@@ -638,9 +664,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var readers = ReaderList.FullReaderList;
-            readers.read(_filePath, _dataFile);
+            readers.read(FilePath, _dataFile);
             if ((new string[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt", "uimf", "uimf.gz" })
-                .Any(ext => _filePath.ToLower().EndsWith(ext)))
+                .Any(ext => FilePath.ToLower().EndsWith(ext)))
             {
                 // Files that do not have vendor centroiding available
                 Console.WriteLine("Using cwt Centroiding");
@@ -654,6 +680,47 @@ namespace InformedProteomics.Backend.MassSpecData
             SpectrumListFactory.wrap(_dataFile, _filters);
 
             _numSpectra = _dataFile.run.spectrumList.size();
+            foreach (var srcFile in _dataFile.fileDescription.sourceFiles)
+            {
+                var cv = srcFile.cvParam(CVID.MS_SHA_1);
+                if (!cv.empty())
+                {
+                    _srcFileChecksum = cv.value;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(_srcFileChecksum))
+            {
+                var fileForChecksum = string.Empty;
+                if (File.Exists(FilePath))
+                {
+                    // is file
+                    fileForChecksum = FilePath;
+                }
+                else
+                {
+                    var dir = new DirectoryInfo(FilePath);
+                    var files = dir.GetFiles("*", SearchOption.AllDirectories);
+                    if (files.Length == 0)
+                    {
+                        throw new IOException("Cannot open directory with no files: " + FilePath);
+                    }
+                    fileForChecksum = files[0].FullName;
+                }
+                using (var fs = new FileStream(fileForChecksum, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var sha1 = new SHA1Managed())
+                {
+                    var hash = sha1.ComputeHash(fs);
+                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                }
+            }
+
+            foreach (var software in _dataFile.softwareList)
+            {
+                _fileFormatVersion = software.version;
+            }
+
             _loaded = true;
         }
 
@@ -889,6 +956,35 @@ namespace InformedProteomics.Backend.MassSpecData
         public void Dispose()
         {
             _dataFile.Dispose();
+        }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public string FilePath { get; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string SrcFileChecksum
+        {
+            get
+            {
+                LoadPwizReader();
+                return _srcFileChecksum;
+            }
+        }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public string FileFormatVersion
+        {
+            get
+            {
+                LoadPwizReader();
+                return _fileFormatVersion;
+            }
         }
 
         #endregion

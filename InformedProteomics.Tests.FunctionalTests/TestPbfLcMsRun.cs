@@ -54,6 +54,8 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var pbfRun = new PbfLcMsRun(pbfFilePath);
 
+            var checksum = pbfRun.PbfFileChecksum;
+
             var specFilePath = Path.ChangeExtension(pbfFilePath, "raw");
             if (!File.Exists(specFilePath))
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 using PSI_Interface.CV;
@@ -24,7 +25,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public virtual bool ContainsChromatograms { get { return true; } }
 
         // This constant should be incremented by 1 if the binary file format is changed
-        public const int FileFormatId = 150607;
+        public const int FileFormatId = 150608;
         private const int EarliestSupportedFileFormatId = 150604;
 
         /** File format id history
@@ -32,6 +33,7 @@ namespace InformedProteomics.Backend.MassSpecData
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
          * 150606: Added ScanNum to the output in the metadata section to support skipped scans
          * 150607: Added the name/path of the source file, and the format of the native id
+         * 150608: Added a file checksum (SHA-1)
          */
 
         #region Public static functions
@@ -362,6 +364,7 @@ namespace InformedProteomics.Backend.MassSpecData
             RawFilePath = specFileName;
             NativeIdFormat = msdr.NativeIdFormat;
             NativeFormat = msdr.NativeFormat;
+            SrcFileChecksum = msdr.SrcFileChecksum.ToLower().Replace("-", "");
 
             try
             {
@@ -388,6 +391,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     msdr.Dispose();
                 }
             }
+            FileFormatVersion = FileFormatId.ToString();
             _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             CreatePrecursorNextScanMap();
@@ -477,9 +481,38 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Member Variables
 
+        /// <summary>
+        /// The path to this pbf file
+        /// </summary>
         public string PbfFilePath { get; private set; }
 
+        /// <summary>
+        /// Raw file path (as of when/where the file was created)
+        /// </summary>
         public string RawFilePath { get; private set; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the pbf file, calculated on first access to this property - lowercase, hex only
+        /// </summary>
+        public string PbfFileChecksum
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_pbfFileChecksum))
+                {
+                    using (var fs = new FileStream(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (var sha1 = new SHA1Managed())
+                    {
+                        var hash = sha1.ComputeHash(fs);
+                        _pbfFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                    }
+                }
+                return _pbfFileChecksum;
+            }
+        }
+
+        private string _pbfFileChecksum = string.Empty;
+        private const int FileChecksumLength = 40;
         private const int RawFilePathLength = 200;
         private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
         protected internal const int NativeIdLength = 50;
@@ -519,20 +552,52 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region IMassSpecDataReader implementation
 
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public override bool TryMakeRandomAccessCapable()
         {
             return true;
         }
 
+        /// <summary>
+        /// Close the reader
+        /// </summary>
         public override void Close()
         {
             _reader.Close();
         }
 
+        /// <summary>
+        /// Properly dispose of all unmanaged resources (specifically, file handles)
+        /// </summary>
         public override void Dispose()
         {
             _reader.Dispose();
         }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public override string FilePath
+        {
+            get { return PbfFilePath; }
+            protected set
+            {
+                // DO NOT USE!!!
+            }
+        }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public override string SrcFileChecksum { get; protected set; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public override string FileFormatVersion { get; protected set; }
 
         #endregion
 
@@ -719,6 +784,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Read the file format integer from the end of the file
             _reader.BaseStream.Seek(-1 * sizeof(int), SeekOrigin.End);
             _fileFormatId = _reader.ReadInt32();
+            FileFormatVersion = _fileFormatId.ToString();
             if (_fileFormatId > FileFormatId || _fileFormatId < EarliestSupportedFileFormatId)
                 return false;
 
@@ -825,15 +891,27 @@ namespace InformedProteomics.Backend.MassSpecData
                 _chromMzIndexToOffset = new long[0];
             }
 
-
             if (_fileFormatId > 150606)
             {
-                _reader.BaseStream.Seek(offsetDataPos - RawFilePathLength - sizeof(int) * 2, SeekOrigin.Begin);
+                var rawPathLocation = offsetDataPos - RawFilePathLength - sizeof(int) * 2;
+                _reader.BaseStream.Seek(rawPathLocation, SeekOrigin.Begin);
                 var c = new char[RawFilePathLength];
                 _reader.Read(c, 0, RawFilePathLength);
                 RawFilePath = (new string(c)).Trim();
                 NativeFormat = (CV.CVID)_reader.ReadInt32();
                 NativeIdFormat = (CV.CVID)_reader.ReadInt32();
+
+                var checksumLocation = rawPathLocation - 40; // stored as hex, so 40 bytes rather than 20.
+                if (_fileFormatId > 150607)
+                {
+                    _reader.BaseStream.Seek(checksumLocation, SeekOrigin.Begin);
+                    c = new char[FileChecksumLength];
+                    _reader.Read(c, 0, FileChecksumLength);
+                    SrcFileChecksum = (new string(c)).Trim();
+                    // This code works if the checksum is written as bytes instead of as a string.
+                    //var bytes = _reader.ReadBytes(20);
+                    //FileChecksum = BitConverter.ToString(bytes);
+                }
             }
             else
             {
@@ -1563,6 +1641,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 _chromMzIndexToOffset[_chromMzIndexToOffset.Length - 1] = _offsetPrecursorChromatogramEnd;
             }
+
+            // Checksum: 40 bytes (could store in 20 bytes, but conversion from hex string to bytes isn't simple)
+            SrcFileChecksum = msdr.SrcFileChecksum.ToLower().Replace("-", "");
+            writer.Write(SrcFileChecksum.PadRight(FileChecksumLength).ToCharArray(0, FileChecksumLength), 0, FileChecksumLength);
 
             // RawFilePath: 200
             // pad or truncate to keep in limit (may have to change in future...)

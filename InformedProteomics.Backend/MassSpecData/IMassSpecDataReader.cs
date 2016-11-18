@@ -44,9 +44,24 @@ namespace InformedProteomics.Backend.MassSpecData
         CV.CVID NativeIdFormat { get; }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// The Native Format of the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
         /// </summary>
         CV.CVID NativeFormat { get; }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        string FilePath { get; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.) - lower case, hex characters only (no dashes)
+        /// </summary>
+        string SrcFileChecksum { get; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        string FileFormatVersion { get; }
     }
 }

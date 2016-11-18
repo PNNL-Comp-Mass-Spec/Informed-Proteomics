@@ -188,6 +188,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     Status = "Reading spectra from file"
                 };
 
+                FilePath = string.Empty;
+                SrcFileChecksum = massSpecDataReader.SrcFileChecksum;
+                FileFormatVersion = massSpecDataReader.FileFormatVersion;
+
                 var trackingInfo = new SpectrumTrackingInfo
                 {
                     NumSpectra = massSpecDataReader.NumSpectra,
@@ -327,15 +331,40 @@ namespace InformedProteomics.Backend.MassSpecData
             if (spec.MsLevel > trackingInfo.MaxMsLevel) trackingInfo.MaxMsLevel = spec.MsLevel;
         }
 
+        /// <summary>
+        /// Close the reader
+        /// </summary>
         public override void Close()
         {
         }
 
+        /// <summary>
+        /// Properly dispose of all unmanaged resources (specifically, file handles)
+        /// </summary>
         public override void Dispose()
         {
             // We don't hold any file handles or unmanaged memory, so do nothing.
         }
 
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public override string FilePath { get; protected set; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public override string SrcFileChecksum { get; protected set; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public override string FileFormatVersion { get; protected set; }
+
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public override bool TryMakeRandomAccessCapable()
         {
             return true;
