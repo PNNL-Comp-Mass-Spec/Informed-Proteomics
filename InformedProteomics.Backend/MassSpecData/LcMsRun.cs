@@ -655,7 +655,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
                 {
-                    if (prevScanNum > -1)
+                    if (prevScanNum < 0)
                     {
                         // We shouldn't encounter this, but better safe than sorry.
                         _precursorScan[scanNum] = MinLcScan;
@@ -690,7 +690,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // determine next scan
                 if (msLevel == nextMsLevel)
                 {
-                    if (nextScanNum < int.MaxValue)
+                    if (nextScanNum == int.MaxValue)
                     {
                         // We shouldn't encounter this, but better safe than sorry.
                         _nextScan[scanNum] = MaxLcScan;
