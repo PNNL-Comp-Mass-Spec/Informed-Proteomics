@@ -108,7 +108,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             public bool SameCluster(Ms1Feature node1, Ms1Feature node2)
             {
                 var massDiff = Math.Abs(node1.Mass - node2.Mass);
-                if (massDiff > _tolerance.GetToleranceAsTh(node1.Mass)) return false;
+                if (massDiff > _tolerance.GetToleranceAsMz(node1.Mass)) return false;
 
                 var etDiff = Math.Abs(_run.GetElutionTime(node1.ScanNum) - _run.GetElutionTime(node2.ScanNum));
                 if (etDiff > ElutionTimeWindowSize) return false;

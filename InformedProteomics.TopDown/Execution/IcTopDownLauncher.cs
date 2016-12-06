@@ -861,7 +861,7 @@ namespace InformedProteomics.TopDown.Execution
                         currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
 
                         var scoreDist = (from distribution in scoreDistributions
-                                         where Math.Abs(distribution.Item1 - match.Ion.Composition.Mass) < Options.PrecursorIonTolerance.GetToleranceAsTh(match.Ion.Composition.Mass)
+                                         where Math.Abs(distribution.Item1 - match.Ion.Composition.Mass) < Options.PrecursorIonTolerance.GetToleranceAsMz(match.Ion.Composition.Mass)
                                          select distribution.Item2).FirstOrDefault();
                         if (scoreDist == null)
                         {

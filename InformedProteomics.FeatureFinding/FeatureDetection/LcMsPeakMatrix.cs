@@ -471,7 +471,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         {
                             if (!(_featureMatrix[row][col].AccurateMass > 0)) continue;
                             var expectedPeakMz = Ion.GetIsotopeMz(_featureMatrix[row][col].AccurateMass, charge, isotopeIndex);
-                            if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > tolerance.GetToleranceAsTh(ms1Peak.Mz)) continue;
+                            if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > tolerance.GetToleranceAsMz(ms1Peak.Mz)) continue;
 
                             // in case of existing isotope peaks, select peaks maximizing envelope similairty
                             if (_featureMatrix[row][col].EnvelopePeaks[i] != null)
@@ -616,7 +616,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 if (!chargeCheck) continue;
 
                 var seedMass = _featureMatrix[row][col].AccurateMass;
-                var massTol = tolerance.GetToleranceAsTh(seedMass);
+                var massTol = tolerance.GetToleranceAsMz(seedMass);
                 var newCluster = new LcMsPeakCluster(Run, seed);
 
                 Array.Clear(tempEnvelope, 0, tempEnvelope.Length);
@@ -734,7 +734,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             ObservedIsotopeEnvelope bestEnvelope = null;
             var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
             var tolerance = new Tolerance(Comparer.Ppm * 0.5);
-            var massTol = tolerance.GetToleranceAsTh(targetMass);
+            var massTol = tolerance.GetToleranceAsMz(targetMass);
             var nPeaksCutoff = NumberOfPeaksCutoff;
 
             var bcCutoff = GetSeedBcDistThreshold();
@@ -1118,7 +1118,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var newMaxCol = maxCol;
             //var tolerance = new Tolerance(5);
             var tolerance = new Tolerance(Comparer.Ppm * 0.5);
-            var massTol = tolerance.GetToleranceAsTh(targetMass);
+            var massTol = tolerance.GetToleranceAsMz(targetMass);
 
             for (var j = minCol; j <= maxCol; j++)
             {
@@ -1302,7 +1302,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var threshold = nPeaks * 0.5;
             var threshold2 = envelope.NumberOfPeaks + (envelope.TheoreticalEnvelope.Size - 1) * 0.7;
 
-            var mzTol = tolerance.GetToleranceAsTh(peaks[peakStartIndex].Mz);
+            var mzTol = tolerance.GetToleranceAsMz(peaks[peakStartIndex].Mz);
 
             var minCheckCharge = Math.Max(envelope.Charge * 2 - 1, 4);
             var maxCheckCharge = Math.Min(envelope.Charge * 5 + 1, 60);

@@ -2,6 +2,9 @@
 
 namespace InformedProteomics.Backend.Database
 {
+    /// <summary>
+    /// Available database search modes
+    /// </summary>
     [Flags]
     public enum DatabaseSearchMode
     {
@@ -18,6 +21,6 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Target and Decoy search
         /// </summary>
-        Both = 3,
+        Both = Target | Decoy,
     }
 }

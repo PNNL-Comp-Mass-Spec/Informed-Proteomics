@@ -2,6 +2,9 @@
 {
     using PSI_Interface.IdentData;
 
+    /// <summary>
+    /// Reader factory for result files
+    /// </summary>
     public class ResultFileReader
     {
         /// <summary>

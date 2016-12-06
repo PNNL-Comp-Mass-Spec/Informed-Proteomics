@@ -32,7 +32,7 @@ namespace InformedProteomics.Test
         private bool _useDecoy;
         private int _precursorCharge;
 
-        private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Th);
+        private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Mz);
 
         [Test]
         public void IonFrequencyFunction()

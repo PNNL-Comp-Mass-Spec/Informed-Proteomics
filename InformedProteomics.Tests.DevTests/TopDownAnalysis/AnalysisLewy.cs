@@ -90,7 +90,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 for (var j = 0; j < features.Count; j++)
                 {
                     //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                    var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                    var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                     foreach (var match in prsmList)
                     {
                         if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)

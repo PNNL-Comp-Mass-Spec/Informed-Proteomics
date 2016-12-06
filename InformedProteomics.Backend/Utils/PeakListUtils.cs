@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.Utils
     {
         public static Peak FindPeak(List<Peak> peakList, double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return FindPeak(peakList, minMz, maxMz);
@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Utils
 
         public static IList<Peak> FindAllPeaks(List<Peak> peakList, double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return FindAllPeaks(peakList, minMz, maxMz);

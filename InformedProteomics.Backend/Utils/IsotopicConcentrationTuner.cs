@@ -202,7 +202,7 @@ namespace InformedProteomics.Backend.Utils
             int j = 0;
             foreach (var theoPeak in theoreticalPeaks)
             {
-                double tolDa = tolerance.GetToleranceAsTh(theoPeak.Mz);
+                double tolDa = tolerance.GetToleranceAsMz(theoPeak.Mz);
                 double maxMz = theoPeak.Mz + tolDa;
                 Peak obsPeak = observedPeaks[j];
 

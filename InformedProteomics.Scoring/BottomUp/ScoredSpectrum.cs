@@ -72,7 +72,7 @@ namespace InformedProteomics.Scoring.BottomUp
 
         internal RankedPeak FindPeak(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
 

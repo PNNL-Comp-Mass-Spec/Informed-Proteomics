@@ -85,7 +85,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
             var tolerance = new Tolerance(5);
             var threshold = nPeaks * 0.5;
-            var mzTol = tolerance.GetToleranceAsTh(Spectrum.Peaks[peakStartIndex].Mz);
+            var mzTol = tolerance.GetToleranceAsMz(Spectrum.Peaks[peakStartIndex].Mz);
 
             var minCheckCharge = Math.Max(checkCharge * 2 - 1, 4);
             var maxCheckCharge = Math.Min(checkCharge * 5 + 1, 60);

@@ -142,7 +142,7 @@ namespace InformedProteomics.TopDown.Scoring
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex - 1; i >= 0; i--)
@@ -171,7 +171,7 @@ namespace InformedProteomics.TopDown.Scoring
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex + 1; i < _ms2Spec.Peaks.Length; i++)

@@ -463,7 +463,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetFullPrecursorIonExtractedIonChromatogram(minMz, maxMz);
@@ -515,7 +515,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -540,7 +540,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC around targetScanNum</returns>
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum, int maxNumConsecutiveScansWithoutPeak = 3)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             if (targetScanNum < 0) return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -585,7 +585,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);

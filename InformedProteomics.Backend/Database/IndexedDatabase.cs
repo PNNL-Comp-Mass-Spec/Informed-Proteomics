@@ -11,16 +11,37 @@ using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
 {
+    /// <summary>
+    /// Provide fast, indexed access to Fasta database information using Permuted Longest Common Prefix data
+    /// </summary>
     public class IndexedDatabase
     {
+        /// <summary>
+        /// File extension to use for Permuted Longest Common Prefix file
+        /// </summary>
         public static readonly string PermutedLongestCommonPrefixFileExtension = ".icplcp";
+
+        /// <summary>
+        /// Encoding to use for writing and reading indexed database files
+        /// </summary>
         public static readonly Encoding Encoding = FastaDatabase.Encoding;
 
         private readonly string _pLcpFilePath;
 
+        /// <summary>
+        /// The Fasta database that will be indexed
+        /// </summary>
         protected readonly FastaDatabase FastaDatabase;
+
+        /// <summary>
+        /// Cached Permuted Longest Common Prefix data
+        /// </summary>
         protected byte[] PLcp;
 
+        /// <summary>
+        /// Constructor - build the index
+        /// </summary>
+        /// <param name="fastaDatabase"></param>
         public IndexedDatabase(FastaDatabase fastaDatabase)
         {
             FastaDatabase = fastaDatabase;
@@ -38,6 +59,9 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Read in the Permuted Longest Common Prefix file
+        /// </summary>
         public void Read()
         {
             using (var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read))
@@ -47,6 +71,15 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numTolerableTermini"></param>
+        /// <param name="numMissedCleavages"></param>
+        /// <param name="enzyme"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme)
         {
@@ -54,6 +87,17 @@ namespace InformedProteomics.Backend.Database
                                enzyme.IsNTerm);
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numTolerableTermini"></param>
+        /// <param name="numMissedCleavages"></param>
+        /// <param name="enzyme"></param>
+        /// <param name="threads"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme, int threads, CancellationToken? cancellationToken = null)
         {
@@ -61,21 +105,48 @@ namespace InformedProteomics.Backend.Database
                                enzyme.IsNTerm, threads, cancellationToken);
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
         {
             return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="threads"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(int minLength, int maxLength, int threads = 0, CancellationToken? cancellationToken = null)
         {
             return AnnotationsAndOffsetsParallel(minLength, maxLength, 0, 0, null, false, threads, cancellationToken);
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
         {
             return IntactSequenceAnnotationsAndOffsets(minLength, maxLength, 0);
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numCTermCleavages"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
         {
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
@@ -98,6 +169,13 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numCTermCleavages"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(int minLength, int maxLength, int numCTermCleavages)
         {
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
@@ -120,9 +198,16 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Get the annotation and offset data from the database for all sequences that comply with the parameters
+        /// </summary>
+        /// <param name="minSequenceLength"></param>
+        /// <param name="maxSequenceLength"></param>
+        /// <param name="maxNumNTermCleavages"></param>
+        /// <param name="maxNumCTermCleavages"></param>
+        /// <returns></returns>
         public IEnumerable<AnnotationAndOffset> SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
-            int minSequenceLength, int maxSequenceLength
-            , int maxNumNTermCleavages, int maxNumCTermCleavages)
+            int minSequenceLength, int maxSequenceLength, int maxNumNTermCleavages, int maxNumCTermCleavages)
         {
             foreach (
                 var annotationAndOffset in
@@ -173,6 +258,10 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Length of the longest sequence
+        /// </summary>
+        /// <returns></returns>
         public int GetLongestSequenceLength()
         {
             return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
@@ -229,6 +318,15 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Estimate the total number of peptides that will be used in processing - essential for reasonably accurate progress reporting
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numNTermCleavages"></param>
+        /// <param name="numCTermCleavages"></param>
+        /// <returns></returns>
         public long EstimateTotalPeptides(int mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1,
             int numCTermCleavages = 0)
         {
@@ -249,6 +347,15 @@ namespace InformedProteomics.Backend.Database
             return EstimateTotalPeptides(cleavageType, minLength, maxLength, numNTermCleavages, numCTermCleavages);
         }
 
+        /// <summary>
+        /// Estimate the total number of peptides that will be used in processing - essential for reasonably accurate progress reporting
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <param name="numNTermCleavages"></param>
+        /// <param name="numCTermCleavages"></param>
+        /// <returns></returns>
         public long EstimateTotalPeptides(InternalCleavageType mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1, int numCTermCleavages = 0)
         {
             long count = 0;
@@ -683,6 +790,13 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
+        /// <summary>
+        /// Get the longest common prefix for the supplied sequence
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
+        /// <returns></returns>
         public static byte GetLcp(IList<byte> sequence, int index1, int index2)
         {
             var lcp = (byte)0;
@@ -785,15 +899,30 @@ namespace InformedProteomics.Backend.Database
         public long Offset { set; get; }
     }
 
+    /// <summary>
+    /// Container for holding a sequence and its offset
+    /// </summary>
     public class SequenceAndOffset
     {
+        /// <summary>
+        /// Constructor - set the data
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="offset"></param>
         public SequenceAndOffset(byte[] sequence, long offset)
         {
             Sequence = sequence;
             Offset = offset;
         }
 
+        /// <summary>
+        /// Sequence
+        /// </summary>
         public byte[] Sequence { set; get; }
+
+        /// <summary>
+        /// Offset
+        /// </summary>
         public long Offset { set; get; }
     }
 }

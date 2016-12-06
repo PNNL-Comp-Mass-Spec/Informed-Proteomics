@@ -7,22 +7,34 @@ using InformedProteomics.Backend.Results;
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Computes the False Decoy Ratio and scores for the supplied target and decoy hits
+    /// </summary>
     public class FdrCalculator
     {
         private readonly bool _multiplePeptidesPerScan;
         private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
         private List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
 
+
+        /// <summary>
+        /// Number of PSMs with a QValue &lt; 0.01
+        /// </summary>
         public int NumPsms { get; private set; }
+
+        /// <summary>
+        /// Number of peptides with a PepQValue &lt; 0.01
+        /// </summary>
         public int NumPeptides { get; private set; }
 
+        /// <summary>
+        /// Error message, if FDR calculation fails
+        /// </summary>
         public string ErrorMessage { get; private set; }
 
-        public List<DatabaseSearchResultData> SeachResults
-        {
-            get { return new List<DatabaseSearchResultData>(searchResults); }
-        }
-
+        /// <summary>
+        /// The full list of filtered results, with FDR scores added
+        /// </summary>
         public List<DatabaseSearchResultData> FilteredResults
         {
             get { return new List<DatabaseSearchResultData>(filteredResults); }
@@ -66,6 +78,12 @@ namespace InformedProteomics.Backend.Utils
             }
         }
 
+        /// <summary>
+        /// Instantiate the FDR calculator
+        /// </summary>
+        /// <param name="targetResults"></param>
+        /// <param name="decoyResults"></param>
+        /// <param name="multiplePeptidesPerScan"></param>
         public FdrCalculator(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults, bool multiplePeptidesPerScan = false)
         {
             ErrorMessage = string.Empty;

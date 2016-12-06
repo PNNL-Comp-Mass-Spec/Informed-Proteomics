@@ -94,7 +94,7 @@ namespace InformedProteomics.Tests.DevTests
                     var maxScanNum = match.ScanNum;
                     var mass = match.Mass;
                     var charge = match.Charge;
-                    var massTh = tolerance.GetToleranceAsTh(mass);
+                    var massTh = tolerance.GetToleranceAsMz(mass);
                     var id1 = match.ProteinId;
 
                     var feature = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
@@ -144,7 +144,7 @@ namespace InformedProteomics.Tests.DevTests
                         if (f2.Flag < 1) continue;
 
                         var prsm2 = featureToPrsm[k];
-                        if (Math.Abs(f1.Mass - f2.Mass) > tolerance.GetToleranceAsTh(f1.Mass)) continue;
+                        if (Math.Abs(f1.Mass - f2.Mass) > tolerance.GetToleranceAsMz(f1.Mass)) continue;
                         if (!f1.CoElutedByNet(f2, 0.005)) continue;
                         if (!prsm1.ShareProteinId(prsm2)) continue;
 
@@ -261,7 +261,7 @@ namespace InformedProteomics.Tests.DevTests
                 for(var j = 0; j < features.Count; j++)
                 {
                     //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                    var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                    var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                     foreach (var match in prsmList)
                     {
                         if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
@@ -335,7 +335,7 @@ namespace InformedProteomics.Tests.DevTests
                 if (f1.DataSetId == f2.DataSetId) return false;
                 // tolerant in mass dimension?
 
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
                 if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
 
                 // tolerant in elution time dimension?
@@ -559,7 +559,7 @@ namespace InformedProteomics.Tests.DevTests
 
                     if (qvalue > 0.01) break;
 
-                    var massTol = tolerance.GetToleranceAsTh(mass);
+                    var massTol = tolerance.GetToleranceAsMz(mass);
 
                     var idx = massList.BinarySearch(mass);
                     if (idx < 0) idx = ~idx;

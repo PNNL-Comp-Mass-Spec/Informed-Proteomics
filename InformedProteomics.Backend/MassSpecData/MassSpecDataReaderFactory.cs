@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// Factory class for getting the right data reader for the provided file(s)
+    /// </summary>
     public static class MassSpecDataReaderFactory
     {
         /// <summary>
@@ -151,6 +154,11 @@ namespace InformedProteomics.Backend.MassSpecData
             get { return ProteoWizardReader.SupportedDirectoryTypes; }
         }
 
+        /// <summary>
+        /// Test the supplied path to see if we can read it using available readers
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static bool IsADirectoryDataset(string path)
         {
             path = NormalizeDatasetPath(path);
@@ -231,6 +239,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private static readonly bool _pwizAvailable;
         private static readonly bool _thermoRawAvailable;
 
+        /// <summary>
+        /// Tests to see if we can load the needed ProteoWizard DLL without errors
+        /// </summary>
+        /// <returns>True if we can load the ProteoWizard DLLs</returns>
         public static bool IsPwizAvailable()
         {
             // TODO: Test this on a system without ProteoWizard installed...
@@ -255,6 +267,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return false;
         }
 
+        /// <summary>
+        /// Tests to see if we can load the needed  Thermo MSFileReader DLL without errors
+        /// </summary>
+        /// <returns></returns>
         public static bool IsThermoRawAvailable()
         {
             try

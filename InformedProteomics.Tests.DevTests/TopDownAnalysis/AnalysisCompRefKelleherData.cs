@@ -104,7 +104,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         for (var j = 0; j < features.Count; j++)
                         {
                             //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                            var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                            var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                             for (var k = 0; k < prsmList.Count; k++)
                             {
                                 var match = prsmList[k];
@@ -205,7 +205,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var j = 0; j < features.Count; j++)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                         for(var k = 0; k < prsmList.Count; k++)
                         {
                             var match = prsmList[k];

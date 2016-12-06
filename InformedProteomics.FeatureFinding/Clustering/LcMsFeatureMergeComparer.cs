@@ -13,7 +13,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
         public bool SameCluster(LcMsPeakCluster f1, LcMsPeakCluster f2)
         {
-            var massTh = _tolerance.GetToleranceAsTh(f1.RepresentativeMass);
+            var massTh = _tolerance.GetToleranceAsMz(f1.RepresentativeMass);
             var massDiff = Math.Abs(f1.RepresentativeMass - f2.RepresentativeMass);
             if (massDiff > massTh) return false;
 

@@ -197,7 +197,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var bestFeature = featureSet.First();
                 featureSet.Remove(bestFeature);
                 outFeatures.Add(bestFeature);
-                var massTol = tol.GetToleranceAsTh(bestFeature.RepresentativeMass);
+                var massTol = tol.GetToleranceAsMz(bestFeature.RepresentativeMass);
 
                 var tempList = new List<LcMsPeakCluster>();
                 foreach (var f in bestFeature.OverlappedFeatures)

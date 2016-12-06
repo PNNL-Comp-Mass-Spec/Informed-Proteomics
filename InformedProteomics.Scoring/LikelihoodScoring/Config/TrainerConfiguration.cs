@@ -75,7 +75,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     break;
                 case "cid":
                     ActivationMethod = ActivationMethod.CID;
-                    Tolerance = _defaultToleranceTh;
+                    Tolerance = _defaultToleranceMz;
                     break;
                 case "etd":
                     ActivationMethod = ActivationMethod.ETD;
@@ -98,7 +98,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     throw new FormatException("Invalid Acquisition Method.");
             }
 
-            MassErrorTolerance = _defaultToleranceTh;
+            MassErrorTolerance = _defaultToleranceMz;
 
             MaxRanks = Convert.ToInt32(config.Contents["maxranks"]);
 
@@ -199,7 +199,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         }
 
         private readonly Tolerance _defaultTolerancePpm = new Tolerance(10, ToleranceUnit.Ppm);
-        private readonly Tolerance _defaultToleranceTh = new Tolerance(0.5, ToleranceUnit.Th);
+        private readonly Tolerance _defaultToleranceMz = new Tolerance(0.5, ToleranceUnit.Mz);
         private IonTypeFactory _ionTypeFactory;
     }
 }

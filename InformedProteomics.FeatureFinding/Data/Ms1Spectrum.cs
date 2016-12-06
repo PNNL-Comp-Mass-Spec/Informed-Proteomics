@@ -49,7 +49,7 @@ namespace InformedProteomics.FeatureFinding.Data
             var observedPeaks = new Ms1Peak[isotopeList.Size];
             var mz = isotopeList.GetIsotopeMz(charge, 0);
 
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
 
@@ -77,7 +77,7 @@ namespace InformedProteomics.FeatureFinding.Data
             for (var j = 1; j < isotopeList.Size; j++)
             {
                 var isotopeMz = isotopeList.GetIsotopeMz(charge, j);
-                tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 minMz = isotopeMz - tolTh;
                 maxMz = isotopeMz + tolTh;
                 for (i = peakIndex; i < Peaks.Length; i++)

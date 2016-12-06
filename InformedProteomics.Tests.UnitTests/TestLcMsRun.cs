@@ -251,7 +251,7 @@ namespace InformedProteomics.Tests.UnitTests
             for (var i = 0; i < mzArr.Length; i++)
             {
                 var mz = mzArr[i];
-                var tolTh = tolerance.GetToleranceAsTh(mz);
+                var tolTh = tolerance.GetToleranceAsMz(mz);
                 var minMz = mz - tolTh;
                 var maxMz = mz + tolTh;
                 var xic1 = run.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);
@@ -267,7 +267,7 @@ namespace InformedProteomics.Tests.UnitTests
             for (var i = 0; i < mzArr.Length; i++)
             {
                 var mz = mzArr[i];
-                var tolTh = tolerance.GetToleranceAsTh(mz);
+                var tolTh = tolerance.GetToleranceAsMz(mz);
                 var minMz = mz - tolTh;
                 var maxMz = mz + tolTh;
                 run.GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorMzArr[i]);

@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <param name="precursorMz"></param>
+        /// <param name="precursorIonMz"></param>
         /// <returns></returns>
         Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz);
     }

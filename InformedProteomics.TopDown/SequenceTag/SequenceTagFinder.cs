@@ -112,7 +112,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             for (var i = 0; i < _deconvolutedPeaks.Count; i++)
             {
-                var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[i].Mass);
+                var massTh = _tolerance.GetToleranceAsMz(_deconvolutedPeaks[i].Mass);
 
                 for (var j = i + 1; j < _deconvolutedPeaks.Count; j++)
                 {
@@ -206,7 +206,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
             //TagStrings = new HashSet<string>();
 
-            var massTh = _tolerance.GetToleranceAsTh(_deconvolutedPeaks[edges[0].Node1].Mass);
+            var massTh = _tolerance.GetToleranceAsMz(_deconvolutedPeaks[edges[0].Node1].Mass);
             var flankingMass = _deconvolutedPeaks[edges[0].Node1].Mass;
 
             for (var e = 0; e < totalCombinations; e++)

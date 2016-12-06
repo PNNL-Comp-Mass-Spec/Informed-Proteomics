@@ -91,7 +91,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>maximum intensity peak</returns>
         public Peak FindPeak(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
 
@@ -156,7 +156,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex - 1; i >= 0; i--)
@@ -177,7 +177,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex + 1; i < Peaks.Length; i++)
@@ -219,7 +219,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex; i >= 0; i--)
@@ -248,7 +248,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex; i < Peaks.Length; i++)
@@ -291,7 +291,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex; i >= 0; i--)
@@ -320,7 +320,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
                 var isotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex; i < Peaks.Length; i++)
@@ -486,7 +486,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             foreach (var peak in Peaks)
             {
-                var mzWindowWidth = tolerance.GetToleranceAsTh(peak.Mz);
+                var mzWindowWidth = tolerance.GetToleranceAsMz(peak.Mz);
                 var mzStart = peak.Mz - mzWindowWidth;
                 var mzEnd = peak.Mz + mzWindowWidth;
 
@@ -564,7 +564,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             foreach (var peak in Peaks)
             {
-                var mzWindowWidth = tolerance.GetToleranceAsTh(peak.Mz);
+                var mzWindowWidth = tolerance.GetToleranceAsMz(peak.Mz);
                 var intensity = peak.Intensity;
 
                 var mzStart = peak.Mz - mzWindowWidth;
@@ -645,7 +645,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public int FindPeakIndex(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return FindPeakIndex(minMz, maxMz);

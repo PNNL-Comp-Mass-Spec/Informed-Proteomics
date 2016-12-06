@@ -22,12 +22,12 @@ namespace InformedProteomics.FeatureFinding.Alignment
             // tolerant in mass dimension?
             if (!_oneDaltonShift)
             {
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
                 if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
             }
             else
             {
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
                 var massDiff = Math.Abs(f1.Mass - f2.Mass);
 
                 if (f1.Mass > 10000 && f2.Mass > 10000)

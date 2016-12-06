@@ -31,7 +31,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 if (f1.DataSetId == f2.DataSetId) return false;
                 // tolerant in mass dimension?
 
-                var massTol = Math.Min(_tolerance.GetToleranceAsTh(f1.Mass), _tolerance.GetToleranceAsTh(f2.Mass));
+                var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
                 if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
 
                 //if (!f1.CoElutedByNet(f2, 0.004)) return false; //e.g) 200*0.001 = 0.2 min = 30 sec
@@ -86,7 +86,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var j = 0; j < features.Count; j++)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                         foreach (var match in prsmList)
                         {
                             if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
@@ -148,7 +148,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var j = 0; j < features.Count; j++)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsTh(features[j].Mass);
+                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
                         foreach (var match in prsmList)
                         {
                             if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)

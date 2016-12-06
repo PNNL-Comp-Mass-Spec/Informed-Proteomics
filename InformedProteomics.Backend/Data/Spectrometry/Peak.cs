@@ -114,7 +114,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 _equalityComparer = new MzComparerWithPpmTolerance(tolerance.GetValue());
             }
-            else if (tolerance.GetUnit() == ToleranceUnit.Th)
+            else if (tolerance.GetUnit() == ToleranceUnit.Mz)
             {
                 _equalityComparer = new MzComparerWithToleranceMz(tolerance.GetValue());
             }

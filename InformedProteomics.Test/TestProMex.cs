@@ -173,7 +173,7 @@ namespace InformedProteomics.Test
                     {
                         var tempList = new List<LcMsPeakCluster>();
                         var features = featureFinder.FindFeatures(bi);
-                        var massTh = (mass < 2000) ? tolerance2.GetToleranceAsTh(mass) : tolerance.GetToleranceAsTh(mass);
+                        var massTh = (mass < 2000) ? tolerance2.GetToleranceAsMz(mass) : tolerance.GetToleranceAsMz(mass);
                         foreach (var feature in features)
                         {
                             if (Math.Abs(mass - feature.Mass) < massTh) tempList.Add(feature);

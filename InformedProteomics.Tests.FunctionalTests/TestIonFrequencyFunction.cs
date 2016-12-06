@@ -189,7 +189,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         };
         private readonly NeutralLoss[] _neutralLosses = { NeutralLoss.NoLoss, NeutralLoss.H2O };
         private List<IonType> _ionTypes;
-        private readonly Tolerance _tolerance = new Tolerance(0.5, ToleranceUnit.Th);
+        private readonly Tolerance _tolerance = new Tolerance(0.5, ToleranceUnit.Mz);
 
         private const string TsvFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
         private const string RawFile = @"\\protoapps\UserData\Wilkins\MSGFPlusTrainingData\CID_LowRes_Tryp.mgf";

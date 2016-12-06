@@ -28,7 +28,7 @@ namespace InformedProteomics.FeatureFinding.Training
                 var tol = new Tolerance(10);
                 //if (!prsm1.ProteinName.Equals(prsm2.ProteinName)) return false;
                 var massDiff = Math.Abs(prsm1.Mass - prsm2.Mass);
-                if (massDiff > tol.GetToleranceAsTh(prsm1.Mass)) return false;
+                if (massDiff > tol.GetToleranceAsMz(prsm1.Mass)) return false;
 
                 var elutionDiff = Math.Abs(_run.GetElutionTime(prsm1.ScanNum) - _run.GetElutionTime(prsm2.ScanNum));
                 if (prsm1.SequenceText.Equals(prsm2.SequenceText))
