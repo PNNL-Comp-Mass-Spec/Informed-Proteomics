@@ -218,11 +218,17 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// List of "folder extensions" that ProteoWizard can read. This does not include all folder type datasets - some require directory listings.
+        /// </summary>
         public static List<string> SupportedDirectoryTypes
         {
             get { return new List<string>() {".d", ".raw"}; }
         }
 
+        /// <summary>
+        /// List of files that are produced by Bruker instruments that ProteoWizard can read.
+        /// </summary>
         public static List<string> BrukerFiles
         {
             get

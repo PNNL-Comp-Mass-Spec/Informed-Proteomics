@@ -5,6 +5,9 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// Interface for objects that can supply mass spectrometry data, usually from a file
+    /// </summary>
     public interface IMassSpecDataReader : IDisposable
     {
         /// <summary>

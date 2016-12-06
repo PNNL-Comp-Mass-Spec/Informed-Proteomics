@@ -9,11 +9,20 @@ using ThermoRawFileReader;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// Class for reading spectra from Thermo .RAW files, using an installed MSFileReader DLL
+    /// </summary>
     public class XCaliburReader : IMassSpecDataReader
     {
-        // Parameters for centroiding spectra
+        /// <summary>
+        /// Parameters for centroiding spectra
+        /// </summary>
         public const int PeakToBackgroundRatio = 0;
 
+        /// <summary>
+        /// Constructor - open the file, and prepare to read
+        /// </summary>
+        /// <param name="filePath"></param>
         public XCaliburReader(string filePath)
         {
             _cachedScanInfo = new clsScanInfo(-1);
@@ -76,11 +85,19 @@ namespace InformedProteomics.Backend.MassSpecData
             return true;
         }
 
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
         public CV.CVID NativeIdFormat
         {
             get { return CV.CVID.MS_Thermo_nativeID_format; }
         }
 
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
         public CV.CVID NativeFormat
         {
             get { return CV.CVID.MS_Thermo_RAW_format; }
@@ -176,21 +193,37 @@ namespace InformedProteomics.Backend.MassSpecData
                 );
         }
 
+        /// <summary>
+        /// Get the maximum scan number in the file
+        /// </summary>
+        /// <returns></returns>
         public int GetMaxScanNum()
         {
             return _maxLcScan;
         }
 
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra
         {
             get { return _numSpectra; }
         }
 
+        /// <summary>
+        /// Get the minimum scan number in the file
+        /// </summary>
+        /// <returns></returns>
         public int GetMinScanNum()
         {
             return _minLcScan;
         }
 
+        /// <summary>
+        /// Read the MS Level of the specified scan number from the file
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public int ReadMsLevel(int scanNum)
         {
             int msLevel;
@@ -203,6 +236,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return scanInfo.MSLevel;
         }
 
+        /// <summary>
+        /// Get the retention time for the scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public double RtFromScanNum(int scanNum)
         {
             var scanInfo = GetScanInfo(scanNum);
@@ -346,12 +384,18 @@ namespace InformedProteomics.Backend.MassSpecData
             return _cachedScanInfo;
         }
 
+        /// <summary>
+        /// Close the reader
+        /// </summary>
         public void Close()
         {
             if (_msfileReader != null)
                 _msfileReader.CloseRawFile();
         }
 
+        /// <summary>
+        /// Clean up - close the file handle
+        /// </summary>
         public void Dispose()
         {
             if (_msfileReader != null)

@@ -2,6 +2,9 @@
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Helper class for determining what resources the system has that we can use, and for trying to not overload the system.
+    /// </summary>
     public static class ParallelizationUtils
     {
         /// <summary>

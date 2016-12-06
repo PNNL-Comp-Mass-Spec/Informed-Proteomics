@@ -2,6 +2,9 @@
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Add functionality to progress reporting using <see cref="IProgress{T}"/>
+    /// </summary>
     public class ProgressData
     {
         /// <summary>

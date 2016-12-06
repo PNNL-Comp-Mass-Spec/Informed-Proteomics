@@ -1,5 +1,8 @@
 ﻿namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Type of dissociation/activation supported/available in this program
+    /// </summary>
     public enum ActivationMethod : byte
     {
         /// <summary>

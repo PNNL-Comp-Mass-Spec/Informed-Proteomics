@@ -16,6 +16,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// File extension
         /// </summary>
         public new const string FileExtensionConst = ".dpbf";
+
+        /// <summary>
+        /// File extension used for this type
+        /// </summary>
         protected override string FileExtensionVirtual { get { return FileExtensionConst; } }
 
         /// <summary>
@@ -114,9 +118,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
-        // Must reflect all changes to WriteSpectrum
+        /// <summary>
+        /// Read a spectrum from the current position in <paramref name="reader"/>, with the option to only read the metadata.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         protected internal override Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
+            // Must reflect all changes to WriteSpectrum
+
             var scanNum = reader.ReadInt32();
             var c = new char[NativeIdLength];
             reader.Read(c, 0, NativeIdLength);
@@ -172,9 +183,14 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
-        // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
+        /// <summary>
+        /// Write the supplied spectrum to the current position in <paramref name="writer"/>
+        /// </summary>
+        /// <param name="specIn"></param>
+        /// <param name="writer"></param>
         protected internal override void WriteSpectrum(Spectrum specIn, BinaryWriter writer)
         {
+            // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
             var spec = specIn as DeconvolutedSpectrum;
             if (spec == null)
             {

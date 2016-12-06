@@ -9,24 +9,65 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// Base class for objects that provide access to LCMS run data
+    /// </summary>
     public abstract class LcMsRun: ILcMsRun, IMassSpecDataReader
     {
+        /// <summary>
+        /// Number of unique isolation windows kept for DIA data
+        /// </summary>
         public const int NumUniqueIsolationWindowThresholdForDia = 1000;
+
+        /// <summary>
+        /// Factor used to bin isolation window data
+        /// </summary>
         public const double IsolationWindowBinningFactor = 10;
         //public const double DefaultSpectrumFilteringWindowSize = 100.0;
 
+        /// <summary>
+        /// Index of first LC scan in the dataset
+        /// </summary>
         public int MinLcScan { get; protected set; }
+
+        /// <summary>
+        /// Index of last LC scan in the dataset
+        /// </summary>
         public int MaxLcScan { get; protected set; }
+
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra { get; protected set; }
 
+        /// <summary>
+        /// Lowest MS Level in the dataset. Usually 1.
+        /// </summary>
         public int MinMsLevel { get; protected set; }
+
+        /// <summary>
+        /// Highest MS Level in the dataset.
+        /// </summary>
         public int MaxMsLevel { get; protected set; }
 
+        /// <summary>
+        /// List of all scan numbers in the dataset
+        /// </summary>
         public IEnumerable<int> AllScanNumbers { get { return this.ScanNumToMsLevel.Select(x => x.Key); } }
 
+        /// <summary>
+        /// The smallest MS1 m/z
+        /// </summary>
         public abstract double MinMs1Mz { get; }
+
+        /// <summary>
+        /// The largest MS1 m/z
+        /// </summary>
         public abstract double MaxMs1Mz { get; }
 
+        /// <summary>
+        /// True if the dataset is DIA data
+        /// </summary>
         public bool IsDia
         {
             get
@@ -103,16 +144,45 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSpectrum(scanNum, includePeaks);
         }
 
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
         public abstract bool TryMakeRandomAccessCapable();
 
         #endregion
 
         #region Spectra and scan operations
 
+        /// <summary>
+        /// Return the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
+
+        /// <summary>
+        /// If <paramref name="scanNum"/> is a MS1 scan, return it; otherwise, return null.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="ms1ScanIndex"></param>
+        /// <returns></returns>
         public abstract Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex);
+
+        /// <summary>
+        /// Return the isolation window for the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
 
+        /// <summary>
+        /// Create a summed MS1 spectrum from the scans within <paramref name="elutionTimeTolerance"/> of <paramref name="scanNum"/>
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="elutionTimeTolerance"></param>
+        /// <returns></returns>
         public Spectrum GetSummedMs1Spectrum(int scanNum, double elutionTimeTolerance)
         {
             var elutionTime = GetElutionTime(scanNum);
@@ -137,7 +207,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSummedMs1Spectrum(minScanNum, maxScanNum);
         }
 
-        // minScanNum, maxScanNum: inclusive
+        /// <summary>
+        /// Create a summed MS1 spectrum from the scans in the supplied range
+        /// </summary>
+        /// <param name="minScanNum">min scan number, inclusive</param>
+        /// <param name="maxScanNum">max scan number, inclusive</param>
+        /// <returns></returns>
         public SummedSpectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
         {
             if (minScanNum < MinLcScan) minScanNum = MinLcScan;
@@ -153,6 +228,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSummedSpectrum(scanNums, minScanNum);
         }
 
+        /// <summary>
+        /// Produce a summed spectrum using the data in the scans specified by <paramref name="scanNums"/>
+        /// </summary>
+        /// <param name="scanNums"></param>
+        /// <param name="repScanNum">Representative scan number</param>
+        /// <returns></returns>
         public SummedSpectrum GetSummedSpectrum(IList<int> scanNums, int repScanNum = 0)
         {
             var mzComparer = new MzComparerWithBinning();
@@ -196,7 +277,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return summedSpec;
         }
 
-        // minScanNum, maxScanNum, minCharge, maxCharge: inclusive
+        /// <summary>
+        /// Get a summed MS2 spectrum from the dataset, with the provided limits
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="minScanNum">min scan number, inclusive</param>
+        /// <param name="maxScanNum">max scan number, inclusive</param>
+        /// <param name="minCharge">min charge, inclusive</param>
+        /// <param name="maxCharge">max charge, inclusive</param>
+        /// <param name="activationMethod"></param>
+        /// <returns></returns>
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass,
             int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
@@ -238,6 +328,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return ScanNumToMsLevel.TryGetValue(scanNum, out msLevel) ? msLevel : 0;
         }
 
+        /// <summary>
+        /// Get the elution time of the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public double GetElutionTime(int scanNum)
         {
             double elutionTime;
@@ -309,6 +404,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         private int[] _ms1ScanVector;
+
+        /// <summary>
+        /// An array of all of the MS1 scan numbers
+        /// </summary>
+        /// <returns></returns>
         public int[] GetMs1ScanVector()
         {
             return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
@@ -391,6 +491,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
+        /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
+        /// </summary>
+        /// <param name="minMz">min m/z</param>
+        /// <param name="maxMz">max m/z</param>
+        /// <returns>An array of doubles, with every intensity value in the provided m/z range</returns>
         public double[] GetFullPrecursorIonExtractedIonChromatogramVector(double minMz, double maxMz)
         {
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -415,6 +521,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
         }
 
+        /// <summary>
+        /// Returns selected peaks between minMz and maxMz. The biggest peak per scan is selected.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
         public abstract Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz);
 
         /// <summary>
@@ -479,6 +591,13 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
         }
 
+        /// <summary>
+        /// Returns a xic for the chosen range that covers the entire run.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <param name="precursorMz"></param>
+        /// <returns></returns>
         public abstract Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz);
 
         #endregion
@@ -556,6 +675,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Isolation Windows
 
+        /// <summary>
+        /// Return the number of unique isolation windows in the dataset
+        /// </summary>
+        /// <returns></returns>
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
@@ -568,6 +691,10 @@ namespace InformedProteomics.Backend.MassSpecData
             return isoWindowSet.Count;
         }
 
+        /// <summary>
+        /// Get the narrowest isolation window width
+        /// </summary>
+        /// <returns></returns>
         public double GetMinIsolationWindowWidth()
         {
             var minWidth = Double.MaxValue;
@@ -622,14 +749,32 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Protected members and functions
 
         // Fields to be defined in a child
+        /// <summary>
+        /// Dictionary to map IsolationMzBins to scan numbers
+        /// </summary>
         protected Dictionary<int, int[]> IsolationMzBinToScanNums;
+
+        /// <summary>
+        /// Dictionary to map scan numbers to MS Levels
+        /// </summary>
         protected Dictionary<int, int> ScanNumToMsLevel;
+
+        /// <summary>
+        /// Dictionary to map scan numbers to elution times
+        /// </summary>
         protected Dictionary<int, double> ScanNumElutionTimeMap;
+
+        /// <summary>
+        /// True if DIA data, false if not, null if unknown
+        /// </summary>
         protected bool? IsDiaOrNull;
 
         private Dictionary<int, int> _precursorScan;
         private Dictionary<int, int> _nextScan;
 
+        /// <summary>
+        /// Create the maps for linking MSn scans to their precursors, and for getting the next MS1 scan number given a scan number
+        /// </summary>
         protected void CreatePrecursorNextScanMap()
         {
             _precursorScan = new Dictionary<int, int>(NumSpectra + 1);

@@ -97,11 +97,20 @@ namespace InformedProteomics.Backend.Utils
             }
         }
 
+        /// <summary>
+        /// True if there was an error calculating the FDR scores
+        /// </summary>
+        /// <returns></returns>
         public bool HasError()
         {
             return !string.IsNullOrWhiteSpace(ErrorMessage);
         }
 
+        /// <summary>
+        /// Write the results with the FDR data to the specified file
+        /// </summary>
+        /// <param name="outputFilePath"></param>
+        /// <param name="includeDecoy"></param>
         public void WriteTo(string outputFilePath, bool includeDecoy = false)
         {
             //var resultsToUse = searchResults;

@@ -7,6 +7,9 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// LcMsRun implementation where all information is held in the system's memory. Due to the amount of memory this can consume, use of <see cref="PbfLcMsRun"/> is generally preferred.
+    /// </summary>
     public class InMemoryLcMsRun : LcMsRun //LcMsRun
     {
         private struct SpectrumTrackingInfo
@@ -369,9 +372,19 @@ namespace InformedProteomics.Backend.MassSpecData
             return true;
         }
 
+        /// <summary>
+        /// List of all MS1 peaks
+        /// </summary>
         public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
 
+        /// <summary>
+        /// The smallest MS1 m/z
+        /// </summary>
         public override double MinMs1Mz { get { return _ms1PeakList[0].Mz; } }
+
+        /// <summary>
+        /// The largest MS1 m/z
+        /// </summary>
         public override double MaxMs1Mz { get { return _ms1PeakList[_ms1PeakList.Count - 1].Mz; } }
 
         /// <summary>
@@ -414,6 +427,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
         }
 
+        /// <summary>
+        /// If <paramref name="scanNum"/> is a MS1 scan, return it; otherwise, return null.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="ms1ScanIndex"></param>
+        /// <returns></returns>
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
             //throw new NotImplementedException();
@@ -424,6 +443,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
+        /// <summary>
+        /// Return the isolation window for the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             var spec = GetSpectrum(scanNum);
@@ -509,6 +533,15 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
+        /// <summary>
+        /// Get an extracted ion chromatogram using the specified limits
+        /// </summary>
+        /// <param name="productIonMz"></param>
+        /// <param name="precursorIonMz"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="minScanNum"></param>
+        /// <param name="maxScanNum"></param>
+        /// <returns></returns>
         public Xic GetProductExtractedIonChromatogram(double productIonMz, double precursorIonMz, Tolerance tolerance, int minScanNum, int maxScanNum)
         {
             var productXic = new Xic();
@@ -529,6 +562,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return productXic;
         }
 
+        /// <summary>
+        /// Old PBF creation workflow
+        /// </summary>
+        /// <param name="outputFilePath"></param>
+        /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun.WriteAsPbf(InMemoryLcMsRun, string, IProgress<ProgressData> = null)", true)]
         public void WriteAsPbf(string outputFilePath, IProgress<ProgressData> progress = null)
         {
@@ -538,6 +576,12 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Old PBF creation workflow
+        /// </summary>
+        /// <param name="imlr"></param>
+        /// <param name="writer"></param>
+        /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun.WriteAsPbf(InMemoryLcMsRun, BinaryWriter, IProgress<ProgressData> = null)", true)]
         public void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {

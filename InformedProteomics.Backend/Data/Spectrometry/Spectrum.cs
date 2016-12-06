@@ -9,8 +9,17 @@ using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Class to hold information about a single Spectrum
+    /// </summary>
     public class Spectrum
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mzArr"></param>
+        /// <param name="intensityArr"></param>
+        /// <param name="scanNum"></param>
         public Spectrum(IList<double> mzArr, IList<double> intensityArr, int scanNum)
         {
             Peaks = new Peak[mzArr.Count];
@@ -18,6 +27,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             ScanNum = scanNum;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="peaks"></param>
+        /// <param name="scanNum"></param>
         public Spectrum(ICollection<Peak> peaks, int scanNum)
         {
             Peaks = new Peak[peaks.Count];
@@ -25,26 +39,48 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             ScanNum = scanNum;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="scanNum"></param>
         public Spectrum(int scanNum)
         {
             ScanNum = scanNum;
         }
 
+        /// <summary>
+        /// Scan Number
+        /// </summary>
         public int ScanNum { get; protected set; }
 
+        /// <summary>
+        /// Native ID
+        /// </summary>
         public string NativeId { get; set; }
 
+        /// <summary>
+        /// Total Ion Current
+        /// </summary>
         public double TotalIonCurrent { get; set; }
 
+        /// <summary>
+        /// MS Level
+        /// </summary>
         public int MsLevel
         {
             get { return _msLevel; }
             set { _msLevel = value; }
         }
 
+        /// <summary>
+        /// Elution time (minutes)
+        /// </summary>
         public double ElutionTime { get; set; }
 
-        // Peaks are assumed to be sorted according to m/z
+        /// <summary>
+        /// Peaks
+        /// </summary>
+        /// <remarks>Peaks are assumed to be sorted according to m/z</remarks>
         public Peak[] Peaks { get; protected set; }
 
         /// <summary>

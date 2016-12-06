@@ -6,8 +6,16 @@
 
     using PSI_Interface.IdentData;
 
+    /// <summary>
+    /// Extension functions for working with identification data.
+    /// </summary>
     public static class IdentificationExtensions
     {
+        /// <summary>
+        /// Convert the sequence information from the external types to the internal types
+        /// </summary>
+        /// <param name="peptide"></param>
+        /// <returns></returns>
         public static Sequence GetIpSequence(this SimpleMZIdentMLReader.PeptideRef peptide)
         {
             var aminoAcidSet = new AminoAcidSet();

@@ -12,6 +12,9 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// Reader for mzML files. Can handle gzipped mzML files, and read in a forward-only fashion or in a random-access fashion.
+    /// </summary>
     public sealed class MzMLReader: IMassSpecDataReader
     {
         #region Private Members
@@ -246,6 +249,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Helper class for converting between native IDs and scan numbers
+        /// </summary>
         public static class NativeIdConversion
         {
             private static Dictionary<string, string> ParseNativeId(string nativeId)
@@ -262,17 +268,34 @@ namespace InformedProteomics.Backend.MassSpecData
                 return map;
             }
 
+            /// <summary>
+            /// Try to get the scan number for <paramref name="nativeId"/>, and parse it as a long int
+            /// </summary>
+            /// <param name="nativeId"></param>
+            /// <param name="num"></param>
+            /// <returns></returns>
             public static bool TryGetScanNumberLong(string nativeId, out long num)
             {
                 return long.TryParse(GetScanNumber(nativeId), out num);
             }
 
+            /// <summary>
+            /// Try to get the scan number for <paramref name="nativeId"/>, and parse it as an int
+            /// </summary>
+            /// <param name="nativeId"></param>
+            /// <param name="num"></param>
+            /// <returns></returns>
             public static bool TryGetScanNumberInt(string nativeId, out int num)
             {
                 return int.TryParse(GetScanNumber(nativeId), out num);
             }
 
-            // Code is ported from MSData.cpp in ProteoWizard
+            /// <summary>
+            /// For the supplied <paramref name="nativeId"/>, get the corresponding scan number
+            /// </summary>
+            /// <param name="nativeId"></param>
+            /// <returns></returns>
+            /// <remarks>Code is ported from MSData.cpp in ProteoWizard</remarks>
             public static string GetScanNumber(string nativeId)
             {
                 // TODO: Add interpreter for Waters' S0F1, S1F1, S0F2,... format
@@ -776,6 +799,9 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Delete unzipped file, if we had to unzip the file to read it.
+        /// </summary>
         public void Cleanup()
         {
             if (_randomAccess && _isGzipped)
@@ -784,12 +810,18 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Close and cleanup file handles
+        /// </summary>
         public void Dispose()
         {
             Close();
             Cleanup();
         }
 
+        /// <summary>
+        /// Close and cleanup file handles
+        /// </summary>
         ~MzMLReader()
         {
             Close();
@@ -968,7 +1000,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
         }
-        
+
         /// <summary>
         /// Handle the child nodes of the run element
         /// Called by IndexMzMl (xml hierarchy)
@@ -1949,11 +1981,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     continue;
                 }
                 //////////////////////////////////////////////////////////////////////////////////////
-                ///
-                /// MS1 Spectra: only need Spectrum data: scanNum, MSLevel, ElutionTime, mzArray, IntensityArray
-                ///
-                /// MS2 Spectra: use ProductSpectrum; adds ActivationMethod and IsolationWindow
-                ///
+                //
+                // MS1 Spectra: only need Spectrum data: scanNum, MSLevel, ElutionTime, mzArray, IntensityArray
+                //
+                // MS2 Spectra: use ProductSpectrum; adds ActivationMethod and IsolationWindow
+                //
                 //////////////////////////////////////////////////////////////////////////////////////
                 switch (reader.Name)
                 {

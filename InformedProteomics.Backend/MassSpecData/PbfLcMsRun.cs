@@ -9,12 +9,20 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
+    /// <summary>
+    /// A file-backed object for accessing mass spec data. Data is read from the vendor format
+    /// to a binary PBF file, and that file is used for fast access to spectra and extracted ion chromatograms
+    /// </summary>
     public class PbfLcMsRun: LcMsRun
     {
         /// <summary>
         /// File extension
         /// </summary>
         public const string FileExtensionConst = ".pbf";
+
+        /// <summary>
+        /// File extension used for this type
+        /// </summary>
         protected virtual string FileExtensionVirtual { get { return FileExtensionConst; } }
 
         /// <summary>
@@ -22,13 +30,19 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public string FileExtension { get { return FileExtensionVirtual; } }
 
+        /// <summary>
+        /// True if the file contains precursor or product chromatograms
+        /// </summary>
         public virtual bool ContainsChromatograms { get { return true; } }
 
-        // This constant should be incremented by 1 if the binary file format is changed
+        /// <summary>
+        /// The current FileFormatId, which is written to the file, and checked before a file is read
+        /// </summary>
+        /// <remarks>This constant should be incremented by 1 if the binary file format is changed</remarks>
         public const int FileFormatId = 150608;
         private const int EarliestSupportedFileFormatId = 150604;
 
-        /** File format id history
+        /* File format id history
          * 150604: Earliest supported, has all data needed by InformedProteomics projects
          * 150605: Added Total Ion Current and Native ID fields to spectrum output.
          * 150606: Added ScanNum to the output in the metadata section to support skipped scans
@@ -456,6 +470,12 @@ namespace InformedProteomics.Backend.MassSpecData
             CreatePrecursorNextScanMap();
         }
 
+        /// <summary>
+        /// Check the file format version of the specified file to see if it is readable with the current version.
+        /// </summary>
+        /// <param name="filePath">path to the file to check</param>
+        /// <param name="isCurrent">true if the format is the same as the current format</param>
+        /// <returns>True if the format is readable</returns>
         public static bool CheckFileFormatVersion(string filePath, out bool isCurrent)
         {
             isCurrent = false;
@@ -515,6 +535,9 @@ namespace InformedProteomics.Backend.MassSpecData
         private const int FileChecksumLength = 40;
         private const int RawFilePathLength = 200;
         private int _fileFormatId = FileFormatId; // For internal checks and backwards compatibility usages.
+        /// <summary>
+        /// The length of the Native ID field in the binary file
+        /// </summary>
         protected internal const int NativeIdLength = 50;
 
         private readonly object _filelock = new object();
@@ -603,16 +626,28 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region LcMsRun Public function overrides
 
+        /// <summary>
+        /// The smallest MS1 m/z
+        /// </summary>
         public override double MinMs1Mz
         {
             get { return _minMs1Mz; }
         }
 
+        /// <summary>
+        /// The largest MS1 m/z
+        /// </summary>
         public override double MaxMs1Mz
         {
             get { return _maxMs1Mz; }
         }
 
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             long offset;
@@ -623,6 +658,11 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
+        /// <summary>
+        /// Read and return the isolation window for the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             long offset;
@@ -758,6 +798,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
+        /// <summary>
+        /// If <paramref name="scanNum"/> is a MS1 scan, return it; otherwise, return null.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="ms1ScanIndex"></param>
+        /// <returns></returns>
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
             long offset;
@@ -988,10 +1034,17 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
-        // Must reflect all changes to WriteSpectrum
-        // reader is passed in because this function should be called within a lock to prevent reading/writing errors
+        /// <summary>
+        /// Read a spectrum from the current position in <paramref name="reader"/>, with the option to only read the metadata.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
+            // Must reflect all changes to WriteSpectrum
+            // reader is passed in because this function should be called within a lock to prevent reading/writing errors
+
             var scanNum = reader.ReadInt32();
             var nativeId = string.Empty;
             if (_fileFormatId > 150604)
@@ -1054,10 +1107,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return spec;
         }
 
-        // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
-        // writer is passed in because this function should be called within a lock to prevent reading/writing errors
+        /// <summary>
+        /// Write the supplied spectrum to the current position in <paramref name="writer"/>
+        /// </summary>
+        /// <param name="spec"></param>
+        /// <param name="writer"></param>
         protected internal virtual void WriteSpectrum(Spectrum spec, BinaryWriter writer)
         {
+            // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
+            // writer is passed in because this function should be called within a lock to prevent reading/writing errors
+
             // scan number: 4
             writer.Write(spec.ScanNum);
 
@@ -1190,6 +1249,12 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region WriteAsPbf (obsolete)
 
+        /// <summary>
+        /// Old PBF file creation workflow
+        /// </summary>
+        /// <param name="imlr"></param>
+        /// <param name="outputFilePath"></param>
+        /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
         {
@@ -1199,6 +1264,12 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Old PBF file creation workflow
+        /// </summary>
+        /// <param name="imlr"></param>
+        /// <param name="writer"></param>
+        /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
         public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
@@ -2100,6 +2171,11 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region XIC reading functions
 
+        /// <summary>
+        /// Get the MzBin index for the supplied m/z
+        /// </summary>
+        /// <param name="mz"></param>
+        /// <returns></returns>
         public static int GetMzBinIndex(double mz)
         {
             return (int)(mz / MzBinSize);
