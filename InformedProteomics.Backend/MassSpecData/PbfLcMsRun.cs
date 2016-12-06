@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert a spec file to pbf, and return an LcMsRun that uses the pbf file
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert a spec file to pbf, and return an LcMsRun that uses the pbf file
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -81,7 +81,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert a spec file to pbf, and return an LcMsRun that uses the pbf file
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader">Data reader; if not a PbfLcMsRun, it will be closed when pbf file creation is finished</param>
@@ -101,7 +101,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert a spec file to pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert a spec file to pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -309,7 +309,7 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Constructor support functions
 
         /// <summary>
-        /// 
+        /// Given a spec file path and other information, either open an existing pbf corresponding to the spec file path, or create a new one
         /// </summary>
         /// <param name="specFileName"></param>
         /// <param name="msdr"></param>
@@ -1206,7 +1206,6 @@ namespace InformedProteomics.Backend.MassSpecData
             long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
-            progressData.Status = "Writing spectra data";
 
             var scanNumToSpecOffset = new long[imlr.NumSpectra + 1];
             var scanNumToIsolationWindow = new IsolationWindow[imlr.NumSpectra + 1];
@@ -1214,7 +1213,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Spectra
             countTotal = imlr.NumSpectra;
             counter = 0;
-            progressData.StepRange(42.9); // SpecData: Approximately 43% of total file size
+            progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             long countMS2Spec = 0;
             for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
             {
@@ -1246,8 +1245,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // All MS1 data sorted by mass, then scan number
             // In rare instances, imlr.Ms1PeakList will be blank (no MS1 spectra); that's OK
-            progressData.Status = "Writing precursor chromatogram";
-            progressData.StepRange(42.9 + 15.7); // Approximately 16% of total file size
+            progressData.StepRange(42.9 + 15.7, "Writing precursor chromatogram"); // Approximately 16% of total file size
             foreach (var peak in imlr.Ms1PeakList)
             {
                 progressData.Report(counter, countTotal);
@@ -1268,8 +1266,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var ms2PeakList = new List<LcMsPeak>();
             counter = 0;
             countTotal = countMS2Spec;
-            progressData.Status = "Processing product ion chromatogram";
-            progressData.StepRange(42.9 + 15.7 + (41.2 / 2)); // Approximately 41% of total file size
+            progressData.StepRange(42.9 + 15.7 + (41.2 / 2), "Processing product ion chromatogram"); // Approximately 41% of total file size
             foreach (var ms2ScanNum in imlr.GetScanNumbers(2))
             {
                 progressData.Report(counter, countTotal);
@@ -1286,8 +1283,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var offsetBeginProductChromatogram = writer.BaseStream.Position;
             counter = 0;
             countTotal = ms2PeakList.Count;
-            progressData.Status = "Writing product ion chromatogram";
-            progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size
+            progressData.StepRange(42.9 + 15.7 + 41.2, "Writing product ion chromatogram"); // Approximately 41% of total file size
             foreach (var peak in ms2PeakList)
             {
                 progressData.Report(counter, countTotal);
@@ -1299,9 +1295,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // Meta information
             var offsetBeginMetaInformation = writer.BaseStream.Position;
-            progressData.Status = "Writing metadata";
             progressData.IsPartialRange = false;
-            progressData.Report(99.8); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.8, "Writing metadata"); // Metadata: Approximately 0.2% of total file size
 
             var warnedInvalidScanNum = false;
             var warnedNullScanToIsolationWindow = false;
@@ -1401,7 +1396,6 @@ namespace InformedProteomics.Backend.MassSpecData
             long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
-            progressData.Status = "Writing spectra data";
 
             var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
             var ms1Scans = new List<int>();
@@ -1417,7 +1411,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
             countTotal = msdr.NumSpectra;
             counter = 0;
-            progressData.StepRange(42.9); // SpecData: Approximately 43% of total file size
+            progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             foreach (var spec in msdr.ReadAllSpectra())
             {
                 progressData.Report(counter, countTotal);
@@ -1512,8 +1506,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (ms2PeakCount > 0 && ContainsChromatograms)
             {
-                progressData.Status = "Writing product chromatogram";
-                progressData.StepRange(42.9 + 15.7 + 41.2); // Approximately 41% of total file size, on standard LCMS file
+                progressData.StepRange(42.9 + 15.7 + 41.2, "Writing product chromatogram"); // Approximately 41% of total file size, on standard LCMS file
                 var prog = new Progress<ProgressData>(p =>
                 {
                     progressData.StatusInternal = p.Status;
@@ -1525,9 +1518,8 @@ namespace InformedProteomics.Backend.MassSpecData
             // Meta information
             _offsetProductChromatogramEnd = writer.BaseStream.Position;
             var offsetBeginMetaInformation = _offsetProductChromatogramEnd;
-            progressData.Status = "Writing metadata";
             progressData.IsPartialRange = false;
-            progressData.Report(99.8); // Metadata: Approximately 0.2% of total file size
+            progressData.Report(99.8, "Writing metadata"); // Metadata: Approximately 0.2% of total file size
 
             var warnedInvalidScanNum = false;
             var warnedNullScanToIsolationWindow = false;

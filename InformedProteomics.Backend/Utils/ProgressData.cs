@@ -87,9 +87,10 @@ namespace InformedProteomics.Backend.Utils
         /// Change to a new range block
         /// </summary>
         /// <param name="newMaxPercentage">New max percent for range, must be greater than current max percent.</param>
+        /// <param name="newStatus">Updated status string, null for no update</param>
         /// <remarks>Will set IsPartialRange to true</remarks>
         /// <remarks>If current max percent is 100, the new max percent can be any value between 0 and 100</remarks>
-        public void StepRange(double newMaxPercentage)
+        public void StepRange(double newMaxPercentage, string newStatus = null)
         {
             if (!IsPartialRange)
             {
@@ -100,6 +101,10 @@ namespace InformedProteomics.Backend.Utils
                 {
                     _maxPercentage = 0;
                 }
+            }
+            if (newStatus != null)
+            {
+                Status = newStatus;
             }
             CheckSetMinMaxRange(_maxPercentage, newMaxPercentage);
         }
@@ -148,9 +153,14 @@ namespace InformedProteomics.Backend.Utils
         /// Updates the percent, then calls the stored progress object's "Report"
         /// </summary>
         /// <param name="pct">percent progress, 0 to 100</param>
-        public void Report(double pct)
+        /// <param name="newStatus">Updated status string, null for no update</param>
+        public void Report(double pct, string newStatus = null)
         {
             Percent = pct;
+            if (newStatus != null)
+            {
+                Status = newStatus;
+            }
             ProgressObj.Report(this);
         }
 
@@ -158,18 +168,20 @@ namespace InformedProteomics.Backend.Utils
         /// Updates the percent, then calls the stored progress object's "Report"
         /// </summary>
         /// <param name="pct">percent progress, 0 to 1</param>
-        public void ReportDecimal(double pct)
+        /// <param name="newStatus">Updated status string, null for no update</param>
+        public void ReportDecimal(double pct, string newStatus = null)
         {
-            Report(pct * 100.0);
+            Report(pct * 100.0, newStatus);
         }
         /// <summary>
         /// Updates the percent, then calls the stored progress object's "Report"
         /// </summary>
         /// <param name="count">The count progress, or numerator</param>
         /// <param name="total">The total number of objects to be counted, or denominator</param>
-        public void Report(double count, double total)
+        /// <param name="newStatus">Updated status string, null for no update</param>
+        public void Report(double count, double total, string newStatus = null)
         {
-            ReportDecimal(count / total);
+            ReportDecimal(count / total, newStatus);
         }
     }
 }

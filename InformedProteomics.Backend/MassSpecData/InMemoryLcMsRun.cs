@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf, and return InMemoryLcMsRun reading from the pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="singleScanNum"></param>
@@ -36,7 +36,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf, and return InMemoryLcMsRun reading from the pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="scanStart"></param>
@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf, and return InMemoryLcMsRun reading from the pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf, and return InMemoryLcMsRun reading from the pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -83,7 +83,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf, and return InMemoryLcMsRun reading from the pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -114,7 +114,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -132,7 +132,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Convert supplied file to pbf
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
@@ -152,7 +152,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// 
+        /// Constructor - read the source file into memory
         /// </summary>
         /// <param name="massSpecDataReader">data reader; will be closed when reading is done unless otherwise specified</param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -228,9 +228,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
 
-                progressData.Status = "Processing Isolation Bins";
                 progressData.IsPartialRange = false;
-                progressData.Report(95.1);
+                progressData.Report(95.1, "Processing Isolation Bins");
 
                 foreach (var entry in isolationMzBinToScanNums)
                 {

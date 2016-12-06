@@ -213,8 +213,7 @@ namespace InformedProteomics.TopDown.Execution
             else
                 Console.Write(@"Reading raw file...");
 
-            progData.Status = "Reading spectra file";
-            progData.StepRange(5.0);
+            progData.StepRange(5.0, "Reading spectra file");
             sw.Start();
 
             _run = PbfLcMsRun.GetLcMsRun(Options.SpecFilePath, 0, 0, prog);
@@ -245,8 +244,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
-            progData.StepRange(10);
-            progData.Status = "Reading Fasta File";
+            progData.StepRange(10, "Reading Fasta File");
             Console.WriteLine(progData.Status);
 
             // Target database
@@ -337,8 +335,7 @@ namespace InformedProteomics.TopDown.Execution
             // Generate sequence tags for all MS/MS spectra
             if (Options.TagBasedSearch)
             {
-                progData.StepRange(25.0);
-                progData.Status = "Generating Sequence Tags";
+                progData.StepRange(25.0, "Generating Sequence Tags");
 
                 sw.Reset();
                 Console.WriteLine(@"Generating sequence tags for MS/MS spectra...");
@@ -361,8 +358,7 @@ namespace InformedProteomics.TopDown.Execution
             var tdaOutputFilePath = Path.Combine(Options.OutputDir, specFileName + TdaFileNameEnding);
             var mzidOutputFilePath = Path.Combine(Options.OutputDir, specFileName + MzidFileNameEnding);
 
-            progData.StepRange(60.0);
-            progData.Status = "Running Target search";
+            progData.StepRange(60.0, "Running Target search");
             List<DatabaseSearchResultData> targetSearchResults = null;
 
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !File.Exists(targetOutputFilePath))
@@ -374,8 +370,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Target results file '{0}' exists; skipping target search.", targetOutputFilePath);
             }
 
-            progData.StepRange(95.0); // total to 95%
-            progData.Status = "Running Decoy search";
+            progData.StepRange(95.0, "Running Decoy search"); // total to 95%
             List<DatabaseSearchResultData> decoySearchResults = null;
 
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !File.Exists(decoyOutputFilePath))
@@ -388,8 +383,7 @@ namespace InformedProteomics.TopDown.Execution
                 Console.WriteLine(@"Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath);
             }
 
-            progData.StepRange(100.0);
-            progData.Status = "Writing combined results file";
+            progData.StepRange(100.0, "Writing combined results file");
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Both))
             {
                 // Add "Qvalue" and "PepQValue"
