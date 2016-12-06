@@ -87,8 +87,7 @@ namespace InformedProteomics.Backend.Utils
         public IsotopeConcentrationCorrelationCurve Tune(IProgress<ProgressData> progress = null)
         {
             // Set up progress reporter
-            progress = progress ?? new Progress<ProgressData>();
-            var progressData = new ProgressData();
+            var progressData = new ProgressData(progress);
 
             this.ValidateParameters();
 
@@ -120,7 +119,7 @@ namespace InformedProteomics.Backend.Utils
             for (int i = 0; i <= numberOfSteps; i++)
             {
                 // Update percent complete
-                progress.Report(progressData.UpdatePercent(100.0 * i / numberOfSteps));
+                progressData.Report(i, numberOfSteps);
 
                 // Calculate concentration
                 var concentrationStep = i * this.StepSize;

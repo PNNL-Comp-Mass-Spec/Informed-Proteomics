@@ -4,10 +4,24 @@ namespace InformedProteomics.Backend.Utils
 {
     public class ProgressData
     {
+        /// <summary>
+        /// Status string - for reporting textual information about the current task
+        /// </summary>
         public string Status { get; set; }
+
+        /// <summary>
+        /// Internal status string - for tracking nested progress status
+        /// </summary>
         public string StatusInternal { get; set; }
+
+        /// <summary>
+        /// Referenced <see cref="IProgress{T}"/> object, that all updates are pushed out to.
+        /// </summary>
         public IProgress<ProgressData> ProgressObj { get; set; }
 
+        /// <summary>
+        /// The current percent progress of the task. Updated using <see cref="Report(double,string)"/> or variants
+        /// </summary>
         public double Percent
         {
             get
@@ -57,11 +71,17 @@ namespace InformedProteomics.Backend.Utils
             }
         }
 
+        /// <summary>
+        /// Throttling for console output - used with ShouldUpdate() to provide a simple throttle to reduce the console output
+        /// </summary>
         public double UpdateFrequencySeconds { get; set; }
 
-        // static for the case of multiple ProgressData objects being fed to "Progress.Report()"
+        /// <summary>
+        /// Last output time, for throttling updates for console output
+        /// </summary>
+        /// <remarks>static for the case of multiple ProgressData objects being fed to "Progress.Report()"</remarks>
         public static DateTime LastUpdated { get; private set; }
-        private static string _updateLock = String.Empty; // Only because we need a reference type for a lock
+        private static readonly string UpdateLock = string.Empty; // Only because we need a reference type for a lock
 
         private double _percent = 0;
         private double _minPercentage = 0;
@@ -99,7 +119,7 @@ namespace InformedProteomics.Backend.Utils
                 _minPercentage = 0;
                 if (_maxPercentage >= 100.0)
                 {
-                    _maxPercentage = 0;
+                    _maxPercentage = 100;
                 }
             }
             if (newStatus != null)
@@ -109,6 +129,11 @@ namespace InformedProteomics.Backend.Utils
             CheckSetMinMaxRange(_maxPercentage, newMaxPercentage);
         }
 
+        /// <summary>
+        /// Perform validity checks on new min/max percent values, and then set them accordingly
+        /// </summary>
+        /// <param name="newMin"></param>
+        /// <param name="newMax"></param>
         private void CheckSetMinMaxRange(double newMin, double newMax)
         {
             if (newMax > newMin)
@@ -129,16 +154,26 @@ namespace InformedProteomics.Backend.Utils
             Report(0.0);
         }
 
+        /// <summary>
+        /// Update percent, and return object. For single-lining a progress update and report with <see cref="IProgress{T}.Report"/>
+        /// </summary>
+        /// <param name="pct"></param>
+        /// <returns></returns>
+        [Obsolete("Use Report() instead, with ProgressObj set.")]
         public ProgressData UpdatePercent(double pct)
         {
             Percent = pct;
             return this;
         }
 
+        /// <summary>
+        /// Check function to limit output frequency, when outputting to console.
+        /// </summary>
+        /// <returns></returns>
         public bool ShouldUpdate()
         {
             var update = false;
-            lock (_updateLock)
+            lock (UpdateLock)
             {
                 if (DateTime.UtcNow >= LastUpdated.AddSeconds(UpdateFrequencySeconds))
                 {
@@ -156,6 +191,10 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="newStatus">Updated status string, null for no update</param>
         public void Report(double pct, string newStatus = null)
         {
+            if (pct > 100)
+            {
+                pct = 100;
+            }
             Percent = pct;
             if (newStatus != null)
             {

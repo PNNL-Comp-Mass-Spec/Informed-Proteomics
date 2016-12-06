@@ -128,7 +128,6 @@ namespace InformedProteomics.FeatureFinding.Alignment
             var ms1ScanNums = run.GetMs1ScanVector();
             var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
 
-            progressReporter = progressReporter ?? new Progress<ProgressData>();
             var progressData = new ProgressData(progressReporter);
 
             for (var j = 0; j < CountAlignedFeatures; j++)
@@ -183,14 +182,12 @@ namespace InformedProteomics.FeatureFinding.Alignment
         {
             if (_alignedFeatures == null) return;
 
-            progressReporter = progressReporter ?? new Progress<ProgressData>();
-
-            var progressData = new ProgressData { IsPartialRange = true };
+            var progressData = new ProgressData(progressReporter) { IsPartialRange = true };
 
             for (var i = 0; i < CountDatasets; i++)
             {
-                progressData.MaxPercentage = ((i + 1) * 100.0) / this.CountDatasets;
-                var subProgress = new Progress<ProgressData>(pd => progressReporter.Report(progressData.UpdatePercent(pd.Percent)));
+                progressData.StepRange(((i + 1) * 100.0) / this.CountDatasets);
+                var subProgress = new Progress<ProgressData>(pd => progressData.Report(pd.Percent));
                 FillMissingFeatures(i, scoreThreshold, subProgress);
                 //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
