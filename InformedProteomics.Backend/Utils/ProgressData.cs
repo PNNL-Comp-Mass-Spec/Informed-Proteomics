@@ -23,6 +23,38 @@ namespace InformedProteomics.Backend.Utils
         public IProgress<ProgressData> ProgressObj { get; set; }
 
         /// <summary>
+        /// When true, anything that will cause progress to go backwards will cause an exception; otherwise, such changes are silently handled to prevent backwards progress. Should not be true in general release code.
+        /// </summary>
+        public bool ThrowExceptionOnBackwardsProgress
+        {
+            get { return _throwExceptionOnBackwardsProgress; }
+            set
+            {
+                if (_throwExceptionOnBackwardsProgress != value)
+                {
+                    _throwExceptionOnBackwardsProgress = value;
+                    CheckForwardOnlyLogic();
+                }
+            }
+        }
+
+        /// <summary>
+        /// When set to true, logic is used that will prevent progress from jumping backwards (errors are silently ignored; see <see cref="ThrowExceptionOnBackwardsProgress"/> to trigger exceptions instead)
+        /// </summary>
+        public bool PreventBackwardsProgress
+        {
+            get { return _preventBackwardsProgress; }
+            set
+            {
+                if (_preventBackwardsProgress != value)
+                {
+                    _preventBackwardsProgress = value;
+                    CheckForwardOnlyLogic();
+                }
+            }
+        }
+
+        /// <summary>
         /// The current percent progress of the task. Updated using <see cref="Report(double,string)"/> or variants
         /// </summary>
         public double Percent
@@ -35,18 +67,63 @@ namespace InformedProteomics.Backend.Utils
                 }
                 return _percent;
             }
-            private set { _percent = value; }
+            private set
+            {
+                if (_useForwardOnlyLogic)
+                {
+                    if (ThrowExceptionOnBackwardsProgress && _percent > value && value < 3 * _lastPercentChange)
+                    {
+                        throw new Exception("Progress percent change will cause anomaly in progress reporting!");
+                    }
+
+                    if (value > _percent)
+                    {
+                        _lastPercentChange = value - _percent;
+                        _percent = value;
+                    }
+                }
+                else
+                {
+                    _percent = value;
+                }
+            }
         }
 
         /// <summary>
         /// If the progress reporting will be blocked into ranges
         /// Setting this to "true" will reset MinPercentage and MaxPercentage to 0.
         /// </summary>
-        public bool IsPartialRange { get; set; }
+        public bool IsPartialRange {
+            get { return _isPartialRange; }
+            set
+            {
+                if (_isPartialRange == value)
+                {
+                    return;
+                }
+                // if setting to false, change percent accordingly to prevent sudden, odd jumps
+                if (!value)
+                {
+                    _percent = Percent;
+                    _isPartialRange = value;
+                }
+                else
+                {
+                    _isPartialRange = value;
+                    // if setting to true, change the min percentage to prevent sudden, odd jumps
+                    if (ThrowExceptionOnBackwardsProgress && _percent > _maxPercentage)
+                    {
+                        throw new Exception("Progress step change from non-partial to partial will cause anomaly in progress reporting!");
+                    }
+
+                    MinPercentage = _percent;
+                }
+            } }
 
         /// <summary>
         /// Must be less than current MaxPercentage
         /// </summary>
+        /// <remarks>Will set IsPartialRange to true</remarks>
         public double MinPercentage
         {
             get
@@ -62,6 +139,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Must be greater than current MinPercentage
         /// </summary>
+        /// <remarks>Will set IsPartialRange to true</remarks>
         public double MaxPercentage
         {
             get
@@ -87,6 +165,41 @@ namespace InformedProteomics.Backend.Utils
         private static readonly string UpdateLock = string.Empty; // Only because we need a reference type for a lock
 
         private double _percent = 0;
+        private double _lastPercentChange = 0;
+        private bool _throwExceptionOnBackwardsProgress = false;
+        private bool _preventBackwardsProgress = false;
+        private bool _useForwardOnlyLogic = false;
+        private bool _isPartialRange = false;
+
+        private void CheckForwardOnlyLogic()
+        {
+            if (ThrowExceptionOnBackwardsProgress)
+            {
+                PreventBackwardsProgress = true;
+            }
+            _useForwardOnlyLogic = ThrowExceptionOnBackwardsProgress || PreventBackwardsProgress;
+        }
+
+        /// <summary>
+        /// Track if a partial range (not 0-100%) has been set previously. This should never be set to false outside of object construction.
+        /// </summary>
+        private bool HasUsedPartialRange
+        {
+            get { return _hasUsedPartialRangeWithAReallyLongAndNastyNameSoThatNoOneEverWantsToUseUtBesidesWhereItIsSupposedToBeUsed; }
+            set
+            {
+                if (!_hasUsedPartialRangeWithAReallyLongAndNastyNameSoThatNoOneEverWantsToUseUtBesidesWhereItIsSupposedToBeUsed && value)
+                {
+                    _hasUsedPartialRangeWithAReallyLongAndNastyNameSoThatNoOneEverWantsToUseUtBesidesWhereItIsSupposedToBeUsed = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backing variable for HasUsedPartialRange. ONLY USE INSIDE OF HasUsedPartialRange GETTER/SETTER.
+        /// </summary>
+        private bool _hasUsedPartialRangeWithAReallyLongAndNastyNameSoThatNoOneEverWantsToUseUtBesidesWhereItIsSupposedToBeUsed = false;
+
         private double _minPercentage = 0;
         private double _maxPercentage = 100;
 
@@ -94,12 +207,14 @@ namespace InformedProteomics.Backend.Utils
         /// Constructor
         /// </summary>
         /// <param name="progress">The progress object that "ProgressData.Report" should call "Report" on</param>
-        public ProgressData(IProgress<ProgressData> progress = null)
+        /// <param name="preventBackwardsProgress">Set to false to disable the logic preventing reverse progress</param>
+        public ProgressData(IProgress<ProgressData> progress = null, bool preventBackwardsProgress = true)
         {
             LastUpdated = DateTime.MinValue;
             UpdateFrequencySeconds = 0.0001;
             IsPartialRange = false;
             ProgressObj = progress;
+            PreventBackwardsProgress = preventBackwardsProgress;
             if (progress == null)
             {
                 ProgressObj = new Progress<ProgressData>();
@@ -117,12 +232,17 @@ namespace InformedProteomics.Backend.Utils
         {
             if (!IsPartialRange)
             {
-                IsPartialRange = true;
+                if (ThrowExceptionOnBackwardsProgress && _percent > _maxPercentage)
+                {
+                    throw new Exception("Progress step change from non-partial to partial will cause anomaly in progress reporting!");
+                }
 
-                _minPercentage = 0;
+                _minPercentage = _percent;
+                // Set the current max range to zero, so that the call to CheckSetMinMaxRange works as we need it to.
+                // Only do it when the max percentage is 100+, to allow potential removal then re-add of percent stepping.
                 if (_maxPercentage >= 100.0)
                 {
-                    _maxPercentage = 100;
+                    _maxPercentage = 0;
                 }
             }
             if (newStatus != null)
@@ -139,6 +259,39 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="newMax"></param>
         private void CheckSetMinMaxRange(double newMin, double newMax)
         {
+            if (_useForwardOnlyLogic)
+            {
+                if (ThrowExceptionOnBackwardsProgress)
+                {
+                    if (_percent > _maxPercentage && !IsPartialRange)
+                    {
+                        throw new Exception("Progress step change from non-partial to partial will cause anomaly in progress reporting!");
+                    }
+                    if (newMin < _minPercentage)
+                    {
+                        throw new Exception("Progress min change will cause anomaly in progress reporting!");
+                    }
+                    if (newMax < _maxPercentage && HasUsedPartialRange)
+                    {
+                        throw new Exception("Progress max change will cause anomaly in progress reporting!");
+                    }
+                }
+
+                // Prevent progress range from decreasing
+                if (newMin < _minPercentage)
+                {
+                    newMin = _minPercentage;
+                }
+                // newMax less than old max is a problem, unless this is the first setting of the max for partial ranges
+                if (newMax < _maxPercentage && HasUsedPartialRange)
+                {
+                    newMax = _maxPercentage;
+                }
+            }
+            if (newMin > 0.0 || newMax < 100.0)
+            {
+                HasUsedPartialRange = true;
+            }
             if (newMax > newMin)
             {
                 _minPercentage = newMin;
@@ -153,7 +306,11 @@ namespace InformedProteomics.Backend.Utils
                 _maxPercentage = 100;
             }
 
+            _isPartialRange = true;
+
             // Trigger an update, with the proper minimum value for the range
+            _lastPercentChange = 0.0;
+            _percent = 0; // Proper minimum value for range, changed outside of the control checks
             Report(0.0);
         }
 
@@ -198,6 +355,12 @@ namespace InformedProteomics.Backend.Utils
             {
                 pct = 100;
             }
+            // drop large spikes that may have been triggered by multithreading
+            if (_useForwardOnlyLogic && pct - _percent > 70 && !(pct.Equals(0.0) && _percent.Equals(100.0)))
+            {
+                pct = _percent;
+            }
+
             Percent = pct;
             if (newStatus != null)
             {
