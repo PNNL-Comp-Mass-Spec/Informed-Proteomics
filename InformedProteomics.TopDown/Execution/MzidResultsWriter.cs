@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
@@ -170,7 +171,7 @@ namespace InformedProteomics.TopDown.Execution
                 var modObj = new SearchModificationObj()
                 {
                     FixedMod = mod.IsFixedModification,
-                    MassDelta = (float)mod.Modification.Mass,
+                    MassDelta = (float) mod.Modification.Mass,
                     Residues = mod.TargetResidue.ToString(),
                 };
                 // "*" is used for wildcard residue N-Term or C-Term modifications. mzIdentML standard says that "." should be used instead.
@@ -181,6 +182,35 @@ namespace InformedProteomics.TopDown.Execution
                 // Really only using this for the modification name parsing for CVParams that exists with ModificationObj
                 var tempMod = new ModificationObj(CV.CVID.MS_unknown_modification, mod.Modification.Name, 0, modObj.MassDelta);
                 modObj.CVParams.Add(tempMod.CVParams.First());
+
+                if (mod.Location != SequenceLocation.Everywhere)
+                {
+                    // specificity rules should be added
+                    var rule = new SpecificityRulesListObj();
+                    switch (mod.Location)
+                    {
+                        case SequenceLocation.PeptideNTerm:
+                            rule.CVParams.Add(new CVParamObj(CV.CVID.MS_modification_specificity_peptide_N_term));
+                            break;
+                        case SequenceLocation.PeptideCTerm:
+                            rule.CVParams.Add(new CVParamObj(CV.CVID.MS_modification_specificity_peptide_C_term));
+                            break;
+                        case SequenceLocation.ProteinNTerm:
+                            rule.CVParams.Add(new CVParamObj(CV.CVID.MS_modification_specificity_protein_N_term));
+                            break;
+                        case SequenceLocation.ProteinCTerm:
+                            rule.CVParams.Add(new CVParamObj(CV.CVID.MS_modification_specificity_protein_C_term));
+                            break;
+                        case SequenceLocation.Everywhere:
+                            // not needed, the enclosing if should prevent ever hitting this
+                            break;
+                        default:
+                            // Limited by enum...
+                            break;
+                    }
+                    modObj.SpecificityRules.Add(rule);
+                }
+
                 settings.ModificationParams.Add(modObj);
             }
 

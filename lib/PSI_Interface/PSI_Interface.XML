@@ -8052,6 +8052,9 @@
         <member name="F:PSI_Interface.CV.CV.CVID.MS_Xevo_TQ_S_micro">
             <summary>Waters Corporation Xevo TQ-S micro triple quadrupole mass spectrometer.</summary>
         </member>
+        <member name="F:PSI_Interface.CV.CV.CVID.MS_Orbitrap_Fusion_Lumos">
+            <summary>Thermo Scientific Orbitrap Fusion Lumos mass spectrometer with Tribrid architecture consisting of quadrupole mass filter, linear ion trap and Orbitrap mass analyzers.</summary>
+        </member>
         <member name="F:PSI_Interface.CV.CV.CVID.UNIMOD_unimod_root_node">
             <summary>The root node of the unimod modifications ontology.</summary>
         </member>
@@ -28028,7 +28031,7 @@
         </member>
         <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Mods">
             <summary>
-            The dictionary of modifications affecting this peptide - key (location of modification) should be considered as being 1-based (see remarks)
+            The List of modifications affecting this peptide - key (location of modification) should be considered as being 1-based (see remarks)
             </summary>
             <remarks>Key is location of the modification within the peptide - position in peptide sequence,
             counted from the N-terminus residue, starting at position 1. Specific modifications to the N-terminus
@@ -28148,6 +28151,14 @@
             MSGF QValue, MSGR PepQValue, Scan number as well as which peptide it is and which evidences
             it has from the analysis run.
             </remarks>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.PossiblyReadEndElement(System.Xml.XmlReader,System.String)">
+            <summary>
+            If the reader is at an EndElement, read it so we can move on to the next node
+            Otherwise, if the element name matches currentNodeName, move to the next node
+            </summary>
+            <param name="reader"></param>
+            <param name="currentNodeName"></param>
         </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadMzIdentMl(System.Xml.XmlReader)">
             <summary>
