@@ -345,6 +345,16 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
+        /// Updates the status, then calls the stored progress object's "Report"
+        /// </summary>
+        /// <param name="newStatus">Updated status string</param>
+        public void Report(string newStatus)
+        {
+            Status = newStatus;
+            ProgressObj.Report(this);
+        }
+
+        /// <summary>
         /// Updates the percent, then calls the stored progress object's "Report"
         /// </summary>
         /// <param name="pct">percent progress, 0 to 100</param>
