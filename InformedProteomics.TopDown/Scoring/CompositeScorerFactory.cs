@@ -56,7 +56,7 @@ namespace InformedProteomics.TopDown.Scoring
         public double FilteringWindowSize { get; private set; }    // 1.1
         public int IsotopeOffsetTolerance { get; private set; }   // 2
 
-        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass)
+        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass) return null;
 
@@ -75,9 +75,9 @@ namespace InformedProteomics.TopDown.Scoring
             return null;
         }
 
-        public void DeconvonluteProductSpectrum(int scanNum)
+        public void DeconvonluteProductSpectrum(int scanNum, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
-            var scorer = GetScorer(scanNum);
+            var scorer = GetScorer(scanNum, activationMethod: activationMethod);
             if (scorer == null) return;
             _ms2Scorer.TryAdd(scanNum, scorer);
         }
@@ -87,13 +87,13 @@ namespace InformedProteomics.TopDown.Scoring
             throw new NotImplementedException();
         }
 
-        public IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0)
+        public IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec == null || spec.Peaks.Length == 0)
                 return null;
             var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
-            return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
+            return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer, activationMethod) : null;
         }
 
         public void WriteToFile(string outputFilePath)

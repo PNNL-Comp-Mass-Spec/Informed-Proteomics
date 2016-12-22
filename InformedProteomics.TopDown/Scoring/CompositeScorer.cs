@@ -15,14 +15,14 @@ namespace InformedProteomics.TopDown.Scoring
 
     public class CompositeScorer : AbstractFragmentScorer
     {
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1)
-            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD)
+            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod)
         {
             ReferencePeakIntensity = GetRefIntensity(ms2Spec.Peaks);
         }
 
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1)
-            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold, activationMethod)
         {
         }
 
@@ -45,8 +45,11 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
+            var ionsFound = new Dictionary<BaseIonType, double>();
+
             foreach (var baseIonType in BaseIonTypes)
             {
+
                 try
                 {
                     var fragmentComposition = baseIonType.IsPrefix
@@ -67,11 +70,18 @@ namespace InformedProteomics.TopDown.Scoring
                         var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
                         var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
 
-                        score += param.Count;
-                        score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
-                        score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
-                        score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
-                        score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+                        double ionscore = 0;
+                        ionscore += param.Count;
+                        ionscore += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
+                        ionscore += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
+                        ionscore += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
+                        ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
+                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
+                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
+
+                        score += ionscore;
 
                         if (baseIonType.IsPrefix)
                             prefixHit = true;

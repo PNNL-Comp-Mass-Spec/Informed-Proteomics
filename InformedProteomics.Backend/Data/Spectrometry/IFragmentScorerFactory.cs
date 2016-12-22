@@ -4,6 +4,6 @@
     {
         IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge);
 
-        IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0);
+        IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0, ActivationMethod activationMethod = ActivationMethod.Unknown);
     }
 }

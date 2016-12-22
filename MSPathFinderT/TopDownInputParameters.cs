@@ -9,6 +9,8 @@ using InformedProteomics.Backend.Utils;
 
 namespace MSPathFinderT
 {
+    using InformedProteomics.Backend.Data.Spectrometry;
+
     public class TopDownInputParameters
     {
         public const string ParameterFileExtension = ".param";
@@ -90,6 +92,7 @@ namespace MSPathFinderT
         public double MaxSequenceMass { get; set; }
         public string FeatureFilePath { get; set; }
         public int MaxNumThreads { get; set; }
+        public ActivationMethod ActivationMethod { get; set; }
 
         /// <summary>
         /// Specific MS2 scans to process
@@ -329,6 +332,9 @@ namespace MSPathFinderT
 
                 currentParameter = "-tagSearch";
                 TagBasedSearch = Convert.ToInt32(parameters["-tagSearch"]) == 1;
+
+                currentParameter = "-act";
+                ActivationMethod = (ActivationMethod)Convert.ToInt32(parameters["-act"]);
             }
             catch (Exception ex)
             {
@@ -432,6 +438,14 @@ namespace MSPathFinderT
                             !Path.GetExtension(value).ToLower().Equals(".msalign"))
                         {
                             return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")";
+                        }
+                    }
+                    else if (key.Equals("-act"))
+                    {
+                        int val;
+                        if (!Int32.TryParse(value, out val) || val < 0 || val > 6)
+                        {
+                            return "Invalid value for the parameter " + key + " {" + value + ")";
                         }
                     }
                     else

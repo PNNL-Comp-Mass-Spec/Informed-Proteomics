@@ -327,7 +327,7 @@ namespace InformedProteomics.TopDown.Execution
             };
             Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
             {
-                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum);
+                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum, Options.ActivationMethod);
             });
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
@@ -693,7 +693,7 @@ namespace InformedProteomics.TopDown.Execution
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
-                        var scorer = this.fragmentScorerFactory.GetScorer(ms2ScanNum, sequenceMass, charge);
+                        var scorer = this.fragmentScorerFactory.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
@@ -794,7 +794,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var sw = new Stopwatch();
 
-            var topDownScorer = new InformedTopDownScorer(_run, Options.AminoAcidSet, Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+            var topDownScorer = new InformedTopDownScorer(_run, Options.AminoAcidSet, Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, activationMethod: Options.ActivationMethod);
 
             // Rescore and Estimate #proteins for GF calculation
             var matches = new LinkedList<DatabaseSequenceSpectrumMatch>[sortedMatches.Length];

@@ -11,23 +11,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
     public abstract class AbstractFragmentScorer : IScorer
     {
-        protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7)
+        protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             Ms2Spectrum = spec;
             Tolerance = tol;
             MinProductCharge = minCharge;
             MaxProductCharge = maxCharge;
 
-            var productSpectrum = spec as ProductSpectrum;
-            if (productSpectrum != null)
-                BaseIonTypes = productSpectrum.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
+            ActivationMethod actToUse = activationMethod;
+            if (actToUse == ActivationMethod.Unknown)
+            {
+                var spectrum = spec as ProductSpectrum;
+                if (spectrum != null) actToUse = spectrum.ActivationMethod;
+                else actToUse = ActivationMethod.CID;
+            }
+
+            if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD) BaseIonTypes = BaseIonTypesCID;
+            else if (actToUse == ActivationMethod.ETD) BaseIonTypes = BaseIonTypesETD;
+            else if (actToUse == ActivationMethod.UVPD) BaseIonTypes = BaseIonTypesUVPD;
+            else BaseIonTypes = BaseIonTypesCID;
+
+            if (actToUse == ActivationMethod.UVPD)
+            {
+                this.PrefixOffsetMass = this.BaseIonTypes[0].OffsetComposition.Mass;
+                this.SuffixOffsetMass = this.BaseIonTypes[2].OffsetComposition.Mass;
+            }
             else
             {
-                var spectrum = spec as DeconvolutedSpectrum;
-                if (spectrum != null)
-                    BaseIonTypes = spectrum.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
-                else
-                    BaseIonTypes = BaseIonTypesCID;
+                this.PrefixOffsetMass = this.BaseIonTypes[0].OffsetComposition.Mass;
+                this.SuffixOffsetMass = this.BaseIonTypes[1].OffsetComposition.Mass;
             }
 
             RelativeIsotopeIntensityThreshold = relativeIsotopeIntensityThreshold;
@@ -191,13 +203,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         protected readonly int MaxProductCharge;
         protected readonly BaseIonType[] BaseIonTypes;
 
+        protected double PrefixOffsetMass;
+
+        protected double SuffixOffsetMass;
+
         protected double RelativeIsotopeIntensityThreshold;
 
-        protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
+        protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD, BaseIonTypesUVPD;
         static AbstractFragmentScorer()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+            BaseIonTypesUVPD = new[] { BaseIonType.A, BaseIonType.Ar, BaseIonType.Y, BaseIonType.YM1 };
         }
     }
 }

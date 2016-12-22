@@ -13,8 +13,8 @@ namespace InformedProteomics.TopDown.Scoring
 
     public class CompositeScorerBasedOnDeconvolutedSpectrum : CompositeScorer
     {
-        public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, ProductSpectrum spec, Tolerance productTolerance, IMassBinning comparer)
-            : base(deconvolutedSpectrum, productTolerance)
+        public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, ProductSpectrum spec, Tolerance productTolerance, IMassBinning comparer, ActivationMethod actMethod = ActivationMethod.Unknown)
+            : base(deconvolutedSpectrum, productTolerance, activationMethod: actMethod)
         {
             ReferencePeakIntensity = GetRefIntensity(spec.Peaks);
             _comparer = comparer;
@@ -79,6 +79,7 @@ namespace InformedProteomics.TopDown.Scoring
             var prefixHit = false;
             var suffixHit = false;
 
+            var ionsFound = new Dictionary<BaseIonType, double>();
             foreach (var baseIonType in BaseIonTypes)
             {
                 var fragmentComposition = baseIonType.IsPrefix
@@ -94,11 +95,19 @@ namespace InformedProteomics.TopDown.Scoring
                     if (_massBinToPeakMap.TryGetValue(massBinNum, out existingPeak))
                     {
                         var massErrorPpm = 1e6 * (Math.Abs(existingPeak.Mass - fragmentComposition.Mass)/fragmentComposition.Mass);
-                        score += param.Count;
-                        score += param.Intensity * Math.Min(existingPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
-                        score += param.Dist * existingPeak.Dist; // Envelope distance-based scoring
-                        score += param.Corr * existingPeak.Corr; // Envelope correlation-based scoring
-                        score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                        double ionscore = 0;
+                        ionscore += param.Count;
+                        ionscore += param.Intensity * Math.Min(existingPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
+                        ionscore += param.Dist * existingPeak.Dist; // Envelope distance-based scoring
+                        ionscore += param.Corr * existingPeak.Corr; // Envelope correlation-based scoring
+                        ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
+                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
+                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
+
+                        score += ionscore;
 
                         if (baseIonType.IsPrefix) prefixHit = true;
                         else suffixHit = true;
@@ -112,8 +121,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double?[][] GetNodeScores(double proteinMass)
         {
-            var prefixOffsetMass = BaseIonTypes[0].OffsetComposition.Mass;
-            var suffixOffsetMass = BaseIonTypes[1].OffsetComposition.Mass;
+
 
             var numNodes = _comparer.GetBinNumber(proteinMass) + 1;
             var nodeScores = new double?[2][];
@@ -125,14 +133,14 @@ namespace InformedProteomics.TopDown.Scoring
             foreach (var peak in deconvPeaks)
             {
                 var prefixIonMass = peak.Mass;
-                var prefixFragmentMass = prefixIonMass - prefixOffsetMass;
+                var prefixFragmentMass = prefixIonMass - PrefixOffsetMass;
                 var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
 
                 if (binIndex >= 0 && binIndex < numNodes)
                     prefixFragScores[binIndex] = GetMatchedIonPeakScore(true, peak);
 
                 var suffixIonMass = peak.Mass;
-                var suffixFragmentMass = suffixIonMass - suffixOffsetMass;
+                var suffixFragmentMass = suffixIonMass - SuffixOffsetMass;
                 prefixFragmentMass = proteinMass - suffixFragmentMass;
                 binIndex = _comparer.GetBinNumber(prefixFragmentMass);
 

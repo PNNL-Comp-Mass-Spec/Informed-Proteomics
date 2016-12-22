@@ -581,7 +581,6 @@
             <param name="directoryPath">Path to file directory</param>
             <param name="outPath">Path to where files should be outputted</param>
             <param name="neutralLosses">NeutralLosses wanted</param>
-            <param name="isDeconvoluted">Whether or not the ion proportion spectrum should be deconvoluted</param>
             <param name="tol">Tolerance ppm value</param>
             <param name="minScore">Minimum threshold for GetCorrScore</param>
             <param name="foundThreshold">Minimum threshold for finding ion proportions</param>
@@ -684,7 +683,13 @@
             Outputs a list of all IonTypes checked for in training
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.OutputIonSetReader.ReadIonSet(System.IO.StreamReader)" -->
+        <member name="M:TopDownTrainer.OutputIonSetReader.ReadIonSet(System.IO.StreamReader)">
+            <summary>
+            Outputs an IonSet from iontypes and values read from file
+            </summary>
+            <param name="sr">StreamReader that reads through a training output file</param>
+            <returns>An IonSet generated from IonTypes and values read from input StreamReader</returns>
+        </member>
         <member name="T:TopDownTrainer.ProbabilisticMetrics">
             <summary>
             ProbabilisticMetrics inherits from AnalysisMetrics and stores ROC curves from ProbabilisticFoldResults
@@ -1424,7 +1429,14 @@
             <param name="maxChargeOffset">Optional maximum charge offset in question (Default = 4)</param>
             <param name="threshold">Optional threshold to check for a test point (Default = 0.15)</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double[0:,0:],System.Double,System.Double,System.Double,System.Int32)" -->
+        <member name="M:TopDownTrainer.PrecursorPeaks.#ctor(System.Double[0:,0:],System.Double,System.Double,System.Double,System.Int32)">
+            <summary>
+            Generates a PrecursorPeaks object from a normalizedIntensityTable. Assumptions about mass and charge
+            offsets are made unless specified in constructor.
+            </summary>
+            <param name="normalizedIntensityTable">Table of mass and charge offsets</param>
+            <param name="threshold">Optional threshold to check for a test point (Default = 0.15)</param>
+        </member>
         <member name="M:TopDownTrainer.PrecursorPeaks.GetBinElements(InformedProteomics.Backend.Data.Spectrometry.Spectrum,System.Double,System.Int32)">
             <summary>
             Takes a ProteinScan and looks at Peaks within an m/z range determined by a
@@ -2055,7 +2067,15 @@
             </summary>
             <param name="ionTypes">IonTypes in question</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.IonSet.AddSequence(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32)" -->
+        <member name="M:TopDownTrainer.IonSet.AddSequence(InformedProteomics.Backend.Data.Spectrometry.Spectrum,InformedProteomics.Backend.Data.Sequence.Sequence,System.Int32)">
+            <summary>
+            Adds a sequence to this IonSet and updates dictionaries according to which Ions have
+            high peak correlation scores.
+            </summary>
+            <param name="spectrum">Spectrum of ProteinScan in question</param>
+            <param name="seq">Sequence of ProteinScan</param>
+            <param name="charge">Charge of ProteinScan</param>
+        </member>
         <member name="M:TopDownTrainer.IonSet.GetIonToPropKeysAboveThreshold(System.Double)">
             <summary>
             Gets the IonTypes in the dictionary, IonToProp, whose values map to IonProportions
@@ -2083,7 +2103,14 @@
             <returns>Dictionary where keys are IonTypes and values are proportions of IonProportions from
             IonToProp</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.IonSet.GetFoundProportionsDictionary" -->
+        <member name="M:TopDownTrainer.IonSet.GetFoundProportionsDictionary">
+            <summary>
+            Outputs dictionary of IonTypes as keys and doubles as values.
+            The IonType keys are the ones from the dictionaries.
+            The double values are the proportion of found ions for that IonType with respect to all ions found
+            </summary>
+            <returns>Dictionary where keys are IonTypes and values are proportions of found ions</returns>
+        </member>
         <member name="M:TopDownTrainer.IonSet.GetFoundDictFromProportions(System.Collections.Generic.Dictionary{InformedProteomics.Backend.Data.Spectrometry.IonType,System.Double},System.Int32)">
             <summary>
             Creates a dictionary of number of found ions for each IonType from proportions and total
@@ -2174,7 +2201,14 @@
             <param name="filename">Path to file in question</param>
             <param name="scan">Scan number of protein in question</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:TopDownTrainer.ProteinScan.GetBottomUp(System.String,System.String,System.Int32)" -->
+        <member name="M:TopDownTrainer.ProteinScan.GetBottomUp(System.String,System.String,System.Int32)">
+            <summary>
+            Generates protein sequence and charge from id and raw files and scan number for BottomUp Data.
+            </summary>
+            <param name="filenameid"></param>
+            <param name="filenameraw">Path to file.</param>
+            <param name="scan">Scan number.</param>
+        </member>
         <member name="M:TopDownTrainer.ProteinScan.CompareTo(TopDownTrainer.ProteinScan)">
             <summary>
             Returns positive number if this ProteinScan has a larger mass than scan

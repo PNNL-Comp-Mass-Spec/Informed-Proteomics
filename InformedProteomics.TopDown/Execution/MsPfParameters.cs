@@ -55,6 +55,8 @@ namespace InformedProteomics.TopDown.Execution
             ScanNumbers = null;
             NumMatchesPerSpectrum = 3;
             TagBasedSearch = true;
+
+            ActivationMethod = ActivationMethod.Unknown;
         }
 
         /// <summary>
@@ -102,6 +104,11 @@ namespace InformedProteomics.TopDown.Execution
         /// Gets or sets the precursor ion tolerance.
         /// </summary>
         public Tolerance PrecursorIonTolerance { get; set; }
+
+        /// <summary>
+        /// Gets or sets the activation method to use during search.
+        /// </summary>
+        public ActivationMethod ActivationMethod { get; set; }
 
         /// <summary>
         /// Gets or sets the precursor ion tolerance in ppm.
@@ -357,6 +364,9 @@ namespace InformedProteomics.TopDown.Execution
                         break;
                     case "Modification":
                         param.Modifications.AddRange(ModFileParser.ParseModification(parts[1]));
+                        break;
+                    case "ActivationMethod":
+                        param.ActivationMethod = (ActivationMethod)Convert.ToInt32(parts[1]);
                         break;
                 }
             }

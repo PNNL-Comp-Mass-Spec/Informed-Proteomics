@@ -31,6 +31,11 @@
         PQD,
 
         /// <summary>
+        /// Ultraviolet photo dissociation
+        /// </summary>
+        UVPD,
+
+        /// <summary>
         /// Unknown activation method
         /// </summary>
         Unknown,

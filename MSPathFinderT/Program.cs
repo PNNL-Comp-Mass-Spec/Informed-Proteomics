@@ -72,6 +72,7 @@ namespace MSPathFinderT
                     {"-threads", "0"},
                     {"-tagSearch", "1"},
                     {"-scansFile", null},
+                    {"-act", "6"}
                 };
 
             for (var i = 0; i < args.Length / 2; i++)
@@ -125,7 +126,8 @@ namespace MSPathFinderT
                     InternalCleavageMode = parameters.SearchMode,
                     MaxNumThreads = parameters.MaxNumThreads,
                     TagBasedSearch = parameters.TagBasedSearch,
-                    ScanNumbers = parameters.ScanNumbers
+                    ScanNumbers = parameters.ScanNumbers,
+                    ActivationMethod = parameters.ActivationMethod,
                 };
 
                 var topDownLauncher = new IcTopDownLauncher(topDownOptions);
@@ -218,7 +220,8 @@ namespace MSPathFinderT
                 "\t[-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)\n" +
                 "\t[-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)\n" +
                 "\t[-threads MaxNumThreads] (maximum number of threads, default: 0 automatic setting)\n" +
-                "\t[-scansFile FilePath] (text file with MS2 scans to process)\n"
+                "\t[-scansFile FilePath] (text file with MS2 scans to process)\n" +
+                "\t[-act ActivationMethod] (0: CID, 1: ETD, 2: HCD, 3: ECD, 4: PQD, 5: UVPD, 6: Unknown/as written"
                 );
 
             // Wait for 1.5 seconds

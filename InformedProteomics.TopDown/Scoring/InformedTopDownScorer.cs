@@ -8,7 +8,7 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class InformedTopDownScorer
     {
-        public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7)
+        public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             Run = run;
             AminoAcidSet = aaSet;
@@ -16,6 +16,7 @@ namespace InformedProteomics.TopDown.Scoring
             MaxProductCharge = maxProductCharge;
             Tolerance = tolerance;
             Ms2CorrThreshold = ms2CorrThreshold;
+            ActivationMethod = activationMethod;
         }
 
         public LcMsRun Run { get; private set; }
@@ -24,6 +25,7 @@ namespace InformedProteomics.TopDown.Scoring
         public int MaxProductCharge { get; private set; }
         public Tolerance Tolerance { get; private set; }
         public double Ms2CorrThreshold { get; private set; }
+        public ActivationMethod ActivationMethod { get; private set; }
 
         public IcScores GetScores(Sequence sequence, int parentIoncharge, int ms2ScanNum)
         {
@@ -43,7 +45,7 @@ namespace InformedProteomics.TopDown.Scoring
         public IcScores GetScores(ProductSpectrum spec, string seqStr, Composition composition, int charge, int ms2ScanNum)
         {
             if (spec == null) return null;
-            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge));
+            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge), activationMethod: ActivationMethod);
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
             if (seqGraph == null) return null;
 
@@ -90,7 +92,7 @@ namespace InformedProteomics.TopDown.Scoring
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
 
-            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge+2));
+            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge+2), activationMethod: ActivationMethod);
             var cleavages = sequence.GetInternalCleavages();
             var cleavageIndex = 0;
 
