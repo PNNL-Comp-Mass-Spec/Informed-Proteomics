@@ -180,7 +180,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
-        private IFragmentScorerFactory fragmentScorerFactory;
+        //private IFragmentScorerFactory fragmentScorerFactory;
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
@@ -314,7 +314,7 @@ namespace InformedProteomics.TopDown.Execution
             // pre-generate deconvoluted spectra for scoring
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
-            this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
+            //this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
             _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
                                                                Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
             sw.Reset();
@@ -693,7 +693,7 @@ namespace InformedProteomics.TopDown.Execution
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
-                        var scorer = this.fragmentScorerFactory.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
+                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
