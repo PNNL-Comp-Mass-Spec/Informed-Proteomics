@@ -74,6 +74,22 @@ namespace InformedProteomics.TopDown.Execution
             }
             var specData = creator.AddSpectraData(path, datasetName, nativeIdFormat, lcmsRun.NativeFormat);
 
+            // Get the search modifications as they were passed into the AminoAcidSet constructor, so we can retrieve masses from them
+            var modDict = new Dictionary<string, Modification>();
+            foreach (var mod in options.AminoAcidSet.SearchModifications)
+            {
+                if (!modDict.ContainsKey(mod.Modification.Name))
+                {
+                    modDict.Add(mod.Modification.Name, mod.Modification);
+                }
+                else if (!modDict[mod.Modification.Name].Composition.Equals(mod.Modification.Composition))
+                {
+                    throw new System.Exception(
+                        "ERROR: Cannot have modifications with the same name and different composition/mass! Fix input modifications! Duplicated modification name: " +
+                        mod.Modification.Name);
+                }
+            }
+
             foreach (var match in matches)
             {
                 var scanNum = match.ScanNum;
@@ -90,12 +106,6 @@ namespace InformedProteomics.TopDown.Execution
                 specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
                 var pep = new PeptideObj(match.Sequence);
 
-                // Get the search modifications as they were passed into the AminoAcidSet constructor, so we can retrieve masses from them
-                var modDict = new Dictionary<string, Modification>();
-                foreach (var mod in options.AminoAcidSet.SearchModifications)
-                {
-                    modDict.Add(mod.Modification.Name, mod.Modification);
-                }
                 var modText = match.Modifications;
                 if (!string.IsNullOrWhiteSpace(modText))
                 {
@@ -104,7 +114,7 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         var tokens = mod.Split(' ');
                         var modInfo = modDict[tokens[0]];
-                        var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, tokens[0], int.Parse(tokens[1]), modInfo.Mass);
+                        var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, modInfo.Name, int.Parse(tokens[1]), modInfo.Mass);
                         pep.Modifications.Add(modObj);
                     }
                 }

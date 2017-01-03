@@ -44,7 +44,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                               Composition.Composition.Parse(compStr);
             if (composition == null)
             {
-                throw new Exception("Illegal Composition");
+                throw new Exception(string.Format("Illegal Composition: \"{0}\" in \"{1}\"", compStr, line));
             }
 
             // Residues
@@ -53,7 +53,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 || residueStr.Any() && residueStr.All(AminoAcid.IsStandardAminoAcidResidue);
             if (!isResidueStrLegitimate)
             {
-                throw new Exception("Illegal residues at line");
+                throw new Exception(string.Format("Illegal residues: \"{0}\" in \"{1}\"", residueStr, line));
             }
 
             // isFixedModification
@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             else if (token[2].Trim().Equals("opt", StringComparison.InvariantCultureIgnoreCase)) isFixedModification = false;
             else
             {
-                throw new Exception("Illegal modification type (fix or opt)");
+                throw new Exception(string.Format("Illegal modification type (fix or opt): \"{0}\" in \"{1}\"", token[2].Trim(), line));
             }
 
             // Location
@@ -84,13 +84,13 @@ namespace InformedProteomics.Backend.Data.Sequence
                 location = SequenceLocation.ProteinCTerm;
             else
             {
-                throw new Exception("{0}: Illegal modification location (fix or opt)");
+                throw new Exception(string.Format("Illegal modification location (any|(Prot-?)?(N|C)-?Term): \"{0}\" in \"{1}\"", token[3].Trim(), line));
             }
 
             // Check if it's valid
             if (residueStr.Equals("*") && location == SequenceLocation.Everywhere)
             {
-                throw new Exception("Invalid modification: * should not be applied to \"any\"");
+                throw new Exception(string.Format("Invalid modification: * should not be applied to \"any\": \"{0}\"", line));
             }
 
             var name = token[4].Split()[0].Trim();
@@ -136,6 +136,22 @@ namespace InformedProteomics.Backend.Data.Sequence
                     }
 
                     searchModList.AddRange(mods);
+                }
+            }
+
+            // name and mass/composition validation - duplicate names are okay, as long as the mass/composition is also identical.
+            var dict = new Dictionary<string, SearchModification>();
+            foreach (var mod in searchModList)
+            {
+                if (!dict.ContainsKey(mod.Name))
+                {
+                    dict.Add(mod.Name, mod);
+                }
+                else if (!dict[mod.Name].Modification.Composition.Equals(mod.Modification.Composition))
+                {
+                    throw new Exception(
+                        "ERROR: Cannot have modifications with the same name and different composition/mass! Fix input modifications! Duplicated modification name: " +
+                        mod.Modification.Name);
                 }
             }
 
