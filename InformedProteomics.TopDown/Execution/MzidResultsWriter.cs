@@ -127,7 +127,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 var start = match.Start;
                 var end = match.End;
-                var pepEv = new PeptideEvidenceObj(dbSeq, pep, start, end, match.Pre, match.Post, false);
+                var pepEv = new PeptideEvidenceObj(dbSeq, pep, start, end, match.Pre, match.Post, match.ProteinName.StartsWith("XXX"));
                 specIdent.AddPeptideEvidence(pepEv);
 
                 var probability = match.Probability;
