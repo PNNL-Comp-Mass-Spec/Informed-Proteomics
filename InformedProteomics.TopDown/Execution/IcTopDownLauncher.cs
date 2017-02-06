@@ -185,6 +185,19 @@ namespace InformedProteomics.TopDown.Execution
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
         private List<int> _ms2ScanNums;
+        private ProgressData searchProgressData = null;
+        private Stopwatch searchStopwatch = null;
+        private Timer progReportTimer;
+
+        public void PrintOverallProgressReport(object searchObj)
+        {
+            var searchClass = (IcTopDownLauncher)searchObj;
+            var progData = searchClass.searchProgressData;
+            var timeElapsed = searchClass.searchStopwatch.Elapsed;
+            var minutes = timeElapsed.TotalMinutes - ((int) timeElapsed.TotalHours * 60);
+
+            Console.WriteLine(@"Total Progress: {0:F2}%, {1}d {2}h {3:F2}m elapsed, Current Task: {4}", progData.Percent, timeElapsed.Days, timeElapsed.Hours, minutes, progData.Status);
+        }
 
         public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
@@ -193,6 +206,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var prog = new Progress<ProgressData>();
             var progData = new ProgressData(progress);
+            searchProgressData = progData;
             if (progress != null)
             {
                 prog = new Progress<ProgressData>(p =>
@@ -205,13 +219,16 @@ namespace InformedProteomics.TopDown.Execution
 
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
+            searchStopwatch = swAll;
             swAll.Start();
             ErrorMessage = string.Empty;
+            // Output a progress report every 5 minutes...
+            progReportTimer = new Timer(PrintOverallProgressReport, this, 0, 1000 * 60 * 5);
 
             if (string.Equals(Path.GetExtension(Options.SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
-                Console.Write(@"Reading pbf file...");
+                Console.WriteLine(@"Reading pbf file...");
             else
-                Console.Write(@"Reading raw file...");
+                Console.WriteLine(@"Creating and loading pbf file...");
 
             progData.StepRange(5.0, "Reading spectra file");
             sw.Start();
@@ -425,8 +442,13 @@ namespace InformedProteomics.TopDown.Execution
             progData.Report(100.0);
 
             Console.WriteLine(@"Done.");
+            // Stop the overall progress reports.
+            progReportTimer.Dispose();
             swAll.Stop();
-            Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1:f2} min)", swAll.Elapsed.TotalSeconds, swAll.Elapsed.TotalMinutes);
+
+            var elapsed = swAll.Elapsed;
+            var minutes = elapsed.Minutes - ((int)elapsed.TotalHours * 60);
+            Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1}d {2}h {3:f2} min)", elapsed.TotalSeconds, elapsed.Days, elapsed.Hours, minutes);
 
             return true;
         }

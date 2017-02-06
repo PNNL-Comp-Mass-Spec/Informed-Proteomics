@@ -42,6 +42,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         reader = new ProteoWizardReader(filePath);
                     }
+                    else
+                    {
+                        Console.WriteLine("WARNING: Could not find a reader for file \"{0}\". Is MSFileReader and/or ProteoWizard installed?", filePath);
+                    }
                     break;
             }
 
