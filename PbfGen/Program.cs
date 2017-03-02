@@ -122,7 +122,7 @@ namespace PbfGen
                 string[] specFilePaths = new[] { specFilePath };
                 if (Directory.Exists(specFilePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(specFilePath))
                 {
-                    specFilePaths = Directory.GetFiles(specFilePath, "*.raw");
+                    specFilePaths = Directory.GetFiles(specFilePath, "*.raw"); // TODO: Support folders with other formats in them too...
                 }
 
                 foreach (var rawFilePath in specFilePaths)

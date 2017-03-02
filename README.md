@@ -35,8 +35,8 @@ Example command lines:
 
 `MSPathFinderT.exe  -s MyDataset.pbf -feature MyDataset.ms1ft -d C:\FASTA\ProteinList.fasta -o C:\WorkFolder -t 10 -f 10 -m 1 -tda 1 -minLength 21 -maxLength 300 -minCharge 2 -maxCharge 30 -minFragCharge 1 -maxFragCharge 15 -minMass 3000 -maxMass 50000 -mod MSPathFinder_Mods.txt`
 
-### Results viewer
-For viewing search results, you might want to consider [LCMS-Spectator](https://github.com/PNNL-Comp-Mass-Spec/LCMS-Spectator)
+### Results viewer / GUI
+For viewing search results, you might want to consider [LCMS-Spectator](https://github.com/PNNL-Comp-Mass-Spec/LCMS-Spectator). It can also function as a GUI for running ProMex and MSPathFinder.
 
 ## ProMex Syntax
 
@@ -129,11 +129,14 @@ Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.
 
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
 Website: http://panomics.pnnl.gov/ or http://omics.pnl.gov
+
 -------------------------------------------------------------------------------
 
 Licensed under the Apache License, Version 2.0; you may not use this file except
 in compliance with the License.  You may obtain a copy of the License at
 http://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
 
 Notice: This computer software was prepared by Battelle Memorial Institute,
 hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
