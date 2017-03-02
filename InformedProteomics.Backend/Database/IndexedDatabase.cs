@@ -366,6 +366,7 @@ namespace InformedProteomics.Backend.Database
                 var lcpEnum = PLcps().GetEnumerator();
                 var fEnum = FastaDatabase.Characters().GetEnumerator();
 
+                // Use "IntWrapper" to allow modifying the value inside of the foreach
                 var seps = new Queue<IntWrapper>();
                 bool read = false;
                 while ((read = fEnum.MoveNext()) || curSequence.Count >= minLength)
