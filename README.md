@@ -4,6 +4,8 @@ The Informed Proteomics project includes algorithms for analysis of both
 top down and bottom up MS/MS proteomics data.  Supported workflows include
 both DDA and DIA.
 
+#### [See the Informed Proteomics GitHub wiki for usage, tutorials, and more!](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki)
+
 ## Downloads
 https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
 
@@ -11,17 +13,20 @@ https://omics.pnl.gov/software/mspathfinder
 
 ## MSPathFinderT
 
-MSPathFinder finds peptides in top-down LC-MS/MS datasets
+MSPathFinder finds peptides in top-down LC-MS/MS datasets. Similar to database search engines for bottom-up, it takes a fasta file, a spectrum file, and a list of modifications as an input and reports proteoform spectrum matches (PsSMs) and their scores. These results are output in a tab-separated format and in a MzIdentML file.
 
 Processing steps:
 
 1. Run PbfGen.exe to convert the instrument file or .mzML file to an optimized binary file
   * Creates a .pbf file
-
     This file contains spectra information and full chromatograms for MS1 and MSn data, allowing fast access to extracted ion chromatograms during the search.
+  * This step usually only needs to be performed once for a dataset, and by default will do nothing if it has previously been run on the dataset and can find the file.
+  * ProMex and MSPathFinderT will perform this step automatically if they are given a spectrum file that is not a .pbf file.
 
 2. Run ProMex on the .Pbf file to deisotope the data, including determine charge states
   * Creates a .ms1ft file
+  * This file can be reused for multiple searches, as long as none of its parameters change
+  * MSPathFinderT will perform this step automatically if not provided with a path to a feature file, using the respective parameters from the MSPathFinderT parameters.
 
 3. Run MSPathfinderT with the .Pbf (or .raw) file and a fasta file to search for proteins
   * Creates \_IcTda.tsv files and .mzid
