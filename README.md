@@ -9,8 +9,6 @@ both DDA and DIA.
 ## Downloads
 https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
 
-https://omics.pnl.gov/software/mspathfinder
-
 ## MSPathFinderT
 
 MSPathFinder finds peptides in top-down LC-MS/MS datasets. Similar to database search engines for bottom-up, it takes a fasta file, a spectrum file, and a list of modifications as an input and reports proteoform spectrum matches (PsSMs) and their scores. These results are output in a tab-separated format and in a MzIdentML file.
