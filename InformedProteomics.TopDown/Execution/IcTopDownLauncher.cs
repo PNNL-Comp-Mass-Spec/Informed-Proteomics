@@ -204,18 +204,14 @@ namespace InformedProteomics.TopDown.Execution
             // Get the Normalized spec file/folder path
             Options.SpecFilePath = MassSpecDataReaderFactory.NormalizeDatasetPath(Options.SpecFilePath);
 
-            var prog = new Progress<ProgressData>();
             var progData = new ProgressData(progress);
             searchProgressData = progData;
-            if (progress != null)
+            var prog = new Progress<ProgressData>(p =>
             {
-                prog = new Progress<ProgressData>(p =>
-                {
-                    progData.Status = p.Status;
-                    progData.StatusInternal = p.StatusInternal;
-                    progData.Report(p.Percent);
-                });
-            }
+                progData.Status = p.Status;
+                progData.StatusInternal = p.StatusInternal;
+                progData.Report(p.Percent);
+            });
 
             var sw = new Stopwatch();
             var swAll = new Stopwatch();
