@@ -473,13 +473,33 @@ namespace MSPathFinderT
             return null;
         }
 
+        /// <summary>
+        /// Prevent the user from specifying too many threads
+        /// </summary>
+        /// <param name="userMaxThreads"></param>
+        /// <returns></returns>
         private int GetOptimalMaxThreads(int userMaxThreads)
         {
             var threads = userMaxThreads;
 
-            if (threads <= 0 || threads > ParallelizationUtils.NumPhysicalCores)
+            // If user-supplied thread count is zero or greater than NumLogicalCores, set it dynamically
+            if (threads <= 0 || threads > ParallelizationUtils.NumLogicalCores)
             {
+                // Non-hyperthreaded max: NumPhysicalCores, which will be the same as NumLogicalCores
                 threads = ParallelizationUtils.NumPhysicalCores;
+
+                // If hyperthreaded: Don't max out the threads, drop it down by one or two to maintain system responsiveness
+                if (ParallelizationUtils.NumLogicalCores > ParallelizationUtils.NumPhysicalCores)
+                {
+                    if (ParallelizationUtils.NumLogicalCores - 2 > ParallelizationUtils.NumPhysicalCores)
+                    {
+                        threads = ParallelizationUtils.NumLogicalCores - 2;
+                    }
+                    else
+                    {
+                        threads = ParallelizationUtils.NumLogicalCores - 1;
+                    }
+                }
             }
             return threads;
         }
