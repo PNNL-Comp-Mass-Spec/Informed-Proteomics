@@ -127,7 +127,8 @@ namespace PbfGen
 
                 foreach (var rawFilePath in specFilePaths)
                 {
-                    var pbfFilePath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(rawFilePath) + PbfLcMsRun.FileExtensionConst);
+                    var pbfFileName = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, PbfLcMsRun.FileExtensionConst);
+                    var pbfFilePath = Path.Combine(outputDir, Path.GetFileName(pbfFileName));
 
                     bool isCurrent;
                     if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out isCurrent) && isCurrent)
