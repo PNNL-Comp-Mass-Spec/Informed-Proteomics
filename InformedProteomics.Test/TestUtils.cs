@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-//using DeconTools.Backend.Utilities.IsotopeDistributionCalculation;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -349,34 +348,6 @@ namespace InformedProteomics.Test
             Console.WriteLine(yIon.GetMz(0));
         }
 
-        /*
-        [Test]
-        public void TestIsotopomerProfile()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            //const string molFormula = "C78H120N22O28S3";    // CCAADDKEACFAVEGPK
-            const string molFormula = "C83H136N22O24S1";
-//            const string molFormula = "C4195H6470N1164O1213S34";
-
-            var isoCalc = IsotopicDistributionCalculator.Instance;
-            var profile = isoCalc.GetIsotopePattern(molFormula);
-
-            var sb = new StringBuilder();
-
-            foreach (var peak in profile.Peaklist)
-            {
-                sb.Append(peak.XValue);
-                sb.Append("\t");
-                sb.Append(peak.Height);
-                sb.Append("\n");
-            }
-
-            Console.Write(sb.ToString());
-        }
-        */
-
         [Test]
         public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
         {
@@ -404,43 +375,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine("{0}: {1}\t{2}", isotopeIndex, ion.GetIsotopeMz(isotopeIndex), ii);
             }
         }
-
-        /*
-        [Test]
-        public void TestTimeToComputeIsotopomerProfiles()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
-            const string dbFilePath = @"C:\cygwin\home\kims336\Data\IMS_Sarc\HumanPeptides.txt";
-
-            if (!File.Exists(dbFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
-            }
-
-            int numPeptides = 0;
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-
-            var isoCalc = IsotopicDistributionCalculator.Instance;
-            foreach (var annotation in File.ReadLines(dbFilePath))
-            {
-                ++numPeptides;
-                var peptide = annotation.Substring(2, annotation.Length - 4);
-                var composition = aaSet.GetComposition(peptide);
-                var molFormula = composition.ToPlainString();
-                isoCalc.GetIsotopePattern(molFormula);
-                composition.GetIsotopomerEnvelopeRelativeIntensities();
-            }
-
-            Console.WriteLine("NumPeptides: " + numPeptides);
-            sw.Stop();
-
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
-        }
-        */
 
         [Test]
         public void TestReadingPnnlOmicsXmlFile()

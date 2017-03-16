@@ -10,7 +10,6 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Scoring;
-//using InformedProteomics.DIA.Search;
 using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
@@ -113,94 +112,6 @@ namespace InformedProteomics.Test
             //    charge, ms2ScanNum);
 //            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);
         }
-
-        /*
-        [Test]
-        public void TestInitialScoring()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            const string icResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\Ic_NTT2_03_NoMod_NoRescoring\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28_IcTarget.tsv";
-            if (!File.Exists(icResultPath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, icResultPath);
-            }
-
-            var icParser = new TsvFileParser(icResultPath);
-            var icScans = icParser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
-            var icPeptides = icParser.GetData("Sequence");
-            var icScore = icParser.GetData("Score").Select(s => Convert.ToInt32(s)).ToArray();
-            var map = new Dictionary<string, int>();
-            for (var i = 0; i < icParser.NumData; i++)
-            {
-                map.Add(icScans[i]+":"+icPeptides[i], icScore[i]);
-            }
-
-            const string msgfPlusResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
-            if (!File.Exists(msgfPlusResultPath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, msgfPlusResultPath);
-            }
-
-            var msgfPlusResults = new MsGfResults(msgfPlusResultPath);
-            var matches = msgfPlusResults.GetMatchesAtPsmFdr(0.01);
-            //Console.WriteLine("NumMatches: {0}", matches.Count);
-            Console.WriteLine("ScanNum\tPeptide\tSpecEValue\tIcScore");
-            foreach (var match in matches)
-            {
-                var scanNum = match.ScanNum;
-                var peptide = match.Peptide;
-                var specEValue = match.SpecEValue;
-                int score;
-                if (!map.TryGetValue(scanNum + ":" + peptide, out score)) score = -1;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", scanNum, peptide, specEValue, score);
-            }
-        }
-
-        [Test]
-        public void TestMs1Filter()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            const string msgfPlusResultPath = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod.tsv";
-            if (!File.Exists(msgfPlusResultPath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, msgfPlusResultPath);
-            }
-
-            var msgfPlusResults = new MsGfResults(msgfPlusResultPath);
-
-            const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
-
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 0);
-            var ms1Filter = new Ms1IsotopeAndChargeCorrFilter(run, new Tolerance(10), 1, 4,
-                400, 5000, 0.3, 0, 0);
-
-            var matches = msgfPlusResults.GetMatchesAtPsmFdr(0.01);
-            var aminoAcidSet = new AminoAcidSet();
-            var numPsms = 0;
-            var numSurvived = 0;
-            Console.WriteLine("ScanNum\tPeptide\tSpecEValue\tFilter");
-            foreach (var match in matches)
-            {
-                var scanNum = match.ScanNum;
-                var peptide = match.Peptide;
-                var specEValue = match.SpecEValue;
-                var peptideMass = (new Sequence(peptide, aminoAcidSet).Composition + Composition.H2O).Mass;
-                var survive = ms1Filter.GetMatchingMs2ScanNums(peptideMass).Contains(scanNum) ? 1 : 0;
-                ++numPsms;
-                numSurvived += survive;
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", scanNum, peptide, specEValue, survive);
-            }
-            Console.WriteLine("SuccessRage: {0}, {1}/{2}", numSurvived/(float)numPsms, numSurvived, numPsms);
-        }
-        */
 
         [Test]
         public void TestPeptideLevelStats()
