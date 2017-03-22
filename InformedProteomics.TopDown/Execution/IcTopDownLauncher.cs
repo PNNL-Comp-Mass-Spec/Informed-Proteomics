@@ -599,7 +599,7 @@ namespace InformedProteomics.TopDown.Execution
             var sw = new Stopwatch();
             long estimatedProteins;
             var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
-            Console.WriteLine(@"Estimated proteins: " + estimatedProteins.ToString("#,##0"));
+            Console.WriteLine(@"Estimated Sequences: " + estimatedProteins.ToString("#,##0"));
 
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
@@ -816,7 +816,7 @@ namespace InformedProteomics.TopDown.Execution
 
             // Rescore and Estimate #proteins for GF calculation
             var matches = new LinkedList<DatabaseSequenceSpectrumMatch>[sortedMatches.Length];
-            long estimatedProteins = 0;
+            long estimatedSequences = 0;
             foreach(var scanNum in _ms2ScanNums)
             {
                 var prsms = sortedMatches[scanNum];
@@ -844,10 +844,10 @@ namespace InformedProteomics.TopDown.Execution
                     }
                 }
 
-                if (matches[scanNum] != null) estimatedProteins += matches[scanNum].Count;
+                if (matches[scanNum] != null) estimatedSequences += matches[scanNum].Count;
             }
 
-            Console.WriteLine(@"Estimated matched proteins: " + estimatedProteins.ToString("#,##0"));
+            Console.WriteLine(@"Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
 
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
@@ -893,7 +893,7 @@ namespace InformedProteomics.TopDown.Execution
                         match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
 
                         currentTask = "Reporting progress " + currentIteration;
-                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData);
+                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                     }
                 }
                 catch (Exception ex)

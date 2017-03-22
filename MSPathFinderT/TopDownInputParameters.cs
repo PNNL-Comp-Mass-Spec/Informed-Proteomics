@@ -378,10 +378,9 @@ namespace MSPathFinderT
                             return "File not found: " + value;
                         }
                         if (Directory.Exists(value)) continue;
-                        var extension = Path.GetExtension(value);
-                        if (!Path.GetExtension(value).ToLower().Equals(".raw") &&
-                            !Path.GetExtension(value).ToLower().Equals(PbfLcMsRun.FileExtensionConst))
+                        if (MassSpecDataReaderFactory.GetMassSpecDataReader(value) == null)
                         {
+                            var extension = Path.GetExtension(value);
                             return "Invalid extension for the parameter " + key + " (" + extension + ")";
                         }
                     }
