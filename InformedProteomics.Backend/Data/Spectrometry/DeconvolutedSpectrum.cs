@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 
+using InformedProteomics.Backend.Data.Composition;
+
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    public class DeconvolutedSpectrum : ProductSpectrum
+    public class DeconvolutedSpectrum : ProductSpectrum, IDeconvolutedSpectrum
     {
         public DeconvolutedSpectrum(Spectrum originalSpec, DeconvolutedPeak[] peaks)
             : base(originalSpec.ScanNum)
@@ -34,6 +36,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var dPeaks = new DeconvolutedPeak[peaks.Count];
             peaks.CopyTo(dPeaks, 0);
             Peaks = dPeaks;
+        }
+
+        public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
+        {
+            return base.FindPeak(composition.Mass, tolerance) as DeconvolutedPeak;
         }
     }
 }

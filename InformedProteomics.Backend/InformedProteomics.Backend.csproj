@@ -105,6 +105,7 @@
     <Compile Include="Data\Spectrometry\AbstractFragmentScorer.cs" />
     <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
     <Compile Include="Data\Spectrometry\DeconvolutedSpectrum.cs" />
+    <Compile Include="Data\Spectrometry\IDeconvolutedSpectrum.cs" />
     <Compile Include="Data\Spectrometry\IFragmentScorerFactory.cs" />
     <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
     <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Spectrum.cs" />
     <Compile Include="Data\Spectrometry\SummedSpectrum.cs" />
+    <Compile Include="Data\Spectrometry\TargetedDeconvolutedSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Tolerance.cs" />
     <Compile Include="Data\Sequence\ModFileParser.cs" />
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
