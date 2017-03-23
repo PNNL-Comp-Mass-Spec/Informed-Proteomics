@@ -41,6 +41,7 @@
     <Compile Include="BottomUp\Partition.cs" />
     <Compile Include="BottomUp\ScoredSpectrum.cs" />
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
+    <Compile Include="GeneratingFunction\IScoringGraphEdge.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphNode.cs" />
     <Compile Include="LikelihoodScoring\Data\LazyLcMsRun.cs" />
     <Compile Include="LikelihoodScoring\Data\RankedPeaks.cs" />

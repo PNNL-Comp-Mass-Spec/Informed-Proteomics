@@ -93,7 +93,7 @@ namespace InformedProteomics.TopDown.Scoring
                 return edgeScore;
             }
 
-            public IEnumerable<ScoringGraphEdge> GetEdges(int nodeIndex)
+            public IEnumerable<IScoringGraphEdge> GetEdges(int nodeIndex)
             {
                 return nodeIndex >= GetNumNodes() ? Enumerable.Empty<ScoringGraphEdge>() : _adjList[nodeIndex];
             }

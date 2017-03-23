@@ -1,6 +1,6 @@
 ﻿namespace InformedProteomics.Scoring.GeneratingFunction
 {
-    public class ScoringGraphEdge
+    public class ScoringGraphEdge : IScoringGraphEdge
     {
         public ScoringGraphEdge(int prevNodeIndex)
         {
