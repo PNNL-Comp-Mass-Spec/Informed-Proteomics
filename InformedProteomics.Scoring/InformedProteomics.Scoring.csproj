@@ -72,7 +72,6 @@
     <Compile Include="GeneratingFunction\ScoreDistribution.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphEdge.cs" />
     <Compile Include="LikelihoodScoring\Data\SpectrumMatchList.cs" />
-    <Compile Include="IFragmentScorer.cs" />
     <Compile Include="LikelihoodScoring\Config\TrainerConfiguration.cs" />
     <Compile Include="LikelihoodScoring\TrainingParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
