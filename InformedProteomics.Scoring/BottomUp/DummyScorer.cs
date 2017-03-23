@@ -2,10 +2,10 @@
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 
+using InformedProteomics.Backend.Data.Sequence;
+
 namespace InformedProteomics.Scoring.BottomUp
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
     public class DummyScorer: IScorer
     {
         public double GetPrecursorIonScore(Ion precursorIon)
