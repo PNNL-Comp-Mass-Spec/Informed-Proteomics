@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring
             if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
 
             var nodeScores = scorer.GetNodeScores(proteinMass);
-            var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList);
+            var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList, _comparer);
 
             return graph;
         }
@@ -67,11 +67,12 @@ namespace InformedProteomics.TopDown.Scoring
 
         internal class ProteinScoringGraph : IScoringGraph
         {
-            internal ProteinScoringGraph(double?[] nodeScoresByPrefixIon, double?[] nodeScoresBySuffixIon, LinkedList<ScoringGraphEdge>[] adjList)
+            internal ProteinScoringGraph(double?[] nodeScoresByPrefixIon, double?[] nodeScoresBySuffixIon, LinkedList<ScoringGraphEdge>[] adjList, IMassBinning comparer)
             {
                 _nodeScoresByPrefixIon = nodeScoresByPrefixIon;
                 _nodeScoresBySuffixIon = nodeScoresBySuffixIon;
                 _adjList = adjList;
+                this._comparer = comparer;
             }
 
             public double GetNodeScore(int nodeIndex)
@@ -103,6 +104,27 @@ namespace InformedProteomics.TopDown.Scoring
                 return _nodeScoresByPrefixIon.Length;
             }
 
+            public double ScoreSequence(Sequence sequence)
+            {
+                var cleavages = sequence.GetInternalCleavages();
+                double score = 0.0;
+                int prevNTermBin = 0, prevCTermBin = 0;
+                foreach (var cleavage in cleavages)
+                {
+                    int nTermBin = _comparer.GetBinNumber(cleavage.PrefixComposition.Mass);
+                    int cTermBin = _comparer.GetBinNumber(cleavage.SuffixComposition.Mass);
+
+                    score += this.GetNodeScore(nTermBin) + this.GetNodeScore(cTermBin);
+                    score += this.GetEdgeScore(prevNTermBin, nTermBin) + this.GetEdgeScore(prevCTermBin, cTermBin);
+
+                    prevNTermBin = nTermBin;
+                    prevCTermBin = cTermBin;
+                }
+
+                return score;
+            }
+
+            private readonly IMassBinning _comparer;
             private readonly double?[] _nodeScoresByPrefixIon;
             private readonly double?[] _nodeScoresBySuffixIon;
             private readonly LinkedList<ScoringGraphEdge>[] _adjList;

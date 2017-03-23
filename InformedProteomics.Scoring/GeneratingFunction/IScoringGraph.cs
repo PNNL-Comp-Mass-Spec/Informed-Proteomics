@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using InformedProteomics.Backend.Data.Sequence;
+
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
     public interface IScoringGraph
@@ -9,5 +11,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         double GetEdgeScore(int nodeIndex1, int nodeIndex2);
         int GetNumNodes();
+
+        double ScoreSequence(Sequence sequence);
     }
 }
