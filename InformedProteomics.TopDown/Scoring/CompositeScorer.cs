@@ -9,21 +9,26 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 
+using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Scoring.Interfaces;
+
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
-    public class CompositeScorer : AbstractFragmentScorer
+    public class CompositeScorer : AbstractFragmentScorer, IInformedScorer
     {
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD)
-            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod)
+        public bool reduceIons;
+
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD, bool reduceIons = false)
+            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod, reduceIons)
         {
+            this.reduceIons = reduceIons;
             ReferencePeakIntensity = GetRefIntensity(ms2Spec.Peaks);
         }
 
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown)
-            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold, activationMethod)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown, bool reduceIons = false)
+            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold, activationMethod, reduceIons)
         {
+            this.reduceIons = reduceIons;
         }
 
         public const double CorrThreshold = 0.7;
@@ -45,7 +50,8 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
-            var ionsFound = new Dictionary<BaseIonType, double>();
+            var nTermIonsFound = new Dictionary<int, double>();
+            var cTermIonsFound = new Dictionary<int, double>();
 
             foreach (var baseIonType in BaseIonTypes)
             {
@@ -77,11 +83,11 @@ namespace InformedProteomics.TopDown.Scoring
                         ionscore += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
                         ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
-                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
-                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
+                        var ionsFound = baseIonType.IsPrefix ? nTermIonsFound : cTermIonsFound;
 
-                        score += ionscore;
+                        if (!ionsFound.ContainsKey(matchedPeak.Charge)) ionsFound.Add(matchedPeak.Charge, ionscore);
+                        else if (ionscore < ionsFound[matchedPeak.Charge]) continue;
+                        else ionsFound[matchedPeak.Charge] = ionscore;
 
                         if (baseIonType.IsPrefix)
                             prefixHit = true;
@@ -96,9 +102,70 @@ namespace InformedProteomics.TopDown.Scoring
                 }
             }
 
-            if (prefixHit && suffixHit)
-                score += ScoreParam.ComplementaryIonCount;
+            var bestNTermScore = double.MinValue;
+            var bestCTermScore = double.MinValue;
+            var scoreSum = 0.0;
+
+            foreach (var bestScore in nTermIonsFound)
+            {
+                if (bestScore.Value > bestNTermScore)
+                {
+                    bestNTermScore = bestScore.Value;
+                }
+                scoreSum += bestScore.Value;
+            }
+            foreach (var bestScore in cTermIonsFound)
+            {
+                if (bestScore.Value > bestCTermScore)
+                {
+                    bestCTermScore = bestScore.Value;
+                }
+                scoreSum += bestScore.Value;
+            }
+
+            if (this.reduceIons)
+            {
+                score += bestNTermScore;
+                score += bestCTermScore;
+            }
+            else
+            {
+                score += scoreSum;
+            }
+
+            //if (prefixHit && suffixHit)
+            //    score += ScoreParam.ComplementaryIonCount;
             return score;
+        }
+
+        public int GetNumMatchedFragments(Sequence sequence)
+        {
+            var cleavages = sequence.GetInternalCleavages();
+            int count = 0;
+            foreach (var cl in cleavages)
+            {
+                foreach (var baseIonType in BaseIonTypes)
+                {
+                    var fragmentComposition = baseIonType.IsPrefix ? cl.PrefixComposition : cl.SuffixComposition;
+                    fragmentComposition += baseIonType.OffsetComposition;
+                    var peaks = FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold);
+                    count += peaks.Any() ? 1 : 0;
+                }
+            }
+
+            return count;
+        }
+
+        public double GetUserVisibleScore(Sequence sequence)
+        {
+            var cleavages = sequence.GetInternalCleavages();
+            double score = 0.0;
+            foreach (var cl in cleavages)
+            {
+                score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
+            }
+
+            return GetProbability(score);
         }
 
         public static double GetRefIntensity(Peak[] peaks)
@@ -112,6 +179,8 @@ namespace InformedProteomics.TopDown.Scoring
             var refIntensity = intensities[refIndex];
             return refIntensity;
         }
+
+        public const double ProbabilityCutoff = 0.1;
 
         public static double GetProbability(double score)
         {
@@ -150,20 +219,20 @@ namespace InformedProteomics.TopDown.Scoring
             };*/
             var trainedParam = new double[]
             {
-                -4.35615875783574,
-                -0.263297798433790,
-                -0.863126458013878,
-                0.238325241230975,
-                0.294277332664349,
-                0.882288576167220,
-                0.732263929496114,
-                -0.0199416790747384,
-                -0.498811136842684,
-                0.180874679890120,
-                0.299790673329884,
-                0.492391631834416,
-                0.314410358803801,
-                -0.0134845040032297,
+                -4.35615875783574,  // Beta0
+                -0.263297798433790, // Complementary Ion Count
+                -0.863126458013878, // Count
+                0.238325241230975,  // ConsecutiveMatch
+                0.294277332664349,  // Intensity
+                0.882288576167220,  // Corr
+                0.732263929496114,  // Dist
+                -0.0199416790747384,// MassError
+                -0.498811136842684, // Count
+                0.180874679890120,  // ConsecutiveMatch
+                0.299790673329884,  // Intensity
+                0.492391631834416,  // Corr
+                0.314410358803801,  // Dist
+                -0.0134845040032297,// MassError
             };
 
             ScoreParam = new ScoreWeight()
@@ -191,6 +260,11 @@ namespace InformedProteomics.TopDown.Scoring
                 },
             };
         }
+
+        /// <summary>
+        /// Gets the score cut off for filtering out PSMs before they are passed into the generating function.
+        /// </summary>
+        public double ScoreCutOff { get { return ScoreParam.Cutoff; } }
 
         internal class ScoreWeight
         {

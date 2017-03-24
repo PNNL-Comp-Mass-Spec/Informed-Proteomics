@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge)
         {
-            throw new NotImplementedException();
+            return new CompositeScorer(spectrum, this._productTolerance, activationMethod: spectrum.ActivationMethod, minCharge: _minProductCharge, maxCharge: _maxProductCharge);
         }
 
         public IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0, ActivationMethod activationMethod = ActivationMethod.Unknown)

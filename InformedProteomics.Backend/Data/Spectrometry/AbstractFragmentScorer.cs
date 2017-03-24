@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.Backend.Data.Spectrometry
+namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Backend.Data.Composition;
-    using InformedProteomics.Backend.Data.Sequence;
-
     public abstract class AbstractFragmentScorer : IScorer
     {
-        protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown, bool reducedIons = false)
         {
             Ms2Spectrum = spec;
             Tolerance = tol;
@@ -26,12 +27,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 else actToUse = ActivationMethod.CID;
             }
 
-            if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD) BaseIonTypes = BaseIonTypesCID;
-            else if (actToUse == ActivationMethod.ETD) BaseIonTypes = BaseIonTypesETD;
-            else if (actToUse == ActivationMethod.UVPD) BaseIonTypes = BaseIonTypesUVPD;
-            else BaseIonTypes = BaseIonTypesCID;
+            if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD) this.BaseIonTypes = BaseIonTypesCID;
+            else if (actToUse == ActivationMethod.ETD) this.BaseIonTypes = BaseIonTypesETD;
+            else if (actToUse == ActivationMethod.UVPD && reducedIons) this.BaseIonTypes = BaseIonTypesUVPDRed;
+            else if (actToUse == ActivationMethod.UVPD && !reducedIons) this.BaseIonTypes = BaseIonTypesUVPD;
+            else this.BaseIonTypes = BaseIonTypesCID;
 
-            if (actToUse == ActivationMethod.UVPD)
+            if (actToUse == ActivationMethod.UVPD && !reducedIons)
             {
                 this.PrefixOffsetMass = this.BaseIonTypes[0].OffsetComposition.Mass;
                 this.SuffixOffsetMass = this.BaseIonTypes[2].OffsetComposition.Mass;
@@ -209,12 +211,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         protected double RelativeIsotopeIntensityThreshold;
 
-        protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD, BaseIonTypesUVPD;
+        protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD, BaseIonTypesUVPD, BaseIonTypesUVPDRed;
         static AbstractFragmentScorer()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
-            BaseIonTypesUVPD = new[] { BaseIonType.A, BaseIonType.Ar, BaseIonType.Y, BaseIonType.YM1 };
+            BaseIonTypesUVPD = new[] { BaseIonType.A, BaseIonType.Ar, BaseIonType.B, BaseIonType.C, BaseIonType.X, BaseIonType.Y, BaseIonType.YM1, BaseIonType.Z };
+            BaseIonTypesUVPDRed = new[] { BaseIonType.A, BaseIonType.Y };
         }
     }
 }
