@@ -92,7 +92,8 @@ namespace InformedProteomics.TopDown.Scoring
             var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
             if (spec == null || spec.Peaks.Length == 0)
                 return null;
-            var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
+            var deconvolutedSpec = Deconvoluter.GetCombinedDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, IsotopeOffsetTolerance, _productTolerance, 0.7);
+            //var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
             return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer, activationMethod) : null;
         }
 
