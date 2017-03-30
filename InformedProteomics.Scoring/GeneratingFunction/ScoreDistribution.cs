@@ -9,6 +9,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             MinScore = minScore;
             MaxScore = maxScore;
             _eValueDistribution = new double[MaxScore - MinScore];
+            _scoreTotal = 0.0;
         }
 
         public int MinScore { get; private set; }   // inclusive
@@ -27,6 +28,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             {
                 var delEValue = otherDistribution._eValueDistribution[index - otherDistribution.MinScore]*weight;
                 _eValueDistribution[index + deltaScore - MinScore] += delEValue;
+                _scoreTotal += delEValue;
             }
         }
 
@@ -44,10 +46,14 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             {
                 spectralEValue += _eValueDistribution[index];
             }
+
+            spectralEValue = spectralEValue / _scoreTotal;
             if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
             return spectralEValue;
         }
 
         private readonly double[] _eValueDistribution;
+
+        private double _scoreTotal;
     }
 }

@@ -108,17 +108,21 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var cleavages = sequence.GetInternalCleavages();
                 double score = 0.0;
-                int prevNTermBin = 0, prevCTermBin = 0;
+                int prevNTermBin = 0;
                 foreach (var cleavage in cleavages)
                 {
                     int nTermBin = _comparer.GetBinNumber(cleavage.PrefixComposition.Mass);
-                    int cTermBin = _comparer.GetBinNumber(cleavage.SuffixComposition.Mass);
 
-                    score += this.GetNodeScore(nTermBin) + this.GetNodeScore(cTermBin);
-                    score += this.GetEdgeScore(prevNTermBin, nTermBin) + this.GetEdgeScore(prevCTermBin, cTermBin);
+                    if (nTermBin < 0)
+                    {
+                        prevNTermBin = nTermBin;
+                        continue;
+                    }
+
+                    score += this.GetNodeScore(nTermBin);
+                    score += prevNTermBin >= 0 ? this.GetEdgeScore(prevNTermBin, nTermBin) : 0;
 
                     prevNTermBin = nTermBin;
-                    prevCTermBin = cTermBin;
                 }
 
                 return score;

@@ -43,6 +43,7 @@
     <Compile Include="GeneratingFunction\GeneratingFunction.cs" />
     <Compile Include="GeneratingFunction\IScoringGraphEdge.cs" />
     <Compile Include="GeneratingFunction\ScoringGraphNode.cs" />
+    <Compile Include="Interfaces\IInformedScorer.cs" />
     <Compile Include="LikelihoodScoring\Data\LazyLcMsRun.cs" />
     <Compile Include="LikelihoodScoring\Data\RankedPeaks.cs" />
     <Compile Include="LikelihoodScoring\FileReaders\DiaTsvReader.cs" />
@@ -82,6 +83,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="TopDown\FilteredProteinMassBinning.cs" />
+    <Compile Include="TopDown\IcScores.cs" />
     <Compile Include="TopDown\IMassBinning.cs" />
     <Compile Include="TopDown\ProteinMassBinning.cs" />
   </ItemGroup>

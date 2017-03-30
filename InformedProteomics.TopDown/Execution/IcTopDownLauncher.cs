@@ -20,6 +20,8 @@ using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using TopDownTrainer;
 
+using InformedProteomics.Scoring.Interfaces;
+
 namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDownLauncher
@@ -180,7 +182,8 @@ namespace InformedProteomics.TopDown.Execution
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
-        //private IFragmentScorerFactory fragmentScorerFactory;
+
+        //private ScoringGraphFactory scoringGraphFactory;
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
@@ -711,7 +714,8 @@ namespace InformedProteomics.TopDown.Execution
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
-                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
+                        //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
+                        var scorer = this._ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
@@ -827,17 +831,33 @@ namespace InformedProteomics.TopDown.Execution
 
                 foreach (var match in prsms)
                 {
-                    var sequence = match.Sequence;
+                    //if (CompositeScorer.GetProbability(match.Score) < CompositeScorer.ProbabilityCutoff)
+                    //{
+                    //    continue;
+                    //}
+
                     var ion = match.Ion;
 
                     // Re-scoring
-                    var scores = topDownScorer.GetScores(spec, sequence, ion.Composition, ion.Charge, scanNum);
-                    if (scores == null) continue;
+                    //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
+                    //if (scores == null) continue;
+                    var scorer = this._ms2ScorerFactory2.GetScorer(this._run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge);
+                    var informedScorer = scorer as IInformedScorer;
+                    var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
+
+                    match.ModificationText = scores.Modifications;
+
+                    double s1 = scores.Score, s2;
+                    int nf1;
+                    //topDownScorer.GetCompositeScores(sequence, ion.Charge, scanNum, out s1, out nf1);
+                    //topDownScorer.GetCompositeScores(ipSequence, this._ms2ScorerFactory2.GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum, out s2);
 
                     match.Score = scores.Score;
-                    match.ModificationText = scores.Modifications;
                     match.NumMatchedFragments = scores.NumMatchedFrags;
-                    if (match.Score > CompositeScorer.ScoreParam.Cutoff)
+                    //match.ModificationText = match.Modifications.ToString();
+                    //match.NumMatchedFragments = scores.NumMatchedFrags;
+                    if (match.Score > informedScorer.ScoreCutOff)
+                    //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
                     {
                         if (matches[scanNum] == null) matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
                         matches[scanNum].AddLast(match);
@@ -862,7 +882,8 @@ namespace InformedProteomics.TopDown.Execution
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
-            Parallel.ForEach(scanNums, pfeOptions, scanNum =>
+            Parallel.ForEach(scanNums, pfeOptions, scanNum =>          
+            //foreach (var scanNum in scanNums)
             {
                 var currentTask = "?";
                 try
@@ -873,6 +894,8 @@ namespace InformedProteomics.TopDown.Execution
                         var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
 
+                        //var scorer = this._ms2ScorerFactory2.GetScorer(match.ScanNum);
+                        //var graph = this.scoringGraphFactory.GetScoringGraph(scorer, match.Ion.Composition.Mass);
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
                         if (graph == null) continue;
 
@@ -890,19 +913,21 @@ namespace InformedProteomics.TopDown.Execution
                         }
 
                         currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
-                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
+                        var ipSequence = Sequence.CreateSequence(match.Sequence, match.ModificationText, topDownScorer.AminoAcidSet);
+                        var graphScore = graph.ScoreSequence(ipSequence);
+                        match.SpecEvalue = scoreDist.GetSpectralEValue(graphScore);
 
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                     }
-                }
+            }
                 catch (Exception ex)
-                {
-                    var errMsg = string.Format("Exception while {0}: {1}", currentTask, ex.Message);
-                    Console.WriteLine(errMsg);
-                    throw new Exception(errMsg, ex);
-                }
-            });
+            {
+                var errMsg = string.Format("Exception while {0}: {1}", currentTask, ex.Message);
+                Console.WriteLine(errMsg);
+                throw new Exception(errMsg, ex);
+            }
+        });
 
             var finalMatches = new DatabaseSequenceSpectrumMatch[matches.Length];
             foreach (var scanNum in scanNums)
@@ -959,7 +984,7 @@ namespace InformedProteomics.TopDown.Execution
                     MostAbundantIsotopeMz = match.Ion.GetMostAbundantIsotopeMz(),
                     Mass = match.Ion.Composition.Mass,
                     NumMatchedFragments = match.NumMatchedFragments,
-                    Probability = CompositeScorer.GetProbability(match.Score),
+                    Probability = match.Score, //CompositeScorer.GetProbability(match.Score),
                     SpecEValue = match.SpecEvalue,
                     EValue = match.SpecEvalue * database.GetNumEntries()
                 };

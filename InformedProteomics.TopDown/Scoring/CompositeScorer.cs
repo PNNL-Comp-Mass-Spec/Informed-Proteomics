@@ -12,8 +12,9 @@ using InformedProteomics.Backend.Data.Spectrometry;
 namespace InformedProteomics.TopDown.Scoring
 {
     using InformedProteomics.Backend.Data.Sequence;
+    using InformedProteomics.Scoring.Interfaces;
 
-    public class CompositeScorer : AbstractFragmentScorer
+    public class CompositeScorer : AbstractFragmentScorer, IInformedScorer
     {
         public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD)
             : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod)
@@ -122,6 +123,37 @@ namespace InformedProteomics.TopDown.Scoring
         internal static ScoreWeight ScoreParam; // score weights without mass error temrs for generating function evaluation
         private const double WeightScaleFactor = 4.0;
 
+        public int GetNumMatchedFragments(Sequence sequence)
+        {
+            var cleavages = sequence.GetInternalCleavages();
+            int count = 0;
+            foreach (var cl in cleavages)
+            {
+                foreach (var baseIonType in BaseIonTypes)
+                {
+                    var fragmentComposition = baseIonType.IsPrefix ? cl.PrefixComposition : cl.SuffixComposition;
+                    fragmentComposition += baseIonType.OffsetComposition;
+                    var peaks = FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold);
+                    count += peaks.Any() ? 1 : 0;
+                }
+            }
+
+            return count;
+        }
+
+        public double GetUserVisibleScore(Sequence sequence)
+        {
+            var cleavages = sequence.GetInternalCleavages();
+            double score = 0.0;
+            foreach (var cl in cleavages)
+            {
+                score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
+            }
+
+            return GetProbability(score);
+        }
+
+
         static CompositeScorer()
         {
             /*ScoreParam = new ScoreWeight()
@@ -191,6 +223,8 @@ namespace InformedProteomics.TopDown.Scoring
                 },
             };
         }
+
+        public double ScoreCutOff { get { return GetProbability(CompositeScorer.ScoreParam.Cutoff); } }
 
         internal class ScoreWeight
         {
