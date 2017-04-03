@@ -331,8 +331,7 @@ namespace InformedProteomics.TopDown.Execution
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
             //this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
-            _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
-                                                               Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+
             sw.Reset();
             Console.WriteLine(@"Generating deconvoluted spectra for MS/MS spectra...");
             sw.Start();
@@ -341,10 +340,19 @@ namespace InformedProteomics.TopDown.Execution
                 MaxDegreeOfParallelism = Options.MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
-            Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
-            {
-                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum, Options.ActivationMethod);
-            });
+
+            // Deconvolute spectra
+            var deconvoluter = new Deconvoluter(this.Options.MinProductIonCharge, this.Options.MaxProductIonCharge, 2, 0.1, this.Options.ProductIonTolerance);
+            var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
+            var deconvolutedRun = new DPbfLcMsRun(this.Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
+
+            _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
+                                                   Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+            //Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+            //{
+            //    _ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
+            //});
+
             sw.Stop();
             Console.WriteLine(@"Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds);
 
@@ -715,7 +723,7 @@ namespace InformedProteomics.TopDown.Execution
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
                         //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
-                        var scorer = this._ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
+                        var scorer = this._ms2ScorerFactory2.GetScorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
