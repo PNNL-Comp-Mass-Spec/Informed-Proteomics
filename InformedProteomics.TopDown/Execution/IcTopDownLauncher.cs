@@ -443,7 +443,7 @@ namespace InformedProteomics.TopDown.Execution
             swAll.Stop();
 
             var elapsed = swAll.Elapsed;
-            var minutes = elapsed.Minutes - ((int)elapsed.TotalHours * 60);
+            var minutes = elapsed.TotalMinutes - ((int)elapsed.TotalHours * 60);
             Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1}d {2}h {3:f2} min)", elapsed.TotalSeconds, elapsed.Days, elapsed.Hours, minutes);
 
             return true;
