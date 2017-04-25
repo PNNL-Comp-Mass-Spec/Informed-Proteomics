@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -51,6 +51,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.DevTests", "InformedProteomics.Tests.DevTests\InformedProteomics.Tests.DevTests.csproj", "{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BAB01DF1-A68A-4F98-9000-697CB1AB6B71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromexAlign", "PromexAlign\PromexAlign.csproj", "{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -118,6 +120,10 @@ Global
 		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,5 +138,6 @@ Global
 		{804ECD5C-E1C4-4C77-A9BE-FA2FD2C7E83F} = {BAB01DF1-A68A-4F98-9000-697CB1AB6B71}
 		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19} = {BAB01DF1-A68A-4F98-9000-697CB1AB6B71}
 		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA} = {BAB01DF1-A68A-4F98-9000-697CB1AB6B71}
+		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8} = {166A038F-C6E6-429B-8FE0-9F7D84785851}
 	EndGlobalSection
 EndGlobal
