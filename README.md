@@ -1,8 +1,6 @@
 # Informed Proteomics
 
-The Informed Proteomics project includes algorithms for analysis of both
-top down and bottom up MS/MS proteomics data.  Supported workflows include
-both DDA and DIA.
+The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. Although the back-end data access and some of the scoring routines are general purpose, this repository is currently maintained for top down MS/MS datasets.
 
 #### [See the Informed Proteomics GitHub wiki for usage, tutorials, and more!](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki)
 

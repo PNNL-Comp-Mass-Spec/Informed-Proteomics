@@ -14,7 +14,7 @@ namespace InformedProteomics.TopDown.Execution
         public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset,
             int numNTermCleavages, ModificationCombination modifications, Ion ion, double score,
             bool isDecoy,
-            double specEvalue = 0.0)
+            double specEvalue = 0.0, int featureId = 0)
         {
             Sequence = sequence;
             Pre = pre == FastaDatabase.Delimiter ? '-' : pre;
@@ -27,6 +27,7 @@ namespace InformedProteomics.TopDown.Execution
             Score = score;
             SpecEvalue = specEvalue;
             IsDecoy = isDecoy;
+            FeatureId = featureId;
         }
 
         public Sequence IpSequence { get; set; }
@@ -45,6 +46,8 @@ namespace InformedProteomics.TopDown.Execution
         public string ModificationText { get; internal set; }
 
         public int NumMatchedFragments { get; internal set; }
+
+        public int FeatureId { get; private set; }
 
         public AminoAcid NTerm
         {

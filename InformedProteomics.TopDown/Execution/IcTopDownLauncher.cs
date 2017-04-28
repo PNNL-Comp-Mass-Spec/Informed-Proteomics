@@ -454,7 +454,7 @@ namespace InformedProteomics.TopDown.Execution
             swAll.Stop();
 
             var elapsed = swAll.Elapsed;
-            var minutes = elapsed.Minutes - ((int)elapsed.TotalHours * 60);
+            var minutes = elapsed.TotalMinutes - ((int)elapsed.TotalHours * 60);
             Console.WriteLine(@"Total elapsed time for search: {0:f1} sec ({1}d {2}h {3:f2} min)", elapsed.TotalSeconds, elapsed.Days, elapsed.Hours, minutes);
 
             return true;
@@ -713,6 +713,8 @@ namespace InformedProteomics.TopDown.Execution
 
                     var modCombinations = modCombs[modIndex];
                     var ms2ScanNums = this.Options.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
+                    var filter = sequenceFilter as Ms1FtFilter;
+                    var featureIds = filter?.GetMatchingFeatureIds(sequenceMass).ToList() ?? new List<int>();
 
                     Parallel.ForEach(ms2ScanNums, pfeOptions, ms2ScanNum =>
                     {
@@ -730,8 +732,19 @@ namespace InformedProteomics.TopDown.Execution
                         var sequence = protSequence.Substring(numNTermCleavages);
                         var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
                         var post = annotation[annotation.Length - 1];
+
+                        var ms2FeatureIds = new List<int>();
+                        if (filter != null)
+                        {
+                            foreach (var featureId in featureIds)
+                            {
+                                var scanRange = filter.Ms1FtIndexToScanRange[featureId];
+                                if (ms2ScanNum >= scanRange.Item1 && ms2ScanNum <= scanRange.Item2) ms2FeatureIds.Add(featureId);
+                            }
+                        }
+                        else ms2FeatureIds = featureIds;
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, numNTermCleavages,
-                            modCombinations, precursorIon, score, isDecoy);
+                            modCombinations, precursorIon, score, isDecoy, featureId: ms2FeatureIds.FirstOrDefault());
 
                         AddMatch(matches, ms2ScanNum, prsm);
                     });
@@ -994,7 +1007,8 @@ namespace InformedProteomics.TopDown.Execution
                     NumMatchedFragments = match.NumMatchedFragments,
                     Probability = match.Score, //CompositeScorer.GetProbability(match.Score),
                     SpecEValue = match.SpecEvalue,
-                    EValue = match.SpecEvalue * database.GetNumEntries()
+                    EValue = match.SpecEvalue * database.GetNumEntries(),
+                    Ms1Feature = match.FeatureId
                 };
 
                 yield return result;
