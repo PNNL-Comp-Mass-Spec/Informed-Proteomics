@@ -25,10 +25,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             _tolerance = tolerance;
             _map = new Dictionary<int, BitArray>();
+            _binToFeatureMap = new Dictionary<int, List<int>>();
             _comparer = new MzComparerWithBinning(30);  // 2 ppm binning
 
             _sequenceMassBinToScanNumsMap = new Dictionary<int, IEnumerable<int>>();
             _scanNumToMassBin = new Dictionary<int, List<int>>();
+        }
+
+        public List<int> GetMatchingFeatureIds(double sequenceMass)
+        {
+            var massBinNum = GetBinNumber(sequenceMass);
+            List<int> featureIds;
+            if (_binToFeatureMap.TryGetValue(massBinNum, out featureIds)) return featureIds;
+
+            return new List<int>();
         }
 
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
@@ -82,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _scanToIsolationWindow = null;
         }
 
-        public void SetMatches(double monoIsotopicMass, int minScanNum, int maxScanNum, int repScanNum, int minCharge, int maxCharge)
+        public void SetMatches(int featureId, double monoIsotopicMass, int minScanNum, int maxScanNum, int repScanNum, int minCharge, int maxCharge)
         {
             if (minScanNum < _run.MinLcScan) minScanNum = _run.MinLcScan;
             if (maxScanNum > _run.MaxLcScan) maxScanNum = _run.MaxLcScan;
@@ -131,10 +141,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (!_map.TryGetValue(binNum, out scanBitArray))
                 {
                     _map.Add(binNum, bitArray);
+                    _binToFeatureMap.Add(binNum, new List<int>());
+                    _binToFeatureMap[binNum].Add(featureId);
                 }
                 else
                 {
                     scanBitArray.Or(bitArray);
+                    _binToFeatureMap[binNum].Add(featureId);
                 }
             }
         }
@@ -155,6 +168,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly Dictionary<int, List<int>> _scanNumToMassBin;
 
         private readonly Dictionary<int, BitArray> _map;
+
+        private readonly Dictionary<int, List<int>> _binToFeatureMap;
         private readonly MzComparerWithBinning _comparer;
     }
 }

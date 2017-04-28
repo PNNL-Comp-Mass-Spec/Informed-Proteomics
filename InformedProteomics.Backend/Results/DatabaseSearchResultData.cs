@@ -7,6 +7,8 @@ using PSI_Interface.IdentData;
 
 namespace InformedProteomics.Backend.Results
 {
+    using System.Linq;
+
     /// <summary>
     /// Container with utilities for reading/writing/storing database search results.
     /// </summary>
@@ -148,6 +150,8 @@ namespace InformedProteomics.Backend.Results
             }
         }
 
+        public int Ms1Feature { get; set; }
+
         private string sequenceWithEnds;
         private double qValue;
         private double pepQValue;
@@ -181,12 +185,12 @@ namespace InformedProteomics.Backend.Results
         /// Header string for default TSV output, without FDR scores
         /// </summary>
         public const string TsvHeaderString = "Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
-                                              "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\t#MatchedFragments\tProbability\tSpecEValue\tEValue";
+                                              "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\tMs1Features\t#MatchedFragments\tProbability\tSpecEValue\tEValue";
 
         /// <summary>
         /// Format string for default TSV output, without FDR scores
         /// </summary>
-        public const string TsvFormatString = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}";
+        public const string TsvFormatString = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}\t{18}";
 
         /// <summary>
         /// Header string for default TSV output, with FDR scores
@@ -235,6 +239,7 @@ namespace InformedProteomics.Backend.Results
                 Charge,               // precursorCharge
                 StringUtilities.DblToString(MostAbundantIsotopeMz, 9, true), // MostAbundantIsotopeMz
                 StringUtilities.DblToString(Mass, 9, true),                  // Mass
+                Ms1Feature,
                 NumMatchedFragments,                                         // (Number of matched fragments)
                 StringUtilities.DblToString(Probability, 4),                 // Probability
                 StringUtilities.DblToString(Math.Max(SmallestValueExcel, SpecEValue), 6, true, 0.001), // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
@@ -261,12 +266,13 @@ namespace InformedProteomics.Backend.Results
         private static int chargeIndex = 11;
         private static int mostAbundantIsotopeMzIndex = 12;
         private static int massIndex = 13;
-        private static int numMatchedFragmentsIndex = 14;
-        private static int probabilityIndex = 15;
-        private static int specEValueIndex = 16;
-        private static int eValueIndex = 17;
-        private static int qValueIndex = 18;
-        private static int pepQValueIndex = 19;
+        private static int ms1FeaturesIndex = 14;
+        private static int numMatchedFragmentsIndex = 15;
+        private static int probabilityIndex = 16;
+        private static int specEValueIndex = 17;
+        private static int eValueIndex = 18;
+        private static int qValueIndex = 19;
+        private static int pepQValueIndex = 20;
 
         /// <summary>
         /// Set the file header string for a file that will be read in
@@ -328,6 +334,9 @@ namespace InformedProteomics.Backend.Results
                         break;
                     case "Mass":
                         massIndex = i;
+                        break;
+                    case "Ms1Features":
+                        ms1FeaturesIndex = i;
                         break;
                     case "#MatchedFragments":
                         numMatchedFragmentsIndex = i;
@@ -416,6 +425,10 @@ namespace InformedProteomics.Backend.Results
             if (tokens.Length > massIndex)
             {
                 Mass = double.Parse(tokens[massIndex]);
+            }
+            if (tokens.Length > ms1FeaturesIndex)
+            {
+                Ms1Feature = Convert.ToInt32(tokens[ms1FeaturesIndex]);
             }
             if (tokens.Length > numMatchedFragmentsIndex)
             {
