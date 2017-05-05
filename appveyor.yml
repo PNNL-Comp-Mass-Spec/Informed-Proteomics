@@ -8,6 +8,7 @@ test:
   categories:
     except:
     - PNL_Domain
+    - Local_Testing
     - Long_Running
 artifacts:
 - path: PbfGen\bin\Debug
