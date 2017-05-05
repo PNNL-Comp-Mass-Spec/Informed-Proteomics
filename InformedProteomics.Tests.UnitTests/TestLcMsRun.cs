@@ -133,6 +133,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestXCaliburReader()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

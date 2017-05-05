@@ -43,6 +43,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestForVlad()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -104,7 +105,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestForYufeng()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

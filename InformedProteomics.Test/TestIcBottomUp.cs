@@ -107,6 +107,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestEdrn()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -125,7 +126,7 @@ namespace InformedProteomics.Test
             }
         }
 
-        public void TestEdrn(string specFilePath)
+        private void TestEdrn(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -287,6 +288,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestDdaPlus()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -411,6 +411,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFasta()
         {
             var db = new FastaDatabase(@"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta");
@@ -462,6 +463,7 @@ namespace InformedProteomics.Test
 
         [Test]
         [STAThread]
+        [Category("PNL_Domain")]
         public void TestFeatureMapGeneration()
         {
             Console.WriteLine("Testing Working");

@@ -17,6 +17,7 @@ namespace InformedProteomics.Tests.DevTests
     public class TestLcMsFeatureFind
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestMaxEntDeconvoluter()
         {
             const string rawFileFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";

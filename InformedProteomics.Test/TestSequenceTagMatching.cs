@@ -153,6 +153,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -211,6 +212,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -260,6 +262,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
