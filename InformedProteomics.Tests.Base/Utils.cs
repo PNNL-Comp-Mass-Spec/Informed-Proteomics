@@ -20,37 +20,35 @@ namespace InformedProteomics.Tests.Base
             var testFile = new FileInfo(filePath);
             if (testFile.Exists)
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("Using file {0} at {1}", testFile.Name, testFile.DirectoryName);
-                Console.ResetColor();
-
                 return testFile;
             }
 
             var altFile = new FileInfo(Path.Combine("UnitTest_Files", Path.GetFileName(filePath)));
             if (altFile.Exists)
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("Using file {0} at {1}", altFile.Name, altFile.DirectoryName);
-                Console.ResetColor();
-
                 return altFile;
             }
 
             // File still not found; try parent directories, up to 4 levels up
             var iteration = 0;
-            var parentFolder = altFile.Directory.Parent;
-
-            while (iteration < 4 && parentFolder != null)
+            if (altFile.Directory != null)
             {
-                var altFile2 = new FileInfo(Path.Combine(parentFolder.FullName, altFile.Name));
-                if (altFile2.Exists)
-                {
-                    return altFile2;
-                }
+                var parentFolder = altFile.Directory.Parent;
 
-                parentFolder = altFile2.Directory.Parent;
-                iteration++;
+                while (iteration < 4 && parentFolder != null)
+                {
+                    var altFile2 = new FileInfo(Path.Combine(parentFolder.FullName, altFile.Name));
+                    if (altFile2.Exists)
+                    {
+                        return altFile2;
+                    }
+
+                    if (altFile2.Directory == null)
+                        break;
+
+                    parentFolder = altFile2.Directory.Parent;
+                    iteration++;
+                }
             }
 
             NUnit.Framework.Assert.Ignore(@"Skipping test {0} since file not found: {1}", callingMethod, filePath);
