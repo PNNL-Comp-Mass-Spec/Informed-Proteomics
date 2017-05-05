@@ -249,7 +249,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             Utils.ShowStarting(methodName);
 
             //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            var rawFilePath = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf");
+            var rawFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf");
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -266,7 +266,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);

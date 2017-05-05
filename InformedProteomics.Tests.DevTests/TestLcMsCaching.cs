@@ -606,7 +606,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var fastaFile = Base.Utils.GetTestFile(methodName, @"UnitTest_Files\ID_003962_71E1A1D4.fasta");
 
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;

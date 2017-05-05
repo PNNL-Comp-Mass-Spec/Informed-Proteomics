@@ -23,7 +23,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta");            
 
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             var indexedDb = new IndexedDatabase(db);
             var arr = db.Characters().ToArray();
@@ -59,7 +59,7 @@ namespace InformedProteomics.Tests.DevTests
             //var array = Enumerable.Range(0, short.MaxValue).ToArray();
             var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta");
 
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             //var indexedDb = new IndexedDatabase(db);
             //indexedDb.Read();
@@ -115,7 +115,7 @@ namespace InformedProteomics.Tests.DevTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -196,7 +196,7 @@ namespace InformedProteomics.Tests.DevTests
             sw.Start();
 
             const int numCTermCleavages = 0;
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -255,7 +255,7 @@ namespace InformedProteomics.Tests.DevTests
 
             const int numNTermCleavages = 1;
             const int numCTermCleavages = 0;
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -312,11 +312,11 @@ namespace InformedProteomics.Tests.DevTests
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile);
- 
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             
-            var db = new FastaDatabase(fastaFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             indexedDb.Read();
             var numSequences = 0L;

@@ -17,14 +17,12 @@ namespace InformedProteomics.Tests.FunctionalTests
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
 
-            var modFilePath = Base.Utils.GetTestFile(methodName, modDefsFile);
-
-            var modFile = new FileInfo(modFilePath);
-
+            var modFile = Base.Utils.GetTestFile(methodName, modDefsFile);
+            
             if (!modFile.Exists)
                 Assert.Ignore("Ignoring test TestParsingManyMods since file not found: " + modFile.FullName);
 
-            var aaSet = new AminoAcidSet(modFilePath);
+            var aaSet = new AminoAcidSet(modFile.FullName);
             //aaSet.Display();
 
             //SequenceLocation.ProteinNTerm

@@ -15,35 +15,46 @@ namespace InformedProteomics.Tests.Base
         /// <param name="filePath">File path to check for, typically at \\proto-2\UnitTest_Files\InformedProteomics_TestFiles</param>
         /// <returns>File path if found, otherwise an empty string</returns>
         /// <remarks>If the file is not found, Assert.Ignore is called, which will throw and IgnoreException</remarks>
-        public static string GetTestFile(string callingMethod, string filePath)
+        public static FileInfo GetTestFile(string callingMethod, string filePath)
         {
-            if (File.Exists(filePath))
+            var testFile = new FileInfo(filePath);
+            if (testFile.Exists)
             {
-                return filePath;
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("Using file {0} at {1}", testFile.Name, testFile.DirectoryName);
+                Console.ResetColor();
+
+                return testFile;
             }
 
             var altFile = new FileInfo(Path.Combine("UnitTest_Files", Path.GetFileName(filePath)));
             if (altFile.Exists)
             {
-                return altFile.FullName;
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("Using file {0} at {1}", altFile.Name, altFile.DirectoryName);
+                Console.ResetColor();
+
+                return altFile;
             }
 
             // File still not found; try parent directories, up to 4 levels up
             var iteration = 0;
-            while (iteration < 4 && altFile.Directory.Parent != null)
+            var parentFolder = altFile.Directory.Parent;
+
+            while (iteration < 4 && parentFolder != null)
             {
-                var altFile2 = new FileInfo(Path.Combine(altFile.Directory.Parent.FullName, altFile.Name));
+                var altFile2 = new FileInfo(Path.Combine(parentFolder.FullName, altFile.Name));
                 if (altFile2.Exists)
                 {
-                    return altFile2.FullName;
+                    return altFile2;
                 }
 
-                altFile = altFile2;
+                parentFolder = altFile2.Directory.Parent;
                 iteration++;
             }
 
             NUnit.Framework.Assert.Ignore(@"Skipping test {0} since file not found: {1}", callingMethod, filePath);
-            return string.Empty;
+            return null;
 
         }
 
