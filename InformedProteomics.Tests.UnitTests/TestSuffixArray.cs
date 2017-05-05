@@ -50,11 +50,16 @@ namespace InformedProteomics.Tests.UnitTests
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
+            var numPeptides = 0;
             foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 13))
             {
-                Console.WriteLine(annotationAndOffset.Annotation);
+                if (numPeptides < 20)
+                    Console.WriteLine(annotationAndOffset.Annotation);
+                numPeptides++;
             }
             sw.Stop();
+
+            Console.WriteLine("Peptide count: {0}", numPeptides);
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -72,11 +77,17 @@ namespace InformedProteomics.Tests.UnitTests
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
+            var numPeptides = 0;
+
             foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(100, 300, 3))
             {
-                Console.WriteLine(annotationAndOffset.Annotation);
+                if (numPeptides < 20)
+                    Console.WriteLine(annotationAndOffset.Annotation);
+                numPeptides++;
             }
             sw.Stop();
+
+            Console.WriteLine("Peptide count: {0}", numPeptides);
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -105,7 +116,8 @@ namespace InformedProteomics.Tests.UnitTests
 
             foreach (var peptide in peptides)
             {
-                Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
+                if (numPeptides < 20)
+                    Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
                 numPeptides++;
             }
 
@@ -173,7 +185,9 @@ namespace InformedProteomics.Tests.UnitTests
                         var anno = numNTermCleavage == 0
                             ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
-                        Console.WriteLine(anno);
+
+                        if (numNTermCleavage < 20)
+                            Console.WriteLine(anno);
                     }
                     ++numNTermCleavage;
                 }
