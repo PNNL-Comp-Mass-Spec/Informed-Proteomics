@@ -20,6 +20,7 @@ namespace InformedProteomics.Tests.DevTests
     internal class TestLcMsCaching
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestClusterCentricSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -59,6 +60,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestIsosFilter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

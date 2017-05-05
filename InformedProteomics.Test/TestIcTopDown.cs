@@ -104,6 +104,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestForYufeng()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

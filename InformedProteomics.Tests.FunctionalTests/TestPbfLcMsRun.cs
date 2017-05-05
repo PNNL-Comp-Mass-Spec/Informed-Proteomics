@@ -244,6 +244,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGeneratingProductXic()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -471,6 +472,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSpectrumNavigation()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

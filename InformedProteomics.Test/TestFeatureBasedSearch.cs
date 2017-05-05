@@ -24,6 +24,7 @@ namespace InformedProteomics.Test
     class TestFeatureBasedSearch
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestFeatureId()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -147,6 +148,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -231,6 +233,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -271,6 +274,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFeatureIdMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -462,6 +466,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestTagMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

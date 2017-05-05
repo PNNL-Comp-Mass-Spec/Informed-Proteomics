@@ -24,6 +24,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     class TestTopDownScoring
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingMsDeconvFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
