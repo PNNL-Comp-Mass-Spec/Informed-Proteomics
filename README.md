@@ -7,6 +7,12 @@ The Informed Proteomics project includes algorithms for proteomic mass spectrome
 ## Downloads
 https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
 
+### Continuous Integration
+
+The latest versions of the Informed Proteomics tools are available on the [AppVeyor CI server](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics/build/artifacts)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/j52ywc5d204gaxtp?svg=true)](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics)
+
 ## MSPathFinderT
 
 MSPathFinder finds peptides in top-down LC-MS/MS datasets. Similar to database search engines for bottom-up, it takes a fasta file, a spectrum file, and a list of modifications as an input and reports proteoform spectrum matches (PsSMs) and their scores. These results are output in a tab-separated format and in a MzIdentML file.
