@@ -250,7 +250,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             Utils.ShowStarting(methodName);
 
             //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            var rawFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf");
+            var rawFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\unitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -278,10 +278,13 @@ namespace InformedProteomics.Tests.FunctionalTests
             //var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
             var scorer = new InformedTopDownScorer(run, aminoAcidSet, minCharge, maxCharge, tolerance);
 
+            if (rawFile.DirectoryName == null)
+                Assert.Ignore("Ignoring test since cannot determine the parent directory of " + rawFile.FullName);
+
             var fileExt = new string[] {"IcTarget", "IcDecoy"};
             foreach (var ext in fileExt)
             {
-                var resultFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}.tsv", ext);
+                var resultFileName = Path.Combine(rawFile.DirectoryName, Path.GetFileNameWithoutExtension(rawFile.Name)) + string.Format("_{0}.tsv", ext);
                 var parser = new TsvFileParser(resultFileName);
                 var scans = parser.GetData("Scan").Select(s => Convert.ToInt32((string) s)).ToArray();
                 var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
@@ -289,7 +292,8 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var modStrs = parser.GetData("Modifications").ToArray();
                 var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
                 var protMass = parser.GetData("Mass").Select(s => Convert.ToDouble(s)).ToArray();
-                var outputFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}_Rescored.tsv", ext);
+
+                var outputFileName = Path.Combine(rawFile.DirectoryName, Path.GetFileNameWithoutExtension(rawFile.Name)) + string.Format("_{0}_Rescored.tsv", ext);
 
                 using (var writer = new StreamWriter(outputFileName))
                 {
@@ -298,49 +302,58 @@ namespace InformedProteomics.Tests.FunctionalTests
                     var lines = new string[parser.NumData];
 
                     //for (var i = 0; i < parser.NumData; i++)
-                    Parallel.For(0, parser.NumData, i =>
+                    Parallel.For(0, 30, i =>
                     {
                         var scan = scans[i];
                         var charge = charges[i];
                         var protSequence = protSequences[i];
                         var modStr = modStrs[i];
                         var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
-                        Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
+                        // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
                         var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
-                        Assert.True(ms2Spec != null);
-                        var scores = scorer.GetScores(sequence, charge, scan);
 
-                        var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
-                            isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
-
-                        var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
-                            comparer);
-                        var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
-
-                        var gf = new GeneratingFunction(graph);
-                        gf.ComputeGeneratingFunction();
-
-                        var specEvalue = gf.GetSpectralEValue(scores.Score);
-
-                        var rowStr = parser.GetRows()[i];
-                        var items = rowStr.Split('\t').ToArray();
-                        var newRowStr = string.Join("\t", items, 0, 15);
-
-                        //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
-                        lock (lines)
+                        if (ms2Spec == null)
                         {
-                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
                         }
-                        //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                        else
+                        {
+                            Assert.True(ms2Spec != null);
+                            var scores = scorer.GetScores(sequence, charge, scan);
+
+                            var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
+                                                                                  isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
+
+                            var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
+                                                                                              comparer);
+                            var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
+
+                            var gf = new GeneratingFunction(graph);
+                            gf.ComputeGeneratingFunction();
+
+                            var specEvalue = gf.GetSpectralEValue(scores.Score);
+
+                            var rowStr = parser.GetRows()[i];
+                            var items = rowStr.Split('\t').ToArray();
+                            var newRowStr = string.Join("\t", items, 0, 15);
+
+                            //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                        }
                     });
 
-                    foreach (var line in lines) writer.WriteLine(line);
+                    foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
+                        Console.WriteLine(line);
+
+
                 }
                 Console.WriteLine("Done");
             }
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void RecomputeFdr()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

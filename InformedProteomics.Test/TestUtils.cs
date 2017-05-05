@@ -23,6 +23,7 @@ namespace InformedProteomics.Test
     internal class TestUtils
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestCountingMs2Scans()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -382,8 +383,9 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
-            var xdocument = XDocument.Load(xmlFileName);
+            var xmlFileName = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\PNNLOmicsElementData.xml");
+
+            var xdocument = XDocument.Load(xmlFileName.FullName);
             var parameterBaseElement = xdocument.Element("parameters");
 
             if (parameterBaseElement == null)
@@ -400,7 +402,7 @@ namespace InformedProteomics.Test
                 var name = element.Element("Name");
                 if (symbol != null && name != null)
                 {
-                    Console.WriteLine("{0} {1}", symbol.Value, name.Value);
+                    Console.WriteLine("{0,3}\t{1}", symbol.Value, name.Value);
                 }
             }
         }

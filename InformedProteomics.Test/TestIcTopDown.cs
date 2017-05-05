@@ -21,25 +21,31 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
-        public void TestForManyMods()
+        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396, 10562511, 11333064)]
+        public void TestForManyMods(string dbFile, int expectedMaxLen300, int expectedMaxLen400, int expectedMaxLen500)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dbFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta";
-            var indexedDb = new IndexedDatabase(new FastaDatabase(dbFilePath));
+            var fastaFile = Utils.GetTestFile(methodName, dbFile);
+
+            var indexedDb = new IndexedDatabase(new FastaDatabase(fastaFile.FullName));
             indexedDb.Read();
 
-            var nProt = indexedDb.EstimateTotalPeptides(1, 21, 300, 1, 0);
-            Console.WriteLine(nProt);
+            var totalPeptidesMaxLen300 = indexedDb.EstimateTotalPeptides(1, 21, 300, 1, 0);
+            Console.WriteLine("{0,12:N0} estimated peptides for max length 300", totalPeptidesMaxLen300);
 
-            nProt = indexedDb.EstimateTotalPeptides(1, 21, 400, 1, 0);
-            Console.WriteLine(nProt);
+            var totalPeptidesMaxLen400 = indexedDb.EstimateTotalPeptides(1, 21, 400, 1, 0);
+            Console.WriteLine("{0,12:N0} estimated peptides for max length 400", totalPeptidesMaxLen400);
 
-            nProt = indexedDb.EstimateTotalPeptides(1, 21, 500, 1, 0);
-            Console.WriteLine(nProt);
+            var totalPeptidesMaxLen500 = indexedDb.EstimateTotalPeptides(1, 21, 500, 1, 0);
+            Console.WriteLine("{0,12:N0} estimated peptides for max length 500", totalPeptidesMaxLen500);
 
-            Console.WriteLine(@"Test not implemented: " + methodName);
+            Assert.AreEqual(expectedMaxLen300, totalPeptidesMaxLen300);
+            Assert.AreEqual(expectedMaxLen400, totalPeptidesMaxLen400);
+            Assert.AreEqual(expectedMaxLen500, totalPeptidesMaxLen500);
+
+
         }
 
         [Test]
