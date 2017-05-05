@@ -160,6 +160,8 @@ namespace InformedProteomics.Tests.UnitTests
             var nTermOnly = 0L;
             var cTermOnly = 0L;
 
+            var displayedResults = 0;
+
             foreach (
                 var annotationAndOffset in
                     indexedDb.IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue,
@@ -186,12 +188,15 @@ namespace InformedProteomics.Tests.UnitTests
                             ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
 
-                        if (numNTermCleavage < 20)
+                        if (displayedResults < 20)
                             Console.WriteLine(anno);
+                        displayedResults++;
                     }
                     ++numNTermCleavage;
                 }
             }
+
+            displayedResults = 0;
 
             foreach (
                 var annotationAndOffset in
@@ -210,7 +215,10 @@ namespace InformedProteomics.Tests.UnitTests
                         var anno = numNTermCleavage == 0
                             ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
-                        Console.WriteLine(anno);
+
+                        if (displayedResults < 20)
+                            Console.WriteLine(anno);
+                        displayedResults++;
                     }
                 }
             }
