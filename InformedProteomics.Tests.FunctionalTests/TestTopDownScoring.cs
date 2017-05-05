@@ -249,12 +249,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             Utils.ShowStarting(methodName);
 
             //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-
-            if (!File.Exists(rawFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-            }
+            var rawFilePath = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf");
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
