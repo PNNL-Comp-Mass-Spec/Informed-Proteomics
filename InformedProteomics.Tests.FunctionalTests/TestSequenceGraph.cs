@@ -283,10 +283,10 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Console.WriteLine("{0}", seqGraph.GetNumProteoformSequences(modIndex));
             }
 
-            Console.WriteLine("\n#Protoeoforms by number of modificaionts: ");
+            Console.WriteLine("\n#Protoeoforms by number of modifications: ");
             for (var nMod = 0; nMod <= numMaxModsPerProtein; nMod++)
             {
-                Console.Write("#modificaitons = {0}", nMod);
+                Console.Write("#modifications = {0}", nMod);
                 Console.Write("\t");
                 Console.WriteLine("{0}", seqGraph.GetNumProteoformSequencesByNumMods(nMod));
             }
