@@ -418,6 +418,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGeneratingMs1FeatureFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -475,6 +476,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestProMexFilter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

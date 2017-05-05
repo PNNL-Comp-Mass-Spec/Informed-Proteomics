@@ -301,6 +301,7 @@ namespace InformedProteomics.Tests.UnitTests
 
         [Test]
         [Ignore("Ignore this since it crashes Nunit 3")]
+        [Category("PNL_Domain")]
         public void TestReadingCorruptedRawFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -370,6 +371,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingRawFileWithSingleMs2Spectrum()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

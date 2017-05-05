@@ -20,6 +20,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\VA139IMSMS.mzML", 3145)] // Centroid, Agilent QTOF
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\VA139IMSMS.mzML.gz", 3145)] // Centroid, Agilent QTOF, gzipped
         [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MZML\VA139IMSMS_compressed.mzML", 3145)] // Centroid, Agilent QTOF, compressed binary data
+        [Category("PNL_Domain")]
         public void TestReadMzML(string filePath, int expectedSpectra)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

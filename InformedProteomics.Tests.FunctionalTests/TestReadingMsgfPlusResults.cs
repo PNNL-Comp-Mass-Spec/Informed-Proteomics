@@ -13,6 +13,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     class TestReadingMsgfPlusResults
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingTmtResultFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

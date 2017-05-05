@@ -14,6 +14,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
+    [Category("PNL_Domain")]
     public class TestPbfLcMsRun
     {
         const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -41,6 +42,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingPbfFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -158,6 +160,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGetChrom()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

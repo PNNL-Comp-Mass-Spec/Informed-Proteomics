@@ -167,6 +167,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestForSbepData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -257,6 +258,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestForJiaData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -485,6 +487,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMsAlignRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -511,6 +514,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestIcRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -23,6 +23,7 @@ namespace InformedProteomics.Tests.DevTests
         public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\yufeng_column_test2.raw";
 
         [Test]
+        [Category("PNL_Domain")]
         public void AddMostAbundantIsotopePeakIntensity()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -457,6 +458,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestAbpSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -499,6 +501,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSumMs2Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

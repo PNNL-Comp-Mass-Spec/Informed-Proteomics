@@ -78,6 +78,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }*/
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMatchedPeakCounter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -141,6 +142,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestCorrMatchedPeakCounter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -204,6 +206,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMatchedPeakPostScorer()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

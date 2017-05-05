@@ -11,6 +11,7 @@ namespace InformedProteomics.Tests.UnitTests
         public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestLoadingProteoWizardWrapper()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

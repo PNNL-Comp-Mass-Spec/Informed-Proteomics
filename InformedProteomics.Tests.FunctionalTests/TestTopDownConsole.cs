@@ -8,6 +8,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestTopDownConsole
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestManyModSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -47,6 +47,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestIMERFeatureAlignment()
         {
             const string outFilePath = @"D:\MassSpecFiles\IMER\promex_crosstab.tsv";
@@ -114,6 +115,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\promex_crosstab_temp.tsv";

@@ -508,6 +508,7 @@ namespace InformedProteomics.Tests.DevTests
         */
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestTagAlignedFeatures()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -635,6 +636,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void CopyUTEX()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
