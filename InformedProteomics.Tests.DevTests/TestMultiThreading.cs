@@ -87,7 +87,7 @@ namespace InformedProteomics.Tests.DevTests
                 m).ToString("0.00 ns"));
             Console.WriteLine((s2.Elapsed.TotalMilliseconds * 1000000 /
                 m).ToString("0.00 ns"));
-            Console.Read();
+
         }
 
         static int SumDefault(IEnumerable<int> array)
