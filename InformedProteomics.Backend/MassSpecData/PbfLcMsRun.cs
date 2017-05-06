@@ -293,13 +293,16 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
         /// <param name="keepDataReaderOpen">use 'true' if the data reader should not be closed when finished creating the PBF file</param>
+        /// <param name="scanStart">Minimum scan number to include in the .PBF file; 0 to disable this filter</param>
+        /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
         public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
-            double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0, IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false)
+                          double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0,
+                          IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false, int scanStart = 0, int scanEnd = 0)
         {
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
-            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen);
+            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen, scanStart, scanEnd);
         }
 
         /// <summary>
@@ -330,7 +333,16 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="pbfFileName"></param>
         /// <param name="progress"></param>
         /// <param name="keepDataReaderOpen"></param>
-        protected internal void GetPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfFileName, IProgress<ProgressData> progress, bool keepDataReaderOpen = false)
+        /// <param name="scanStart">Minimum scan number to include in the .PBF file; 0 to disable this filter</param>
+        /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
+        protected internal void GetPbfFile(
+            string specFileName,
+            IMassSpecDataReader msdr,
+            string pbfFileName,
+            IProgress<ProgressData> progress,
+            bool keepDataReaderOpen = false,
+            int scanStart = 0,
+            int scanEnd = 0)
         {
             string pbfPath2, fileName, tempPath;
             var pbfPath = GetCheckPbfFilePath(specFileName, out pbfPath2, out fileName, out tempPath);
@@ -356,7 +368,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return;
             }
 
-            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress, keepDataReaderOpen);
+            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress, keepDataReaderOpen, scanStart, scanEnd);
         }
 
         /// <summary>
@@ -368,7 +380,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="tempPath"></param>
         /// <param name="progress"></param>
         /// <param name="keepDataReaderOpen"></param>
-        protected internal void BuildPbfFile(string specFileName, IMassSpecDataReader msdr, string pbfPath, string tempPath, IProgress<ProgressData> progress, bool keepDataReaderOpen = false)
+        /// <param name="scanStart">Minimum scan number to include in the .PBF file; 0 to disable this filter</param>
+        /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
+        protected internal void BuildPbfFile(
+            string specFileName,
+            IMassSpecDataReader msdr,
+            string pbfPath,
+            string tempPath,
+            IProgress<ProgressData> progress,
+            bool keepDataReaderOpen = false,
+            int scanStart = 0,
+            int scanEnd = 0)
         {
             if (msdr == null)
             {
@@ -386,7 +408,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 using (var writer =
                     new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
-                    WriteToPbf(msdr, writer, progress);
+                    WriteToPbf(msdr, writer, scanStart, scanEnd, progress);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -395,7 +417,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 using (var writer =
                     new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
-                    WriteToPbf(msdr, writer, progress);
+                    WriteToPbf(msdr, writer, scanStart, scanEnd, progress);
                 }
             }
             finally
@@ -1452,7 +1474,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="msdr"></param>
         /// <param name="writer"></param>
         /// <param name="progress"></param>
-        private void WriteToPbf(IMassSpecDataReader msdr, BinaryWriter writer, IProgress<ProgressData> progress = null)
+        private void WriteToPbf(
+            IMassSpecDataReader msdr, 
+            BinaryWriter writer, 
+            int startScan, 
+            int endScan, 
+            IProgress<ProgressData> progress = null)
         {
             ScanNumToMsLevel = new Dictionary<int, int>(msdr.NumSpectra + 1);
             ScanNumElutionTimeMap = new Dictionary<int, double>(msdr.NumSpectra + 1);
@@ -1464,7 +1491,6 @@ namespace InformedProteomics.Backend.MassSpecData
             MinMsLevel = int.MaxValue;
             MaxMsLevel = int.MinValue;
 
-            long countTotal = 1;
             long counter = 0;
             var progressData = new ProgressData(progress);
 
@@ -1480,13 +1506,43 @@ namespace InformedProteomics.Backend.MassSpecData
             var maxMs2Mz = double.MinValue;
             var minMs2Mz = double.MaxValue;
             var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
-            countTotal = msdr.NumSpectra;
+            int countTotal;
+
+            if (endScan > 0 && endScan > msdr.NumSpectra)
+                endScan = 0;
+
+            if (startScan > 0)
+            {
+                if (endScan > 0)
+                {
+                    countTotal = endScan - startScan + 1;
+                }
+                else
+                {
+                    countTotal = msdr.NumSpectra - startScan + 1;
+                }
+            } else if (endScan > 0)
+            {
+                countTotal = endScan;
+            }
+            else
+            {
+                countTotal = msdr.NumSpectra;
+            }
+
             counter = 0;
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             foreach (var spec in msdr.ReadAllSpectra())
             {
+                if (startScan > 0 && spec.ScanNum < startScan)
+                    continue;
+
+                if (endScan > 0 && spec.ScanNum > endScan)
+                    break;
+
                 progressData.Report(counter, countTotal);
                 counter++;
+
                 // Store offset, and write spectrum now
                 _scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
                 WriteSpectrum(spec, writer);
