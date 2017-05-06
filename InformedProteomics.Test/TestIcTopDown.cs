@@ -223,6 +223,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestForAaronData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -321,6 +322,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestForQcShew()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -360,7 +362,7 @@ namespace InformedProteomics.Test
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
-        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
+        private void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
             DatabaseSearchMode tda, InternalCleavageType searchMode)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -384,8 +386,7 @@ namespace InformedProteomics.Test
                 );
         }
 
-        [Test]
-        public void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
+        private void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
             int minSequenceLength, int maxSequenceLength,
             int minPrecursorIonCharge, int maxPrecursorIonCharge,
             int minProductIonCharge, int maxProductIonCharge,
@@ -432,6 +433,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestPrSm()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
