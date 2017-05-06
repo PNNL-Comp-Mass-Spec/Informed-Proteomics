@@ -21,7 +21,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var sw = new System.Diagnostics.Stopwatch();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta");            
+            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta");
 
             var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
@@ -64,11 +64,16 @@ namespace InformedProteomics.Tests.DevTests
             //var indexedDb = new IndexedDatabase(db);
             //indexedDb.Read();
             //var peptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 30);
-            var charArray = db.Characters().Select(c => (int)c);
+            var charArray = db.Characters().Select(c => (int)c).ToList();
 
             // Test methods.
-            Console.WriteLine(SumAsParallel(charArray));
-            Console.WriteLine(SumDefault(charArray));
+            var defaultSum = SumAsParallel(charArray);
+            var parallelSum = SumAsParallel(charArray);
+
+            Console.WriteLine("Default sum {0}", defaultSum);
+            Console.WriteLine("Parallel sum {0}", parallelSum);
+
+            Assert.AreEqual(parallelSum, defaultSum);
 
             const int m = 100;
             var s1 = Stopwatch.StartNew();
@@ -77,17 +82,16 @@ namespace InformedProteomics.Tests.DevTests
                 SumDefault(charArray);
             }
             s1.Stop();
+
             var s2 = Stopwatch.StartNew();
             for (var i = 0; i < m; i++)
             {
                 SumAsParallel(charArray);
             }
             s2.Stop();
-            Console.WriteLine((s1.Elapsed.TotalMilliseconds * 1000000 /
-                m).ToString("0.00 ns"));
-            Console.WriteLine((s2.Elapsed.TotalMilliseconds * 1000000 /
-                m).ToString("0.00 ns"));
 
+            Console.WriteLine("{0:F2} msec/sum, on average for default", s1.Elapsed.TotalMilliseconds / m);
+            Console.WriteLine("{0:F2} msec/sum, on average for parallel", s2.Elapsed.TotalMilliseconds / m);
         }
 
         static int SumDefault(IEnumerable<int> array)
@@ -110,8 +114,8 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
-            var fastaFile = Utils.GetTestFile(methodName, dbFile);         
-            
+            var fastaFile = Utils.GetTestFile(methodName, dbFile);
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -191,7 +195,7 @@ namespace InformedProteomics.Tests.DevTests
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile);
-          
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -249,7 +253,7 @@ namespace InformedProteomics.Tests.DevTests
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile);
-     
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
@@ -315,7 +319,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            
+
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             indexedDb.Read();
@@ -395,6 +399,6 @@ namespace InformedProteomics.Tests.DevTests
 
             //var primes = serialQuery.ToArray();
         }
-        
+
     }
 }
