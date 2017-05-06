@@ -9,3 +9,8 @@
 MS1FeatureExtractor/rc/
 Installer/Output/
 *.DotSettings
+/UnitTest_Files/ID_003962_71E1A1D4.icanno
+/UnitTest_Files/ID_003962_71E1A1D4.icplcp
+/UnitTest_Files/ID_003962_71E1A1D4.icseq
+/UnitTest_Files/NUnit*.txt
+/UnitTest_Files/NUnit*.xml
