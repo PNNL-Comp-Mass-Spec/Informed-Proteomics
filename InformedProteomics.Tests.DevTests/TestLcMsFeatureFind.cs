@@ -118,22 +118,15 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            //const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
-            //const string rawFile = @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf";
-            //const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_3\MZ20150729FG_WT1.pbf";
-
-            if (!File.Exists(rawFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
-            }
+            var rawFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
             //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile.FullName);
+
+            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                 (stopwatch.ElapsedMilliseconds)/1000.0d);

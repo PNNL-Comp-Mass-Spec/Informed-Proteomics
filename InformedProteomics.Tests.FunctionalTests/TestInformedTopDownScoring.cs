@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
@@ -13,16 +15,14 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestInformedTopDownScoring
     {
         [Test]
-        public void TestRescoring()
+        [TestCase(4177, 6, "MLILTRRVGETLMIGDEVTVTVLGVKGNQVRIGVNAPKEVSVHREEIYQRIQSEKS", 70.97136)]
+        [TestCase(4265, 15, "ALRLKDLVKKTERQLSDYQRQLSMVKTTESVQKATATITDSFASSNSKLLNAKDSLERIKARQQQFDDRLKAAETLAEEGSDKSLQAKLAEAGIGEQKSNANAVLERIKARKS", 41.95799)]
+        public void TestRescoring(int scanNum, int charge, string sequence, double expectedScore)
         {
-            //const string specFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            //const string sequence = "SGWYELSKSSNDQFKFVLKAGNGEVILTSELYTGKSGAMNGIESVQTNSPIEARYAKEVAKNDKPYFNLKAANHQIIGTSQMYSSTA";
-            //const int scanNum = 4084;
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
 
-            const string sequence = "SKTKHPLPEQWQKNQEAAKATQVAFDLDEKFQYSIRKAALDAGVSPSDQIRTILGLSVSRRPTRPRLTVSLNADDYVQLAEKYDLNADAQLEIKRRVLEDLVRFVAED";
-            const int scanNum = 5448;
-            const int charge = 11;
+            var specFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -42,11 +42,13 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(specFile.FullName, 0, 0);
             var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
             var scores = informedScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, composition, charge, scanNum);
             Console.WriteLine("Total Score = " + scores.Score);
             Console.WriteLine("#Fragments = " + scores.NumMatchedFrags);
+
+            Assert.AreEqual(expectedScore, scores.Score, 0.0001);
         }
     }
 }

@@ -212,20 +212,15 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string modFilePath = @"..\..\..\TestFiles\Mods.txt";
+            var modFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\Mods.txt");
 
-            if (!File.Exists(modFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modFilePath);
-            }
-
-            var modFileParser = new ModFileParser(modFilePath);
+            var modFileParser = new ModFileParser(modFile.FullName);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)
             {
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}", searhMod.TargetResidue, searhMod.Location, searhMod.IsFixedModification, searhMod.Modification);
             }
-            var aaSet = new AminoAcidSet(modFilePath);
+            var aaSet = new AminoAcidSet(modFile.FullName);
             aaSet.Display();
         }
 

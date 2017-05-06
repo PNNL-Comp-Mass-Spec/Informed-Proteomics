@@ -103,9 +103,6 @@ namespace InformedProteomics.Tests.UnitTests
 
             var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
 
-            //            const string fastaFile = @"C:\cygwin\home\kims336\Data\QCShew\ID_003456_9B916A8B.fasta";
-            //            const string fastaFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
-            //            const string fastaFile = @"H:\Research\CPTAC_Phospho\database\ID_004208_295531A4.fasta";
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
@@ -150,7 +147,6 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string fastaFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
             var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
 
             var db = new FastaDatabase(fastaFile.FullName);

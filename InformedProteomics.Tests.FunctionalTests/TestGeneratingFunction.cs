@@ -21,33 +21,34 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestGeneratingFunction
     {
         [Test]
-        public void TestGetScoreDistribution()
+        [TestCase(4032, "MRHYEIVFMVHPDQSEQVPGMIERYTGAITEANGKIHRLEDWGRR")]
+        [TestCase(4445, "MKTFTATPETVTRDWFVVDADGKTLGRIATEIALRLRGKHKPEYTPHVDTGDYIIVINAEKVTVTGNKAQGKTYYSHSGFPGGIKQISFEKLQAHKPEMIIEKAVKGMLPKGPLGRAMFRKLKVYAGAEHNHAAQQPQVLDI")]
+        public void TestGetScoreDistribution(int scanNum, string protSequence)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
-            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string idFileFolder = @"D:\MassSpecFiles\training\IdScoring\MSPF_trainset";
 
-            const int scanNum = 5927;
-            const string protSequence = "MNKSELIEKIASGADISKAAAGRALDSFIAAVTEGLKEGDKISLVGFGTFEVRERAERTGRNPQTGEEIKIAAAKIPAFKAGKALKDAVN";
+            var rawFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
 
-            const string modStr = "";
-
-            var idFile = string.Format(@"{0}\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv", idFileFolder);
-            if (!File.Exists(idFile)) return;
-            //Console.WriteLine(dataset);
-
-            if (!File.Exists(rawFile))
+            if (!rawFile.Exists)
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
+
+            const string modStr = "";
+
+            //var idFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
+            //if (!idFile.Exists)
+            //{
+            //    Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
+            //}
 
             const int maxCharge = 20;
             const int minCharge = 1;
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -76,35 +77,37 @@ namespace InformedProteomics.Tests.FunctionalTests
             var sequence = Sequence.CreateSequence(protSequence, modStr, aaSet);
             var proteinMass = sequence.Mass + Composition.H2O.Mass;
 
-                Console.WriteLine("Mass = {0}", proteinMass);
+            Console.WriteLine("Mass = {0}", proteinMass);
 
-                var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
-                var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(spectrum, minCharge, maxCharge,
-                    isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
+            var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
+            var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(spectrum, minCharge, maxCharge,
+                isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
 
-                stopwatch.Restart();
+            stopwatch.Restart();
 
-                var scorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, spectrum, tolerance, comparer);
-                var graph = graphFactory.CreateScoringGraph(scorer, proteinMass);
-                stopwatch.Stop();
-                Console.WriteLine(@"node generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            var scorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, spectrum, tolerance, comparer);
+            var graph = graphFactory.CreateScoringGraph(scorer, proteinMass);
+            stopwatch.Stop();
+            Console.WriteLine(@"node generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
-                stopwatch.Reset();
-                stopwatch.Start();
-                var gf = new GeneratingFunction(graph);
-                gf.ComputeGeneratingFunction();
-                //gf.ComputeGeneratingFunction(graph);
-                stopwatch.Stop();
-                Console.WriteLine(@"computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-                var scoreDist = gf.GetScoreDistribution();
+            stopwatch.Reset();
+            stopwatch.Start();
+            var gf = new GeneratingFunction(graph);
+            gf.ComputeGeneratingFunction();
+            //gf.ComputeGeneratingFunction(graph);
+            stopwatch.Stop();
+            Console.WriteLine(@"computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            var scoreDist = gf.GetScoreDistribution();
 
-                Console.WriteLine("{0}-{1}", scoreDist.MinScore, scoreDist.MaxScore);
+            Console.WriteLine("{0}-{1}", scoreDist.MinScore, scoreDist.MaxScore);
 
-                for (var score = 45; score <= gf.MaximumScore; score++)
-                {
-                    var specEvalue = gf.GetSpectralEValue(score);
-                    Console.WriteLine("{0} : {1}", score, specEvalue);
-                }
+            Console.WriteLine("{0} : {1}", "score", "specEValue");
+
+            for (var score = 15; score <= gf.MaximumScore; score++)
+            {
+                var specEvalue = gf.GetSpectralEValue(score);
+                Console.WriteLine("{0} : {1}", score, specEvalue);
+            }
 
             stopwatch2.Stop();
             Console.WriteLine(@"TOTAL computing generation function = {0:0.000} sec", (stopwatch2.ElapsedMilliseconds) / 1000.0d);
@@ -128,12 +131,12 @@ namespace InformedProteomics.Tests.FunctionalTests
             public double GetMass(int binNumber)
             {
                 //throw new NotImplementedException();
-                return binNumber/Constants.RescalingConstantHighPrecision;
+                return binNumber / Constants.RescalingConstantHighPrecision;
             }
 
             public double GetMassStart(int binNumber)
             {
-                return 0.5*(GetMass(binNumber - 1) + GetMass(binNumber));
+                return 0.5 * (GetMass(binNumber - 1) + GetMass(binNumber));
             }
 
             public double GetMassEnd(int binNumber)
