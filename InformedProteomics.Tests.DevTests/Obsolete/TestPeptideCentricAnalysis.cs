@@ -19,6 +19,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
     {
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void CompareRt()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -84,6 +85,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void CompareRtFusion()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -135,6 +137,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -172,6 +175,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void GenerateVennDiagramsPeMmr()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -224,6 +228,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestXicGen()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -268,6 +273,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestFusionDdaData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -376,6 +382,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void AnalyizeFusionDdaData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

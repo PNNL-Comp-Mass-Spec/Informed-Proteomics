@@ -67,6 +67,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Ignore("File Missing, test obsolete, or long test")]
+        [Category("Local_Testing")]
         public void TestParsingGlycoMods()
         {
             const string modFilePath = @"C:\cygwin\home\kims336\Data\Debug\MSPathFinder_Mods.txt";

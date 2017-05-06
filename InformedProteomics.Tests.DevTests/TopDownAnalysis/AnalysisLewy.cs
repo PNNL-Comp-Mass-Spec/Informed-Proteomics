@@ -56,6 +56,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\Lewy\aligned\promex_crosstab_temp.tsv";
@@ -239,6 +240,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountTagMatches()
         {
             for (var i = 1; i < 52; i++)
@@ -252,6 +254,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void CopyAllMSPFResult()
         {
             var destPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old\201502";
@@ -319,6 +322,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void CopyAllMSPFResultFor10Reps()
         {
             var destPath = @"\\protoapps\UserData\Jungkap\CPTAC_10reps\DMS_old";
@@ -363,6 +367,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
         /*
         [Test]
+        [Category("Local_Testing")]
         public void TestFindLowAbundanceFeature()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -84,6 +84,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FilteringEfficiencyQcShew()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -213,6 +214,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FilteringEfficiency()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -392,6 +394,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestPossibleSequenceMasses()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -425,6 +428,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs1Filtering()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -527,6 +531,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs2Caching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -572,6 +577,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs1Signature()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -596,6 +602,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestNominalMassErrors()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -606,7 +613,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var sw = new System.Diagnostics.Stopwatch();
 
-            var fastaFile = Base.Utils.GetTestFile(methodName, @"UnitTest_Files\ID_003962_71E1A1D4.fasta");
+            var fastaFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_003962_71E1A1D4.fasta");
 
             var db = new FastaDatabase(fastaFile.FullName);
             db.Read();

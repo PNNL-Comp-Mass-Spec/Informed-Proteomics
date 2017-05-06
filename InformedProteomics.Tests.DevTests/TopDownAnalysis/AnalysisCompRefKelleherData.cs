@@ -14,7 +14,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
     class AnalysisCompRefKelleherData
     {
-        public List<string> GetDataSetNamesStudy3(int fraction1, int fraction2)
+        private List<string> GetDataSetNamesStudy3(int fraction1, int fraction2)
         {
             var i = fraction1;
             var j = fraction2;
@@ -34,6 +34,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         public const string PbfPath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";
 
         [Test]
+        [Category("Local_Testing")]
         public void CopyAllMSPFResult()
         {
             var destPath = @"D:\MassSpecFiles\CompRef_Kelleher\Study2";
@@ -69,6 +70,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindMissingLcMsFeatures()
         {
             var mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
@@ -126,7 +128,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
         }
 
-        public void FeatureFind(List<ProteinSpectrumMatch> prsms, LcMsRun run, string outTsvFilePath)
+        private void FeatureFind(List<ProteinSpectrumMatch> prsms, LcMsRun run, string outTsvFilePath)
         {
             var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
             // write result files
@@ -150,6 +152,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void AnalysisStudy3()
         {
             var mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
@@ -172,7 +175,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
         }
 
-        public void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)
+        private void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)
         {
             var nDataset = datasets.Count;
             var prsmReader = new ProteinSpectrumMatchReader();

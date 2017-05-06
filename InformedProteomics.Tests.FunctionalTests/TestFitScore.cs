@@ -16,6 +16,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestFitScore
     {
         [Test]
+        [Category("PNL_Domain")]
         public void TestFitScoreCalculationCid()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -44,13 +45,14 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var ion = new Ion(protComp, 20);
 //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
-            var isotopomerEnvelop = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
+            var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             Console.WriteLine(@"MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
             var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);
             for (var i = 0; i < matchedPeaks.Length; i++)
             {
-                Console.WriteLine(@"{0}\t{1}\t{2}\t{3}", i, ion.GetIsotopeMz(i), isotopomerEnvelop[i], matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity);
+                var intensity = matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity;
+                Console.WriteLine(@"{0,3}  {1,10:F4}  {2,10:F3}  {3,10:F3}", i, ion.GetIsotopeMz(i), isotopomerEnvelope[i], intensity);
             }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
             var cosine = spec.GetConsineScore(ion, new Tolerance(15), 0.1);
@@ -66,6 +68,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFitScoreCalculationEtd()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -82,6 +82,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void Test43KProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -186,6 +187,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestDeconvolution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -211,6 +213,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -233,6 +236,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestRunningTimeSummingSpectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -261,6 +265,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -306,6 +311,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSmartIsoWindowSumming()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -393,6 +399,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGeneratingXicsOfAllCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

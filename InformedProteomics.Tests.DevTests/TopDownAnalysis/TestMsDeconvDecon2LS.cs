@@ -80,6 +80,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestCptac10Replicates()
         {
             const string featureFolder = @"D:\MassSpecFiles\CPTAC_rep10\icr2ls";

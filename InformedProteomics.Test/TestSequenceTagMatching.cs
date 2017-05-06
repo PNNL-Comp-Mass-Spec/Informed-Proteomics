@@ -22,6 +22,7 @@ namespace InformedProteomics.Test
     public class TestSequenceTagMatching
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestSearchWithTagGeneration()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -65,6 +66,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchForLewy()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -103,6 +105,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchCompRef()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -395,6 +398,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedScansPerProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -463,6 +467,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteinDeltaMass()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

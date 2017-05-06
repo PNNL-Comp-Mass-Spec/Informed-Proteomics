@@ -13,6 +13,7 @@ namespace InformedProteomics.Tests.UnitTests
     [TestFixture]
     public class TestLcMsRun
     {
+        [Category("PNL_Domain")]
         public void TestReadingIsolationWindows()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -35,6 +36,7 @@ namespace InformedProteomics.Tests.UnitTests
             }
         }
 
+        [Category("PNL_Domain")]
         public void TestReadingScanNums()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -95,6 +97,7 @@ namespace InformedProteomics.Tests.UnitTests
             Console.WriteLine(run.GetNextScanNum(20025));
         }
 
+        [Category("PNL_Domain")]
         public void TestParsingSpectrumFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -158,6 +161,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingDiaRawFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -219,6 +223,7 @@ namespace InformedProteomics.Tests.UnitTests
         //}
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGeneratingProductManyXics()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -281,6 +286,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestNoiseFiltration()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -329,6 +335,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingSingleSpecMzMlFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -345,6 +352,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingBrukerDaltonDataSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

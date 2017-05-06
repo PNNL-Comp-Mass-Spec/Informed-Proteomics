@@ -14,6 +14,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestIcTopDownResults
     {
         [Test]
+        [Category("Local_Testing")]
         public void ValidateIcResultsWithModifications()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

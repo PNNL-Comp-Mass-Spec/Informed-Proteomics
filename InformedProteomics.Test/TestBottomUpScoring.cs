@@ -17,9 +17,11 @@ using NUnit.Framework;
 namespace InformedProteomics.Test
 {
     [TestFixture]
+    [Category("Local_Testing")]
     public class TestBottomUpScoring
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestPsm()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -57,6 +59,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestVennDiagram()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -88,6 +91,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestLogLikelihoodScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -114,6 +118,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestPeptideLevelStats()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -198,6 +203,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CompareIpaIc()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

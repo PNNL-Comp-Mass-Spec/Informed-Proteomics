@@ -44,6 +44,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
         /*
         [Test]
+        [Category("Local_Testing")]
         public void PrintAllScorers()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -61,6 +62,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestLikelihoodScorer()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -19,6 +19,7 @@ namespace InformedProteomics.Test
     public class TestSequenceTagFinder
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestSequenceTag()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

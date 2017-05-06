@@ -20,6 +20,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
     {
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestTopDownScoringForAllXics()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -126,6 +127,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestMsAlignPlusResults()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -189,6 +191,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestTopDownScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

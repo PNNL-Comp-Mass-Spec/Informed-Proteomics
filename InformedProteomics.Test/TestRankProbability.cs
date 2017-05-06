@@ -16,6 +16,7 @@ namespace InformedProteomics.Test
     public class TestRankProbability
     {
         [Test]
+        [Category("Local_Testing")]
         public void RankProbability()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

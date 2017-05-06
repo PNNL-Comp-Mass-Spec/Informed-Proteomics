@@ -187,6 +187,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestRunningTimeChromGen()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -278,6 +279,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestGeneratingProductXics()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

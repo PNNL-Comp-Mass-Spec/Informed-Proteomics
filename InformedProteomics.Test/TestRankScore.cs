@@ -40,6 +40,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void RankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -69,6 +70,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void DiaRankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

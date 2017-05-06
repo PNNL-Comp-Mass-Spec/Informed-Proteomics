@@ -28,6 +28,7 @@ namespace InformedProteomics.Test
     public class TestProMex
     {
         [Test]
+        [Category("Local_Testing")]
         public void CollectTrainingSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -98,6 +99,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void ExtractLcMsFeaturesForTrainingSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -323,6 +325,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMs1EvidenceScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -358,6 +361,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestPredictPTMfromMs1ft()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -505,6 +509,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestFeatureExampleForFigure()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

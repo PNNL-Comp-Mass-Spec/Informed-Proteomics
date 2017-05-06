@@ -19,6 +19,7 @@ namespace InformedProteomics.Test
     public class TestIcBottomUp
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestChaoChaoWhim()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -167,6 +168,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMaccossDia()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -186,6 +188,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMaccossDda()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -245,6 +248,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestQcShewQExactive()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

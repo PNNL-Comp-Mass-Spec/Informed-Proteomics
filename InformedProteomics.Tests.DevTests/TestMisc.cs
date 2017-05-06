@@ -18,6 +18,7 @@ namespace InformedProteomics.Tests.DevTests
     public class TestMisc
     {
         [Test]
+        [Category("Local_Testing")]
         public void RemovePepFdrFromFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -49,6 +50,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CreatePeptideAbundanceTableWithSkyline()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -175,6 +177,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestPathUtils()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

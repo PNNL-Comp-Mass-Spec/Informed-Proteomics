@@ -25,6 +25,7 @@ namespace InformedProteomics.Tests.DevTests
         private const string ProteinNamePrefix = "M744_";
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestQuantifyIdedProteoforms()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -189,6 +190,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestAlignFeatures()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

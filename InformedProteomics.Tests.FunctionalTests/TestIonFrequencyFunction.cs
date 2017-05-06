@@ -82,6 +82,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void IonPresent()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

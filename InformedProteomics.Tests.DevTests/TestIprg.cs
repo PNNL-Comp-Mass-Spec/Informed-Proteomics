@@ -19,6 +19,7 @@ namespace InformedProteomics.Tests.DevTests
     {
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingExcelFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -28,6 +29,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void ProcessIprg2015PreStudy()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -119,6 +121,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void AddNaToTable()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -145,6 +148,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void AddProteinLengths()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -186,6 +190,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void GetProteinAccessions()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -244,6 +249,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CreateTargetList()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

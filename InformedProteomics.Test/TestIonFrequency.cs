@@ -35,6 +35,7 @@ namespace InformedProteomics.Test
         private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Mz);
 
         [Test]
+        [Category("Local_Testing")]
         public void IonFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

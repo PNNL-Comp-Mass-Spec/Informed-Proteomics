@@ -32,6 +32,7 @@ namespace InformedProteomics.Test
         private double _binWidth;
 
         [Test]
+        [Category("Local_Testing")]
         public void OffsetFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -107,6 +108,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void PrecursorOffsetFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
