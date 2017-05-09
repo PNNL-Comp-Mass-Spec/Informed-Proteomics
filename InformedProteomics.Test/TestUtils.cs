@@ -549,7 +549,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestNumIsoWindows()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -572,7 +572,7 @@ namespace InformedProteomics.Test
         [TestCase("EAQADAAAEIAEDAAEAEDAGKPK", @"\\protoapps\UserData\Wilkins\BottomUp\DIA_10mz\data\Q_2014_0523_50_10_fmol_uL_10mz.raw", 54407)]
         [TestCase("KYETIDSLQIDDLMNRREVRQPADWQADENGSNDKGNGKGEPAVKVDEVVKSAPAEAELKDADESPVK",
                   @"\\protoapps\UserData\Wilkins\TopDown\Anil\QC_Shew_IntactProtein_new_CID-30CE-4Sep14_Bane_C2Column_3.raw", 2755)]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestPpmErrorCalculation(string seqText, string rawFilePath, int scanNum)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

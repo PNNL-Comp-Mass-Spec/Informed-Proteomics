@@ -40,7 +40,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void RankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

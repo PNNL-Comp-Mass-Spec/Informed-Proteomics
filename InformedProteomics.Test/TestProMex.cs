@@ -578,7 +578,6 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
         public void TestFeatureMapGeneration()
         {
             Console.WriteLine("Testing Working");
