@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.Utils;
+using NUnit.Framework;
 
 namespace InformedProteomics.Tests.Base
 {
@@ -13,6 +16,8 @@ namespace InformedProteomics.Tests.Base
         private const string MZML_TEST_FILE = @"QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML";
 
         private const string PBF_TEST_FILE = @"QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf";
+
+        private const string DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss tt";
 
         /// <summary>
         /// Look for the default .mzML testing file in the default test file folder,
@@ -44,14 +49,155 @@ namespace InformedProteomics.Tests.Base
             var pbfFilePath = Path.Combine(DEFAULT_SPEC_FILES_FOLDER, PBF_TEST_FILE);
 
             var pbfFileInfo = GetTestFile("PbfTestFilePath", pbfFilePath, false);
+
             if (pbfFileInfo != null)
             {
+                // Check for a lock file, which would indicate another process is creating the .pbf file
+                var existingLockFile = new FileInfo(Path.Combine(pbfFileInfo.FullName + ".lock"));
+                WaitForLockFile(existingLockFile, false);
+
+                pbfFileInfo.Refresh();
+                if (pbfFileInfo.Exists)
+                {
+                    DeleteLockFile(existingLockFile);
                     return pbfFileInfo.FullName;
+                }
             }
+
+            if (!createIfMissing)
+            {
+                // Not creating the file if missing; return the default path, despite the fact that the file does not exist
+                // The calling method will discover that the file is missing and act accordingly
+                return pbfFilePath;
+            }
+
+            // Create the missing file
+
+            var mzmlFilePath = Path.Combine(DEFAULT_SPEC_FILES_FOLDER, MZML_TEST_FILE);
+
+            var mzmlFileInfo = GetTestFile("MzmlTestFilePath", mzmlFilePath, false);
+            if (mzmlFileInfo?.DirectoryName == null)
+            {
+                // Unable to create the pbf file; return the default path, despite the fact that the file does not exist
+                return pbfFilePath;
+            }
+
+            Console.WriteLine("Creating {0} using {1}", PBF_TEST_FILE, mzmlFileInfo.FullName);
+
+            var lockFile = new FileInfo(Path.Combine(mzmlFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(mzmlFileInfo.Name) + ".pbf.lock"));
+            var newPbfFilePath = Path.Combine(mzmlFileInfo.DirectoryName, PBF_TEST_FILE);
+
+            try
+            {
+                // Create a new lock file so other processes know this thread is creating the .pbf file
+                WaitForLockFile(lockFile, true);
+
+                var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(mzmlFileInfo.FullName);
+                var progress = new Progress<ProgressData>(p =>
+                {
+                    p.UpdateFrequencySeconds = 2;
+                    if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
+                    {
+                        Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
+                    }
+                });
+
+                var run = new PbfLcMsRun(mzmlFileInfo.FullName, reader, newPbfFilePath, 0, 0, progress);
+                Console.WriteLine();
+                Console.WriteLine("Created " + run.PbfFilePath);
+
+                DeleteLockFile(lockFile);
+
+                return run.PbfFilePath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception creating {0} using {1}: {2}", PBF_TEST_FILE, mzmlFileInfo.FullName, ex.Message);
+
+                try
+                {
+                    var incompletePbfFile = new FileInfo(newPbfFilePath);
+                    if (incompletePbfFile.Exists)
+                        incompletePbfFile.Delete();
+
+                    DeleteLockFile(lockFile);
+                }
+                catch
+                {
+                    // Ignore errors here
+                }
 
                 // Return the default path, despite the fact that the file does not exist
                 return pbfFilePath;
+            }
+
         }
+
+        private static void CreateLockFile(FileSystemInfo lockFile)
+        {
+            using (var writer = new StreamWriter(new FileStream(lockFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+            {
+                writer.WriteLine("Creating PBF file: " + DateTime.Now.ToString(DATE_TIME_FORMAT));
+            }
+        }
+
+        private static void DeleteLockFile(FileSystemInfo lockFile)
+        {
+            try
+            {
+                if (lockFile == null)
+                    return;
+
+                lockFile.Refresh();
+                if (lockFile.Exists)
+                    lockFile.Delete();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in DeleteLockFile: " + ex.Message);
+            }
+
+        }
+
+        private static void WaitForLockFile(FileSystemInfo lockFile, bool createNewLockFile, int waitTimeMinutes = 5)
+        {
+            try
+            {
+                if (lockFile == null)
+                    return;
+
+                if (!lockFile.Exists)
+                {
+                    if (createNewLockFile)
+                        CreateLockFile(lockFile);
+
+                    return;
+                }
+
+                var timestamp = lockFile.LastWriteTimeUtc;
+                while (DateTime.UtcNow.Subtract(timestamp).TotalMinutes < waitTimeMinutes)
+                {
+                    lockFile.Refresh();
+                    if (!lockFile.Exists)
+                    {
+                        // The other process has deleted the lock file
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(5000);
+
+                }
+
+                if (createNewLockFile)
+                    CreateLockFile(lockFile);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in WaitForLockFile: " + ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Checks for the existence of filePath
         /// If not found, but the file exists in the UnitTest_Files directory in this project or solution, returns the local file path
         /// If not found in either place, raises an IgnoreException by invoking Assert.Ignore
