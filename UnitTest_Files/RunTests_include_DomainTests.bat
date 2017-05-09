@@ -1,4 +1,4 @@
-set FilterClause=--where "cat != PNL_Domain && cat != Local_Testing && cat != Long_Running"
+set FilterClause=--where "cat != Local_Testing && cat != Long_Running"
 set NUnitExe="C:\Program Files (x86)\NUnit.org\nunit-console\nunit3-console.exe"
 
 %NUnitExe% ..\InformedProteomics.Tests.UnitTests\bin\Debug\InformedProteomics.Tests.UnitTests.dll %FilterClause% --out=NUnitConsole_UnitTests.txt --result:NUnit_UnitTests.xml --timeout=90000
