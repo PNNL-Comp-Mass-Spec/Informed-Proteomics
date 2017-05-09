@@ -308,7 +308,7 @@ namespace InformedProteomics.Tests.UnitTests
 
         [Test]
         [Ignore("Ignore this since it crashes Nunit 3")]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestReadingCorruptedRawFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
