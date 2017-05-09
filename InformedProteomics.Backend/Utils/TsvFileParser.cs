@@ -67,24 +67,24 @@ namespace InformedProteomics.Backend.Utils
 
         public ISet<string> GetPeptides(double pepQValueThreshold)
         {
-            var peptideColumnIndex = -1;
-            var pepQValueColumnIndex = -1;
-            var proteinColumnIndex = -1;
+            FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var pepQValueColumnIndex, "PepQValue");
 
-            for (var i = 0; i < _header.Length; i++)
-            {
-                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence")) peptideColumnIndex = i;
-                if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName")) proteinColumnIndex = i;
-                if (_header[i].Equals("PepQValue")) pepQValueColumnIndex = i;
-            }
+            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || pepQValueColumnIndex < 0) return null;
 
-            var peptideSet = new HashSet<string>();
-            if (pepQValueColumnIndex < 0 || peptideColumnIndex < 0 || proteinColumnIndex < 0) return null;
+            var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, pepQValueColumnIndex, pepQValueThreshold);
+            return peptideSet;
+        }
 
-            var peptides = _data[_header[peptideColumnIndex]];
-            var proteins = _data[_header[proteinColumnIndex]];
-            var pepQValues = _data[_header[pepQValueColumnIndex]];
-            for (var i = 0; i < pepQValues.Count; i++)
+        public ISet<string> GetPeptidesAboveQValueThreshold(double qValueThreshold)
+        {
+            FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var qValueColumnIndex, "QValue");
+
+            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || qValueColumnIndex < 0) return null;
+
+            var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, qValueColumnIndex, qValueThreshold);
+            return peptideSet;
+        }
+
         /// <summary>
         /// Map from header column index to header column name
         /// </summary>
@@ -96,40 +96,77 @@ namespace InformedProteomics.Backend.Utils
 
         private readonly char _delimeter;
 
+        private int FindColumnIgnoreCase(Dictionary<int, string> headers, string headerName)
+        {
+            foreach (var i in headers.Keys)
             {
-                var pepQValue = Convert.ToDouble(pepQValues[i]);
-                if (pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
+                if (headers[i].IndexOf(headerName, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return i;
+                }
             }
-            return peptideSet;
+
+            return -1;
+
         }
 
-        public ISet<string> GetPeptidesAboveQValueThreshold(double qValueThreshold)
+        private void FindPeptideHeaders(out int peptideColumnIndex, out int proteinColumnIndex, out int qValueColumnIndex, string qValueColumnName)
         {
-            var peptideColumnIndex = -1;
-            var pepQValueColumnIndex = -1;
-            var proteinColumnIndex = -1;
+            peptideColumnIndex = -1;
+            proteinColumnIndex = -1;
+            qValueColumnIndex = -1;
 
-            for (var i = 0; i < _header.Length; i++)
+            foreach (var i in _header.Keys)
             {
-                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence")) peptideColumnIndex = i;
-                if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName")) proteinColumnIndex = i;
-                if (_header[i].Equals("QValue")) pepQValueColumnIndex = i;
+                if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence"))
+                    peptideColumnIndex = i;
+                else if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName"))
+                    proteinColumnIndex = i;
+                else if (_header[i].Equals(qValueColumnName))
+                    qValueColumnIndex = i;
             }
 
-            var peptideSet = new HashSet<string>();
-            if (pepQValueColumnIndex < 0 || peptideColumnIndex < 0 || proteinColumnIndex < 0) return null;
+            if (peptideColumnIndex < 0)
+            {
+                peptideColumnIndex = FindColumnIgnoreCase(_header, "peptide");
+            }
 
+            if (proteinColumnIndex < 0)
+            {
+                proteinColumnIndex = FindColumnIgnoreCase(_header, "protein");
+            }
+
+            if (qValueColumnIndex < 0)
+            {
+                qValueColumnIndex = FindColumnIgnoreCase(_header, qValueColumnName);
+            }
+
+            if (qValueColumnIndex < 0)
+            {
+                qValueColumnIndex = FindColumnIgnoreCase(_header, "qvalue");
+            }
+        }
+
+        private ISet<string> GetPeptidesAboveThreshold(int peptideColumnIndex, int proteinColumnIndex, int qValueColumnIndex, double qValueThreshold)
+        {
             var peptides = _data[_header[peptideColumnIndex]];
             var proteins = _data[_header[proteinColumnIndex]];
-            var pepQValues = _data[_header[pepQValueColumnIndex]];
-            for (var i = 0; i < pepQValues.Count; i++)
-            {
-                var pepQValue = Convert.ToDouble(pepQValues[i]);
-                if (pepQValue <= qValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
-            }
-            return peptideSet;
-        }
+            var qValues = _data[_header[qValueColumnIndex]];
 
+            var peptideSet = new HashSet<string>();
+
+            for (var i = 0; i < qValues.Count; i++)
+            {
+                if (double.TryParse(qValues[i], out var qValue))
+                {
+                    if (qValue <= qValueThreshold && !proteins[i].StartsWith("XXX"))
+                        peptideSet.Add(peptides[i]);
+                }
+            }
+
+            return peptideSet;
+
+        }
 
         private void Parse()
         {
