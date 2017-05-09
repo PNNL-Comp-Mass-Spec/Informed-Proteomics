@@ -578,7 +578,6 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [STAThread]
         [Category("PNL_Domain")]
         public void TestFeatureMapGeneration()
         {
@@ -588,11 +587,23 @@ namespace InformedProteomics.Test
             mFeatureMapPbfFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             mFeatureMapResultsFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
 
+            var thread = new Thread(new ThreadStart(FeatureMapGeneration));
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+        }
+
+        private void FeatureMapGeneration()
+        {
+
             var resultsFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(mFeatureMapPbfFile) + "_FeatureMap.png");
 
             var map = new LcMsFeatureMap(PbfLcMsRun.GetLcMsRun(mFeatureMapPbfFile), mFeatureMapResultsFile, 2000, 50000);
             map.SaveImage(resultsFilePath);
 
+            Console.WriteLine("Image saved to " + resultsFilePath);
         }
 
         [Test]
