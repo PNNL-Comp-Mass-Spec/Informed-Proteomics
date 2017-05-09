@@ -5,12 +5,8 @@ using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Execution;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test

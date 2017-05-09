@@ -11,8 +11,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.PostProcessing;
-using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using NUnit.Framework;
 

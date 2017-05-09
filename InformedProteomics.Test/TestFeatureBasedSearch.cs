@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
@@ -16,7 +15,6 @@ using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
-//using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 
 namespace InformedProteomics.Test
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
@@ -20,7 +20,6 @@ using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
-using ProMex;
 
 namespace InformedProteomics.Test
 {
