@@ -296,11 +296,11 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     Console.WriteLine(newMspDir);
                     var filePath = string.Format(@"{0}\{1}_IcTsv.zip", newMspDir, dataName);
                     var destFilePath = string.Format(@"{0}\{1}_IcTsv.zip", destPath, dataName);
-                    File.Copy(filePath, destFilePath);
+                    File.Copy(filePath, destFilePath, true);
 
                     //filePath = string.Format(@"{0}\{1}.ms1ft", newMspDir, dataName);
                     //destFilePath = string.Format(@"{0}\{1}.ms1ft", destPath, dataName);
-                    //File.Copy(filePath, destFilePath);
+                    //File.Copy(filePath, destFilePath, true);
                 //}
 
                 /*
@@ -315,7 +315,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
                 var filePath2 = string.Format(@"{0}\{1}_IcTsv.zip", oldMspDir, dataName);
                 var destFilePath2 = string.Format(@"{0}\{1}_IcTsv.zip", oldDestPath, dataName);
-                File.Copy(filePath2, destFilePath2);
+                File.Copy(filePath2, destFilePath2, true);
                 */
                 //foreach(var directories
             }
@@ -362,7 +362,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 Console.WriteLine(newMspDir);
                 var filePath = string.Format(@"{0}\{1}_IcTsv.zip", newMspDir, dataName);
                 var destFilePath = string.Format(@"{0}\{1}_IcTsv.zip", destPath, dataName);
-                File.Copy(filePath, destFilePath);
+                File.Copy(filePath, destFilePath, true);
             }
         }
         /*
