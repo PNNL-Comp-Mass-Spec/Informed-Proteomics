@@ -673,7 +673,10 @@ namespace InformedProteomics.Test
             var featureFinder = new LcMsPeakMatrix(run, scorer);
             var feature = featureFinder.GetLcMsPeakCluster(28061.6177, 20, 34, 7624, 7736);
 
-            var writer = new StreamWriter(@"D:\MassSpecFiles\CPTAC_rep10\example\peaks.txt");
+            var resultsFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(rawFile) + "_peaks.txt");
+            var writer = new StreamWriter(resultsFilePath);
+
+            writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n", "Scan", "Elution_Time", "Charge", "ID", "MZ", "Intensity", "Pearson_Correlation");
 
             var envelope = feature.TheoreticalEnvelope;
             foreach (var e in envelope.Isotopes) Console.WriteLine(e.Ratio);
@@ -689,6 +692,8 @@ namespace InformedProteomics.Test
                 }
             }
             writer.Close();
+
+            Console.WriteLine("Results are in file " + resultsFilePath);
         }
 
         public static string[] TrainSetFileLists = new string[]
