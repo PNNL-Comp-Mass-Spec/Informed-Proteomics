@@ -26,6 +26,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestMaxEntDeconvoluter()
         {
             const string rawFileFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";

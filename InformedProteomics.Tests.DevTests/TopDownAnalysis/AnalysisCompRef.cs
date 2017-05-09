@@ -116,6 +116,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\promex_crosstab_temp.tsv";

@@ -17,6 +17,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
     {
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestPeptidomics()
         {
             const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Quant";
@@ -120,6 +121,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestCompRef()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features_requant.tsv";

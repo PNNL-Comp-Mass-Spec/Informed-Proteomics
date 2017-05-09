@@ -10,7 +10,7 @@ namespace InformedProteomics.Tests.DevTests
     public class UnidentifiedFeatureAnalysisTest
     {
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestUnidentifiedFeatureAnalysis()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

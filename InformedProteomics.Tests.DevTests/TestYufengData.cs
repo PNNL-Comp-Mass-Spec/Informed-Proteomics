@@ -24,6 +24,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void AddMostAbundantIsotopePeakIntensity()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -83,6 +84,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void Test43KProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -188,6 +190,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestDeconvolution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -237,6 +240,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestRunningTimeSummingSpectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -266,6 +270,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -312,6 +317,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSmartIsoWindowSumming()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -400,6 +406,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestGeneratingXicsOfAllCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -466,6 +473,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestAbpSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -509,6 +517,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSumMs2Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
