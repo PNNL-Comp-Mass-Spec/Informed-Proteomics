@@ -2,29 +2,51 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Parses the data in a tab-delimited file, caching the data in memory
+    /// </summary>
+    /// <remarks>
+    /// The data is stored in memory both as full rows (one string per row), and parsed by column
+    /// Column names are case-sensitive
+    /// </remarks>
     public class TsvFileParser
     {
-        public TsvFileParser(string fileName, char delimiter = '\t')
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="filePath">File to read</param>
+        /// <param name="delimeter">Delimeter, tab by default</param>
+        public TsvFileParser(string filePath, char delimeter = '\t')
         {
-            FileName = fileName;
-            _delimeter = delimiter;
+            FileName = filePath;
+            _delimeter = delimeter;
+
+            _header = new Dictionary<int, string>();
+            _rows = new List<string>();
+            _data = new Dictionary<string, List<string>>();
+
             Parse();
         }
 
+        /// <summary>
+        /// Filename
+        /// </summary>
         public string FileName { get; private set; }
 
+        /// <summary>
+        /// Number of rows
+        /// </summary>
         public int NumData
         {
-            get { return _rows.Length; }
+            get { return _rows.Count; }
         }
 
         public IList<string> GetHeaders()
         {
-            return _header;
+            return (from item in _header orderby item.Key select item.Value).ToList();
         }
 
         public Dictionary<string, List<string>> GetAllData()
@@ -63,6 +85,17 @@ namespace InformedProteomics.Backend.Utils
             var proteins = _data[_header[proteinColumnIndex]];
             var pepQValues = _data[_header[pepQValueColumnIndex]];
             for (var i = 0; i < pepQValues.Count; i++)
+        /// <summary>
+        /// Map from header column index to header column name
+        /// </summary>
+        private readonly Dictionary<int, string> _header;
+
+        private readonly List<string> _rows;
+
+        private readonly Dictionary<string, List<string>> _data;
+
+        private readonly char _delimeter;
+
             {
                 var pepQValue = Convert.ToDouble(pepQValues[i]);
                 if (pepQValue <= pepQValueThreshold && !proteins[i].StartsWith("XXX")) peptideSet.Add(peptides[i]);
@@ -97,40 +130,54 @@ namespace InformedProteomics.Backend.Utils
             return peptideSet;
         }
 
-        private string[] _header;
-        private string[] _rows;
-        private Dictionary<string, List<string>> _data;
-        private readonly char _delimeter;
 
         private void Parse()
         {
-            var rows = new List<string>();
-            _data = new Dictionary<string, List<string>>();
-            // parse header
-            var firstRow = true;
-            foreach (var line in File.ReadLines(FileName))
+            _rows.Clear();
+            _data.Clear();
+            _header.Clear();
+
+            var headerParsed = false;
+
+            using (var reader = new StreamReader(new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                var token = line.Split(_delimeter);
-                if (firstRow)
+                while (!reader.EndOfStream)
                 {
-                    _header = new string[token.Length];
+                    var line = reader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    var token = line.Split(_delimeter);
+                    if (!headerParsed)
+                    {
+                        for (var i = 0; i < token.Length; i++)
+                        {
+                            if (_data.ContainsKey(token[i]))
+                            {
+                                Console.WriteLine("Warning: header line has duplicate column names; ignoring duplicate " + token[i]);
+                                continue;
+                            }
+                            _header.Add(i, token[i]);
+                            _data[token[i]] = new List<string>();
+                        }
+                        headerParsed = true;
+                        continue;
+                    }
+
+                    if (token.Length > _header.Count)
+                        continue;
+
                     for (var i = 0; i < token.Length; i++)
                     {
-                        _header[i] = token[i];
-                        _data[_header[i]] = new List<string>();
-                    }
-                    firstRow = false;
-                    continue;
-                }
+                        if (!_header.ContainsKey(i))
+                            continue;
 
-                if (token.Length != _header.Length) continue;
-                for (var i = 0; i < token.Length; i++)
-                {
-                    _data[_header[i]].Add(token[i]);
+                        _data[_header[i]].Add(token[i]);
+                    }
+                    _rows.Add(line);
                 }
-                rows.Add(line);
             }
-            _rows = rows.ToArray();
         }
+
     }
 }
