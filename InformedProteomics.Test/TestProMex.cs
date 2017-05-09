@@ -607,8 +607,10 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
-        public void TestProMexFilter()
+        [TestCase(6182.399, "4507,4509")]
+        [TestCase(10868.732, "4828")]
+        [TestCase(17804.0293, "4458,4478,4479,4502,4504")]
+        public void TestProMexFilter(double massToFind, string expectedScanNumbers)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -619,15 +621,36 @@ namespace InformedProteomics.Test
             var promexFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft");
             var promexFile = Utils.GetTestFile(methodName, promexFilePath);
 
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName, 0, 0);
 
-            var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
+            var ms1Filter = new Ms1FtFilter(run, new Tolerance(10), promexFile.FullName);
 
+            Console.WriteLine();
+
+            var matchingScanNums = new SortedSet<int>();
+
+            foreach (var item in ms1Filter.GetMatchingMs2ScanNums(massToFind))
+                matchingScanNums.Add(item);
+
+            var scanNumList = string.Join(",", matchingScanNums);
+
+            Console.WriteLine("Scans with mass {0}:", massToFind);
+            Console.WriteLine(scanNumList);
+
+            var expectedScanNumList = expectedScanNumbers.Split(',');
+
+            var matchCount = 0;
+            foreach (var scanNumText in expectedScanNumList)
             {
+                var scanNum = int.Parse(scanNumText);
 
-            var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath);
+                if (!matchingScanNums.Contains(scanNum))
+                    Assert.Fail("Did not find scan {0} for mass {1}", scanNum, massToFind);
 
-//            Console.WriteLine("ScanNums: {0}", string.Join("\t",filter.GetMatchingMs2ScanNums(8480.327609)));
-            Assert.IsTrue(filter.GetMatchingMs2ScanNums(8480.327609).Contains(5255));
+                matchCount++;
+            }
+
+            Assert.AreEqual(matchCount, matchingScanNums.Count, "Found extra matching scan nums vs. what was expected");
         }
 
         [Test]
