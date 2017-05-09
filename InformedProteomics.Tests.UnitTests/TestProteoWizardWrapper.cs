@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
@@ -8,7 +9,7 @@ namespace InformedProteomics.Tests.UnitTests
     [TestFixture]
     internal class TestProteoWizardWrapper
     {
-        public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw";
+        public readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, @"QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw");
 
         [Test]
         [Category("PNL_Domain")]

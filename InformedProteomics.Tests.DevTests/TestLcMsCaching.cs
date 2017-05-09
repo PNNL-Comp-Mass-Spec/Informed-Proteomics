@@ -613,7 +613,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var sw = new System.Diagnostics.Stopwatch();
 
-            var fastaFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_003962_71E1A1D4.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_003962_71E1A1D4.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             db.Read();

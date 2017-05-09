@@ -383,7 +383,7 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var xmlFileName = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\PNNLOmicsElementData.xml");
+            var xmlFileName = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "PNNLOmicsElementData.xml"));
 
             var xdocument = XDocument.Load(xmlFileName.FullName);
             var parameterBaseElement = xdocument.Element("parameters");

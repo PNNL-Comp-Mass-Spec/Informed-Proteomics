@@ -17,7 +17,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     [Category("PNL_Domain")]
     public class TestPbfLcMsRun
     {
-        const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+        private readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw");
 
         [Test]
         public void TestWritingPbfFile()
@@ -48,7 +48,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string pbfFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
+            var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
             if (!File.Exists(pbfFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
@@ -166,13 +166,13 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rafFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf";
-            if (!File.Exists(rafFilePath))
+            var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
+            if (!File.Exists(pbfFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
             }
 
-            var pbfRun = new PbfLcMsRun(rafFilePath);
+            var pbfRun = new PbfLcMsRun(pbfFilePath);
 
             Console.WriteLine(@"Chromatogram");
             // chromatogram comparison

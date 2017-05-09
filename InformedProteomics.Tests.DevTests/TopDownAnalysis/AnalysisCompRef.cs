@@ -47,7 +47,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestIMERFeatureAlignment()
         {
             const string outFilePath = @"D:\MassSpecFiles\IMER\promex_crosstab.tsv";
@@ -119,11 +119,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\promex_crosstab_temp.tsv";
-            const string outFolder = @"\\protoapps\UserData\Jungkap\CompRef\aligned";
 
             var runLabels = new[] {"32A", "32B", "32C", "32D", "32E", "32F", "32G", "33A", "33B", "33C", "33D", "33E", "33F", "33G"};
             var nDataset = runLabels.Length;
-            //CPTAC_Intact_CR32A_24Aug15_Bane_15-02-06-RZ
+
             var prsmReader = new ProteinSpectrumMatchReader();
             var tolerance = new Tolerance(10);
             var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));

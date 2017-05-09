@@ -23,6 +23,14 @@ namespace InformedProteomics.Tests.FunctionalTests
 
     class TestTopDownScoring
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [Category("PNL_Domain")]
         public void TestReadingMsDeconvFile()
@@ -42,6 +50,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
             var parser = new MsDeconvFilter(run, new Tolerance(10), filePath);
         }
+
         /*
         [Test]
         [Category("Local_Testing")]
@@ -165,7 +174,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SBEP_STM_001_02272012_Aragon.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"SBEP_STM_001_02272012_Aragon.raw");
             if (!File.Exists(specFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
@@ -223,8 +232,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const int ms2ScanNum = 4658;
             var sequence = new Sequence("GYSIKDIIYQGEKSGVHNWQTLSGQNFYWHPDWLHIAEDLTGHKATASIQAEGTKATQNEAEQTIVKHLNKS", new AminoAcidSet());
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3.raw");
 
             if (!File.Exists(specFilePath))
             {
@@ -251,8 +259,8 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            var rawFile = Base.Utils.GetTestFile(methodName, @"\\proto-2\unitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -269,7 +277,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
@@ -280,13 +288,13 @@ namespace InformedProteomics.Tests.FunctionalTests
             //var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
             var scorer = new InformedTopDownScorer(run, aminoAcidSet, minCharge, maxCharge, tolerance);
 
-            if (rawFile.DirectoryName == null)
-                Assert.Ignore("Ignoring test since cannot determine the parent directory of " + rawFile.FullName);
+            if (pbfFile.DirectoryName == null)
+                Assert.Ignore("Ignoring test since cannot determine the parent directory of " + pbfFile.FullName);
 
             var fileExt = new string[] {"IcTarget", "IcDecoy"};
             foreach (var ext in fileExt)
             {
-                var resultFileName = Path.Combine(rawFile.DirectoryName, Path.GetFileNameWithoutExtension(rawFile.Name)) + string.Format("_{0}.tsv", ext);
+                var resultFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}.tsv", ext);
                 var parser = new TsvFileParser(resultFileName);
                 var scans = parser.GetData("Scan").Select(s => Convert.ToInt32((string) s)).ToArray();
                 var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
@@ -295,7 +303,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
                 var protMass = parser.GetData("Mass").Select(s => Convert.ToDouble(s)).ToArray();
 
-                var outputFileName = Path.Combine(rawFile.DirectoryName, Path.GetFileNameWithoutExtension(rawFile.Name)) + string.Format("_{0}_Rescored.tsv", ext);
+                var outputFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}_Rescored.tsv", ext);
 
                 using (var writer = new StreamWriter(outputFileName))
                 {

@@ -26,6 +26,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestQuantifyIdedProteoforms()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -516,10 +517,10 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var featureDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
-            var mspDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\MSP";
-            var outFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_features.tsv";
-            var resultFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_ids.tsv";
+            var featureDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");
+            var mspDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Output\MSP");
+            var outFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Output\aligned_features.tsv");
+            var resultFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"\Output\aligned_ids.tsv");
 
             if (!Directory.Exists(featureDir))
             {
@@ -644,10 +645,10 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var featureDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
+            var featureDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");
             //var rawDir = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            //var outFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output\aligned_features.tsv";
-            var dmsDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\ProMex";
+            //var outFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Output\aligned_features.tsv");
+            var dmsDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "ProMex");
 
             if (!Directory.Exists(featureDir))
             {

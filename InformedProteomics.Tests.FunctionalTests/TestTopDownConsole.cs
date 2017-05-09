@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
@@ -14,12 +15,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_intact_01.raw";
-            const string featureFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_intact_01.ms1ft";
-            const string databaseFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\ID_004858_0EE8CF61.fasta";
-            const string modFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Mods.txt";
-            const string testOutputPath =
-                @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\TestOutput";
+            var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.raw");
+            var featureFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.ms1ft");
+            var databaseFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\ID_004858_0EE8CF61.fasta");
+            var modFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Mods.txt");
+            var testOutputPath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\TestOutput");
 
             var args = new[]
             {

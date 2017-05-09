@@ -167,7 +167,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = FilePaths.TestRawFilePath;
+            var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -229,7 +229,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = FilePaths.TestRawFilePath;
+            var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -314,7 +314,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Corrupted\YS_Shew_testHCD_CID.raw";
+            var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Corrupted\YS_Shew_testHCD_CID.raw");
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -386,7 +386,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\2015-05-06_Carbonic_HCD_854_50AVG.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "2015-05-06_Carbonic_HCD_854_50AVG.raw");
             if (!File.Exists(specFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);

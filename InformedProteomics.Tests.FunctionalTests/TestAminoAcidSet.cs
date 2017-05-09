@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Tests.FunctionalTests
@@ -11,14 +12,14 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestAminoAcidSet
     {
         [Test]
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_DB_Mods.txt")]
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\Lewy_ManyMods\Lewy_DB_Mods2.txt")]
+        [TestCase(@"TEST_FOLDER\TopDown\Lewy_ManyMods\Lewy_DB_Mods.txt")]
+        [TestCase(@"TEST_FOLDER\TopDown\Lewy_ManyMods\Lewy_DB_Mods2.txt")]
         public void TestParsingManyMods(string modDefsFile)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
 
-            var modFile = Base.Utils.GetTestFile(methodName, modDefsFile);
-            
+            var modFile = Utils.GetTestFile(methodName, modDefsFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
             if (!modFile.Exists)
                 Assert.Ignore("Ignoring test TestParsingManyMods since file not found: " + modFile.FullName);
 

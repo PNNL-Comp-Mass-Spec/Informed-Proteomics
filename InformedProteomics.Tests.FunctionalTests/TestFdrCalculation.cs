@@ -18,9 +18,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var targetResultPath = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv");
+            var targetFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv");
+            var targetResultPath = Utils.GetTestFile(methodName, targetFile);
 
-            var decoyResultPath = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv");
+            var decoyFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv");
+            var decoyResultPath = Utils.GetTestFile(methodName, decoyFile);
 
             if (targetResultPath.DirectoryName == null)
                 Assert.Ignore("Cannot determine the parent directory of " + targetResultPath.FullName);

@@ -21,13 +21,13 @@ namespace InformedProteomics.Test
     internal class TestIcTopDown
     {
         [Test]
-        [TestCase(@"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396, 10562511, 11333064)]
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396, 10562511, 11333064)]
         public void TestForManyMods(string dbFile, int expectedMaxLen300, int expectedMaxLen400, int expectedMaxLen500)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var fastaFile = Utils.GetTestFile(methodName, dbFile);
+            var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
             var indexedDb = new IndexedDatabase(new FastaDatabase(fastaFile.FullName));
             indexedDb.Read();
@@ -176,15 +176,16 @@ namespace InformedProteomics.Test
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestForSbepData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
             //// Salmonella
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\SBEP_STM_001_02272012_Aragon.raw";
-            const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002166_F86E3B2F.fasta";
-            const string outputDir = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Results\Mod_M2";
+            var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\SBEP_STM_001_02272012_Aragon.raw");
+            var dbFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_002166_F86E3B2F.fasta");
+            var outputDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Results\Mod_M2");
 
             if (!File.Exists(specFilePath))
             {
@@ -267,7 +268,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestForJiaData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -275,7 +276,7 @@ namespace InformedProteomics.Test
 
             // QC_Shew
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            //const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
+            // var dbFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_002216_235ACCEA.fasta");
             //const string dbFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\Test.fasta";
 
             // Jia's data
@@ -497,13 +498,13 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestMsAlignRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
             const string msAlignResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
             const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod_Rescored.tsv";
 
@@ -524,15 +525,15 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestIcRescoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
-            //const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re.icdresult";
-            //const string outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re_Rescored.icdresult";
+            // var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, @"QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
+            // var icResultPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re.icdresult";
+            // var outputPath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402_Map07_Re_Rescored.icdresult";
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";
             const string icResultPath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.ictresult";

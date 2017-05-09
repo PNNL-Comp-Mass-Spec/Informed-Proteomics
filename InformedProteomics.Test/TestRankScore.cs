@@ -71,15 +71,14 @@ namespace InformedProteomics.Test
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void DiaRankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dataFile =
-    @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            const string tsvFile =
-                @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
+            const string dataFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            const string tsvFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
 
             if (!File.Exists(dataFile))
             {
@@ -97,12 +96,9 @@ namespace InformedProteomics.Test
             var scans = parser.GetData("ScanNum");
 
             var lcms = InMemoryLcMsRun.GetLcMsRun(dataFile, 0, 0);
-            var rankScorer =
-    new DiaRankScore(
-        @"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");
+            var rankScorer = new DiaRankScore(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");
 
-            using (
-                var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt"))
+            using (var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt"))
             {
                 outFile.WriteLine("Target\tDecoy");
                 for (int i = 0; i < sequences.Count; i++)

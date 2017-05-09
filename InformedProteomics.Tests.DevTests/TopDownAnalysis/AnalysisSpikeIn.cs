@@ -14,8 +14,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
     public class AnalysisSpikeIn
     {
-        private string[] datasets = new string[]
-        {
+        private readonly string[] datasets = {
             "CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ",
             "CPTAC_Intact_Spike_1x_2_27Apr15_Bane_14-09-03RZ",
             "CPTAC_Intact_Spike_1x_3_27Apr15_Bane_14-09-03RZ",
@@ -33,9 +32,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             "CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ"
         };
 
-        public const string Ms1FtFolder = @"\\protoapps\UserData\Jungkap\Quant";
-        public const string MsPfFolder = @"\\protoapps\UserData\Jungkap\Quant\MSPF";
-        public const string RawFolder = @"\\protoapps\UserData\Jungkap\Quant";
+        private const string Ms1FtFolder = @"\\protoapps\UserData\Jungkap\Quant";
+        private const string MsPfFolder = @"\\protoapps\UserData\Jungkap\Quant\MSPF";
+        private const string RawFolder = @"\\protoapps\UserData\Jungkap\Quant";
 
         internal class SpikeInFeatureComparer : INodeComparer<LcMsFeature>
         {
@@ -66,6 +65,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\Quant\aligned\promex_crosstab.tsv";
@@ -123,7 +123,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
-        public void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
+        private void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
         {
             var nDataset = runLabels.Length;
             var writer = new StreamWriter(outputFilePath);

@@ -16,6 +16,14 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     public class TestLcMsFeatureFind
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [Category("PNL_Domain")]
         public void TestMaxEntDeconvoluter()
@@ -51,6 +59,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestLcMsFeatureXic()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -90,6 +99,7 @@ namespace InformedProteomics.Tests.DevTests
                 Console.Write("\n");
             }
             Console.WriteLine("---------------------------------------------------------------");
+
             for (var i = 0; i < feature.Envelopes.Length; i++)
             {
                 for (var j = 0; j < feature.Envelopes[i].Length; j++)
@@ -101,6 +111,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             Console.WriteLine("---------------------------------------------------------------");
+
             for (var i = 0; i < feature.Envelopes.Length; i++)
             {
                 for (var j = 0; j < feature.Envelopes[i].Length; j++)
@@ -118,15 +129,16 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var rawFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
             //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile.FullName);
+            Console.WriteLine(@"Start loading MS1 data from {0}", pbfFile.FullName);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                 (stopwatch.ElapsedMilliseconds)/1000.0d);

@@ -26,6 +26,15 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [Category("Local_Testing")]
         public void CollectTrainingSet()
@@ -366,15 +375,10 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string resultFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
-            if (!File.Exists(resultFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
-            }
+            var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
+            var resultFile = Utils.GetTestFile(methodName, resultFilePath);
 
-            // const string ms1ftFilePath = @"\\protoapps\UserData\Jungkap\FeatureFinding\ProMex_v1.1\test\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
-
-            var parser = new TsvFileParser(resultFilePath);
+            var parser = new TsvFileParser(resultFile.FullName);
             var sequences = parser.GetData("Sequence");
             var modifications = parser.GetData("Modifications");
             var scanNums = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
@@ -434,7 +438,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
-            const string outFolderPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Output";
+            var outFolderPath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");
             if (!Directory.Exists(outFolderPath))
             {
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
@@ -472,12 +476,14 @@ namespace InformedProteomics.Test
             Console.WriteLine("Testing Working");
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
-            const string rawFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            const string testFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
-            const string outputFile = @"D:\MassSpecFiles\training\raw\";
+            mFeatureMapPbfFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            mFeatureMapResultsFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
 
-            var map = new LcMsFeatureMap(PbfLcMsRun.GetLcMsRun(rawFile), testFile, 2000, 50000);
-            map.SaveImage(outputFile + "test.png");
+            var resultsFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(mFeatureMapPbfFile) + "_FeatureMap.png");
+
+            var map = new LcMsFeatureMap(PbfLcMsRun.GetLcMsRun(mFeatureMapPbfFile), mFeatureMapResultsFile, 2000, 50000);
+            map.SaveImage(resultsFilePath);
+
         }
 
         [Test]
@@ -487,19 +493,16 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
+
+            var promexFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft");
+            var promexFile = Utils.GetTestFile(methodName, promexFilePath);
+
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
 
-            const string ms1FtPath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TopDown\ProductionQCShew\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
-            if (!File.Exists(ms1FtPath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, ms1FtPath);
-            }
 
             var filter = new Ms1FtFilter(run, new Tolerance(10), ms1FtPath);
 

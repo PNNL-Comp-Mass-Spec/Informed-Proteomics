@@ -21,7 +21,7 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             var searchableDb = new SearchableDatabase(db);
@@ -46,7 +46,7 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
@@ -73,7 +73,7 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
@@ -101,7 +101,7 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
@@ -147,7 +147,7 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
@@ -234,7 +234,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var fastaFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta");
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
             
             var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
@@ -261,7 +261,7 @@ namespace InformedProteomics.Tests.UnitTests
         //    const int numMissedCleavages = 1;
         //    var enzyme = Enzyme.Trypsin;
 
-        //    const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+        //    var dbFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta");
         //    var targetDb = new FastaDatabase(dbFilePath);
 
         //    var indexedDbTarget = new IndexedDatabase(targetDb);
@@ -314,7 +314,7 @@ namespace InformedProteomics.Tests.UnitTests
         //    var sw = new System.Diagnostics.Stopwatch();
         //    sw.Start();
 
-        //    const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\BSA.fasta";
+        //    var dbFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "BSA.fasta");
         //    var db = new FastaDatabase(dbFile);
         //    db.Decoy(Enzyme.Trypsin);
         //    sw.Stop();

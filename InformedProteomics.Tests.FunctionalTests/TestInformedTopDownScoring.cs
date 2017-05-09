@@ -14,6 +14,14 @@ namespace InformedProteomics.Tests.FunctionalTests
 {
     public class TestInformedTopDownScoring
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [TestCase(4177, 6, "MLILTRRVGETLMIGDEVTVTVLGVKGNQVRIGVNAPKEVSVHREEIYQRIQSEKS", 70.97136)]
         [TestCase(4265, 15, "ALRLKDLVKKTERQLSDYQRQLSMVKTTESVQKATATITDSFASSNSKLLNAKDSLERIKARQQQFDDRLKAAETLAEEGSDKSLQAKLAEAGIGEQKSNANAVLERIKARKS", 41.95799)]
@@ -22,7 +30,8 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var specFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
@@ -42,7 +51,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
-            var run = PbfLcMsRun.GetLcMsRun(specFile.FullName, 0, 0);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName, 0, 0);
             var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
             var scores = informedScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, composition, charge, scanNum);
             Console.WriteLine("Total Score = " + scores.Score);

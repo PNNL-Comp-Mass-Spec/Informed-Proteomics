@@ -19,6 +19,14 @@ namespace InformedProteomics.Tests.FunctionalTests
     [TestFixture]
     public class TestGeneratingFunction
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [TestCase(4032, "MRHYEIVFMVHPDQSEQVPGMIERYTGAITEANGKIHRLEDWGRR")]
         [TestCase(4445, "MKTFTATPETVTRDWFVVDADGKTLGRIATEIALRLRGKHKPEYTPHVDTGDYIIVINAEKVTVTGNKAQGKTYYSHSGFPGGIKQISFEKLQAHKPEMIIEKAVKGMLPKGPLGRAMFRKLKVYAGAEHNHAAQQPQVLDI")]
@@ -27,27 +35,22 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var rawFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf");
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
-            if (!rawFile.Exists)
+            if (!pbfFile.Exists)
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFile);
             }
 
             const string modStr = "";
-
-            //var idFile = Utils.GetTestFile(methodName, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
-            //if (!idFile.Exists)
-            //{
-            //    Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
-            //}
 
             const int maxCharge = 20;
             const int minCharge = 1;
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile.FullName);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -70,7 +73,6 @@ namespace InformedProteomics.Tests.FunctionalTests
             stopwatch.Stop();
             Console.WriteLine(@"edge generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
-            var n = 0;
             var stopwatch2 = Stopwatch.StartNew();
 
             var sequence = Sequence.CreateSequence(protSequence, modStr, aaSet);
@@ -109,7 +111,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
 
             stopwatch2.Stop();
-            Console.WriteLine(@"TOTAL computing generation function = {0:0.000} sec", (stopwatch2.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(@"TOTAL computing generation function = {0:0.000} sec", stopwatch2.ElapsedMilliseconds / 1000.0d);
         }
 
         internal class TestMassBin : IMassBinning
@@ -143,10 +145,10 @@ namespace InformedProteomics.Tests.FunctionalTests
                 return 0.5 * (GetMass(binNumber + 1) + GetMass(binNumber));
             }
 
-            public double MaxMass { get; private set; }
-            public double MinMass { get; private set; }
-            public int NumberOfBins { get; private set; }
-            public bool Filtered { get; private set; }
+            public double MaxMass { get; }
+            public double MinMass { get; }
+            public int NumberOfBins { get; }
+            public bool Filtered { get; }
         }
         /*
         [Test]
