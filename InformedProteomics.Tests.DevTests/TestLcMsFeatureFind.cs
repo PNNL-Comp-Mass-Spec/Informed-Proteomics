@@ -22,8 +22,8 @@ namespace InformedProteomics.Tests.DevTests
         {
             const string rawFileFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";
             const string fname = "WHIM2_LoHi_T2DD_HCD_GF07_02";
-            string rawFile = string.Format(@"{0}\{1}.pbf", rawFileFolder, fname);
-            string ms1ft = string.Format(@"\\protoapps\UserData\Jungkap\CompRef\lowRes\{0}.ms1ft", fname);
+            var rawFile = string.Format(@"{0}\{1}.pbf", rawFileFolder, fname);
+            var ms1ft = string.Format(@"\\protoapps\UserData\Jungkap\CompRef\lowRes\{0}.ms1ft", fname);
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 1.4826, 0);
             var ms1ScanNums = run.GetMs1ScanVector();

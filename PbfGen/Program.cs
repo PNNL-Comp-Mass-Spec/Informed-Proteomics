@@ -151,7 +151,7 @@ namespace PbfGen
             try
             {
 #endif
-            string[] specFilePaths = new[] { specFilePath };
+            var specFilePaths = new[] { specFilePath };
             if (Directory.Exists(specFilePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(specFilePath))
             {
                 specFilePaths = Directory.GetFiles(specFilePath, "*.raw"); // TODO: Support folders with other formats in them too...
@@ -178,7 +178,7 @@ namespace PbfGen
                 else if (endScan > 0)
                     Console.WriteLine("Only including scans 1 to {0}", endScan);
 
-                IMassSpecDataReader reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
+                var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
                 var progress = new Progress<ProgressData>(p =>
                 {
                     p.UpdateFrequencySeconds = 2;

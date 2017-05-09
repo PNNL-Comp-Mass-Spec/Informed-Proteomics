@@ -626,7 +626,7 @@ namespace InformedProteomics.Tests.DevTests
         {
             var fileEntries = Directory.GetFiles(featureDir);
             var dataset = new List<string>();
-            foreach (string fileName in fileEntries)
+            foreach (var fileName in fileEntries)
             {
                 if (fileName.EndsWith("ms1ft"))
                 {
@@ -657,7 +657,7 @@ namespace InformedProteomics.Tests.DevTests
             var fileEntries = Directory.GetFiles(featureDir);
 
             var dataset = new List<string>();
-            foreach (string fileName in fileEntries)
+            foreach (var fileName in fileEntries)
             {
                 if (fileName.EndsWith("ms1ft"))
                 {

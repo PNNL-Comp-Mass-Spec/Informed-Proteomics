@@ -120,7 +120,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\promex_crosstab_temp.tsv";
             const string outFolder = @"\\protoapps\UserData\Jungkap\CompRef\aligned";
-            var runLabels = new string[] {"32A", "32B", "32C", "32D", "32E", "32F", "32G", "33A", "33B", "33C", "33D", "33E", "33F", "33G"};
+
+            var runLabels = new[] {"32A", "32B", "32C", "32D", "32E", "32F", "32G", "33A", "33B", "33C", "33D", "33E", "33F", "33G"};
             var nDataset = runLabels.Length;
             //CPTAC_Intact_CR32A_24Aug15_Bane_15-02-06-RZ
             var prsmReader = new ProteinSpectrumMatchReader();
