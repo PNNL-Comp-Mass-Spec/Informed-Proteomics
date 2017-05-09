@@ -18,7 +18,9 @@ using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.Training;
 using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.Execution;
+using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
+using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -26,6 +28,9 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
+
+        private string mFeatureMapPbfFile;
+        private string mFeatureMapResultsFile;
 
         [OneTimeSetUp]
         public void Setup()
@@ -123,9 +128,8 @@ namespace InformedProteomics.Test
             var tolerance2 = new Tolerance(20);
             var id = 1;
 
-            for(var d = 0; d < TrainSetFileLists.Length; d++)
+            foreach (var dataset in TrainSetFileLists)
             {
-                var dataset = TrainSetFileLists[d];
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var filtedIdResultFile = string.Format(@"{0}\{1}.trainset.tsv", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
                 var featureResult = string.Format(@"{0}\{1}.ms1ft", idFileFolder, Path.GetFileNameWithoutExtension(dataset));
@@ -369,8 +373,12 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [Category("PNL_Domain")]
-        public void TestPredictPTMfromMs1ft()
+        [TestCase(0.001, 70)]
+        [TestCase(0.005, 74)]
+        [TestCase(0.01, 80)]
+        [TestCase(0.02, 83)]
+        [TestCase(0.05, 98)]
+        public void TestParsePtms(double qValueThreshold, int expectedPTMListCount)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -381,22 +389,31 @@ namespace InformedProteomics.Test
             var parser = new TsvFileParser(resultFile.FullName);
             var sequences = parser.GetData("Sequence");
             var modifications = parser.GetData("Modifications");
+            var compositions = parser.GetData("Composition");
             var scanNums = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var qValues = parser.GetData("QValue").Select(s => Convert.ToDouble(s)).ToArray();
             var nMacthed = parser.GetData("#MatchedFragments");
             var aaSet = new AminoAcidSet();
             var ptmList = new List<Tuple<int, double, double>>();
 
+            var trimChars = new[] {'"', ' '};
+            var filterPassingResults = 0;
+
             for (var i = 0; i < parser.NumData; i++)
             {
-                if (qValues[i] > 0.01) continue;
-                //var sequenceComp = aaSet.GetComposition(sequences[i]) + Composition.H2O;
+                if (qValues[i] > qValueThreshold)
+                    continue;
+
+                filterPassingResults++;
+
                 var seq = new Sequence(sequences[i], aaSet);
                 var sequenceComp = seq.Composition + Composition.H2O;
 
                 var modComposition = Composition.Zero;
-                var modsStr = modifications[i];
-                if (modsStr.Length == 0) continue;
+                var modsStr = modifications[i].Trim(trimChars);
+                if (modsStr.Length == 0)
+                    continue;
+
                 var mods = modsStr.Split(',');
                 foreach (var modStr in mods.Where(str => str.Length > 0))
                 {
@@ -404,17 +421,109 @@ namespace InformedProteomics.Test
                     var mod = Modification.Get(modName);
                     modComposition += mod.Composition;
                 }
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", scanNums[i], sequenceComp.Mass, modComposition.Mass, nMacthed[i], sequences[i], modsStr);
-                //var compFromSeqAndMods = sequenceComp + modComposition;
-                //Assert.True(compFromSeqAndMods.Equals(compositions[i]));
+
+                if (ptmList.Count < 5)
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", scanNums[i], sequenceComp.Mass, modComposition.Mass, nMacthed[i], sequences[i], modsStr);
+
+                var compFromSeqAndMods = sequenceComp + modComposition;
+
+                var expectedComposition = compositions[i];
+                Assert.AreEqual(expectedComposition, compFromSeqAndMods.ToString(), "Composition Mismatch");
 
                 ptmList.Add(new Tuple<int, double, double>(scanNums[i], sequenceComp.Mass, modComposition.Mass));
             }
 
-            //var featureParser = new TsvFileParser(ms1ftFilePath);
-            //var minScan = featureParser.GetData("MinScan").Select(s => Convert.ToInt32(s)).ToArray();
-            //var maxScan = featureParser.GetData("MaxScan").Select(s => Convert.ToInt32(s)).ToArray();
-            //var monoMass = featureParser.GetData("MonoMass").Select(s => Convert.ToDouble(s)).ToArray();
+            Console.WriteLine();
+            Console.WriteLine("{0} results with PTMs / {1} total results passing threshold qValue < {2}", ptmList.Count, filterPassingResults, qValueThreshold);
+            Assert.AreEqual(expectedPTMListCount, ptmList.Count, "Unexpected number of identifications with at least one PTM at qValue < {0}", qValueThreshold);
+
+        }
+
+        [Test]
+        [TestCase(0.001, 12, 95)]
+        [TestCase(0.01, 8, 98)]
+        [TestCase(0.01, 12, 100)]
+        [TestCase(0.01, 15, 100)]
+        [TestCase(0.02, 12, 103)]
+        public void TestParseMs1Ft(double qValueThreshold, int tolerancePpm, int expectedFeaturesWithId)
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
+
+            var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
+            var resultFile = Utils.GetTestFile(methodName, resultFilePath);
+
+            var ms1ftFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft");
+            var ms1ftFile = Utils.GetTestFile(methodName, ms1ftFilePath);
+
+            var resultParser = new MsPathFinderParser(resultFile.FullName);
+
+            var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
+            var idMassList = idList.Select(id => id.Mass).ToList();
+            var idFlag = new bool[idList.Count];
+
+            var featureParser = new TsvFileParser(ms1ftFile.FullName);
+
+            var minScan = featureParser.GetData("MinScan").Select(s => Convert.ToInt32(s)).ToArray();
+            var maxScan = featureParser.GetData("MaxScan").Select(s => Convert.ToInt32(s)).ToArray();
+            var minCharge = featureParser.GetData("MinCharge").Select(s => Convert.ToInt32(s)).ToArray();
+            var maxCharge = featureParser.GetData("MaxCharge").Select(s => Convert.ToInt32(s)).ToArray();
+            var monoMass = featureParser.GetData("MonoMass").Select(Convert.ToDouble).ToArray();
+
+            var numFeaturesWithId = 0;
+
+            for (var i = 0; i < featureParser.NumData; i++)
+            {
+                var mass = monoMass[i];
+
+                // Find Id
+                var tolDa = new Tolerance(tolerancePpm).GetToleranceAsDa(mass, 1);
+                var minMass = mass - tolDa;
+                var maxMass = mass + tolDa;
+                var index = idMassList.BinarySearch(mass);
+                if (index < 0) index = ~index;
+
+                var matchedId = new List<MsPathFinderId>();
+
+                // go down
+                var curIndex = index - 1;
+                while (curIndex >= 0)
+                {
+                    var curId = idList[curIndex];
+                    if (curId.Mass < minMass) break;
+                    if (curId.Scan > minScan[i] && curId.Scan < maxScan[i]
+                        && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
+                    {
+                        matchedId.Add(curId);
+                        idFlag[curIndex] = true;
+                    }
+                    --curIndex;
+                }
+
+                // go up
+                curIndex = index;
+                while (curIndex < idList.Count)
+                {
+                    var curId = idList[curIndex];
+                    if (curId.Mass > maxMass) break;
+                    if (curId.Scan >= minScan[i] && curId.Scan <= maxScan[i]
+                        && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
+                    {
+                        matchedId.Add(curId);
+                        idFlag[curIndex] = true;
+                    }
+                    ++curIndex;
+                }
+
+                if (matchedId.Any())
+                {
+                    ++numFeaturesWithId;
+                }
+
+            }
+
+            Console.WriteLine("Filtering on qValue < {0} and mass error < {1} ppm, find {2} features with an ID", qValueThreshold, tolerancePpm, numFeaturesWithId);
+            Assert.AreEqual(expectedFeaturesWithId, numFeaturesWithId, "Unexpected number of features with an ID");
         }
 
         [Test]
