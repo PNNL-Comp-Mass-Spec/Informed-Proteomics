@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring
                 foreach (var scanNumber in subDictionary.Keys)
                 {
                     var composition = subDictionary[scanNumber];
-                    var scorer = new TopDownScorer(composition, _run, _tolerance, null);
+                    var scorer = new TopDownScorer(composition, _run, _tolerance);
                     var areXicMissing = scorer.AreXicMissing(charge, scanNumber);
                     var corrScores = scorer.GetIsotopeCorrelationIntensityRawScores(charge, scanNumber);
                     for (var c = TopDownScorer.MinCharge; c <= TopDownScorer.MaxCharge;c++ )

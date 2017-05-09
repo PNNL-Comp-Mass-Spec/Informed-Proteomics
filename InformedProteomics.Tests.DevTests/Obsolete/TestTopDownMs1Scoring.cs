@@ -110,7 +110,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                     {
                         totalProtCompositions++;
                        // Console.WriteLine(protComposition);
-                        var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
+                        var scorer = new TopDownScorer(protComposition, run, precursorTolerance);
                         var score = scorer.GetScore();
 
                         Console.WriteLine(score);
@@ -178,7 +178,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 var protCompositions = seqGraph.GetSequenceCompositions();
 
-                var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance, null);
+                var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance);
                 var score = scorer.GetScore();
 
                 writer.WriteLine(s+"\t"+score);
@@ -240,7 +240,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 //for (var charge = TopDownScorer.MinCharge; charge <= TopDownScorer.MaxCharge; charge++)
                 //{
-                var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
+                var scorer = new TopDownScorer(protComposition, run, precursorTolerance);
                 var score = scorer.GetScore();
 
                 Console.WriteLine(score);
