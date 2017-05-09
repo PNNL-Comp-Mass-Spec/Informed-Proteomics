@@ -19,6 +19,8 @@ namespace InformedProteomics.Tests.Base
 
         private const string DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss tt";
 
+        private static string mLastStatus = "";
+
         /// <summary>
         /// Look for the default .mzML testing file in the default test file folder,
         /// plus also in the UnitTest_Files directory in this project or solution
@@ -92,12 +94,20 @@ namespace InformedProteomics.Tests.Base
                 // Create a new lock file so other processes know this thread is creating the .pbf file
                 WaitForLockFile(lockFile, true);
 
+                mLastStatus = string.Empty;
+
                 var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(mzmlFileInfo.FullName);
                 var progress = new Progress<ProgressData>(p =>
                 {
                     p.UpdateFrequencySeconds = 2;
-                    if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
+                    if (p.Percent < 100 && (p.Percent % 25).Equals(0) || p.ShouldUpdate())
                     {
+                        var statusMessage = string.Format("{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
+
+                        if (string.Equals(mLastStatus, statusMessage))
+                            return;
+
+                        mLastStatus = statusMessage;
                         Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
                     }
                 });
