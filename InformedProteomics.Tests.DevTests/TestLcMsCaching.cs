@@ -251,7 +251,7 @@ namespace InformedProteomics.Tests.DevTests
             sw.Reset();
             sw.Start();
             //var ms1BasedFilter = new Ms1BasedFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm);
-//
+            //
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm, 20);
             //var ms1BasedFilter = new ProductScorerBasedOnDeconvolutedSpectra(run,
             //    minPrecursorCharge, maxPrecursorCharge,
@@ -379,9 +379,9 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             Console.WriteLine("TotalNumComparisons: {0}", numComparisons);
-            Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons/(double)(maxBinNum-minBinNum+1));
-            Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs/(double)totalSpecs, numUnfilteredSpecs, totalSpecs);
-            Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count/(double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
+            Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons / (double)(maxBinNum - minBinNum + 1));
+            Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
+            Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
 
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -397,7 +397,7 @@ namespace InformedProteomics.Tests.DevTests
             var converted = BitConverter.DoubleToInt64Bits(value);
             var rounded = (converted >> numShifts) << numShifts;
             var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
-            var roundedInt = (int) (rounded >> 32);
+            var roundedInt = (int)(rounded >> 32);
             Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, rounded);
             Console.WriteLine("{0}\t{1}", value, roundedDouble);
             Console.WriteLine("PPM error: {0}", (roundedDouble - value) / value * 1E6);
@@ -514,10 +514,10 @@ namespace InformedProteomics.Tests.DevTests
                 var apexScanNum = xicMostAbundant.GetApexScanNum();
                 if (apexScanNum < run.MinLcScan) apexScanNum = scanNum;
                 //var sumSpec = run.GetSummedMs1Spectrum(apexScanNum);
-//                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
-//                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
+                //                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
+                //                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
 
-                var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12/charge, tolerance, scanNum);
+                var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12 / charge, tolerance, scanNum);
 
                 var plusOneIsotopeCorr = xicMostAbundant.GetCorrelation(xicNextIsotope);
 
@@ -614,6 +614,7 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestNominalMassErrors()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -642,8 +643,8 @@ namespace InformedProteomics.Tests.DevTests
                 var sequenceComp = aaSet.GetComposition(sequenceStr);
                 var mass = sequenceComp.Mass;
                 var nominalMass = sequenceComp.NominalMass;
-                var error = (int) Math.Round(mass*Constants.RescalingConstant) - nominalMass;
-                var errorBin = error + hist.Length/2;
+                var error = (int)Math.Round(mass * Constants.RescalingConstant) - nominalMass;
+                var errorBin = error + hist.Length / 2;
                 if (errorBin < 0) errorBin = 0;
                 if (errorBin >= hist.Length) errorBin = hist.Length - 1;
                 hist[errorBin]++;
@@ -652,7 +653,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumSequences: {0}", numSequences);
             for (var i = 0; i < hist.Length; i++)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", i - hist.Length/2, hist[i], hist[i]/(double)numSequences);
+                Console.WriteLine("{0}\t{1}\t{2}", i - hist.Length / 2, hist[i], hist[i] / (double)numSequences);
             }
 
             sw.Stop();
