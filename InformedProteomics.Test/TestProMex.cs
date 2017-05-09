@@ -343,20 +343,20 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string TestRawFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01.pbf";
-            if (!File.Exists(TestRawFile))
+            var testRawFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.pbf");
+            if (!File.Exists(testRawFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFile);
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, testRawFile);
             }
 
-            const string TestResultFile = @"\\protoapps\UserData\Jungkap\Lewy\Lewy_intact_01_IcTda.tsv";
-            if (!File.Exists(TestResultFile))
+            var testResultFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\TestOutput\Lewy_intact_01_IcTda.tsv");
+            if (!File.Exists(testResultFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestResultFile);
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, testResultFile);
             }
 
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
-            var tsvParser = new TsvFileParser(TestResultFile);
+            var run = PbfLcMsRun.GetLcMsRun(testRawFile);
+            var tsvParser = new TsvFileParser(testResultFile);
             var featureFinder = new LcMsPeakMatrix(run);
 
             for (var i = 0; i < tsvParser.NumData; i++)
@@ -584,8 +584,15 @@ namespace InformedProteomics.Test
             Console.WriteLine("Testing Working");
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
-            mFeatureMapPbfFile = @"\\protoapps\UserData\Jungkap\Joshua\testData\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            mFeatureMapResultsFile = @"\\protoapps\UserData\Jungkap\Joshua\FeatureMap\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
+
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
+
+            var promexFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft");
+            var promexFile = Utils.GetTestFile(methodName, promexFilePath);
+
+            mFeatureMapPbfFile = pbfFile.FullName;
+            mFeatureMapResultsFile = promexFile.FullName;
 
             var thread = new Thread(new ThreadStart(FeatureMapGeneration));
 

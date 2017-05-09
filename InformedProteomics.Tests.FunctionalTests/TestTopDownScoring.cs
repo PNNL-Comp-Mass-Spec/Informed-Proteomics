@@ -110,14 +110,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
-            const string specFilePath = @"\\protoapps\UserData\Jungkap\Joshua\testData\SBEP_STM_001_02272012_Aragon.raw";
+            var specFilePath = Base.Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "SBEP_STM_001_02272012_Aragon.pbf"));
 
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
-
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath.FullName, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
@@ -174,13 +169,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
-            var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"SBEP_STM_001_02272012_Aragon.raw");
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
+            var specFilePath = Base.Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "SBEP_STM_001_02272012_Aragon.pbf"));
 
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath.FullName, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
