@@ -19,6 +19,15 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     internal class TestLcMsCaching
     {
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
         [TestCase(0.001, 108)]
         [TestCase(0.01, 113)]
@@ -66,21 +75,23 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";
-            if (!File.Exists(isosFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, isosFilePath);
-            }
+            var isosFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_isos.csv");
+            var isosfile = Utils.GetTestFile(methodName, isosFilePath);
 
-            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            if (!File.Exists(rawFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-            }
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
-            var filter = new IsosFilter(run, new Tolerance(10), isosFilePath);
-            Console.WriteLine(string.Join("\t",filter.GetMatchingMs2ScanNums(30261.68374)));
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
+            var filter = new IsosFilter(run, new Tolerance(10), isosfile.FullName);
+
+            var massToFind = 944.08176;
+            var matchingScanNums = filter.GetMatchingMs2ScanNums(massToFind).ToList();
+
+            var scanNumList = string.Join(",", matchingScanNums);
+
+            Console.WriteLine("Scans with mass {0}:", massToFind);
+            Console.WriteLine(scanNumList);
+
         }
 
         [Test]
