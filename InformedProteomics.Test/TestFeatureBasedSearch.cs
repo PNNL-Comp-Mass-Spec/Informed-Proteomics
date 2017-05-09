@@ -152,9 +152,6 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dataSet = @"H:\Research\Lewy\raw\Lewy_intact_07";
-            //            const int scanNum = 5158;
-            const int minTagLength = 7;
             const int minNumTagMatches = 1;
             var aminoAcidSet = AminoAcidSet.GetStandardAminoAcidSet();
 
@@ -299,8 +296,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
-            var idList =
-                resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
+            var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
             var idMassList = idList.Select(id => id.Mass).ToList();
             var idFlag = new bool[idList.Count];
 
