@@ -47,7 +47,19 @@ namespace InformedProteomics.TopDown.Scoring
             var repScanArray = ftFileParser.GetData("RepScan").Select(s => Convert.ToInt32(s)).ToArray();
             var minChargeArray = ftFileParser.GetData("MinCharge").Select(s => Convert.ToInt32(s)).ToArray();
             var maxChargeArray = ftFileParser.GetData("MaxCharge").Select(s => Convert.ToInt32(s)).ToArray();
-            var scoreArray = ftFileParser.GetData("LikelihoodRatio").Select(Convert.ToDouble).ToArray();
+
+            var likelihoodRatioData = ftFileParser.GetData("LikelihoodRatio");
+
+            double[] scoreArray;
+            if (likelihoodRatioData != null && likelihoodRatioData.Count > 0)
+            {
+                scoreArray = likelihoodRatioData.Select(Convert.ToDouble).ToArray();
+            }
+            else
+            {
+                scoreArray = new double[monoMassArr.Length];
+            }
+
             var featureCountFiltered = 0;
 
             for (var i = 0; i < monoMassArr.Length; i++)
