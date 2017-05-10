@@ -120,5 +120,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 //        private static readonly AminoAcidSet StandardAaSet = new AminoAcidSet();
 
         #endregion
+
+        public override string ToString()
+        {
+            return this.Residue.ToString();
+        }
     }
 }
