@@ -7,6 +7,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 {
     public class Modification : IMolecule
     {
+        public const string MOD_MASS_FORMAT_STRING = "{0:N3}";
+
         public int AccessionNum { get; set; }
         public Composition.Composition Composition { get; set; }
         public string Name { get; set; }
@@ -64,7 +66,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static IList<Modification> GetFromMass(double mass)
         {
-            var massStr = string.Format("{0:N3}", mass);
+            var massStr = string.Format(MOD_MASS_FORMAT_STRING, mass);
             return GetFromMass(massStr);
         }
 
@@ -154,7 +156,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
         {
-            string lowerName = name.ToLower();
+            var lowerName = name.ToLower();
             var mod = Get(lowerName);
             if (mod != null) return mod;
 
@@ -165,7 +167,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification RegisterAndGetModification(string name, double mass)
         {
-            string lowerName = name.ToLower();
+            var lowerName = name.ToLower();
             var modList = GetFromMass(mass);
             if (modList != null && modList.Any()) return modList[0];
 
@@ -187,10 +189,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static Modification UpdateAndGetModification(string name, Composition.Composition composition)
         {
             // Names should be case-insensitive.
-            string lowerName = name.ToLower();
+            var lowerName = name.ToLower();
             if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
 
-            var massStr = string.Format("{0:N3}", composition.Mass);
+            var massStr = string.Format(MOD_MASS_FORMAT_STRING, composition.Mass);
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
 
             // Use original-cased name in modification object.
@@ -210,10 +212,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static Modification UpdateAndGetModification(string name, double mass)
         {
             // Names should be case-insensitive.
-            string lowerName = name.ToLower();
+            var lowerName = name.ToLower();
             if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
 
-            var massStr = string.Format("{0:N3}", mass);
+            var massStr = string.Format(MOD_MASS_FORMAT_STRING, mass);
             if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
 
             var modification = new Modification(-1, mass, name);
@@ -231,19 +233,21 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static void UnregisterModification(Modification modification)
         {
             var lowerName = modification.Name.ToLower();
-            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
+            if (NameToModMap.ContainsKey(lowerName))
+                NameToModMap.Remove(lowerName);
 
-            var massStr = string.Format("{0:N3}", modification.Mass);
-            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+            var massStr = string.Format(MOD_MASS_FORMAT_STRING, modification.Mass);
+            if (MassToModMap.ContainsKey(massStr))
+                MassToModMap.Remove(massStr);
         }
 
         public static void Register(Modification modification)
         {
             var lowerName = modification.Name.ToLower();
             NameToModMap.Add(lowerName, modification);
-            var massStr = string.Format("{0:N3}", modification.Composition.Mass);
-            IList<Modification> modList;
-            if (!MassToModMap.TryGetValue(massStr, out modList))
+            var massStr = string.Format(MOD_MASS_FORMAT_STRING, modification.Composition.Mass);
+
+            if (!MassToModMap.TryGetValue(massStr, out var modList))
             {
                 modList = new List<Modification> { modification };
                 MassToModMap[massStr] = modList;
