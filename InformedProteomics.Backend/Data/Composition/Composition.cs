@@ -382,18 +382,23 @@ namespace InformedProteomics.Backend.Data.Composition
                         element = e.Substring(0, e.IndexOf('('));
                         num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
                     }
-                    if (element.Equals("C")) c = num;
-                    else if (element.Equals("H")) h = num;
-                    else if (element.Equals("N")) n = num;
-                    else if (element.Equals("O")) o = num;
-                    else if (element.Equals("S")) s = num;
-                    else if (element.Equals("P")) p = num;
+                    if (element.Equals("C")) c += num;
+                    else if (element.Equals("H")) h += num;
+                    else if (element.Equals("N")) n += num;
+                    else if (element.Equals("O")) o += num;
+                    else if (element.Equals("S")) s += num;
+                    else if (element.Equals("P")) p += num;
                     else
                     {
                         var atom = Atom.Get(element);
                         if (atom == null) return null;
-                        if (additionalElements == null) additionalElements = new Dictionary<Atom, short>();
-                        additionalElements.Add(atom, (short)num);
+                        if (additionalElements == null)
+                            additionalElements = new Dictionary<Atom, short>();
+
+                        if (additionalElements.TryGetValue(atom, out var currentAtomCount))
+                            additionalElements[atom] = (short)(currentAtomCount + num);
+                        else
+                            additionalElements.Add(atom, (short)num);
                     }
                 }
                 else // illegal string
