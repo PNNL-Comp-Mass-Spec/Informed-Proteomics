@@ -11,7 +11,7 @@
             MostAbundantIsotopeIndex = mostAbundantIsotopeIndex;
         }
 
-        public double[] Envelope { get; private set; }
-        public int MostAbundantIsotopeIndex { get; private set; }
+        public double[] Envelope { get; }
+        public int MostAbundantIsotopeIndex { get; }
     }
 }

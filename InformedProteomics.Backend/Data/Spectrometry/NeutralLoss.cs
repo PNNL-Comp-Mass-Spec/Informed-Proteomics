@@ -12,9 +12,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Composition = composition;
         }
 
-        public string Symbol { get; private set; }
-        public string Name { get; private set; }
-        public Composition.Composition Composition { get; private set; }
+        public string Symbol { get; }
+        public string Name { get; }
+        public Composition.Composition Composition { get; }
 
         public static readonly NeutralLoss NoLoss = new NeutralLoss("", "NoLoss", Data.Composition.Composition.Zero);
         public static readonly NeutralLoss H2O = new NeutralLoss("-H2O", "H2O", Data.Composition.Composition.H2O);

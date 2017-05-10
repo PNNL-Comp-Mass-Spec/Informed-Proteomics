@@ -8,7 +8,7 @@
             Spectrum = spectrum;
         }
 
-        public Sequence.Sequence Peptide { get; private set; }
-        public ProductSpectrum Spectrum { get; private set; }
+        public Sequence.Sequence Peptide { get; }
+        public ProductSpectrum Spectrum { get; }
     }
 }

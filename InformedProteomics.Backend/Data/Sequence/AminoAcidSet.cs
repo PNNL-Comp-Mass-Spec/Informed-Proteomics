@@ -158,7 +158,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// The list of search modifications provided via the mods file.
         /// </summary>
-        public IEnumerable<SearchModification> SearchModifications { get; private set; }
+        public IEnumerable<SearchModification> SearchModifications { get; }
 
         #endregion
 

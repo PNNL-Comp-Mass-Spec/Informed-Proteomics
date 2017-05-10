@@ -7,8 +7,8 @@ namespace InformedProteomics.Backend.Data.Biology
 {
     public class Ion
     {
-        public Composition.Composition Composition { get; private set; }
-        public int Charge { get; private set; }
+        public Composition.Composition Composition { get; }
+        public int Charge { get; }
 
         public Ion(Composition.Composition composition, int charge)
         {

@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             get { return _modificationParams; }
         }
 
-        public bool IsValid { get; private set; }
+        public bool IsValid { get; }
         public int NumNTermCleavages { get; private set; }
 
         /// <summary>
@@ -622,7 +622,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             AddPrevNodeIndex(prevNodeIndex);
         }
 
-        public int ModificationCombinationIndex { get; private set; }
+        public int ModificationCombinationIndex { get; }
 
         private int[] _prevNodeIndices;
         private int _count;

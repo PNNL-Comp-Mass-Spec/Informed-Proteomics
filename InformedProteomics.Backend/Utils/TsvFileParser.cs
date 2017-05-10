@@ -34,7 +34,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Filename
         /// </summary>
-        public string FileName { get; private set; }
+        public string FileName { get; }
 
         /// <summary>
         /// Number of rows

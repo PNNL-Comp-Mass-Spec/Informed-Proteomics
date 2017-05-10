@@ -20,10 +20,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Properties
 
-        public char Residue { get; private set; }
-        public string Name { get; private set; }
-        public Composition.Composition Composition { get; private set; }
-        public double Mass { get; private set; }
+        public char Residue { get; }
+        public string Name { get; }
+        public Composition.Composition Composition { get; }
+        public double Mass { get; }
 
         #endregion
 

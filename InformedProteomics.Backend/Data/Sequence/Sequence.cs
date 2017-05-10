@@ -88,8 +88,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         // 1-based: PrefixComposition[0] = Composition.Zero
-        public Composition.Composition[] PrefixComposition { get; private set; }
-        public Composition.Composition Composition { get; private set; }
+        public Composition.Composition[] PrefixComposition { get; }
+        public Composition.Composition Composition { get; }
         public double Mass { get { return Composition.Mass; } }
 
         private readonly double[] _prefixMass;

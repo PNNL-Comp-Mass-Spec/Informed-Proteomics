@@ -58,9 +58,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             get { return _modificationParams; }
         }
 
-        public double ShiftMass { get; private set; }
+        public double ShiftMass { get; }
 
-        public bool IsValid { get; private set; }
+        public bool IsValid { get; }
 
         /// <summary>
         /// Gets all possible compositions of the current sequence

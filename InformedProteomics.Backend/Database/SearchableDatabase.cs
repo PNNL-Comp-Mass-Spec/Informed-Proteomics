@@ -30,7 +30,7 @@ namespace InformedProteomics.Backend.Database
             InitializeLcps(neighboringLcps, _leftLcps, _rightLcps, 0, _suffixArray.Length-1);
         }
 
-        public FastaDatabase FastaDatabase { get; private set; }
+        public FastaDatabase FastaDatabase { get; }
 
         /// <summary>
         /// Find all occurrences of pattern in the fasta sequence. Return all matched indices.

@@ -71,7 +71,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// True if this instance is tied to the decoy database
         /// </summary>
-        public bool IsDecoy { get; private set; }
+        public bool IsDecoy { get; }
 
         /// <summary>
         /// Constructor

@@ -18,9 +18,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Intensity = peak.Intensity;
         }
 
-        public int ScanNum { get; private set; }
-        public double Mz { get; private set; }
-        public double Intensity { get; private set; }
+        public int ScanNum { get; }
+        public double Mz { get; }
+        public double Intensity { get; }
 
         public int CompareTo(XicPoint other)
         {

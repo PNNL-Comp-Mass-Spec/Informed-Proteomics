@@ -10,8 +10,8 @@ namespace InformedProteomics.Backend.Utils
     /// </summary>
     public class Centroider
     {
-        public IList<double> Mzs { get; private set; }
-        public IList<double> Intensities { get; private set; }
+        public IList<double> Mzs { get; }
+        public IList<double> Intensities { get; }
 
         public Centroider(IList<double> mzs, IList<double> intensities)
         {

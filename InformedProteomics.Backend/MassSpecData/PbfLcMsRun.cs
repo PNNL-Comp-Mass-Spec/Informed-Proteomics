@@ -2115,9 +2115,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private class ScanMetadata : IComparable<ScanMetadata>
         {
-            public int ScanNum { get; private set; }
-            public int MsLevel { get; private set; }
-            public double ElutionTime { get; private set; }
+            public int ScanNum { get; }
+            public int MsLevel { get; }
+            public double ElutionTime { get; }
 
             public ScanMetadata(int scanTime, int msLevel, double elutionTime)
             {
@@ -2142,8 +2142,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private class ScanPeakMetaData
         {
-            public int ScanNum { get; private set; }
-            public int NumPeaks { get; private set; }
+            public int ScanNum { get; }
+            public int NumPeaks { get; }
             public int PeaksRead { get { return _numPeaksRead; } }
             private int _numPeaksRead;
             private long _nextPeakOffset;
