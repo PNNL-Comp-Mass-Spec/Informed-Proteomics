@@ -30,6 +30,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         };
 
         [Test]
+        [Category("Local_Testing")]
         public void TestCptacSpikeIn()
         {
             const string featureFolder = @"D:\MassSpecFiles\CPTAC_spike_in\promex";
