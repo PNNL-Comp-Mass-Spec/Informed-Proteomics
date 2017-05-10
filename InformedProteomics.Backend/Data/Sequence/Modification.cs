@@ -73,8 +73,20 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static IList<Modification> GetFromMass(string massStr)
         {
             if (massStr.StartsWith("+")) massStr = massStr.Substring(1);
-            IList<Modification> modList;
-            return MassToModMap.TryGetValue(massStr, out modList) ? modList : null;
+
+            if (MassToModMap.TryGetValue(massStr, out var modList))
+                return modList;
+
+            // Exact match not found; assure the mod mass is properly formatted
+            if (double.TryParse(massStr, out var modMass))
+            {
+                var formattedMass = string.Format(MOD_MASS_FORMAT_STRING, modMass);
+
+                if (MassToModMap.TryGetValue(formattedMass, out var modList2))
+                    return modList2;
+            }
+
+            return null;
         }
 
         public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
@@ -142,6 +154,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
+
+        /// <summary>
+        /// Dictionary mapping mod mass (formatted with const MOD_MASS_FORMAT_STRING) to mod name
+        /// </summary>
         private static readonly Dictionary<string, IList<Modification>> MassToModMap;
 
         static Modification()
