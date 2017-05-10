@@ -67,8 +67,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
-            int newModCombIndex;
-            if (_modCombMap.TryGetValue(prevModCombIndex * _modifications.Length + modIndex, out newModCombIndex))
+            if (_modCombMap.TryGetValue(prevModCombIndex * _modifications.Length + modIndex, out var newModCombIndex))
             {
                 return newModCombIndex;
             }
@@ -77,8 +76,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
         {
-            int modIndex;
-            if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out modIndex))
+            if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out var modIndex))
             {
                 return _modifications[modIndex];
             }

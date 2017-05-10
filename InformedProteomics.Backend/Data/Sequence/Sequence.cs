@@ -72,8 +72,8 @@ namespace InformedProteomics.Backend.Data.Sequence
                     var nTermMod = indexModMap[-1];
                     aa = new ModifiedAminoAcid(aa, nTermMod);
                 }
-                Modification mod;
-                if (indexModMap.TryGetValue(i, out mod))
+
+                if (indexModMap.TryGetValue(i, out var mod))
                 {
                     var modifiedAa = new ModifiedAminoAcid(aa, mod);
                     aaList.Add(modifiedAa);

@@ -672,8 +672,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset)) return null;
             var spec = ReadSpectrum(offset, includePeaks);
             if (spec.MsLevel == 1 && _precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_precursorSignalToNoiseRatioThreshold);
             else if (_productSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_productSignalToNoiseRatioThreshold);
@@ -687,8 +686,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
-            long offset;
-            if (_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
+            if (_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
             {
                 var spec = ReadSpectrum(offset, false) as ProductSpectrum;
                 if (spec != null)
@@ -828,9 +826,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
-            long offset;
             ms1ScanIndex = -1;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset)) return null;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset)) return null;
 
             var ms1ScanNums = GetMs1ScanVector();
             ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
@@ -913,8 +910,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var maxBinNum = (int)Math.Round(maxMz * IsolationWindowBinningFactor);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
-                        List<int> scanNumList;
-                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out var scanNumList))
                         {
                             scanNumList = new List<int>();
                             isolationMzBinToScanNums[binNum] = scanNumList;
@@ -1193,8 +1189,7 @@ namespace InformedProteomics.Backend.MassSpecData
         // Must reflect all changes to WriteSpectrum
         private ScanPeakMetaData GetPeakMetaDataForSpectrum(int scanNum)
         {
-            long offset;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out offset))
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
             {
                 return null;
             }
@@ -1475,10 +1470,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="writer"></param>
         /// <param name="progress"></param>
         private void WriteToPbf(
-            IMassSpecDataReader msdr, 
-            BinaryWriter writer, 
-            int startScan, 
-            int endScan, 
+            IMassSpecDataReader msdr,
+            BinaryWriter writer,
+            int startScan,
+            int endScan,
             IProgress<ProgressData> progress = null)
         {
             ScanNumToMsLevel = new Dictionary<int, int>(msdr.NumSpectra + 1);
@@ -1715,8 +1710,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var maxBinNum = (int)Math.Round(maxMz * IsolationWindowBinningFactor);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
-                        List<int> scanNumList;
-                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out var scanNumList))
                         {
                             scanNumList = new List<int>();
                             isolationMzBinToScanNums[binNum] = scanNumList;

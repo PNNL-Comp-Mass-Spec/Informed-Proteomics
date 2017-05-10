@@ -321,8 +321,7 @@ namespace InformedProteomics.Backend.Database
         public string GetProteinName(long offset)
         {
             var offsetKey = GetOffsetKey(offset);
-            string proteinName;
-            if (_names.TryGetValue(offsetKey, out proteinName))
+            if (_names.TryGetValue(offsetKey, out var proteinName))
                 return proteinName;
 
             return "UnknownProtein_Offset" + offset;
@@ -337,8 +336,7 @@ namespace InformedProteomics.Backend.Database
         {
             var offsetKey = GetOffsetKey(offset);
 
-            string proteinDescription;
-            if (_descriptions.TryGetValue(offsetKey, out proteinDescription))
+            if (_descriptions.TryGetValue(offsetKey, out var proteinDescription))
                 return proteinDescription;
 
             return "Unknown description, Offset " + offset;
@@ -351,8 +349,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public long? GetOffset(string name)
         {
-            long offset;
-            if (!_nameToOffset.TryGetValue(name, out offset))
+            if (!_nameToOffset.TryGetValue(name, out var offset))
                 return null;
             return offset;
         }
@@ -364,8 +361,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public string GetProteinDescription(string name)
         {
-            long offset;
-            if (!_nameToOffset.TryGetValue(name, out offset)) return null;
+            if (!_nameToOffset.TryGetValue(name, out var offset)) return null;
             var offsetKey = GetOffsetKey(offset);
             return _descriptions[offsetKey];
         }
@@ -377,8 +373,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public int GetProteinLength(string name)
         {
-            int length;
-            if (_nameToLength.TryGetValue(name, out length)) return length;
+            if (_nameToLength.TryGetValue(name, out var length)) return length;
             return -1;
         }
 
@@ -389,8 +384,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public string GetProteinSequence(string name)
         {
-            long offset;
-            if (!_nameToOffset.TryGetValue(name, out offset)) return null;
+            if (!_nameToOffset.TryGetValue(name, out var offset)) return null;
 
             var length = _nameToLength[name];
             return GetProteinSequence(offset, length);
@@ -587,8 +581,7 @@ namespace InformedProteomics.Backend.Database
 
                     var proteinInfoCurrent = new ProteinHashInfo(sequence);
 
-                    ProteinHashInfo proteinInfoCached;
-                    if (proteinNamesAndStats.TryGetValue(name, out proteinInfoCached))
+                    if (proteinNamesAndStats.TryGetValue(name, out var proteinInfoCached))
                     {
                         // Duplicate name; either skip this protein or rename it
                         if (proteinInfoCached.SequenceLength == proteinInfoCurrent.SequenceLength &&
@@ -667,14 +660,13 @@ namespace InformedProteomics.Backend.Database
                     _offsetList.Add(offset);
                     var length = int.Parse(token[1]);
                     var name = token[2];
-                    int lengthExistingEntry;
-                    if (_nameToLength.TryGetValue(name, out lengthExistingEntry))
+
+                    if (_nameToLength.TryGetValue(name, out var lengthExistingEntry))
                     {
                         Console.WriteLine("Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
                                           name, offset, Path.GetFileName(_annoFilePath));
 
-                        int duplicateSuffix;
-                        if (_duplicateNameCounts.TryGetValue(name, out duplicateSuffix))
+                        if (_duplicateNameCounts.TryGetValue(name, out var duplicateSuffix))
                         {
                             duplicateSuffix++;
                             _duplicateNameCounts[name] = duplicateSuffix;

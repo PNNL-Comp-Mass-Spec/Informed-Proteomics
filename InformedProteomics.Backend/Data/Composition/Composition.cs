@@ -200,8 +200,7 @@ namespace InformedProteomics.Backend.Data.Composition
             // Both have additional elements
             foreach (var entry in _additionalElements)
             {
-                short otherValue;
-                if (!(other._additionalElements.TryGetValue(entry.Key, out otherValue))) return false;
+                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue))) return false;
                 if (entry.Value != otherValue) return false;
             }
             return true;
@@ -228,8 +227,8 @@ namespace InformedProteomics.Backend.Data.Composition
                 foreach (var element in c._additionalElements)
                 {
                     var atom = element.Key;
-                    short numAtoms;
-                    if (_additionalElements.TryGetValue(atom, out numAtoms))
+
+                    if (_additionalElements.TryGetValue(atom, out var numAtoms))
                     {
                         // atom was in _additionalElements
                         additionalElements[atom] = (short)(numAtoms + element.Value);

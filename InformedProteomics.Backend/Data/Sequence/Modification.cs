@@ -56,9 +56,9 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         public static Modification Get(string psiMsName)
         {
-            string lowerPsiMsName = psiMsName.ToLower();
-            Modification mod;
-            if (NameToModMap.TryGetValue(lowerPsiMsName, out mod)) return mod;
+            var lowerPsiMsName = psiMsName.ToLower();
+
+            if (NameToModMap.TryGetValue(lowerPsiMsName, out var mod)) return mod;
             return null;
         }
 

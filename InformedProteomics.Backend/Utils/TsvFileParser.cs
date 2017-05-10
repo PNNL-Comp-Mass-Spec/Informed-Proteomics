@@ -56,8 +56,7 @@ namespace InformedProteomics.Backend.Utils
 
         public IList<string> GetData(string columnName)
         {
-            List<string> columnData;
-            return _data.TryGetValue(columnName, out columnData) ? columnData : null;
+            return _data.TryGetValue(columnName, out var columnData) ? columnData : null;
         }
 
         public IList<string> GetRows()

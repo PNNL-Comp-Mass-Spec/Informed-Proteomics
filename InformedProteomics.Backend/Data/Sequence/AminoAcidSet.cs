@@ -43,6 +43,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         break;
                 }
 
+                // loc is SequenceLocation.Everywhere
                 foreach (var aa in AminoAcid.StandardAminoAcidArr)
                 {
                     residueMap.Add(aa.Residue, aa);
@@ -115,8 +116,8 @@ namespace InformedProteomics.Backend.Data.Sequence
                 {
                     var residueModMap = locationSpecificResidueVariableModMap[loc];
                     var appliedResidue = targetResidue != '*' ? targetResidue : SequenceLocationToLocationResidue[loc];
-                    List<Modification> modList;
-                    if (residueModMap.TryGetValue(appliedResidue, out modList))
+
+                    if (residueModMap.TryGetValue(appliedResidue, out var modList))
                     {
                         modList.Add(searchModification.Modification);
                     }
@@ -169,8 +170,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         public AminoAcid GetAminoAcid(char residue, SequenceLocation location)
         {
             var residueMap = _locationSpecificResidueMap[location];
-            AminoAcid aminoAcid;
-            if (residueMap.TryGetValue(residue, out aminoAcid))
+
+            if (residueMap.TryGetValue(residue, out var aminoAcid))
             {
                 return aminoAcid;
             }
@@ -185,8 +186,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int[] GetModificationIndices(char residue, SequenceLocation location)
         {
             var residueModMap = _locationSpecificResidueModMap[location];
-            int[] modIndexArr;
-            if (residueModMap.TryGetValue(residue, out modIndexArr))
+
+            if (residueModMap.TryGetValue(residue, out var modIndexArr))
             {
                 return modIndexArr;
             }
