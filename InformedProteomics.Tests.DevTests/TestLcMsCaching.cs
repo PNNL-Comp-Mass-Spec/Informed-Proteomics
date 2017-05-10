@@ -579,7 +579,7 @@ namespace InformedProteomics.Tests.DevTests
             //for (var nominalMass = 1000; nominalMass <= 1000; nominalMass++)
             //{
             //    Console.WriteLine("{0}\t{1}", nominalMass,
-            //        string.Join(",", Averagine.GetIsotopomerEnvelopeFromNominalMass(nominalMass).Envolope.Select(v => string.Format("{0:f3}", v))));
+            //        string.Join(",", Averagine.GetIsotopomerEnvelopeFromNominalMass(nominalMass).Envelope.Select(v => string.Format("{0:f3}", v))));
             //}
             for (var nominalMass = 1000; nominalMass <= 50000; nominalMass++)
             {

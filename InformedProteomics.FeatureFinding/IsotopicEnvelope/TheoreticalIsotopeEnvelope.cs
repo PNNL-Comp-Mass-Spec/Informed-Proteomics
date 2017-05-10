@@ -16,15 +16,15 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
         {
             MonoMass = monoMass;
             var isoEnv = Averagine.GetIsotopomerEnvelope(monoMass);
-            var isotopeRankings = ArrayUtil.GetRankings(isoEnv.Envolope);
+            var isotopeRankings = ArrayUtil.GetRankings(isoEnv.Envelope);
 
             Isotopes = new List<Isotope>(maxNumOfIsotopes);
             var ratioSum = 0d;
-            for (var i = 0; i < isoEnv.Envolope.Length; i++)
+            for (var i = 0; i < isoEnv.Envelope.Length; i++)
             {
-                if (isoEnv.Envolope[i] < relativeIntensityThreshold || isotopeRankings[i] > maxNumOfIsotopes) continue;
-                ratioSum += isoEnv.Envolope[i];
-                Isotopes.Add(new Isotope(i, isoEnv.Envolope[i]));
+                if (isoEnv.Envelope[i] < relativeIntensityThreshold || isotopeRankings[i] > maxNumOfIsotopes) continue;
+                ratioSum += isoEnv.Envelope[i];
+                Isotopes.Add(new Isotope(i, isoEnv.Envelope[i]));
             }
 
             if (!(ratioSum > 0)) throw new Exception("Abnormal Theoretical Envelope");
