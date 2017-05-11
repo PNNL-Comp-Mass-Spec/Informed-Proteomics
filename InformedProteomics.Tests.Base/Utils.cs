@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
@@ -48,6 +49,8 @@ namespace InformedProteomics.Tests.Base
         /// <returns>Path to the file if found, otherwise the default path on Proto-2</returns>
         public static string GetPbfTestFilePath(bool createIfMissing)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+
             var pbfFilePath = Path.Combine(DEFAULT_SPEC_FILES_FOLDER, PBF_TEST_FILE);
 
             var pbfFileInfo = GetTestFile("PbfTestFilePath", pbfFilePath, false);
@@ -84,7 +87,7 @@ namespace InformedProteomics.Tests.Base
                 return pbfFilePath;
             }
 
-            Console.WriteLine("Creating {0} using {1}", PBF_TEST_FILE, mzmlFileInfo.FullName);
+            ShowMessage(methodName, string.Format("Creating {0} using {1}", PBF_TEST_FILE, mzmlFileInfo.FullName));
 
             var lockFile = new FileInfo(Path.Combine(mzmlFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(mzmlFileInfo.Name) + ".pbf.lock"));
             var newPbfFilePath = Path.Combine(mzmlFileInfo.DirectoryName, PBF_TEST_FILE);
@@ -95,6 +98,7 @@ namespace InformedProteomics.Tests.Base
                 WaitForLockFile(lockFile, true);
 
                 mLastStatus = string.Empty;
+                var startTime = DateTime.UtcNow;
 
                 var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(mzmlFileInfo.FullName);
                 var progress = new Progress<ProgressData>(p =>
@@ -114,7 +118,7 @@ namespace InformedProteomics.Tests.Base
 
                 var run = new PbfLcMsRun(mzmlFileInfo.FullName, reader, newPbfFilePath, 0, 0, progress);
                 Console.WriteLine();
-                Console.WriteLine("Created " + run.PbfFilePath);
+                ShowMessage(methodName, string.Format("Created {0} in {1:F0} seconds", run.PbfFilePath, DateTime.UtcNow.Subtract(startTime).TotalSeconds));
 
                 DeleteLockFile(lockFile);
 
@@ -122,7 +126,7 @@ namespace InformedProteomics.Tests.Base
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception creating {0} using {1}: {2}", PBF_TEST_FILE, mzmlFileInfo.FullName, ex.Message);
+                ShowMessage(methodName, string.Format("Exception creating {0} using {1}: {2}", PBF_TEST_FILE, mzmlFileInfo.FullName, ex.Message));
 
                 try
                 {
@@ -284,7 +288,7 @@ namespace InformedProteomics.Tests.Base
 
         private static void ShowMessage(string methodName, string message)
         {
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + @", {0}, {1}", message, methodName);
+            Console.WriteLine(DateTime.Now.ToString(DATE_TIME_FORMAT) + @", {0}, {1}", message, methodName);
         }
     }
 }
