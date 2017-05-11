@@ -332,7 +332,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return buf.ToString();
         }
 
-        // Parses plain string (e.g. C2H3N1O1S)
+        /// <summary>
+        /// Parse a plain-string empirical formula, for example
+        /// C2H3N1O1S
+        /// </summary>
+        /// <param name="plaincompositionStr"></param>
+        /// <remarks>Empirical formula cannot have parentheses or spaces</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition ParseFromPlainString(string plaincompositionStr)
         {
             if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
@@ -353,8 +359,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return Parse(unimodString.ToString());
         }
 
-        // Initially implemented by Kyowon, re-implemented by Sangtae
-        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2))
+        /// <summary>
+        /// Parse unimod-like composition string, for example
+        /// H(117) C(77) N(17) O(26) S(2)
+        /// </summary>
+        /// <param name="compositionStr"></param>
+        /// <remarks>Requires the use of parentheses for element counts.  Also requires whitespace (typically a space) between each element and count</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition Parse(string compositionStr)
         {
             var c = 0;
