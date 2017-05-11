@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +14,6 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Tests.Base;
-using MathNet.Numerics.Statistics;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -158,14 +158,50 @@ namespace InformedProteomics.Test
         [TestCase("H(250) C(150) N(40) O(50) S(2)", 3475.76909165)]
         [TestCase("H(225) C(150) N(40) O(50) S(2) H(25)", 3475.76909165)]
         [TestCase("H(257) C(150) N(42) O(56) S(4) 13C(12) 15N(3)", 3871.784229)]
+        [TestCase("H(257)\tC(150)\tN(42)\tO(56) S(4) 13C(12) 15N(3)", 3871.784229)]
         [TestCase("H(225) C(150) N(40) O(50) S(2) Fe(3)", 3618.378283675)]
         [TestCase("H(225) C(150) N(40) O(50) S(2) Fe(2) Fe(1)", 3618.378283675)]
+        [TestCase("H(225) C(150) N(40) O(50) S2 Fe(3)", 0)]
+        [TestCase("C2H3N1O1S", 0)]
+        [TestCase("H225C150N40O50", 0)]
         public void ParseComposition(string empiricalFormula, double expectedMass)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
             var comp = Composition.Parse(empiricalFormula);
+            if (comp == null)
+            {
+                Assert.True(Math.Abs(expectedMass) < 0.00001, "Empirical formula failed parsing, but we expected it to succeed: {0}", empiricalFormula);
+                return;
+            }
+
+            var computedMass = comp.Mass;
+            Console.WriteLine("AveragineMass: {0}", computedMass);
+
+            Assert.AreEqual(expectedMass, computedMass, 0.000001, "Mass mismatch for {0}", empiricalFormula);
+        }
+
+        [Test]
+        [TestCase("C2H3N1O1S", 88.993534)]
+        [TestCase("H225C150N40O50", 3386.629324)]
+        [TestCase("H225C150N-40O50", 2266.383404)]
+        [TestCase("H225 C150 N40 O50", 0)]
+        [TestCase("C2H3N1O1S", 88.993534)]
+        [TestCase("C(2)H(3)N(1O)", 0)]
+        [TestCase("H(257) C(150) N(42) O(56) S(4) 13C(12) 15N(3)", 0)]
+        public void ParsePlainComposition(string empiricalFormula, double expectedMass)
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
+
+            var comp = Composition.ParseFromPlainString(empiricalFormula);
+            if (comp == null)
+            {
+                Assert.True(Math.Abs(expectedMass) < 0.00001, "Empirical formula failed parsing, but we expected it to succeed: {0}", empiricalFormula);
+                return;
+            }
+
             var computedMass = comp.Mass;
             Console.WriteLine("AveragineMass: {0}", computedMass);
 
@@ -292,12 +328,13 @@ namespace InformedProteomics.Test
 
         [Test]
         [TestCase("IRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG",
-            "C(185) H(299) N(55) O(53) S(1)", 13, 7, 4171.211301, 4172.214656, 0.370361)]
+            "C(185) H(299) N(55) O(53) S(1)", 13, 7, 4171.211301, 4172.214656, 0.370361, 0.366639)]
         [TestCase("METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK",
-            "C(557) H(929) N(161) O(171) S(5)", 18, 15, 12769.755127, 12770.758481, 0.004518)]
+            "C(557) H(929) N(161) O(171) S(5)", 18, 15, 12769.755127, 12770.758481, 0.004518, 0.108029)]
         public void TestPeptide(
             string sequence, string expectedEmpiricalFormula, int chargeState, int expectedPeakCount,
-            double expectedMass, double expectedSecondIsotopeMz, double expectedFirstIsotopomerIntensity)
+            double expectedMass, double expectedSecondIsotopeMz,
+            double expectedFirstIsotopomerIntensity, double expectedFirstIsotopeIntensity)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -320,9 +357,9 @@ namespace InformedProteomics.Test
             // 2nd isotope
             Console.WriteLine();
             Console.WriteLine("First 3 isotopes");
-            Console.WriteLine("{0:5F}" ,composition.GetIsotopeMass(0));
-            Console.WriteLine("{0:5F}", composition.GetIsotopeMass(1));
-            Console.WriteLine("{0:5F}", composition.GetIsotopeMass(2));
+            Console.WriteLine("{0:F5}", composition.GetIsotopeMass(0));
+            Console.WriteLine("{0:F5}", composition.GetIsotopeMass(1));
+            Console.WriteLine("{0:F5}", composition.GetIsotopeMass(2));
 
             Assert.AreEqual(expectedSecondIsotopeMz, composition.GetIsotopeMass(1), 0.00001, "Second isotope m/z mismatch");
 
@@ -349,9 +386,11 @@ namespace InformedProteomics.Test
             Console.WriteLine("Isotope ions for charge {0}: ", chargeState);
             var ion = new Ion(composition + Composition.H2O, chargeState);
 
-            ShowIsotopes(ion.GetIsotopes(0.1));
+            var ionIsotopes = ion.GetIsotopes(0.1).ToList();
+            ShowIsotopes(ionIsotopes);
 
-            Console.WriteLine();
+            Assert.AreEqual(expectedFirstIsotopeIntensity, ionIsotopes.First().Ratio, 0.00001, "First isotope intensity mismatch");
+
         }
 
         [Test]
@@ -399,8 +438,8 @@ namespace InformedProteomics.Test
             var sequence = new Sequence(peptide, aaSet);
 
             var ionTypeFactory = new IonTypeFactory(
-                new[] {BaseIonType.B, BaseIonType.Y},
-                new[] {NeutralLoss.NoLoss, NeutralLoss.H2O},
+                new[] { BaseIonType.B, BaseIonType.Y },
+                new[] { NeutralLoss.NoLoss, NeutralLoss.H2O },
                 maxCharge);
 
             var precursor = sequence.GetPrecursorIon(precursorCharge);
@@ -489,8 +528,8 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [TestCase("_.STR._",      2, 3,       "C(13) H(24) N(6) O(5) S(0)",    "C(13) H(26) N(6) O(11) S(0) P(2)")]
-        [TestCase("_.PEPTIDES._", 2, 3,       "C(37) H(56) N(8) O(16) S(0)",   "C(37) H(58) N(8) O(22) S(0) P(2)")]
+        [TestCase("_.STR._", 2, 3, "C(13) H(24) N(6) O(5) S(0)", "C(13) H(26) N(6) O(11) S(0) P(2)")]
+        [TestCase("_.PEPTIDES._", 2, 3, "C(37) H(56) N(8) O(16) S(0)", "C(37) H(58) N(8) O(22) S(0) P(2)")]
         [TestCase("_.PEPTIDESTRINGS._", 2, 3, "C(62) H(100) N(18) O(25) S(0)", "C(62) H(102) N(18) O(31) S(0) P(2)")]
         [TestCase("_.PEPTIDESTRINGS._", 4, 5, "C(62) H(100) N(18) O(25) S(0)", "C(62) H(104) N(18) O(37) S(0) P(4)")]
         public void TestSequenceGraph(
@@ -560,7 +599,7 @@ namespace InformedProteomics.Test
             var modCombos = new Dictionary<List<Modification>, Tuple<int, double, double, int, int>>();
 
             AppendModCombo(modCombos,
-                           new List<Modification> {Modification.Acetylation, Modification.Phosphorylation, Modification.Oxidation},
+                           new List<Modification> { Modification.Acetylation, Modification.Phosphorylation, Modification.Oxidation },
                            new Tuple<int, double, double, int, int>(20, 0, 239.898993, 14, -1));
 
             AppendModCombo(modCombos,
@@ -596,7 +635,8 @@ namespace InformedProteomics.Test
                     {
                         Console.WriteLine("{0}: Mods {1,-25}, formula {2,-25}, mass {3:F4}",
                                           modCombIndex, modCombination, modCombination.Composition, comboMass);
-                    } else if (modCombIndex == 3)
+                    }
+                    else if (modCombIndex == 3)
                         Console.WriteLine("...");
 
                     minMass = Math.Min(minMass, comboMass);
@@ -623,34 +663,14 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestCSharpSyntax()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            //const string path = @"C:\cygwin\home\kims336\Developments\InformedProteomics\InformedProteomics.Test\TestFiles\BSA_10ugml_IMS6_TOF03_CID_27Aug12_Frodo_Collision_Energy_Collapsed.UIMF";
-            //Console.WriteLine(Path.GetFileName(path));
-            //Console.WriteLine(Path.GetFileNameWithoutExtension(path));
-            //Console.WriteLine(Path.GetExtension(path));
-            //Console.WriteLine(Path.GetDirectoryName(path));
-
-            //const int size = int.MaxValue/4-1;
-            //var hugeList = new List<int>(size);
-            //Console.WriteLine("Success: " + size + " " + hugeList.Capacity);
-
-            var set = new HashSet<double>();
-            Console.WriteLine("Max: " + set.DefaultIfEmpty().Max(n => n*2));
-        }
-
-        [Test]
-        [TestCase("a.",     1,  -26.987089,  "C(-1) H(1) N(0) O(-1) S(0)")]
-        [TestCase("b",      1,    0,         "C(0) H(0) N(0) O(0) S(0)")]
-        [TestCase("y",      1,   18.010565,  "C(0) H(2) N(0) O(1) S(0)")]
-        [TestCase("b2-H2O", 2,  -18.010565,  "C(0) H(-2) N(0) O(-1) S(0)")]
-        [TestCase("c-H2O",  1,   -0.9840156, "C(0) H(1) N(1) O(-1) S(0)")]
-        [TestCase("z3",     3,    1.9918406, "C(0) H(0) N(-1) O(1) S(0)")]
-        [TestCase("w2",     2,   73.0290,    "C(0) H(0) N(0) O(0) S(0) 73.029")]
-        [TestCase("b3-NH3", 3,  -17.0265491, "C(0) H(-3) N(-1) O(0) S(0)")]
+        [TestCase("a.", 1, -26.987089, "C(-1) H(1) N(0) O(-1) S(0)")]
+        [TestCase("b", 1, 0, "C(0) H(0) N(0) O(0) S(0)")]
+        [TestCase("y", 1, 18.010565, "C(0) H(2) N(0) O(1) S(0)")]
+        [TestCase("b2-H2O", 2, -18.010565, "C(0) H(-2) N(0) O(-1) S(0)")]
+        [TestCase("c-H2O", 1, -0.9840156, "C(0) H(1) N(1) O(-1) S(0)")]
+        [TestCase("z3", 3, 1.9918406, "C(0) H(0) N(-1) O(1) S(0)")]
+        [TestCase("w2", 2, 73.0290, "C(0) H(0) N(0) O(0) S(0) 73.029")]
+        [TestCase("b3-NH3", 3, -17.0265491, "C(0) H(-3) N(-1) O(0) S(0)")]
         public void TestIonTypeGeneration(string ionTypeName, int expectedCharge, double expectedMass, string expectedComposition)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -674,7 +694,8 @@ namespace InformedProteomics.Test
                 {
                     Console.WriteLine("{0,2} {1,-10} {2,-40} {3,12:F4} {4,4} {5,6}",
                                       index, ionType.Name, ionType.OffsetComposition, ionType.Mass, ionType.Charge, ionType.IsPrefixIon);
-                } else if (validateIonInfo)
+                }
+                else if (validateIonInfo)
                 {
                     Console.WriteLine("Ion {0} with composition {1}, mass {2:F4}, charge {3}+",
                                       ionType.Name, ionType.OffsetComposition, ionType.Mass, ionType.Charge);
@@ -700,31 +721,50 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        public void TestIsotopemerProfileByKyowon() // is faster and more accurate than IsotopicDistributionCalculator
+        [TestCase(149, 244, 44, 57, 0, 0, true, 14, 6, 262.99008,  0.74258)]
+        [TestCase(83, 136, 22, 24, 1, 0, false, 14, 4, 135.15031,  0.26262)]
+        [TestCase(210, 323, 54, 61, 0, 0, false, 14, 8, 329.46470 , 0.92816)]
+        [TestCase(419, 699, 119, 129, 1, 0, false, 8, 12, 1190.4038, 0.62797)]
+        [TestCase(419, 699, 119, 129, 1, 0, false, 14, 12, 680.66243, 0.62797)]
+        public void TestIsotopemerProfile(
+            int c, int h, int n, int o, int s, int p, bool addAdditionalElements, int charge,
+            int expectedIsotopeCount, double expectedMzFourthIsotope, double expectedIntensityFourthIsotope)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //C78H120N22O28S3 C150H120N220O28S30
-            //var additionalElements = new[]
-            //    {
-            //        new Tuple<Atom, short>(Atom.Get("P"), 1),
-            //        new Tuple<Atom, short>(Atom.Get("13C"), 3),
-            //        new Tuple<Atom, short>(Atom.Get("15N"), 1),
-            //    };
-            //var composition = new Composition(149, 244, 44, 57, 0, additionalElements);
-//            var composition = new Composition(83, 136, 22, 24, 1);
-            //var composition = new Composition(210, 323, 54, 61, 0);
-            var composition = new Composition(419, 699, 119, 129, 1);
-            const int charge = 14;
-            var ion = new Ion(composition + Composition.H2O, charge);
-            var ff = composition.GetIsotopomerEnvelopeRelativeIntensities();
-            var isotopeIndex = -1;
-            foreach (var ii in ff)
+            Composition composition;
+            if (addAdditionalElements)
             {
-                ++isotopeIndex;
-                Console.WriteLine("{0,2}:  {1:F4}  {2:F4}", isotopeIndex, ion.GetIsotopeMz(isotopeIndex), ii);
+                var additionalElements = new[]
+                {
+                    new Tuple<Atom, short>(Atom.Get("P"), 1),
+                    new Tuple<Atom, short>(Atom.Get("13C"), 3),
+                    new Tuple<Atom, short>(Atom.Get("15N"), 1),
+                };
+                composition = new Composition(c, h, n, o, s, p, additionalElements);
             }
+            else
+            {
+                composition = new Composition(c, h, n, o, s, p);
+            }
+
+            var ion = new Ion(composition + Composition.H2O, charge);
+            var isotopeIntensities = composition.GetIsotopomerEnvelopeRelativeIntensities();
+
+            Console.WriteLine("Isotopes of {0} at charge {1}", composition, charge);
+
+            var isotopeIndex = 0;
+            foreach (var intensity in isotopeIntensities)
+            {
+                Console.WriteLine("{0,2}:  {1:F5}  {2:F5}", isotopeIndex, ion.GetIsotopeMz(isotopeIndex), intensity);
+                ++isotopeIndex;
+            }
+
+            Assert.AreEqual(expectedIsotopeCount, isotopeIndex, "Isotope count mismatch");
+            Assert.AreEqual(expectedMzFourthIsotope, ion.GetIsotopeMz(3), 0.00001, "Isotope m/z count mismatch");
+            Assert.AreEqual(expectedIntensityFourthIsotope, isotopeIntensities[3], 0.00001, "Isotope intensity mismatch");
+
         }
 
         [Test]
@@ -733,28 +773,44 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var xmlFileName = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "PNNLOmicsElementData.xml"));
+            var xmlFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "PNNLOmicsElementData.xml"));
 
-            var xdocument = XDocument.Load(xmlFileName.FullName);
+            var xdocument = XDocument.Load(xmlFile.FullName);
             var parameterBaseElement = xdocument.Element("parameters");
 
             if (parameterBaseElement == null)
             {
-                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'parameters' but it was not found");
+                throw new IOException("Problem reading xml file; Expected element 'parameters' but it was not found: " + xmlFile.FullName);
             }
 
-// ReSharper disable PossibleNullReferenceException
-            var elements = parameterBaseElement.Element("ElementIsotopes").Elements("Element");
-// ReSharper restore PossibleNullReferenceException
+
+            var elementItem = parameterBaseElement.Element("ElementIsotopes");
+            if (elementItem == null)
+                Assert.Fail("ElementIsotopes element not found in " + xmlFile.FullName);
+
+            var elements = elementItem.Elements("Element").ToList();
+
             foreach (var element in elements)
             {
                 var symbol = element.Element("Symbol");
                 var name = element.Element("Name");
-                if (symbol != null && name != null)
-                {
-                    Console.WriteLine("{0,3}\t{1}", symbol.Value, name.Value);
-                }
+
+                if (symbol == null)
+                    Assert.Fail("Symbol element not found for " + element);
+
+                if (name == null)
+                    Assert.Fail("Name element not found for " + element);
+
+                Console.WriteLine("{0,3}\t{1}", symbol.Value, name.Value);
+
+                if (symbol.Value == "K")
+                    Assert.AreEqual("Potassium", name.Value);
+
             }
+
+            Console.WriteLine("Element Count: " + elements.Count);
+            Assert.AreEqual(104, elements.Count, "Unexpected element count");
+
         }
 
         [Test]
@@ -763,28 +819,47 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var isotopes = new[] {0.8, 0.9, 0.6, 0.3};
+            var isotopes = new[] { 0.8, 0.9, 0.6, 0.3 };
             var index = Enumerable.Range(0, isotopes.Length).ToArray();
 
-            Array.Sort(index, (i,j) => isotopes[j].CompareTo(isotopes[i]));
+            Array.Sort(index, (i, j) => isotopes[j].CompareTo(isotopes[i]));
 
+            var lastIntensity = double.MaxValue;
+            var expectedIndexOrder = new List<int> {1, 0, 2, 3};
+
+            Console.WriteLine("{0}\t{1}", "#", "Intensity");
             for (var i = 0; i < isotopes.Length; i++)
             {
                 Console.WriteLine("{0}\t{1}", index[i], isotopes[index[i]]);
+
+                Assert.AreEqual(expectedIndexOrder[i], index[i], "Index order mismatch");
+
+                Assert.Greater(lastIntensity, isotopes[index[i]], "Intensities are not in descending order");
+                lastIntensity = isotopes[index[i]];
             }
+
         }
 
         [Test]
-        public void TestEnum()
+        [TestCase(ActivationMethod.CID, 0)]
+        [TestCase(ActivationMethod.ETD, 1)]
+        [TestCase(ActivationMethod.HCD, 2)]
+        [TestCase(ActivationMethod.ECD, 3)]
+        [TestCase(ActivationMethod.PQD, 4)]
+        [TestCase(ActivationMethod.UVPD, 5)]
+        public void TestEnum(ActivationMethod activation, byte expectedCode)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const ActivationMethod activation = ActivationMethod.ETD;
-            const byte code = (byte) activation;
-            Console.WriteLine((byte)activation);
-            Console.WriteLine(code);
-            Console.WriteLine((ActivationMethod)code);
+            var code = (byte)activation;
+            var activationFromCode = (ActivationMethod)code;
+
+            Console.WriteLine("{0} has value {1}", activation, code);
+
+            Assert.AreEqual(expectedCode, code, "Unexpected enum value for ETD");
+
+            Assert.AreEqual(activation, activationFromCode, "Enum round trip mismatch");
         }
 
         [Test]
@@ -793,109 +868,176 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            Console.WriteLine("{0}", Math.Exp(13021));
+            Console.WriteLine("Overflow reports {0}", Math.Exp(13021));
+
+            Assert.AreEqual("Infinity", Math.Exp(13021).ToString(CultureInfo.InvariantCulture));
         }
 
         [Test]
-        public void TestRegEx()
+        [TestCase(@"^[a-zA-Z]+\d*$", "H12", true)]
+        [TestCase(@"^([A-Z][a-z]?\d*)+$", "C2H3N1O1S-1", false)]
+        [TestCase(@"[A-Z][a-z]?-?\d*", "H12O-3", true)]                 // Used by ParseFromPlainString
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "C2H3N1O1S1", true)]            // Used by ParseFromPlainString
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "C2H3N1O1S-1", true)]           // Used by ParseFromPlainString
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "13C(3)", false)]               // Used by ParseFromPlainString
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "C2H3N1O1S1", true)]
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "13C(3)", false)]
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "N", true)]
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "H(12)", false)]
+        [TestCase(@"^([A-Z][a-z]?-?\d*)+$", "H(12) C(4) 13C(3) N 15N O", false)]
+        [TestCase(@"^\d*[a-zA-Z]+(\(-?\d+\))?$", "H(257)", true)]
+        [TestCase(@"^\d*[a-zA-Z]+(\(-?\d+\))?$", "S(4)", true)]
+        [TestCase(@"^\d*[a-zA-Z]+(\(-?\d+\))?$", "S", true)]
+        [TestCase(@"^\d*[a-zA-Z]+(\(-?\d+\))?$", "13C(12)", true)]
+        [TestCase(@"^\d*[a-zA-Z]+(\(-?\d+\))?$", "13C", true)]
+        public void TestRegEx(string pattern, string empiricalFormula, bool shouldMatch)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //const string protAnnotation = "A.HAHLTHQYPAANAQVTAAPQAITLNFSEGVETGFSGAKITGPKNENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK._";
-            //const char delimiter = (char)FastaDatabase.Delimiter;
-            //Console.WriteLine(@"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$");
-            //Console.WriteLine(Regex.IsMatch(protAnnotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"_]$"));
-            //const string s = "H(12)";
-            //Console.WriteLine(Regex.IsMatch(s, @"^\d*[a-zA-Z]+$"));
-            //const string plaincompositionStr = "H(12) C(4) 13C(3) N 15N O asdf1";
-            const string plaincompositionStr = "H(12)";
-            Console.WriteLine(Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?\d*)+$"));
+
+            var isMatch = Regex.IsMatch(empiricalFormula, pattern);
+            Console.WriteLine("IsMatch of '{0}' to '{1}' reports {2}", pattern, empiricalFormula, isMatch);
+
+            Assert.AreEqual(shouldMatch, isMatch, "Unexpected match result for {0}", empiricalFormula);
         }
 
+
         [Test]
-        public void TestParsingComposition()
+        [TestCase("C2HBr365Ag2", "C,2|H,1|Br,365|Ag,2")]
+        [TestCase("C2H3N1OS2", "C,2|H,3|N,1|O,1|S,2")]
+        public void TestRegEx2(string sequenceStr, string expectedMatchList)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string compositionStr = "H(230) C(136) N(40) O(46) S 13C(6) 15N(2)";
-            var composition = Composition.Parse(compositionStr);
-            Console.WriteLine("{0}\t{1}", composition, composition.Mass);
-        }
-
-        [Test]
-        public void TestIonTypeFactory()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            const string sequenceStr = "PEPTIDE";
-            var aminoAcidSet = new AminoAcidSet();
-            var sequence = new Sequence(sequenceStr, aminoAcidSet);
-            var compositionOfFirstPrefix = sequence.GetComposition(0, 2);
-            Console.WriteLine("{0}\t{1}", compositionOfFirstPrefix, compositionOfFirstPrefix.Mass);
-
-            var ionTypeFactory = new IonTypeFactory(new[] { BaseIonType.B, BaseIonType.Y }, new[] { NeutralLoss.NoLoss }, 10);
-            var bIon = ionTypeFactory.GetIonType("b");
-            var yIon = ionTypeFactory.GetIonType("y2");
-            Console.WriteLine("{0}\t{1}\t{2}", bIon, bIon.OffsetComposition, bIon.OffsetComposition.Mass);
-            Console.WriteLine("{0}\t{1}\t{2}", yIon, yIon.OffsetComposition, yIon.OffsetComposition.Mass);
-
-            // Compute mass of y2 = AveragineMass(DE) + OffsetY
-            var compositionOfSecondSuffix = sequence.GetComposition(sequenceStr.Length - 2, sequenceStr.Length);
-            var y2Ion = yIon.GetIon(compositionOfSecondSuffix);
-            Console.WriteLine("m/z of y++: {0}", y2Ion.GetMonoIsotopicMz());
-        }
-
-        [Test]
-        public void TestDeconvolutedIonTypes()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            var comp1 = Composition.H2O;
-            var comp2 = new CompositionWithDeltaMass(-1);
-            Console.WriteLine(comp1 + comp2);
-            Console.WriteLine(comp1 - comp2);
-
-            var ionTypeFactory = IonTypeFactory.GetDeconvolutedIonTypeFactory(new[] {BaseIonType.B, BaseIonType.Y}, new[] { NeutralLoss.NoLoss, NeutralLoss.H2O});
-            foreach (var ionType in ionTypeFactory.GetAllKnownIonTypes())
+            var expectedMatches = new Dictionary<string, int>();
+            foreach (var item in expectedMatchList.Split('|'))
             {
-                Console.WriteLine(ionType);
+                var parts = item.Split(',');
+                expectedMatches.Add(parts[0], int.Parse(parts[1]));
             }
-        }
 
-        [Test]
-        public void TestLinq()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
+            Console.Write(sequenceStr + " --> ");
 
-            var intArr = new List<double> {4.0, 1.0, 2.0, 6.0};
-            Console.WriteLine(intArr.Median());
-        }
-
-        [Test]
-        public void TestRegularExpressions()
-        {
-            var methodName = MethodBase.GetCurrentMethod().Name;
-            Utils.ShowStarting(methodName);
-
-            const string str = "C2HBr365Ag2";
-            var matches = Regex.Matches(str, @"[A-Z][a-z]?\d*");
+            var matches = Regex.Matches(sequenceStr, @"[A-Z][a-z]?\d*");
             foreach (var match in matches)
             {
                 var element = match.ToString();
                 var atom = Regex.Match(element, @"[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
-                if (num.Length == 0) num = "1";
-                Console.WriteLine("{0} ({1})", atom, num);
+                if (num.Length == 0)
+                    num = "1";
+
+                Console.Write("{0} ({1}) ", atom, num);
+
+                if (!expectedMatches.TryGetValue(atom.ToString(), out var expectedCount))
+                    Assert.Fail("Unrecognized atom: " + atom);
+
+                Assert.AreEqual(expectedCount, int.Parse(num), "Atom count mismatch");
             }
 
-            var comp = Composition.ParseFromPlainString(str);
-            Console.WriteLine(comp.ToPlainString());
-            Console.WriteLine(comp.ToString());
+            Console.WriteLine();
+
+        }
+
+
+        [Test]
+        [TestCase("PEPTIDE", "C(10) H(14) N(2) O(4) S(0)", 226.0953570, 132.047327)]
+        [TestCase("CAFFEINE", "C(6) H(10) N(2) O(2) S(1)", 174.0462983, 131.555319)]
+        public void TestIonTypeFactory(string sequenceStr, string expectedFirstPrefix, double expectedFirstPrefixMass, double expectedY2Mass)
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
+
+            var aminoAcidSet = new AminoAcidSet();
+            var sequence = new Sequence(sequenceStr, aminoAcidSet);
+            var compositionOfFirstPrefix = sequence.GetComposition(0, 2);
+            Console.WriteLine("First prefix {0} has mass {1}", compositionOfFirstPrefix, compositionOfFirstPrefix.Mass);
+
+            Assert.AreEqual(expectedFirstPrefix, compositionOfFirstPrefix.ToString(), "First prefix composition mismatch");
+            Assert.AreEqual(expectedFirstPrefixMass, compositionOfFirstPrefix.Mass, 0.00001, "First prefix composition mass mismatch");
+
+            var ionTypeFactory = new IonTypeFactory(new[] { BaseIonType.B, BaseIonType.Y }, new[] { NeutralLoss.NoLoss }, 10);
+            var bIonType = ionTypeFactory.GetIonType("b");
+            var y2IonType = ionTypeFactory.GetIonType("y2");
+            Console.WriteLine("b ion\t{0}\t{1}", bIonType.OffsetComposition, bIonType.OffsetComposition.Mass);
+            Console.WriteLine("y2 ion\t{0}\t{1}", y2IonType.OffsetComposition, y2IonType.OffsetComposition.Mass);
+
+            Assert.AreEqual(bIonType.OffsetComposition.Mass, bIonType.Mass);
+
+            Assert.AreEqual(0, bIonType.Mass, 0.00001, "b ion offset mass should be zero");
+            Assert.AreEqual(18.0105647, y2IonType.Mass, 0.00001, "y2 ion offset mass should be 18");
+
+            // Compute mass of y2 = AveragineMass(DE) + OffsetY
+            var compositionOfSecondSuffix = sequence.GetComposition(sequenceStr.Length - 2, sequenceStr.Length);
+            var y2Ion = y2IonType.GetIon(compositionOfSecondSuffix);
+            var y2IonMass = y2Ion.GetMonoIsotopicMz();
+
+            Console.WriteLine("m/z of y++: {0}", y2IonMass);
+
+            Assert.AreEqual(expectedY2Mass, y2IonMass, 0.00001);
+        }
+
+        [Test]
+        [TestCase("H2O", 0, 18.010564)]
+        [TestCase("H2O", -1, 17.010564)]
+        [TestCase("H2O", 5.5, 23.510564)]
+        [TestCase("NH3", -1, 16.026549)]
+        [TestCase("CO", -1, 26.9949146)]
+        public void TestDeconvolutedIonTypes(string compName, double addonMass, double expectedMassAfterAddition)
+        {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
+
+            Composition comp;
+            switch (compName)
+            {
+                case "H2O":
+                    comp = Composition.H2O;
+                    break;
+                case "NH3":
+                    comp = Composition.NH3;
+                    break;
+                case "CO":
+                    comp = Composition.CO;
+                    break;
+                default:
+                    Assert.Fail("Unrecognized composition; update the switch statement");
+                    // ReSharper disable once HeuristicUnreachableCode
+                    throw new ArgumentException("Unrecognized composition", nameof(compName));
+            }
+
+            var comp2 = new CompositionWithDeltaMass(addonMass);
+            var added = comp + comp2;
+
+            Console.WriteLine("{0} plus {1:F2} is {2} with mass {3:F6}", compName, addonMass, added, added.Mass);
+
+            Assert.AreEqual(expectedMassAfterAddition, added.Mass, 0.00001, "Unexpected mass");
+
+            var typeCount = 0;
+
+            var massByIontype = new Dictionary<string, double>()
+            {
+                {"b'", -1.00727649},
+                {"b'-H2O", -19.017841},
+                {"y'", 17.003288},
+                {"y'-H2O", -1.00727649},
+            };
+
+            var ionTypeFactory = IonTypeFactory.GetDeconvolutedIonTypeFactory(new[] { BaseIonType.B, BaseIonType.Y }, new[] { NeutralLoss.NoLoss, NeutralLoss.H2O });
+            foreach (var ionType in ionTypeFactory.GetAllKnownIonTypes())
+            {
+                Console.WriteLine(ionType);
+                if (!massByIontype.TryGetValue(ionType.Name, out var expectedOffsetMass))
+                    Assert.Fail("Unrecognized ion type for combo: " + ionType.Name);
+
+                Assert.AreEqual(expectedOffsetMass, ionType.Mass, 0.00001, "Unexpected offset mass for ion " + ionType.Name);
+
+                typeCount++;
+            }
+
+            Assert.AreEqual(4, typeCount);
         }
 
         [Test]
@@ -930,7 +1072,7 @@ namespace InformedProteomics.Test
 
             var tolerance = new Tolerance(10, ToleranceUnit.Ppm);
             const int maxCharge = 15;
-            const double relIntThres = 0.1;
+            const double minimumRelativeIntensity = 0.1;
 
             if (!File.Exists(rawFilePath))
             {
@@ -948,15 +1090,15 @@ namespace InformedProteomics.Test
             foreach (var iontype in iontypes)
             {
                 var ion = iontype.GetIon(sequence.Composition);
-                var obsPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, relIntThres);
+                var obsPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, minimumRelativeIntensity);
                 if (obsPeaks == null) continue;
-                var isotopes = ion.GetIsotopes(relIntThres).ToArray();
+                var isotopes = ion.GetIsotopes(minimumRelativeIntensity).ToArray();
                 for (var i = 0; i < isotopes.Length; i++)
                 {
                     if (obsPeaks[i] == null) continue;
                     var obsMz = obsPeaks[i].Mz;
                     var theoMz = ion.GetIsotopeMz(isotopes[i].Index);
-                    var ppmError = (obsMz - theoMz)/theoMz*1e6;
+                    var ppmError = (obsMz - theoMz) / theoMz * 1e6;
                     Assert.True(ppmError <= tolerance.GetValue());
                 }
             }
@@ -978,7 +1120,7 @@ namespace InformedProteomics.Test
             Assert.AreEqual(mod, getmod);
 
             const string modName2 = "mod2";
-            var composition2 = new Composition(1,0,2,4,1,9);
+            var composition2 = new Composition(1, 0, 2, 4, 1, 9);
             var editedMod = Modification.UpdateAndGetModification(modName2, composition2);
             Assert.NotNull(editedMod);
 
@@ -1020,12 +1162,6 @@ namespace InformedProteomics.Test
             Tuple<int, double, double, int, int> expectedResults)
         {
             modCombos.Add(modList, expectedResults);
-        }
-
-
-        private void ShowIsotopes(IEnumerable<Isotope> isotopes)
-        {
-            ShowIsotopes(isotopes.ToList());
         }
 
         private void ShowIsotopes(List<Isotope> isotopes)
