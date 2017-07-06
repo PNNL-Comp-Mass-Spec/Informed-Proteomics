@@ -113,7 +113,7 @@ namespace PbfGen
                     return -1;
                 }
 
-                if (paramDic.TryGetValue("start", out var startScanText))
+                if (paramDic.TryGetValue("start", out var startScanText) && !string.IsNullOrWhiteSpace(startScanText))
                 {
                     if (!int.TryParse(startScanText, out startScan))
                     {
@@ -122,7 +122,7 @@ namespace PbfGen
                     }
                 }
 
-                if (paramDic.TryGetValue("end", out var endScanText))
+                if (paramDic.TryGetValue("end", out var endScanText) && !string.IsNullOrWhiteSpace(endScanText))
                 {
                     if (!int.TryParse(endScanText, out endScan))
                     {
