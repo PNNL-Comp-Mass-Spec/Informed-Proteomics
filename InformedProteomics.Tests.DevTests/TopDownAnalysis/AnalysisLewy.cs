@@ -326,7 +326,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         public void CopyAllMSPFResultFor10Reps()
         {
             var destPath = @"\\protoapps\UserData\Jungkap\CPTAC_10reps\DMS_old";
-            var oldDestPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old";
+            //var oldDestPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old";
             var dmsPath = @"\\Proto-5\VOrbiETD02\2015_1";
 
             for (var i = 1; i < 11; i++)

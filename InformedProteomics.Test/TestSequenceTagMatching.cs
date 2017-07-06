@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 4;
+            //const int minTagLength = 4;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
@@ -142,7 +142,7 @@ namespace InformedProteomics.Test
                 var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
-                const int minTagLength = 5;
+                //const int minTagLength = 5;
                 //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
                 Console.WriteLine("-----------------{0}--------------------", rawFile);
@@ -175,7 +175,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 5;
+            //const int minTagLength = 5;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 

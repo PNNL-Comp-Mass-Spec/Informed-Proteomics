@@ -1468,7 +1468,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="msdr"></param>
         /// <param name="writer"></param>
+        /// <param name="endScan"></param>
         /// <param name="progress"></param>
+        /// <param name="startScan"></param>
         private void WriteToPbf(
             IMassSpecDataReader msdr,
             BinaryWriter writer,
