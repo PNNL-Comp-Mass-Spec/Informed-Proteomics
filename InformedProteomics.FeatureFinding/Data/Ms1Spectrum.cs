@@ -15,21 +15,28 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public double MinMz
         {
-            get { return Peaks[0].Mz; }
+            get { return Peaks.Length > 0 ? Peaks[0].Mz : 0; }
         }
 
         public double MaxMz
         {
-            get { return Peaks[Peaks.Length - 1].Mz; }
+            get { return Peaks.Length > 0 ? Peaks[Peaks.Length - 1].Mz : 0; }
         }
 
         public Ms1Spectrum(int scanNum, int index, Ms1Peak[] peaks) : base(scanNum)
         {
             Index = index;
             Peaks = new Peak[peaks.Length];
-            peaks.CopyTo(Peaks, 0);
-            MedianIntensity = Peaks.Select(p => p.Intensity).Median();
-            PreArrangeLocalMzWindows();
+            if (peaks.Length > 0)
+            {
+                peaks.CopyTo(Peaks, 0);
+                MedianIntensity = Peaks.Select(p => p.Intensity).Median();
+                PreArrangeLocalMzWindows();
+            }
+            else
+            {
+                MedianIntensity = 0;
+            }
         }
 
         public Ms1Spectrum(int scanNum, int index, Peak[] peaks) : base(scanNum)
@@ -37,11 +44,18 @@ namespace InformedProteomics.FeatureFinding.Data
             Index = index;
             MsLevel = 1;
             Peaks = new Peak[peaks.Length];
-            var sIndex = (ushort) index;
-            for (var i = 0; i < Peaks.Length; i++)
-                Peaks[i] = new Ms1Peak(peaks[i].Mz, peaks[i].Intensity, i) {Ms1SpecIndex = sIndex};
-            MedianIntensity = Peaks.Select(p => p.Intensity).Median();
-            PreArrangeLocalMzWindows();
+            if (peaks.Length > 0)
+            {
+                var sIndex = (ushort)index;
+                for (var i = 0; i < Peaks.Length; i++)
+                    Peaks[i] = new Ms1Peak(peaks[i].Mz, peaks[i].Intensity, i) { Ms1SpecIndex = sIndex };
+                MedianIntensity = Peaks.Select(p => p.Intensity).Median();
+                PreArrangeLocalMzWindows();
+            }
+            else
+            {
+                MedianIntensity = 0;
+            }
         }
 
         public Ms1Peak[] GetAllIsotopePeaks(double monoIsotopeMass, int charge, TheoreticalIsotopeEnvelope isotopeList, Tolerance tolerance)
@@ -115,6 +129,10 @@ namespace InformedProteomics.FeatureFinding.Data
 
         private void PreArrangeLocalMzWindows()
         {
+            if (Peaks.Length == 0)
+            {
+                return;
+            }
             var numberOfbins = (int)Math.Round((MaxMz - MinMz) / MzWindowSize) + 1;
 
             _peakStartIndex     = new int[2][];
@@ -181,6 +199,20 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public LocalMzWindow GetLocalMzWindow(double mz)
         {
+            if (Peaks.Length == 0)
+            {
+                return new LocalMzWindow()
+                {
+                    MinMz = 0,
+                    MaxMz = 0,
+                    PeakStartIndex = -1,
+                    PeakCount = 0,
+                    MedianIntensity = 0,
+                    HighestIntensity = 0,
+                    IntensePeakCount = 0,
+                    PeakRanking = null,
+                };
+            }
             var binIndex = (int)Math.Round((mz - MinMz) / MzWindowSize);
 
             var binCenterMz = MinMz + MzWindowSize * binIndex;
