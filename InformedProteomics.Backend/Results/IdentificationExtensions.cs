@@ -26,7 +26,7 @@
                 var seqIndex = Math.Max(0, mod.Key - 1);
                 var mzidMod = mod.Value;
 
-                var modification = Modification.Get(mzidMod.Tag);
+                var modification = Modification.Get(mzidMod.Tag, mzidMod.Mass);
                 sequence[seqIndex] = new ModifiedAminoAcid(sequence[seqIndex], modification);
             }
 

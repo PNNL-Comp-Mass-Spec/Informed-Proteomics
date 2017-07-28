@@ -9,6 +9,11 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         public const string MOD_MASS_FORMAT_STRING = "{0:N3}";
 
+        /// <summary>
+        /// Integer portion of MS:1001460
+        /// </summary>
+        private const int UNKNOWN_PSI_MOD_ACCESSION = 1001460;
+
         public int AccessionNum { get; set; }
         public Composition.Composition Composition { get; set; }
         public string Name { get; set; }
@@ -56,12 +61,33 @@ namespace InformedProteomics.Backend.Data.Sequence
             return Name;
         }
 
+        /// <summary>
+        /// Retrieve a Modification object for the given mod
+        /// </summary>
+        /// <param name="psiMsName"></param>
+        /// <remarks>Returns null if the mod name is not recognized</remarks>
         public static Modification Get(string psiMsName)
         {
             var lowerPsiMsName = psiMsName.ToLower();
 
             if (NameToModMap.TryGetValue(lowerPsiMsName, out var mod)) return mod;
             return null;
+        }
+
+        /// <summary>
+        /// Retrieve a Modification object for the given mod
+        /// </summary>
+        /// <param name="modName">ModName (either an official PSI name or a generic name)</param>
+        /// <param name="deltaMass"></param>
+        public static Modification Get(string modName, double deltaMass)
+        {
+            var mod = Get(modName);
+            if (mod != null)
+                return mod;
+
+            var genericMod = new Modification(UNKNOWN_PSI_MOD_ACCESSION, deltaMass, modName);
+
+            return genericMod;
         }
 
         public static IList<Modification> GetFromMass(double mass)
