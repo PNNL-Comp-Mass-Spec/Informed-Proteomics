@@ -14,6 +14,7 @@ namespace InformedProteomics.Tests.DevTests
     public class TestLcMsMap
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestMs1Filter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

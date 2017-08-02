@@ -72,9 +72,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         public delegate IEnumerable<Composition> CompositionCalculator(AminoAcid aminoAcid = null);
 
-        public string Symbol { get; private set; }
-        public bool IsPrefix { get; private set; }
-        public Composition OffsetComposition { get; private set; }
+        public string Symbol { get; }
+        public bool IsPrefix { get; }
+        public Composition OffsetComposition { get; }
 
         public BaseIonType GetDeconvolutedIon()
         {

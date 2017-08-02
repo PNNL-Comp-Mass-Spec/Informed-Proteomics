@@ -2,10 +2,17 @@
 
 The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. Although the back-end data access and some of the scoring routines are general purpose, this repository is currently maintained for top down MS/MS datasets.
 
+## Install/Tutorials
 #### [See the Informed Proteomics GitHub wiki for usage, tutorials, and more!](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki)
 
 ## Downloads
 https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
+
+### Continuous Integration
+
+The latest versions of the Informed Proteomics tools are available on the [AppVeyor CI server](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics/build/artifacts)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/j52ywc5d204gaxtp?svg=true)](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics)
 
 ## MSPathFinderT
 

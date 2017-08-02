@@ -277,7 +277,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public Peak[] GetAllIsotopePeaks(double monoIsotopeMass, int charge, IsotopomerEnvelope envelope, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var mostAbundantIsotopeIndex = envelope.MostAbundantIsotopeIndex;
-            var isotopomerEnvelope = envelope.Envolope;
+            var isotopomerEnvelope = envelope.Envelope;
             var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopeMass, charge, mostAbundantIsotopeIndex);
             var mostAbundantIsotopePeakIndex = FindPeakIndex(mostAbundantIsotopeMz, tolerance);
             if (mostAbundantIsotopePeakIndex < 0) return null;

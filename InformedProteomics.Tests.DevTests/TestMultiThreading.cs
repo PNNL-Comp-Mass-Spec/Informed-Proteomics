@@ -6,6 +6,7 @@ using System.Reflection;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
+using System.IO;
 
 namespace InformedProteomics.Tests.DevTests
 {
@@ -20,9 +21,11 @@ namespace InformedProteomics.Tests.DevTests
 
             var sw = new System.Diagnostics.Stopwatch();
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
-            var db = new FastaDatabase(dbFile);
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_002216_235ACCEA.fasta"));
+
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
+
             var indexedDb = new IndexedDatabase(db);
             var arr = db.Characters().ToArray();
 
@@ -55,17 +58,23 @@ namespace InformedProteomics.Tests.DevTests
             Utils.ShowStarting(methodName);
 
             //var array = Enumerable.Range(0, short.MaxValue).ToArray();
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";
-            var db = new FastaDatabase(dbFile);
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_002216_235ACCEA.fasta"));
+
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             //var indexedDb = new IndexedDatabase(db);
             //indexedDb.Read();
             //var peptides = indexedDb.AnnotationsAndOffsetsNoEnzyme(7, 30);
-            var charArray = db.Characters().Select(c => (int)c);
+            var charArray = db.Characters().Select(c => (int)c).ToList();
 
             // Test methods.
-            Console.WriteLine(SumAsParallel(charArray));
-            Console.WriteLine(SumDefault(charArray));
+            var defaultSum = SumAsParallel(charArray);
+            var parallelSum = SumAsParallel(charArray);
+
+            Console.WriteLine("Default sum {0}", defaultSum);
+            Console.WriteLine("Parallel sum {0}", parallelSum);
+
+            Assert.AreEqual(parallelSum, defaultSum);
 
             const int m = 100;
             var s1 = Stopwatch.StartNew();
@@ -74,17 +83,16 @@ namespace InformedProteomics.Tests.DevTests
                 SumDefault(charArray);
             }
             s1.Stop();
+
             var s2 = Stopwatch.StartNew();
             for (var i = 0; i < m; i++)
             {
                 SumAsParallel(charArray);
             }
             s2.Stop();
-            Console.WriteLine((s1.Elapsed.TotalMilliseconds * 1000000 /
-                m).ToString("0.00 ns"));
-            Console.WriteLine((s2.Elapsed.TotalMilliseconds * 1000000 /
-                m).ToString("0.00 ns"));
-            Console.Read();
+
+            Console.WriteLine("{0:F2} msec/sum, on average for default", s1.Elapsed.TotalMilliseconds / m);
+            Console.WriteLine("{0:F2} msec/sum, on average for parallel", s2.Elapsed.TotalMilliseconds / m);
         }
 
         static int SumDefault(IEnumerable<int> array)
@@ -98,19 +106,21 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
-        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        //[TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
+        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
+        //[TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumeration(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
+            var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -154,7 +164,7 @@ namespace InformedProteomics.Tests.DevTests
             // 15MB
             // serial:
             // Parallel2:
-            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(fastaFile) + "_par.txt"), FileMode.Create))
             //using (var fout = new StreamWriter(ofstream))
             //{
             //    foreach (var annOff in annotationsAndOffsets)
@@ -176,20 +186,22 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
-        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
-        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
-        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
+        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
+        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
+        [TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
+        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
         public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
+            var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
             const int numCTermCleavages = 0;
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -210,7 +222,7 @@ namespace InformedProteomics.Tests.DevTests
                     //++numSequences;
                 }
                 );/**/
-            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(fastaFile) + "_par.txt"), FileMode.Create))
             //using (var fout = new StreamWriter(ofstream))
             //{
             //    foreach (var annOff in annotationsAndOffsets)
@@ -232,25 +244,23 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 2700388)]  // 1.5MB
-        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 4165765)]  // 3MB
-        [TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396)]  // 6MB
-        [TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
+        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2700388)]  // 1.5MB
+        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 4165765)]  // 3MB
+        [TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396)]  // 6MB
+        [TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
         public void TestSequenceEnumerationNCTerm(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
+            var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
             const int numNTermCleavages = 1;
             const int numCTermCleavages = 0;
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
             var timeDB = sw.Elapsed;
@@ -271,7 +281,7 @@ namespace InformedProteomics.Tests.DevTests
                     //++numSequences;
                 }
                 );/**/
-            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(dbFile) + "_par.txt"), FileMode.Create))
+            //using (var ofstream = new FileStream(Path.Combine(@"F:\InformedProteomicsTestFiles", Path.GetFileNameWithoutExtension(fastaFile) + "_par.txt"), FileMode.Create))
             //using (var fout = new StreamWriter(ofstream))
             //{
             //    foreach (var annOff in annotationsAndOffsets)
@@ -297,23 +307,21 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
-        [TestCase(3, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        //[TestCase(6, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        //[TestCase(15, @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
+        //[TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
+        //[TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
+            var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_002216_235ACCEA.fasta";  // 1.5MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_005133_8491EFA2.fasta";  // 3MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004530_B63BD900.fasta";  // 6MB
-            //const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\ID_004208_295531A4.fasta";  // 15MB
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             indexedDb.Read();
             var numSequences = 0L;
@@ -335,7 +343,7 @@ namespace InformedProteomics.Tests.DevTests
             //    var ofstream =
             //        new FileStream(
             //            Path.Combine(@"F:\InformedProteomicsTestFiles",
-            //                Path.GetFileNameWithoutExtension(dbFile) + "_old.txt"), FileMode.Create))
+            //                Path.GetFileNameWithoutExtension(fastaFile) + "_old.txt"), FileMode.Create))
             //using (var fout = new StreamWriter(ofstream))
             //{
             //    foreach (var annOff in annotationsAndOffsets)
@@ -392,5 +400,6 @@ namespace InformedProteomics.Tests.DevTests
 
             //var primes = serialQuery.ToArray();
         }
+
     }
 }

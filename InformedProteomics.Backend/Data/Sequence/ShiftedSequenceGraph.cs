@@ -58,9 +58,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             get { return _modificationParams; }
         }
 
-        public double ShiftMass { get; private set; }
+        public double ShiftMass { get; }
 
-        public bool IsValid { get; private set; }
+        public bool IsValid { get; }
 
         /// <summary>
         /// Gets all possible compositions of the current sequence
@@ -315,11 +315,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                     var prevNodeIndex = i;
                     var prevNode = _graph[_index - 1][i];
                     var prevModCombIndex = prevNode.ModificationCombinationIndex;
-                    Node newNode;
+
                     // unmodified edge
-                    if (modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out newNode))
+                    if (modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out var unmodifiedEdgeNode))
                     {
-                        newNode.AddPrevNodeIndex(prevNodeIndex);
+                        unmodifiedEdgeNode.AddPrevNodeIndex(prevNodeIndex);
                     }
                     else
                     {
@@ -333,9 +333,9 @@ namespace InformedProteomics.Backend.Data.Sequence
                                                     prevNode.ModificationCombinationIndex, modIndex);
                         if (modCombIndex < 0)   // too many modifications
                             continue;
-                        if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out newNode))
+                        if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out var modifiedEdgeNode))
                         {
-                            newNode.AddPrevNodeIndex(prevNodeIndex);
+                            modifiedEdgeNode.AddPrevNodeIndex(prevNodeIndex);
                         }
                         else
                         {

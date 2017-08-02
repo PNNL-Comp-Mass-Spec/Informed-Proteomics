@@ -8,8 +8,8 @@
             Index = index;
         }
 
-        public Modification Modification { get; private set; }
-        public int Index { get; private set; }
+        public Modification Modification { get; }
+        public int Index { get; }
 
         public override string ToString()
         {

@@ -38,23 +38,23 @@ namespace InformedProteomics.Backend.Data.Composition
 
         public IsotopomerEnvelope GetIsotopomerEnvelope()
         {
-            return _isotopomerEnvelop ??
-                   (_isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass));
+            return _isotopomerEnvelope ??
+                   (_isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass));
         }
 
         public double[] GetIsotopomerEnvelopeRelativeIntensities()
         {
-            if (_isotopomerEnvelop == null) _isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            return _isotopomerEnvelop.Envolope;
+            if (_isotopomerEnvelope == null) _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
+            return _isotopomerEnvelope.Envelope;
         }
 
         public int GetMostAbundantIsotopeZeroBasedIndex()
         {
-            if (_isotopomerEnvelop == null) _isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            return _isotopomerEnvelop.MostAbundantIsotopeIndex;
+            if (_isotopomerEnvelope == null) _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
+            return _isotopomerEnvelope.MostAbundantIsotopeIndex;
         }
 
-        private IsotopomerEnvelope _isotopomerEnvelop;
+        private IsotopomerEnvelope _isotopomerEnvelope;
 
         #endregion
     }

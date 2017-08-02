@@ -20,9 +20,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Charge = charge;
         }
 
-        public double IsolationWindowTargetMz { get; private set; }
-        public double IsolationWindowLowerOffset { get; private set; }
-        public double IsolationWindowUpperOffset { get; private set; }
+        public double IsolationWindowTargetMz { get; }
+        public double IsolationWindowLowerOffset { get; }
+        public double IsolationWindowUpperOffset { get; }
         public double? MonoisotopicMz { get; set; }
         public int? Charge { get; set; }
 

@@ -15,6 +15,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestOffsetFrequencyFunction
     {
         [Test]
+        [Category("Local_Testing")]
         public void PrintOffsetFrequency()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -5,12 +5,8 @@ using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Execution;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.Scoring;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -19,6 +15,7 @@ namespace InformedProteomics.Test
     public class TestIcBottomUp
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestChaoChaoWhim()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -107,6 +104,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestEdrn()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -125,7 +123,7 @@ namespace InformedProteomics.Test
             }
         }
 
-        public void TestEdrn(string specFilePath)
+        private void TestEdrn(string specFilePath)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -166,6 +164,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMaccossDia()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -185,6 +184,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMaccossDda()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -244,6 +244,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestQcShewQExactive()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -287,6 +288,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestDdaPlus()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

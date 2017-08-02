@@ -41,10 +41,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
         public double MzWithoutAdductIonMass { get { return Mass / Charge; } }
         public double Mass { get { return Mz; } }
-        public int Charge { get; private set; }
+        public int Charge { get; }
 
-        public double Corr { get; private set; }
-        public double Dist { get; private set; }
+        public double Corr { get; }
+        public double Dist { get; }
 
         /*
         public bool PeakShare(DeconvolutedPeak other)
@@ -58,7 +58,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Used for retrieving Observed peaks when reading from a .dpbf file, in conjunction with a .pbf file.
         /// </summary>
-        internal List<int> ObservedPeakIndices { get; private set; }
+        internal List<int> ObservedPeakIndices { get; }
 
         /// <summary>
         /// Uses the peaks in spec to find and set the <see cref="ObservedPeaks"/> according to the indices in <see cref="ObservedPeakIndices"/>

@@ -13,6 +13,7 @@ namespace InformedProteomics.Tests.UnitTests
     [TestFixture]
     public class TestLcMsRun
     {
+        [Category("PNL_Domain")]
         public void TestReadingIsolationWindows()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -35,6 +36,7 @@ namespace InformedProteomics.Tests.UnitTests
             }
         }
 
+        [Category("PNL_Domain")]
         public void TestReadingScanNums()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -95,6 +97,7 @@ namespace InformedProteomics.Tests.UnitTests
             Console.WriteLine(run.GetNextScanNum(20025));
         }
 
+        [Category("PNL_Domain")]
         public void TestParsingSpectrumFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -133,6 +136,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestXCaliburReader()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -157,12 +161,13 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingDiaRawFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = FilePaths.TestRawFilePath;
+            var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -218,12 +223,13 @@ namespace InformedProteomics.Tests.UnitTests
         //}
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestGeneratingProductManyXics()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = FilePaths.TestRawFilePath;
+            var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -280,6 +286,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestNoiseFiltration()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -301,12 +308,13 @@ namespace InformedProteomics.Tests.UnitTests
 
         [Test]
         [Ignore("Ignore this since it crashes Nunit 3")]
+        [Category("Local_Testing")]
         public void TestReadingCorruptedRawFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\Corrupted\YS_Shew_testHCD_CID.raw";
+            var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Corrupted\YS_Shew_testHCD_CID.raw");
             if (!File.Exists(rawFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
@@ -327,6 +335,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingSingleSpecMzMlFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -343,6 +352,7 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingBrukerDaltonDataSet()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -370,12 +380,13 @@ namespace InformedProteomics.Tests.UnitTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingRawFileWithSingleMs2Spectrum()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\2015-05-06_Carbonic_HCD_854_50AVG.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "2015-05-06_Carbonic_HCD_854_50AVG.raw");
             if (!File.Exists(specFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);

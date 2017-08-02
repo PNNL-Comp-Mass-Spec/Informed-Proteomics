@@ -53,14 +53,22 @@ namespace InformedProteomics.Tests.FunctionalTests
             var minMass = 0;
             var maxMass = 50000;
             var hBins = new List<int>();
+            var resultCount = 0;
+
+            Console.WriteLine("{0,10}\t{1,10}\t{2,10}", "Mass", "BinNum1", "BinNum2");
 
             for (var m = minMass; m <= maxMass; m += 100)
             {
                 var binNum1 = Constants.GetBinNumHighPrecision(m);
                 var binNum2 = comparer.GetBinNumber(m);
 
-                Console.WriteLine("{0}\t{1}\t{2}", m, binNum1, binNum2);
+                if (resultCount < 20 || resultCount % 50 == 0)
+                    Console.WriteLine("{0,10}\t{1,10}\t{2,10}", m, binNum1, binNum2);
+
+                resultCount++;
             }
+
+            Console.WriteLine("Result count: {0}", resultCount);
         }
     }
 }

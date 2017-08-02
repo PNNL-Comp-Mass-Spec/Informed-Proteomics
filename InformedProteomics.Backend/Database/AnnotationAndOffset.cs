@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Database
             Annotation = sequence;
         }
 
-        public long Offset { get; private set; }
-        public string Annotation { get; private set; }
+        public long Offset { get; }
+        public string Annotation { get; }
     }
 }

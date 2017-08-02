@@ -66,8 +66,12 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
                 var ms1Spec = run.GetMs1Spectrum(ms1Scan);
                 Ms1Spectra.Add(ms1Spec);
-                foreach (var peak in ms1Spec.Peaks)
-                    _ms1PeakList.Add(peak as Ms1Peak);
+
+                if (ms1Spec.Peaks.Length > 0)
+                {
+                    foreach (var peak in ms1Spec.Peaks)
+                        _ms1PeakList.Add(peak as Ms1Peak);
+                }
 
                 scansCached++;
                 if (scansCached == ushort.MaxValue)

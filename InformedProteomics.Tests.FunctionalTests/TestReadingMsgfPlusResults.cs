@@ -13,12 +13,13 @@ namespace InformedProteomics.Tests.FunctionalTests
     class TestReadingMsgfPlusResults
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestReadingTmtResultFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string filePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSGFPlusResultTMT10.tsv";
+            var filePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "MSGFPlusResultTMT10.tsv");
             if (!File.Exists(filePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);

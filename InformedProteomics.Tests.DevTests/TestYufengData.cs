@@ -20,15 +20,17 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     public class TestYufengData
     {
-        public const string TestRawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\yufeng_column_test2.raw";
+        public readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\yufeng_column_test2.raw");
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void AddMostAbundantIsotopePeakIntensity()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw";
+            var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw");
 
             if (!File.Exists(rawFilePath))
             {
@@ -37,7 +39,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const string resultFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv";
+            var resultFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTda.tsv");
 
             var parser = new TsvFileParser(resultFilePath);
             var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
@@ -68,7 +70,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             // Writing
-            const string newResultFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv";
+            var newResultFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv");
             using (var writer = new StreamWriter(newResultFilePath))
             {
                 writer.WriteLine(string.Join("\t", parser.GetHeaders())+"\t"+"PrecursorIntensity");
@@ -81,6 +83,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void Test43KProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -185,6 +189,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestDeconvolution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -210,6 +216,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -232,6 +239,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestRunningTimeSummingSpectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -260,6 +269,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -305,6 +316,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSmartIsoWindowSumming()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -392,6 +405,8 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestGeneratingXicsOfAllCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -457,12 +472,14 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestAbpSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
 
             if (!File.Exists(specFilePath))
             {
@@ -499,12 +516,14 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestSumMs2Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\TestYufengData\NewQC_LongSep_29Sep14_141001104925.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\NewQC_LongSep_29Sep14_141001104925.raw");
 
             if (!File.Exists(specFilePath))
             {

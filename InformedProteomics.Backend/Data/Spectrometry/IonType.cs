@@ -12,12 +12,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
     public class IonType
     {
-        public string Name { get; private set; }
-        public Composition.Composition OffsetComposition { get; private set; }
-        public int Charge { get; private set; }
-        public bool IsPrefixIon { get; private set; }
-        public BaseIonType BaseIonType { get; private set; }
-        public NeutralLoss NeutralLoss { get; private set; }
+        public string Name { get; }
+        public double Mass => OffsetComposition.Mass;
+        public Composition.Composition OffsetComposition { get; }
+        public int Charge { get; }
+        public bool IsPrefixIon { get; }
+        public BaseIonType BaseIonType { get; }
+        public NeutralLoss NeutralLoss { get; }
 
         private readonly double _offsetMass;    // duplication but stored for performance
 

@@ -14,8 +14,8 @@ namespace InformedProteomics.Backend.Utils
             ComputeVennDiagram();
         }
 
-        public ISet<T> Set1 { get; private set; }
-        public ISet<T> Set2 { get; private set; }
+        public ISet<T> Set1 { get; }
+        public ISet<T> Set2 { get; }
 
         public ISet<T> Intersection { get; private set; }
         public ISet<T> Set1Only { get; private set; }

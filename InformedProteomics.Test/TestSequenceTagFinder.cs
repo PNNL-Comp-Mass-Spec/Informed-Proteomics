@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -19,6 +18,7 @@ namespace InformedProteomics.Test
     public class TestSequenceTagFinder
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestSequenceTag()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -4,10 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
-using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
@@ -32,6 +28,7 @@ namespace InformedProteomics.Test
         private double _binWidth;
 
         [Test]
+        [Category("Local_Testing")]
         public void OffsetFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -107,6 +104,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void PrecursorOffsetFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
@@ -84,12 +85,19 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var seqComposition = seqCompositions[modIndex];
                 Console.WriteLine("SequenceComposition: {0}", seqComposition);
 
-                foreach (var composition in seqGraph.GetFragmentCompositions(modIndex, 0))
+                var compIndex = 0;
+                var compositions = seqGraph.GetFragmentCompositions(modIndex, 0).ToList();
+                foreach (var composition in compositions)
                 {
-                    //if (composition.GetMass() > seqComposition.GetMass())
+                    if (compIndex < 5 || compIndex >= compositions.Count - 5)
                     {
-                        Console.WriteLine("***Seq: {0}, Frag: {1}", seqComposition, composition);
+                        Console.WriteLine("  Seq: {0}, Frag: {1}", seqComposition, composition);
+                    } else if (compIndex == 5)
+                    {
+                        Console.WriteLine("  ...");
                     }
+
+                    compIndex++;
                 }
             }
         }
@@ -127,8 +135,12 @@ namespace InformedProteomics.Tests.FunctionalTests
             for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             {
                 var seqComposition = seqCompositions[modIndex];
-                Console.WriteLine("SequenceComposition: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+                if (modIndex < 5 || modIndex >= seqCompositions.Length - 5)
+                    Console.WriteLine("  Seq: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+                else if (modIndex == 5)
+                    Console.WriteLine("  ...");
             }
+            Console.WriteLine();
 
             seqGraph.CleaveNTerm();
             seqCompositions = seqGraph.GetSequenceCompositions();
@@ -137,7 +149,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             for (var modIndex = 0; modIndex < seqCompositions.Length; modIndex++)
             {
                 var seqComposition = seqCompositions[modIndex];
-                Console.WriteLine("SequenceComposition: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+
+                if (modIndex < 5 || modIndex >= seqCompositions.Length - 5)
+                    Console.WriteLine("  Seq: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+                else if (modIndex == 5)
+                    Console.WriteLine("  ...");
             }
         }
 
@@ -212,20 +228,16 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string modFilePath = @"..\..\..\TestFiles\Mods.txt";
+            var modFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\Mods.txt");
+            var modFile = Utils.GetTestFile(methodName, modFilePath);
 
-            if (!File.Exists(modFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modFilePath);
-            }
-
-            var modFileParser = new ModFileParser(modFilePath);
+            var modFileParser = new ModFileParser(modFile.FullName);
             Console.WriteLine("MaxNumDynModsPerSequence: {0}", modFileParser.MaxNumDynModsPerSequence);
             foreach (var searhMod in modFileParser.SearchModifications)
             {
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}", searhMod.TargetResidue, searhMod.Location, searhMod.IsFixedModification, searhMod.Modification);
             }
-            var aaSet = new AminoAcidSet(modFilePath);
+            var aaSet = new AminoAcidSet(modFile.FullName);
             aaSet.Display();
         }
 
@@ -283,10 +295,10 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Console.WriteLine("{0}", seqGraph.GetNumProteoformSequences(modIndex));
             }
 
-            Console.WriteLine("\n#Protoeoforms by number of modificaionts: ");
+            Console.WriteLine("\n#Protoeoforms by number of modifications: ");
             for (var nMod = 0; nMod <= numMaxModsPerProtein; nMod++)
             {
-                Console.Write("#modificaitons = {0}", nMod);
+                Console.Write("#modifications = {0}", nMod);
                 Console.Write("\t");
                 Console.WriteLine("{0}", seqGraph.GetNumProteoformSequencesByNumMods(nMod));
             }

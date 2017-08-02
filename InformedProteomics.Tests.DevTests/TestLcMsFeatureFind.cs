@@ -16,13 +16,23 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     public class TestLcMsFeatureFind
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestMaxEntDeconvoluter()
         {
             const string rawFileFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2015_4";
             const string fname = "WHIM2_LoHi_T2DD_HCD_GF07_02";
-            string rawFile = string.Format(@"{0}\{1}.pbf", rawFileFolder, fname);
-            string ms1ft = string.Format(@"\\protoapps\UserData\Jungkap\CompRef\lowRes\{0}.ms1ft", fname);
+            var rawFile = string.Format(@"{0}\{1}.pbf", rawFileFolder, fname);
+            var ms1ft = string.Format(@"\\protoapps\UserData\Jungkap\CompRef\lowRes\{0}.ms1ft", fname);
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile, 1.4826, 0);
             var ms1ScanNums = run.GetMs1ScanVector();
@@ -50,6 +60,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestLcMsFeatureXic()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -89,6 +100,7 @@ namespace InformedProteomics.Tests.DevTests
                 Console.Write("\n");
             }
             Console.WriteLine("---------------------------------------------------------------");
+
             for (var i = 0; i < feature.Envelopes.Length; i++)
             {
                 for (var j = 0; j < feature.Envelopes[i].Length; j++)
@@ -100,6 +112,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             Console.WriteLine("---------------------------------------------------------------");
+
             for (var i = 0; i < feature.Envelopes.Length; i++)
             {
                 for (var j = 0; j < feature.Envelopes[i].Length; j++)
@@ -117,22 +130,16 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-            //const string rawFile = @"D:\MassSpecFiles\CompRef\CPTAC_Intact_CR_Pool_2_25Jun15_Bane_15-02-02RZ.pbf";
-            //const string rawFile = @"D:\MassSpecFiles\IMER\Dey_IMERblast_01_08May14_Alder_14-01-33.pbf";
-            //const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_3\MZ20150729FG_WT1.pbf";
-
-            if (!File.Exists(rawFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
-            }
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
             // var outTsvFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, "ms1ft");
             //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
-            var run = PbfLcMsRun.GetLcMsRun(rawFile);
+            Console.WriteLine(@"Start loading MS1 data from {0}", pbfFile.FullName);
+
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                 (stopwatch.ElapsedMilliseconds)/1000.0d);

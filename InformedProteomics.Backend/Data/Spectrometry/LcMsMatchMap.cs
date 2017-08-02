@@ -18,8 +18,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            IEnumerable<int> ms2ScanNums;
-            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out ms2ScanNums)) return ms2ScanNums;
+
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums)) return ms2ScanNums;
             return new int[0];
         }
 
@@ -31,8 +31,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var maxBinNum = GetBinNumber(maxMass);
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                IList<IntRange> scanRanges;
-                if (!_map.TryGetValue(binNum, out scanRanges)) continue;
+                if (!_map.TryGetValue(binNum, out var scanRanges)) continue;
                 var sequenceMass = GetMass(binNum);
                 var ms2ScanNums = new List<int>();
 
@@ -74,8 +73,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 for (var curBinNum = curMinBinNum; curBinNum <= curMaxBinNum; curBinNum++)
                 {
                     if (curBinNum < minBinNum || curBinNum > maxBinNum) continue;
-                    List<int> existingMs2ScanNums;
-                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out existingMs2ScanNums)) continue;
+
+                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out var existingMs2ScanNums)) continue;
                     foreach (var ms2ScanNum in existingMs2ScanNums)
                     {
                         ms2ScanNums.Add(ms2ScanNum);
@@ -93,8 +92,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var range = new IntRange(minScanNum, maxScanNum);
 
             var binNum = GetBinNumber(monoIsotopicMass);
-            IList<IntRange> ranges;
-            if (_map.TryGetValue(binNum, out ranges))
+
+            if (_map.TryGetValue(binNum, out var ranges))
             {
                 var newRanges = new List<IntRange>();
                 foreach (var existingRange in ranges)

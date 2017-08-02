@@ -132,7 +132,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     var offsetTolerance = isotopeOffsetTolerance;
                     if (isotopeOffsetTolerance < 0)
                     {
-                        offsetTolerance = isotopomerEnvelope.Envolope.Length;
+                        offsetTolerance = isotopomerEnvelope.Envelope.Length;
                     }
 
                     for (var isotopeIndex = mostAbundantIsotopeIndex - offsetTolerance;
@@ -144,7 +144,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var observedPeaks = GetAllIsotopePeaks(spectrum, monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
                         if (observedPeaks == null) continue;
 
-                        var envelop = isotopomerEnvelope.Envolope;
+                        var envelop = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
 
                         int observedPeakCount = 0;
@@ -274,7 +274,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             double relativeIntensityThreshold)
         {
             var mostAbundantIsotopeIndex = envelope.MostAbundantIsotopeIndex;
-            var isotopomerEnvelope = envelope.Envolope;
+            var isotopomerEnvelope = envelope.Envelope;
             var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoisotopicMass, charge, mostAbundantIsotopeIndex);
             var mostAbundantIsotopePeakIndex = spec.FindPeakIndex(mostAbundantIsotopeMz, tolerance);
             if (mostAbundantIsotopePeakIndex < 0) return null;
@@ -410,7 +410,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
                         if (observedPeaks == null) continue;
 
-                        var envelop = isotopomerEnvelope.Envolope;
+                        var envelop = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
 
                         for (var i = 0; i < observedPeaks.Length; i++)

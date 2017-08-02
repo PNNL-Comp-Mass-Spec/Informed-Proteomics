@@ -20,6 +20,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
     {
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestTopDownScoringForAllXics()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -109,7 +110,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                     {
                         totalProtCompositions++;
                        // Console.WriteLine(protComposition);
-                        var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
+                        var scorer = new TopDownScorer(protComposition, run, precursorTolerance);
                         var score = scorer.GetScore();
 
                         Console.WriteLine(score);
@@ -126,6 +127,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestMsAlignPlusResults()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -176,7 +178,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 var protCompositions = seqGraph.GetSequenceCompositions();
 
-                var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance, null);
+                var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance);
                 var score = scorer.GetScore();
 
                 writer.WriteLine(s+"\t"+score);
@@ -189,6 +191,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void TestTopDownScoring()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -237,7 +240,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 //for (var charge = TopDownScorer.MinCharge; charge <= TopDownScorer.MaxCharge; charge++)
                 //{
-                var scorer = new TopDownScorer(protComposition, run, precursorTolerance, null);
+                var scorer = new TopDownScorer(protComposition, run, precursorTolerance);
                 var score = scorer.GetScore();
 
                 Console.WriteLine(score);

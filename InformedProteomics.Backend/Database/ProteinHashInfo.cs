@@ -17,12 +17,12 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Number of residues in the protein sequqence
         /// </summary>
-        public int SequenceLength { get; private set; }
+        public int SequenceLength { get; }
 
         /// <summary>
         /// SHA-1 Hash of the protein sequence
         /// </summary>
-        public string SequenceHash { get; private set; }
+        public string SequenceHash { get; }
 
         /// <summary>
         /// Constructor

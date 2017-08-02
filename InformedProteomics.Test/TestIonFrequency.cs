@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
@@ -35,6 +34,7 @@ namespace InformedProteomics.Test
         private readonly Tolerance _defaultTolerance = new Tolerance(0.5, ToleranceUnit.Mz);
 
         [Test]
+        [Category("Local_Testing")]
         public void IonFrequencyFunction()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -59,13 +59,13 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                int tableCount = 1;
+                var tableCount = 1;
                 if (_precursorCharge > 0)
                     tableCount = _precursorCharge;
 
                 var ionFrequencyFunctions = new IonFrequencyTable[tableCount];
                 var decoyionFrequencyFunctions = new IonFrequencyTable[tableCount];
-                for (int i = 0; i < tableCount; i++)
+                for (var i = 0; i < tableCount; i++)
                 {
                     ionFrequencyFunctions[i] = new IonFrequencyTable(_ionTypes,
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
@@ -73,10 +73,10 @@ namespace InformedProteomics.Test
                                 _defaultTolerance, _relativeIntensityThreshold, _combineCharges);
                 }
 
-                for (int i = 0; i < txtFiles.Count; i++)
+                for (var i = 0; i < txtFiles.Count; i++)
                 {
-                    string textFile = txtFiles[i];
-                    string rawFile = rawFiles[i];
+                    var textFile = txtFiles[i];
+                    var rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
                     var lcms = new LazyLcMsRun(rawFile, NoiseFiltration, NoiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp);
@@ -84,7 +84,7 @@ namespace InformedProteomics.Test
                     if (_useDecoy)
                         decoyMatchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp, 0, true);
 
-                    for (int j = 0; j < tableCount; j++)
+                    for (var j = 0; j < tableCount; j++)
                     {
                         var matches = _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList;
 
@@ -102,9 +102,9 @@ namespace InformedProteomics.Test
 
                 // Print Offset Frequency tables to output file
                 var outFile = _outFileName.Replace("@", name);
-                for (int i = 0; i < tableCount; i++)
+                for (var i = 0; i < tableCount; i++)
                 {
-                    string outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
+                    var outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
                     var ionFrequencies = ionFrequencyFunctions[i].GetProbabilities();
                     var decoyionFrequencies = decoyionFrequencyFunctions[i].GetProbabilities();
                     using (var finalOutputFile = new StreamWriter(outFileName))
@@ -112,7 +112,7 @@ namespace InformedProteomics.Test
                         finalOutputFile.Write("Ion\tTarget");
                         if (_useDecoy) finalOutputFile.Write("\tDecoy");
                         finalOutputFile.WriteLine();
-                        for (int j=0;j<ionFrequencies.Length;j++)
+                        for (var j=0;j<ionFrequencies.Length;j++)
                         {
                             finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].Label.Name, ionFrequencies[j].Prob);
                             if (_useDecoy)
@@ -144,10 +144,10 @@ namespace InformedProteomics.Test
 
             // Read ion data
             var ionInfo = reader.GetNodes("ion").First();
-            int totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
+            var totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
             var ionTypeStr = ionInfo.Contents["iontype"].Split(',');
             var ions = new BaseIonType[ionTypeStr.Length];
-            for (int i = 0; i < ionTypeStr.Length; i++)
+            for (var i = 0; i < ionTypeStr.Length; i++)
             {
                 switch (ionTypeStr[i].ToLower())
                 {
@@ -173,7 +173,7 @@ namespace InformedProteomics.Test
             }
             var ionLossStr = ionInfo.Contents["losses"].Split(',');
             var ionLosses = new NeutralLoss[ionLossStr.Length];
-            for (int i = 0; i < ionLossStr.Length; i++)
+            for (var i = 0; i < ionLossStr.Length; i++)
             {
                 switch (ionLossStr[i].ToLower())
                 {

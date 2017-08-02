@@ -21,13 +21,9 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var searchableDb = new SearchableDatabase(db);
             //const string pattern = "NSGSHFCGGSLINSQWVVSAAH";
             const string pattern = "FPTDDDDK";
@@ -50,19 +46,20 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
+            var numPeptides = 0;
             foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 13))
             {
-                Console.WriteLine(annotationAndOffset.Annotation);
+                if (numPeptides < 20)
+                    Console.WriteLine(annotationAndOffset.Annotation);
+                numPeptides++;
             }
             sw.Stop();
+
+            Console.WriteLine("Peptide count: {0}", numPeptides);
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -76,19 +73,21 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
+            var numPeptides = 0;
+
             foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(100, 300, 3))
             {
-                Console.WriteLine(annotationAndOffset.Annotation);
+                if (numPeptides < 20)
+                    Console.WriteLine(annotationAndOffset.Annotation);
+                numPeptides++;
             }
             sw.Stop();
+
+            Console.WriteLine("Peptide count: {0}", numPeptides);
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -102,16 +101,9 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
-//            const string dbFile = @"C:\cygwin\home\kims336\Data\QCShew\ID_003456_9B916A8B.fasta";
-//            const string dbFile = @"H:\Research\DDAPlus\database\Yeast_SGD_withContam.fasta";
-//            const string dbFile = @"H:\Research\CPTAC_Phospho\database\ID_004208_295531A4.fasta";
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
             var peptides = indexedDb
@@ -121,7 +113,8 @@ namespace InformedProteomics.Tests.UnitTests
 
             foreach (var peptide in peptides)
             {
-                Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
+                if (numPeptides < 20)
+                    Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
                 numPeptides++;
             }
 
@@ -154,19 +147,16 @@ namespace InformedProteomics.Tests.UnitTests
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
-            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownQCShew\database\ID_002216_235ACCEA.fasta";
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
 
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
 
             var both = 0L;
             var nTermOnly = 0L;
             var cTermOnly = 0L;
+
+            var displayedResults = 0;
 
             foreach (
                 var annotationAndOffset in
@@ -193,11 +183,16 @@ namespace InformedProteomics.Tests.UnitTests
                         var anno = numNTermCleavage == 0
                             ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
-                        Console.WriteLine(anno);
+
+                        if (displayedResults < 20)
+                            Console.WriteLine(anno);
+                        displayedResults++;
                     }
                     ++numNTermCleavage;
                 }
             }
+
+            displayedResults = 0;
 
             foreach (
                 var annotationAndOffset in
@@ -216,7 +211,10 @@ namespace InformedProteomics.Tests.UnitTests
                         var anno = numNTermCleavage == 0
                             ? annotation
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
-                        Console.WriteLine(anno);
+
+                        if (displayedResults < 20)
+                            Console.WriteLine(anno);
+                        displayedResults++;
                     }
                 }
             }
@@ -236,13 +234,9 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\MSPathFinderT\Short.fasta";
-            if (!File.Exists(dbFile))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
-            }
-
-            var db = new FastaDatabase(dbFile);
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
+            
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             var indexedDb = new IndexedDatabase(db);
             foreach (var peptideAnnotationAndOffset in indexedDb.AnnotationsAndOffsets(6, 20, 2, 0, Enzyme.Trypsin))
@@ -267,7 +261,7 @@ namespace InformedProteomics.Tests.UnitTests
         //    const int numMissedCleavages = 1;
         //    var enzyme = Enzyme.Trypsin;
 
-        //    const string dbFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+        //    var dbFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta");
         //    var targetDb = new FastaDatabase(dbFilePath);
 
         //    var indexedDbTarget = new IndexedDatabase(targetDb);
@@ -320,7 +314,7 @@ namespace InformedProteomics.Tests.UnitTests
         //    var sw = new System.Diagnostics.Stopwatch();
         //    sw.Start();
 
-        //    const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\BSA.fasta";
+        //    var dbFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "BSA.fasta");
         //    var db = new FastaDatabase(dbFile);
         //    db.Decoy(Enzyme.Trypsin);
         //    sw.Stop();

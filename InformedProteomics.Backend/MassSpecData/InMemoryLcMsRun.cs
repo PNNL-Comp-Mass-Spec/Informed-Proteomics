@@ -314,8 +314,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var maxBinNum = (int)Math.Round(isolationWindow.MaxMz * IsolationWindowBinningFactor);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
-                        List<int> scanNumList;
-                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out scanNumList))
+                        if (!isolationMzBinToScanNums.TryGetValue(binNum, out var scanNumList))
                         {
                             scanNumList = new List<int>();
                             isolationMzBinToScanNums[binNum] = scanNumList;
@@ -395,9 +394,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>spectrum</returns>
         public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
-            Spectrum spec = null;
             // Not sure if stripping peaks out is worth it; but definitely want to return as a copy if we do.
-            //if (_scanNumSpecMap.TryGetValue(scanNum, out spec) && !includePeaks)
+            //if (_scanNumSpecMap.TryGetValue(scanNum, out var spec) && !includePeaks)
             //{
             //    ProductSpectrum pspec = null;
             //    if ((pspec = spec as ProductSpectrum) != null)
@@ -424,7 +422,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //    }
             //}
             //return spec;
-            return _scanNumSpecMap.TryGetValue(scanNum, out spec) ? spec : null;
+            return _scanNumSpecMap.TryGetValue(scanNum, out var spec) ? spec : null;
         }
 
         /// <summary>

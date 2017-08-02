@@ -19,8 +19,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             Composition = modificationList.Aggregate(Data.Composition.Composition.Zero, (current, mod) => current + mod.Composition);
         }
 
-        public Composition.Composition Composition { get; private set; }
-        public IList<Modification> Modifications { get; private set; }
+        public Composition.Composition Composition { get; }
+        public IList<Modification> Modifications { get; }
 
         public int GetNumModifications()
         {

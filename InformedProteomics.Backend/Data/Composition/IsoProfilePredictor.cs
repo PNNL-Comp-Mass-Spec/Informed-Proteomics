@@ -114,11 +114,11 @@ namespace InformedProteomics.Backend.Data.Composition
         public static readonly double[] DefaultProbO = { 0.99757, 0.00038, 0.00205, 0 };
         public static readonly double[] DefaultProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
 
-        public double[] ProbC { get; private set; }
-        public double[] ProbH { get; private set; }
-        public double[] ProbN { get; private set; }
-        public double[] ProbO { get; private set; }
-        public double[] ProbS { get; private set; }
+        public double[] ProbC { get; }
+        public double[] ProbH { get; }
+        public double[] ProbN { get; }
+        public double[] ProbO { get; }
+        public double[] ProbS { get; }
 
         private static int[][][] _possibleIsotopeCombinations;
 

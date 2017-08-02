@@ -11,8 +11,8 @@
             SuffixResidue = suffixResidue;
         }
 
-        public Composition.Composition PrefixComposition { get; private set; }
-        public Composition.Composition SuffixComposition { get; private set; }
+        public Composition.Composition PrefixComposition { get; }
+        public Composition.Composition SuffixComposition { get; }
 
         public AminoAcid PrefixResidue { get; private set; }
 

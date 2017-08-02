@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
@@ -16,7 +15,6 @@ using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
-//using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 
 namespace InformedProteomics.Test
 {
@@ -24,6 +22,7 @@ namespace InformedProteomics.Test
     class TestFeatureBasedSearch
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestFeatureId()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -147,14 +146,12 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dataSet = @"H:\Research\Lewy\raw\Lewy_intact_07";
-            //            const int scanNum = 5158;
-            const int minTagLength = 7;
             const int minNumTagMatches = 1;
             var aminoAcidSet = AminoAcidSet.GetStandardAminoAcidSet();
 
@@ -231,6 +228,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -271,6 +269,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestFeatureIdMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -297,8 +296,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
-            var idList =
-                resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
+            var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
             var idMassList = idList.Select(id => id.Mass).ToList();
             var idFlag = new bool[idList.Count];
 
@@ -462,6 +460,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

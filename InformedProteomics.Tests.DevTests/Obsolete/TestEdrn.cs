@@ -20,6 +20,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
     {
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -52,6 +53,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void SummarizeDda()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -92,6 +94,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
         [Ignore("File Missing, test obsolete, or long test")]
         [Test]
+        [Category("Local_Testing")]
         public void ComputeSpikedInPeptideMzHist()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

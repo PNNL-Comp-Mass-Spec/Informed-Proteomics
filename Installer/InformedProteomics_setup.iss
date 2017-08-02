@@ -17,6 +17,8 @@ Source: InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll.co
 
 ; InformedProteomics.Backend Nuget libraries
 Source: InformedProteomics.Backend\bin\Release\MathNet.Numerics.dll                                                                               ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\PSI_Interface.dll                                                                                  ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\DotNetZip.dll                                                                                      ; DestDir: {app}
 
 ; SAIS
 Source: SAIS\bin\Release\SAIS.dll                                                                                                                 ; DestDir: {app}
@@ -26,8 +28,6 @@ Source: lib\alglibnet2.dll                                                      
 Source: lib\PNNLOmics.dll                                                                                                                         ; DestDir: {app}
 Source: lib\ProteinFileReader.dll                                                                                                                 ; DestDir: {app}
 Source: lib\ThermoRawFileReader.dll                                                                                                               ; DestDir: {app}
-Source: lib\PSI_Interface\PSI_Interface.dll                                                                                                       ; DestDir: {app}
-Source: lib\PSI_Interface\Ionic.Zip.dll                                                                                                           ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
 Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}

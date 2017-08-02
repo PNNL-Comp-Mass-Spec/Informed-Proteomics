@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Tests.FunctionalTests
@@ -9,10 +12,18 @@ namespace InformedProteomics.Tests.FunctionalTests
     public class TestAminoAcidSet
     {
         [Test]
-        public void TestParsingManyMods()
+        [TestCase(@"TEST_FOLDER\TopDown\Lewy_ManyMods\Lewy_DB_Mods.txt")]
+        [TestCase(@"TEST_FOLDER\TopDown\Lewy_ManyMods\Lewy_DB_Mods2.txt")]
+        public void TestParsingManyMods(string modDefsFile)
         {
-            const string modFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\Mods.txt";
-            var aaSet = new AminoAcidSet(modFilePath);
+            var methodName = MethodBase.GetCurrentMethod().Name;
+
+            var modFile = Utils.GetTestFile(methodName, modDefsFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
+
+            if (!modFile.Exists)
+                Assert.Ignore("Ignoring test TestParsingManyMods since file not found: " + modFile.FullName);
+
+            var aaSet = new AminoAcidSet(modFile.FullName);
             //aaSet.Display();
 
             //SequenceLocation.ProteinNTerm
@@ -57,6 +68,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Ignore("File Missing, test obsolete, or long test")]
+        [Category("Local_Testing")]
         public void TestParsingGlycoMods()
         {
             const string modFilePath = @"C:\cygwin\home\kims336\Data\Debug\MSPathFinder_Mods.txt";

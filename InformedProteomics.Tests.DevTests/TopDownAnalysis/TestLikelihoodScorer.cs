@@ -24,6 +24,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestGenerateFrequencyData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -27,7 +27,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         ? c.PrefixComposition + baseIonType.OffsetComposition
                         : c.SuffixComposition + baseIonType.OffsetComposition;
 
-                    for (int charge = MinCharge; charge <= MaxCharge; charge++)
+                    for (var charge = MinCharge; charge <= MaxCharge; charge++)
                     {
                         var ion = new Ion(fragmentComposition, charge);
                         var observedPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, RelativeIsotopeIntensityThreshold);

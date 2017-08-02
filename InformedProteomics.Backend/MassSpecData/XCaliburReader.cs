@@ -106,17 +106,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Path to the file
         /// </summary>
-        public string FilePath { get; private set; }
+        public string FilePath { get; }
 
         /// <summary>
         /// SHA-1 Checksum of the raw file
         /// </summary>
-        public string SrcFileChecksum { get; private set; }
+        public string SrcFileChecksum { get; }
 
         /// <summary>
         /// Version of the file format
         /// </summary>
-        public string FileFormatVersion { get; private set; }
+        public string FileFormatVersion { get; }
 
         /// <summary>
         /// Reads the mass spectrum with the specified scanNum from the raw file
@@ -320,9 +320,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 Charge = charge;
             }
 
-            internal double IsolationWidth { get; private set; }
-            internal double? MonoisotopicMz { get; private set; }
-            internal int? Charge { get; private set; }
+            internal double IsolationWidth { get; }
+            internal double? MonoisotopicMz { get; }
+            internal int? Charge { get; }
         }
 
         private static double ParseMzValueFromThermoScanInfo(string scanFilterString)

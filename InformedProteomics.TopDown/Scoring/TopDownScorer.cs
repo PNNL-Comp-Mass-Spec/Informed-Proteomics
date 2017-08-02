@@ -21,7 +21,9 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly Composition _proteinCompositionPlusWater;
         private readonly double[][][] _xicArray; // charge, num isotope (from _minIsotopeIndex) , scan number index
         private readonly double[][][] _smoothedXicArray; // charge, num isotope, scan number index
-        private readonly SubScoreFactory _factory;
+
+        // [Obsolete("This functionality of this class is not implemented")]
+        // private readonly SubScoreFactory _factory;
 
         private readonly int _minIsotopeIndex;
         private readonly int _maxIntensityIsotopeIndex;
@@ -29,12 +31,29 @@ namespace InformedProteomics.TopDown.Scoring
         private const int NumberAfterMaxIsotopeIndex = 3; //
         private const float MinIsotopeIntensity = 0.2f;
 
-        public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolernace, SubScoreFactory factory)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="proteinComposition"></param>
+        /// <param name="run"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="factory"></param>
+        [Obsolete("Use the version of TopDownScore that does not take factory")]
+        public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolerance, SubScoreFactory factory) : this(proteinComposition, run, tolerance)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="proteinComposition"></param>
+        /// <param name="run"></param>
+        /// <param name="tolerance"></param>
+        public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolerance)
         {
             _run = run;
             _proteinCompositionPlusWater = proteinComposition + Composition.H2O;
-            _tolerance = tolernace;
-            _factory = factory;
+            _tolerance = tolerance;
 
             _maxIntensityIsotopeIndex = _proteinCompositionPlusWater.GetMostAbundantIsotopeZeroBasedIndex();
             var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelopeRelativeIntensities();
@@ -233,13 +252,17 @@ namespace InformedProteomics.TopDown.Scoring
                         FilterXic(truncatedXics[charge - MinCharge][charge - MinCharge],
                                   truncatedXics[charge - MinCharge][charge2 - MinCharge]))
                     {
-                        diff = _factory == null ? -.3 : _factory.GetMissingXicScore(charge2);
-                      //  Console.WriteLine(charge + "\t" + charge2 + "\t" + "filtered" + "\t**");
+                        // diff = _factory?.GetMissingXicScore(charge2) ?? -.3;
+                        diff = -.3;
+
+                        //  Console.WriteLine(charge + "\t" + charge2 + "\t" + "filtered" + "\t**");
                     }
                     else
                     {
                         var corrIntScore = GetIsotopeCorrelationIntegerRawScore(truncatedXics[charge - MinCharge][charge2 - MinCharge]);
-                        diff = _factory == null ? corrIntScore : _factory.GetXicCorrScore(charge2, corrIntScore);
+                        // diff = _factory?.GetXicCorrScore(charge2, corrIntScore) ?? corrIntScore;
+                        diff = corrIntScore;
+
                         //diff = 1;
                         // Console.WriteLine(charge + "\t" + charge2 + "\t" + diff + "\t**");
                     }

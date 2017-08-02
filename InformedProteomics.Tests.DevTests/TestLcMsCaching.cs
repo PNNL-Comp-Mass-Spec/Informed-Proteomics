@@ -19,69 +19,83 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     internal class TestLcMsCaching
     {
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
-        public void TestClusterCentricSearch()
+        [TestCase(0.001, 108)]
+        [TestCase(0.01, 113)]
+        [TestCase(0.02, 116)]
+        [TestCase(0.05, 130)]
+        public void TestClusterCentricSearch(double qValueThreshold, int expectedNumCompositions)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string pfResultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
-            if (!File.Exists(pfResultFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pfResultFilePath);
-            }
+            var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
+            var resultFile = Utils.GetTestFile(methodName, resultFilePath);
 
-            var tsvReader = new TsvFileParser(pfResultFilePath);
+            var tsvReader = new TsvFileParser(resultFile.FullName);
 
-            var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32((string) s)).ToArray();
+            var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32((string)s)).ToArray();
             var compositions = tsvReader.GetData("Composition").ToArray();
             var qValues = tsvReader.GetData("QValue").Select(Convert.ToDouble).ToArray();
 
             var compScanTable = new Dictionary<string, IList<int>>();
-            for(var i=0; i<qValues.Length; i++)
+            for (var i = 0; i < qValues.Length; i++)
             {
                 var qValue = qValues[i];
-                if (qValue > 0.01) break;
+                if (qValue > qValueThreshold) break;
                 IList<int> scanNums;
-                if(compScanTable.TryGetValue(compositions[i], out scanNums))
+                if (compScanTable.TryGetValue(compositions[i], out scanNums))
                 {
                     scanNums.Add(ms2Scans[i]);
                 }
                 else
                 {
-                    compScanTable.Add(compositions[i], new List<int> {ms2Scans[i]});
+                    compScanTable.Add(compositions[i], new List<int> { ms2Scans[i] });
                 }
             }
 
             Console.Write("NumCompositions: {0}", compScanTable.Keys.Count);
 
-            //const string featureFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V4_JP_Len500\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            Assert.AreEqual(expectedNumCompositions, compScanTable.Keys.Count);
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestIsosFilter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string isosFilePath = @"H:\Research\QCShew_TopDown\Production\ICRTools\QC_Shew_Intact_26Sep14_Bane_C2Column3_Isos.csv";
-            if (!File.Exists(isosFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, isosFilePath);
-            }
+            var isosFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_isos.csv");
+            var isosfile = Utils.GetTestFile(methodName, isosFilePath);
 
-            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            if (!File.Exists(rawFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-            }
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
-            var filter = new IsosFilter(run, new Tolerance(10), isosFilePath);
-            Console.WriteLine(string.Join("\t",filter.GetMatchingMs2ScanNums(30261.68374)));
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
+            var filter = new IsosFilter(run, new Tolerance(10), isosfile.FullName);
+
+            var massToFind = 944.08176;
+            var matchingScanNums = filter.GetMatchingMs2ScanNums(massToFind).ToList();
+
+            var scanNumList = string.Join(",", matchingScanNums);
+
+            Console.WriteLine("Scans with mass {0}:", massToFind);
+            Console.WriteLine(scanNumList);
+
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FilteringEfficiencyQcShew()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -211,6 +225,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FilteringEfficiency()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -236,7 +251,7 @@ namespace InformedProteomics.Tests.DevTests
             sw.Reset();
             sw.Start();
             //var ms1BasedFilter = new Ms1BasedFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm);
-//
+            //
             //var ms1BasedFilter = new Ms1IsotopeTopKFilter(run, minPrecursorCharge, maxPrecursorCharge, tolerancePpm, 20);
             //var ms1BasedFilter = new ProductScorerBasedOnDeconvolutedSpectra(run,
             //    minPrecursorCharge, maxPrecursorCharge,
@@ -364,9 +379,9 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             Console.WriteLine("TotalNumComparisons: {0}", numComparisons);
-            Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons/(double)(maxBinNum-minBinNum+1));
-            Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs/(double)totalSpecs, numUnfilteredSpecs, totalSpecs);
-            Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count/(double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
+            Console.WriteLine("AverageNumComparisons: {0:f2}", numComparisons / (double)(maxBinNum - minBinNum + 1));
+            Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
+            Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
 
             Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
@@ -382,7 +397,7 @@ namespace InformedProteomics.Tests.DevTests
             var converted = BitConverter.DoubleToInt64Bits(value);
             var rounded = (converted >> numShifts) << numShifts;
             var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
-            var roundedInt = (int) (rounded >> 32);
+            var roundedInt = (int)(rounded >> 32);
             Console.WriteLine("{0,25:E16}{1,23:X16}{2,23:X16}", value, converted, rounded);
             Console.WriteLine("{0}\t{1}", value, roundedDouble);
             Console.WriteLine("PPM error: {0}", (roundedDouble - value) / value * 1E6);
@@ -390,6 +405,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestPossibleSequenceMasses()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -423,6 +439,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs1Filtering()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -497,10 +514,10 @@ namespace InformedProteomics.Tests.DevTests
                 var apexScanNum = xicMostAbundant.GetApexScanNum();
                 if (apexScanNum < run.MinLcScan) apexScanNum = scanNum;
                 //var sumSpec = run.GetSummedMs1Spectrum(apexScanNum);
-//                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
-//                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
+                //                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
+                //                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
 
-                var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12/charge, tolerance, scanNum);
+                var xicNextIsotope = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz() + Constants.C13MinusC12 / charge, tolerance, scanNum);
 
                 var plusOneIsotopeCorr = xicMostAbundant.GetCorrelation(xicNextIsotope);
 
@@ -525,6 +542,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs2Caching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -561,7 +579,7 @@ namespace InformedProteomics.Tests.DevTests
             //for (var nominalMass = 1000; nominalMass <= 1000; nominalMass++)
             //{
             //    Console.WriteLine("{0}\t{1}", nominalMass,
-            //        string.Join(",", Averagine.GetIsotopomerEnvelopeFromNominalMass(nominalMass).Envolope.Select(v => string.Format("{0:f3}", v))));
+            //        string.Join(",", Averagine.GetIsotopomerEnvelopeFromNominalMass(nominalMass).Envelope.Select(v => string.Format("{0:f3}", v))));
             //}
             for (var nominalMass = 1000; nominalMass <= 50000; nominalMass++)
             {
@@ -570,6 +588,7 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestMs1Signature()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -593,18 +612,22 @@ namespace InformedProteomics.Tests.DevTests
             }
         }
 
+        [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestNominalMassErrors()
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            Utils.ShowStarting(methodName);
+
             const int minLength = 300;
             const int maxLength = 400;
 
             var sw = new System.Diagnostics.Stopwatch();
 
-//            const string dbFile = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
-            const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownJia\database\ID_003962_71E1A1D4.fasta";
+            var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_003962_71E1A1D4.fasta"));
 
-            //const string dbFile = @"C:\cygwin\home\kims336\Data\TopDownJia\database\TargetProteins.fasta";
-            var db = new FastaDatabase(dbFile);
+            var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             var indexedDb = new IndexedDatabase(db);
             var numSequences = 0L;
@@ -620,8 +643,8 @@ namespace InformedProteomics.Tests.DevTests
                 var sequenceComp = aaSet.GetComposition(sequenceStr);
                 var mass = sequenceComp.Mass;
                 var nominalMass = sequenceComp.NominalMass;
-                var error = (int) Math.Round(mass*Constants.RescalingConstant) - nominalMass;
-                var errorBin = error + hist.Length/2;
+                var error = (int)Math.Round(mass * Constants.RescalingConstant) - nominalMass;
+                var errorBin = error + hist.Length / 2;
                 if (errorBin < 0) errorBin = 0;
                 if (errorBin >= hist.Length) errorBin = hist.Length - 1;
                 hist[errorBin]++;
@@ -630,7 +653,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumSequences: {0}", numSequences);
             for (var i = 0; i < hist.Length; i++)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", i - hist.Length/2, hist[i], hist[i]/(double)numSequences);
+                Console.WriteLine("{0}\t{1}\t{2}", i - hist.Length / 2, hist[i], hist[i] / (double)numSequences);
             }
 
             sw.Stop();

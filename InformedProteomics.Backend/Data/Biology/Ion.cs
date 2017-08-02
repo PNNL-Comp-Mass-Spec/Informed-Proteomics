@@ -7,8 +7,8 @@ namespace InformedProteomics.Backend.Data.Biology
 {
     public class Ion
     {
-        public Composition.Composition Composition { get; private set; }
-        public int Charge { get; private set; }
+        public Composition.Composition Composition { get; }
+        public int Charge { get; }
 
         public Ion(Composition.Composition composition, int charge)
         {
@@ -53,15 +53,15 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Gets theoretical isotope peaks whose intensities are relative to the most intense isotope
         /// </summary>
-        /// <param name="relativeIntensityThreshold">relative isotope intensity threshold</param>
+        /// <param name="minimumRelativeIntensity">Minimum intensity threshold for including the isotope in the results</param>
         /// <returns>Enumerable of isotope peaks</returns>
-        public IEnumerable<Isotope> GetIsotopes(double relativeIntensityThreshold)
+        public IEnumerable<Isotope> GetIsotopes(double minimumRelativeIntensity)
         {
             var isotopeIndex = -1;
             foreach (var isotopeRatio in Composition.GetIsotopomerEnvelopeRelativeIntensities())
             {
                 ++isotopeIndex;
-                if (isotopeRatio > relativeIntensityThreshold)
+                if (isotopeRatio >= minimumRelativeIntensity)
                 {
                     yield return new Isotope(isotopeIndex, isotopeRatio);
                 }

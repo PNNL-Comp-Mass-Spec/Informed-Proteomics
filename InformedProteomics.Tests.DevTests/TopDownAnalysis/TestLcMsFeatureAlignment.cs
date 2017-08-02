@@ -16,11 +16,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
     class TestLcMsFeatureAlignment
     {
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestPeptidomics()
         {
             const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Quant";
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            string outFilePath = string.Format(@"{0}\aligned_features2.tsv", ms1ftFolder);
+            var outFilePath = string.Format(@"{0}\aligned_features2.tsv", ms1ftFolder);
 
             var fileEntries = Directory.GetFiles(ms1ftFolder);
 
@@ -42,7 +44,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             //for (var i = 1; i <= 10; i++) dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
             var rawFiles = new List<string>();
             var ms1FtFiles = new List<string>();
-            foreach (string datasetName in dataset)
+            foreach (var datasetName in dataset)
             {
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, datasetName);
                 var ms1File = string.Format(@"{0}\{1}.ms1ft", ms1ftFolder, datasetName);
@@ -72,11 +74,12 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestCptac10Replicates()
         {
             const string ms1ftFolder = @"D:\MassSpecFiles\CPTAC_rep10";
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1";
-            string outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
+            var outFilePath = string.Format(@"{0}\aligned_features.tsv", ms1ftFolder);
 
             //var fileEntries = Directory.GetFiles(ms1ftFolder);
             //var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
@@ -87,7 +90,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var rawFiles = new List<string>();
             var ms1FtFiles = new List<string>();
 
-            foreach (string datasetName in dataset)
+            foreach (var datasetName in dataset)
             {
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, datasetName);
                 var ms1File = string.Format(@"{0}\{1}.ms1ft", ms1ftFolder, datasetName);
@@ -117,6 +120,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Long_Running")]
         public void TestCompRef()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features_requant.tsv";
@@ -133,6 +138,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestIMER()
         {
             const string outFilePath = @"D:\MassSpecFiles\IMER\aligned_features.tsv";
@@ -149,6 +155,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTempCompRefLcMsFeatureAlign()
         {
             const string dataFolder = @"D:\MassSpecFiles\CompRef";

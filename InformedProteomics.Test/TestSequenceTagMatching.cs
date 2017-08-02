@@ -11,8 +11,6 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.PostProcessing;
-using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
 using NUnit.Framework;
 
@@ -22,6 +20,7 @@ namespace InformedProteomics.Test
     public class TestSequenceTagMatching
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestSearchWithTagGeneration()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -65,6 +64,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchForLewy()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -78,7 +78,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 4;
+            //const int minTagLength = 4;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
@@ -103,6 +103,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchCompRef()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -141,7 +142,7 @@ namespace InformedProteomics.Test
                 var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
-                const int minTagLength = 5;
+                //const int minTagLength = 5;
                 //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
                 Console.WriteLine("-----------------{0}--------------------", rawFile);
@@ -153,6 +154,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -173,7 +175,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 5;
+            //const int minTagLength = 5;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
@@ -211,6 +213,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -260,6 +263,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -392,6 +396,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedScansPerProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -460,6 +465,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteinDeltaMass()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

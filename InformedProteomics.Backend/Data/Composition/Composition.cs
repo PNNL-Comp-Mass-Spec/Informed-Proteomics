@@ -200,8 +200,7 @@ namespace InformedProteomics.Backend.Data.Composition
             // Both have additional elements
             foreach (var entry in _additionalElements)
             {
-                short otherValue;
-                if (!(other._additionalElements.TryGetValue(entry.Key, out otherValue))) return false;
+                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue))) return false;
                 if (entry.Value != otherValue) return false;
             }
             return true;
@@ -228,8 +227,8 @@ namespace InformedProteomics.Backend.Data.Composition
                 foreach (var element in c._additionalElements)
                 {
                     var atom = element.Key;
-                    short numAtoms;
-                    if (_additionalElements.TryGetValue(atom, out numAtoms))
+
+                    if (_additionalElements.TryGetValue(atom, out var numAtoms))
                     {
                         // atom was in _additionalElements
                         additionalElements[atom] = (short)(numAtoms + element.Value);
@@ -333,7 +332,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return buf.ToString();
         }
 
-        // Parses plain string (e.g. C2H3N1O1S)
+        /// <summary>
+        /// Parse a plain-string empirical formula, for example
+        /// C2H3N1O1S
+        /// </summary>
+        /// <param name="plaincompositionStr"></param>
+        /// <remarks>Empirical formula cannot have parentheses or spaces</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition ParseFromPlainString(string plaincompositionStr)
         {
             if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
@@ -354,8 +359,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return Parse(unimodString.ToString());
         }
 
-        // Initially implemented by Kyowon, re-implemented by Sangtae
-        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2))
+        /// <summary>
+        /// Parse unimod-like composition string, for example
+        /// H(117) C(77) N(17) O(26) S(2)
+        /// </summary>
+        /// <param name="compositionStr"></param>
+        /// <remarks>Requires the use of parentheses for element counts.  Also requires whitespace (typically a space) between each element and count</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition Parse(string compositionStr)
         {
             var c = 0;
@@ -383,18 +393,23 @@ namespace InformedProteomics.Backend.Data.Composition
                         element = e.Substring(0, e.IndexOf('('));
                         num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
                     }
-                    if (element.Equals("C")) c = num;
-                    else if (element.Equals("H")) h = num;
-                    else if (element.Equals("N")) n = num;
-                    else if (element.Equals("O")) o = num;
-                    else if (element.Equals("S")) s = num;
-                    else if (element.Equals("P")) p = num;
+                    if (element.Equals("C")) c += num;
+                    else if (element.Equals("H")) h += num;
+                    else if (element.Equals("N")) n += num;
+                    else if (element.Equals("O")) o += num;
+                    else if (element.Equals("S")) s += num;
+                    else if (element.Equals("P")) p += num;
                     else
                     {
                         var atom = Atom.Get(element);
                         if (atom == null) return null;
-                        if (additionalElements == null) additionalElements = new Dictionary<Atom, short>();
-                        additionalElements.Add(atom, (short)num);
+                        if (additionalElements == null)
+                            additionalElements = new Dictionary<Atom, short>();
+
+                        if (additionalElements.TryGetValue(atom, out var currentAtomCount))
+                            additionalElements[atom] = (short)(currentAtomCount + num);
+                        else
+                            additionalElements.Add(atom, (short)num);
                     }
                 }
                 else // illegal string

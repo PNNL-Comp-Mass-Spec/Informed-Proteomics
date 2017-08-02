@@ -15,6 +15,7 @@ namespace InformedProteomics.Test
     public class TestResults
     {
         [Test]
+        [Category("Local_Testing")]
         public void SummarizeAnilResults()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -72,6 +73,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountIdentifiedPeptides()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -112,6 +114,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -152,6 +155,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestIcrTools()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -27,8 +27,7 @@ namespace InformedProteomics.Backend.Utils
 
         public static double GetLogCombination(int n, int k)
         {
-            double sum = 0d;
-            if (LogCombinations.TryGetValue(new Tuple<int, int>(n, k), out sum)) return sum;
+            if (LogCombinations.TryGetValue(new Tuple<int, int>(n, k), out var sum)) return sum;
 
             for (var i = 0; i < k; i++)
             {

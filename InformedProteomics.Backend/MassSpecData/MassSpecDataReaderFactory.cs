@@ -272,7 +272,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Tests to see if we can load the needed  Thermo MSFileReader DLL without errors
+        /// Tests to see if we can load the needed Thermo MSFileReader DLL without errors
         /// </summary>
         /// <returns></returns>
         public static bool IsThermoRawAvailable()

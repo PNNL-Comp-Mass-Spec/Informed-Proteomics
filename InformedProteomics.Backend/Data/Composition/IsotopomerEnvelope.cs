@@ -5,13 +5,13 @@
     [Serializable]
     public class IsotopomerEnvelope
     {
-        public IsotopomerEnvelope(double[] envolope, int mostAbundantIsotopeIndex)
+        public IsotopomerEnvelope(double[] envelope, int mostAbundantIsotopeIndex)
         {
-            Envolope = envolope;
+            Envelope = envelope;
             MostAbundantIsotopeIndex = mostAbundantIsotopeIndex;
         }
 
-        public double[] Envolope { get; private set; }
-        public int MostAbundantIsotopeIndex { get; private set; }
+        public double[] Envelope { get; }
+        public int MostAbundantIsotopeIndex { get; }
     }
 }

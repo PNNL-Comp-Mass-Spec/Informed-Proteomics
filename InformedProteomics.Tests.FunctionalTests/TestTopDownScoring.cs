@@ -23,7 +23,16 @@ namespace InformedProteomics.Tests.FunctionalTests
 
     class TestTopDownScoring
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            // Verify that the test .pbf file exists
+            // If it does not exist, yet the .mzML file exists, create the .pbf file
+            Utils.GetPbfTestFilePath(true);
+        }
+
         [Test]
+        [Category("PNL_Domain")]
         public void TestReadingMsDeconvFile()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -41,8 +50,10 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
             var parser = new MsDeconvFilter(run, new Tolerance(10), filePath);
         }
+
         /*
         [Test]
+        [Category("Local_Testing")]
         public void PrintAllScorers()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -60,6 +71,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestLikelihoodScorer()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -78,6 +90,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }*/
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMatchedPeakCounter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -97,14 +110,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
-            const string specFilePath = @"\\protoapps\UserData\Jungkap\Joshua\testData\SBEP_STM_001_02272012_Aragon.raw";
+            var specFilePath = Base.Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "SBEP_STM_001_02272012_Aragon.pbf"));
 
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
-
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath.FullName, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
@@ -141,6 +149,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestCorrMatchedPeakCounter()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -160,13 +169,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
             Assert.NotNull(seqGraph, "Invalid sequence: {0}", protAnnotation);
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SBEP_STM_001_02272012_Aragon.raw";
-            if (!File.Exists(specFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
-            }
+            var specFilePath = Base.Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "SBEP_STM_001_02272012_Aragon.pbf"));
 
-            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath, 1.4826, 1.4826);
+            var run = InMemoryLcMsRun.GetLcMsRun(specFilePath.FullName, 1.4826, 1.4826);
 
             sw.Start();
             var precursorFilter = new Ms1ContainsIonFilter(run, precursorIonTolerance);
@@ -204,6 +209,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
+        [Category("PNL_Domain")]
         public void TestMatchedPeakPostScorer()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -217,8 +223,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const int ms2ScanNum = 4658;
             var sequence = new Sequence("GYSIKDIIYQGEKSGVHNWQTLSGQNFYWHPDWLHIAEDLTGHKATASIQAEGTKATQNEAEQTIVKHLNKS", new AminoAcidSet());
 
-            const string specFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            //const string specFilePath = @"D:\MassSpecFiles\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3.raw");
 
             if (!File.Exists(specFilePath))
             {
@@ -245,13 +250,8 @@ namespace InformedProteomics.Tests.FunctionalTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //const string rawFilePath = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-            const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
-
-            if (!File.Exists(rawFilePath))
-            {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
-            }
+            var pbfFilePath = Utils.GetPbfTestFilePath(false);
+            var pbfFile = Utils.GetTestFile(methodName, pbfFilePath);
 
             // Configure amino acid set
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -268,7 +268,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var comparer = new FilteredProteinMassBinning(aaSet, 50000, 28);
 
-            var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
+            var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             const double filteringWindowSize = 1.1;
             const int isotopeOffsetTolerance = 2;
             var tolerance = new Tolerance(10);
@@ -279,10 +279,13 @@ namespace InformedProteomics.Tests.FunctionalTests
             //var scorer = new MatchedPeakPostScorer(tolerance, minCharge, maxCharge);
             var scorer = new InformedTopDownScorer(run, aminoAcidSet, minCharge, maxCharge, tolerance);
 
+            if (pbfFile.DirectoryName == null)
+                Assert.Ignore("Ignoring test since cannot determine the parent directory of " + pbfFile.FullName);
+
             var fileExt = new string[] {"IcTarget", "IcDecoy"};
             foreach (var ext in fileExt)
             {
-                var resultFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}.tsv", ext);
+                var resultFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}.tsv", ext);
                 var parser = new TsvFileParser(resultFileName);
                 var scans = parser.GetData("Scan").Select(s => Convert.ToInt32((string) s)).ToArray();
                 var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
@@ -290,7 +293,8 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var modStrs = parser.GetData("Modifications").ToArray();
                 var compositions = parser.GetData("Composition").Select(Composition.Parse).ToArray();
                 var protMass = parser.GetData("Mass").Select(s => Convert.ToDouble(s)).ToArray();
-                var outputFileName = string.Format(@"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_{0}_Rescored.tsv", ext);
+
+                var outputFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}_Rescored.tsv", ext);
 
                 using (var writer = new StreamWriter(outputFileName))
                 {
@@ -299,49 +303,58 @@ namespace InformedProteomics.Tests.FunctionalTests
                     var lines = new string[parser.NumData];
 
                     //for (var i = 0; i < parser.NumData; i++)
-                    Parallel.For(0, parser.NumData, i =>
+                    Parallel.For(0, 30, i =>
                     {
                         var scan = scans[i];
                         var charge = charges[i];
                         var protSequence = protSequences[i];
                         var modStr = modStrs[i];
                         var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
-                        Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
+                        // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
                         var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
-                        Assert.True(ms2Spec != null);
-                        var scores = scorer.GetScores(sequence, charge, scan);
 
-                        var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
-                            isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
-
-                        var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
-                            comparer);
-                        var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
-
-                        var gf = new GeneratingFunction(graph);
-                        gf.ComputeGeneratingFunction();
-
-                        var specEvalue = gf.GetSpectralEValue(scores.Score);
-
-                        var rowStr = parser.GetRows()[i];
-                        var items = rowStr.Split('\t').ToArray();
-                        var newRowStr = string.Join("\t", items, 0, 15);
-
-                        //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
-                        lock (lines)
+                        if (ms2Spec == null)
                         {
-                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
                         }
-                        //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                        else
+                        {
+                            Assert.True(ms2Spec != null);
+                            var scores = scorer.GetScores(sequence, charge, scan);
+
+                            var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
+                                                                                  isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
+
+                            var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
+                                                                                              comparer);
+                            var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
+
+                            var gf = new GeneratingFunction(graph);
+                            gf.ComputeGeneratingFunction();
+
+                            var specEvalue = gf.GetSpectralEValue(scores.Score);
+
+                            var rowStr = parser.GetRows()[i];
+                            var items = rowStr.Split('\t').ToArray();
+                            var newRowStr = string.Join("\t", items, 0, 15);
+
+                            //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                            //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                        }
                     });
 
-                    foreach (var line in lines) writer.WriteLine(line);
+                    foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
+                        Console.WriteLine(line);
+
+
                 }
                 Console.WriteLine("Done");
             }
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void RecomputeFdr()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

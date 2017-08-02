@@ -25,21 +25,28 @@ namespace InformedProteomics.Test
             const int ranks = 20;
             var rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Iontrap, Enzyme.Trypsin,
                                            Protocol.Standard);
-            for (int charge = 1; charge < 4; charge++)
+            for (var charge = 1; charge < 4; charge++)
             {
                 var ionTypes = rankScorer.GetIonTypes(charge, 0);
                 foreach (var ionType in ionTypes)
                 {
-                    for (int r = 0; r <= ranks; r++)
+                    for (var r = 0; r <= ranks; r++)
                     {
-                        Console.WriteLine(@"Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3}",
-                            charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
+                        if (r < 4 || r > ranks - 4)
+                            Console.WriteLine(@"Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3:F4}",
+                                charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
+                        else if (r == 4)
+                            Console.WriteLine("  ...");
                     }
+                    Console.WriteLine();
+
                 }
+                Console.WriteLine();
             }
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void RankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -54,12 +61,12 @@ namespace InformedProteomics.Test
             }
 
             var rankScorer = new RankScore(filePath);
-            for (int charge = 1; charge < 4; charge++)
+            for (var charge = 1; charge < 4; charge++)
             {
                 var ionTypes = rankScorer.GetIonTypes(charge, 0);
                 foreach (var ionType in ionTypes)
                 {
-                    for (int r = 0; r <= ranks; r++)
+                    for (var r = 0; r <= ranks; r++)
                     {
                         Console.WriteLine("Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3}",
                             charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
@@ -69,15 +76,15 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("PNL_Domain")]
+        [Category("Local_Testing")]
         public void DiaRankScore()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            const string dataFile =
-    @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
-            const string tsvFile =
-                @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
+            const string dataFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
+            const string tsvFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
 
             if (!File.Exists(dataFile))
             {
@@ -95,19 +102,16 @@ namespace InformedProteomics.Test
             var scans = parser.GetData("ScanNum");
 
             var lcms = InMemoryLcMsRun.GetLcMsRun(dataFile, 0, 0);
-            var rankScorer =
-    new DiaRankScore(
-        @"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");
+            var rankScorer = new DiaRankScore(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");
 
-            using (
-                var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt"))
+            using (var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt"))
             {
                 outFile.WriteLine("Target\tDecoy");
-                for (int i = 0; i < sequences.Count; i++)
+                for (var i = 0; i < sequences.Count; i++)
                 {
-                    string sequenceStr = sequences[i];
-                    int charge = Convert.ToInt32(charges[i]);
-                    int scan = Convert.ToInt32(scans[i]);
+                    var sequenceStr = sequences[i];
+                    var charge = Convert.ToInt32(charges[i]);
+                    var scan = Convert.ToInt32(scans[i]);
 
                     var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
                     var decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);

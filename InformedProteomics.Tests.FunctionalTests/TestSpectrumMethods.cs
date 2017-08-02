@@ -15,6 +15,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     class TestSpectrumMethods
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestGetAllIsotopePeaks()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
