@@ -46,7 +46,7 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
-            var ionsFound = new Dictionary<BaseIonType, double>();
+            var ionsFound = new Dictionary<bool, double>();
 
             foreach (var baseIonType in BaseIonTypes)
             {
@@ -78,11 +78,12 @@ namespace InformedProteomics.TopDown.Scoring
                         ionscore += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
                         ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
-                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
-                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
+                        if (!ionsFound.ContainsKey(baseIonType.IsPrefix)) ionsFound.Add(baseIonType.IsPrefix, ionscore);
+                        if (ionsFound.ContainsKey(baseIonType.IsPrefix) && ionsFound[baseIonType.IsPrefix] > ionscore) continue;
 
-                        score += ionscore;
+                        ionsFound[baseIonType.IsPrefix] = ionscore;
+
+                        //score += ionscore;
 
                         if (baseIonType.IsPrefix)
                             prefixHit = true;
@@ -99,6 +100,9 @@ namespace InformedProteomics.TopDown.Scoring
 
             if (prefixHit && suffixHit)
                 score += ScoreParam.ComplementaryIonCount;
+
+            foreach (var ionScore in ionsFound.Values) score += ionScore;
+
             return score;
         }
 
@@ -150,7 +154,7 @@ namespace InformedProteomics.TopDown.Scoring
                 score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
             }
 
-            return GetProbability(score);
+            return score; //GetProbability(score);
         }
 
 
@@ -224,7 +228,7 @@ namespace InformedProteomics.TopDown.Scoring
             };
         }
 
-        public double ScoreCutOff { get { return GetProbability(CompositeScorer.ScoreParam.Cutoff); } }
+        public double ScoreCutOff => CompositeScorer.ScoreParam.Cutoff;
 
         internal class ScoreWeight
         {

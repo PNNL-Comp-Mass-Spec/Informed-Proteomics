@@ -54,7 +54,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <param name="precursorMass">The precursor mass to get the scorer for.</param>
         /// <param name="precursorCharge">The precursor charge to get the scorer for.</param>
         /// <returns>The scorer selected based on the arguments.</returns>
-        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge)
+        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             var parameters = this.scoringParameterSet.GetScoringParameters(spectrum.ActivationMethod, precursorMass);
             var targetedDeconvolutedSpectrum = new TargetedDeconvolutedSpectrum(spectrum, 1, precursorCharge - 1);

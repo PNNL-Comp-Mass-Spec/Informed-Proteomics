@@ -78,7 +78,7 @@ namespace InformedProteomics.TopDown.Scoring
             return scorer;
         }
 
-        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge)
+        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             IScorer scorer = null;
             if (spectrum is DeconvolutedSpectrum)
@@ -91,7 +91,7 @@ namespace InformedProteomics.TopDown.Scoring
                 scorer = new CompositeScorer(
                                 spectrum,
                                 this._productTolerance,
-                                activationMethod: spectrum.ActivationMethod,
+                                activationMethod: activationMethod,
                                 minCharge: _minProductCharge,
                                 maxCharge: _maxProductCharge);
             }

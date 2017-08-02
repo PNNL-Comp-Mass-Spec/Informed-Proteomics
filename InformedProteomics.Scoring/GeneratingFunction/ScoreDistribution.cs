@@ -2,6 +2,8 @@
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
+    using System.Linq;
+
     public class ScoreDistribution
     {
         public ScoreDistribution(int minScore, int maxScore)
@@ -39,15 +41,17 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public double GetSpectralEValue(int score)
         {
-            var spectralEValue = 0.0;
+            var area = 0.0;
 
             var minIndex = (score >= MinScore) ? score - MinScore : 0;
             for (var index = minIndex; index < _eValueDistribution.Length; index++)
             {
-                spectralEValue += _eValueDistribution[index];
+                area += _eValueDistribution[index];
             }
 
-            spectralEValue = spectralEValue / _scoreTotal;
+            if (area.Equals(0.0)) area = this._eValueDistribution.Last(v => v > 0);
+
+            var spectralEValue = area / _scoreTotal;
             if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
             return spectralEValue;
         }

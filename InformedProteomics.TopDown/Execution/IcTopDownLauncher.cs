@@ -333,6 +333,7 @@ namespace InformedProteomics.TopDown.Execution
             //this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
 
             sw.Reset();
+
             Console.WriteLine(@"Generating deconvoluted spectra for MS/MS spectra...");
             sw.Start();
             var pfeOptions = new ParallelOptions
@@ -744,7 +745,7 @@ namespace InformedProteomics.TopDown.Execution
                         }
                         else ms2FeatureIds = featureIds;
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, numNTermCleavages,
-                            modCombinations, precursorIon, score, isDecoy, featureId: ms2FeatureIds.FirstOrDefault());
+                            modCombinations, precursorIon, score, isDecoy, featureId: Math.Max(ms2FeatureIds.FirstOrDefault(), 1));
 
                         AddMatch(matches, ms2ScanNum, prsm);
                     });
@@ -862,7 +863,7 @@ namespace InformedProteomics.TopDown.Execution
                     // Re-scoring
                     //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
                     //if (scores == null) continue;
-                    var scorer = this._ms2ScorerFactory2.GetScorer(this._run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge);
+                    var scorer = this._ms2ScorerFactory2.GetScorer(this._run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge, this.Options.ActivationMethod);
                     var informedScorer = scorer as IInformedScorer;
                     var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
 
@@ -877,7 +878,7 @@ namespace InformedProteomics.TopDown.Execution
                     match.NumMatchedFragments = scores.NumMatchedFrags;
                     //match.ModificationText = match.Modifications.ToString();
                     //match.NumMatchedFragments = scores.NumMatchedFrags;
-                    if (match.Score > informedScorer.ScoreCutOff)
+                    if (match.Score > 0.25*informedScorer.ScoreCutOff)
                     //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
                     {
                         if (matches[scanNum] == null) matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
@@ -934,9 +935,10 @@ namespace InformedProteomics.TopDown.Execution
                         }
 
                         currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
-                        var ipSequence = Sequence.CreateSequence(match.Sequence, match.ModificationText, topDownScorer.AminoAcidSet);
-                        var graphScore = graph.ScoreSequence(ipSequence);
-                        match.SpecEvalue = scoreDist.GetSpectralEValue(graphScore);
+                        //var ipSequence = Sequence.CreateSequence(match.Sequence, match.ModificationText, topDownScorer.AminoAcidSet);
+                        //var graphScore = graph.ScoreSequence(ipSequence);
+
+                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score); //* 1e-34;
 
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
@@ -1005,7 +1007,7 @@ namespace InformedProteomics.TopDown.Execution
                     MostAbundantIsotopeMz = match.Ion.GetMostAbundantIsotopeMz(),
                     Mass = match.Ion.Composition.Mass,
                     NumMatchedFragments = match.NumMatchedFragments,
-                    Probability = match.Score, //CompositeScorer.GetProbability(match.Score),
+                    Probability = CompositeScorer.GetProbability(match.Score),
                     SpecEValue = match.SpecEvalue,
                     EValue = match.SpecEvalue * database.GetNumEntries(),
                     Ms1Feature = match.FeatureId
