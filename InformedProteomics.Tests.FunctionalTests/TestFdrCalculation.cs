@@ -98,11 +98,11 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 Assert.AreEqual(2655, qValueByScan.Count, "Result count {0} does not match expected count", qValueByScan.Count);
 
-                VerifyQValue(tdaResultPath, qValueByScan, 1808, 9.99e-308);
-                VerifyQValue(tdaResultPath, qValueByScan, 2565, 1.323038e-38);
-                VerifyQValue(tdaResultPath, qValueByScan, 1682, 1.912647e-12);
-                VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.010666);
-                VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.113394);
+                VerifyQValue(tdaResultPath, qValueByScan, 1808, 0); //9.99e-308);
+                VerifyQValue(tdaResultPath, qValueByScan, 2565, 0); //1.323038e-38);
+                VerifyQValue(tdaResultPath, qValueByScan, 1682, 0); // 1.912647e-12);
+                VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.0116883); //0.010666);
+                VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.0227943); //0.113394);
 
             }
             Console.WriteLine(@"Done, see " + tdaResultPath);
