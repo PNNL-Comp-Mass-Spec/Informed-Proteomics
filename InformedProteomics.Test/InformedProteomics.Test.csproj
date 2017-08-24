@@ -106,10 +106,6 @@
       <Project>{b31c2ac2-88c6-43c9-b809-26b7547592ff}</Project>
       <Name>PbfGen</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SAIS\SAIS.csproj">
-      <Project>{da126245-858b-4084-ab86-54fe1e10772e}</Project>
-      <Name>SAIS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSPathFinderT\MSPathFinderT.csproj">
       <Project>{dfbecbac-7fda-4c78-9f4e-cc21c79a6db6}</Project>
       <Name>MSPathFinderT</Name>

@@ -1,11 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DA126245-858B-4084-AB86-54FE1E10772E} = {DA126245-858B-4084-AB86-54FE1E10772E}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Test", "InformedProteomics.Test\InformedProteomics.Test.csproj", "{800535C0-E5A3-4A05-8ED6-FDF02658D999}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -35,8 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PbfGen", "PbfGen\PbfGen.csp
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMex", "ProMex\ProMex.csproj", "{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIS", "SAIS\SAIS.csproj", "{DA126245-858B-4084-AB86-54FE1E10772E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj", "{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}"
 EndProject
@@ -96,10 +91,6 @@ Global
 		{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1586B333-5F3C-4E33-ABB9-6767EAC8FCD1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA126245-858B-4084-AB86-54FE1E10772E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA126245-858B-4084-AB86-54FE1E10772E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA126245-858B-4084-AB86-54FE1E10772E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -139,5 +130,8 @@ Global
 		{A7D227F1-9BC5-4D2A-B0FF-A0C34A7BFF19} = {BAB01DF1-A68A-4F98-9000-697CB1AB6B71}
 		{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA} = {BAB01DF1-A68A-4F98-9000-697CB1AB6B71}
 		{C2C569D4-41C4-4DCE-8191-9107CFBA59B8} = {166A038F-C6E6-429B-8FE0-9F7D84785851}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {50912C29-E918-4FF6-AFAF-1F3F6782D01A}
 	EndGlobalSection
 EndGlobal
