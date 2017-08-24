@@ -58,8 +58,6 @@
     <Compile Include="Execution\DatabaseSequenceSpectrumMatch.cs" />
     <Compile Include="Execution\IcRescorer.cs" />
     <Compile Include="Execution\IcTopDownLauncher.cs" />
-    <Compile Include="Execution\LcMsFeatureFinderInputParameter.cs" />
-    <Compile Include="Execution\LcMsFeatureFinderLauncher.cs" />
     <Compile Include="Execution\MSAlignRescorer.cs" />
     <Compile Include="Execution\MsPfParameters.cs" />
     <Compile Include="Execution\MzidResultsWriter.cs" />

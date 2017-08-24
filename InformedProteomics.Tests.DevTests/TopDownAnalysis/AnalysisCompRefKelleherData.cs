@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Scoring;

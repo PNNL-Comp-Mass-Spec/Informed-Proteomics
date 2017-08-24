@@ -49,32 +49,25 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TsvFileReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70A129AC-217A-4086-9ECB-63FF22289D90}</Project>
       <Name>InformedProteomics.Backend</Name>
     </ProjectReference>
-    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
-      <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
-      <Name>InformedProteomics.TopDown</Name>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

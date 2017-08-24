@@ -11,6 +11,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.Clustering;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
@@ -561,7 +562,7 @@ namespace InformedProteomics.Test
             const double maxScanMass = 5000;
             const int maxThreads = 10;
 
-            var param = new LcMsFeatureFinderInputParameter()
+            var param = new LcMsFeatureFinderInputParameters()
             {
                 InputPath = specFilePath,
                 OutputPath = outFolderPath,

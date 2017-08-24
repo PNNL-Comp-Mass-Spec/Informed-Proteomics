@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using InformedProteomics.Backend.Utils;
 
-namespace InformedProteomics.TopDown.Execution
+namespace InformedProteomics.FeatureFinding
 {
-    public class LcMsFeatureFinderInputParameter
+    public class LcMsFeatureFinderInputParameters
     {
         public const string MINIMUM_MASS = "-minMass";
         public const string MAXIMUM_MASS = "-maxMass";
@@ -35,7 +35,7 @@ namespace InformedProteomics.TopDown.Execution
 
         public double LikelihoodScoreThreshold;
 
-        public LcMsFeatureFinderInputParameter()
+        public LcMsFeatureFinderInputParameters()
         {
             MinSearchMass = 600;
             MaxSearchMass = 50000;
@@ -47,7 +47,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxThreads = 0;
         }
 
-        public LcMsFeatureFinderInputParameter(Dictionary<string, string> paramDic)
+        public LcMsFeatureFinderInputParameters(Dictionary<string, string> paramDic)
         {
             Parse(paramDic);
         }

@@ -6,6 +6,7 @@ using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.Clustering;
 using InformedProteomics.FeatureFinding.Data;

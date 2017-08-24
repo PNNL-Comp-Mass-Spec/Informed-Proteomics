@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using InformedProteomics.TopDown.Execution;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding;
 
 namespace ProMex
 {
@@ -51,18 +51,18 @@ namespace ProMex
                 // initialize parameters
                 _paramDic = new Dictionary<string, string>
                 {
-                    {LcMsFeatureFinderInputParameter.INPUT_FILE_PATH, null},
-                    {LcMsFeatureFinderInputParameter.OUTPUT_FOLDER_PATH, null},
-                    {LcMsFeatureFinderInputParameter.MINIMUM_CHARGE, "1"},
-                    {LcMsFeatureFinderInputParameter.MAXIMUM_CHARGE, "60"},
-                    {LcMsFeatureFinderInputParameter.MINIMUM_MASS, "2000.0"},
-                    {LcMsFeatureFinderInputParameter.MAXIMUM_MASS, "50000.0"},
-                    {LcMsFeatureFinderInputParameter.INCLUDE_ADDITIONAL_SCORES, "n"},
-                    {LcMsFeatureFinderInputParameter.SAVE_CSV, "n"},
-                    {LcMsFeatureFinderInputParameter.SAVE_PNG_FEATURE_MAP, "y"},
-                    {LcMsFeatureFinderInputParameter.LIKELIHOOD_SCORE_THRESHOLD, "-10"},
-                    {LcMsFeatureFinderInputParameter.MAXIMUM_THREADS, "0"},
-                    {LcMsFeatureFinderInputParameter.EXISTING_MS1FT_FILE, ""}
+                    {LcMsFeatureFinderInputParameters.INPUT_FILE_PATH, null},
+                    {LcMsFeatureFinderInputParameters.OUTPUT_FOLDER_PATH, null},
+                    {LcMsFeatureFinderInputParameters.MINIMUM_CHARGE, "1"},
+                    {LcMsFeatureFinderInputParameters.MAXIMUM_CHARGE, "60"},
+                    {LcMsFeatureFinderInputParameters.MINIMUM_MASS, "2000.0"},
+                    {LcMsFeatureFinderInputParameters.MAXIMUM_MASS, "50000.0"},
+                    {LcMsFeatureFinderInputParameters.INCLUDE_ADDITIONAL_SCORES, "n"},
+                    {LcMsFeatureFinderInputParameters.SAVE_CSV, "n"},
+                    {LcMsFeatureFinderInputParameters.SAVE_PNG_FEATURE_MAP, "y"},
+                    {LcMsFeatureFinderInputParameters.LIKELIHOOD_SCORE_THRESHOLD, "-10"},
+                    {LcMsFeatureFinderInputParameters.MAXIMUM_THREADS, "0"},
+                    {LcMsFeatureFinderInputParameters.EXISTING_MS1FT_FILE, ""}
                 };
 
                 for (var i = 0; i < args.Length / 2; i++)
@@ -102,7 +102,7 @@ namespace ProMex
             try
             {
 #endif
-                var param = new LcMsFeatureFinderInputParameter(_paramDic);
+                var param = new LcMsFeatureFinderInputParameters(_paramDic);
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
                 param.Display();
                 var launcher = new LcMsFeatureFinderLauncher(param);

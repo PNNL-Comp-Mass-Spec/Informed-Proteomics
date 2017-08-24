@@ -11,7 +11,7 @@ using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.Scoring;
 
-namespace InformedProteomics.TopDown.Execution
+namespace InformedProteomics.FeatureFinding
 {
     public class LcMsFeatureFinderLauncher
     {
@@ -21,9 +21,9 @@ namespace InformedProteomics.TopDown.Execution
         /// Constructor
         /// </summary>
         /// <param name="parameters"></param>
-        public LcMsFeatureFinderLauncher(LcMsFeatureFinderInputParameter parameters = null)
+        public LcMsFeatureFinderLauncher(LcMsFeatureFinderInputParameters parameters = null)
         {
-            Parameters = parameters ?? new LcMsFeatureFinderInputParameter();
+            Parameters = parameters ?? new LcMsFeatureFinderInputParameters();
             try
             {
                 _likelihoodScorer = new LcMsFeatureLikelihood(Parameters.LikelihoodScoreThreshold);
@@ -135,7 +135,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         public const string FileExtension = "ms1ft";
-        public readonly LcMsFeatureFinderInputParameter Parameters;
+        public readonly LcMsFeatureFinderInputParameters Parameters;
 
         /// <summary>
         /// Find features in the data file

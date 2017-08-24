@@ -13,6 +13,7 @@ using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Results;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
@@ -282,7 +283,7 @@ namespace InformedProteomics.TopDown.Execution
                     Console.WriteLine(@"Running ProMex...");
                     sw.Reset();
                     sw.Start();
-                    var param = new LcMsFeatureFinderInputParameter
+                    var param = new LcMsFeatureFinderInputParameters
                     {
                         InputPath = Options.SpecFilePath,
                         MinSearchMass = Options.MinSequenceMass,

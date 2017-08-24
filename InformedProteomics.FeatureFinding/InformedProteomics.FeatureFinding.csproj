@@ -71,6 +71,8 @@
     <Compile Include="IsotopicEnvelope\LcMsEnvelopeComparer.cs" />
     <Compile Include="IsotopicEnvelope\ObservedIsotopeEnvelope.cs" />
     <Compile Include="IsotopicEnvelope\TheoreticalIsotopeEnvelope.cs" />
+    <Compile Include="LcMsFeatureFinderInputParameters.cs" />
+    <Compile Include="LcMsFeatureFinderLauncher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\LcMsFeatureLikelihood.cs" />
     <Compile Include="Scoring\LcMsPeakScorer.cs" />
