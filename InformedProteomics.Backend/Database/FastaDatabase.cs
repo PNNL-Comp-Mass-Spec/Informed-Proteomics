@@ -39,26 +39,6 @@ namespace InformedProteomics.Backend.Database
         public const string ShuffleDecoyFileExtension = ".icsfldecoy.fasta";
 
         /// <summary>
-        /// Prefix to flag decoy proteins
-        /// </summary>
-        public const string DecoyProteinPrefix = "XXX";
-
-        /// <summary>
-        /// Sequence delimiter in the backing files
-        /// </summary>
-        public const byte Delimiter = (byte)'_';
-
-        /// <summary>
-        /// Last character marker in the backing files
-        /// </summary>
-        public const byte LastCharacter = (byte)'~';
-
-        /// <summary>
-        /// Annotation delimiter in the backing files
-        /// </summary>
-        public const char AnnotationDelimiter = '/';
-
-        /// <summary>
         /// For shuffled decoys, number of mutations
         /// </summary>
         public const int NumMutations = 3;
@@ -151,7 +131,7 @@ namespace InformedProteomics.Backend.Database
                     var description = reader.ProteinDescription;
                     var sequence = reader.ProteinSequence;
 
-                    decoyWriter.WriteLine(">{0}_{1} {2}", DecoyProteinPrefix, name, description);
+                    decoyWriter.WriteLine(">{0}_{1} {2}", FastaDatabaseConstants.DecoyProteinPrefix, name, description);
 
                     if (!shuffle)
                     {
@@ -164,12 +144,12 @@ namespace InformedProteomics.Backend.Database
                             {
                                 var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
                                 decoySequence.Remove(decoySequence.Length - 1, 1);
-                                decoySequence.Append(residue);
+                                decoySequence.Append((char) residue);
                                 decoySequence.Append(residueToBeReplaced);
                             }
                             else
                             {
-                                decoySequence.Append(residue);
+                                decoySequence.Append((char) residue);
                             }
                         }
                         decoyWriter.WriteLine(decoySequence);
@@ -479,7 +459,7 @@ namespace InformedProteomics.Backend.Database
             if (string.IsNullOrWhiteSpace(lastLine))
                 return false;
 
-            var token = lastLine.Split(AnnotationDelimiter);
+            var token = lastLine.Split(FastaDatabaseConstants.AnnotationDelimiter);
             if (token.Length != 2)
                 return false;
 
@@ -576,7 +556,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     var name = reader.ProteinName;
                     var description = reader.ProteinDescription;
-                    var sequence = (char)Delimiter + reader.ProteinSequence;
+                    var sequence = (char) FastaDatabaseConstants.Delimiter + reader.ProteinSequence;
                     var length = sequence.Length;
 
                     var proteinInfoCurrent = new ProteinHashInfo(sequence);
@@ -597,21 +577,18 @@ namespace InformedProteomics.Backend.Database
 
                     proteinNamesAndStats.Add(name, proteinInfoCurrent);
 
-                    seqWriter.Write(Encoding.GetBytes(sequence));
+                    seqWriter.Write(Encoding.GetBytes((string) sequence));
 
                     annoWriter.WriteLine("{0}{1}{2}{3}{4}{5}{6}",
-                        offset,
-                        AnnotationDelimiter,
-                        length,
-                        AnnotationDelimiter,
-                        name.Replace(AnnotationDelimiter, '-'),
-                        AnnotationDelimiter,
+                        offset, FastaDatabaseConstants.AnnotationDelimiter,
+                        length, FastaDatabaseConstants.AnnotationDelimiter,
+                        name.Replace(FastaDatabaseConstants.AnnotationDelimiter, '-'), FastaDatabaseConstants.AnnotationDelimiter,
                         description);
 
                     offset += sequence.Length;
                 }
 
-                seqWriter.Write((char)Delimiter);
+                seqWriter.Write((char) FastaDatabaseConstants.Delimiter);
 
                 // write file format Id
                 seqWriter.Write(FileFormatId);
@@ -620,7 +597,7 @@ namespace InformedProteomics.Backend.Database
                 var hashCode = File.GetLastWriteTimeUtc(_databaseFilePath).GetHashCode();
 
                 seqWriter.Write(hashCode);
-                annoWriter.Write("{0}{1}{2}", FileFormatId, AnnotationDelimiter, hashCode);
+                annoWriter.Write("{0}{1}{2}", FileFormatId, FastaDatabaseConstants.AnnotationDelimiter, hashCode);
 
                 reader.CloseFile();
             }
@@ -632,7 +609,7 @@ namespace InformedProteomics.Backend.Database
             {
                 _sequence = new byte[fileStream.Length - 2 * sizeof(int) + 1];
                 fileStream.Read(_sequence, 0, _sequence.Length);
-                _sequence[_sequence.Length - 1] = LastCharacter;
+                _sequence[_sequence.Length - 1] = FastaDatabaseConstants.LastCharacter;
             }
 
             return true;
@@ -653,7 +630,7 @@ namespace InformedProteomics.Backend.Database
                 string s;
                 while ((s = reader.ReadLine()) != null)
                 {
-                    var token = s.Split(AnnotationDelimiter);
+                    var token = s.Split(FastaDatabaseConstants.AnnotationDelimiter);
                     if (token.Length < 4)
                         break;
                     var offset = long.Parse(token[0]);

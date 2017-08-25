@@ -304,7 +304,7 @@ namespace InformedProteomics.Backend.Database
             foreach (var residue in FastaDatabase.Characters())
             {
                 ++offset;
-                if (residue == FastaDatabase.Delimiter)
+                if (residue == FastaDatabaseConstants.Delimiter)
                 {
                     if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(buf.ToArray(), curOffset);
                     //if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(Encoding.GetString(buf.ToArray()), curOffset);
@@ -377,7 +377,7 @@ namespace InformedProteomics.Backend.Database
                         curSequence.AddLast(fEnum.Current);
                         lcpList.AddLast(lcpEnum.Current);
 
-                        if (fEnum.Current == FastaDatabase.Delimiter)
+                        if (fEnum.Current == FastaDatabaseConstants.Delimiter)
                         {
                             seps.Enqueue(new IntWrapper(curSequence.Count - 1));
                         }
@@ -466,8 +466,8 @@ namespace InformedProteomics.Backend.Database
                 foreach (var residue in enzymaticResidues)
                 {
                     isCleavable[residue] = true;
-                    if (isCleavable.Length > FastaDatabase.Delimiter)
-                        isCleavable[FastaDatabase.Delimiter] = true;
+                    if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
+                        isCleavable[FastaDatabaseConstants.Delimiter] = true;
                 }
             }
 
@@ -510,7 +510,7 @@ namespace InformedProteomics.Backend.Database
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
@@ -520,7 +520,7 @@ namespace InformedProteomics.Backend.Database
                     }
                     else // N-term enzyme
                     {
-                        if (seqArr[0] == FastaDatabase.Delimiter || isCleavable[seqArr[1]]) ++ntt;
+                        if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]]) ++ntt;
                         if (ntt < numTolerableTermini - 1) continue;
 
                         // Could be run in parallel, but probably not worth the cost.
@@ -582,8 +582,8 @@ namespace InformedProteomics.Backend.Database
                 foreach (var residue in enzymaticResidues)
                 {
                     isCleavable[residue] = true;
-                    if (isCleavable.Length > FastaDatabase.Delimiter)
-                        isCleavable[FastaDatabase.Delimiter] = true;
+                    if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
+                        isCleavable[FastaDatabaseConstants.Delimiter] = true;
                 }
             }
 
@@ -641,7 +641,7 @@ namespace InformedProteomics.Backend.Database
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabase.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
@@ -652,7 +652,7 @@ namespace InformedProteomics.Backend.Database
                 }
                 else // N-term enzyme
                 {
-                    if (seqArr[0] == FastaDatabase.Delimiter || isCleavable[seqArr[1]]) ++ntt;
+                    if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]]) ++ntt;
                     if (!(ntt < numTolerableTermini - 1))
                     {
                         // Could be run in parallel, but probably not worth the cost.

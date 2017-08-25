@@ -185,7 +185,7 @@ namespace InformedProteomics.Test
                 var row = distinctSorted[i];
                 var columns = row.Split('\t');
                 var protein = columns[proteinIndex];
-                if (protein.StartsWith(FastaDatabase.DecoyProteinPrefix)) numDecoy++;
+                if (protein.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix)) numDecoy++;
                 else numTarget++;
                 fdr[i] = numDecoy / (double)numTarget;
             }

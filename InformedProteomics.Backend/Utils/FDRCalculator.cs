@@ -141,7 +141,7 @@ namespace InformedProteomics.Backend.Utils
             }
             else
             {
-                resultsToWrite = resultsToUse.Where(x => !x.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix));
+                resultsToWrite = resultsToUse.Where(x => !x.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix));
             }
             DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
         }
@@ -164,7 +164,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = 0; i < distinctSorted.Length; i++)
             {
                 var result = distinctSorted[i];
-                if (result.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix))
+                if (result.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix))
                     numDecoy++;
                 else
                     numTarget++;
@@ -208,7 +208,7 @@ namespace InformedProteomics.Backend.Utils
             for (var i = 0; i < distinctSorted.Length; i++)
             {
                 var row = distinctSorted[i];
-                if (row.ProteinName.StartsWith(FastaDatabase.DecoyProteinPrefix))
+                if (row.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix))
                     numDecoy++;
                 else
                     numTarget++;

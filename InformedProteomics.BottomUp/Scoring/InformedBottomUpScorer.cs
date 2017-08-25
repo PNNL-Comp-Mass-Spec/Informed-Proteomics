@@ -43,8 +43,8 @@ namespace InformedProteomics.BottomUp.Scoring
         public IcBottomUpScores GetScores(char pre, string sequence, char post, Composition composition, int charge,
             int ms2ScanNum)
         {
-            var nTerm = pre == FastaDatabase.Delimiter ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm;
-            var cTerm = post == FastaDatabase.Delimiter ? AminoAcid.ProteinCTerm : AminoAcid.PeptideCTerm;
+            var nTerm = pre == FastaDatabaseConstants.Delimiter ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm;
+            var cTerm = post == FastaDatabaseConstants.Delimiter ? AminoAcid.ProteinCTerm : AminoAcid.PeptideCTerm;
             return GetScores(pre, sequence, post, nTerm, cTerm, composition, charge, ms2ScanNum);
         }
 
@@ -97,11 +97,11 @@ namespace InformedProteomics.BottomUp.Scoring
             var creditC = Math.Log(probC / sumAAProbabilities);
             var penaltyC = Math.Log((1.0 - probC) / (1.0 - sumAAProbabilities));
 
-            if (pre == 'K' || pre == 'R' || pre == FastaDatabase.Delimiter || pre == '-') ms2Score += creditN;
+            if (pre == 'K' || pre == 'R' || pre == FastaDatabaseConstants.Delimiter || pre == '-') ms2Score += creditN;
             else ms2Score += penaltyN;
 
             var lastResidue = sequence[sequence.Length - 1];
-            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabase.Delimiter || post == '-') ms2Score += creditC;
+            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabaseConstants.Delimiter || post == '-') ms2Score += creditC;
             else ms2Score += penaltyC;
 
             var modifications = scoreAndModifications.Item2;
