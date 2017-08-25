@@ -170,6 +170,7 @@
     <Compile Include="Results\DatabaseSearchResultData.cs" />
     <Compile Include="Results\IdentificationExtensions.cs" />
     <Compile Include="Results\ResultFileReader.cs" />
+    <Compile Include="MassSpecData\IPbfLcMsRun.cs" />
     <Compile Include="MathAndStats\ArrayUtil.cs" />
     <Compile Include="MathAndStats\CubicSpline.cs" />
     <Compile Include="MathAndStats\FitScoreCalculator.cs" />

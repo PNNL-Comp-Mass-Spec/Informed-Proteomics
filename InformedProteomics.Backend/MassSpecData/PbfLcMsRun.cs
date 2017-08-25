@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// A file-backed object for accessing mass spec data. Data is read from the vendor format
     /// to a binary PBF file, and that file is used for fast access to spectra and extracted ion chromatograms
     /// </summary>
-    public class PbfLcMsRun: LcMsRun
+    public class PbfLcMsRun: LcMsRun, IPbfLcMsRun
     {
         /// <summary>
         /// File extension

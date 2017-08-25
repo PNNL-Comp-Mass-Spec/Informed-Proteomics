@@ -150,7 +150,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             get
             {
-                var run = this.dataReader as PbfLcMsRun;
+                var run = this.dataReader as IPbfLcMsRun;
                 return run != null ? run.PbfFileChecksum : this.dataReader.SrcFileChecksum;
             }
         }
