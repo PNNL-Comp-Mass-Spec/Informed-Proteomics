@@ -11,7 +11,7 @@ using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.BottomUp.Scoring;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
-using PNNLOmics.Utilities;
+using PRISM;
 
 namespace InformedProteomics.BottomUp.Execution
 {

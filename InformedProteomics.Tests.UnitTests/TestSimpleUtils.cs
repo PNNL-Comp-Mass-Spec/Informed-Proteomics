@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
-using PNNLOmics.Utilities;
+using PRISM;
 
 namespace InformedProteomics.Tests.UnitTests
 {

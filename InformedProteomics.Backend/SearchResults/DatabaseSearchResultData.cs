@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
-using PNNLOmics.Utilities;
+using PRISM;
 using PSI_Interface.IdentData;
 
 namespace InformedProteomics.Backend.SearchResults
