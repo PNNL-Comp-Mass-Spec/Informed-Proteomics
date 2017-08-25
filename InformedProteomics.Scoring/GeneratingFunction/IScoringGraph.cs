@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Scoring.GeneratingFunction

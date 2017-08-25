@@ -15,7 +15,6 @@ using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
 using InformedProteomics.FeatureFinding.Util;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests

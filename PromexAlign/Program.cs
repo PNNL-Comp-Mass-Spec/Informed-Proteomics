@@ -1,13 +1,11 @@
 ﻿using System.IO;
 using System;
 using System.Linq;
-
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
-
 using MathNet.Numerics.Statistics;
 
 namespace PromexAlign

@@ -1,9 +1,8 @@
-﻿using InformedProteomics.Backend.Data.Biology;
+﻿using System;
+using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
-    using System;
-
     [Serializable]
     public abstract class AbstractComposition
     {

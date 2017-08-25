@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

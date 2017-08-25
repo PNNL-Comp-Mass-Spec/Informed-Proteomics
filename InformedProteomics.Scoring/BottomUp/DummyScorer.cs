@@ -1,8 +1,7 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Spectrometry;
-
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.BottomUp
 {

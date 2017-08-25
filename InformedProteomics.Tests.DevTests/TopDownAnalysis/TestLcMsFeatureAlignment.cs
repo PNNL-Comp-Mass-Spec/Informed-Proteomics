@@ -9,7 +9,6 @@ using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.Data;
-using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis

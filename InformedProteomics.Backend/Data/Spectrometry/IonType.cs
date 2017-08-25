@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using InformedProteomics.Backend.Data.Sequence;
 
     public class IonType

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -18,10 +17,8 @@ using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.Training;
 using InformedProteomics.Tests.Base;
-using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
-using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test

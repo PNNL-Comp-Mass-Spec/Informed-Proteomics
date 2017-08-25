@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
     public class IonTypeFactory
     {
         private bool removeReduntantIonTypes;

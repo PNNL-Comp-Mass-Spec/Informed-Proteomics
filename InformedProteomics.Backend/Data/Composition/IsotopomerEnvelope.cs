@@ -1,7 +1,7 @@
-﻿namespace InformedProteomics.Backend.Data.Composition
-{
-    using System;
+﻿using System;
 
+namespace InformedProteomics.Backend.Data.Composition
+{
     [Serializable]
     public class IsotopomerEnvelope
     {

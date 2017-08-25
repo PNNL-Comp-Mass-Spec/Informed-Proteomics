@@ -19,7 +19,6 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using TopDownTrainer;
 
 using InformedProteomics.Scoring.Interfaces;
 
@@ -905,7 +904,7 @@ namespace InformedProteomics.TopDown.Execution
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
-            Parallel.ForEach(scanNums, pfeOptions, scanNum =>          
+            Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             //foreach (var scanNum in scanNums)
             {
                 var currentTask = "?";

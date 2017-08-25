@@ -1,6 +1,4 @@
-﻿using System;
-
-using InformedProteomics.Backend.Data.Spectrometry;
+﻿using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring.FlipScoring
 {

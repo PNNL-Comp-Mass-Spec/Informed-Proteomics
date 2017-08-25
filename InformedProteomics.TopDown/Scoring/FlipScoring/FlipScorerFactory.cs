@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 
@@ -43,7 +42,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// </summary>
         /// <param name="lcmsRun">LcmsRun for selected deconvoluted spectra required for scoring.</param>
         /// <param name="isTopDown">A value indicating whether the experiment is an intact experiment or not.</param>
-        public FlipScorerFactory(DPbfLcMsRun lcmsRun, bool isTopDown = true) 
+        public FlipScorerFactory(DPbfLcMsRun lcmsRun, bool isTopDown = true)
             : this(lcmsRun, new ScoringParameterSet(isTopDown)) { }
 
         /// <summary>

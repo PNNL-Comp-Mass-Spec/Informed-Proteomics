@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics;
-using Constants = InformedProteomics.Backend.Data.Biology.Constants;
+using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

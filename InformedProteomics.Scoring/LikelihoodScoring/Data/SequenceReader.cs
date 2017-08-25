@@ -1,5 +1,4 @@
 ﻿using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data

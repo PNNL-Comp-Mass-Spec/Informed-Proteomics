@@ -8,7 +8,6 @@ using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
-using InformedProteomics.TopDown.Execution;
 using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis

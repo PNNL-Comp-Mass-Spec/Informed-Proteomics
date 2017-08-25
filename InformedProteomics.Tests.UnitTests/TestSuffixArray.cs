@@ -235,7 +235,7 @@ namespace InformedProteomics.Tests.UnitTests
             Utils.ShowStarting(methodName);
 
             var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));
-            
+
             var db = new FastaDatabase(fastaFile.FullName);
             db.Read();
             var indexedDb = new IndexedDatabase(db);

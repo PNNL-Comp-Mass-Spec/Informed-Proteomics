@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.Utils;
-using PNNLOmics.Utilities;
 
 namespace InformedProteomics.TopDown.Execution
 {

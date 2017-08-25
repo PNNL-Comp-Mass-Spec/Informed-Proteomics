@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.TopDown.Scoring.FlipScoring;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
-
-using InformedProteomics.TopDown.Scoring.FlipScoring;
-
-using System.Collections.Generic;
 
 namespace InformedProteomics.TopDown.Scoring
 {

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.IO;
-
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring.FlipScoring
@@ -19,8 +15,8 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// Initializes a new instance of the <see cref="ScoringParameters" /> class.
         /// </summary>
         /// <param name="mass">The mass</param>
+        /// <param name="tolerance"></param>
         /// <param name="precursorPeakFilter"></param>
-        /// <param name="selectedIonTypes"></param>
         public ScoringParameters(double mass, Tolerance tolerance, PrecursorPeakFilter precursorPeakFilter)
         {
             this.Mass = mass;
@@ -52,7 +48,6 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// </summary>
         public BaseIonType[] SelectedIonTypes => this.FeatureWeights.IonWeights.Keys.ToArray();
 
-        
         /// <summary>
         /// Parse a single scoring param file.
         /// </summary>

@@ -1,19 +1,14 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.Interfaces;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Backend.Data.Sequence;
-    using InformedProteomics.Scoring.Interfaces;
-
     public class CompositeScorer : AbstractFragmentScorer, IInformedScorer
     {
         public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD)

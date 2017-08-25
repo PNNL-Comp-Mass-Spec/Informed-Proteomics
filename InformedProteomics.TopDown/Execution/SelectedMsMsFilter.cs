@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Execution
 {
-    using InformedProteomics.Backend.Data.Spectrometry;
     public class SelectedMsMsFilter : ISequenceFilter
     {
         private readonly List<int> ms2Scans;

@@ -1,5 +1,4 @@
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {

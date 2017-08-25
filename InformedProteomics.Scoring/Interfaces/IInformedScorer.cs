@@ -1,5 +1,4 @@
-﻿using System;
-using InformedProteomics.Backend.Data.Sequence;
+﻿using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Scoring.Interfaces
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 
