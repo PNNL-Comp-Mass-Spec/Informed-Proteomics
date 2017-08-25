@@ -85,10 +85,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Reads a Spectrum from the DPBF file with isotope peaks populated
         /// </summary>
-        /// <param name="fullData">The file used to create the DPBF file (throws <see cref="ArgumentException"/> if it is not) - PBF file preferred.</param>
+        /// <param name="fullData">The file used to create the DPBF file (throws <see cref="System.ArgumentException"/> if it is not) - PBF file preferred.</param>
         /// <param name="scanNum">The scan to read</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">If the checksum of the source file does not match the checksum stored in the DPBF file</exception>
+        /// <exception cref="System.ArgumentException">If the checksum of the source file does not match the checksum stored in the DPBF file</exception>
         public DeconvolutedSpectrum GetSpectrumWithIsotopePeaks(IMassSpecDataReader fullData, int scanNum)
         {
             if (this.SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun && this.SrcFileChecksum != ((PbfLcMsRun)fullData).PbfFileChecksum))

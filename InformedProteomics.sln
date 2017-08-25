@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromexAlign", "PromexAlign\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend.Database", "InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj", "{451D1CE9-97D2-4898-9F59-4D058223637A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend.MassSpecData", "InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj", "{05B37516-2B5C-4C60-BFE2-D6854A19478A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{451D1CE9-97D2-4898-9F59-4D058223637A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451D1CE9-97D2-4898-9F59-4D058223637A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{451D1CE9-97D2-4898-9F59-4D058223637A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

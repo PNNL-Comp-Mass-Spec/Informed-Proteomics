@@ -57,13 +57,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Used for retrieving Observed peaks when reading from a .dpbf file, in conjunction with a .pbf file.
         /// </summary>
-        internal List<int> ObservedPeakIndices { get; }
+        public List<int> ObservedPeakIndices { get; }
 
         /// <summary>
         /// Uses the peaks in spec to find and set the <see cref="ObservedPeaks"/> according to the indices in <see cref="ObservedPeakIndices"/>
         /// </summary>
         /// <param name="spec"></param>
-        internal void SetObservedPeaksFromSpectrum(Spectrum spec)
+        public void SetObservedPeaksFromSpectrum(Spectrum spec)
         {
             var peaks = new List<Peak>();
             foreach (var index in ObservedPeakIndices)
