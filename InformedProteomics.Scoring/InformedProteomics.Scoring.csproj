@@ -87,7 +87,6 @@
     <Compile Include="TopDown\IMassBinning.cs" />
     <Compile Include="TopDown\ProteinMassBinning.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj">
       <Project>{05b37516-2b5c-4c60-bfe2-d6854a19478a}</Project>
