@@ -168,9 +168,6 @@
     <Compile Include="Data\Spectrometry\Fragment.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
     <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="Results\DatabaseSearchResultData.cs" />
-    <Compile Include="Results\IdentificationExtensions.cs" />
-    <Compile Include="Results\ResultFileReader.cs" />
     <Compile Include="MassSpecData\IPbfLcMsRun.cs" />
     <Compile Include="MathAndStats\ArrayUtil.cs" />
     <Compile Include="MathAndStats\CubicSpline.cs" />
@@ -180,9 +177,12 @@
     <Compile Include="MathAndStats\SimpleMath.cs" />
     <Compile Include="MathAndStats\TriDiagonalMatrix.cs" />
     <Compile Include="MathAndStats\VennDiagram.cs" />
+    <Compile Include="SearchResults\DatabaseSearchResultData.cs" />
+    <Compile Include="SearchResults\FdrCalculator.cs" />
+    <Compile Include="SearchResults\IdentificationExtensions.cs" />
+    <Compile Include="SearchResults\ResultFileReader.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
     <Compile Include="Utils\Centroider.cs" />
-    <Compile Include="Utils\FdrCalculator.cs" />
     <Compile Include="Utils\IntRange.cs" />
     <Compile Include="Utils\IsotopicConcentrationTuner.cs" />
     <Compile Include="Utils\Misc.cs" />

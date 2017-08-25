@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.Results;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.SearchResults
 {
     /// <summary>
     /// Computes the False Decoy Ratio and scores for the supplied target and decoy hits

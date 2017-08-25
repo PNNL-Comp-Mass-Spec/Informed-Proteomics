@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Results;
+using InformedProteomics.Backend.SearchResults;
 using PSI_Interface.CV;
 using PSI_Interface.IdentData;
 using PSI_Interface.IdentData.IdentDataObjs;

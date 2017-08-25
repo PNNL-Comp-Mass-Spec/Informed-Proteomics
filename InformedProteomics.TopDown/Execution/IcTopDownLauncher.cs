@@ -11,7 +11,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Results;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.FeatureDetection;

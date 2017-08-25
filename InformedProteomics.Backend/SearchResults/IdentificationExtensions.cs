@@ -1,11 +1,9 @@
-﻿namespace InformedProteomics.Backend.Results
+﻿using System;
+using InformedProteomics.Backend.Data.Sequence;
+using PSI_Interface.IdentData;
+
+namespace InformedProteomics.Backend.SearchResults
 {
-    using System;
-
-    using InformedProteomics.Backend.Data.Sequence;
-
-    using PSI_Interface.IdentData;
-
     /// <summary>
     /// Extension functions for working with identification data.
     /// </summary>

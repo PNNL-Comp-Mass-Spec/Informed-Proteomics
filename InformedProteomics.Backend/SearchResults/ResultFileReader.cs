@@ -1,7 +1,7 @@
-﻿namespace InformedProteomics.Backend.Results
-{
-    using PSI_Interface.IdentData;
+﻿using PSI_Interface.IdentData;
 
+namespace InformedProteomics.Backend.SearchResults
+{
     /// <summary>
     /// Reader factory for result files
     /// </summary>

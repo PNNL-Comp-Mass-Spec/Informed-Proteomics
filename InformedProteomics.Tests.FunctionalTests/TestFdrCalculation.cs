@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 

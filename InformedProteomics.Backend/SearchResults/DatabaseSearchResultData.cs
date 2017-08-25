@@ -5,10 +5,8 @@ using InformedProteomics.Backend.Data.Sequence;
 using PNNLOmics.Utilities;
 using PSI_Interface.IdentData;
 
-namespace InformedProteomics.Backend.Results
+namespace InformedProteomics.Backend.SearchResults
 {
-    using System.Linq;
-
     /// <summary>
     /// Container with utilities for reading/writing/storing database search results.
     /// </summary>
