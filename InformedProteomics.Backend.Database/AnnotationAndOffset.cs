@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace InformedProteomics.Backend.Database
+﻿namespace InformedProteomics.Backend.Database
 {
     public class AnnotationAndOffset
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Sequence;
 using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
