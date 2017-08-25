@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.MathAndStats
 {
     public class SimpleMath
     {

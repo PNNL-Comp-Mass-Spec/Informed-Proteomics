@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.FeatureFinding.Clustering;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.IsotopicEnvelope;

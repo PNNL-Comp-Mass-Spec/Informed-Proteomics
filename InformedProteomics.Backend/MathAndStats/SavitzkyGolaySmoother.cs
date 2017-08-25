@@ -1,8 +1,8 @@
 ﻿using System;
-using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.MathAndStats
 {
     public class SavitzkyGolaySmoother
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;

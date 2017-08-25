@@ -2,7 +2,7 @@
 using System.Linq;
 using MathNet.Numerics.Distributions;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.MathAndStats
 {
     public class FitScoreCalculator
     {

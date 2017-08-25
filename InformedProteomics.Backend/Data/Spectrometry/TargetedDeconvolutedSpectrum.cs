@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {

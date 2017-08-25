@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -108,6 +108,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var combination in combinations)
             {
                 var modList = (from i in combination where i > 0 select _modifications[i - 1]).ToList();
+                // Could also use:
+                //var modList = combination.Where(i => i > 0).Select(i => _modifications[i - 1]).ToList();
                 var modComb = new ModificationCombination(modList);
                 _modificationCombinations[++index] = modComb;
                 var hashValue = ToHash(combination);

@@ -170,27 +170,27 @@
     <Compile Include="Results\DatabaseSearchResultData.cs" />
     <Compile Include="Results\IdentificationExtensions.cs" />
     <Compile Include="Results\ResultFileReader.cs" />
+    <Compile Include="MathAndStats\ArrayUtil.cs" />
+    <Compile Include="MathAndStats\CubicSpline.cs" />
+    <Compile Include="MathAndStats\FitScoreCalculator.cs" />
+    <Compile Include="MathAndStats\OtsuThreshold.cs" />
+    <Compile Include="MathAndStats\SavitzkyGolaySmoother.cs" />
+    <Compile Include="MathAndStats\SimpleMath.cs" />
+    <Compile Include="MathAndStats\TriDiagonalMatrix.cs" />
+    <Compile Include="MathAndStats\VennDiagram.cs" />
     <Compile Include="Utils\AnonymousComparer.cs" />
-    <Compile Include="Utils\ArrayUtil.cs" />
     <Compile Include="Utils\Centroider.cs" />
-    <Compile Include="Utils\CubicSpline.cs" />
     <Compile Include="Utils\FdrCalculator.cs" />
-    <Compile Include="Utils\FitScoreCalculator.cs" />
     <Compile Include="Utils\IntRange.cs" />
     <Compile Include="Utils\IsotopicConcentrationTuner.cs" />
     <Compile Include="Utils\Misc.cs" />
-    <Compile Include="Utils\OtsuThreshold.cs" />
     <Compile Include="Utils\ParallelizationUtils.cs" />
     <Compile Include="Utils\PeakListUtils.cs" />
     <Compile Include="Utils\ProgressData.cs" />
-    <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
-    <Compile Include="Utils\SimpleMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\FastaDatabase.cs" />
     <Compile Include="Utils\SimpleStringProcessing.cs" />
-    <Compile Include="Utils\TriDiagonalMatrix.cs" />
     <Compile Include="Utils\TsvFileParser.cs" />
-    <Compile Include="Utils\VennDiagram.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

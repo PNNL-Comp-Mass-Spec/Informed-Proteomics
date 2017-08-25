@@ -6,6 +6,7 @@ using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;

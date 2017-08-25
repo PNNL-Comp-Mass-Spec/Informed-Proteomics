@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MathAndStats;
 using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Utils

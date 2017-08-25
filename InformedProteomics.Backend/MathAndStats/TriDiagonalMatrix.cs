@@ -24,11 +24,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
 using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace InformedProteomics.Backend.Utils
+namespace InformedProteomics.Backend.MathAndStats
 {
     /// <summary>
     /// A tri-diagonal matrix has non-zero entries only on the main diagonal, the diagonal above the main (super), and the

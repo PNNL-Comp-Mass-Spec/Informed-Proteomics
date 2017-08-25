@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
