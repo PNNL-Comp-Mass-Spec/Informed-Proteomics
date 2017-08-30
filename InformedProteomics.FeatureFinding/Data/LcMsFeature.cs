@@ -52,6 +52,10 @@ namespace InformedProteomics.FeatureFinding.Data
         public int ScanLength { get { return MaxScanNum - MinScanNum + 1; } }
 
         public double Abundance { get; protected set; }
+
+        /// <summary>
+        /// LikelihoodRatio
+        /// </summary>
         public double Score { get; set; }
 
         public double Mass { get { return RepresentativeMass;  } }

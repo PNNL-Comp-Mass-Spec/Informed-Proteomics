@@ -537,6 +537,13 @@ namespace InformedProteomics.FeatureFinding.Clustering
         public readonly double[] EnvelopeCorrelationScoreAcrossCharge;
         public readonly double[] EnvelopeIntensityScoreAcrossCharge;
 
+        /// <summary>
+        /// Abundance distribution
+        /// </summary>
+        /// <remarks>
+        /// Index 0 holds abundances for even charges
+        /// Index 1 holds abundances for odd charges
+        /// </remarks>
         public readonly double[] AbundanceDistributionAcrossCharge;
 
         public readonly double[] BestCorrelationScoreAcrossCharge;

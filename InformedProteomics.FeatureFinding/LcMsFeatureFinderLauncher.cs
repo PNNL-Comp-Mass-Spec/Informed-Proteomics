@@ -378,7 +378,9 @@ namespace InformedProteomics.FeatureFinding
                 sb.AppendFormat("{0},{1:0.000}", feature.TheoreticalEnvelope.Isotopes[i].Index, intensity[i] / maxIntensity);
             }
 
+            // LikelihoodRatio
             sb.Append(string.Format("\t{0:0.0000}", feature.Score));
+
             if (scoreReport)
             {
                 sb.AppendFormat("\t{0}", feature.BestCharge[LcMsPeakCluster.EvenCharge]);

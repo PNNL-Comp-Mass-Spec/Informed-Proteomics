@@ -33,6 +33,9 @@ namespace InformedProteomics.FeatureFinding.Scoring
             ScoreThreshold = likelihoodThreshold;
         }
 
+        /// <summary>
+        /// LikelihoodRatioThreshold
+        /// </summary>
         public readonly double ScoreThreshold;
 
         public double GetScore(LcMsPeakCluster feature)
