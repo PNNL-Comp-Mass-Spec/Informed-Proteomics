@@ -56,7 +56,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -180,7 +179,7 @@
       <Version>3.13.1</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.4.21</Version>
+      <Version>2.4.23</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
       <Version>1.2.0</Version>

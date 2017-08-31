@@ -1809,41 +1809,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             // List overhead per item: is array-backed, so item (+ pointer to it)
             // item size: double, double, int, so 20 bytes
-            //var avgPeaksPerSpec = (double)totalPeaksCount / scansForMsLevelX.Count;
-            // Testing: Approx. 10 peaks per KB - it underestimates on the non-low-memory implementation, but only by 2-3 peaks/KB
-            //var totalKBytesInMem = (totalPeaksCount * (20 + 8)) / 1024;
-            var totalKBytesInMem = totalPeaksCount / 10;
-            double memoryFreeKB = 0;
-            double totalMemKB = 0;
-            //var osVersion = Environment.OSVersion.Version;
-            //if (osVersion < new Version(6, 0)) // Older than Vista
-            //{
-            //    // For pre-Vista: "SELECT * FROM Win32_LogicalMemoryConfiguration", and a different property.
-            //    // Have no good systems to test on (Sequest head nodes??)
-            //}
-            foreach (var item in new System.Management.ManagementObjectSearcher("SELECT * FROM CIM_OperatingSystem").Get())
-            {
-                memoryFreeKB += double.Parse(item["FreePhysicalMemory"].ToString());
-                //foreach (var p in item.Properties)
-                //{
-                //    Console.WriteLine("{0}: {1}", p.Name, p.Value);
-                //}
-            }
-            // Get total physical memory
-            foreach (var item in new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem").Get())
-            {
-                // TotalPhysicalMemory is in Bytes, so divide by 1024
-                totalMemKB += double.Parse(item["TotalPhysicalMemory"].ToString()) / 1024.0;
-                //foreach (var p in item.Properties)
-                //{
-                //    Console.WriteLine("{0}: {1}", p.Name, p.Value);
-                //}
-            }
-
-            //Console.WriteLine("memoryFreeKB: " + memoryFreeKB);
-            //Console.WriteLine("totalKBytesInMem: " + totalKBytesInMem);
-            //Console.WriteLine("NumScans: " + scansForMsLevelX.Count);
-            //Console.WriteLine("NumPeaks: " + totalPeaksCount);
+            var memoryFreeKB = PRISM.SystemInfo.GetFreeMemoryMB() / 1024.0;
+            var totalMemKB = PRISM.SystemInfo.GetTotalMemoryMB() / 1024.0;
 
             // Configure a reserve amount to avoid using all physical memory, which has the cost of excessive paging
             var quarterTotalPhysicalMemory = totalMemKB / 4;
@@ -1860,8 +1827,6 @@ namespace InformedProteomics.Backend.MassSpecData
             // item size: double, double, int, so 20 bytes
             // Perform a massive merge-sort style read/write, to minimize memory usage - set a minimum of 5
             int maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, scansForMsLevelX.Count);
-
-            //Console.WriteLine("maxInMemoryPerSpec: " + maxInMemoryPerSpec);
 
             progData.Status = "Writing product chromatogram";
             if (isMs1List)
