@@ -8,7 +8,6 @@ namespace InformedProteomics.Backend.Data.Biology
     /// <summary>
     /// Atom class - elements of the periodic table
     /// </summary>
-    [Serializable]
     public class Atom : IMatter, IEquatable<Atom>
     {
         /// <summary>

@@ -10,7 +10,6 @@ namespace InformedProteomics.Backend.Data.Composition
     /// <summary>
     /// Composition, consisting of elements C, H, N, O, S, or P, and optionally additional elements
     /// </summary>
-    [Serializable]
     public class Composition: AbstractComposition
     {
         /// <summary>
@@ -252,7 +251,6 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Mass of the composition
         /// </summary>
-        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public override double Mass
         {
             get { return (double)(_mass ?? (_mass = GetMonoIsotopicMass())); }
@@ -261,7 +259,6 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Nominal mass of the composition
         /// </summary>
-        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public override int NominalMass
         {
             get { return (int)(_nominalMass ?? (_nominalMass = GetNominalMass())); }

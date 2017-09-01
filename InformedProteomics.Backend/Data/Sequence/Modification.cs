@@ -38,7 +38,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Mass of the modification
         /// </summary>
-        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public double Mass { get { return Composition.Mass; } }
 
         /// <summary>

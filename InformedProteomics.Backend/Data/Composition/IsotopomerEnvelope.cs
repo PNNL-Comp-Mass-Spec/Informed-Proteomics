@@ -1,11 +1,8 @@
-﻿using System;
-
-namespace InformedProteomics.Backend.Data.Composition
+﻿namespace InformedProteomics.Backend.Data.Composition
 {
     /// <summary>
     /// Class for a single Isotopomer envelope
     /// </summary>
-    [Serializable]
     public class IsotopomerEnvelope
     {
         /// <summary>
