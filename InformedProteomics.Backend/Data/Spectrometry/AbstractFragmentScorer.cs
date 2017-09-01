@@ -10,8 +10,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 {
     using InformedProteomics.Backend.Data.Composition;
 
+    /// <summary>
+    /// Base class for fragment scorers
+    /// </summary>
     public abstract class AbstractFragmentScorer : IScorer
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="spec"></param>
+        /// <param name="tol"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="relativeIsotopeIntensityThreshold"></param>
+        /// <param name="activationMethod"></param>
         protected AbstractFragmentScorer(Spectrum spec, Tolerance tol, int minCharge = 1, int maxCharge = 20, double relativeIsotopeIntensityThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             Ms2Spectrum = spec;
@@ -46,10 +58,23 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             RelativeIsotopeIntensityThreshold = relativeIsotopeIntensityThreshold;
         }
 
+        /// <summary>
+        /// Get the fragment score for the provided fragment compositions and residues
+        /// </summary>
+        /// <param name="prefixFragmentComposition"></param>
+        /// <param name="suffixFragmentComposition"></param>
+        /// <param name="nTerminalResidue"></param>
+        /// <param name="cTerminalResidue"></param>
+        /// <returns></returns>
         public abstract double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
             AminoAcid nTerminalResidue = null,
             AminoAcid cTerminalResidue = null);
 
+        /// <summary>
+        /// Get the range of min and max charges for the fragment composition
+        /// </summary>
+        /// <param name="fragmentComposition"></param>
+        /// <returns></returns>
         protected IntRange GetMinMaxChargeRange(Composition fragmentComposition)
         {
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -57,6 +82,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return GetMinMaxChargeRange(fragmentIonMostAbuMass);
         }
 
+        /// <summary>
+        /// Get the range of min and max charges for the provided fragment mass
+        /// </summary>
+        /// <param name="fragmentIonMostAbuMass"></param>
+        /// <returns></returns>
         protected IntRange GetMinMaxChargeRange(double fragmentIonMostAbuMass)
         {
             var minMz = Ms2Spectrum.Peaks.First().Mz;
@@ -70,6 +100,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new IntRange(minCharge, maxCharge);
         }
 
+        /// <summary>
+        /// Find the praks that match the provided composition
+        /// </summary>
+        /// <param name="fragmentComposition"></param>
+        /// <param name="corrThreshold"></param>
+        /// <param name="distThreshold"></param>
+        /// <returns></returns>
         protected IEnumerable<DeconvolutedPeak> FindMatchedPeaks(Composition fragmentComposition,
                    double corrThreshold, double distThreshold)
         {
@@ -146,6 +183,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return null;
         }
         */
+
+        /// <summary>
+        /// Find the highest-intensity peak that matches the provided fragment composition
+        /// </summary>
+        /// <param name="fragmentComposition"></param>
+        /// <param name="corrThreshold"></param>
+        /// <param name="distThreshold"></param>
+        /// <param name="observedCharge"></param>
+        /// <param name="envelopeCorr"></param>
+        /// <param name="envelopeDist"></param>
+        /// <returns></returns>
         protected Peak[] FindMostIntensePeak(Composition fragmentComposition, double corrThreshold, double distThreshold, out int observedCharge, out double envelopeCorr, out double envelopeDist)
         {
             Peak[] intenseObservedPeaks = null;
@@ -182,6 +230,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return intenseObservedPeaks;
         }
 
+        /// <summary>
+        /// Get the Bhattacharyya distance and the Pearson correlation for the provided ion and peaks
+        /// </summary>
+        /// <param name="ion"></param>
+        /// <param name="observedPeaks"></param>
+        /// <returns></returns>
         public static Tuple<double, double> GetDistCorr(Ion ion, Peak[] observedPeaks)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
@@ -198,19 +252,51 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             //return new Tuple<double, double>(bcDist, corr);
         }
 
+        /// <summary>
+        /// The spectrum being scored
+        /// </summary>
         public readonly Spectrum Ms2Spectrum;
+
+        /// <summary>
+        /// Tolerance used for scoring
+        /// </summary>
         protected readonly Tolerance Tolerance;
+
+        /// <summary>
+        /// Min charge used for scoring
+        /// </summary>
         protected readonly int MinProductCharge;
+
+        /// <summary>
+        /// Max charge used for scoring
+        /// </summary>
         protected readonly int MaxProductCharge;
+
+        /// <summary>
+        /// Base Ion Types used in scoring
+        /// </summary>
         protected readonly BaseIonType[] BaseIonTypes;
 
+        /// <summary>
+        /// The prefix offset mass
+        /// </summary>
         protected double PrefixOffsetMass;
 
+        /// <summary>
+        /// the suffix offset mass
+        /// </summary>
         protected double SuffixOffsetMass;
 
+        /// <summary>
+        /// The relative isotope intensity threshold
+        /// </summary>
         protected double RelativeIsotopeIntensityThreshold;
 
+        /// <summary>
+        /// The default base ion types for different fragmentation methods
+        /// </summary>
         protected static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD, BaseIonTypesUVPD;
+
         static AbstractFragmentScorer()
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };

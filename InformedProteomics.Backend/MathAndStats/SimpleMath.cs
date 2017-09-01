@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Simple math algorithms and tools
+    /// </summary>
     public class SimpleMath
     {
+        /// <summary>
+        /// Calculate n choose k
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="k"></param>
+        /// <returns></returns>
         public static int NChooseK(int n, int k)
         {
             int num = 1;
@@ -19,12 +28,24 @@ namespace InformedProteomics.Backend.MathAndStats
 
         private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new Dictionary<Tuple<int, int>, double>();
 
+        /// <summary>
+        /// Get the combination for n and k
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="k"></param>
+        /// <returns></returns>
         public static double GetCombination(int n, int k)
         {
             var sum = GetLogCombination(n, k);
             return Math.Exp(sum);
         }
 
+        /// <summary>
+        /// Get the log combination for n and k
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="k"></param>
+        /// <returns></returns>
         public static double GetLogCombination(int n, int k)
         {
             if (LogCombinations.TryGetValue(new Tuple<int, int>(n, k), out var sum)) return sum;
@@ -39,6 +60,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return sum;
         }
 
+        /// <summary>
+        /// Get the combinations with repetition for n and length
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static int[][] GetCombinationsWithRepetition(int n, int length)
         {
             if (n <= 0)
@@ -76,6 +103,12 @@ namespace InformedProteomics.Backend.MathAndStats
             }
         }
 
+        /// <summary>
+        /// Get n to the k combinations
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static int[][] GetNtoTheKCombinations(int n, int length)
         {
             if (n <= 0)
@@ -112,7 +145,13 @@ namespace InformedProteomics.Backend.MathAndStats
             }
         }
 
-        static public double GetCorrelation(double[] v1, double[] v2)
+        /// <summary>
+        /// Get the correlation score between 2 arrays
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <returns></returns>
+        public static double GetCorrelation(double[] v1, double[] v2)
         {
             if (v1.Length <= 1) return 0.0;
 
@@ -126,24 +165,46 @@ namespace InformedProteomics.Backend.MathAndStats
             return Math.Min(Math.Max(0, rho / (v1.Length - 1)), 1);
         }
 
-        static public double GetSampleMean(double[] x)
+        /// <summary>
+        /// Get the mean of the values in <paramref name="x"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static double GetSampleMean(double[] x)
         {
             var m = x.Sum();
             return m / x.Length;
         }
 
-        static public double GetSampleVariance(double[] x, double m)
+        /// <summary>
+        /// Get the variance of the values in <paramref name="x"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static double GetSampleVariance(double[] x, double m)
         {
             var var = x.Sum(v => (v - m) * (v - m));
             return var / (x.Length - 1);
         }
 
-        static public float GetSampleMean(float[] x)
+        /// <summary>
+        /// Get the mean of the values in <paramref name="x"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static float GetSampleMean(float[] x)
         {
             return x.Average();
         }
 
-        static public float GetSampleVariance(float[] x, float m)
+        /// <summary>
+        /// Get the variance of the values in <paramref name="x"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static float GetSampleVariance(float[] x, float m)
         {
             var variance = 0f;
             var length = x.Length;
@@ -155,7 +216,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return variance / (length - 1);
         }
 
-        static public IEnumerable<int> GetFactors(int x)
+        /// <summary>
+        /// Get the factors of x
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static IEnumerable<int> GetFactors(int x)
         {
             for (var factor = 1; factor * factor <= x; factor++)
             {
@@ -165,7 +231,13 @@ namespace InformedProteomics.Backend.MathAndStats
             }
         }
 
-        static public double GetKLDivergence(double[] P, double[] Q)
+        /// <summary>
+        /// Get the KL Divergence of the provided data
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="Q"></param>
+        /// <returns></returns>
+        public static double GetKLDivergence(double[] P, double[] Q)
         {
             var ret = P.Select((t, i) => t*(Math.Log(t) - Math.Log(Q[i]))).Sum();
 

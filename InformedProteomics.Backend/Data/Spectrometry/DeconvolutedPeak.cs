@@ -4,8 +4,20 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Deconvoluted peak class
+    /// </summary>
     public class DeconvolutedPeak : Peak
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mass"></param>
+        /// <param name="intensity"></param>
+        /// <param name="charge"></param>
+        /// <param name="corr"></param>
+        /// <param name="dist"></param>
+        /// <param name="isotopePeaks"></param>
         public DeconvolutedPeak(double mass, double intensity, int charge, double corr, double dist, Peak[] isotopePeaks = null) : base(mass, intensity)
         {
             Charge = charge;
@@ -32,17 +44,46 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             ObservedPeakIndices = new List<int>();
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mzPeak"></param>
+        /// <param name="charge"></param>
+        /// <param name="corr"></param>
+        /// <param name="dist"></param>
         public DeconvolutedPeak(Peak mzPeak, int charge, double corr = 0, double dist = 0)
             : this(charge * (mzPeak.Mz - Constants.Proton), mzPeak.Intensity, charge, corr, dist)
         {
         }
 
+        /// <summary>
+        /// Get the summed intensity of the deconvoluted peak
+        /// </summary>
         public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
+
+        /// <summary>
+        /// Get the m/z without the adduct ion mass
+        /// </summary>
         public double MzWithoutAdductIonMass { get { return Mass / Charge; } }
+
+        /// <summary>
+        /// Get the mass (m/z) of the deconvoluted peak
+        /// </summary>
         public double Mass { get { return Mz; } }
+
+        /// <summary>
+        /// Get the charge of the deconvoluted peak
+        /// </summary>
         public int Charge { get; }
 
+        /// <summary>
+        /// Get the Pearson Correlation of the deconvoluted peak
+        /// </summary>
         public double Corr { get; }
+
+        /// <summary>
+        /// Get the Bhattacharyya distance of the deconvoluted peak
+        /// </summary>
         public double Dist { get; }
 
         /*
@@ -51,6 +92,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return ObservedPeaks.Any(peak => other.ObservedPeaks.Contains(peak));
         }*/
 
+        /// <summary>
+        /// Observed peaks of this deconvoluted peak
+        /// </summary>
         public Peak[] ObservedPeaks { get; private set; }
         //private readonly HashSet<Peak> _isotopePeaks;
 

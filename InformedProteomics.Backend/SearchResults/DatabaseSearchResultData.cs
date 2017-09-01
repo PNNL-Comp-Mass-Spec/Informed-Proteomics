@@ -148,6 +148,9 @@ namespace InformedProteomics.Backend.SearchResults
             }
         }
 
+        /// <summary>
+        /// Ms1Feature id
+        /// </summary>
         public int Ms1Feature { get; set; }
 
         private string sequenceWithEnds;

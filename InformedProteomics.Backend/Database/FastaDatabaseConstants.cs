@@ -1,5 +1,8 @@
 ﻿namespace InformedProteomics.Backend.Database
 {
+    /// <summary>
+    /// Constants used in multiple places where Fasta Databases are used
+    /// </summary>
     public static class FastaDatabaseConstants
     {
         /// <summary>

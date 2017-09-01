@@ -4,11 +4,19 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Savitzky-Golay Smoothing implementation
+    /// </summary>
     public class SavitzkyGolaySmoother
     {
         private readonly int _mNumPointsForSmoothing;
         private readonly Matrix<double> _mSmoothingFiltersConjugateTranspose;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="pointsForSmoothing"></param>
+        /// <param name="polynomialOrder"></param>
         public SavitzkyGolaySmoother(int pointsForSmoothing, int polynomialOrder)
         {
             if (pointsForSmoothing < 3) throw new ArgumentOutOfRangeException("savGolayPoints must be an odd number 3 or higher");
@@ -19,6 +27,10 @@ namespace InformedProteomics.Backend.MathAndStats
             _mSmoothingFiltersConjugateTranspose = smoothingFilters.ConjugateTranspose();
         }
 
+        /// <summary>
+        /// Smooth the provided 2-dimensional array
+        /// </summary>
+        /// <param name="inputValues"></param>
         public void Smooth(ref double[,] inputValues)
         {
             // TODO: Using the matrix works, but does a lot of data accesses. Can improve by working out all the data access myself? I might be able to cut down on number of data accesses, but not sure.
@@ -37,6 +49,11 @@ namespace InformedProteomics.Backend.MathAndStats
             inputValues = inputMatrix.ToArray();
         }
 
+        /// <summary>
+        /// Smooth the provided array
+        /// </summary>
+        /// <param name="inputValues"></param>
+        /// <returns></returns>
         public double[] Smooth(double[] inputValues)
         {
             // No need to smooth if all values are 0

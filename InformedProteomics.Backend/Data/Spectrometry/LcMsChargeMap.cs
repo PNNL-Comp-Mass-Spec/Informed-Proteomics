@@ -8,9 +8,19 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Charge map for LC-MS data
+    /// </summary>
     public class LcMsChargeMap
     {
         private const int MaxNumMs2ScansPerFeature = int.MaxValue;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="run"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="maxNumMs2ScansPerMass"></param>
         public LcMsChargeMap(LcMsRun run, Tolerance tolerance, int maxNumMs2ScansPerMass = MaxNumMs2ScansPerFeature)
         {
             _run = run;
@@ -32,6 +42,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _scanNumToMassBin = new Dictionary<int, List<int>>();
         }
 
+        /// <summary>
+        /// Get feature ids of features that match the sequence mass
+        /// </summary>
+        /// <param name="sequenceMass"></param>
+        /// <returns></returns>
         public List<int> GetMatchingFeatureIds(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
@@ -41,6 +56,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new List<int>();
         }
 
+        /// <summary>
+        /// Get MS2 scan numbers that have precursors that match the sequence mass
+        /// </summary>
+        /// <param name="sequenceMass"></param>
+        /// <returns></returns>
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
@@ -50,6 +70,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new int[0];
         }
 
+        /// <summary>
+        /// Get the mass matching the scan number
+        /// </summary>
+        /// <param name="ms2ScanNum"></param>
+        /// <returns></returns>
         public IEnumerable<double> GetMatchingMass(int ms2ScanNum)
         {
             List<int> massBinNums;
@@ -57,6 +82,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new double[0];
         }
 
+        /// <summary>
+        /// Create the mass to scan number map
+        /// </summary>
         public void CreateMassToScanNumMap()
         {
             /*
@@ -92,6 +120,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _scanToIsolationWindow = null;
         }
 
+        /// <summary>
+        /// Set the matches
+        /// </summary>
+        /// <param name="featureId"></param>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="minScanNum"></param>
+        /// <param name="maxScanNum"></param>
+        /// <param name="repScanNum"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
         public void SetMatches(int featureId, double monoIsotopicMass, int minScanNum, int maxScanNum, int repScanNum, int minCharge, int maxCharge)
         {
             if (minScanNum < _run.MinLcScan) minScanNum = _run.MinLcScan;

@@ -6,32 +6,64 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
+    /// <summary>
+    /// Averagine algorithm - creates isotopic envelopes based on an averaged elemental composition
+    /// </summary>
     public class Averagine
     {
         // NominalMass -> Isotope Envelop (Changed to ConcurrentDictionary by Chris)
         private readonly ConcurrentDictionary<int, IsotopomerEnvelope> IsotopeEnvelopMap;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Averagine()
         {
             this.IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
         }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for <paramref name="monoIsotopeMass"/>
+        /// </summary>
+        /// <param name="monoIsotopeMass"></param>
+        /// <returns></returns>
         public static IsotopomerEnvelope GetIsotopomerEnvelope(double monoIsotopeMass)
         {
             return DefaultAveragine.GetIsotopomerEnvelopeInst(monoIsotopeMass);
         }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for <paramref name="monoIsotopeMass"/> using <paramref name="isoProfilePredictor"/>
+        /// </summary>
+        /// <param name="monoIsotopeMass"></param>
+        /// <param name="isoProfilePredictor"></param>
+        /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelopeInst(double monoIsotopeMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
             return GetIsotopomerEnvelopeFromNominalMassInst(nominalMass, isoProfilePredictor);
         }
 
+        /// <summary>
+        /// Get the theoretical Isotope profile for <paramref name="monoIsotopeMass"/> at charge <paramref name="charge"/>
+        /// </summary>
+        /// <param name="monoIsotopeMass"></param>
+        /// <param name="charge"></param>
+        /// <param name="relativeIntensityThreshold"></param>
+        /// <returns></returns>
         public static List<Peak> GetTheoreticalIsotopeProfile(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1)
         {
             return DefaultAveragine.GetTheoreticalIsotopeProfileInst(monoIsotopeMass, charge, relativeIntensityThreshold);
         }
 
+        /// <summary>
+        /// Get the theoretical Isotope profile for <paramref name="monoIsotopeMass"/> at charge <paramref name="charge"/> using <paramref name="isoProfilePredictor"/>
+        /// </summary>
+        /// <param name="monoIsotopeMass"></param>
+        /// <param name="charge"></param>
+        /// <param name="relativeIntensityThreshold"></param>
+        /// <param name="isoProfilePredictor"></param>
+        /// <returns></returns>
         public List<Peak> GetTheoreticalIsotopeProfileInst(double monoIsotopeMass, int charge, double relativeIntensityThreshold = 0.1, IsoProfilePredictor isoProfilePredictor = null)
         {
             var peakList = new List<Peak>();
@@ -46,11 +78,22 @@ namespace InformedProteomics.Backend.Data.Composition
             return peakList;
         }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for the nominal mass <paramref name="nominalMass"/>
+        /// </summary>
+        /// <param name="nominalMass"></param>
+        /// <returns></returns>
         public static IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMass(int nominalMass)
         {
             return DefaultAveragine.GetIsotopomerEnvelopeFromNominalMassInst(nominalMass);
         }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for the nominal mass <paramref name="nominalMass"/> using <paramref name="isoProfilePredictor"/>
+        /// </summary>
+        /// <param name="nominalMass"></param>
+        /// <param name="isoProfilePredictor"></param>
+        /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMassInst(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var nominalMassFound = IsotopeEnvelopMap.TryGetValue(nominalMass, out var envelope);
@@ -70,6 +113,9 @@ namespace InformedProteomics.Backend.Data.Composition
         private const double S = 0.0417;
         private const double AveragineMass = C * Atom.C + H * Atom.H + N * Atom.N + O * Atom.O + S * Atom.S;
 
+        /// <summary>
+        /// Default averagine formula
+        /// </summary>
         public static Averagine DefaultAveragine;
 
         static Averagine()

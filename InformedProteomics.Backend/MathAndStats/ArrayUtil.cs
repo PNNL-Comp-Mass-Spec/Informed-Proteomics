@@ -5,6 +5,9 @@ using System.Text;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Static class with array handling utilities
+    /// </summary>
     public static class ArrayUtil
     {
         /// <summary>
@@ -33,7 +36,15 @@ namespace InformedProteomics.Backend.MathAndStats
             return s.ToString();
         }
 
-        public static string ToString<T>(T[][] array, string deliminator = "\t", string format = "")
+        /// <summary>
+        /// Create a string to display the array values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static string ToString<T>(T[][] array, string delimiter = "\t", string format = "")
         {
             var s = new StringBuilder();
             var formatString = "{0" + format + "}";
@@ -44,7 +55,7 @@ namespace InformedProteomics.Backend.MathAndStats
                 {
                     if (j < array[i].Length - 1)
                     {
-                        s.AppendFormat(formatString + deliminator, array[i][j]);
+                        s.AppendFormat(formatString + delimiter, array[i][j]);
                     }
                     else
                     {
@@ -57,6 +68,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return s.ToString();
         }
 
+        /// <summary>
+        /// Return an array ranking every value in <paramref name="values"/>, highest value 1 and lowest value n
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="lowerBoundValue"></param>
+        /// <returns></returns>
         public static int[] GetRankings(IEnumerable<double> values, double lowerBoundValue = 0.0d)
         {
             var temp = new List<KeyValuePair<double, int>>();
@@ -76,6 +93,13 @@ namespace InformedProteomics.Backend.MathAndStats
             return rankingList;
         }
 
+        /// <summary>
+        /// Return an array ranking every value in <paramref name="values"/>, highest value 1 and lowest value n
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="median"></param>
+        /// <param name="lowerBoundValue"></param>
+        /// <returns></returns>
         public static int[] GetRankings(IEnumerable<double> values, out double median, double lowerBoundValue = 0.0d)
         {
             var temp = new List<KeyValuePair<double, int>>();
@@ -98,7 +122,13 @@ namespace InformedProteomics.Backend.MathAndStats
             return rankingList;
         }
 
-        // Kadane's algorithm
+        /// <summary>
+        /// Kadane's algorithm
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="start"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public static int MaxSumSubarray(IList<int> a, out int start, out int len)
         {
             start = 0;
@@ -134,7 +164,13 @@ namespace InformedProteomics.Backend.MathAndStats
             return sum;
         }
 
-        // Kadane's algorithm
+        /// <summary>
+        /// Kadane's algorithm
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="start"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public static double MaxSumSubarray(IList<double> a, out int start, out int len)
         {
             start = 0;

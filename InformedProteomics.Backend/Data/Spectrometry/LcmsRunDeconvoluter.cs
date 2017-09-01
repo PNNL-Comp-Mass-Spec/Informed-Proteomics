@@ -5,6 +5,9 @@ using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Implementation of a deconvoluter that can be used to create a deconvoluted implementation of <see cref="LcMsRun"/>
+    /// </summary>
     public class LcmsRunDeconvoluter : IMassSpecDataReader
     {
         /// <summary>

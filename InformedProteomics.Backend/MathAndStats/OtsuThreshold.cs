@@ -2,9 +2,21 @@
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Class for calculating Otsu threshold
+    /// </summary>
     public class OtsuThreshold
     {
-        // find otsu threshold
+        /// <summary>
+        /// Calculate the Otsu threshold for the provided data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="minX"></param>
+        /// <param name="maxX"></param>
+        /// <param name="intervalX"></param>
+        /// <param name="xLb"></param>
+        /// <param name="xUb"></param>
+        /// <returns></returns>
         public static double GetThreshold(double[] data, double minX, double maxX, double intervalX, double xLb, double xUb)
         {
             var nBins = (int)Math.Ceiling((maxX - minX) / intervalX);
@@ -23,6 +35,20 @@ namespace InformedProteomics.Backend.MathAndStats
             return RunOtsuMethod(hist, minX, intervalX);
         }
 
+        /// <summary>
+        /// Calculate the Otsu threshold for the provided data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="minX"></param>
+        /// <param name="maxX"></param>
+        /// <param name="intervalX"></param>
+        /// <param name="minRow"></param>
+        /// <param name="maxRow"></param>
+        /// <param name="minCol"></param>
+        /// <param name="maxCol"></param>
+        /// <param name="xLb"></param>
+        /// <param name="xUb"></param>
+        /// <returns></returns>
         public static double GetThreshold(double[][] data, double minX, double maxX, double intervalX,
             int minRow, int maxRow, int minCol, int maxCol, double xLb, double xUb)
         {

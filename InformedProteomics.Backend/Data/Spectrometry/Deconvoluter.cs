@@ -7,8 +7,14 @@ using InformedProteomics.Backend.MathAndStats;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Deconvolution class
+    /// </summary>
     public class Deconvoluter
     {
+        /// <summary>
+        /// Largest mass that will be deconvoluted
+        /// </summary>
         public const double MaxMass = 50000;
 
         private readonly int minCharge;
@@ -23,6 +29,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly double corrScoreThreshold;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="filteringWindowSize"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
         public Deconvoluter(
             int minCharge,
             int maxCharge,
@@ -39,6 +54,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             this.corrScoreThreshold = corrScoreThreshold;
         }
 
+        /// <summary>
+        /// Get a deconvoluted spectrum that combines multiple charge states
+        /// </summary>
+        /// <param name="spectrum"></param>
+        /// <returns></returns>
         public DeconvolutedSpectrum GetCombinedDeconvolutedSpectrum(Spectrum spectrum)
         {
             return GetCombinedDeconvolutedSpectrum(
@@ -50,6 +70,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         this.corrScoreThreshold);
         }
 
+        /// <summary>
+        /// Get the deconvoluted spectrum
+        /// </summary>
+        /// <param name="spec"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="filteringWindowSize"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        /// <returns></returns>
         public static DeconvolutedSpectrum GetDeconvolutedSpectrum(
                     Spectrum spec, int minCharge, int maxCharge,
                     int isotopeOffsetTolerance, double filteringWindowSize,
@@ -60,6 +91,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new DeconvolutedSpectrum(spec, peaks.ToArray());
         }
 
+        /// <summary>
+        /// Get a deconvoluted spectrum that combines multiple charge states
+        /// </summary>
+        /// <param name="spectrum"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        /// <returns></returns>
         public static DeconvolutedSpectrum GetCombinedDeconvolutedSpectrum(
             Spectrum spectrum,
             int minCharge,
@@ -68,7 +109,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Tolerance tolerance,
             double corrScoreThreshold)
         {
-            spectrum.FilterNosieByIntensityHistogram();
+            spectrum.FilterNoiseByIntensityHistogram();
             var deconvolutedPeaks = GetDeconvolutedPeaks_new(spectrum.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, tolerance, corrScoreThreshold);
             var binHash = new Dictionary<int, DeconvolutedPeak>();
             foreach (var deconvolutedPeak in deconvolutedPeaks)
@@ -93,6 +134,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new DeconvolutedSpectrum(spectrum, peakList);
         }
 
+        /// <summary>
+        /// Get the deconvoluted peaks that correspond to the provided peak list
+        /// </summary>
+        /// <param name="peaks"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        /// <returns></returns>
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks_new(
             Peak[] peaks,
             int minCharge,
@@ -343,7 +394,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return observedPeaks;
         }
 
-        // Select the best peak within +/- filteringWindowSize
+        /// <summary>
+        /// Get the deconvoluted peaks, selecting the best peak within +/- filteringWindowSize
+        /// </summary>
+        /// <param name="peaks"></param>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="filteringWindowSize"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        /// <returns></returns>
         public static List<DeconvolutedPeak> GetDeconvolutedPeaks(
             Peak[] peaks, int minCharge, int maxCharge,
             int isotopeOffsetTolerance, double filteringWindowSize,
@@ -447,6 +508,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return monoIsotopePeakList;
         }
 
+        /// <summary>
+        /// Filters out some data based on parameters, maybe?
+        /// </summary>
+        /// <param name="peaks"></param>
+        /// <param name="windowSize"></param>
+        /// <param name="topRankCutoff"></param>
+        /// <returns></returns>
         public static List<DeconvolutedPeak> FilterOut(List<DeconvolutedPeak> peaks, double windowSize, int topRankCutoff)
         {
             var retSpec = new List<DeconvolutedPeak>();

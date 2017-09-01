@@ -6,8 +6,16 @@ using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Simple string processing functions
+    /// </summary>
     public class SimpleStringProcessing
     {
+        /// <summary>
+        /// Random shuffle a string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string Shuffle(string str)
         {
             var indices = Enumerable.Range(0, str.Length).OrderBy(r => Random.Next()).ToArray();
@@ -16,6 +24,12 @@ namespace InformedProteomics.Backend.Utils
             return sflStr.ToString();
         }
 
+        /// <summary>
+        /// Perform a set number of random mutations on a string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="numMutations"></param>
+        /// <returns></returns>
         public static string Mutate(string str, int numMutations)
         {
             var length = str.Length;
@@ -44,6 +58,11 @@ namespace InformedProteomics.Backend.Utils
             return mutated.ToString();
         }
 
+        /// <summary>
+        /// Get the string between 2 periods, so A.BCDEFGHI.J returns BCDEFGHI
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string GetStringBetweenDots(string str)
         {
             //if (!Regex.IsMatch(str, @"^[A-Z" + FastaDatabase.Delimiter + @"]\.[A-Z]+\.[A-Z" + FastaDatabase.Delimiter + @"]$")) return null;

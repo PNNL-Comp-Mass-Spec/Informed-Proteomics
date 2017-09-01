@@ -36,6 +36,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             GenerateModCombMap();
         }
 
+        /// <summary>
+        /// Max number of dynamic modifications per sequence
+        /// </summary>
         public int MaxNumDynModsPerSequence
         {
             get { return _maxNumDynModsPerSequence; }
@@ -60,11 +63,22 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _modificationCombinations[modCombIndex];
         }
 
+        /// <summary>
+        /// Get the modification at index <paramref name="modIndex"/>
+        /// </summary>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         public Modification GetModification(int modIndex)
         {
             return _modifications[modIndex];
         }
 
+        /// <summary>
+        /// Get the index of a modification combination
+        /// </summary>
+        /// <param name="prevModCombIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
             if (_modCombMap.TryGetValue(prevModCombIndex * _modifications.Length + modIndex, out var newModCombIndex))
@@ -74,6 +88,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return -1;
         }
 
+        /// <summary>
+        /// Get the modification at the index between the provided indices
+        /// </summary>
+        /// <param name="prevModCombIndex"></param>
+        /// <param name="curModCombIndex"></param>
+        /// <returns></returns>
         public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
         {
             if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out var modIndex))
@@ -83,6 +103,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return null;
         }
 
+        /// <summary>
+        /// Get all <see cref="ModificationCombination"/>s in this instance
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ModificationCombination> GetModificationCombinations()
         {
             return _modificationCombinations;

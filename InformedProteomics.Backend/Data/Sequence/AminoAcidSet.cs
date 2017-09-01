@@ -5,11 +5,16 @@ using InformedProteomics.Backend.Data.Enum;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// Set of amino acids used in a search
+    /// </summary>
     public class AminoAcidSet
     {
         #region Constructors
 
-        // Generate an amino acid map with 20 standard amino acids
+        /// <summary>
+        /// Generate an amino acid map with 20 standard amino acids
+        /// </summary>
         public AminoAcidSet()
         {
             // Initialization
@@ -52,7 +57,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
-        // Generate an amino acid map with Cys static modification
+        /// <summary>
+        /// Generate an amino acid map with Cys static modification
+        /// </summary>
+        /// <param name="cysMod"></param>
         public AminoAcidSet(Modification cysMod): this()
         {
             foreach (var loc in AllSequenceLocations)
@@ -62,15 +70,28 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
+        /// <summary>
+        /// Construct an amino acid map using the 20 standard amino acids and any modifications in mod file at path <paramref name="modFilePath"/>
+        /// </summary>
+        /// <param name="modFilePath"></param>
         public AminoAcidSet(string modFilePath): this(new ModFileParser(modFilePath))
         {
         }
 
+        /// <summary>
+        /// Construct an amino acid map using the 20 standard amino acids and any modifications in mod file parsed by <paramref name="modFileParser"/>
+        /// </summary>
+        /// <param name="modFileParser"></param>
         private AminoAcidSet(ModFileParser modFileParser)
             : this(modFileParser.SearchModifications, modFileParser.MaxNumDynModsPerSequence)
         {
         }
 
+        /// <summary>
+        /// Construct an amino acid map using the 20 standard amino acids and any modifications in <paramref name="searchModifications"/>
+        /// </summary>
+        /// <param name="searchModifications"></param>
+        /// <param name="maxNumModsPerSequence"></param>
         public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence): this()
         {
             if (searchModifications == null) return;
@@ -162,11 +183,21 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #endregion
 
+        /// <summary>
+        /// Get the amino acid specified by character <paramref name="residue"/>, with any static modifications
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <returns></returns>
         public AminoAcid GetAminoAcid(char residue)
         {
             return GetAminoAcid(residue, SequenceLocation.Everywhere);
         }
-
+        /// <summary>
+        /// Get the amino acid specified by character <paramref name="residue"/> that occurs at location <paramref name="location"/>, with any static modifications
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
         public AminoAcid GetAminoAcid(char residue, SequenceLocation location)
         {
             var residueMap = _locationSpecificResidueMap[location];
@@ -178,11 +209,22 @@ namespace InformedProteomics.Backend.Data.Sequence
             return null;
         }
 
+        /// <summary>
+        /// Get the indices of modifications that apply to residue <paramref name="residue"/>
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <returns></returns>
         public int[] GetModificationIndices(char residue)
         {
             return GetModificationIndices(residue, SequenceLocation.Everywhere);
         }
 
+        /// <summary>
+        /// Get the indices of modifications that apply to residue <paramref name="residue"/> at location <paramref name="location"/>
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
         public int[] GetModificationIndices(char residue, SequenceLocation location)
         {
             var residueModMap = _locationSpecificResidueModMap[location];
@@ -194,7 +236,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new int[0];
         }
 
-        // This method ignores N- and C-term specific modifications.
+        /// <summary>
+        /// Get the composition of <paramref name="sequence"/> using this amino acid map (with static modification masses added)
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        /// <remarks>This method ignores N- and C-term specific modifications.</remarks>
         public Composition.Composition GetComposition(string sequence)
         {
             var composition = Composition.Composition.Zero;
@@ -214,11 +261,18 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         //public Composition.Composition GetComposition(AminoAcid nTerm, string sequence, AminoAcid cTerm)
 
+        /// <summary>
+        /// Get the parameters governing use of dynamic modifications
+        /// </summary>
+        /// <returns></returns>
         public ModificationParams GetModificationParams()
         {
             return _modificationParams;
         }
 
+        /// <summary>
+        /// Display this amino acid set on the console
+        /// </summary>
         public void Display()
         {
             foreach (var location in AllSequenceLocations)
@@ -239,6 +293,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
+        /// <summary>
+        /// Get the set of unique compositions within this amino acid set
+        /// </summary>
+        /// <returns></returns>
         public Composition.Composition[] GetUniqueCompositions()
         {
             //var aaList = AminoAcid.StandardAminoAcidArr.ToList();
@@ -273,11 +331,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             return uniqueCompositionList.ToArray();
         }
 
+        /// <summary>
+        /// Get the standard amino acid set, with no modifications
+        /// </summary>
+        /// <returns></returns>
         public static AminoAcidSet GetStandardAminoAcidSet()
         {
             return _standardAminoAcidSet ?? (_standardAminoAcidSet = new AminoAcidSet());
         }
 
+        /// <summary>
+        /// Get the standard amino acid set, with static Cysteine Alkylation (Carboamidomethyl)
+        /// </summary>
+        /// <returns></returns>
         public static AminoAcidSet GetStandardAminoAcidSetWithCarboamidomethylCys()
         {
             return _standardAminoAcidSetWithCarboamidomethylCys ??
@@ -339,27 +405,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 SequenceLocation.ProteinCTerm
             };
-        }
-    }
-
-    public class ModifiedAminoAcid: AminoAcid
-    {
-        public ModifiedAminoAcid(AminoAcid aa, Modification modification)
-            : base(aa.Residue, aa.Name+"+"+modification.Name, aa.Composition+modification.Composition)
-        {
-            var modAa = aa as ModifiedAminoAcid;
-            if(modAa == null) _modification = modification; // aa is not modified
-            else    // aa is already modified
-            {
-                _modification = Modification.RegisterAndGetModification(modAa.Modification.Name+"+"+modification.Name, Composition);
-            }
-        }
-
-        private readonly Modification _modification;
-
-        public Modification Modification
-        {
-            get { return _modification; }
         }
     }
 }

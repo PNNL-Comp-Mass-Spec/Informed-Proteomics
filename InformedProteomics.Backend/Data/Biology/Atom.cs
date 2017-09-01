@@ -5,9 +5,19 @@ using System.Xml.Linq;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
+    /// <summary>
+    /// Atom class - elements of the periodic table
+    /// </summary>
     [Serializable]
     public class Atom : IMatter, IEquatable<Atom>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="mass"></param>
+        /// <param name="nominalMass"></param>
+        /// <param name="name"></param>
         public Atom(string code, double mass, int nominalMass, string name)
         {
             Code = code;
@@ -16,18 +26,36 @@ namespace InformedProteomics.Backend.Data.Biology
             Name = name;
         }
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public Atom()
         {
         }
 
+        /// <summary>
+        /// Atomic Symbol
+        /// </summary>
         public string Code { get; set; }
 
+        /// <summary>
+        /// Name of element
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Monoisotopic mass of element
+        /// </summary>
         public double Mass { get; set; }
 
+        /// <summary>
+        /// Nominal mass
+        /// </summary>
         public int NominalMass { get; set; }
 
+        /// <summary>
+        /// Get an array of all supported elements, and some compounds
+        /// </summary>
         public static readonly Atom[] AtomArr =
             {
                 // Use Unimod values
@@ -74,12 +102,36 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("Pent", 132.042257, 85, "Pentose"),
             };
 
+        /// <summary>
+        /// Monoisotopic mass of Carbon
+        /// </summary>
         public const double C = 12.0;
+
+        /// <summary>
+        /// Monoisotopic mass of Hydrogen
+        /// </summary>
         public const double H = 1.007825035;
+
+        /// <summary>
+        /// Monoisotopic mass of Nitrogen
+        /// </summary>
         public const double N = 14.003074;
+
+        /// <summary>
+        /// Monoisotopic mass of Oxygen
+        /// </summary>
         public const double O = 15.99491463;
+
+        /// <summary>
+        /// Monoisotopic mass of Sulfur
+        /// </summary>
         public const double S = 31.9720707;
 
+        /// <summary>
+        /// Get the atom that corresponds to the provided atomic symbol
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static Atom Get(string code)
         {
             return AtomMap[code];
@@ -126,6 +178,7 @@ namespace InformedProteomics.Backend.Data.Biology
             }
         }
 
+        /// <inheritdoc />
         public bool Equals(Atom other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -133,10 +186,12 @@ namespace InformedProteomics.Backend.Data.Biology
             return this.Name.Equals(other.Name);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object other) {
             return Equals(other as Atom);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() {
             var result = 29;
             result = result * 13 + (Name == null ? 0 : Name.GetHashCode());

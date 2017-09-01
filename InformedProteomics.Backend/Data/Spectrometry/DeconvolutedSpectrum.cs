@@ -2,8 +2,16 @@
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Deconvoluted spectrum
+    /// </summary>
     public class DeconvolutedSpectrum : ProductSpectrum, IDeconvolutedSpectrum
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="originalSpec"></param>
+        /// <param name="peaks"></param>
         public DeconvolutedSpectrum(Spectrum originalSpec, DeconvolutedPeak[] peaks)
             : base(originalSpec.ScanNum)
         {
@@ -29,6 +37,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = dPeaks;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="peaks"></param>
+        /// <param name="scanNum"></param>
         public DeconvolutedSpectrum(ICollection<DeconvolutedPeak> peaks, int scanNum) : base(scanNum)
         {
             var dPeaks = new DeconvolutedPeak[peaks.Count];
@@ -36,6 +49,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Peaks = dPeaks;
         }
 
+        /// <summary>
+        /// Get the peak that matches <paramref name="composition"/> and <paramref name="tolerance"/>
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
         public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
         {
             return base.FindPeak(composition.Mass, tolerance) as DeconvolutedPeak;

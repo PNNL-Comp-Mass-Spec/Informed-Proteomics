@@ -5,8 +5,14 @@ using InformedProteomics.Backend.Data.Composition;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// Modification
+    /// </summary>
     public class Modification : IMolecule
     {
+        /// <summary>
+        /// The format string for outputting modification masses within sequences
+        /// </summary>
         public const string MOD_MASS_FORMAT_STRING = "{0:N3}";
 
         /// <summary>
@@ -14,13 +20,33 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         private const int UNKNOWN_PSI_MOD_ACCESSION = 1001460;
 
+        /// <summary>
+        /// The UNIMOD accession number of the modification
+        /// </summary>
         public int AccessionNum { get; set; }
+
+        /// <summary>
+        /// The composition of the modification
+        /// </summary>
         public Composition.Composition Composition { get; set; }
+
+        /// <summary>
+        /// The name of the modification
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Mass of the modification
+        /// </summary>
         [System.Runtime.Serialization.IgnoreDataMemberAttribute]
         public double Mass { get { return Composition.Mass; } }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="accessionNum"></param>
+        /// <param name="composition"></param>
+        /// <param name="name"></param>
         public Modification(int accessionNum, Composition.Composition composition, string name)
         {
             AccessionNum = accessionNum;
@@ -28,6 +54,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             Name = name;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="accessionNum"></param>
+        /// <param name="deltaMass"></param>
+        /// <param name="name"></param>
         public Modification(int accessionNum, double deltaMass, string name)
         {
             AccessionNum = accessionNum;
@@ -35,15 +67,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             Name = name;
         }
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public Modification()
         {
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return AccessionNum > 0 ? AccessionNum : Name.GetHashCode();
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             var otherMod = obj as Modification;
@@ -90,12 +127,22 @@ namespace InformedProteomics.Backend.Data.Sequence
             return genericMod;
         }
 
+        /// <summary>
+        /// Get the modification that matches the given mass
+        /// </summary>
+        /// <param name="mass"></param>
+        /// <returns></returns>
         public static IList<Modification> GetFromMass(double mass)
         {
             var massStr = string.Format(MOD_MASS_FORMAT_STRING, mass);
             return GetFromMass(massStr);
         }
 
+        /// <summary>
+        /// Get the modification that matches the given mass
+        /// </summary>
+        /// <param name="massStr"></param>
+        /// <returns></returns>
         public static IList<Modification> GetFromMass(string massStr)
         {
             if (massStr.StartsWith("+")) massStr = massStr.Substring(1);
@@ -115,37 +162,154 @@ namespace InformedProteomics.Backend.Data.Sequence
             return null;
         }
 
+        /// <summary>
+        /// No modification
+        /// </summary>
         public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
 
+        /// <summary>
+        /// Acetylation
+        /// </summary>
         public static readonly Modification Acetylation = new Modification(1, new Composition.Composition(2, 2, 0, 1, 0), "Acetyl");
+
+        /// <summary>
+        /// Carbamidomethylation
+        /// </summary>
         public static readonly Modification Carbamidomethylation = new Modification(4, new Composition.Composition(2, 3, 1, 1, 0), "Carbamidomethyl");
+
+        /// <summary>
+        /// Carbamylation
+        /// </summary>
         public static readonly Modification Carbamylation = new Modification(5, new Composition.Composition(1, 1, 1, 1, 0), "Carbamyl");
+
+        /// <summary>
+        /// Carboxymethylation
+        /// </summary>
         public static readonly Modification Carboxymethylation = new Modification(6, new Composition.Composition(2, 2, 2, 0, 0), "Carboxymethyl");
+
+        /// <summary>
+        /// Deamidation
+        /// </summary>
         public static readonly Modification Deamidation = new Modification(7, new Composition.Composition(0, -1, -1, 1, 0), "Deamidated");
+
+        /// <summary>
+        /// NipCam
+        /// </summary>
         public static readonly Modification NipCam = new Modification(17, new Composition.Composition(5, 9, 1, 1, 0), "NIPCAM");
+
+        /// <summary>
+        /// Phosphorylation
+        /// </summary>
         public static readonly Modification Phosphorylation = new Modification(21, new Composition.Composition(0, 1, 0, 3, 0, 1), "Phospho");
+
+        /// <summary>
+        /// PyroCarbamidomethyl
+        /// </summary>
         public static readonly Modification PyroCarbamidomethyl = new Modification(26, new Composition.Composition(0, -3, -1, 0, 0), "Pyro-carbamidomethyl");
+
+        /// <summary>
+        /// PyroGluE
+        /// </summary>
         public static readonly Modification PyroGluE = new Modification(27, new Composition.Composition(0, -2, 0, -1, 0), "Glu->pyro-Glu");
+
+        /// <summary>
+        /// PyroGluQ
+        /// </summary>
         public static readonly Modification PyroGluQ = new Modification(28, new Composition.Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
+
+        /// <summary>
+        /// Methylation
+        /// </summary>
         public static readonly Modification Methylation = new Modification(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl");
+
+        /// <summary>
+        /// Oxidation
+        /// </summary>
         public static readonly Modification Oxidation = new Modification(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
+
+        /// <summary>
+        /// TriOxidation
+        /// </summary>
         public static readonly Modification TriOxidation = new Modification(400, new Composition.Composition(0, 0, 0, 3, 0), "TriOxidation");
+
+        /// <summary>
+        /// DiMethylation
+        /// </summary>
         public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
+
+        /// <summary>
+        /// TriMethylation
+        /// </summary>
         public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
+
+        /// <summary>
+        /// Glutathione
+        /// </summary>
         public static readonly Modification Glutathione = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
+
+        /// <summary>
+        /// Cysteinyl
+        /// </summary>
         public static readonly Modification Cysteinyl = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
+
+        /// <summary>
+        /// Dehydro
+        /// </summary>
         public static readonly Modification Dehydro = new Modification(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
+
+        /// <summary>
+        /// Itraq4Plex
+        /// </summary>
         public static readonly Modification Itraq4Plex = new Modification(214, Data.Composition.Composition.Parse("H(12) C(4) 13C(3) N 15N O"), "iTRAQ4plex");
+
+        /// <summary>
+        /// Tmt6Plex
+        /// </summary>
         public static readonly Modification Tmt6Plex = new Modification(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
+
+        /// <summary>
+        /// Nethylmaleimide
+        /// </summary>
         public static readonly Modification Nethylmaleimide = new Modification(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
+
+        /// <summary>
+        /// Nitrosyl
+        /// </summary>
         public static readonly Modification Nitrosyl = new Modification(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
+
+        /// <summary>
+        /// ThrToAla
+        /// </summary>
         public static readonly Modification ThrToAla = new Modification(659, Data.Composition.Composition.Parse("H(-2) C(-1) O(-1)"), "Thr->Ala");
+
+        /// <summary>
+        /// Dethiomethyl
+        /// </summary>
         public static readonly Modification Dethiomethyl = new Modification(526, Data.Composition.Composition.Parse("H(-4) C(-1) S(-1)"), "Dethiomethyl");
+
+        /// <summary>
+        /// DelC2H2
+        /// </summary>
         public static readonly Modification DelC2H2 = new Modification(254, Data.Composition.Composition.Parse("H(2) C(2)"), "Delta:H(2)C(2)");
+
+        /// <summary>
+        /// SerToXle
+        /// </summary>
         public static readonly Modification SerToXle = new Modification(656, Data.Composition.Composition.Parse("H(6) C(3) O(-1)"), "Ser->Xle");
+
+        /// <summary>
+        /// SerToAsn
+        /// </summary>
         public static readonly Modification SerToAsn = new Modification(651, Data.Composition.Composition.Parse("H C N"), "Ser->Asn");
+
+        /// <summary>
+        /// SerToAsp
+        /// </summary>
         public static readonly Modification SerToAsp = new Modification(1196, Data.Composition.Composition.Parse("C O"), "Ser->Asp");
 
+        /// <summary>
+        /// Common modifications
+        /// </summary>
         public static readonly Modification[] CommonModifications =
             {
                 Acetylation,
@@ -172,11 +336,19 @@ namespace InformedProteomics.Backend.Data.Sequence
                 Nitrosyl
             };
 
-        // Heavy peptides
+        /// <summary>
+        /// Heavy peptide
+        /// </summary>
         public static readonly Modification LysToHeavyLys = new Modification(259, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-2) 15N(2)"), "Label:13C(6)15N(2)");
+
+        /// <summary>
+        /// Heavy peptide
+        /// </summary>
         public static readonly Modification ArgToHeavyArg = new Modification(267, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-4) 15N(4)"), "Label:13C(6)15N(4)");
 
-        // For Aaron's data
+        /// <summary>
+        /// For Aaron's data
+        /// </summary>
         public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
@@ -196,6 +368,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
         }
 
+        /// <summary>
+        /// Register and Get the modification specified by <paramref name="name"/> and <paramref name="composition"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="composition"></param>
+        /// <returns></returns>
         public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
         {
             var lowerName = name.ToLower();
@@ -207,6 +385,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return mod;
         }
 
+        /// <summary>
+        /// Register and Get the modification specified by <paramref name="name"/> and <paramref name="mass"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="mass"></param>
+        /// <returns></returns>
         public static Modification RegisterAndGetModification(string name, double mass)
         {
             var lowerName = name.ToLower();
@@ -283,6 +467,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                 MassToModMap.Remove(massStr);
         }
 
+        /// <summary>
+        /// Register the provided modification
+        /// </summary>
+        /// <param name="modification"></param>
         public static void Register(Modification modification)
         {
             var lowerName = modification.Name.ToLower();

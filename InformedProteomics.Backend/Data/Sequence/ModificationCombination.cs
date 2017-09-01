@@ -9,22 +9,41 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class ModificationCombination
     {
+        /// <summary>
+        /// No modification
+        /// </summary>
         public static readonly ModificationCombination NoModification = new ModificationCombination(new List<Modification>());
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="modificationList"></param>
         public ModificationCombination(IList<Modification> modificationList)
         {
             Modifications = modificationList;
             Composition = modificationList.Aggregate(Data.Composition.Composition.Zero, (current, mod) => current + mod.Composition);
         }
 
+        /// <summary>
+        /// Composition
+        /// </summary>
         public Composition.Composition Composition { get; }
+
+        /// <summary>
+        /// Modifications applied to the sequence
+        /// </summary>
         public IList<Modification> Modifications { get; }
 
+        /// <summary>
+        /// Number of modifications applied to the sequence
+        /// </summary>
+        /// <returns></returns>
         public int GetNumModifications()
         {
             return Modifications.Count;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             Debug.Assert(Modifications != null, "Modifications != null");

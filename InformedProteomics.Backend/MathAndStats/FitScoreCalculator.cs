@@ -4,8 +4,20 @@ using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Class containing various methods for computing fit scores
+    /// </summary>
     public class FitScoreCalculator
     {
+        /// <summary>
+        /// Calculate the Bhattacharyya distance for the provided data
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="count"></param>
+        /// <param name="v1Index"></param>
+        /// <param name="v2Index"></param>
+        /// <returns></returns>
         public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0 )
         {
             if (count == -1) count = v1.Length;
@@ -33,6 +45,15 @@ namespace InformedProteomics.Backend.MathAndStats
             return -Math.Log(bc);
         }
 
+        /// <summary>
+        /// Calculate the HyperGeometric P value for the provided data
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="k"></param>
+        /// <param name="n1"></param>
+        /// <param name="k1"></param>
+        /// <param name="upperTailProb"></param>
+        /// <returns></returns>
         public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
             if (k >= n) return 1.0d;
@@ -44,6 +65,14 @@ namespace InformedProteomics.Backend.MathAndStats
             return pValue;
         }
 
+        /// <summary>
+        /// Calculate the Rank Sum P value for the provided data
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="n1"></param>
+        /// <param name="r1"></param>
+        /// <param name="upperTailProb"></param>
+        /// <returns></returns>
         public static double GetRankSumPvalue(double n, double n1, double r1, bool upperTailProb = true)
         {
             var n2 = n - n1;
@@ -101,6 +130,15 @@ namespace InformedProteomics.Backend.MathAndStats
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
         }*/
 
+        /// <summary>
+        /// Calculate Bhattacharyya distance and Pearson correlation for the provided data
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="count"></param>
+        /// <param name="v1Index"></param>
+        /// <param name="v2Index"></param>
+        /// <returns></returns>
         public static Tuple<double, double> GetDistanceAndCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1) count = v1.Length;
@@ -155,6 +193,15 @@ namespace InformedProteomics.Backend.MathAndStats
             return new Tuple<double, double>(dist, corr);
         }
 
+        /// <summary>
+        /// Calculate the Pearson correlation for the provided data
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="count"></param>
+        /// <param name="v1Index"></param>
+        /// <param name="v2Index"></param>
+        /// <returns></returns>
         public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1) count = v1.Length;
@@ -193,7 +240,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
         }
 
-        // the larger the better
+        /// <summary>
+        /// Calculate the cosine score for the provided data. Larger scores are better.
+        /// </summary>
+        /// <param name="theorPeakList"></param>
+        /// <param name="observedPeakList"></param>
+        /// <returns></returns>
         public static double GetCosine(double[] theorPeakList, double[] observedPeakList)
         {
             if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
@@ -213,6 +265,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return innerProduct / Math.Sqrt(magnitudeTheo * magnitudeObs);
         }
 
+        /// <summary>
+        /// Calculate the dot product of the provided data
+        /// </summary>
+        /// <param name="theorPeakList"></param>
+        /// <param name="observedPeakList"></param>
+        /// <returns></returns>
         public static double GetDotProduct(double[] theorPeakList, double[] observedPeakList)
         {
             if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
@@ -228,7 +286,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return innerProduct;
         }
 
-        // the smaller the better
+        /// <summary>
+        /// Calculate the Decon Tools fit score for the provided data. Smaller scores are better.
+        /// </summary>
+        /// <param name="theorPeakList"></param>
+        /// <param name="observedPeakList"></param>
+        /// <returns></returns>
         public static double GetDeconToolsFit(double[] theorPeakList, double[] observedPeakList)
         {
             if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 1.0;
@@ -253,6 +316,12 @@ namespace InformedProteomics.Backend.MathAndStats
             return fitScore;
         }
 
+        /// <summary>
+        /// Calculate the fit of Normalized vectors using the provided data.
+        /// </summary>
+        /// <param name="normTheorPeakList"></param>
+        /// <param name="normObservedPeakList"></param>
+        /// <returns></returns>
         public static double GetFitOfNormalizedVectors(double[] normTheorPeakList, double[] normObservedPeakList)
         {
             if (normTheorPeakList.Length != normObservedPeakList.Length || normTheorPeakList.Length == 0) return 1.0;

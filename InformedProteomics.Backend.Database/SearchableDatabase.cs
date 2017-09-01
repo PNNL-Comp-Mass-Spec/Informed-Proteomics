@@ -4,9 +4,15 @@ using SuffixArray;
 
 namespace InformedProteomics.Backend.Database
 {
-    // In memory algorithm
+    /// <summary>
+    /// In memory algorithm for database search
+    /// </summary>
     public class SearchableDatabase
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="fastaDatabase"></param>
         public SearchableDatabase(FastaDatabase fastaDatabase)
         {
             FastaDatabase = fastaDatabase;
@@ -29,6 +35,9 @@ namespace InformedProteomics.Backend.Database
             InitializeLcps(neighboringLcps, _leftLcps, _rightLcps, 0, _suffixArray.Length-1);
         }
 
+        /// <summary>
+        /// Fasta database that is being searched
+        /// </summary>
         public FastaDatabase FastaDatabase { get; }
 
         /// <summary>
@@ -228,6 +237,13 @@ namespace InformedProteomics.Backend.Database
             return byte.MaxValue;
         }
 
+        /// <summary>
+        /// Get the longest common prefix for the supplied arguments
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="index"></param>
+        /// <param name="startIndex"></param>
+        /// <returns></returns>
         public byte GetLcp(IList<byte> pattern, int index, byte startIndex)
         {
             for (var offset = startIndex; offset < pattern.Count; offset++)

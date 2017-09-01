@@ -23,7 +23,6 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <DocumentationFile>bin\Release\InformedProteomics.Backend.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -89,6 +88,7 @@
     <Compile Include="Data\Sequence\ModificationCombination.cs" />
     <Compile Include="Data\Sequence\ModificationInstance.cs" />
     <Compile Include="Data\Sequence\ModificationParams.cs" />
+    <Compile Include="Data\Sequence\ModifiedAminoAcid.cs" />
     <Compile Include="Data\Sequence\SearchModification.cs" />
     <Compile Include="Data\Sequence\Sequence.cs" />
     <Compile Include="Data\Sequence\SequenceGraph.cs" />
@@ -110,10 +110,12 @@
     <Compile Include="Data\Spectrometry\Isotope.cs" />
     <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
     <Compile Include="Data\Spectrometry\LcMsMatchMap.cs" />
+    <Compile Include="Data\Spectrometry\LcMsPeak.cs" />
     <Compile Include="Data\Spectrometry\LcmsRunDeconvoluter.cs" />
     <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
     <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
     <Compile Include="Data\Spectrometry\Peak.cs" />
+    <Compile Include="Data\Spectrometry\PeakComparers.cs" />
     <Compile Include="Data\Spectrometry\PeptideSpectrumMatch.cs" />
     <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
     <Compile Include="Data\Spectrometry\Protocol.cs" />

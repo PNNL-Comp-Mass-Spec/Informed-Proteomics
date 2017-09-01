@@ -2,8 +2,17 @@
 
 namespace InformedProteomics.Backend.MathAndStats
 {
+    /// <summary>
+    /// Venn Diagram calculation
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class VennDiagram<T>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="set1"></param>
+        /// <param name="set2"></param>
         public VennDiagram(ISet<T> set1, ISet<T> set2)
         {
             Set1 = set1;
@@ -11,11 +20,29 @@ namespace InformedProteomics.Backend.MathAndStats
             ComputeVennDiagram();
         }
 
+        /// <summary>
+        /// Set 1 data
+        /// </summary>
         public ISet<T> Set1 { get; }
+
+        /// <summary>
+        /// Set 2 data
+        /// </summary>
         public ISet<T> Set2 { get; }
 
+        /// <summary>
+        /// Intersection of Set 1 and set 2
+        /// </summary>
         public ISet<T> Intersection { get; private set; }
+
+        /// <summary>
+        /// Set 1 - set 2
+        /// </summary>
         public ISet<T> Set1Only { get; private set; }
+
+        /// <summary>
+        /// Set 2 - set 1
+        /// </summary>
         public ISet<T> Set2Only { get; private set; }
 
         private void ComputeVennDiagram()

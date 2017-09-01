@@ -8,15 +8,32 @@ namespace InformedProteomics.Backend.Utils
     /// </summary>
     public class Centroider
     {
+        /// <summary>
+        /// List of m/zs to be centroided
+        /// </summary>
         public IList<double> Mzs { get; }
+
+        /// <summary>
+        /// List of intensities to be centroided
+        /// </summary>
         public IList<double> Intensities { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mzs"></param>
+        /// <param name="intensities"></param>
         public Centroider(IList<double> mzs, IList<double> intensities)
         {
             this.Mzs = mzs;
             this.Intensities = intensities;
         }
 
+        /// <summary>
+        /// Get the centroided data
+        /// </summary>
+        /// <param name="centroidedMzs"></param>
+        /// <param name="centroidedIntensities"></param>
         public void GetCentroidedData(out double[] centroidedMzs, out double[] centroidedIntensities)
         {
             var list1 = new List<double>();

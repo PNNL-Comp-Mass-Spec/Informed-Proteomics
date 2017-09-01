@@ -1,5 +1,8 @@
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// A fragment of a sequence
+    /// </summary>
     public class Fragment
     {
         /// <summary>
@@ -32,6 +35,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         public string IonSymbol { get; set; }
 
+        /// <summary>
+        /// Check if 2 fragments are equal
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(Fragment other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -39,6 +47,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return Equals(other.IonSymbol, IonSymbol);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -47,21 +56,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return Equals((Fragment)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return IonSymbol.GetHashCode();
         }
 
+        /// <summary>
+        /// Overloaded equality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator ==(Fragment left, Fragment right)
         {
             return Equals(left, right);
         }
 
+        /// <summary>
+        /// Overloaded inequality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator !=(Fragment left, Fragment right)
         {
             return !Equals(left, right);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return string.Format("ChargeState: {0}, Mz: {1}, AveragineMass: {2}, ResidueNumber: {3}, FragmentIonClassBase: {4}, IonSymbol: {5}", ChargeState, Mz, Mass, ResidueNumber, IonType, IonSymbol);

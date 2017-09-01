@@ -1,5 +1,8 @@
 ﻿namespace InformedProteomics.Backend.Database
 {
+    /// <summary>
+    /// Type of peptide cleavage to use (for Top-Down searches)
+    /// </summary>
     public enum InternalCleavageType
     {
         /// <summary>

@@ -7,8 +7,19 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// A shifted mass sequence graph
+    /// </summary>
     public class ShiftedSequenceGraph
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="aminoAcidSet"></param>
+        /// <param name="shiftedMass"></param>
+        /// <param name="isForward"></param>
+        /// <param name="maxSequenceLength"></param>
+        /// <param name="maxSequenceMass"></param>
         public ShiftedSequenceGraph(AminoAcidSet aminoAcidSet, double shiftedMass, bool isForward, int maxSequenceLength, double maxSequenceMass = 50000.0)
         {
             _aminoAcidSet = aminoAcidSet;
@@ -43,22 +54,41 @@ namespace InformedProteomics.Backend.Data.Sequence
             IsValid = true;
         }
 
+        /// <summary>
+        /// Add an amino acid to this shifted sequence graph
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
         public bool AddAminoAcid(char residue, SequenceLocation location = SequenceLocation.Everywhere)
         {
             return PutAminoAcid(_index, residue, location);
         }
 
+        /// <summary>
+        /// The amino acid set used in this shifted sequence graph
+        /// </summary>
         public AminoAcidSet AminoAcidSet
         {
             get { return _aminoAcidSet; }
         }
+
+        /// <summary>
+        /// Modifications used in this shifted sequence graph
+        /// </summary>
         public ModificationParams ModificationParams
         {
             get { return _modificationParams; }
         }
 
+        /// <summary>
+        /// The mass by which this sequence graph is shifted
+        /// </summary>
         public double ShiftMass { get; }
 
+        /// <summary>
+        /// If this shifted sequence graph is valid
+        /// </summary>
         public bool IsValid { get; }
 
         /// <summary>
@@ -85,6 +115,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _graph[_index].Length;
         }
 
+        /// <summary>
+        /// Set the sink to the provided modification index
+        /// </summary>
+        /// <param name="modIndex"></param>
         public void SetSink(int modIndex)
         {
             _sinkModIndex = modIndex;
@@ -94,10 +128,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var t in _compNodeComposition) Array.Clear(t, 0, t.Length);
         }
 
+        /// <summary>
+        /// Get the sink sequence composition with H2O added
+        /// </summary>
+        /// <returns></returns>
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
         {
             return _sinkSequenceCompositionWithH2O;
         }
+
+        /// <summary>
+        /// Get the fragment score using the provided scorer
+        /// </summary>
+        /// <param name="scorer"></param>
+        /// <returns></returns>
         public double GetFragmentScore(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -114,6 +158,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             return fragmentScore;
         }
 
+        /// <summary>
+        /// Get the score and modifications
+        /// </summary>
+        /// <param name="scorer"></param>
+        /// <returns></returns>
         public Tuple<double, LinkedList<ModificationInstance>> GetScoreAndModifications(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -132,6 +181,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Tuple<double, LinkedList<ModificationInstance>>(fragmentScore.Item1, fragmentScore.Item2);
         }
 
+        /// <summary>
+        /// Get the fragment score and modifications
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <param name="scorer"></param>
+        /// <param name="nodeScore"></param>
+        /// <param name="maxScoreAndMods"></param>
+        /// <returns></returns>
         private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(int seqIndex, int modIndex,
             IScorer scorer, double?[][] nodeScore, Tuple<double, LinkedList<ModificationInstance>>[][] maxScoreAndMods)
         {
@@ -200,6 +258,12 @@ namespace InformedProteomics.Backend.Data.Sequence
                 ((double)curNodeScore + bestPrevNodeScore, newMods ?? bestPrevMods);
         }
 
+        /// <summary>
+        /// Get the composition at the provided sequence index and mod index
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
             if (_nodeComposition[seqIndex][modIndex] == null)
@@ -212,6 +276,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _nodeComposition[seqIndex][modIndex];
         }
 
+        /// <summary>
+        /// Get the complementary composition at the provided sequence index and mod index
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
             if (_compNodeComposition[seqIndex][modIndex] == null)
@@ -229,6 +299,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _compNodeComposition[seqIndex, modIndex];*/
         }
 
+        /// <summary>
+        /// Get the fragment score at the provided sequence index and mod index, using the provided scorer
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <param name="scorer"></param>
+        /// <param name="nodeScore"></param>
+        /// <param name="maxScore"></param>
+        /// <returns></returns>
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
