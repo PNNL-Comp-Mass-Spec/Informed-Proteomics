@@ -869,8 +869,8 @@ namespace InformedProteomics.TopDown.Execution
 
                     match.ModificationText = scores.Modifications;
 
-                    double s1 = scores.Score, s2;
-                    int nf1;
+                    //double s1 = scores.Score, s2;
+                    //int nf1;
                     //topDownScorer.GetCompositeScores(sequence, ion.Charge, scanNum, out s1, out nf1);
                     //topDownScorer.GetCompositeScores(ipSequence, this._ms2ScorerFactory2.GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum, out s2);
 

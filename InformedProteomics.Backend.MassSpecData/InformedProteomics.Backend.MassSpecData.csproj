@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="pwiz_bindings_cli">
       <HintPath>..\lib\pwiz_bindings_cli.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
