@@ -1,8 +1,8 @@
-﻿namespace InformedProteomics.Backend.Data.Spectrometry
-{
-    using System;
-    using System.Linq;
+﻿using System;
+using System.Linq;
 
+namespace InformedProteomics.Backend.Data.Spectrometry
+{
     /// <summary>
     /// Facilitates working with mass spec measurement tolerances
     /// </summary>

@@ -44,26 +44,48 @@ namespace InformedProteomics.Backend.Utils
             get { return _rows.Count; }
         }
 
+        /// <summary>
+        /// Get the TSV file headers
+        /// </summary>
+        /// <returns></returns>
         public IList<string> GetHeaders()
         {
             return (from item in _header orderby item.Key select item.Value).ToList();
         }
 
+        /// <summary>
+        /// Get all data in the TSV
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, List<string>> GetAllData()
         {
             return _data;
         }
 
+        /// <summary>
+        /// Get the data in the specified column
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public IList<string> GetData(string columnName)
         {
             return _data.TryGetValue(columnName, out var columnData) ? columnData : null;
         }
 
+        /// <summary>
+        /// Get all rows of data
+        /// </summary>
+        /// <returns></returns>
         public IList<string> GetRows()
         {
             return _rows;
         }
 
+        /// <summary>
+        /// Get peptides that pass the specified threshold
+        /// </summary>
+        /// <param name="pepQValueThreshold"></param>
+        /// <returns></returns>
         public ISet<string> GetPeptides(double pepQValueThreshold)
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var pepQValueColumnIndex, "PepQValue");
@@ -74,6 +96,11 @@ namespace InformedProteomics.Backend.Utils
             return peptideSet;
         }
 
+        /// <summary>
+        /// Get peptides that pass the specified threshold
+        /// </summary>
+        /// <param name="qValueThreshold"></param>
+        /// <returns></returns>
         public ISet<string> GetPeptidesAboveQValueThreshold(double qValueThreshold)
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var qValueColumnIndex, "QValue");

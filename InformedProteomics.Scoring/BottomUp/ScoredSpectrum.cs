@@ -2,13 +2,12 @@
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 
 namespace InformedProteomics.Scoring.BottomUp
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
     public class ScoredSpectrum: IScorer
     {
         public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, double massWithH2O, Tolerance tolerance)

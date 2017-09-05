@@ -2,16 +2,12 @@
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
 using MathNet.Numerics.Distributions;
-using MathNet.Numerics.Financial;
-using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
     public class LikelihoodScorer : AbstractFragmentScorer
     {
         public const double CorrThreshold = 0.7;

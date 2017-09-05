@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.TopDown.Scoring.FlipScoring
@@ -74,7 +73,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sourceMassBin"></param>
         /// <param name="sinkMassBin"></param>

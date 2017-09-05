@@ -1,11 +1,10 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
     public class MatchedPeakCounter: AbstractFragmentScorer
     {
         public MatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)

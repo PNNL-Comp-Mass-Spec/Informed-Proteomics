@@ -5,16 +5,44 @@ using MathNet.Numerics;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
+    /// <summary>
+    /// Isotopic profile predictor
+    /// </summary>
     public class IsoProfilePredictor
     {
+        /// <summary>
+        /// Max number of isotopes to predict
+        /// </summary>
         public int MaxNumIsotopes { get; set; }
+
+        /// <summary>
+        /// The relative intensity threshold
+        /// </summary>
         public double IsotopeRelativeIntensityThreshold { get; set; }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for the provided atom counts
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static IsotopomerEnvelope GetIsotopomerEnvelop(int c, int h, int n, int o, int s)
         {
             return Predictor.GetIsotopomerEnvelope(c, h, n, o, s);
         }
 
+        /// <summary>
+        /// Get the Isotopomer envelope for the provided atom counts
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelope(int c, int h, int n, int o, int s)
         {
             var dist = new double[MaxNumIsotopes];
@@ -60,6 +88,9 @@ namespace InformedProteomics.Backend.Data.Composition
             return new IsotopomerEnvelope(truncatedDist, mostIntenseIsotopomerIndex);
         }
 
+        /// <summary>
+        /// Default IsoProfilePredictor
+        /// </summary>
         public static IsoProfilePredictor Predictor;
 
         static IsoProfilePredictor()
@@ -67,6 +98,11 @@ namespace InformedProteomics.Backend.Data.Composition
             Predictor = new IsoProfilePredictor();
         }
 
+        /// <summary>
+        /// Constructor, uses default isotope probabilities
+        /// </summary>
+        /// <param name="relativeIntensityThreshold"></param>
+        /// <param name="maxNumIsotopes"></param>
         public IsoProfilePredictor(double relativeIntensityThreshold = 0.1, int maxNumIsotopes = 100)
         {
             ProbC = DefaultProbC;
@@ -84,6 +120,16 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Constructor, uses provided isotope probabilities
+        /// </summary>
+        /// <param name="probC"></param>
+        /// <param name="probH"></param>
+        /// <param name="probN"></param>
+        /// <param name="probO"></param>
+        /// <param name="probS"></param>
+        /// <param name="relativeIntensityThreshold"></param>
+        /// <param name="maxNumIsotopes"></param>
         public IsoProfilePredictor(
                                    double[] probC,
                                    double[] probH,
@@ -108,16 +154,54 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Default isotope probabilities for Carbon
+        /// </summary>
         public static readonly double[] DefaultProbC = { .9893, 0.0107, 0, 0 };
+
+        /// <summary>
+        /// Default isotope probabilities for Hydrogen
+        /// </summary>
         public static readonly double[] DefaultProbH = { .999885, .000115, 0, 0 };
+
+        /// <summary>
+        /// Default isotope probabilities for Nitrogen
+        /// </summary>
         public static readonly double[] DefaultProbN = { 0.99632, 0.00368, 0, 0 };
+
+        /// <summary>
+        /// Default isotope probabilities for Oxygen
+        /// </summary>
         public static readonly double[] DefaultProbO = { 0.99757, 0.00038, 0.00205, 0 };
+
+        /// <summary>
+        /// Default isotope probabilities for Sulfur
+        /// </summary>
         public static readonly double[] DefaultProbS = { 0.9493, 0.0076, 0.0429, 0.0002 };
 
+        /// <summary>
+        /// Isotope probabilities for Carbon used by this instance
+        /// </summary>
         public double[] ProbC { get; }
+
+        /// <summary>
+        /// Isotope probabilities for Hydrogen used by this instance
+        /// </summary>
         public double[] ProbH { get; }
+
+        /// <summary>
+        /// Isotope probabilities for Nitrogen used by this instance
+        /// </summary>
         public double[] ProbN { get; }
+
+        /// <summary>
+        /// Isotope probabilities for Oxygen used by this instance
+        /// </summary>
         public double[] ProbO { get; }
+
+        /// <summary>
+        /// Isotope probabilities for Sulfur used by this instance
+        /// </summary>
         public double[] ProbS { get; }
 
         private static int[][][] _possibleIsotopeCombinations;

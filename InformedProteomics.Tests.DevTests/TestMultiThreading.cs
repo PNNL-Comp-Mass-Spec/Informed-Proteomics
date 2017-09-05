@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
-using System.IO;
 
 namespace InformedProteomics.Tests.DevTests
 {

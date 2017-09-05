@@ -5,17 +5,36 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
+    /// <summary>
+    /// Ion class: a biological component with a charge
+    /// </summary>
     public class Ion
     {
+        /// <summary>
+        /// Elemental composition of the ion
+        /// </summary>
         public Composition.Composition Composition { get; }
+
+        /// <summary>
+        /// Electrical charge of the ion
+        /// </summary>
         public int Charge { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <param name="charge"></param>
         public Ion(Composition.Composition composition, int charge)
         {
             Composition = composition;
             Charge = charge;
         }
 
+        /// <summary>
+        /// Get the monoisotopic m/z of the ion
+        /// </summary>
+        /// <returns></returns>
         public double GetMonoIsotopicMz()
         {
             return (Composition.Mass + Charge * Constants.Proton) / Charge;
@@ -86,6 +105,10 @@ namespace InformedProteomics.Backend.Data.Biology
             }
         }
 
+        /// <summary>
+        /// Get the top 3 isotopes for this ion
+        /// </summary>
+        /// <returns></returns>
         public IList<Isotope> GetTop3Isotopes()
         {
             var isotopes = Composition.GetIsotopomerEnvelopeRelativeIntensities();
@@ -110,12 +133,26 @@ namespace InformedProteomics.Backend.Data.Biology
             return top3;
         }
 
+        /// <summary>
+        /// Get the m/z of the specified isotope
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="charge"></param>
+        /// <param name="isotopeIndex"></param>
+        /// <returns></returns>
         public static double GetIsotopeMz(double monoIsotopicMass, int charge, int isotopeIndex)
         {
             var isotopeMass = monoIsotopicMass + isotopeIndex*Constants.C13MinusC12;
             return isotopeMass/charge + Constants.Proton;
         }
 
+        /// <summary>
+        /// Get the monoisotopic mass of the specified isotope
+        /// </summary>
+        /// <param name="isotopeMz"></param>
+        /// <param name="charge"></param>
+        /// <param name="isotopeIndex"></param>
+        /// <returns></returns>
         public static double GetMonoIsotopicMass(double isotopeMz, int charge, int isotopeIndex)
         {
             var isotopeMass = (isotopeMz - Constants.Proton) * charge;

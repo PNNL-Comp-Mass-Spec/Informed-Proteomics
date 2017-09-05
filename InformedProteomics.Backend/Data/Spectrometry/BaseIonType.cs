@@ -1,18 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    using System.Linq;
-
-    using InformedProteomics.Backend.Data.Sequence;
-
     using Composition = InformedProteomics.Backend.Data.Composition.Composition;
 
+    /// <summary>
+    /// Base class for IonTypes
+    /// </summary>
     public class BaseIonType
     {
+        /// <summary>
+        /// Default base ion types
+        /// </summary>
         public static readonly BaseIonType A, Ar, B, C, D, V, W, X, Xr, Y, YM1, Zr, Z;
 
+        /// <summary>
+        /// List of all base ion types
+        /// </summary>
         public static readonly IEnumerable<BaseIonType> AllBaseIonTypes;
 
         private readonly CompositionCalculator _compositionCalculator;
@@ -70,18 +77,43 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             AllBaseIonTypes = new List<BaseIonType> { A, Ar, B, C, D, V, W, X, Xr, Y, YM1, Z, Zr };
         }
 
+        /// <summary>
+        /// Calculates the composition of the ion, with option amino acid
+        /// </summary>
+        /// <param name="aminoAcid"></param>
+        /// <returns></returns>
         public delegate IEnumerable<Composition> CompositionCalculator(AminoAcid aminoAcid = null);
 
+        /// <summary>
+        /// Ion symble
+        /// </summary>
         public string Symbol { get; }
+
+        /// <summary>
+        /// If the ion is a prefix ion
+        /// </summary>
         public bool IsPrefix { get; }
+
+        /// <summary>
+        /// The offset this ion adds to a composition
+        /// </summary>
         public Composition OffsetComposition { get; }
 
+        /// <summary>
+        /// Gets the deconvoluted version of this ion
+        /// </summary>
+        /// <returns></returns>
         public BaseIonType GetDeconvolutedIon()
         {
             return new BaseIonType(Symbol + "'", IsPrefix,
                 OffsetComposition + new CompositionWithDeltaMass(-Biology.Constants.Proton));
         }
 
+        /// <summary>
+        /// Get possible compositions of this ion
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <returns></returns>
         public IEnumerable<Composition> GetPossibleCompositions(AminoAcid residue = null)
         {
             return _compositionCalculator(residue);

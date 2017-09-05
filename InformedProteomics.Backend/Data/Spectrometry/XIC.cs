@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Extracted Ion Chromatogram
+    /// </summary>
     public class Xic: List<XicPoint>
     {
         //public int Min { get; private set; }
@@ -16,6 +20,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Smoother = new SavitzkyGolaySmoother(9, 2);
         }
 
+        /// <summary>
+        /// Get the Pearson correlation of 2 XICs
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public double GetCorrelation(Xic other)
         {
             if (Count == 0 || other == null || other.Count == 0) return 0;
@@ -45,6 +54,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return correlation;
         }
 
+        /// <summary>
+        /// Get the Cosine score of 2 XICs
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public double GetCosine(Xic other)
         {
             if (Count == 0 || other == null || other.Count == 0) return 0;
@@ -73,16 +87,29 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return correlation;
         }
 
+        /// <summary>
+        /// Get the sum of the intensities in the XIC
+        /// </summary>
+        /// <returns></returns>
         public double GetSumIntensities()
         {
             return this.Sum(p => p.Intensity);
         }
 
+        /// <summary>
+        /// Check if this XIC contains data in scan <paramref name="scanNum"/>
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public bool ContainsScanNum(int scanNum)
         {
             return this.Any(xicPeak => xicPeak.ScanNum == scanNum);
         }
 
+        /// <summary>
+        /// Get the scan number of the highest-intensity peak in this XIC
+        /// </summary>
+        /// <returns></returns>
         public int GetApexScanNum()
         {
             var maxIntensity = double.MinValue;
@@ -98,6 +125,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return apexScan;
         }
 
+        /// <summary>
+        /// Get the nearest intensity peak to the provided scan number
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="performSmoothing"></param>
+        /// <returns></returns>
         public int GetNearestApexScanNum(int scanNumber, bool performSmoothing = true)
         {
             // If there are not very many points, just return the global apex
@@ -197,7 +230,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Console.WriteLine("Displayed {0} out of {1} data points", pointsShown, this.Count);
         }
 
-        // sort XicPoints and select one peak per scan
+        /// <summary>
+        /// Sort XicPoints and select one peak per scan
+        /// </summary>
+        /// <param name="xic"></param>
+        /// <returns></returns>
         public static Xic GetSelectedXic(Xic xic)
         {
             if (xic.Count == 0) return xic;
@@ -229,11 +266,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return newXic;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj as Xic != null && Equals((Xic) obj);
         }
 
+        /// <summary>
+        /// Check 2 Xics for equality
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         protected bool Equals(Xic other)
         {
             for (var i = 0; i < Count; i++)
@@ -243,6 +286,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return true;
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return base.GetHashCode();

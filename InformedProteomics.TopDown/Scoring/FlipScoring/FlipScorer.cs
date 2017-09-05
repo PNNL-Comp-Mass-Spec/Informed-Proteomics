@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -12,7 +11,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
     /// <summary>
     /// Top down scorer that uses the FLIP scoring model.
     /// </summary>
-    public class FlipScorer<TNeutralMonoSpectrum> : IInformedScorer, IScorer 
+    public class FlipScorer<TNeutralMonoSpectrum> : IInformedScorer, IScorer
         where TNeutralMonoSpectrum : IDeconvolutedSpectrum
     {
         /// <summary>
@@ -21,7 +20,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         private readonly ScoringParameters scoringParameters;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FlipScorer{TNeutralMonoSpectrum}" /> class. 
+        /// Initializes a new instance of the <see cref="FlipScorer{TNeutralMonoSpectrum}" /> class.
         /// </summary>
         /// <param name="scoringParameters">Parameters to use for scoring ions.</param>
         /// <param name="productSpectrum">The deconvoluted spectrum to get ions to calculate scores for.</param>

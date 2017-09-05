@@ -34,18 +34,6 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="PNNLOmics, Version=1.1.5714.31155, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\PNNLOmics.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -71,9 +59,14 @@
     <Compile Include="TestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj">
+      <Project>{451d1ce9-97d2-4898-9f59-4d058223637a}</Project>
+      <Name>InformedProteomics.Backend.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj">
+      <Project>{05b37516-2b5c-4c60-bfe2-d6854a19478a}</Project>
+      <Name>InformedProteomics.Backend.MassSpecData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
       <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
       <Name>InformedProteomics.Backend</Name>
@@ -98,27 +91,19 @@
       <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
       <Name>InformedProteomics.TopDown</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProMex\ProMex.csproj">
-      <Project>{1586b333-5f3c-4e33-abb9-6767eac8fcd1}</Project>
-      <Name>ProMex</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PbfGen\PbfGen.csproj">
-      <Project>{b31c2ac2-88c6-43c9-b809-26b7547592ff}</Project>
-      <Name>PbfGen</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SAIS\SAIS.csproj">
-      <Project>{da126245-858b-4084-ab86-54fe1e10772e}</Project>
-      <Name>SAIS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MSPathFinderT\MSPathFinderT.csproj">
-      <Project>{dfbecbac-7fda-4c78-9f4e-cc21c79a6db6}</Project>
-      <Name>MSPathFinderT</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\UnitTest_Files\PNNLOmicsElementData.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics">
+      <Version>3.20.0</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit">
+      <Version>3.8.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

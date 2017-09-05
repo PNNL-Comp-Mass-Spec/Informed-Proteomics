@@ -11,7 +11,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Results;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.FeatureDetection;
@@ -19,7 +19,6 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using TopDownTrainer;
 
 using InformedProteomics.Scoring.Interfaces;
 
@@ -905,7 +904,7 @@ namespace InformedProteomics.TopDown.Execution
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
-            Parallel.ForEach(scanNums, pfeOptions, scanNum =>          
+            Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             //foreach (var scanNum in scanNums)
             {
                 var currentTask = "?";

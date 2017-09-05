@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.Utils;
-using PNNLOmics.Utilities;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -17,8 +13,8 @@ namespace InformedProteomics.TopDown.Execution
             double specEvalue = 0.0, int featureId = 0)
         {
             Sequence = sequence;
-            Pre = pre == FastaDatabase.Delimiter ? '-' : pre;
-            Post = post == FastaDatabase.Delimiter ? '-' : post;
+            Pre = pre == FastaDatabaseConstants.Delimiter ? '-' : pre;
+            Post = post == FastaDatabaseConstants.Delimiter ? '-' : post;
             ScanNum = scanNum;
             Offset = offset;
             NumNTermCleavages = numNTermCleavages;

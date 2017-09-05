@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using InformedProteomics.Scoring.GeneratingFunction;
-
 using InformedProteomics.Backend.Data.Sequence;
-
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.TopDown.Scoring.FlipScoring;
 
 namespace InformedProteomics.TopDown.Scoring

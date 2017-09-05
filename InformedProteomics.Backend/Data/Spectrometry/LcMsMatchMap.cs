@@ -8,13 +8,26 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// LC-MS spectrum and sequence matches
+    /// </summary>
     public class LcMsMatchMap
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public LcMsMatchMap()
         {
             _map = new Dictionary<int, IList<IntRange>>();
         }
 
+        /// <summary>
+        /// Get the MS2 scan numbers that match the sequence mass
+        /// </summary>
+        /// <param name="sequenceMass"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="run"></param>
+        /// <returns></returns>
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
         {
             var massBinNum = GetBinNumber(sequenceMass);
@@ -23,6 +36,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return new int[0];
         }
 
+        /// <summary>
+        /// Create a map of sequence masses and MS2 scans
+        /// </summary>
+        /// <param name="run"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="minMass"></param>
+        /// <param name="maxMass"></param>
         public void CreateSequenceMassToMs2ScansMap(LcMsRun run, Tolerance tolerance, double minMass, double maxMass)
         {
             // Make a bin to scan numbers map without considering tolerance
@@ -87,6 +107,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _map = null;
         }
 
+        /// <summary>
+        /// Set the matches
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="minScanNum"></param>
+        /// <param name="maxScanNum"></param>
         public void SetMatches(double monoIsotopicMass, int minScanNum, int maxScanNum)
         {
             var range = new IntRange(minScanNum, maxScanNum);
@@ -116,11 +142,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        /// <summary>
+        /// Get the bin number for the provided mass
+        /// </summary>
+        /// <param name="mass"></param>
+        /// <returns></returns>
         public static int GetBinNumber(double mass)
         {
             return (int)Math.Round(mass * Constants.RescalingConstantHighPrecision);
         }
 
+        /// <summary>
+        /// Get the mass for the provided bin number
+        /// </summary>
+        /// <param name="binNum"></param>
+        /// <returns></returns>
         public static double GetMass(int binNum)
         {
             return binNum / Constants.RescalingConstantHighPrecision;

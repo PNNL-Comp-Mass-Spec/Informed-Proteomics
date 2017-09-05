@@ -6,24 +6,40 @@ using InformedProteomics.Backend.Data.Enum;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// Class to parse mod files
+    /// </summary>
     public class ModFileParser
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="modFilePath"></param>
         public ModFileParser(string modFilePath)
         {
             _modFilePath = modFilePath;
             _searchModifications = Parse(modFilePath, out _maxNumDynModsPerSequence);
         }
 
+        /// <summary>
+        /// Path to mod file
+        /// </summary>
         public string ModFilePath
         {
             get { return _modFilePath;  }
         }
 
+        /// <summary>
+        /// Modifications in the mod file
+        /// </summary>
         public IEnumerable<SearchModification> SearchModifications
         {
             get { return _searchModifications; }
         }
 
+        /// <summary>
+        /// Max number of dynamic modifications per sequence
+        /// </summary>
         public int MaxNumDynModsPerSequence
         {
             get { return _maxNumDynModsPerSequence; }
@@ -33,6 +49,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly IEnumerable<SearchModification> _searchModifications;
         private readonly int _maxNumDynModsPerSequence;
 
+        /// <summary>
+        /// Parse the provided modification line
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public static List<SearchModification> ParseModification(string line)
         {
             var token = line.Split(',');
@@ -99,6 +120,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return residueStr.Select(residue => new SearchModification(mod, residue, location, isFixedModification)).ToList();
         }
 
+        /// <summary>
+        /// Parse the provided lines, returning the modifications and the max number of dynamic mods per peptide
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="maxNumDynModsPerPeptide"></param>
+        /// <returns></returns>
         public static List<SearchModification> Parse(IEnumerable<string> lines, out int maxNumDynModsPerPeptide)
         {
             var searchModList = new List<SearchModification>();
@@ -158,6 +185,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return searchModList;
         }
 
+        /// <summary>
+        /// Parse the provided mod file, returning modifications and the max number of dynamic mods per peptide
+        /// </summary>
+        /// <param name="modFilePath"></param>
+        /// <param name="maxNumDynModsPerPeptide"></param>
+        /// <returns></returns>
         private static IEnumerable<SearchModification> Parse(string modFilePath, out int maxNumDynModsPerPeptide)
         {
             var searchModList = new List<SearchModification>();

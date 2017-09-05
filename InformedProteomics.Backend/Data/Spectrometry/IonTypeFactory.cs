@@ -4,12 +4,17 @@ using System.Linq;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    using InformedProteomics.Backend.Data.Sequence;
-
+    /// <summary>
+    /// Factory for creating Ion types
+    /// </summary>
     public class IonTypeFactory
     {
         private bool removeReduntantIonTypes;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="removeRedundantIonTypes"></param>
         public IonTypeFactory(bool removeRedundantIonTypes = true)
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
@@ -20,6 +25,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             this.removeReduntantIonTypes = removeRedundantIonTypes;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="maxCharge"></param>
         public IonTypeFactory(int maxCharge)
             : this(
                 BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
@@ -29,6 +38,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="baseIons"></param>
+        /// <param name="neutralLosses"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="removeRedundantIonTypes"></param>
         public IonTypeFactory(
             IEnumerable<BaseIonType> baseIons,
             IEnumerable<NeutralLoss> neutralLosses,
@@ -42,49 +58,39 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             GenerateAllKnownIonTypes();
         }
 
+        /// <summary>
+        /// Get a <see cref="IonTypeFactory"/> for the deconvoluted versions of <paramref name="baseIons"/> and <paramref name="neutralLosses"/>
+        /// </summary>
+        /// <param name="baseIons"></param>
+        /// <param name="neutralLosses"></param>
+        /// <returns></returns>
         public static IonTypeFactory GetDeconvolutedIonTypeFactory(IEnumerable<BaseIonType> baseIons, IEnumerable<NeutralLoss> neutralLosses)
         {
             var ionTypeFactory = new IonTypeFactory(baseIons.Select(ion => ion.GetDeconvolutedIon()), neutralLosses, 1);
             return ionTypeFactory;
         }
 
-        // e.g. y2-NH3
+        /// <summary>
+        /// Get an ion type by name, e.g. y2-NH3
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public IonType GetIonType(string name)
         {
             return _ionTypeMap[name];
         }
 
+        /// <summary>
+        /// Get ion type according to the parameters
+        /// </summary>
+        /// <param name="baseIonType"></param>
+        /// <param name="charge"></param>
+        /// <param name="neutralLoss"></param>
+        /// <returns></returns>
         public IonType GetIonType(BaseIonType baseIonType, int charge, NeutralLoss neutralLoss)
         {
             var ionTypeName = string.Format("{0}{1}{2}", baseIonType.Symbol, charge, neutralLoss.Name);
             return _ionTypeMap[ionTypeName];
-        }
-
-        public IonType GetIonType(bool isPrefix, int charge, float offset)
-        {
-            //var intOffset = Convert.ToInt32(offset);
-            //if (isPrefix)
-            //{
-            //    if (charge == 1)
-            //    {
-            //        if (intOffset == 1) return GetIonType("b");
-            //        if (intOffset == -16) return GetIonType("b-NH3");
-            //        if (intOffset == -17) return GetIonType("b-H2O");
-            //        if (intOffset == -27) return GetIonType("a");
-            //    }
-            //}
-            //else
-            //{
-            //    if (charge == 1)
-            //    {
-            //        if (intOffset == 19) return GetIonType("y");
-            //        if (intOffset == 2) return GetIonType("y-NH3");
-            //        if (intOffset == 1) return GetIonType("y-H2O");
-            //        if (intOffset == 3) return GetIonType("z");
-            //    }
-            //}
-            //Console.WriteLine("{0}_{1}_{2} doesn't exist!", isPrefix, charge, offset);
-            throw new System.NotImplementedException();
         }
 
         /// <summary>
@@ -109,6 +115,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return chargedIonTypes;
         }
 
+        /// <summary>
+        /// Get all known ion types
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<IonType> GetAllKnownIonTypes()
         {
             return _ionTypeMap.Values.ToArray();

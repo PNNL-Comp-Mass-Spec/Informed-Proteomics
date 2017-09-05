@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.IsotopicEnvelope;
 using MathNet.Numerics.Distributions;

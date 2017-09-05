@@ -1,241 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <DocumentationFile>bin\Release\InformedProteomics.Backend.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70A129AC-217A-4086-9ECB-63FF22289D90}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>net451<!--;netstandard2.0--></TargetFrameworks>
     <RootNamespace>InformedProteomics.Backend</RootNamespace>
     <AssemblyName>InformedProteomics.Backend</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <Version>1.1.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <Description>Data structures and generic algorithms for working with Top-Down mass spec data</Description>
+    <Company>Pacific Northwest National Laboratory</Company>
+    <Product>InformedProteomics.Backend</Product>
+    <Authors>PNNL-Comp-Mass-Spec</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</PackageProjectUrl>
+    <Copyright>Copyright @ PNNL 2017</Copyright>
+    <Title>InformedProteomics.Backend</Title>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="PNNLOmics, Version=1.1.5714.31155, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\PNNLOmics.dll</HintPath>
-    </Reference>
-    <Reference Include="ProteinFileReader, Version=1.1.4405.25759, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ProteinFileReader.dll</HintPath>
-    </Reference>
-    <Reference Include="PSI_Interface, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PSI_Interface.1.2.0\lib\net45\PSI_Interface.dll</HintPath>
-    </Reference>
-    <Reference Include="pwiz_bindings_cli">
-      <HintPath>..\lib\pwiz_bindings_cli.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+    <PackageReference Include="PRISM-Library" Version="2.4.23" />
+    <PackageReference Include="PSI_Interface" Version="1.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net451'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <Reference Include="ThermoRawFileReader">
-      <HintPath>..\lib\ThermoRawFileReader.dll</HintPath>
-    </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Database\DatabaseSearchMode.cs" />
-    <Compile Include="Database\InternalCleavageType.cs" />
-    <Compile Include="Database\PeptideEnumerator.cs" />
-    <Compile Include="Database\AnnotationAndOffset.cs" />
-    <Compile Include="Database\ProteinHashInfo.cs" />
-    <Compile Include="Database\SearchableDatabase.cs" />
-    <Compile Include="Data\Biology\Constants.cs" />
-    <Compile Include="Data\Composition\Averagine.cs" />
-    <Compile Include="Data\Composition\AbstractComposition.cs" />
-    <Compile Include="Data\Composition\CompositionWithDeltaMass.cs" />
-    <Compile Include="Data\Composition\IsoProfilePredictor.cs" />
-    <Compile Include="Data\Composition\IsotopomerEnvelope.cs" />
-    <Compile Include="Data\Sequence\Cleavage.cs" />
-    <Compile Include="Data\Sequence\ISequenceTagGenerator.cs" />
-    <Compile Include="Data\Sequence\ModificationInstance.cs" />
-    <Compile Include="Data\Sequence\ShiftedSequenceGraph.cs" />
-    <Compile Include="Data\Spectrometry\AbstractFragmentScorer.cs" />
-    <Compile Include="Data\Spectrometry\ActivationMethod.cs" />
-    <Compile Include="Data\Spectrometry\DeconvolutedSpectrum.cs" />
-    <Compile Include="Data\Spectrometry\IDeconvolutedSpectrum.cs" />
-    <Compile Include="Data\Spectrometry\IFragmentScorerFactory.cs" />
-    <Compile Include="Data\Spectrometry\LcMsChargeMap.cs" />
-    <Compile Include="Data\Spectrometry\ISequenceFilter.cs" />
-    <Compile Include="Data\Spectrometry\DeconvolutedPeak.cs" />
-    <Compile Include="Data\Spectrometry\Deconvoluter.cs" />
-    <Compile Include="Data\Spectrometry\LcmsRunDeconvoluter.cs" />
-    <Compile Include="Data\Spectrometry\Ms2DetectorType.cs" />
-    <Compile Include="Data\Spectrometry\IsolationWindow.cs" />
-    <Compile Include="Data\Spectrometry\Isotope.cs" />
-    <Compile Include="Data\Spectrometry\LcMsMatchMap.cs" />
-    <Compile Include="Data\Spectrometry\Protocol.cs" />
-    <Compile Include="Data\Spectrometry\PeptideSpectrumMatch.cs" />
-    <Compile Include="Data\Spectrometry\ProductSpectrum.cs" />
-    <Compile Include="Data\Spectrometry\Spectrum.cs" />
-    <Compile Include="Data\Spectrometry\SummedSpectrum.cs" />
-    <Compile Include="Data\Spectrometry\TargetedDeconvolutedSpectrum.cs" />
-    <Compile Include="Data\Spectrometry\Tolerance.cs" />
-    <Compile Include="Data\Sequence\ModFileParser.cs" />
-    <Compile Include="Data\Sequence\ModificationCombination.cs" />
-    <Compile Include="Data\Sequence\ModificationParams.cs" />
-    <Compile Include="Data\Sequence\SequenceGraph.cs" />
-    <Compile Include="Data\Spectrometry\BaseIonType.cs" />
-    <Compile Include="Data\Spectrometry\IonType.cs" />
-    <Compile Include="Data\Spectrometry\IonTypeFactory.cs" />
-    <Compile Include="Data\Spectrometry\NeutralLoss.cs" />
-    <Compile Include="Data\Spectrometry\ToleranceUnit.cs" />
-    <Compile Include="Data\Spectrometry\IScorer.cs" />
-    <Compile Include="Data\Spectrometry\Xic.cs" />
-    <Compile Include="Data\Spectrometry\XicPoint.cs" />
-    <Compile Include="MassSpecData\DPbfLcMsRun.cs" />
-    <Compile Include="MassSpecData\LcMsRun.cs" />
-    <Compile Include="MassSpecData\MassSpecDataReaderFactory.cs" />
-    <Compile Include="MassSpecData\MzMLReader.cs" />
-    <Compile Include="MassSpecData\IChromatogramExtractor.cs" />
-    <Compile Include="MassSpecData\ILcMsRun.cs" />
-    <Compile Include="MassSpecData\ISpectrumExtractor.cs" />
-    <Compile Include="MassSpecData\InMemoryLcMsRun.cs" />
-    <Compile Include="MassSpecData\IMassSpecDataReader.cs" />
-    <Compile Include="MassSpecData\MassSpecDataType.cs" />
-    <Compile Include="MassSpecData\ProteoWizardReader.cs" />
-    <Compile Include="MassSpecData\PbfLcMsRun.cs" />
-    <Compile Include="MassSpecData\XCaliburReader.cs" />
-    <Compile Include="Data\Enum\SequenceLocation.cs" />
-    <Compile Include="Data\Enum\SequenceType.cs" />
-    <Compile Include="Data\Biology\Atom.cs" />
-    <Compile Include="Data\Biology\Enzyme.cs" />
-    <Compile Include="Data\Biology\IMatter.cs" />
-    <Compile Include="Data\Biology\IMolecule.cs" />
-    <Compile Include="Data\Biology\Ion.cs" />
-    <Compile Include="Data\Sequence\AminoAcid.cs" />
-    <Compile Include="Data\Sequence\AminoAcidSet.cs" />
-    <Compile Include="Data\Composition\Composition.cs" />
-    <Compile Include="Data\Sequence\Modification.cs" />
-    <Compile Include="Data\Sequence\SearchModification.cs" />
-    <Compile Include="Data\Sequence\Sequence.cs" />
-    <Compile Include="Data\Spectrometry\Fragment.cs" />
-    <Compile Include="Data\Spectrometry\Peak.cs" />
-    <Compile Include="Database\IndexedDatabase.cs" />
-    <Compile Include="Results\DatabaseSearchResultData.cs" />
-    <Compile Include="Results\IdentificationExtensions.cs" />
-    <Compile Include="Results\ResultFileReader.cs" />
-    <Compile Include="Utils\AnonymousComparer.cs" />
-    <Compile Include="Utils\ArrayUtil.cs" />
-    <Compile Include="Utils\Centroider.cs" />
-    <Compile Include="Utils\CubicSpline.cs" />
-    <Compile Include="Utils\FdrCalculator.cs" />
-    <Compile Include="Utils\FitScoreCalculator.cs" />
-    <Compile Include="Utils\IntRange.cs" />
-    <Compile Include="Utils\IsotopicConcentrationTuner.cs" />
-    <Compile Include="Utils\Misc.cs" />
-    <Compile Include="Utils\OtsuThreshold.cs" />
-    <Compile Include="Utils\ParallelizationUtils.cs" />
-    <Compile Include="Utils\PeakListUtils.cs" />
-    <Compile Include="Utils\ProgressData.cs" />
-    <Compile Include="Utils\SavitzkyGolaySmoother.cs" />
-    <Compile Include="Utils\SimpleMath.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Database\FastaDatabase.cs" />
-    <Compile Include="Utils\SimpleStringProcessing.cs" />
-    <Compile Include="Utils\TriDiagonalMatrix.cs" />
-    <Compile Include="Utils\TsvFileParser.cs" />
-    <Compile Include="Utils\VennDiagram.cs" />
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="MSFileReaderLib">
-      <Guid>{F0C5F3E3-4F2A-443E-A74D-0AABE3237494}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SAIS\SAIS.csproj">
-      <Project>{da126245-858b-4084-ab86-54fe1e10772e}</Project>
-      <Name>SAIS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

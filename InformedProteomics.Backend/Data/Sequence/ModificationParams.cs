@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.MathAndStats;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -36,6 +36,9 @@ namespace InformedProteomics.Backend.Data.Sequence
             GenerateModCombMap();
         }
 
+        /// <summary>
+        /// Max number of dynamic modifications per sequence
+        /// </summary>
         public int MaxNumDynModsPerSequence
         {
             get { return _maxNumDynModsPerSequence; }
@@ -60,11 +63,22 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _modificationCombinations[modCombIndex];
         }
 
+        /// <summary>
+        /// Get the modification at index <paramref name="modIndex"/>
+        /// </summary>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         public Modification GetModification(int modIndex)
         {
             return _modifications[modIndex];
         }
 
+        /// <summary>
+        /// Get the index of a modification combination
+        /// </summary>
+        /// <param name="prevModCombIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
             if (_modCombMap.TryGetValue(prevModCombIndex * _modifications.Length + modIndex, out var newModCombIndex))
@@ -74,6 +88,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return -1;
         }
 
+        /// <summary>
+        /// Get the modification at the index between the provided indices
+        /// </summary>
+        /// <param name="prevModCombIndex"></param>
+        /// <param name="curModCombIndex"></param>
+        /// <returns></returns>
         public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
         {
             if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out var modIndex))
@@ -83,6 +103,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return null;
         }
 
+        /// <summary>
+        /// Get all <see cref="ModificationCombination"/>s in this instance
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ModificationCombination> GetModificationCombinations()
         {
             return _modificationCombinations;
@@ -108,6 +132,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var combination in combinations)
             {
                 var modList = (from i in combination where i > 0 select _modifications[i - 1]).ToList();
+                // Could also use:
+                //var modList = combination.Where(i => i > 0).Select(i => _modifications[i - 1]).ToList();
                 var modComb = new ModificationCombination(modList);
                 _modificationCombinations[++index] = modComb;
                 var hashValue = ToHash(combination);
