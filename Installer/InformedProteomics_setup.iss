@@ -1,7 +1,7 @@
 ; This is an Inno Setup configuration file
 ; http://www.jrsoftware.org/isinfo.php
 
-#define ApplicationVersion GetFileVersion('..\InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll')
+#define ApplicationVersion GetFileVersion('..\InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend.dll')
 
 [CustomMessages]
 AppName=DeconTools
@@ -12,21 +12,25 @@ AppName=DeconTools
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
 [Files]
 ; InformedProteomics.Backend
-Source: InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll                                                                     ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\InformedProteomics.Backend.dll.config                                                              ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend.dll                                                              ; DestDir: {app}
 
 ; InformedProteomics.Backend Nuget libraries
-Source: InformedProteomics.Backend\bin\Release\MathNet.Numerics.dll                                                                               ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\PSI_Interface.dll                                                                                  ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\DotNetZip.dll                                                                                      ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\MathNet.Numerics.dll                                                                        ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\PRISM.dll                                                                                   ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\PSI_Interface.dll                                                                           ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\DotNetZip.dll                                                                               ; DestDir: {app}
 
-; SAIS
-Source: SAIS\bin\Release\SAIS.dll                                                                                                                 ; DestDir: {app}
+; InformedProteomics.Backend.Database
+Source: InformedProteomics.Backend.Database\bin\Release\net451\InformedProteomics.Backend.Database.dll                                            ; DestDir: {app}
+
+; InformedProteomics.Backend.Database Nuget libraries
+Source: InformedProteomics.Backend.Database\bin\Release\net451\SAIS.dll                                                                           ; DestDir: {app}
+Source: InformedProteomics.Backend.Database\bin\Release\net451\ProteinFileReader.dll                                                              ; DestDir: {app}
+
+; InformedProteomics.Backend.MassSpecData
+Source: InformedProteomics.Backend.MassSpecData\bin\Release\InformedProteomics.Backend.MassSpecData.dll                                    ; DestDir: {app}
 
 ; Manually managed libraries
-Source: lib\alglibnet2.dll                                                                                                                        ; DestDir: {app}
-Source: lib\PNNLOmics.dll                                                                                                                         ; DestDir: {app}
-Source: lib\ProteinFileReader.dll                                                                                                                 ; DestDir: {app}
 Source: lib\ThermoRawFileReader.dll                                                                                                               ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
