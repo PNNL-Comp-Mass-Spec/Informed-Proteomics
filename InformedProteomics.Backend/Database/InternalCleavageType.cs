@@ -6,11 +6,11 @@
     public enum InternalCleavageType
     {
         /// <summary>
-        /// Any sequence in a protein that matches the parameters for N and C terminus cleavages
+        /// Only intact proteins
         /// </summary>
-        /// <remarks>All cleavage combinations that meet the parameters for N and C terminus cleavage maximums will be checked.
-        /// NOTE: Any sequence minLength &lt;= length &lt;= maxLength</remarks>
-        MultipleInternalCleavages = 0,
+        /// <remarks>No cleavages will be performed on the protein sequences
+        /// NOTE: Allows C-term cleavages up to the specified maximum</remarks>
+        NoInternalCleavage = 0,
 
         /// <summary>
         /// Only sequences that match either the N terminus cleavages parameter or the C terminus cleavages parameter
@@ -18,13 +18,13 @@
         /// <remarks>If the C terminus has no cleavage, the N terminus can have cleavages up to the specified N terminus cleavages max;
         /// if the N terminus has no cleavages, the C terminus can have cleavages up to the specified C terminus cleavages max.
         /// NOTE: Any sequence minLength &lt;= length &lt;= maxLength, with C or N terminus cleavages</remarks>
-        SingleInternalCleavage,
+        SingleInternalCleavage = 1,
 
         /// <summary>
-        /// Only intact proteins
+        /// Any sequence in a protein that matches the parameters for N and C terminus cleavages
         /// </summary>
-        /// <remarks>No cleavages will be performed on the protein sequences
-        /// NOTE: Allows C-term cleavages up to the specified maximum</remarks>
-        NoInternalCleavage,
+        /// <remarks>All cleavage combinations that meet the parameters for N and C terminus cleavage maximums will be checked.
+        /// NOTE: Any sequence minLength &lt;= length &lt;= maxLength</remarks>
+        MultipleInternalCleavages = 2
     }
 }
