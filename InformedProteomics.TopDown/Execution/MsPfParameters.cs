@@ -4,6 +4,7 @@ using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
+using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Execution
 {
@@ -12,6 +13,8 @@ namespace InformedProteomics.TopDown.Execution
     /// </summary>
     public class MsPfParameters
     {
+        public const string ParameterFileExtension = ".param";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MsPfParameters"/> class, with the parameters specifying required options for a search
         /// </summary>
@@ -35,6 +38,11 @@ namespace InformedProteomics.TopDown.Execution
         public MsPfParameters()
         {
             this.Modifications = new List<SearchModification>();
+            SetDefaults();
+        }
+
+        protected void SetDefaults()
+        {
             FeatureFilePath = null;
             MinSequenceLength = 21;
             MaxSequenceLength = 500;
@@ -46,7 +54,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxSequenceMass = 50000.0;
             PrecursorIonTolerance = new Tolerance(10);
             ProductIonTolerance = new Tolerance(10);
-            TargetDecoySearchMode = DatabaseSearchMode.Both;
+            TargetDecoySearchMode = DatabaseSearchMode.Target;
             InternalCleavageMode = InternalCleavageType.SingleInternalCleavage;
 
             MaxNumNTermCleavages = 1;
@@ -62,7 +70,7 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the output directory for the results
         /// </summary>
-        public string OutputDir { get; set; }
+        public virtual string OutputDir { get; set; }
 
         /// <summary>
         /// Gets or sets the AminoAcidSet
@@ -78,27 +86,27 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the path for the Spec file.
         /// </summary>
-        public string SpecFilePath { get; set; }
+        public virtual string SpecFilePath { get; set; }
 
         /// <summary>
         /// Gets or sets the path for the FASTA file.
         /// </summary>
-        public string DatabaseFilePath { get; set; }
+        public virtual string DatabaseFilePath { get; set; }
 
         /// <summary>
         /// Gets or sets the path for the MS1 feature file.
         /// </summary>
-        public string FeatureFilePath { get; set; }
+        public virtual string FeatureFilePath { get; set; }
 
         /// <summary>
         /// Gets or sets the MSPathFinder search mode.
         /// </summary>
-        public InternalCleavageType InternalCleavageMode { get; set; }
+        public virtual InternalCleavageType InternalCleavageMode { get; set; }
 
         /// <summary>
         /// Gets or sets the DB search mode.
         /// </summary>
-        public DatabaseSearchMode TargetDecoySearchMode { get; set; }
+        public virtual DatabaseSearchMode TargetDecoySearchMode { get; set; }
 
         /// <summary>
         /// Gets or sets the precursor ion tolerance.
@@ -108,12 +116,12 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the activation method to use during search.
         /// </summary>
-        public ActivationMethod ActivationMethod { get; set; }
+        public virtual ActivationMethod ActivationMethod { get; set; }
 
         /// <summary>
         /// Gets or sets the precursor ion tolerance in ppm.
         /// </summary>
-        public double PrecursorIonTolerancePpm
+        public virtual double PrecursorIonTolerancePpm
         {
             get { return PrecursorIonTolerance.GetValue(); }
             set { PrecursorIonTolerance = new Tolerance(value); }
@@ -127,7 +135,7 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the product ion tolerance in ppm.
         /// </summary>
-        public double ProductIonTolerancePpm
+        public virtual double ProductIonTolerancePpm
         {
             get { return ProductIonTolerance.GetValue(); }
             set { ProductIonTolerance = new Tolerance(value); }
@@ -136,42 +144,42 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the minimum length of a sequence.
         /// </summary>
-        public int MinSequenceLength { get; set; }
+        public virtual int MinSequenceLength { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum length of a sequence.
         /// </summary>
-        public int MaxSequenceLength { get; set; }
+        public virtual int MaxSequenceLength { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum possible precursor ion charge state.
         /// </summary>
-        public int MinPrecursorIonCharge { get; set; }
+        public virtual int MinPrecursorIonCharge { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum possible precursor ion charge state.
         /// </summary>
-        public int MaxPrecursorIonCharge { get; set; }
+        public virtual int MaxPrecursorIonCharge { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum possible product ion charge state.
         /// </summary>
-        public int MinProductIonCharge { get; set; }
+        public virtual int MinProductIonCharge { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum possible product ion charge state.
         /// </summary>
-        public int MaxProductIonCharge { get; set; }
+        public virtual int MaxProductIonCharge { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum possible sequence mass.
         /// </summary>
-        public double MinSequenceMass { get; set; }
+        public virtual double MinSequenceMass { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum possible sequence mass.
         /// </summary>
-        public double MaxSequenceMass { get; set; }
+        public virtual double MaxSequenceMass { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum possible MS1 feature probability threshold.
@@ -227,7 +235,7 @@ namespace InformedProteomics.TopDown.Execution
             set { TargetDecoySearchMode = value; }
         }
 
-        public bool TagBasedSearch { get; set; }
+        public virtual bool TagBasedSearch { get; set; }
 
         /// <summary>
         /// Specific MS2 scan numbers to process
@@ -238,7 +246,7 @@ namespace InformedProteomics.TopDown.Execution
         public int NumMatchesPerSpectrum { get; set; }
 
         /// <remarks>default 4</remarks>
-        public int MaxNumThreads { get; set; }
+        public virtual int MaxNumThreads { get; set; }
 
         /// <summary>
         /// 0: all internal sequences,
@@ -247,7 +255,7 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <remarks>default 1</remarks>
         [Obsolete("Use InternalCleavageMode")]
-        public int SearchModeInt
+        public virtual int SearchModeInt
         {
             get
             {
@@ -278,6 +286,39 @@ namespace InformedProteomics.TopDown.Execution
         /// Gets or sets a list containing the post-translational modifications used for database search.
         /// </summary>
         public List<SearchModification> Modifications { get; set; }
+
+        public void Write()
+        {
+            var outputFilePath = Path.Combine(OutputDir, Path.GetFileNameWithoutExtension(SpecFilePath) + ParameterFileExtension);
+
+            using (var writer = new StreamWriter(outputFilePath))
+            {
+                writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
+                writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+                writer.WriteLine("FeatureFile\t{0}", !string.IsNullOrWhiteSpace(FeatureFilePath) ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, ".ms1ft")));
+#pragma warning disable 618
+                writer.WriteLine("SearchMode\t" + SearchModeInt);
+#pragma warning restore 618
+                writer.WriteLine("InternalCleavageMode\t" + InternalCleavageMode);
+                writer.WriteLine("Tag-based search\t" + TagBasedSearch);
+                writer.WriteLine("Tda\t" + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
+                writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
+                writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
+                writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
+                writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
+                writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
+                writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
+                writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
+                writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
+                writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
+                writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
+                writer.WriteLine("MaxDynamicModificationsPerSequence\t" + MaxDynamicModificationsPerSequence);
+                foreach (var searchMod in Modifications)
+                {
+                    writer.WriteLine("Modification\t" + searchMod);
+                }
+            }
+        }
 
         /// <summary>
         /// Opens parameter file from .PARAM file..
@@ -318,7 +359,12 @@ namespace InformedProteomics.TopDown.Execution
                         param.FeatureFilePath = parts[1];
                         break;
                     case "SearchMode":
-                        param.InternalCleavageMode = (InternalCleavageType)Convert.ToInt32(parts[1]);
+#pragma warning disable 618
+                        param.SearchModeInt = Convert.ToInt32(parts[1]);
+#pragma warning restore 618
+                        break;
+                    case "InternalCleavageMode":
+                        param.InternalCleavageMode = (InternalCleavageType)Enum.Parse(typeof(InternalCleavageType), parts[1]);
                         break;
                     case "Tda":
                         int tda = 0;

@@ -61,40 +61,17 @@ namespace MSPathFinderT
 
                 Console.WriteLine(Name + " " + Version);
                 parameters.Display();
-                parameters.Write();
+
+                parameters.MaxNumNTermCleavages = 1; // max number of N-term cleavages
+                parameters.MaxNumCTermCleavages = 0; // max number of C-term cleavages
 
                 foreach (var specFilePath in parameters.SpecFilePaths)
                 {
-                    var topDownOptions = new MsPfParameters(
-                        specFilePath,
-                        parameters.DatabaseFilePath,
-                        parameters.OutputDir,
-                        parameters.AminoAcidSet,
-                        parameters.FeatureFilePath)
-                    {
-                        MinSequenceLength = parameters.MinSequenceLength,
-                        MaxSequenceLength = parameters.MaxSequenceLength,
-                        MaxNumNTermCleavages = 1, // max number of N-term cleavages
-                        MaxNumCTermCleavages = 0, // max number of C-term cleavages
-                        MinPrecursorIonCharge = parameters.MinPrecursorIonCharge,
-                        MaxPrecursorIonCharge = parameters.MaxPrecursorIonCharge,
-                        MinProductIonCharge = parameters.MinProductIonCharge,
-                        MaxProductIonCharge = parameters.MaxProductIonCharge,
-                        MinSequenceMass = parameters.MinSequenceMass,
-                        MaxSequenceMass = parameters.MaxSequenceMass,
-                        PrecursorIonTolerancePpm = parameters.PrecursorIonTolerancePpm,
-                        ProductIonTolerancePpm = parameters.ProductIonTolerancePpm,
-                        //RunTargetDecoyAnalysisBool = parameters.TdaBool,
-                        TargetDecoySearchMode = parameters.TargetDecoySearchMode,
-                        //SearchModeInt = parameters.SearchModeInt,
-                        InternalCleavageMode = parameters.InternalCleavageMode,
-                        MaxNumThreads = parameters.MaxNumThreads,
-                        TagBasedSearch = parameters.TagBasedSearch,
-                        ScanNumbers = parameters.ScanNumbers,
-                        ActivationMethod = parameters.ActivationMethod,
-                    };
+                    // Update the spec file path in the parameters for each search
+                    parameters.SpecFilePath = specFilePath;
+                    parameters.Write();
 
-                    var topDownLauncher = new IcTopDownLauncher(topDownOptions);
+                    var topDownLauncher = new IcTopDownLauncher(parameters);
 
                     var success = topDownLauncher.RunSearch();
 
