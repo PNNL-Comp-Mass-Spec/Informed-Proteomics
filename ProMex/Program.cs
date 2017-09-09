@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding;
+using PRISM;
 
 namespace ProMex
 {
@@ -20,8 +19,6 @@ namespace ProMex
             }
         }
 
-        private static Dictionary<string, string> _paramDic;
-
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
@@ -29,6 +26,8 @@ namespace ProMex
         [STAThread]
         static int Main(string[] args)
         {
+            LcMsFeatureFinderInputParameters parameters;
+
             try
             {
                 var handle = Process.GetCurrentProcess().MainWindowHandle;
@@ -36,61 +35,31 @@ namespace ProMex
 
                 //args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "3000", "-maxMass", "30000"};
 
-                if (args.Length == 0)
+                var parser = new CommandLineParser<ProMexInputParameters>(Name, Version);
+                parser.UsageExamples.Add("To create a PNG of the features in an existing ms1ft file " +
+                "(requires both a .pbf file and a .ms1ft file):\n\tProMex.exe -i dataset.pbf -ms1ft dataset.ms1ft -featureMap");
+
+                var results = parser.ParseArgs(args);
+
+                if (!results.Success)
                 {
-                    PrintUsageInfo();
+                    // Wait for 1.5 seconds
+                    System.Threading.Thread.Sleep(1500);
+
                     return -1;
                 }
 
-                if (args.Length % 2 != 0)
+                if (!results.ParsedResults.Validate())
                 {
-                    PrintUsageInfo("The number of arguments must be even.");
+                    parser.PrintHelp();
+
+                    // Wait for 1.5 seconds
+                    System.Threading.Thread.Sleep(1500);
+
                     return -1;
                 }
 
-                // initialize parameters
-                _paramDic = new Dictionary<string, string>
-                {
-                    {LcMsFeatureFinderInputParameters.INPUT_FILE_PATH, null},
-                    {LcMsFeatureFinderInputParameters.OUTPUT_FOLDER_PATH, null},
-                    {LcMsFeatureFinderInputParameters.MINIMUM_CHARGE, "1"},
-                    {LcMsFeatureFinderInputParameters.MAXIMUM_CHARGE, "60"},
-                    {LcMsFeatureFinderInputParameters.MINIMUM_MASS, "2000.0"},
-                    {LcMsFeatureFinderInputParameters.MAXIMUM_MASS, "50000.0"},
-                    {LcMsFeatureFinderInputParameters.INCLUDE_ADDITIONAL_SCORES, "n"},
-                    {LcMsFeatureFinderInputParameters.SAVE_CSV, "n"},
-                    {LcMsFeatureFinderInputParameters.SAVE_PNG_FEATURE_MAP, "y"},
-                    {LcMsFeatureFinderInputParameters.LIKELIHOOD_SCORE_THRESHOLD, "-10"},
-                    {LcMsFeatureFinderInputParameters.MAXIMUM_THREADS, "0"},
-                    {LcMsFeatureFinderInputParameters.EXISTING_MS1FT_FILE, ""}
-                };
-
-                for (var i = 0; i < args.Length / 2; i++)
-                {
-                    var key = args[2 * i];
-                    var value = args[2 * i + 1];
-                    if (!_paramDic.ContainsKey(key))
-                    {
-                        PrintUsageInfo("Invalid parameter: " + key);
-                        return -1;
-                    }
-                    _paramDic[key] = value;
-                }
-
-                // Parse command line parameters
-                var inputFilePath = _paramDic["-i"];
-
-                if (inputFilePath == null)
-                {
-                    PrintUsageInfo("Missing required parameter -i!");
-                    return -1;
-                }
-
-                if (!File.Exists(inputFilePath) && !Directory.Exists(inputFilePath))
-                {
-                    PrintUsageInfo("File not found: " + inputFilePath);
-                    return -1;
-                }
+                parameters = results.ParsedResults;
             }
             catch (Exception ex)
             {
@@ -102,19 +71,18 @@ namespace ProMex
             try
             {
 #endif
-                var param = new LcMsFeatureFinderInputParameters(_paramDic);
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
-                param.Display();
-                var launcher = new LcMsFeatureFinderLauncher(param);
+                parameters.Display();
+                var launcher = new LcMsFeatureFinderLauncher(parameters);
                 int errorCode;
 
-                if (string.IsNullOrWhiteSpace(param.ExistingFeaturesFilePath))
+                if (string.IsNullOrWhiteSpace(parameters.ExistingFeaturesFilePath))
                 {
                     errorCode = launcher.Run();
                 }
                 else
                 {
-                    errorCode = launcher.CreateFeatureMapImage(param.InputPath, param.ExistingFeaturesFilePath);
+                    errorCode = launcher.CreateFeatureMapImage(parameters.InputPath, parameters.ExistingFeaturesFilePath);
                 }
 
                 return errorCode;
@@ -132,45 +100,6 @@ namespace ProMex
                 return errorCode;
             }
 #endif
-        }
-
-        private static void PrintUsageInfo(string errorMessage = null)
-        {
-            if (!string.IsNullOrWhiteSpace(errorMessage))
-            {
-                Console.WriteLine("----------------------------------------------------------");
-                Console.WriteLine("Error: " + errorMessage);
-                Console.WriteLine("----------------------------------------------------------");
-                Console.WriteLine();
-            }
-
-            Console.WriteLine(
-                Name + " " + Version + "\n" +
-                "Usage: " + Name + ".exe\n" +
-                "\t[-i InputFolder or InputFile]\n" +
-                "\t[-o OutFolder (default : InputFolder)]\n" +
-                "\t[-minCharge MinCharge] (minimum charge state, default: 1)\n" +
-                "\t[-maxCharge MaxCharge] (maximum charge state, default: 60)\n" +
-                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)\n" +
-                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
-                "\t[-featureMap y or n (default: y)]\n" +
-                "\t[-score y or n (default: n)]\n" +
-                "\t[-maxThreads 0 (default: 0 (automatic set))]\n"
-                );
-
-            Console.WriteLine(
-                "Syntax to create a PNG of the features in an existing ms1ft file\n" +
-                "(requires both a .pbf file and a .ms1ft file)\n"  +
-                Name + ".exe\n" +
-                "\t[-i PbfFile]\n" +
-                "\t[-o OutFolder (default : InputFolder)]\n" +
-                "\t[-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)\n" +
-                "\t[-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)\n" +
-                "\t[-ms1ft FeaturesFilePath (use a period to infer the name from the pbf file)]\n"
-                );
-
-            // Wait for 1.5 seconds
-            System.Threading.Thread.Sleep(1500);
         }
     }
 }
