@@ -7,6 +7,8 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.TopDown.Execution;
+using PRISM;
 
 namespace MSPathFinderT
 {
@@ -14,18 +16,27 @@ namespace MSPathFinderT
     {
         public const string ParameterFileExtension = ".param";
 
+        [Option("s", "specFile", Required = true, HelpText = "Spectrum File (*.raw)", HelpShowsDefault = false)]
+        public string SpecFilePath { get; set; }
+
         public IEnumerable<string> SpecFilePaths { get; set; }
+
+        [Option("d", "database", Required = true, HelpText = "Database File (*.fasta or *.fa)", HelpShowsDefault = false)]
         public string DatabaseFilePath { get; set; }
+
+        [Option("o", "outputDir", HelpText = "Output Folder", HelpShowsDefault = false)]
         public string OutputDir { get; set; }
+
         public AminoAcidSet AminoAcidSet { get; set; }
 
+        [Option("m", "searchMode", Min = 0, Max = 2, HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)")]
         public int SearchModeInt
         {
             get
             {
-                if (SearchMode == InternalCleavageType.MultipleInternalCleavages)
+                if (InternalCleavageMode == InternalCleavageType.MultipleInternalCleavages)
                     return 0;
-                if (SearchMode == InternalCleavageType.SingleInternalCleavage)
+                if (InternalCleavageMode == InternalCleavageType.SingleInternalCleavage)
                     return 1;
                 return 2;
             }
@@ -33,65 +44,146 @@ namespace MSPathFinderT
             {
                 if (value == 0)
                 {
-                    SearchMode = InternalCleavageType.MultipleInternalCleavages;
+                    InternalCleavageMode = InternalCleavageType.MultipleInternalCleavages;
                 }
                 else if (value == 1)
                 {
-                    SearchMode = InternalCleavageType.SingleInternalCleavage;
+                    InternalCleavageMode = InternalCleavageType.SingleInternalCleavage;
                 }
                 else
                 {
-                    SearchMode = InternalCleavageType.NoInternalCleavage;
+                    InternalCleavageMode = InternalCleavageType.NoInternalCleavage;
                 }
             }
         }
 
-        public InternalCleavageType SearchMode { get; set; }
+        [Option("ic", HelpText = "Search Mode")]
+        public InternalCleavageType InternalCleavageMode { get; set; }
 
+        [Option("tagSearch", HelpText = "Include Tag-based Search (can use '0' for false, '1' for true)")]
         public bool TagBasedSearch { get; set; }
 
-        public bool? TdaBool
+        [Option("mod", HelpText = "Path to modification file. (Default: no modifications)", HelpShowsDefault = false)]
+        public string ModsFilePath { get; set; }
+
+        [Option("tda", Min = -1, Max = 1, HelpText = "Database search mode (0: don't search decoy database, 1: search shuffled decoy database)")]
+        public int TdaInt
         {
             get
             {
-                if (Tda == DatabaseSearchMode.Both)
-                    return true;
-                if (Tda == DatabaseSearchMode.Decoy)
-                    return null;
+                if (TargetDecoySearchMode == DatabaseSearchMode.Both)
+                    return 1;
+                if (TargetDecoySearchMode == DatabaseSearchMode.Decoy)
+                    return -1;
                 //(Tda2 == DatabaseSearchMode.Target)
-                return false;
+                return 0;
             }
             set
             {
-                if (value == null)
+                if (value == -1)
                 {
-                    Tda = DatabaseSearchMode.Decoy;
+                    TargetDecoySearchMode = DatabaseSearchMode.Decoy;
                 }
-                else if (value.Value)
+                else if (value == 1)
                 {
-                    Tda = DatabaseSearchMode.Both;
+                    TargetDecoySearchMode = DatabaseSearchMode.Both;
                 }
                 else
                 {
-                    Tda = DatabaseSearchMode.Target;
+                    TargetDecoySearchMode = DatabaseSearchMode.Target;
                 }
             }
         }
 
-        public DatabaseSearchMode Tda { get; set; }
+        //[Option("tda", HelpText = "Database search mode")]
+        public DatabaseSearchMode TargetDecoySearchMode { get; set; }
+
+        [Option("t", "precursorTol", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
         public double PrecursorIonTolerancePpm { get; set; }
+
+        [Option("f", "fragmentTol", /*Min = 1,*/ HelpText = "Fragment Ion Tolerance (in PPM)")]
         public double ProductIonTolerancePpm { get; set; }
+
+        [Option("minLength", Min = 0, HelpText = "Minimum Sequence Length")]
         public int MinSequenceLength { get; set; }
+
+        [Option("maxLength", Min = 0, HelpText = "Maximum Sequence Length")]
         public int MaxSequenceLength { get; set; }
+
+        [Option("minCharge", Min = 1, HelpText = "Minimum precursor ion charge")]
         public int MinPrecursorIonCharge { get; set; }
+
+        [Option("maxCharge", Min = 1, HelpText = "Maximum precursor ion charge")]
         public int MaxPrecursorIonCharge { get; set; }
+
+        [Option("minFragCharge", Min = 1, HelpText = "Minimum fragment ion charge")]
         public int MinProductIonCharge { get; set; }
+
+        [Option("maxFragCharge", Min = 1, HelpText = "Maximum fragment ion charge")]
         public int MaxProductIonCharge { get; set; }
+
+        [Option("minMass", /*Min = 1,*/ HelpText = "Minimum sequence mass in Da")]
         public double MinSequenceMass { get; set; }
+
+        [Option("maxMass", /*Min = 1,*/ HelpText = "Maximum sequence mass in Da")]
         public double MaxSequenceMass { get; set; }
+
+        [Option("feature", HelpText = "*.ms1ft, *_isos.csv, or *.msalign, (Default: Run ProMex)", HelpShowsDefault = false)]
         public string FeatureFilePath { get; set; }
+
+        [Option("threads", Min = 0, HelpText = "Maximum number of threads, or 0 to set automatically")]
         public int MaxNumThreads { get; set; }
+
+        [Option("act", HelpText = "Activation Method")]
         public ActivationMethod ActivationMethod { get; set; }
+
+        [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
+        public string ScansFilePath { get; set; }
+
+        public TopDownInputParameters()
+        {
+            SpecFilePath = "";
+            DatabaseFilePath = "";
+            OutputDir = null;
+            SearchModeInt = 1;
+            InternalCleavageMode = InternalCleavageType.SingleInternalCleavage;
+            TagBasedSearch = true;
+            TdaInt = 0;
+            TargetDecoySearchMode = DatabaseSearchMode.Target;
+            PrecursorIonTolerancePpm = 10;
+            ProductIonTolerancePpm = 10;
+            MinSequenceLength = 21;
+            MaxSequenceLength = 500;
+            MinPrecursorIonCharge = 2;
+            MaxPrecursorIonCharge = 50;
+            MinProductIonCharge = 1;
+            MaxProductIonCharge = 20;
+            MinSequenceMass = 3000;
+            MaxSequenceMass = 50000;
+            FeatureFilePath = "";
+            MaxNumThreads = 0;
+            ActivationMethod = ActivationMethod.Unknown;
+            ScansFilePath = "";
+
+            // Single-source the defaults...
+            var o = new MsPfParameters();
+            InternalCleavageMode = o.InternalCleavageMode;
+            TargetDecoySearchMode = o.TargetDecoySearchMode;
+            TagBasedSearch = o.TagBasedSearch;
+            PrecursorIonTolerancePpm = o.PrecursorIonTolerancePpm;
+            ProductIonTolerancePpm = o.ProductIonTolerancePpm;
+            MinSequenceLength = o.MinSequenceLength;
+            MaxSequenceLength = o.MaxSequenceLength;
+            MinPrecursorIonCharge = o.MinPrecursorIonCharge;
+            MaxPrecursorIonCharge = o.MaxPrecursorIonCharge;
+            MinProductIonCharge = o.MinProductIonCharge;
+            MaxProductIonCharge = o.MaxProductIonCharge;
+            MinSequenceMass = o.MinSequenceMass;
+            MaxSequenceMass = o.MaxSequenceMass;
+            ActivationMethod = o.ActivationMethod;
+            MaxNumThreads = o.MaxNumThreads;
+            // TODO: ...
+        }
 
         /// <summary>
         /// Specific MS2 scans to process
@@ -100,6 +192,175 @@ namespace MSPathFinderT
 
         private IEnumerable<SearchModification> _searchModifications;
         private int _maxNumDynModsPerSequence;
+
+
+
+        public bool Validate()
+        {
+            // Spec file path validation
+            if (string.IsNullOrWhiteSpace(SpecFilePath))
+            {
+                PrintError("Missing parameter for spectrum file path");
+                return false;
+            }
+
+            // Check for folder-type datasets, and replace specFilePath with the directory name if it is.
+            SpecFilePath = MassSpecDataReaderFactory.GetDatasetName(SpecFilePath);
+
+            var isDirectoryDataset = MassSpecDataReaderFactory.IsADirectoryDataset(SpecFilePath);
+            // True if specFilePath is a directory that is NOT a supported folder-type dataset.
+            var specPathIsDirectory = Directory.Exists(SpecFilePath) && !isDirectoryDataset;
+
+            if (!File.Exists(SpecFilePath) && !specPathIsDirectory && !isDirectoryDataset)
+            {
+                PrintError("File not found: " + SpecFilePath);
+                return false;
+            }
+
+            var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
+
+            if (!specPathIsDirectory && !(types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()))
+            {
+                PrintError("Invalid file extension for spectrum file: (" + Path.GetExtension(SpecFilePath) + ") " + SpecFilePath);
+                return false;
+            }
+
+            // TODO: Handle non-.raw files in the subfolder
+            SpecFilePaths = Directory.Exists(SpecFilePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(SpecFilePath) ? Directory.GetFiles(SpecFilePath, "*.raw") : new[] { SpecFilePath };
+
+            // Database path validation
+            if (string.IsNullOrWhiteSpace(DatabaseFilePath))
+            {
+                PrintError("Missing parameter for database file path");
+                return false;
+            }
+            if (!File.Exists(DatabaseFilePath))
+            {
+                PrintError("File not found: " + DatabaseFilePath);
+                return false;
+            }
+            var dbExtension = Path.GetExtension(DatabaseFilePath).ToLower();
+            if (!dbExtension.Equals(".fa") &&
+                !dbExtension.Equals(".fasta"))
+            {
+                PrintError("Invalid extension for the database file path (" + dbExtension + ")");
+                return false;
+            }
+
+            // Output directory validation
+            if (string.IsNullOrWhiteSpace(OutputDir))
+            {
+                // Must use "Path.GetFullPath" to return the absolute path when the source file is in the working directory
+                // But, it could cause problems with too-long paths.
+                OutputDir = specPathIsDirectory ? SpecFilePath : Path.GetDirectoryName(Path.GetFullPath(SpecFilePath));
+            }
+
+            if (string.IsNullOrWhiteSpace(OutputDir))
+            {
+                PrintError("Invalid output file directory: " + OutputDir);
+                return false;
+            }
+
+            if (!Directory.Exists(OutputDir))
+            {
+                if (File.Exists(OutputDir) && !File.GetAttributes(OutputDir).HasFlag(FileAttributes.Directory))
+                {
+                    PrintError("OutputDir \"" + OutputDir + "\" is not a directory!");
+                    return false;
+                }
+                Directory.CreateDirectory(OutputDir);
+            }
+
+            // Mods file validation
+            if (!string.IsNullOrWhiteSpace(ModsFilePath) && !File.Exists(ModsFilePath))
+            {
+                PrintError("Modifications file not found: " + ModsFilePath);
+                return false;
+            }
+
+            try
+            {
+                var errorMessage = LoadModsFile(ModsFilePath);
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    PrintError(errorMessage);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                PrintError("Exception parsing the file for parameter -mod: " + ex.Message);
+                return false;
+            }
+
+            // Scans file validation
+            if (!string.IsNullOrWhiteSpace(ScansFilePath) && !File.Exists(ScansFilePath))
+            {
+                PrintError("Scans File file not found: " + ScansFilePath);
+                return false;
+            }
+            try
+            {
+                var errorMessage = LoadScansFile(ScansFilePath);
+                if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    PrintError(errorMessage);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                PrintError("Exception parsing the file for parameter -scansFile: " + ex.Message);
+                return false;
+            }
+
+            // Feature file validation
+            if (!string.IsNullOrWhiteSpace(FeatureFilePath) && !File.Exists(FeatureFilePath))
+            {
+                PrintError("Feature File not found: " + FeatureFilePath);
+                return false;
+            }
+            if (!string.IsNullOrWhiteSpace(FeatureFilePath) &&
+                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".csv") &&
+                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".ms1ft") &&
+                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".msalign"))
+            {
+                PrintError("Invalid extension for the Feature file path (" + Path.GetExtension(FeatureFilePath) + ")");
+                return false;
+            }
+
+            // MinX/MaxX validation
+            if (MinSequenceLength > MaxSequenceLength)
+            {
+                PrintError("MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!");
+                return false;
+            }
+
+            if (MinProductIonCharge > MaxProductIonCharge)
+            {
+                PrintError("MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!");
+                return false;
+            }
+
+            if (MinSequenceMass > MaxSequenceMass)
+            {
+                PrintError("MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!");
+                return false;
+            }
+
+            MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
+
+            return true;
+        }
+
+        private static void PrintError(string errorMessage)
+        {
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine("Error: " + errorMessage);
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine();
+        }
 
         public void Display()
         {
@@ -114,8 +375,9 @@ namespace MSPathFinderT
             Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
             Console.WriteLine("OutputDir:        " + OutputDir);
             Console.WriteLine("SearchMode: " + SearchModeInt);
+            Console.WriteLine("InternalCleavageMode: " + InternalCleavageMode);
             Console.WriteLine("Tag-based search: " + TagBasedSearch);
-            Console.WriteLine("Tda: " + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
+            Console.WriteLine("Tda: " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
             Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
             Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
             Console.WriteLine("MinSequenceLength: " + MinSequenceLength);
@@ -158,8 +420,9 @@ namespace MSPathFinderT
                     writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                     writer.WriteLine("FeatureFile\t{0}", FeatureFilePath != null ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(specFilePath, ".ms1ft")));
                     writer.WriteLine("SearchMode\t" + SearchModeInt);
+                    writer.WriteLine("InternalCleavageMode\t" + InternalCleavageMode);
                     writer.WriteLine("Tag-based search\t" + TagBasedSearch);
-                    writer.WriteLine("Tda\t" + (TdaBool == null ? "Decoy" : (bool)TdaBool ? "Target+Decoy" : "Target"));
+                    writer.WriteLine("Tda\t" + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
                     writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
                     writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
                     writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
@@ -177,298 +440,6 @@ namespace MSPathFinderT
                     }
                 }
             }
-        }
-
-        public string Parse(Dictionary<string, string> parameters)
-        {
-            var message = CheckIsValid(parameters);
-            if (message != null)
-                return message;
-
-            try
-            {
-                var specFilePath = parameters["-s"];
-                SpecFilePaths = Directory.Exists(specFilePath) ? Directory.GetFiles(specFilePath, "*.raw") : new[] { specFilePath };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception parsing the file path for parameter -s: " + ex.Message);
-                throw;
-            }
-
-            DatabaseFilePath = parameters["-d"];
-
-            try
-            {
-                var outputDir = parameters["-o"] ?? Environment.CurrentDirectory;
-
-                if (!Directory.Exists(outputDir))
-                {
-                    if (File.Exists(outputDir) && !File.GetAttributes(outputDir).HasFlag(FileAttributes.Directory))
-                    {
-                        return "OutputDir is not a directory: " + outputDir;
-                    }
-                    Directory.CreateDirectory(outputDir);
-                }
-                OutputDir = outputDir;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception validating the path for parameter -o: " + ex.Message);
-                throw;
-            }
-
-            try
-            {
-                var modFilePath = parameters["-mod"];
-                var errorMessage = LoadModsFile(modFilePath);
-                if (!string.IsNullOrWhiteSpace(errorMessage))
-                    return errorMessage;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception parsing the file for parameter -mod: " + ex.Message);
-                throw;
-            }
-
-            try
-            {
-                var scansFilePath = parameters["-scansFile"];
-                var errorMessage = LoadScansFile(scansFilePath);
-                if (!string.IsNullOrWhiteSpace(errorMessage))
-                    return errorMessage;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception parsing the file for parameter -scansFile: " + ex.Message);
-                throw;
-            }
-
-            var currentParameter = string.Empty;
-
-            try
-            {
-                currentParameter = "-feature";
-                FeatureFilePath = parameters["-feature"];
-
-                currentParameter = "-m";
-                var searchMode = Convert.ToInt32(parameters["-m"]);
-                if (searchMode < 0 || searchMode > 2)
-                {
-                    return "Invalid value (" + searchMode + ") for parameter -m";
-                }
-                SearchModeInt = searchMode;
-
-                currentParameter = "-t";
-                PrecursorIonTolerancePpm = Convert.ToDouble(parameters["-t"]);
-
-                currentParameter = "-f";
-                ProductIonTolerancePpm = Convert.ToDouble(parameters["-f"]);
-
-                currentParameter = "-tda";
-                var tdaVal = Convert.ToInt32(parameters["-tda"]);
-                if (tdaVal != 0 && tdaVal != 1 && tdaVal != -1)
-                {
-                    return "Invalid value (" + tdaVal + ") for parameter -tda";
-                }
-
-                if (tdaVal == 1)
-                {
-                    Tda = DatabaseSearchMode.Both;
-                }
-                else if (tdaVal == -1)
-                {
-                    Tda = DatabaseSearchMode.Decoy;
-                }
-                else
-                {
-                    Tda = DatabaseSearchMode.Target;
-                }
-
-                currentParameter = "-minLength";
-                MinSequenceLength = Convert.ToInt32(parameters["-minLength"]);
-
-                currentParameter = "-maxLength";
-                MaxSequenceLength = Convert.ToInt32(parameters["-maxLength"]);
-                if (MinSequenceLength > MaxSequenceLength)
-                {
-                    return "MinSequenceLength (" + MinSequenceLength + ") is larger than MaxSequenceLength (" + MaxSequenceLength + ")!";
-                }
-
-                currentParameter = "-feature";
-                MinPrecursorIonCharge = Convert.ToInt32(parameters["-minCharge"]);
-
-                currentParameter = "-feature";
-                MaxPrecursorIonCharge = Convert.ToInt32(parameters["-maxCharge"]);
-                if (MinSequenceLength > MaxSequenceLength)
-                {
-                    return "MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!";
-                }
-
-                currentParameter = "-minFragCharge";
-                MinProductIonCharge = Convert.ToInt32(parameters["-minFragCharge"]);
-
-                currentParameter = "-maxFragCharge";
-                MaxProductIonCharge = Convert.ToInt32(parameters["-maxFragCharge"]);
-                if (MinSequenceLength > MaxSequenceLength)
-                {
-                    return "MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!";
-                }
-
-                currentParameter = "-minMass";
-                MinSequenceMass = Convert.ToDouble(parameters["-minMass"]);
-
-                currentParameter = "-maxMass";
-                MaxSequenceMass = Convert.ToDouble(parameters["-maxMass"]);
-                if (MinSequenceMass > MaxSequenceMass)
-                {
-                    return "MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!";
-                }
-
-                currentParameter = "-threads";
-                MaxNumThreads = Convert.ToInt32(parameters["-threads"]);
-                MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
-
-                currentParameter = "-tagSearch";
-                TagBasedSearch = Convert.ToInt32(parameters["-tagSearch"]) == 1;
-
-                currentParameter = "-act";
-                ActivationMethod = (ActivationMethod)Convert.ToInt32(parameters["-act"]);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception parsing parameter '" + currentParameter + "': " + ex.Message);
-                throw;
-            }
-
-            return null;
-        }
-
-        static string CheckIsValid(Dictionary<string, string> parameters)
-        {
-            var optionalKeys = new SortedSet<string>(StringComparer.InvariantCultureIgnoreCase)
-            {
-                "-mod",
-                "-o",
-                "-feature",
-                "-scansFile"
-            };
-
-            foreach (var keyValuePair in parameters)
-            {
-                var key = keyValuePair.Key;
-                var value = keyValuePair.Value;
-
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(keyValuePair.Value) && !optionalKeys.Contains(keyValuePair.Key))
-                    {
-                        return "Missing required parameter " + key;
-                    }
-
-                    if (key.Equals("-s"))
-                    {
-                        if (value == null)
-                        {
-                            return "Missing parameter " + key;
-                        }
-                        if (!File.Exists(value) && !Directory.Exists(value))
-                        {
-                            return "File not found: " + value;
-                        }
-                        if (Directory.Exists(value)) continue;
-                        if (MassSpecDataReaderFactory.GetMassSpecDataReader(value) == null)
-                        {
-                            var extension = Path.GetExtension(value);
-                            return "Invalid extension for the parameter " + key + " (" + extension + ")";
-                        }
-                    }
-                    else if (key.Equals("-d"))
-                    {
-                        if (value == null)
-                        {
-                            return "Missing required parameter " + key;
-                        }
-                        if (!File.Exists(value))
-                        {
-                            return "File not found: " + value;
-                        }
-                        var extension = Path.GetExtension(value).ToLower();
-                        if (!extension.Equals(".fa") &&
-                            !extension.Equals(".fasta"))
-                        {
-                            return "Invalid extension for the parameter " + key + " (" + extension + ")";
-                        }
-                    }
-                    else if (key.Equals("-o"))
-                    {
-                    }
-                    else if (key.Equals("-threads"))
-                    {
-                        if (value == null || Int32.Parse(value) < 0)
-                        {
-                            return "Invalid number of maximum threads " + value;
-                        }
-                    }
-                    else if (key.Equals("-mod"))
-                    {
-                        if (!string.IsNullOrWhiteSpace(value) && !File.Exists(value))
-                        {
-                            return "-mod file not found: " + value;
-                        }
-                    }
-                    else if (key.Equals("-scansFile"))
-                    {
-                        if (!string.IsNullOrWhiteSpace(value) && !File.Exists(value))
-                        {
-                            return "-scansFile file not found: " + value;
-                        }
-                    }
-                    else if (key.Equals("-feature"))
-                    {
-                        if (value != null && !File.Exists(value))
-                        {
-                            return "File not found: " + value;
-                        }
-                        if (value != null &&
-                            !Path.GetExtension(value).ToLower().Equals(".csv") &&
-                            !Path.GetExtension(value).ToLower().Equals(".ms1ft") &&
-                            !Path.GetExtension(value).ToLower().Equals(".msalign"))
-                        {
-                            return "Invalid extension for the parameter " + key + " (" + Path.GetExtension(value) + ")";
-                        }
-                    }
-                    else if (key.Equals("-act"))
-                    {
-                        int val;
-                        if (!Int32.TryParse(value, out val) || val < 0 || val > 6)
-                        {
-                            return "Invalid value for the parameter " + key + " {" + value + ")";
-                        }
-                    }
-                    else
-                    {
-                        double num;
-                        if (!double.TryParse(value, out num))
-                        {
-                            return "Invalid value (" + value + ") for the parameter " + key;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    if (string.IsNullOrEmpty(key))
-                        key = "?UnknownKey?";
-
-                    if (string.IsNullOrEmpty(value))
-                        value = string.Empty;
-
-                    Console.WriteLine("Error parsing parameter '" + key + "' with value '" + value + "'");
-                    throw;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>

@@ -47,6 +47,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="PRISM-Library">
+      <Version>2.4.31</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj">
       <Project>{05b37516-2b5c-4c60-bfe2-d6854a19478a}</Project>
       <Name>InformedProteomics.Backend.MassSpecData</Name>

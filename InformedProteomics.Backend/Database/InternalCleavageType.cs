@@ -1,4 +1,6 @@
-﻿namespace InformedProteomics.Backend.Database
+﻿using System.ComponentModel;
+
+namespace InformedProteomics.Backend.Database
 {
     /// <summary>
     /// Type of peptide cleavage to use (for Top-Down searches)
@@ -10,6 +12,7 @@
         /// </summary>
         /// <remarks>No cleavages will be performed on the protein sequences
         /// NOTE: Allows C-term cleavages up to the specified maximum</remarks>
+        [Description("No Internal Cleavage")]
         NoInternalCleavage = 0,
 
         /// <summary>
@@ -18,6 +21,7 @@
         /// <remarks>If the C terminus has no cleavage, the N terminus can have cleavages up to the specified N terminus cleavages max;
         /// if the N terminus has no cleavages, the C terminus can have cleavages up to the specified C terminus cleavages max.
         /// NOTE: Any sequence minLength &lt;= length &lt;= maxLength, with C or N terminus cleavages</remarks>
+        [Description("Single Internal Cleavage")]
         SingleInternalCleavage = 1,
 
         /// <summary>
@@ -25,6 +29,7 @@
         /// </summary>
         /// <remarks>All cleavage combinations that meet the parameters for N and C terminus cleavage maximums will be checked.
         /// NOTE: Any sequence minLength &lt;= length &lt;= maxLength</remarks>
+        [Description("Multiple Internal Cleavages")]
         MultipleInternalCleavages = 2
     }
 }

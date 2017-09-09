@@ -37,12 +37,12 @@ namespace InformedProteomics.TopDown.Execution
             this.Modifications = new List<SearchModification>();
             FeatureFilePath = null;
             MinSequenceLength = 21;
-            MaxSequenceLength = 300;
+            MaxSequenceLength = 500;
             MinPrecursorIonCharge = 2;
-            MaxPrecursorIonCharge = 60;
+            MaxPrecursorIonCharge = 50;
             MinProductIonCharge = 1;
             MaxProductIonCharge = 20;
-            MinSequenceMass = 2000.0;
+            MinSequenceMass = 3000.0;
             MaxSequenceMass = 50000.0;
             PrecursorIonTolerance = new Tolerance(10);
             ProductIonTolerance = new Tolerance(10);
@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Execution
 
             MaxNumNTermCleavages = 1;
             MaxNumCTermCleavages = 0;
-            MaxNumThreads = 4;
+            MaxNumThreads = 0;
             ScanNumbers = null;
             NumMatchesPerSpectrum = 3;
             TagBasedSearch = true;
