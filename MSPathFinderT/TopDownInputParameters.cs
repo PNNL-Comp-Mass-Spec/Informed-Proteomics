@@ -25,7 +25,7 @@ namespace MSPathFinderT
         [Option("o", "outputDir", HelpText = "Output Folder", HelpShowsDefault = false)]
         public override string OutputDir { get; set; }
 
-        [Option("m", "searchMode", Min = 0, Max = 2, HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)")]
+        [Option("m", "searchMode", Min = 0, Max = 2, HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)", Hidden = true)]
         [Obsolete("Use InternalCleavageMode")]
         public override int SearchModeInt
         {
@@ -329,9 +329,6 @@ namespace MSPathFinderT
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
             Console.WriteLine("OutputDir:        " + OutputDir);
-#pragma warning disable 618
-            Console.WriteLine("SearchMode: " + SearchModeInt);
-#pragma warning restore 618
             Console.WriteLine("InternalCleavageMode: " + InternalCleavageMode);
             Console.WriteLine("Tag-based search: " + TagBasedSearch);
             Console.WriteLine("Tda: " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));

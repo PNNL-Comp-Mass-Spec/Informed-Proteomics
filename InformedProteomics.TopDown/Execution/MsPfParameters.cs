@@ -296,9 +296,6 @@ namespace InformedProteomics.TopDown.Execution
                 writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
                 writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
                 writer.WriteLine("FeatureFile\t{0}", !string.IsNullOrWhiteSpace(FeatureFilePath) ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, ".ms1ft")));
-#pragma warning disable 618
-                writer.WriteLine("SearchMode\t" + SearchModeInt);
-#pragma warning restore 618
                 writer.WriteLine("InternalCleavageMode\t" + InternalCleavageMode);
                 writer.WriteLine("Tag-based search\t" + TagBasedSearch);
                 writer.WriteLine("Tda\t" + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
