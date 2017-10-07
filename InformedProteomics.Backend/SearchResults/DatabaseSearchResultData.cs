@@ -107,7 +107,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// </summary>
         public double QValue
         {
-            get { return qValue; }
+            get => qValue;
             set
             {
                 qValue = value;
@@ -120,7 +120,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// </summary>
         public double PepQValue
         {
-            get { return pepQValue; }
+            get => pepQValue;
             set
             {
                 pepQValue = value;
@@ -492,8 +492,7 @@ namespace InformedProteomics.Backend.SearchResults
                     if (isFirstLine)
                     {
                         isFirstLine = false;
-                        int test;
-                        if (!int.TryParse(line.Substring(0, 1), out test))
+                        if (!int.TryParse(line.Substring(0, 1), out _))
                         {
                             SetInputFileHeader(line);
                             continue;

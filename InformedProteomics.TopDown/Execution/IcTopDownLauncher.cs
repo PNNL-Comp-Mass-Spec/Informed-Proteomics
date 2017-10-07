@@ -72,100 +72,146 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         public string ErrorMessage { get; private set; }
-        public MsPfParameters Options { get; private set; }
+        public MsPfParameters Options { get; }
 
         [Obsolete("Use options!", true)]
-        public string SpecFilePath { get { return Options.SpecFilePath; } private set { Options.SpecFilePath = value; } }
+        public string SpecFilePath => Options.SpecFilePath;
+
         [Obsolete("Use options!", true)]
-        public string DatabaseFilePath { get { return Options.DatabaseFilePath; } private set { Options.DatabaseFilePath = value; } }
+        public string DatabaseFilePath => Options.DatabaseFilePath;
+
         [Obsolete("Use options!", true)]
-        public string OutputDir { get { return Options.OutputDir; } private set { Options.OutputDir = value; } }
+        public string OutputDir => Options.OutputDir;
+
         [Obsolete("Use options!", true)]
-        public AminoAcidSet AminoAcidSet { get { return Options.AminoAcidSet; } private set { Options.AminoAcidSet = value; } }
+        public AminoAcidSet AminoAcidSet => Options.AminoAcidSet;
+
         [Obsolete("Use options!", true)]
-        public string FeatureFilePath { get { return Options.FeatureFilePath; } set { Options.FeatureFilePath = value; } }
+        public string FeatureFilePath { get => Options.FeatureFilePath;
+            set => Options.FeatureFilePath = value;
+        }
 
         /// <remarks>default 21</remarks>
         [Obsolete("Use options!", true)]
-        public int MinSequenceLength { get { return Options.MinSequenceLength; } set { Options.MinSequenceLength = value; } }
+        public int MinSequenceLength { get => Options.MinSequenceLength;
+            set => Options.MinSequenceLength = value;
+        }
 
         /// <remarks>default 300</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxSequenceLength { get { return Options.MaxSequenceLength; } set { Options.MaxSequenceLength = value; } }
+        public int MaxSequenceLength { get => Options.MaxSequenceLength;
+            set => Options.MaxSequenceLength = value;
+        }
 
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumNTermCleavages { get { return Options.MaxNumNTermCleavages; } set { Options.MaxNumNTermCleavages = value; } }
+        public int MaxNumNTermCleavages { get => Options.MaxNumNTermCleavages;
+            set => Options.MaxNumNTermCleavages = value;
+        }
 
         /// <remarks>default 0</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumCTermCleavages { get { return Options.MaxNumCTermCleavages; } set { Options.MaxNumCTermCleavages = value; } }
+        public int MaxNumCTermCleavages { get => Options.MaxNumCTermCleavages;
+            set => Options.MaxNumCTermCleavages = value;
+        }
 
         /// <remarks>default 2</remarks>
         [Obsolete("Use options!", true)]
-        public int MinPrecursorIonCharge { get { return Options.MinPrecursorIonCharge; } set { Options.MinPrecursorIonCharge = value; } }
+        public int MinPrecursorIonCharge { get => Options.MinPrecursorIonCharge;
+            set => Options.MinPrecursorIonCharge = value;
+        }
 
         /// <remarks>default 60</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxPrecursorIonCharge { get { return Options.MaxPrecursorIonCharge; } set { Options.MaxPrecursorIonCharge = value; } }
+        public int MaxPrecursorIonCharge { get => Options.MaxPrecursorIonCharge;
+            set => Options.MaxPrecursorIonCharge = value;
+        }
 
         /// <remarks>default 2000</remarks>
         [Obsolete("Use options!", true)]
-        public double MinSequenceMass { get { return Options.MinSequenceMass; } set { Options.MinSequenceMass = value; } }
+        public double MinSequenceMass { get => Options.MinSequenceMass;
+            set => Options.MinSequenceMass = value;
+        }
 
         /// <remarks>default 50000</remarks>
         [Obsolete("Use options!", true)]
-        public double MaxSequenceMass { get { return Options.MaxSequenceMass; } set { Options.MaxSequenceMass = value; } }
+        public double MaxSequenceMass { get => Options.MaxSequenceMass;
+            set => Options.MaxSequenceMass = value;
+        }
 
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int MinProductIonCharge { get { return Options.MinProductIonCharge; } set { Options.MinProductIonCharge = value; } }
+        public int MinProductIonCharge { get => Options.MinProductIonCharge;
+            set => Options.MinProductIonCharge = value;
+        }
 
         /// <remarks>default 20</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxProductIonCharge { get { return Options.MaxProductIonCharge; } set { Options.MaxProductIonCharge = value; } }
+        public int MaxProductIonCharge { get => Options.MaxProductIonCharge;
+            set => Options.MaxProductIonCharge = value;
+        }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public Tolerance PrecursorIonTolerance { get { return Options.PrecursorIonTolerance; } set { Options.PrecursorIonTolerance = value; } }
+        public Tolerance PrecursorIonTolerance { get => Options.PrecursorIonTolerance;
+            set => Options.PrecursorIonTolerance = value;
+        }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public Tolerance ProductIonTolerance { get { return Options.ProductIonTolerance; } set { Options.ProductIonTolerance = value; } }
+        public Tolerance ProductIonTolerance { get => Options.ProductIonTolerance;
+            set => Options.ProductIonTolerance = value;
+        }
 
         /// <remarks>default true
         /// true: target and decoy, false: target only, null: decoy only</remarks>
         [Obsolete("Use options!", true)]
-        public bool? RunTargetDecoyAnalysisBool { get { return Options.RunTargetDecoyAnalysisBool; } set { Options.RunTargetDecoyAnalysisBool = value; } }
+        public bool? RunTargetDecoyAnalysisBool { get => Options.RunTargetDecoyAnalysisBool;
+            set => Options.RunTargetDecoyAnalysisBool = value;
+        }
 
         /// <remarks>default Both</remarks>
         [Obsolete("Use options!", true)]
-        public DatabaseSearchMode RunTargetDecoyAnalysis { get { return Options.TargetDecoySearchMode; } set { Options.TargetDecoySearchMode = value; } }
+        public DatabaseSearchMode RunTargetDecoyAnalysis { get => Options.TargetDecoySearchMode;
+            set => Options.TargetDecoySearchMode = value;
+        }
 
         [Obsolete("Use options!", true)]
-        public bool TagBasedSearch { get { return Options.TagBasedSearch; } set { Options.TagBasedSearch = value; } }
+        public bool TagBasedSearch { get => Options.TagBasedSearch;
+            set => Options.TagBasedSearch = value;
+        }
 
         /// <summary>
         /// Specific MS2 scan numbers to process
         /// </summary>
         [Obsolete("Use options!", true)]
-        public IEnumerable<int> ScanNumbers { get { return Options.ScanNumbers; } set { Options.ScanNumbers = value; } }
+        public IEnumerable<int> ScanNumbers { get => Options.ScanNumbers;
+            set => Options.ScanNumbers = value;
+        }
 
         /// <remarks>default 3</remarks>
         [Obsolete("Use options!", true)]
-        public int NumMatchesPerSpectrum { get { return Options.NumMatchesPerSpectrum; } set { Options.NumMatchesPerSpectrum = value; } }
+        public int NumMatchesPerSpectrum { get => Options.NumMatchesPerSpectrum;
+            set => Options.NumMatchesPerSpectrum = value;
+        }
 
         /// <remarks>default 4</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumThreads { get { return Options.MaxNumThreads; } set { Options.MaxNumThreads = value; } }
+        public int MaxNumThreads { get => Options.MaxNumThreads;
+            set => Options.MaxNumThreads = value;
+        }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public double PrecursorIonTolerancePpm { get { return Options.PrecursorIonTolerancePpm; } set { Options.PrecursorIonTolerancePpm = value; } }
+        public double PrecursorIonTolerancePpm { get => Options.PrecursorIonTolerancePpm;
+            set => Options.PrecursorIonTolerancePpm = value;
+        }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public double ProductIonTolerancePpm { get { return Options.ProductIonTolerancePpm; } set { Options.ProductIonTolerancePpm = value; } }
+        public double ProductIonTolerancePpm { get => Options.ProductIonTolerancePpm;
+            set => Options.ProductIonTolerancePpm = value;
+        }
 
         /// <summary>
         /// 0: all internal sequences,
@@ -174,11 +220,15 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int SearchModeInt { get { return Options.SearchModeInt; } set { Options.SearchModeInt = value; } }
+        public int SearchModeInt { get => Options.SearchModeInt;
+            set => Options.SearchModeInt = value;
+        }
 
         /// <remarks>default SingleInternalCleavage</remarks>
         [Obsolete("Use options!", true)]
-        public InternalCleavageType SearchMode { get { return Options.InternalCleavageMode; } set { Options.InternalCleavageMode = value; } }
+        public InternalCleavageType SearchMode { get => Options.InternalCleavageMode;
+            set => Options.InternalCleavageMode = value;
+        }
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
@@ -609,8 +659,7 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             var sw = new Stopwatch();
-            long estimatedProteins;
-            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out estimatedProteins, cancellationToken);
+            var annotationsAndOffsets = GetAnnotationsAndOffsets(db, out var estimatedProteins, cancellationToken);
             Console.WriteLine(@"Estimated Sequences: " + estimatedProteins.ToString("#,##0"));
 
             var numProteins = 0;
