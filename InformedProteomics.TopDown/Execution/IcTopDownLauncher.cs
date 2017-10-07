@@ -766,6 +766,8 @@ namespace InformedProteomics.TopDown.Execution
                     var filter = sequenceFilter as Ms1FtFilter;
                     var featureIds = filter?.GetMatchingFeatureIds(sequenceMass).ToList() ?? new List<int>();
 
+                    var nTermCleavages = numNTermCleavages;
+
                     Parallel.ForEach(ms2ScanNums, pfeOptions, ms2ScanNum =>
                     {
                         if (ms2ScanNum > _ms2ScanNums.Last() || ms2ScanNum < _ms2ScanNums.First()) return;
@@ -779,8 +781,8 @@ namespace InformedProteomics.TopDown.Execution
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
-                        var sequence = protSequence.Substring(numNTermCleavages);
-                        var pre = numNTermCleavages == 0 ? annotation[0] : annotation[numNTermCleavages + 1];
+                        var sequence = protSequence.Substring(nTermCleavages);
+                        var pre = nTermCleavages == 0 ? annotation[0] : annotation[nTermCleavages + 1];
                         var post = annotation[annotation.Length - 1];
 
                         var ms2FeatureIds = new List<int>();
@@ -793,7 +795,7 @@ namespace InformedProteomics.TopDown.Execution
                             }
                         }
                         else ms2FeatureIds = featureIds;
-                        var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, numNTermCleavages,
+                        var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, nTermCleavages,
                             modCombinations, precursorIon, score, isDecoy, featureId: Math.Max(ms2FeatureIds.FirstOrDefault(), 1));
 
                         AddMatch(matches, ms2ScanNum, prsm);
