@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Execution;
 
 namespace MSPathFinder
@@ -9,13 +10,22 @@ namespace MSPathFinder
     internal class Program
     {
         public const string Name = "MSPathFinder";
-        public const string Version = "0.15 (Sep 11, 2014)";
+        public static string Version
+        {
+            get
+            {
+                var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return string.Format("version {0}.{1}.{2} (" + Misc.GetBuildDateTextFromVersion() + ")", programVersion.Major, programVersion.Minor, programVersion.Build);
+            }
+        }
+
         public const double CorrThreshold = 0.7;
+
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
         private const uint EnableExtendedFlags = 0x0080;
-
+       
         private static void Main(string[] args)
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;
@@ -71,7 +81,7 @@ namespace MSPathFinder
             parameters.Display();
             parameters.Write();
 
-            foreach (string specFilePath in parameters.SpecFilePaths)
+            foreach (var specFilePath in parameters.SpecFilePaths)
             {
                 var bottomUpLauncher = new IcBottomUpLauncher(
                     specFilePath,
@@ -108,7 +118,7 @@ namespace MSPathFinder
             }
 
             Console.WriteLine(
-                Name + " " + Version + "\n" +
+                Name + " version " + Version + "\n" +
                 "Usage: " + Name + ".exe\n" +
                 "\t-s SpectrumFile or Folder (*.raw)\n" +
                 "\t-d DatabaseFile (*.fasta or *.fa)\n" +
