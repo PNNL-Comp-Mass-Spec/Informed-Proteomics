@@ -200,7 +200,7 @@ namespace InformedProteomics.Backend.Results
         /// <summary>
         /// Format string for default TSV output, with FDR scores
         /// </summary>
-        public const string TdaTsvFormatString = TsvFormatString + "\t{18}\t{19}";
+        public const string TdaTsvFormatString = TsvFormatString + "\t{19}\t{20}";
 
         /// <summary>
         /// Get the header string for default TSV output, with columns added for FDR scores if addTdaScores is true
