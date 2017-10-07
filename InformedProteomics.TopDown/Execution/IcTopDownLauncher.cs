@@ -878,67 +878,106 @@ namespace InformedProteomics.TopDown.Execution
                 Status = "Calculating spectral E-values for matches"
             };
 
-            if (_cachedScoreDistributions == null)
-            {
-                _cachedScoreDistributions = new LinkedList<Tuple<double, ScoreDistribution>>[_run.MaxLcScan + 1];
-                foreach (var scanNum in _ms2ScanNums)
-                    _cachedScoreDistributions[scanNum] = new LinkedList<Tuple<double, ScoreDistribution>>();
-            }
-
             var sw = new Stopwatch();
 
-            var topDownScorer = new InformedTopDownScorer(_run, Options.AminoAcidSet, Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, activationMethod: Options.ActivationMethod);
-
-            // Rescore and Estimate #proteins for GF calculation
-            var matches = new LinkedList<DatabaseSequenceSpectrumMatch>[sortedMatches.Length];
             long estimatedSequences = 0;
-            foreach(var scanNum in _ms2ScanNums)
+            var matches = new LinkedList<DatabaseSequenceSpectrumMatch>[sortedMatches.Count];
+
+            var currentTask = "?";
+
+            try
             {
-                var prsms = sortedMatches[scanNum];
-                if (prsms == null) continue;
-                var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-                if (spec == null || spec.Peaks.Length == 0)
-                    continue;
+                currentTask = "Validate _cachedScoreDistributions";
 
-                foreach (var match in prsms)
+                if (_cachedScoreDistributions == null)
                 {
-                    //if (CompositeScorer.GetProbability(match.Score) < CompositeScorer.ProbabilityCutoff)
-                    //{
-                    //    continue;
-                    //}
-
-                    var ion = match.Ion;
-
-                    // Re-scoring
-                    //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
-                    //if (scores == null) continue;
-                    var scorer = this._ms2ScorerFactory2.GetScorer(this._run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge, this.Options.ActivationMethod);
-                    var informedScorer = scorer as IInformedScorer;
-                    var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
-
-                    match.ModificationText = scores.Modifications;
-
-                    //double s1 = scores.Score, s2;
-                    //int nf1;
-                    //topDownScorer.GetCompositeScores(sequence, ion.Charge, scanNum, out s1, out nf1);
-                    //topDownScorer.GetCompositeScores(ipSequence, this._ms2ScorerFactory2.GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum, out s2);
-
-                    match.Score = scores.Score;
-                    match.NumMatchedFragments = scores.NumMatchedFrags;
-                    //match.ModificationText = match.Modifications.ToString();
-                    //match.NumMatchedFragments = scores.NumMatchedFrags;
-                    if (match.Score > 0.25*informedScorer.ScoreCutOff)
-                    //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
+                    if (_run == null)
                     {
-                        if (matches[scanNum] == null) matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
-                        matches[scanNum].AddLast(match);
+                        ReportError("_run is null in RunGeneratingFunction; cannot initialize _cachedScoreDistributions");
                     }
+
+                    if (_ms2ScanNums == null)
+                    {
+                        ReportError("_ms2ScanNums is null in RunGeneratingFunction; cannot initialize _cachedScoreDistributions");
+                    }
+
+                    _cachedScoreDistributions = new LinkedList<Tuple<double, ScoreDistribution>>[_run.MaxLcScan + 1];
+                    foreach (var scanNum in _ms2ScanNums)
+                        _cachedScoreDistributions[scanNum] = new LinkedList<Tuple<double, ScoreDistribution>>();
                 }
 
-                if (matches[scanNum] != null) estimatedSequences += matches[scanNum].Count;
-            }
+                currentTask = "Instantiate InformedTopDownScorer";
 
-            Console.WriteLine(@"Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
+                var topDownScorer = new InformedTopDownScorer(_run, Options.AminoAcidSet, Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, activationMethod: Options.ActivationMethod);
+
+                currentTask = "Rescore and Estimate #proteins for GF calculation";
+
+                foreach(var scanNum in _ms2ScanNums)
+                {
+                    var prsms = sortedMatches[scanNum];
+                    if (prsms == null) continue;
+
+                    if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+                        continue;
+
+                    if (spec.Peaks.Length == 0)
+                        continue;
+
+                    currentTask = "Check prmsms in scan " + scanNum;
+
+                    foreach (var match in prsms)
+                    {
+                        //if (CompositeScorer.GetProbability(match.Score) < CompositeScorer.ProbabilityCutoff)
+                        //{
+                        //    continue;
+                        //}
+
+                        var ion = match.Ion;
+
+                        // Re-scoring
+                        //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
+                        //if (scores == null) continue;
+                        var scorer = _ms2ScorerFactory2.GetScorer(_run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge, Options.ActivationMethod);
+
+                        if (!(scorer is IInformedScorer informedScorer))
+                        {
+                            throw new Exception("scorer is not an instance of type IInformedScorer; " +
+                                                "cannot score since actually a " + scorer.GetType().Name);
+                        }
+
+                        var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
+
+                        match.ModificationText = scores.Modifications;
+
+                        //double s1 = scores.Score, s2;
+                        //int nf1;
+                        //topDownScorer.GetCompositeScores(sequence, ion.Charge, scanNum, out s1, out nf1);
+                        //topDownScorer.GetCompositeScores(ipSequence, _ms2ScorerFactory2.GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum, out s2);
+
+                        match.Score = scores.Score;
+                        match.NumMatchedFragments = scores.NumMatchedFrags;
+                        //match.ModificationText = match.Modifications.ToString();
+                        //match.NumMatchedFragments = scores.NumMatchedFrags;
+                        if (match.Score > 0.25 * informedScorer.ScoreCutOff)
+                        //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
+                        {
+                            if (matches[scanNum] == null) matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
+                            matches[scanNum].AddLast(match);
+                        }
+                    }
+
+                    if (matches[scanNum] != null) estimatedSequences += matches[scanNum].Count;
+                }
+
+                currentTask = "Parallel.ForEach";
+
+                Console.WriteLine(@"Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
+
+            }
+            catch (Exception ex)
+            {
+                ReportError(string.Format("Exception while {0} in RunGeneratingFunction: {1}", currentTask, ex.Message), ex);
+            }
 
             var numProteins = 0;
             var lastUpdate = DateTime.MinValue; // Force original update of 0%
@@ -956,7 +995,7 @@ namespace InformedProteomics.TopDown.Execution
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             //foreach (var scanNum in scanNums)
             {
-                var currentTask = "?";
+                currentTask = "Inside Parallel.ForEach";
                 try
                 {
                     var scoreDistributions = _cachedScoreDistributions[scanNum];
@@ -993,11 +1032,9 @@ namespace InformedProteomics.TopDown.Execution
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                     }
             }
-                catch (Exception ex)
+            catch (Exception ex)
             {
-                var errMsg = string.Format("Exception while {0}: {1}", currentTask, ex.Message);
-                Console.WriteLine(errMsg);
-                throw new Exception(errMsg, ex);
+                ReportError(string.Format("Exception while {0} in RunGeneratingFunction: {1}", currentTask, ex.Message), ex);
             }
         });
 
@@ -1064,6 +1101,20 @@ namespace InformedProteomics.TopDown.Execution
 
                 yield return result;
             }
+        }
+
+        /// <summary>
+        /// Show an error message at the console then throw an exception
+        /// </summary>
+        /// <param name="errMsg"></param>
+        /// <param name="ex"></param>
+        private void ReportError(string errMsg, Exception ex = null)
+        {
+            Console.WriteLine(errMsg);
+            if (ex == null)
+                throw new Exception(errMsg);
+
+            throw new Exception(errMsg, ex);
         }
     }
 }
