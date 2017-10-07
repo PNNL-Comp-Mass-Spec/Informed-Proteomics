@@ -238,8 +238,8 @@ namespace InformedProteomics.TopDown.Execution
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
         private List<int> _ms2ScanNums;
-        private ProgressData searchProgressData = null;
-        private Stopwatch searchStopwatch = null;
+        private ProgressData searchProgressData;
+        private Stopwatch searchStopwatch;
         private Timer progReportTimer;
 
         public void PrintOverallProgressReport(object searchObj)
@@ -319,9 +319,9 @@ namespace InformedProteomics.TopDown.Execution
 
             progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
-            if (this.Options.ScanNumbers != null && this.Options.ScanNumbers.Any())
+            if (Options.ScanNumbers != null && Options.ScanNumbers.Any())
             {
-                ms1Filter = new SelectedMsMsFilter(this.Options.ScanNumbers);
+                ms1Filter = new SelectedMsMsFilter(Options.ScanNumbers);
             }
             else if (string.IsNullOrWhiteSpace(Options.FeatureFilePath))
             {
@@ -380,7 +380,7 @@ namespace InformedProteomics.TopDown.Execution
             // pre-generate deconvoluted spectra for scoring
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
-            //this.fragmentScorerFactory = new CompositionScorerFactory(this._run, true);
+            //this.fragmentScorerFactory = new CompositionScorerFactory(_run, true);
 
             sw.Reset();
 
@@ -393,9 +393,9 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             // Deconvolute spectra
-            var deconvoluter = new Deconvoluter(this.Options.MinProductIonCharge, this.Options.MaxProductIonCharge, 2, 0.1, this.Options.ProductIonTolerance);
+            var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, 0.1, Options.ProductIonTolerance);
             var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
-            var deconvolutedRun = new DPbfLcMsRun(this.Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
+            var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
 
             _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
                                                    Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
@@ -762,7 +762,7 @@ namespace InformedProteomics.TopDown.Execution
                     if (sequenceMass < Options.MinSequenceMass || sequenceMass > Options.MaxSequenceMass) continue;
 
                     var modCombinations = modCombs[modIndex];
-                    var ms2ScanNums = this.Options.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
+                    var ms2ScanNums = Options.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
                     var filter = sequenceFilter as Ms1FtFilter;
                     var featureIds = filter?.GetMatchingFeatureIds(sequenceMass).ToList() ?? new List<int>();
 
@@ -775,7 +775,7 @@ namespace InformedProteomics.TopDown.Execution
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
                         //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
-                        var scorer = this._ms2ScorerFactory2.GetScorer(ms2ScanNum);
+                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
@@ -871,7 +871,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private LinkedList<Tuple<double, ScoreDistribution>>[] _cachedScoreDistributions;
-        private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(SortedSet<DatabaseSequenceSpectrumMatch>[] sortedMatches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             var progData = new ProgressData(progress)
             {
@@ -965,7 +965,7 @@ namespace InformedProteomics.TopDown.Execution
                         var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
 
-                        //var scorer = this._ms2ScorerFactory2.GetScorer(match.ScanNum);
+                        //var scorer = _ms2ScorerFactory2.GetScorer(match.ScanNum);
                         //var graph = this.scoringGraphFactory.GetScoringGraph(scorer, match.Ion.Composition.Mass);
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
                         if (graph == null) continue;
@@ -1022,14 +1022,14 @@ namespace InformedProteomics.TopDown.Execution
             return nMatches;
         }
 
-        private List<DatabaseSearchResultData> WriteResultsToFile(DatabaseSequenceSpectrumMatch[] matches, string outputFilePath, FastaDatabase database)
+        private List<DatabaseSearchResultData> WriteResultsToFile(IReadOnlyList<DatabaseSequenceSpectrumMatch> matches, string outputFilePath, FastaDatabase database)
         {
             var results = CreateResults(matches, database).ToList();
-            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, results, false);
+            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, results);
             return results;
         }
 
-        private IEnumerable<DatabaseSearchResultData> CreateResults(DatabaseSequenceSpectrumMatch[] matches, FastaDatabase database)
+        private IEnumerable<DatabaseSearchResultData> CreateResults(IReadOnlyList<DatabaseSequenceSpectrumMatch> matches, FastaDatabase database)
         {
             foreach (var scanNum in _ms2ScanNums)
             {
