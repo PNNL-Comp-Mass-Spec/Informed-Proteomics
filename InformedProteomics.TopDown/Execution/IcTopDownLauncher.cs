@@ -87,97 +87,129 @@ namespace InformedProteomics.TopDown.Execution
         public AminoAcidSet AminoAcidSet => Options.AminoAcidSet;
 
         [Obsolete("Use options!", true)]
-        public string FeatureFilePath { get => Options.FeatureFilePath;
+        public string FeatureFilePath
+        {
+            get => Options.FeatureFilePath;
             set => Options.FeatureFilePath = value;
         }
 
         /// <remarks>default 21</remarks>
         [Obsolete("Use options!", true)]
-        public int MinSequenceLength { get => Options.MinSequenceLength;
+        public int MinSequenceLength
+        {
+            get => Options.MinSequenceLength;
             set => Options.MinSequenceLength = value;
         }
 
         /// <remarks>default 300</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxSequenceLength { get => Options.MaxSequenceLength;
+        public int MaxSequenceLength
+        {
+            get => Options.MaxSequenceLength;
             set => Options.MaxSequenceLength = value;
         }
 
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumNTermCleavages { get => Options.MaxNumNTermCleavages;
+        public int MaxNumNTermCleavages
+        {
+            get => Options.MaxNumNTermCleavages;
             set => Options.MaxNumNTermCleavages = value;
         }
 
         /// <remarks>default 0</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumCTermCleavages { get => Options.MaxNumCTermCleavages;
+        public int MaxNumCTermCleavages
+        {
+            get => Options.MaxNumCTermCleavages;
             set => Options.MaxNumCTermCleavages = value;
         }
 
         /// <remarks>default 2</remarks>
         [Obsolete("Use options!", true)]
-        public int MinPrecursorIonCharge { get => Options.MinPrecursorIonCharge;
+        public int MinPrecursorIonCharge
+        {
+            get => Options.MinPrecursorIonCharge;
             set => Options.MinPrecursorIonCharge = value;
         }
 
         /// <remarks>default 60</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxPrecursorIonCharge { get => Options.MaxPrecursorIonCharge;
+        public int MaxPrecursorIonCharge
+        {
+            get => Options.MaxPrecursorIonCharge;
             set => Options.MaxPrecursorIonCharge = value;
         }
 
         /// <remarks>default 2000</remarks>
         [Obsolete("Use options!", true)]
-        public double MinSequenceMass { get => Options.MinSequenceMass;
+        public double MinSequenceMass
+        {
+            get => Options.MinSequenceMass;
             set => Options.MinSequenceMass = value;
         }
 
         /// <remarks>default 50000</remarks>
         [Obsolete("Use options!", true)]
-        public double MaxSequenceMass { get => Options.MaxSequenceMass;
+        public double MaxSequenceMass
+        {
+            get => Options.MaxSequenceMass;
             set => Options.MaxSequenceMass = value;
         }
 
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int MinProductIonCharge { get => Options.MinProductIonCharge;
+        public int MinProductIonCharge
+        {
+            get => Options.MinProductIonCharge;
             set => Options.MinProductIonCharge = value;
         }
 
         /// <remarks>default 20</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxProductIonCharge { get => Options.MaxProductIonCharge;
+        public int MaxProductIonCharge
+        {
+            get => Options.MaxProductIonCharge;
             set => Options.MaxProductIonCharge = value;
         }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public Tolerance PrecursorIonTolerance { get => Options.PrecursorIonTolerance;
+        public Tolerance PrecursorIonTolerance
+        {
+            get => Options.PrecursorIonTolerance;
             set => Options.PrecursorIonTolerance = value;
         }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public Tolerance ProductIonTolerance { get => Options.ProductIonTolerance;
+        public Tolerance ProductIonTolerance
+        {
+            get => Options.ProductIonTolerance;
             set => Options.ProductIonTolerance = value;
         }
 
         /// <remarks>default true
         /// true: target and decoy, false: target only, null: decoy only</remarks>
         [Obsolete("Use options!", true)]
-        public bool? RunTargetDecoyAnalysisBool { get => Options.RunTargetDecoyAnalysisBool;
+        public bool? RunTargetDecoyAnalysisBool
+        {
+            get => Options.RunTargetDecoyAnalysisBool;
             set => Options.RunTargetDecoyAnalysisBool = value;
         }
 
         /// <remarks>default Both</remarks>
         [Obsolete("Use options!", true)]
-        public DatabaseSearchMode RunTargetDecoyAnalysis { get => Options.TargetDecoySearchMode;
+        public DatabaseSearchMode RunTargetDecoyAnalysis
+        {
+            get => Options.TargetDecoySearchMode;
             set => Options.TargetDecoySearchMode = value;
         }
 
         [Obsolete("Use options!", true)]
-        public bool TagBasedSearch { get => Options.TagBasedSearch;
+        public bool TagBasedSearch
+        {
+            get => Options.TagBasedSearch;
             set => Options.TagBasedSearch = value;
         }
 
@@ -185,31 +217,41 @@ namespace InformedProteomics.TopDown.Execution
         /// Specific MS2 scan numbers to process
         /// </summary>
         [Obsolete("Use options!", true)]
-        public IEnumerable<int> ScanNumbers { get => Options.ScanNumbers;
+        public IEnumerable<int> ScanNumbers
+        {
+            get => Options.ScanNumbers;
             set => Options.ScanNumbers = value;
         }
 
         /// <remarks>default 3</remarks>
         [Obsolete("Use options!", true)]
-        public int NumMatchesPerSpectrum { get => Options.NumMatchesPerSpectrum;
+        public int NumMatchesPerSpectrum
+        {
+            get => Options.NumMatchesPerSpectrum;
             set => Options.NumMatchesPerSpectrum = value;
         }
 
         /// <remarks>default 4</remarks>
         [Obsolete("Use options!", true)]
-        public int MaxNumThreads { get => Options.MaxNumThreads;
+        public int MaxNumThreads
+        {
+            get => Options.MaxNumThreads;
             set => Options.MaxNumThreads = value;
         }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public double PrecursorIonTolerancePpm { get => Options.PrecursorIonTolerancePpm;
+        public double PrecursorIonTolerancePpm
+        {
+            get => Options.PrecursorIonTolerancePpm;
             set => Options.PrecursorIonTolerancePpm = value;
         }
 
         /// <remarks>default 10 ppm</remarks>
         [Obsolete("Use options!", true)]
-        public double ProductIonTolerancePpm { get => Options.ProductIonTolerancePpm;
+        public double ProductIonTolerancePpm
+        {
+            get => Options.ProductIonTolerancePpm;
             set => Options.ProductIonTolerancePpm = value;
         }
 
@@ -220,13 +262,17 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <remarks>default 1</remarks>
         [Obsolete("Use options!", true)]
-        public int SearchModeInt { get => Options.SearchModeInt;
+        public int SearchModeInt
+        {
+            get => Options.SearchModeInt;
             set => Options.SearchModeInt = value;
         }
 
         /// <remarks>default SingleInternalCleavage</remarks>
         [Obsolete("Use options!", true)]
-        public InternalCleavageType SearchMode { get => Options.InternalCleavageMode;
+        public InternalCleavageType SearchMode
+        {
+            get => Options.InternalCleavageMode;
             set => Options.InternalCleavageMode = value;
         }
 

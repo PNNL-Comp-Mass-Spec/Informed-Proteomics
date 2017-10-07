@@ -22,13 +22,13 @@ namespace InformedProteomics.TopDown.Scoring
             ActivationMethod = activationMethod;
         }
 
-        public LcMsRun Run { get; private set; }
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public int MinProductCharge { get; private set; }
-        public int MaxProductCharge { get; private set; }
-        public Tolerance Tolerance { get; private set; }
-        public double Ms2CorrThreshold { get; private set; }
-        public ActivationMethod ActivationMethod { get; private set; }
+        public LcMsRun Run { get; }
+        public AminoAcidSet AminoAcidSet { get; }
+        public int MinProductCharge { get; }
+        public int MaxProductCharge { get; }
+        public Tolerance Tolerance { get; }
+        public double Ms2CorrThreshold { get; }
+        public ActivationMethod ActivationMethod { get; }
 
         public IcScores GetScores(Sequence sequence, int parentIoncharge, int ms2ScanNum)
         {
