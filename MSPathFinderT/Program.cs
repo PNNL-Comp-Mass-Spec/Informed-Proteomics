@@ -72,6 +72,10 @@ namespace MSPathFinderT
                     parameters.Write();
 
                     var topDownLauncher = new IcTopDownLauncher(parameters);
+                    topDownLauncher.ErrorEvent += TopDownLauncher_ErrorEvent;
+                    topDownLauncher.WarningEvent += TopDownLauncher_WarningEvent;
+                    topDownLauncher.StatusEvent += TopDownLauncher_StatusEvent;
+                    topDownLauncher.ProgressUpdate += TopDownLauncher_ProgressUpdate;
 
                     var success = topDownLauncher.RunSearch();
 
@@ -127,5 +131,26 @@ namespace MSPathFinderT
 
                 return errorCode;
         }
+
+        private static void TopDownLauncher_ProgressUpdate(string progressMessage, float percentComplete)
+        {
+            Console.WriteLine(progressMessage);
+        }
+
+        private static void TopDownLauncher_StatusEvent(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        private static void TopDownLauncher_ErrorEvent(string message, Exception ex)
+        {
+            ConsoleMsgUtils.ShowError(message, ex);
+        }
+
+        private static void TopDownLauncher_WarningEvent(string message)
+        {
+            ConsoleMsgUtils.ShowWarning("Warning: " + message);
+        }
+
     }
 }
