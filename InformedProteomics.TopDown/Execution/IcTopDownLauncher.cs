@@ -1033,6 +1033,12 @@ namespace InformedProteomics.TopDown.Execution
 
                         var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
 
+                        if (scores == null)
+                        {
+                            ReportWarning("scores is null for index " + matchIndex + " in scan " + scanNum);
+                            continue;
+                        }
+
                         match.ModificationText = scores.Modifications;
 
                         //double s1 = scores.Score, s2;
