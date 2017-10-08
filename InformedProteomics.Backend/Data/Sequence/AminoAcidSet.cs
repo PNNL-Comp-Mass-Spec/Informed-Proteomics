@@ -364,8 +364,8 @@ namespace InformedProteomics.Backend.Data.Sequence
         #endregion
 
         private static readonly IEnumerable<SequenceLocation> AllSequenceLocations;
-        private readonly static Dictionary<SequenceLocation, char> SequenceLocationToLocationResidue;
-        private readonly static Dictionary<SequenceLocation, IEnumerable<SequenceLocation>> AffectedLocations;
+        private static readonly Dictionary<SequenceLocation, char> SequenceLocationToLocationResidue;
+        private static readonly Dictionary<SequenceLocation, IEnumerable<SequenceLocation>> AffectedLocations;
 
         static AminoAcidSet()
         {

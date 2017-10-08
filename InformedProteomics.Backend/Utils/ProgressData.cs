@@ -57,6 +57,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// The current percent progress of the task. Updated using <see cref="Report(double,string)"/> or variants
         /// </summary>
+        /// <remarks>Value between 0 and 100</remarks>
         public double Percent
         {
             get
