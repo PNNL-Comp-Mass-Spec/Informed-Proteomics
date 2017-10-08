@@ -290,7 +290,9 @@ namespace InformedProteomics.TopDown.Execution
 
         public void PrintOverallProgressReport(object searchObj)
         {
-            var searchClass = (IcTopDownLauncher)searchObj;
+            if (!(searchObj is IcTopDownLauncher searchClass))
+                return;
+
             var progData = searchClass.searchProgressData;
             var timeElapsed = searchClass.searchStopwatch.Elapsed;
             var minutes = timeElapsed.TotalMinutes - ((int) timeElapsed.TotalHours * 60);

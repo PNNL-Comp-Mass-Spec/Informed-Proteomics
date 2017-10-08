@@ -32,23 +32,23 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IcScores GetScores(Sequence sequence, int parentIoncharge, int ms2ScanNum)
         {
-            double score;
-            int nMatchedFragments;
-            GetCompositeScores(sequence, parentIoncharge, ms2ScanNum, out score, out nMatchedFragments);
+            GetCompositeScores(sequence, parentIoncharge, ms2ScanNum, out var score, out var nMatchedFragments);
             return new IcScores(nMatchedFragments, score, sequence.GetModificationString());
         }
 
         public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
-            var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            if (spec == null) return null;
+            if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                return null;
+
             return GetScores(spec, seqStr, composition, charge, ms2ScanNum);
         }
 
         public IcScores GetIcScores(IInformedScorer informedScorer, IScorer scorer, string seqStr, Composition composition)
         {
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return null;
+            if (seqGraph == null)
+                return null;
 
             var bestScore = double.NegativeInfinity;
             Tuple<double, string> bestScoreAndModifications = null;
@@ -73,7 +73,7 @@ namespace InformedProteomics.TopDown.Scoring
             if (bestScoreAndModifications == null) return null;
 
             var modifications = bestScoreAndModifications.Item2;
-            var sequence = Sequence.CreateSequence(seqStr, modifications, this.AminoAcidSet);
+            var sequence = Sequence.CreateSequence(seqStr, modifications, AminoAcidSet);
             var numMatchedFragments = informedScorer.GetNumMatchedFragments(sequence);
             var score = informedScorer.GetUserVisibleScore(sequence);
 
@@ -112,10 +112,7 @@ namespace InformedProteomics.TopDown.Scoring
             var modifications = bestScoreAndModifications.Item2;
             var seqObj = Sequence.CreateSequence(seqStr, modifications, AminoAcidSet);
 
-            double score;
-            int nMatchedFragments;
-
-            GetCompositeScores(seqObj, charge, ms2ScanNum, out score, out nMatchedFragments);
+            GetCompositeScores(seqObj, charge, ms2ScanNum, out var score, out var nMatchedFragments);
             return new IcScores(nMatchedFragments, score, modifications);
         }
 
@@ -124,8 +121,8 @@ namespace InformedProteomics.TopDown.Scoring
             score = 0d;
             nMatchedFragments = 0;
 
-            var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            if (spec == null) return;
+            if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                return;
 
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
@@ -136,9 +133,7 @@ namespace InformedProteomics.TopDown.Scoring
 
             foreach (var c in cleavages)
             {
-                bool prefixHit;
-                bool suffixHit;
-                score += scorer.GetFragmentScore(c.PrefixComposition, c.SuffixComposition, out prefixHit, out suffixHit);
+                score += scorer.GetFragmentScore(c.PrefixComposition, c.SuffixComposition, out var prefixHit, out var suffixHit);
 
                 nMatchedFragments += (prefixHit) ? 1 : 0;
                 nMatchedFragments += (suffixHit) ? 1 : 0;
