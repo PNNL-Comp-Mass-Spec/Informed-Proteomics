@@ -866,7 +866,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 if (matches[ms2ScanNum] == null)
                 {
-                    matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> {prsm};
+                    matches[ms2ScanNum] = new SortedSet<DatabaseSequenceSpectrumMatch> { prsm };
                 }
                 else // already exists
                 {
@@ -970,7 +970,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 currentTask = "Rescore and Estimate #proteins for GF calculation";
 
-                foreach(var scanNum in _ms2ScanNums)
+                foreach (var scanNum in _ms2ScanNums)
                 {
                     var prsms = sortedMatches[scanNum];
                     if (prsms == null) continue;
@@ -981,8 +981,9 @@ namespace InformedProteomics.TopDown.Execution
                     if (spec.Peaks.Length == 0)
                         continue;
 
-                    currentTask = "Check prmsms in scan " + scanNum;
+                    currentTask = "Looping over prmsms for scan " + scanNum;
 
+                    var matchIndex = 0;
                     foreach (var match in prsms)
                     {
                         //if (CompositeScorer.GetProbability(match.Score) < CompositeScorer.ProbabilityCutoff)
@@ -990,12 +991,39 @@ namespace InformedProteomics.TopDown.Execution
                         //    continue;
                         //}
 
+                        if (match == null)
+                        {
+                            ReportError("Match is null for index " + matchIndex + " in scan " + scanNum);
+                            continue;
+                        }
+
                         var ion = match.Ion;
+
+                        if (ion == null)
+                        {
+                            ReportError("Ion is null for index " + matchIndex + " in scan " + scanNum);
+                            continue;
+                        }
 
                         // Re-scoring
                         //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
                         //if (scores == null) continue;
-                        var scorer = _ms2ScorerFactory2.GetScorer(_run.GetSpectrum(match.ScanNum) as ProductSpectrum, ion.Composition.Mass, ion.Charge, Options.ActivationMethod);
+
+                        var productSpectrum = _run.GetSpectrum(match.ScanNum) as ProductSpectrum;
+                        if (productSpectrum == null)
+                        {
+                            ReportError("productSpectrum is null for index " + matchIndex + " in scan " + scanNum);
+                            continue;
+                        }
+
+                        var ionComposition = ion.Composition;
+                        if (ionComposition == null)
+                        {
+                            ReportError("ionComposition is null for index " + matchIndex + ", match " + match + " in scan " + scanNum);
+                            continue;
+                        }
+
+                        var scorer = _ms2ScorerFactory2.GetScorer(productSpectrum, ionComposition.Mass, ion.Charge, Options.ActivationMethod);
 
                         if (!(scorer is IInformedScorer informedScorer))
                         {
@@ -1019,12 +1047,17 @@ namespace InformedProteomics.TopDown.Execution
                         if (match.Score > 0.25 * informedScorer.ScoreCutOff)
                         //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
                         {
-                            if (matches[scanNum] == null) matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
+                            if (matches[scanNum] == null)
+                                matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
+
                             matches[scanNum].AddLast(match);
                         }
+
+                        matchIndex++;
                     }
 
-                    if (matches[scanNum] != null) estimatedSequences += matches[scanNum].Count;
+                    if (matches[scanNum] != null)
+                        estimatedSequences += matches[scanNum].Count;
                 }
 
                 currentTask = "Parallel.ForEach";
@@ -1089,12 +1122,12 @@ namespace InformedProteomics.TopDown.Execution
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                     }
-            }
-            catch (Exception ex)
-            {
-                ReportError(string.Format("Exception while {0} in RunGeneratingFunction: {1}", currentTask, ex.Message), ex);
-            }
-        });
+                }
+                catch (Exception ex)
+                {
+                    ReportError(string.Format("Exception while {0} in RunGeneratingFunction: {1}", currentTask, ex.Message), ex);
+                }
+            });
 
             var finalMatches = new DatabaseSequenceSpectrumMatch[matches.Length];
             foreach (var scanNum in scanNums)
