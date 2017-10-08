@@ -288,14 +288,17 @@ namespace InformedProteomics.TopDown.Execution
         private Stopwatch searchStopwatch;
         private Timer progReportTimer;
 
-        public void PrintOverallProgressReport(object searchObj)
+        private void ReportOverallProgress(object searchObj)
         {
             if (!(searchObj is IcTopDownLauncher searchClass))
                 return;
 
             var progData = searchClass.searchProgressData;
             var timeElapsed = searchClass.searchStopwatch.Elapsed;
-            var minutes = timeElapsed.TotalMinutes - ((int) timeElapsed.TotalHours * 60);
+            var minutes = timeElapsed.TotalMinutes - ((int)timeElapsed.TotalHours * 60);
+
+            var progMsg = string.Format("Total Progress: {0:F2}%, {1}d {2}h {3:F2}m elapsed, Current Task: {4}",
+                progData.Percent, timeElapsed.Days, timeElapsed.Hours, minutes, progData.Status);
 
             OnProgressUpdate(progMsg, (float)progData.Percent);
         }
@@ -319,8 +322,9 @@ namespace InformedProteomics.TopDown.Execution
             searchStopwatch = swAll;
             swAll.Start();
             ErrorMessage = string.Empty;
-            // Output a progress report every 5 minutes...
-            progReportTimer = new Timer(PrintOverallProgressReport, this, 0, 1000 * 60 * 5);
+
+            // Output a progress message every 5 minutes...
+            progReportTimer = new Timer(ReportOverallProgress, this, 0, 1000 * 60 * 5);
 
             if (string.Equals(Path.GetExtension(Options.SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
                 UpdateStatus("Reading pbf file...", progData);
@@ -563,7 +567,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private List<DatabaseSearchResultData> RunDatabaseSearch(FastaDatabase searchDb, string outputFilePath, ISequenceFilter ms1Filter, string searchModeString, IProgress<ProgressData> progress)
         {
-            var progressData = new ProgressData(progress);
+            var progData = new ProgressData(progress);
             var sw = new Stopwatch();
             var searchModeStringCap = char.ToUpper(searchModeString[0]) + searchModeString.Substring(1);
 
@@ -576,7 +580,7 @@ namespace InformedProteomics.TopDown.Execution
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
             var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
-            progressData.StepRange(50);
+            progData.StepRange(50);
             if (Options.TagBasedSearch)
             {
                 UpdateStatus(string.Format("Tag-based searching the {0} database", searchModeString), progData);
@@ -584,21 +588,21 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Start();
                 var progTag = new Progress<ProgressData>(p =>
                 {
-                    progressData.StatusInternal = p.Status;
-                    progressData.Report(p.Percent);
+                    progData.StatusInternal = p.Status;
+                    progData.Report(p.Percent);
                 });
                 RunTagBasedSearch(matches, searchDb, null, progTag);
                 OnStatusEvent(string.Format("{1} database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap));
             }
-            progressData.StepRange(100);
+            progData.StepRange(100);
 
+            UpdateStatus(string.Format("Searching the {0} database", searchModeString), progData);
             sw.Reset();
-            Console.WriteLine(@"Searching the {0} database", searchModeString);
             sw.Start();
             var prog = new Progress<ProgressData>(p =>
             {
-                progressData.StatusInternal = p.Status;
-                progressData.Report(p.Percent);
+                progData.StatusInternal = p.Status;
+                progData.Report(p.Percent);
             });
             RunSearch(matches, searchDb, ms1Filter, null, prog);
             OnStatusEvent(string.Format("{1} database search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap));
