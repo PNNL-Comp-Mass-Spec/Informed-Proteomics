@@ -208,49 +208,55 @@ namespace InformedProteomics.FeatureFinding
             Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
 
-            // write result files
-            var tsvWriter = new StreamWriter(ms1FeaturesFilePath);
-            tsvWriter.WriteLine(GetHeaderString(Parameters.ScoreReport));
+            var featureId = 0;
 
-            StreamWriter csvWriter = null;
+            Stream csvStream = new MemoryStream();
             if (Parameters.CsvOutput)
             {
-                csvWriter = new StreamWriter(outCsvFilePath);
-                csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
+                csvStream = new FileStream(outCsvFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             }
-
-            var filteredFeatures = container.GetFilteredFeatures(featureFinder);
-            var featureId = 0;
-            foreach (var feature in filteredFeatures)
+            // write result files
+            using (var tsvWriter = new StreamWriter(ms1FeaturesFilePath))
+            using (var csvWriter = new StreamWriter(csvStream))
             {
-                featureId++;
-                tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature, Parameters.ScoreReport));
+                tsvWriter.WriteLine(GetHeaderString(Parameters.ScoreReport));
 
-                var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
-
-                if (csvWriter != null)
+                if (Parameters.CsvOutput)
                 {
-                    foreach (var envelope in feature.EnumerateEnvelopes())
-                    {
-                        //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
-                        var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                        if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
+                    csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
+                }
 
-                        var fitscore = 1.0 - feature.BestCorrelationScore;
-                        csvWriter.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance, mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureId));
+                var filteredFeatures = container.GetFilteredFeatures(featureFinder);
+                foreach (var feature in filteredFeatures)
+                {
+                    featureId++;
+                    tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature, Parameters.ScoreReport));
+
+                    var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
+
+                    if (Parameters.CsvOutput)
+                    {
+                        foreach (var envelope in feature.EnumerateEnvelopes())
+                        {
+                            //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
+                            var mostAbuPeak = envelope.Peaks[mostAbuIdx];
+                            if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
+
+                            var fitscore = 1.0 - feature.BestCorrelationScore;
+                            csvWriter.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
+                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureId));
+                        }
                     }
                 }
             }
-            tsvWriter.Close();
 
             Console.WriteLine(@"Complete feature filtration");
             Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of filtered features = {0}", featureId);
             Console.WriteLine(@" - ProMex output: {0}", ms1FeaturesFilePath);
 
-            if (csvWriter != null)
+            if (Parameters.CsvOutput)
             {
-                csvWriter.Close();
                 Console.WriteLine(@" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
             }
 
