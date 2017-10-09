@@ -6,6 +6,7 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SearchResults;
@@ -144,6 +145,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 // MS-GF+ similarity: find/add isotope error?
                 // MS-GF+ similarity: find/add assumed dissociation method?
+                //specIdent.UserParams.Add(new UserParamObj() {Name = "Assumed Dissociation Method", Value = match.});
             }
 
             var identData = creator.GetIdentData();
@@ -174,6 +176,14 @@ namespace InformedProteomics.TopDown.Execution
                 new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = options.NumMatchesPerSpectrum.ToString() },
                 new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() },
             });
+
+            var activationMethod = options.ActivationMethod.ToString();
+            if (options.ActivationMethod == ActivationMethod.Unknown)
+            {
+                activationMethod = $"Determined By Spectrum ({options.ActivationMethod})";
+            }
+            settings.AdditionalSearchParams.Items.Add(new UserParamObj() { Name = "SpecifiedActivationMethod", Value = activationMethod });
+
             // Add search type, if not a target-deacoy search
             if (options.TargetDecoySearchMode != DatabaseSearchMode.Both)
             {

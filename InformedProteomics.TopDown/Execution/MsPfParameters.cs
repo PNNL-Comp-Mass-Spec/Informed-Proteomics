@@ -309,6 +309,7 @@ namespace InformedProteomics.TopDown.Execution
                 writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
                 writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
                 writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
+                writer.WriteLine("ActivationMethod\t" + ActivationMethod);
                 writer.WriteLine("MaxDynamicModificationsPerSequence\t" + MaxDynamicModificationsPerSequence);
                 foreach (var searchMod in Modifications)
                 {
@@ -409,7 +410,7 @@ namespace InformedProteomics.TopDown.Execution
                         param.Modifications.AddRange(ModFileParser.ParseModification(parts[1]));
                         break;
                     case "ActivationMethod":
-                        param.ActivationMethod = (ActivationMethod)Convert.ToInt32(parts[1]);
+                        param.ActivationMethod = (ActivationMethod)Enum.Parse(typeof(ActivationMethod), parts[1]);
                         break;
                 }
             }
