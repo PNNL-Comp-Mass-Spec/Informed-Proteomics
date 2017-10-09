@@ -41,7 +41,7 @@ namespace InformedProteomics.TopDown.Execution
             var searchDb = creator.AddSearchDatabase(database.GetFastaFilePath(), database.GetNumEntries(), Path.GetFileNameWithoutExtension(database.GetFastaFilePath()), CV.CVID.CVID_Unknown,
                 CV.CVID.MS_FASTA_format);
 
-            if (options.TargetDecoySearchMode == DatabaseSearchMode.Both)
+            if (options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy))
             {
                 searchDb.CVParams.AddRange(new CVParamObj[]
                 {
@@ -174,6 +174,11 @@ namespace InformedProteomics.TopDown.Execution
                 new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = options.NumMatchesPerSpectrum.ToString() },
                 new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() },
             });
+            // Add search type, if not a target-deacoy search
+            if (options.TargetDecoySearchMode != DatabaseSearchMode.Both)
+            {
+                settings.AdditionalSearchParams.Items.Add(new UserParamObj() { Name = "SearchType", Value = options.TargetDecoySearchMode.ToString() });
+            }
 
             // Get the search modifications as they were passed into the AminoAcidSet constructor...
             foreach (var mod in options.AminoAcidSet.SearchModifications)

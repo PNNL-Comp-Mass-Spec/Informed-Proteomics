@@ -550,6 +550,23 @@ namespace InformedProteomics.TopDown.Execution
                 var mzidWriter = new MzidResultsWriter(targetDb, _run, Options);
                 mzidWriter.WriteResultsToMzid(fdrCalculator.FilteredResults, mzidOutputFilePath);
             }
+            else
+            {
+                var results = targetSearchResults;
+                var filePath = targetOutputFilePath;
+                if (!Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target))
+                {
+                    results = decoySearchResults;
+                    filePath = decoyOutputFilePath;
+                }
+                if (results == null)
+                {
+                    results = DatabaseSearchResultData.ReadResultsFromFile(filePath);
+                }
+
+                var mzidWriter = new MzidResultsWriter(targetDb, _run, Options);
+                mzidWriter.WriteResultsToMzid(results, mzidOutputFilePath);
+            }
             progData.Report(100.0);
 
             OnStatusEvent("Done.");
