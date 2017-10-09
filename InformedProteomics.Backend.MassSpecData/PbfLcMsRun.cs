@@ -1145,7 +1145,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // ms level: 1
             writer.Write(Convert.ToByte(spec.MsLevel));
 
-            // elution time: 4
+            // elution time: 8
             writer.Write(spec.ElutionTime);
 
             // Total Ion Current: 4
