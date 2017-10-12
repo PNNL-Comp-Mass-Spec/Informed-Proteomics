@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using CsvHelper;
+using CsvHelper.Configuration;
 using InformedProteomics.Backend.Data.Sequence;
 using PRISM;
 using PSI_Interface.IdentData;
@@ -172,290 +175,7 @@ namespace InformedProteomics.Backend.SearchResults
             HasTdaScores = false;
         }
 
-        /// <summary>
-        /// Construct using a string from a tsv file input
-        /// </summary>
-        /// <param name="line"></param>
-        public DatabaseSearchResultData(string line)
-            : this()
-        {
-            ParseTsvLine(line);
-        }
-
-        /// <summary>
-        /// Header string for default TSV output, without FDR scores
-        /// </summary>
-        public const string TsvHeaderString = "Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
-                                              "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\tMs1Features\t#MatchedFragments\tProbability\tSpecEValue\tEValue";
-
-        /// <summary>
-        /// Format string for default TSV output, without FDR scores
-        /// </summary>
-        public const string TsvFormatString = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}\t{16}\t{17}\t{18}";
-
-        /// <summary>
-        /// Header string for default TSV output, with FDR scores
-        /// </summary>
-        public const string TdaTsvHeaderString = TsvHeaderString + "\tQValue\tPepQValue";
-
-        /// <summary>
-        /// Format string for default TSV output, with FDR scores
-        /// </summary>
-        public const string TdaTsvFormatString = TsvFormatString + "\t{19}\t{20}";
-
-        /// <summary>
-        /// Get the header string for default TSV output, with columns added for FDR scores if addTdaScores is true
-        /// </summary>
-        /// <param name="addTdaScores"></param>
-        /// <returns></returns>
-        public static string GetHeaderString(bool addTdaScores = false)
-        {
-            return addTdaScores ? TdaTsvHeaderString : TsvHeaderString;
-        }
-
-        /// <summary>
-        /// Create a TSV format string from this object
-        /// </summary>
-        /// <param name="addTdaScores">True to add FDR results (QValue and PepQValue) to the output</param>
-        /// <returns></returns>
-        public string TsvFormattedString(bool addTdaScores = false)
-        {
-            var format = TsvFormatString;
-            if (addTdaScores)
-            {
-                format = TdaTsvFormatString;
-            }
-            return String.Format(format,
-                ScanNum,
-                Pre,                  // Pre
-                Sequence,             // Sequence
-                Post,                 // Post
-                Modifications,        // Modifications
-                Composition,          // Composition
-                ProteinName,          // ProteinName
-                ProteinDescription,   // ProteinDescription
-                ProteinLength,        // ProteinLength
-                Start,                // Start position in protein
-                End,                  // End position in protein
-                Charge,               // precursorCharge
-                StringUtilities.DblToString(MostAbundantIsotopeMz, 9, true), // MostAbundantIsotopeMz
-                StringUtilities.DblToString(Mass, 9, true),                  // Mass
-                Ms1Feature,
-                NumMatchedFragments,                                         // (Number of matched fragments)
-                StringUtilities.DblToString(Probability, 4),                 // Probability
-                StringUtilities.DblToString(Math.Max(SmallestValueExcel, SpecEValue), 6, true, 0.001), // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
-                StringUtilities.DblToString(Math.Max(SmallestValueExcel, EValue), 6, true, 0.001),     // EValue; will be displayed using scientific notation if the value is less than 0.001
-                StringUtilities.DblToString(QValue, 7),
-                StringUtilities.DblToString(PepQValue, 7)
-            );
-        }
-
         private const double SmallestValueExcel = 9.99E-308;
-
-        private static string lastSetHeaderLine = "";
-        private static int scanNumIndex = 0;
-        private static int preIndex = 1;
-        private static int sequenceIndex = 2;
-        private static int postIndex = 3;
-        private static int modificationsIndex = 4;
-        private static int compositionIndex = 5;
-        private static int proteinNameIndex = 6;
-        private static int proteinDescriptionIndex = 7;
-        private static int proteinLengthIndex = 8;
-        private static int startIndex = 9;
-        private static int endIndex = 10;
-        private static int chargeIndex = 11;
-        private static int mostAbundantIsotopeMzIndex = 12;
-        private static int massIndex = 13;
-        private static int ms1FeaturesIndex = 14;
-        private static int numMatchedFragmentsIndex = 15;
-        private static int probabilityIndex = 16;
-        private static int specEValueIndex = 17;
-        private static int eValueIndex = 18;
-        private static int qValueIndex = 19;
-        private static int pepQValueIndex = 20;
-
-        /// <summary>
-        /// Set the file header string for a file that will be read in
-        /// </summary>
-        /// <param name="headerLine"></param>
-        public static void SetInputFileHeader(string headerLine)
-        {
-            if (string.IsNullOrWhiteSpace(headerLine))
-            {
-                return;
-            }
-            if (!string.IsNullOrWhiteSpace(lastSetHeaderLine) && headerLine.EndsWith(lastSetHeaderLine))
-            {
-                return;
-            }
-            var tokens = headerLine.Split('\t');
-            for (var i = 0; i < tokens.Length; i++)
-            {
-                switch (tokens[i])
-                {
-                    case "Scan":
-                        scanNumIndex = i;
-                        break;
-                    case "Pre":
-                        preIndex = i;
-                        break;
-                    case "Sequence":
-                        sequenceIndex = i;
-                        break;
-                    case "Post":
-                        postIndex = i;
-                        break;
-                    case "Modifications":
-                        modificationsIndex = i;
-                        break;
-                    case "Composition":
-                        compositionIndex = i;
-                        break;
-                    case "ProteinName":
-                        proteinNameIndex = i;
-                        break;
-                    case "ProteinDesc":
-                        proteinDescriptionIndex = i;
-                        break;
-                    case "ProteinLength":
-                        proteinLengthIndex = i;
-                        break;
-                    case "Start":
-                        startIndex = i;
-                        break;
-                    case "End":
-                        endIndex = i;
-                        break;
-                    case "Charge":
-                        chargeIndex = i;
-                        break;
-                    case "MostAbundantIsotopeMz":
-                        mostAbundantIsotopeMzIndex = i;
-                        break;
-                    case "Mass":
-                        massIndex = i;
-                        break;
-                    case "Ms1Features":
-                        ms1FeaturesIndex = i;
-                        break;
-                    case "#MatchedFragments":
-                        numMatchedFragmentsIndex = i;
-                        break;
-                    case "Probability":
-                        probabilityIndex = i;
-                        break;
-                    case "SpecEValue":
-                        specEValueIndex = i;
-                        break;
-                    case "EValue":
-                        eValueIndex = i;
-                        break;
-                    case "QValue":
-                        qValueIndex = i;
-                        break;
-                    case "PepQValue":
-                        pepQValueIndex = i;
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parse a string from a tsv file input
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="headerLine"></param>
-        public void ParseTsvLine(string line, string headerLine = null)
-        {
-            SetInputFileHeader(headerLine);
-            var tokens = line.Split('\t');
-
-            if (tokens.Length > scanNumIndex)
-            {
-                ScanNum = int.Parse(tokens[scanNumIndex]);
-            }
-            if (tokens.Length > preIndex)
-            {
-                Pre = tokens[preIndex];
-            }
-            if (tokens.Length > sequenceIndex)
-            {
-                Sequence = tokens[sequenceIndex];
-            }
-            if (tokens.Length > postIndex)
-            {
-                Post = tokens[postIndex];
-            }
-            if (tokens.Length > modificationsIndex)
-            {
-                Modifications = tokens[modificationsIndex];
-            }
-            if (tokens.Length > compositionIndex)
-            {
-                Composition = tokens[compositionIndex];
-            }
-            if (tokens.Length > proteinNameIndex)
-            {
-                ProteinName = tokens[proteinNameIndex];
-            }
-            if (tokens.Length > proteinDescriptionIndex)
-            {
-                ProteinDescription = tokens[proteinDescriptionIndex];
-            }
-            if (tokens.Length > proteinLengthIndex)
-            {
-                ProteinLength = int.Parse(tokens[proteinLengthIndex]);
-            }
-            if (tokens.Length > startIndex)
-            {
-                Start = int.Parse(tokens[startIndex]);
-            }
-            if (tokens.Length > endIndex)
-            {
-                End = int.Parse(tokens[endIndex]);
-            }
-            if (tokens.Length > chargeIndex)
-            {
-                Charge = int.Parse(tokens[chargeIndex]);
-            }
-            if (tokens.Length > mostAbundantIsotopeMzIndex)
-            {
-                MostAbundantIsotopeMz = double.Parse(tokens[mostAbundantIsotopeMzIndex]);
-            }
-            if (tokens.Length > massIndex)
-            {
-                Mass = double.Parse(tokens[massIndex]);
-            }
-            if (tokens.Length > ms1FeaturesIndex)
-            {
-                Ms1Feature = Convert.ToInt32(tokens[ms1FeaturesIndex]);
-            }
-            if (tokens.Length > numMatchedFragmentsIndex)
-            {
-                NumMatchedFragments = int.Parse(tokens[numMatchedFragmentsIndex]);
-            }
-            if (tokens.Length > probabilityIndex)
-            {
-                Probability = double.Parse(tokens[probabilityIndex]);
-            }
-            if (tokens.Length > specEValueIndex)
-            {
-                SpecEValue = double.Parse(tokens[specEValueIndex]);
-            }
-            if (tokens.Length > eValueIndex)
-            {
-                EValue = double.Parse(tokens[eValueIndex]);
-            }
-            if (tokens.Length > qValueIndex)
-            {
-                QValue = double.Parse(tokens[qValueIndex]);
-            }
-            if (tokens.Length > pepQValueIndex)
-            {
-                PepQValue = double.Parse(tokens[pepQValueIndex]);
-            }
-        }
 
         /// <summary>
         /// Write the resultData in TSV format to the specified path, possibly including FDR scores
@@ -465,13 +185,18 @@ namespace InformedProteomics.Backend.SearchResults
         /// <param name="includeTdaScores">If FDR scores should be output also</param>
         public static void WriteResultsToFile(string filePath, IEnumerable<DatabaseSearchResultData> resultData, bool includeTdaScores = false)
         {
-            using (var stream = new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))))
             {
-                stream.WriteLine(GetHeaderString(includeTdaScores));
-                foreach (var result in resultData)
+                SetCsvWriterConfig(tsv.Configuration);
+                if (includeTdaScores)
                 {
-                    stream.WriteLine(result.TsvFormattedString(includeTdaScores));
+                    tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
                 }
+                else
+                {
+                    tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+                }
+                tsv.WriteRecords(resultData);
             }
         }
 
@@ -482,24 +207,30 @@ namespace InformedProteomics.Backend.SearchResults
         /// <returns></returns>
         public static List<DatabaseSearchResultData> ReadResultsFromFile(string filePath)
         {
-            var results = new List<DatabaseSearchResultData>();
+            List<DatabaseSearchResultData> results;
             using (var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                string line;
-                var isFirstLine = true;
-                while (!stream.EndOfStream && (line = stream.ReadLine()) != null)
+                // check for QValue header, to determine the mapping used for reading
+                var hasTda = false;
+                var line = stream.ReadLine();
+                if (!string.IsNullOrWhiteSpace(line) && line.ToLower().Contains("qvalue"))
                 {
-                    if (isFirstLine)
+                    hasTda = true;
+                }
+                stream.BaseStream.Seek(0, SeekOrigin.Begin);
+                stream.DiscardBufferedData();
+                using (var tsv = new CsvReader(stream))
+                {
+                    SetCsvReaderConfig(tsv.Configuration);
+                    if (hasTda)
                     {
-                        isFirstLine = false;
-                        if (!int.TryParse(line.Substring(0, 1), out _))
-                        {
-                            SetInputFileHeader(line);
-                            continue;
-                        }
+                        tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
                     }
-
-                    results.Add(new DatabaseSearchResultData(line));
+                    else
+                    {
+                        tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+                    }
+                    results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
                 }
             }
             if (results.Count == 0)
@@ -507,6 +238,66 @@ namespace InformedProteomics.Backend.SearchResults
                 return null;
             }
             return results;
+        }
+
+        private static void SetCsvReaderConfig(IReaderConfiguration config)
+        {
+            config.Delimiter = "\t";
+            config.PrepareHeaderForMatch = header => header?.Trim().ToLower();
+            config.HeaderValidated = null;
+            config.MissingFieldFound = null;
+            //config.BadDataFound = null;
+            config.Comment = '#';
+            config.AllowComments = true;
+        }
+
+        private static void SetCsvWriterConfig(IWriterConfiguration config)
+        {
+            config.Delimiter = "\t";
+            config.Comment = '#';
+            config.AllowComments = true;
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private class DatabaseSearchResultDataMap : ClassMap<DatabaseSearchResultData>
+        {
+            protected int ColumnCount;
+
+            // ReSharper disable once MemberCanBeProtected.Local
+            public DatabaseSearchResultDataMap()
+            {
+                ColumnCount = 0;
+                Map(x => x.ScanNum).Index(ColumnCount++).Name("Scan");
+                Map(x => x.Pre).Index(ColumnCount++).Name("Pre");                                                                                                                          // Pre
+                Map(x => x.Sequence).Index(ColumnCount++).Name("Sequence");                                                                                                                // Sequence
+                Map(x => x.Post).Index(ColumnCount++).Name("Post");                                                                                                                        // Post
+                Map(x => x.Modifications).Index(ColumnCount++).Name("Modifications");                                                                                                      // Modifications
+                Map(x => x.Composition).Index(ColumnCount++).Name("Composition");                                                                                                          // Composition
+                Map(x => x.ProteinName).Index(ColumnCount++).Name("ProteinName");                                                                                                          // ProteinName
+                Map(x => x.ProteinDescription).Index(ColumnCount++).Name("ProteinDesc");                                                                                                   // ProteinDescription
+                Map(x => x.ProteinLength).Index(ColumnCount++).Name("ProteinLength");                                                                                                      // ProteinLength
+                Map(x => x.Start).Index(ColumnCount++).Name("Start");                                                                                                                      // Start position in protein
+                Map(x => x.End).Index(ColumnCount++).Name("End");                                                                                                                          // End position in protein
+                Map(x => x.Charge).Index(ColumnCount++).Name("Charge");                                                                                                                    // precursorCharge
+                Map(x => x.MostAbundantIsotopeMz).Index(ColumnCount++).Name("MostAbundantIsotopeMz").ConvertUsing(x => StringUtilities.DblToString(x.MostAbundantIsotopeMz, 9, true));     // MostAbundantIsotopeMz
+                Map(x => x.Mass).Index(ColumnCount++).Name("Mass").ConvertUsing(x => StringUtilities.DblToString(x.Mass, 9, true));                                                        // Mass
+                Map(x => x.Ms1Feature).Index(ColumnCount++).Name("Ms1Features");
+                Map(x => x.NumMatchedFragments).Index(ColumnCount++).Name("#MatchedFragments");                                                                                            // (Number of matched fragments)
+                Map(x => x.Probability).Index(ColumnCount++).Name("Probability").ConvertUsing(x => StringUtilities.DblToString(x.Probability, 4));                                         // Probability
+                Map(x => x.SpecEValue).Index(ColumnCount++).Name("SpecEValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.SpecEValue), 6, true, 0.001)); // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
+                Map(x => x.EValue).Index(ColumnCount++).Name("EValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.EValue), 6, true, 0.001));             // EValue; will be displayed using scientific notation if the value is less than 0.001
+            }
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private class DatabaseSearchResultDataTdaMap : DatabaseSearchResultDataMap
+        {
+            // Adds in the columns expected for TDA results
+            public DatabaseSearchResultDataTdaMap() : base()
+            {
+                Map(x => x.QValue).Index(ColumnCount++).Name("QValue").ConvertUsing(x => StringUtilities.DblToString(x.QValue, 7));
+                Map(x => x.PepQValue).Index(ColumnCount++).Name("PepQValue").ConvertUsing(x => StringUtilities.DblToString(x.PepQValue, 7));
+            }
         }
 
         /// <summary>
