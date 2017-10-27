@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using PRISM;
 
 namespace PbfGen
@@ -15,7 +14,7 @@ namespace PbfGen
             get
             {
                 var programVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return string.Format("version {0}.{1}.{2} (" + Misc.GetBuildDateTextFromVersion() + ")", programVersion.Major, programVersion.Minor, programVersion.Build);
+                return string.Format("version {0}.{1}.{2} (" + InformedProteomics.Backend.Utils.Misc.GetBuildDateTextFromVersion() + ")", programVersion.Major, programVersion.Minor, programVersion.Build);
             }
         }
 
@@ -97,7 +96,7 @@ namespace PbfGen
                         Console.WriteLine("Only including scans 1 to {0}", options.EndScan);
 
                     var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
-                    var progress = new Progress<InformedProteomics.Backend.Utils.ProgressData>(p =>
+                    var progress = new Progress<ProgressData>(p =>
                     {
                         p.UpdateFrequencySeconds = 2;
                         if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())

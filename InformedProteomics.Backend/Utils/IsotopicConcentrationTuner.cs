@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Gets or sets the element to manipulte isotope proportions for.
+        /// Gets or sets the element to manipulate isotope proportions for.
         /// </summary>
         public Atom Element { get; set; }
 
@@ -83,10 +83,10 @@ namespace InformedProteomics.Backend.Utils
         /// isotopic profile to the provided observed peaks.
         /// </summary>
         /// <param name="progress">The progress reporter.</param>
-        public IsotopeConcentrationCorrelationCurve Tune(IProgress<ProgressData> progress = null)
+        public IsotopeConcentrationCorrelationCurve Tune(IProgress<PRISM.ProgressData> progress = null)
         {
             // Set up progress reporter
-            var progressData = new ProgressData(progress);
+            var progressData = new PRISM.ProgressData(progress);
 
             this.ValidateParameters();
 

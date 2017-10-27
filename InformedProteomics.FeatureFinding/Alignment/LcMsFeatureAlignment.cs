@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Scoring;
 using InformedProteomics.FeatureFinding.Util;
 using MathNet.Numerics.Statistics;
+using PRISM;
 
 namespace InformedProteomics.FeatureFinding.Alignment
 {
@@ -56,7 +56,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
         public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run, double minMass = 2000, double maxMass = 50000)
         {
             var featureList = new List<LcMsFeature>();
-            var tsvReader = new TsvFileParser(featureFilePath);
+            var tsvReader = new Backend.Utils.TsvFileParser(featureFilePath);
             //var run = (rawFilePath == null || !File.Exists(rawFilePath)) ? null : PbfLcMsRun.GetLcMsRun(rawFilePath);
             var featureIds = tsvReader.GetData("FeatureID");
 

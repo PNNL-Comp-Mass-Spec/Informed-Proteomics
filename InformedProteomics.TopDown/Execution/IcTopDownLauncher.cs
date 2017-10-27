@@ -12,15 +12,14 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SearchResults;
-using InformedProteomics.Backend.Utils;
 using InformedProteomics.FeatureFinding;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-
 using InformedProteomics.Scoring.Interfaces;
+using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
 {

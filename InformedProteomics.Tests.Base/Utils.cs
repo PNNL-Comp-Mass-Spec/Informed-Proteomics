@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
 using NUnit.Framework;
+using PRISM;
 
 namespace InformedProteomics.Tests.Base
 {
