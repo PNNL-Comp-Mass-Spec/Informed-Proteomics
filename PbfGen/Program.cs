@@ -97,7 +97,7 @@ namespace PbfGen
                         Console.WriteLine("Only including scans 1 to {0}", options.EndScan);
 
                     var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
-                    var progress = new Progress<ProgressData>(p =>
+                    var progress = new Progress<InformedProteomics.Backend.Utils.ProgressData>(p =>
                     {
                         p.UpdateFrequencySeconds = 2;
                         if ((p.Percent % 25).Equals(0) || p.ShouldUpdate())
