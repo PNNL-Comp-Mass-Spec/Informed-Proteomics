@@ -1,7 +1,7 @@
 ; This is an Inno Setup configuration file
 ; http://www.jrsoftware.org/isinfo.php
 
-#define ApplicationVersion GetFileVersion('..\InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend.dll')
+#define ApplicationVersion GetFileVersion('..\MSPathFinderT\bin\Release\MSPathFinderT.exe')
 
 [CustomMessages]
 AppName=DeconTools
