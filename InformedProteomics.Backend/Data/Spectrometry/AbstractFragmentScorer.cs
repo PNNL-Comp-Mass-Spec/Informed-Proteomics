@@ -301,7 +301,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
-            BaseIonTypesUVPD = new[] { BaseIonType.A, BaseIonType.Ar, BaseIonType.B, BaseIonType.C, BaseIonType.X, BaseIonType.Xr, BaseIonType.Y, BaseIonType.YM1, BaseIonType.Z, BaseIonType.Zr };
+            BaseIonTypesUVPD = new[] { BaseIonType.A, BaseIonType.Ar, BaseIonType.Y, BaseIonType.YM1 };
         }
     }
 }

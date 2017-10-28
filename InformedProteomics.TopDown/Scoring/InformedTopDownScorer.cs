@@ -3,12 +3,9 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Scoring.Interfaces;
-
     public class InformedTopDownScorer
     {
         public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)
@@ -42,42 +39,6 @@ namespace InformedProteomics.TopDown.Scoring
                 return null;
 
             return GetScores(spec, seqStr, composition, charge, ms2ScanNum);
-        }
-
-        public IcScores GetIcScores(IInformedScorer informedScorer, IScorer scorer, string seqStr, Composition composition)
-        {
-            var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
-            if (seqGraph == null)
-                return null;
-
-            var bestScore = double.NegativeInfinity;
-            Tuple<double, string> bestScoreAndModifications = null;
-            var protCompositions = seqGraph.GetSequenceCompositions();
-
-            for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
-            {
-                seqGraph.SetSink(modIndex);
-                var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-
-                if (!protCompositionWithH2O.Equals(composition)) continue;
-
-                var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
-                var curScore = curScoreAndModifications.Item1;
-
-                if (!(curScore > bestScore)) continue;
-
-                bestScoreAndModifications = curScoreAndModifications;
-                bestScore = curScore;
-            }
-
-            if (bestScoreAndModifications == null) return null;
-
-            var modifications = bestScoreAndModifications.Item2;
-            var sequence = Sequence.CreateSequence(seqStr, modifications, AminoAcidSet);
-            var numMatchedFragments = informedScorer.GetNumMatchedFragments(sequence);
-            var score = informedScorer.GetUserVisibleScore(sequence);
-
-            return new IcScores(numMatchedFragments, score, modifications);
         }
 
         public IcScores GetScores(ProductSpectrum spec, string seqStr, Composition composition, int charge, int ms2ScanNum)
@@ -154,21 +115,34 @@ namespace InformedProteomics.TopDown.Scoring
             score += preContCount * CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch;
             score += sufContCount * CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;
         }
+    }
 
-        public void GetCompositeScores(Sequence sequence, CompositeScorerBasedOnDeconvolutedSpectrum scorer, out double score)
+    public class IcScores
+    {
+        public IcScores(int nMatchedFragments, double score, string modifications)
         {
-            score = 0d;
+            NumMatchedFrags = nMatchedFragments;
+            Score = score;
+            Modifications = modifications;
+        }
 
-            //var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            //if (spec == null) return;
+        public int NumMatchedFrags { get; private set; }
+        public double Score { get; private set; } // this score is used to calculate p-value by generating function
 
-            //var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge + 2), activationMethod: ActivationMethod);
-            var cleavages = sequence.GetInternalCleavages();
+        public string Modifications { get; private set; }
 
-            foreach (var c in cleavages)
-            {
-                score += scorer.GetFragmentScore(c.PrefixComposition, c.SuffixComposition);
-            }
+        public override string ToString()
+        {
+            return string.Join("\t",
+                new[]
+                {
+                    NumMatchedFrags, Score,
+                });
+        }
+
+        public static string GetScoreNames()
+        {
+            return "#MatchedFragments\tScore";
         }
     }
 }

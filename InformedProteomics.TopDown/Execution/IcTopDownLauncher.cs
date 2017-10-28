@@ -18,7 +18,7 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using InformedProteomics.Scoring.Interfaces;
+using TopDownTrainer;
 using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
@@ -277,8 +277,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
-
-        //private ScoringGraphFactory scoringGraphFactory;
+        //private IFragmentScorerFactory fragmentScorerFactory;
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
@@ -432,7 +431,8 @@ namespace InformedProteomics.TopDown.Execution
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
             //this.fragmentScorerFactory = new CompositionScorerFactory(_run, true);
-
+            _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
+                                                               Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
             sw.Reset();
 
             UpdateStatus("Generating deconvoluted spectra for MS/MS spectra...", progData);
@@ -442,19 +442,10 @@ namespace InformedProteomics.TopDown.Execution
                 MaxDegreeOfParallelism = Options.MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
-
-            // Deconvolute spectra
-            var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, 0.1, Options.ProductIonTolerance);
-            var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
-            var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
-
-            _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
-                                                   Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
-            //Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
-            //{
-            //    _ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
-            //});
-
+            Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+            {
+                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum, Options.ActivationMethod);
+            });
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
@@ -848,8 +839,7 @@ namespace InformedProteomics.TopDown.Execution
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
-                        //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
-                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum);
+                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
@@ -868,7 +858,7 @@ namespace InformedProteomics.TopDown.Execution
                         }
                         else ms2FeatureIds = featureIds;
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, nTermCleavages,
-                            modCombinations, precursorIon, score, isDecoy, featureId: Math.Max(ms2FeatureIds.FirstOrDefault(), 1));
+                            modCombinations, precursorIon, score, isDecoy, featureId: ms2FeatureIds.FirstOrDefault());
 
                         AddMatch(matches, ms2ScanNum, prsm);
                     });
@@ -1002,18 +992,14 @@ namespace InformedProteomics.TopDown.Execution
                     var matchIndex = 0;
                     foreach (var match in prsms)
                     {
-                        //if (CompositeScorer.GetProbability(match.Score) < CompositeScorer.ProbabilityCutoff)
-                        //{
-                        //    continue;
-                        //}
-
+                    var sequence = match.Sequence;
                         if (match == null)
                         {
                             ReportError("Match is null for index " + matchIndex + " in scan " + scanNum);
                             continue;
                         }
 
-                        var ion = match.Ion;
+                    var ion = match.Ion;
 
                         if (ion == null)
                         {
@@ -1021,71 +1007,34 @@ namespace InformedProteomics.TopDown.Execution
                             continue;
                         }
 
-                        // Re-scoring
-                        //var scores = topDownScorer.GetScores(spec, match.Sequence, ion.Composition, ion.Charge, scanNum);
-                        //if (scores == null) continue;
-
-                        var productSpectrum = _run.GetSpectrum(match.ScanNum) as ProductSpectrum;
-                        if (productSpectrum == null)
-                        {
-                            ReportError("productSpectrum is null for index " + matchIndex + " in scan " + scanNum);
-                            continue;
-                        }
-
-                        var ionComposition = ion.Composition;
-                        if (ionComposition == null)
-                        {
-                            ReportError("ionComposition is null for index " + matchIndex + ", match " + match + " in scan " + scanNum);
-                            continue;
-                        }
-
-                        var scorer = _ms2ScorerFactory2.GetScorer(productSpectrum, ionComposition.Mass, ion.Charge, Options.ActivationMethod);
-
-                        if (!(scorer is IInformedScorer informedScorer))
-                        {
-                            throw new Exception("scorer is not an instance of type IInformedScorer; " +
-                                                "cannot score since actually a " + scorer.GetType().Name);
-                        }
-
-                        var scores = topDownScorer.GetIcScores(informedScorer, scorer, match.Sequence, ion.Composition);
-
+                    // Re-scoring
+                    var scores = topDownScorer.GetScores(spec, sequence, ion.Composition, ion.Charge, scanNum);
                         if (scores == null)
                         {
                             ReportWarning("scores is null for index " + matchIndex + " in scan " + scanNum);
                             continue;
                         }
 
-                        match.ModificationText = scores.Modifications;
-
-                        //double s1 = scores.Score, s2;
-                        //int nf1;
-                        //topDownScorer.GetCompositeScores(sequence, ion.Charge, scanNum, out s1, out nf1);
-                        //topDownScorer.GetCompositeScores(ipSequence, _ms2ScorerFactory2.GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum, out s2);
-
-                        match.Score = scores.Score;
-                        match.NumMatchedFragments = scores.NumMatchedFrags;
-                        //match.ModificationText = match.Modifications.ToString();
-                        //match.NumMatchedFragments = scores.NumMatchedFrags;
-                        if (match.Score > 0.25 * informedScorer.ScoreCutOff)
-                        //if (match.Score > CompositeScorer.ScoreParam.Cutoff)
-                        {
+                    match.Score = scores.Score;
+                    match.ModificationText = scores.Modifications;
+                    match.NumMatchedFragments = scores.NumMatchedFrags;
+                    if (match.Score > CompositeScorer.ScoreParam.Cutoff)
+                    {
                             if (matches[scanNum] == null)
                                 matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
 
-                            matches[scanNum].AddLast(match);
-                        }
+                        matches[scanNum].AddLast(match);
+                    }
 
                         matchIndex++;
-                    }
+                }
 
                     if (matches[scanNum] != null)
                         estimatedSequences += matches[scanNum].Count;
-                }
+            }
 
                 currentTask = "Parallel.ForEach";
-
                 OnStatusEvent("Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
-
             }
             catch (Exception ex)
             {
@@ -1106,7 +1055,6 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
-            //foreach (var scanNum in scanNums)
             {
                 currentTask = "Inside Parallel.ForEach";
                 try
@@ -1117,8 +1065,6 @@ namespace InformedProteomics.TopDown.Execution
                         var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
 
-                        //var scorer = _ms2ScorerFactory2.GetScorer(match.ScanNum);
-                        //var graph = this.scoringGraphFactory.GetScoringGraph(scorer, match.Ion.Composition.Mass);
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
                         if (graph == null) continue;
 
@@ -1136,10 +1082,7 @@ namespace InformedProteomics.TopDown.Execution
                         }
 
                         currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
-                        //var ipSequence = Sequence.CreateSequence(match.Sequence, match.ModificationText, topDownScorer.AminoAcidSet);
-                        //var graphScore = graph.ScoreSequence(ipSequence);
-
-                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score); //* 1e-34;
+                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
 
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);

@@ -161,9 +161,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 cleavages[index] = new Cleavage(
                     prefixComposition += this[index].Composition,   // prefix
-                    this[index],
-                    suffixComposition += this[Count - 1 - index].Composition,    // suffix
-                    this[index + 1]
+                    suffixComposition += this[Count - 1 - index].Composition    // suffix
                     );
             }
             return cleavages;

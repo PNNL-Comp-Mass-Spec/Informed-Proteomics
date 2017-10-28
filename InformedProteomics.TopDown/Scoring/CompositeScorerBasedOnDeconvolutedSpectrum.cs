@@ -75,8 +75,7 @@ namespace InformedProteomics.TopDown.Scoring
             var prefixHit = false;
             var suffixHit = false;
 
-            var ionsFound = new Dictionary<bool, double>();
-
+            var ionsFound = new Dictionary<BaseIonType, double>();
             foreach (var baseIonType in BaseIonTypes)
             {
                 var fragmentComposition = baseIonType.IsPrefix
@@ -100,12 +99,11 @@ namespace InformedProteomics.TopDown.Scoring
                         ionscore += param.Corr * existingPeak.Corr; // Envelope correlation-based scoring
                         ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                        if (!ionsFound.ContainsKey(baseIonType.IsPrefix)) ionsFound.Add(baseIonType.IsPrefix, ionscore);
-                        if (ionsFound.ContainsKey(baseIonType.IsPrefix) && ionsFound[baseIonType.IsPrefix] > ionscore) continue;
+                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
+                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
+                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
 
-                        ionsFound[baseIonType.IsPrefix] = ionscore;
-
-                        //score += ionscore;
+                        score += ionscore;
 
                         if (baseIonType.IsPrefix) prefixHit = true;
                         else suffixHit = true;
@@ -114,59 +112,42 @@ namespace InformedProteomics.TopDown.Scoring
             }
 
             if (prefixHit && suffixHit) score += ScoreParam.ComplementaryIonCount;
-
-            //foreach (var ionScore in ionsFound.Values) score += ionScore;
-
             return score;
         }
 
         public double?[][] GetNodeScores(double proteinMass)
         {
+
+
             var numNodes = _comparer.GetBinNumber(proteinMass) + 1;
             var nodeScores = new double?[2][];
             var prefixFragScores = nodeScores[0] = new double?[numNodes];
             var suffixFragScores = nodeScores[1] = new double?[numNodes];
             var deconvPeaks = (DeconvolutedPeak[])Ms2Spectrum.Peaks;
 
+            // assume that peaks are prefixFragment ions
             foreach (var peak in deconvPeaks)
             {
-                foreach (var ionType in this.BaseIonTypes)
-                {
-                    var fragmentMass = peak.Mass - ionType.OffsetComposition.Mass;
-                    fragmentMass = ionType.IsPrefix ? peak.Mass : proteinMass - fragmentMass;
-                    var binIndex = this._comparer.GetBinNumber(fragmentMass);
+                var prefixIonMass = peak.Mass;
+                var prefixFragmentMass = prefixIonMass - PrefixOffsetMass;
+                var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
 
-                    var nodeSet = ionType.IsPrefix ? prefixFragScores : suffixFragScores;
-                    var compNodeSet = !ionType.IsPrefix ? prefixFragScores : suffixFragScores;
-                    if (binIndex < 0 || binIndex >= numNodes) continue;
-                    nodeSet[binIndex] = GetMatchedIonPeakScore(ionType.IsPrefix, peak);
-                    if (compNodeSet[binIndex] != null) suffixFragScores[binIndex] += ScoreParam.ComplementaryIonCount;
+                if (binIndex >= 0 && binIndex < numNodes)
+                    prefixFragScores[binIndex] = GetMatchedIonPeakScore(true, peak);
+
+                var suffixIonMass = peak.Mass;
+                var suffixFragmentMass = suffixIonMass - SuffixOffsetMass;
+                prefixFragmentMass = proteinMass - suffixFragmentMass;
+                binIndex = _comparer.GetBinNumber(prefixFragmentMass);
+
+                if (binIndex >= 0 && binIndex < numNodes)
+                {
+                    suffixFragScores[binIndex] = GetMatchedIonPeakScore(false, peak);
+
+                    if (prefixFragScores[binIndex] != null) // there are complementary pair ions
+                        suffixFragScores[binIndex] += ScoreParam.ComplementaryIonCount;
                 }
             }
-
-            // assume that peaks are prefixFragment ions
-            //foreach (var peak in deconvPeaks)
-            //{
-            //    var prefixIonMass = peak.Mass;
-            //    var prefixFragmentMass = prefixIonMass - PrefixOffsetMass;
-            //    var binIndex = _comparer.GetBinNumber(prefixFragmentMass);
-
-            //    if (binIndex >= 0 && binIndex < numNodes)
-            //        prefixFragScores[binIndex] = GetMatchedIonPeakScore(true, peak);
-
-            //    var suffixIonMass = peak.Mass;
-            //    var suffixFragmentMass = suffixIonMass - SuffixOffsetMass;
-            //    prefixFragmentMass = proteinMass - suffixFragmentMass;
-            //    binIndex = _comparer.GetBinNumber(prefixFragmentMass);
-
-            //    if (binIndex >= 0 && binIndex < numNodes)
-            //    {
-            //        suffixFragScores[binIndex] = GetMatchedIonPeakScore(false, peak);
-
-            //        if (prefixFragScores[binIndex] != null) // there are complementary pair ions
-            //            suffixFragScores[binIndex] += ScoreParam.ComplementaryIonCount;
-            //    }
-            //}
 
             return nodeScores;
         }

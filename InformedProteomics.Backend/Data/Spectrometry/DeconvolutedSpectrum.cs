@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Deconvoluted spectrum
     /// </summary>
-    public class DeconvolutedSpectrum : ProductSpectrum, IDeconvolutedSpectrum
+    public class DeconvolutedSpectrum : ProductSpectrum
     {
         /// <summary>
         /// Constructor
@@ -47,17 +47,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var dPeaks = new DeconvolutedPeak[peaks.Count];
             peaks.CopyTo(dPeaks, 0);
             Peaks = dPeaks;
-        }
-
-        /// <summary>
-        /// Get the peak that matches <paramref name="composition"/> and <paramref name="tolerance"/>
-        /// </summary>
-        /// <param name="composition"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
-        {
-            return base.FindPeak(composition.Mass, tolerance) as DeconvolutedPeak;
         }
     }
 }

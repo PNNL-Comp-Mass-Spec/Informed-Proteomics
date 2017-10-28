@@ -5,11 +5,10 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Scoring.Interfaces;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class CompositeScorer : AbstractFragmentScorer, IInformedScorer
+    public class CompositeScorer : AbstractFragmentScorer
     {
         public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.UVPD)
             : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod)
@@ -41,7 +40,7 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
-            var ionsFound = new Dictionary<bool, double>();
+            var ionsFound = new Dictionary<BaseIonType, double>();
 
             foreach (var baseIonType in BaseIonTypes)
             {
@@ -73,10 +72,9 @@ namespace InformedProteomics.TopDown.Scoring
                         ionscore += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
                         ionscore += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                        //if (!ionsFound.ContainsKey(baseIonType.IsPrefix)) ionsFound.Add(baseIonType.IsPrefix, ionscore);
-                        //if (ionsFound.ContainsKey(baseIonType.IsPrefix) && ionsFound[baseIonType.IsPrefix] > ionscore) continue;
-
-                        //ionsFound[baseIonType.IsPrefix] = ionscore;
+                        if (ionsFound.ContainsKey(baseIonType)) ionsFound.Add(baseIonType, ionscore);
+                        if (baseIonType == BaseIonType.Ar && ionsFound.ContainsKey(BaseIonType.A) && ionscore < ionsFound[BaseIonType.A]) continue;
+                        if (baseIonType == BaseIonType.YM1 && ionsFound.ContainsKey(BaseIonType.Y) && ionscore < ionsFound[BaseIonType.Y]) continue;
 
                         score += ionscore;
 
@@ -95,9 +93,6 @@ namespace InformedProteomics.TopDown.Scoring
 
             if (prefixHit && suffixHit)
                 score += ScoreParam.ComplementaryIonCount;
-
-            //foreach (var ionScore in ionsFound.Values) score += ionScore;
-
             return score;
         }
 
@@ -121,37 +116,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         internal static ScoreWeight ScoreParam; // score weights without mass error temrs for generating function evaluation
         private const double WeightScaleFactor = 4.0;
-
-        public int GetNumMatchedFragments(Sequence sequence)
-        {
-            var cleavages = sequence.GetInternalCleavages();
-            int count = 0;
-            foreach (var cl in cleavages)
-            {
-                foreach (var baseIonType in BaseIonTypes)
-                {
-                    var fragmentComposition = baseIonType.IsPrefix ? cl.PrefixComposition : cl.SuffixComposition;
-                    fragmentComposition += baseIonType.OffsetComposition;
-                    var peaks = FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold);
-                    count += peaks.Any() ? 1 : 0;
-                }
-            }
-
-            return count;
-        }
-
-        public double GetUserVisibleScore(Sequence sequence)
-        {
-            var cleavages = sequence.GetInternalCleavages();
-            double score = 0.0;
-            foreach (var cl in cleavages)
-            {
-                score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
-            }
-
-            return score; //GetProbability(score);
-        }
-
 
         static CompositeScorer()
         {
@@ -222,8 +186,6 @@ namespace InformedProteomics.TopDown.Scoring
                 },
             };
         }
-
-        public double ScoreCutOff => CompositeScorer.ScoreParam.Cutoff;
 
         internal class ScoreWeight
         {

@@ -10,8 +10,6 @@ using InformedProteomics.TopDown.Scoring;
 
 namespace InformedProteomics.TopDown.Execution
 {
-    using InformedProteomics.Scoring.TopDown;
-
     public class IcRescorer
     {
         public IcRescorer(string specFilePath, string icResultFilePath, string outputFilePath, AminoAcidSet aaSet, Tolerance tolerance, double ms2CorrThreshold = 0.7

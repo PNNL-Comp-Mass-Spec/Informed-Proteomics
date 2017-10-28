@@ -26,7 +26,6 @@ namespace InformedProteomics.TopDown.Execution
             FeatureId = featureId;
         }
 
-        public Sequence IpSequence { get; set; }
         public string Sequence { get; private set; }
         public char Pre { get; private set; }
         public char Post { get; private set; }
