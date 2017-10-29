@@ -407,6 +407,9 @@ namespace InformedProteomics.Backend.Database
                         --sep.Value;
                     }
                 }
+
+                lcpEnum.Dispose();
+                fEnum.Dispose();
             }
             else
             {
@@ -736,6 +739,8 @@ namespace InformedProteomics.Backend.Database
                 curSequence.RemoveFirst();
                 lcpList.RemoveFirst();
             }
+
+            lcpEnum.Dispose();
 
             // Data dependency: cannot run in parallel; Also, not a significantly costly operation (< 10 seconds)
             while (curSequence.Count >= minLength)
