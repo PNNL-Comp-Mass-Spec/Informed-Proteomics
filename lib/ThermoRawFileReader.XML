@@ -478,8 +478,9 @@
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Mass">
             <summary>
-            Peak Mass
+            Peak m/z
             </summary>
+            <remarks>This is observed m/z; it is not monoisotopic mass</remarks>
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Intensity">
             <summary>
@@ -500,11 +501,25 @@
             <summary>
             Peak Noise
             </summary>
+            <remarks>For signal/noise ratio, see SignalToNoise</remarks>
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Charge">
             <summary>
             Peak Charge
             </summary>
+            <remarks>Will be 0 if the charge could not be determined</remarks>
+        </member>
+        <member name="P:ThermoRawFileReader.udtFTLabelInfoType.SignalToNoise">
+            <summary>
+            Signal to noise ratio
+            </summary>
+            <returns>Intensity divided by noise, or 0 if Noise is 0</returns>
+        </member>
+        <member name="M:ThermoRawFileReader.udtFTLabelInfoType.ToString">
+            <summary>
+            Return a summary of this object
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:ThermoRawFileReader.ActivationTypeConstants">
             <summary>
@@ -754,7 +769,7 @@
             Class for reading Thermo Finnigan .raw files, using the IXRawfile5 interface
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.XRawFileIO.MAX_SCANS_TO_CACHE_INFO">
+        <member name="F:ThermoRawFileReader.XRawFileIO.mMaxScansToCacheInfo">
             <summary>
             Maximum size of the scan info cache
             </summary>
@@ -799,6 +814,11 @@
             MS Tune Info
             </summary>
         </member>
+        <member name="P:ThermoRawFileReader.XRawFileIO.ScanInfoCacheMaxSize">
+            <summary>
+            Changes the maximum number of scan metadata cached. Set to 0 to disable caching. Default 50000.
+            </summary>
+        </member>
         <member name="E:ThermoRawFileReader.XRawFileIO.ReportError">
             <summary>
             Event handler for reporting error messages
@@ -839,6 +859,19 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.IsMSFileReaderInstalled">
+            <summary>
+            Tests to see if we can load the needed Thermo MSFileReader DLL class without errors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.IsMSFileReaderInstalled(System.String@)">
+            <summary>
+            Tests to see if we can load the needed Thermo MSFileReader DLL class without errors
+            </summary>
+            <param name="error">Reason for failure</param>
+            <returns></returns>
+        </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.CloseRawFile">
             <summary>
             Close the .raw file
@@ -868,21 +901,21 @@
             <remarks>We do not parse mass information out for Full Neutral Loss scans</remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@)">
-            <summary>
-            Parse out the parent ion from filterText
-            </summary>
-            <param name="filterText"></param>
-            <param name="parentIonMz">Parent ion m/z (output)</param>
-            <returns>True if success</returns>
-            <remarks>If multiple parent ion m/z values are listed then parentIonMz will have the last one.  However, if the filter text contains "Full msx" then parentIonMz will have the first parent ion listed</remarks>
-            <remarks>
-            This was created for use in other programs that only need the parent ion m/z, and no other functions from ThermoRawFileReader.
-            Other projects that use this:
-                 PHRPReader
+             <summary>
+             Parse out the parent ion from filterText
+             </summary>
+             <param name="filterText"></param>
+             <param name="parentIonMz">Parent ion m/z (output)</param>
+             <returns>True if success</returns>
+             <remarks>If multiple parent ion m/z values are listed then parentIonMz will have the last one.  However, if the filter text contains "Full msx" then parentIonMz will have the first parent ion listed</remarks>
+             <remarks>
+             This was created for use in other programs that only need the parent ion m/z, and no other functions from ThermoRawFileReader.
+             Other projects that use this:
+                  PHRPReader
             
-            To copy this, take the code from this function, plus the regex strings <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_NONMSX_REGEX"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_MSX_REGEX"/>,
-            with their uses in <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyNonMsx"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyMsx"/>
-            </remarks>
+             To copy this, take the code from this function, plus the regex strings <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_NONMSX_REGEX"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_MSX_REGEX"/>,
+             with their uses in <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyNonMsx"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyMsx"/>
+             </remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@,System.Int32@,System.String@)">
             <summary>
@@ -934,6 +967,14 @@
             Number of scans in the .raw file
             </summary>
             <returns>the number of scans, or -1 if an error</returns>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.GetRetentionTime(System.Int32,System.Double@)">
+            <summary>
+            Get the retention time for the specified scan. Use when searching for scans in a time range.
+            </summary>
+            <param name="scan">Scan number</param>
+            <param name="retentionTime">retention time</param>
+            <returns>True if no error, False if an error</returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetScanInfo(System.Int32,ThermoRawFileReader.clsScanInfo@)">
             <summary>
@@ -1041,6 +1082,20 @@
             <param name="ftLabelData">List of mass, intensity, resolution, baseline intensity, noise floor, and charge for each data point</param>
             <returns>The number of data points, or -1 if an error</returns>
             <remarks></remarks>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.GetMSLevel(System.Int32)">
+            <summary>
+            Get the MSLevel (aka MS order) for a given scan
+            </summary>
+            <param name="scan"></param>
+            <returns>The MSOrder, or 0 if an error</returns>
+            <remarks>
+            MS1 spectra will return 1, MS2 spectra will return 2, etc.
+            Other, specialized scan types:
+              Neutral gain:   -3
+              Neutral loss:   -2
+              Parent scan:    -1
+            </remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetScanPrecisionData(System.Int32,ThermoRawFileReader.udtMassPrecisionInfoType[]@)">
             <summary>
@@ -1182,11 +1237,13 @@
             <summary>
             Scan event data
             </summary>
+            <remarks>Ignores scan events with a blank or null event name</remarks>
         </member>
         <member name="F:ThermoRawFileReader.clsScanInfo.mStatusLog">
             <summary>
             Status Log data
             </summary>
+            <remarks>Includes blank events that separate log sections</remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.CacheDateUTC">
             <summary>
@@ -1349,12 +1406,12 @@
             <remarks></remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.NumChannels">
-            <summary>
+             <summary>
             
-            </summary>
-            <value></value>
-            <returns></returns>
-            <remarks></remarks>
+             </summary>
+             <value></value>
+             <returns></returns>
+             <remarks></remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.UniformTime">
             <summary>
@@ -1418,7 +1475,7 @@
         </member>
         <member name="M:ThermoRawFileReader.clsScanInfo.StoreScanEvents(System.String[],System.String[])">
             <summary>
-            Store this scan's scan events using a parallel string arrays
+            Store this scan's scan events using parallel string arrays
             </summary>
             <param name="eventNames"></param>
             <param name="eventValues"></param>
@@ -1426,7 +1483,7 @@
         </member>
         <member name="M:ThermoRawFileReader.clsScanInfo.StoreStatusLog(System.String[],System.String[])">
             <summary>
-            Store this scan's scan events using a parallel string arrays
+            Store this scan's log messages using parallel string arrays
             </summary>
             <param name="logNames"></param>
             <param name="logValues"></param>
