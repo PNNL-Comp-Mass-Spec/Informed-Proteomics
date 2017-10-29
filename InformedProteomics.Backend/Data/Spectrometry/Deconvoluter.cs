@@ -23,8 +23,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly int isotopeOffsetTolerance;
 
-        private readonly double filteringWindowSize;
-
         private readonly Tolerance tolerance;
 
         private readonly double corrScoreThreshold;
@@ -35,23 +33,40 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="minCharge"></param>
         /// <param name="maxCharge"></param>
         /// <param name="isotopeOffsetTolerance"></param>
-        /// <param name="filteringWindowSize"></param>
         /// <param name="tolerance"></param>
         /// <param name="corrScoreThreshold"></param>
         public Deconvoluter(
             int minCharge,
             int maxCharge,
             int isotopeOffsetTolerance,
-            double filteringWindowSize,
             Tolerance tolerance,
             double corrScoreThreshold = 0.7)
         {
             this.minCharge = minCharge;
             this.maxCharge = maxCharge;
             this.isotopeOffsetTolerance = isotopeOffsetTolerance;
-            this.filteringWindowSize = filteringWindowSize;
             this.tolerance = tolerance;
             this.corrScoreThreshold = corrScoreThreshold;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="filteringWindowSize"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        [Obsolete("Use the constructor without parameter filteringWindowSize")]
+        public Deconvoluter(
+            int minCharge,
+            int maxCharge,
+            int isotopeOffsetTolerance,
+            double filteringWindowSize,
+            Tolerance tolerance,
+            double corrScoreThreshold = 0.7) : this(minCharge, maxCharge, isotopeOffsetTolerance, tolerance, corrScoreThreshold)
+        {
         }
 
         /// <summary>
