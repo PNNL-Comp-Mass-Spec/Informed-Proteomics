@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Extracted Ion Chromatogram
     /// </summary>
-    public class Xic: List<XicPoint>
+    public class Xic : List<XicPoint>
     {
         //public int Min { get; private set; }
         //public int Max { get; private set; }
@@ -138,12 +138,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var xicPointList = new List<XicPoint>();
 
-            if(performSmoothing)
+            if (performSmoothing)
             {
-                double[] intensityValues = this.Select(x => x.Intensity).ToArray();
+                var intensityValues = this.Select(x => x.Intensity).ToArray();
                 intensityValues = Smoother.Smooth(intensityValues);
 
-                for(var i = 0; i < Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     xicPointList.Add(new XicPoint(this[i].ScanNum, this[i].Mz, intensityValues[i]));
                 }
@@ -155,10 +155,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             // Find the XIC Point that is closest to the input scan number
             var searchPoint = new XicPoint(scanNumber, 0, 0);
-            int indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
+            var indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
             indexOfClosestScan = indexOfClosestScan < 0 ? ~indexOfClosestScan : indexOfClosestScan;
             if (indexOfClosestScan >= xicPointList.Count) indexOfClosestScan = xicPointList.Count - 1;
-            XicPoint closestXicPoint = xicPointList[indexOfClosestScan];
+            var closestXicPoint = xicPointList[indexOfClosestScan];
 
             // Figure out if we want to search for an apex by moving left or right
             bool moveRight;
@@ -168,15 +168,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             else moveRight = false;
 
             // Check to the right
-            if(moveRight)
+            if (moveRight)
             {
                 if (indexOfClosestScan + 1 >= xicPointList.Count) return GetApexScanNum();
-                double previousIntensity = xicPointList[indexOfClosestScan + 1].Intensity;
+                var previousIntensity = xicPointList[indexOfClosestScan + 1].Intensity;
 
-                for (int i = indexOfClosestScan + 2; i < xicPointList.Count; i++)
+                for (var i = indexOfClosestScan + 2; i < xicPointList.Count; i++)
                 {
-                    double currentIntensity = xicPointList[i].Intensity;
-                    if (currentIntensity < previousIntensity) return xicPointList[i-1].ScanNum;
+                    var currentIntensity = xicPointList[i].Intensity;
+                    if (currentIntensity < previousIntensity) return xicPointList[i - 1].ScanNum;
                     previousIntensity = currentIntensity;
                 }
             }
@@ -184,12 +184,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             else
             {
                 if (indexOfClosestScan - 1 < 0) return GetApexScanNum();
-                double previousIntensity = this[indexOfClosestScan - 1].Intensity;
+                var previousIntensity = this[indexOfClosestScan - 1].Intensity;
 
-                for (int i = indexOfClosestScan - 2; i >= 0; i--)
+                for (var i = indexOfClosestScan - 2; i >= 0; i--)
                 {
-                    double currentIntensity = this[i].Intensity;
-                    if (currentIntensity < previousIntensity) return this[i+1].ScanNum;
+                    var currentIntensity = this[i].Intensity;
+                    if (currentIntensity < previousIntensity) return this[i + 1].ScanNum;
                     previousIntensity = currentIntensity;
                 }
             }
@@ -269,7 +269,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj as Xic != null && Equals((Xic) obj);
+            if (!(obj is Xic itemToCompare))
+                return false;
+
+            return this.Equals(itemToCompare);
         }
 
         /// <summary>

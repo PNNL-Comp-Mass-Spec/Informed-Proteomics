@@ -101,8 +101,8 @@ namespace InformedProteomics.Backend.Database
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
                                                       int numMissedCleavages, Enzyme enzyme, int threads, CancellationToken? cancellationToken = null)
         {
-            return AnnotationsAndOffsetsParallel(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
-                               enzyme.IsNTerm, threads, cancellationToken);
+            return AnnotationsAndOffsetsParallel(
+                minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues, enzyme.IsNTerm, threads, cancellationToken);
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace InformedProteomics.Backend.Database
                 }
                 else
                 {
-                    if (buf != null) buf.Add(residue);
+                    buf?.Add(residue);
                 }
             }
         }
@@ -368,7 +368,7 @@ namespace InformedProteomics.Backend.Database
 
                 // Use "IntWrapper" to allow modifying the value inside of the foreach
                 var seps = new Queue<IntWrapper>();
-                bool read = false;
+                bool read;
                 while ((read = fEnum.MoveNext()) || curSequence.Count >= minLength)
                 {
                     if (read)
@@ -415,7 +415,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     var seqLength = sonc.Sequence.Length;
                     // mode 2
-                    for (int i = 0; i <= numCTermCleavages; i++)
+                    for (var i = 0; i <= numCTermCleavages; i++)
                     {
                         // mode 2
                         if (mode == InternalCleavageType.NoInternalCleavage && minLength <= seqLength - i && seqLength - i <= maxLength)
@@ -425,7 +425,7 @@ namespace InformedProteomics.Backend.Database
                         // mode 1 #1
                         if (mode == InternalCleavageType.SingleInternalCleavage)
                         {
-                            for (int j = 0; minLength <= seqLength - i - j; j++)
+                            for (var j = 0; minLength <= seqLength - i - j; j++)
                             {
                                 if (seqLength - i - j <= maxLength)
                                 {
@@ -437,9 +437,9 @@ namespace InformedProteomics.Backend.Database
                     if (mode == InternalCleavageType.SingleInternalCleavage)
                     {
                         // mode 1 #2
-                        for (int i = numCTermCleavages + 1; i <= seqLength - minLength; i++)
+                        for (var i = numCTermCleavages + 1; i <= seqLength - minLength; i++)
                         {
-                            for (int j = 0; j <= numNTermCleavages; j++)
+                            for (var j = 0; j <= numNTermCleavages; j++)
                             {
                                 if (minLength <= seqLength - i - j &&
                                     seqLength - i - j <= maxLength)
@@ -570,21 +570,21 @@ namespace InformedProteomics.Backend.Database
             }
         }
 
-        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, IEnumerable<char> enzymaticResidues,
-                                                      bool isNTermEnzyme, int threads = 0, CancellationToken? cancellationToken = null
+        private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(
+            int minLength, int maxLength, int numTolerableTermini,
+            int numMissedCleavages, IEnumerable<char> enzymaticResidues,
+            bool isNTermEnzyme, int threads = 0, CancellationToken? cancellationToken = null
             )
         {
             var isCleavable = new bool[128];
-            if (enzymaticResidues != null)
+            var residues = enzymaticResidues as IList<char> ?? enzymaticResidues.ToList();
+
+            // Could be run in parallel, but probably not worth the cost.
+            foreach (var residue in residues)
             {
-                // Could be run in parallel, but probably not worth the cost.
-                foreach (var residue in enzymaticResidues)
-                {
-                    isCleavable[residue] = true;
-                    if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
-                        isCleavable[FastaDatabaseConstants.Delimiter] = true;
-                }
+                isCleavable[residue] = true;
+                if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
+                    isCleavable[FastaDatabaseConstants.Delimiter] = true;
             }
 
             var isStandardAminoAcid = new bool[256];
@@ -600,19 +600,26 @@ namespace InformedProteomics.Backend.Database
             {
                 threads = ParallelizationUtils.NumPhysicalCores;
             }
+
             //int prevThreads, prevPorts;
             //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
             //ThreadPool.SetMinThreads(8, prevPorts);
-            CancellationToken token = cancellationToken != null ? cancellationToken.Value : CancellationToken.None;
+            var token = cancellationToken ?? CancellationToken.None;
+
             // pre, peptide sequence, next
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(48).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
-            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(threads).WithCancellation(token).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(threads).WithCancellation(token).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, residues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
         }
 
         private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallelInternal(int minLength, int numTolerableTermini,
-            int numMissedCleavages, IEnumerable<char> enzymaticResidues, bool isNTermEnzyme, SequenceLcpAndOffset seqAndLcp, bool[] isCleavable, bool[] isStandardAminoAcid
+            int numMissedCleavages,
+            IEnumerable<char> enzymaticResidues,
+            bool isNTermEnzyme,
+            SequenceLcpAndOffset seqAndLcp,
+            IReadOnlyList<bool> isCleavable,
+            IReadOnlyList<bool> isStandardAminoAcid
             )
         {
             var seqArr = Encoding.GetString(seqAndLcp.Sequence);

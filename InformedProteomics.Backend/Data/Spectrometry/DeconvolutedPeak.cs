@@ -59,17 +59,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Get the summed intensity of the deconvoluted peak
         /// </summary>
-        public double SummedIntensity { get { return ObservedPeaks == null ? Intensity : ObservedPeaks.Where(p => p != null).Sum(p => p.Intensity); } }
+        public double SummedIntensity { get { return ObservedPeaks?.Where(p => p != null).Sum(p => p.Intensity) ?? Intensity; } }
 
         /// <summary>
         /// Get the m/z without the adduct ion mass
         /// </summary>
-        public double MzWithoutAdductIonMass { get { return Mass / Charge; } }
+        public double MzWithoutAdductIonMass => Mass / Charge;
 
         /// <summary>
         /// Get the mass (m/z) of the deconvoluted peak
         /// </summary>
-        public double Mass { get { return Mz; } }
+        public double Mass => Mz;
 
         /// <summary>
         /// Get the charge of the deconvoluted peak

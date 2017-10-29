@@ -20,12 +20,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// File extension used for this type
         /// </summary>
-        protected override string FileExtensionVirtual { get { return FileExtensionConst; } }
+        protected override string FileExtensionVirtual => FileExtensionConst;
 
         /// <summary>
         /// File extension - overridden. See <see cref="FileExtensionConst"/> for static access.
         /// </summary>
-        public override bool ContainsChromatograms { get { return false; } }
+        public override bool ContainsChromatograms => false;
 
         /// <summary>
         /// Function to convert a spectra file name/path to a *.pbf name, even when it has multiple extensions (i.e., .mzML.gz)
@@ -91,13 +91,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <exception cref="System.ArgumentException">If the checksum of the source file does not match the checksum stored in the DPBF file</exception>
         public DeconvolutedSpectrum GetSpectrumWithIsotopePeaks(IMassSpecDataReader fullData, int scanNum)
         {
-            if (this.SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun && this.SrcFileChecksum != ((PbfLcMsRun)fullData).PbfFileChecksum))
+            if (SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun && SrcFileChecksum != ((PbfLcMsRun)fullData).PbfFileChecksum))
             {
                 throw new ArgumentException("Supplied file was not used to create this DPBF file!", nameof(fullData));
             }
 
-            var spec = GetSpectrum(scanNum, true) as DeconvolutedSpectrum;
-            if (spec == null)
+            if (!(GetSpectrum(scanNum, true) is DeconvolutedSpectrum spec))
             {
                 return null;
             }
@@ -137,7 +136,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var tic = reader.ReadSingle();
 
             double? precursorMass = reader.ReadDouble();
-            if (precursorMass == 0.0) precursorMass = null;
+            if (Math.Abs(precursorMass.Value) < float.Epsilon) precursorMass = null;
             int? precursorCharge = reader.ReadInt32();
             if (precursorCharge == 0) precursorCharge = null;
             var activationMethod = (ActivationMethod)reader.ReadByte();
@@ -174,12 +173,12 @@ namespace InformedProteomics.Backend.MassSpecData
                     isolationWindowUpperOffset,
                     precursorMass,
                     precursorCharge
-                    )
+                ),
+                MsLevel = msLevel,
+                ElutionTime = elutionTime,
+                NativeId = nativeId,
+                TotalIonCurrent = tic
             };
-            spec.MsLevel = msLevel;
-            spec.ElutionTime = elutionTime;
-            spec.NativeId = nativeId;
-            spec.TotalIonCurrent = tic;
             return spec;
         }
 
@@ -191,10 +190,9 @@ namespace InformedProteomics.Backend.MassSpecData
         protected internal override void WriteSpectrum(Spectrum specIn, BinaryWriter writer)
         {
             // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
-            var spec = specIn as DeconvolutedSpectrum;
-            if (spec == null)
+            if (!(specIn is DeconvolutedSpectrum spec))
             {
-                throw new ArgumentException("Input spectrum must be DeconvolutedSpectrum!");
+                throw new ArgumentException("Input spectrum must be DeconvolutedSpectrum!", nameof(specIn));
             }
 
             // scan number: 4

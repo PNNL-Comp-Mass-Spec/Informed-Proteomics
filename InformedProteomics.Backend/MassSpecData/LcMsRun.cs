@@ -53,7 +53,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// List of all scan numbers in the dataset
         /// </summary>
-        public IEnumerable<int> AllScanNumbers { get { return this.ScanNumToMsLevel.Select(x => x.Key); } }
+        public IEnumerable<int> AllScanNumbers { get { return ScanNumToMsLevel.Select(x => x.Key); } }
 
         /// <summary>
         /// The smallest MS1 m/z
@@ -68,13 +68,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// True if the dataset is DIA data
         /// </summary>
-        public bool IsDia
-        {
-            get
-            {
-                return IsDiaOrNull ?? (bool)(IsDiaOrNull = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia);
-            }
-        }
+        public bool IsDia => IsDiaOrNull ?? (bool)(IsDiaOrNull = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia);
 
         /// <summary>
         /// Default values for configuration properties
@@ -249,8 +243,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     var mzBin = mzComparer.GetBinNumber(peak.Mz);
 
-                    List<double> mzList;
-                    if (mzDic.TryGetValue(mzBin, out mzList))
+                    if (mzDic.TryGetValue(mzBin, out var mzList))
                     {
                         mzList.Add(peak.Mz);
                         intDic[mzBin] += peak.Intensity;
@@ -324,8 +317,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>MS level</returns>
         public int GetMsLevel(int scanNum)
         {
-            int msLevel;
-            return ScanNumToMsLevel.TryGetValue(scanNum, out msLevel) ? msLevel : 0;
+            return ScanNumToMsLevel.TryGetValue(scanNum, out var msLevel) ? msLevel : 0;
         }
 
         /// <summary>
@@ -335,8 +327,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public double GetElutionTime(int scanNum)
         {
-            double elutionTime;
-            return ScanNumElutionTimeMap.TryGetValue(scanNum, out elutionTime) ? elutionTime : 0.0;
+            return ScanNumElutionTimeMap.TryGetValue(scanNum, out var elutionTime) ? elutionTime : 0.0;
         }
 
         #endregion
@@ -379,7 +370,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>previous scan number at the specified level</returns>
         public int GetPrevScanNum(int scanNum, int msLevel)
         {
-            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key < scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MinLcScan - 1, 0)).Max(x => x.Key);
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key < scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MinLcScan - 1, 0)).Max(x => x.Key);
         }
 
         /// <summary>
@@ -390,7 +381,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number at the specified level</returns>
         public int GetNextScanNum(int scanNum, int msLevel)
         {
-            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key > scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MaxLcScan + 1, 0)).Min(x => x.Key);
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key > scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MaxLcScan + 1, 0)).Min(x => x.Key);
         }
 
         /// <summary>
@@ -400,7 +391,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>scan numbers of the specified msLevel</returns>
         public IList<int> GetScanNumbers(int msLevel)
         {
-            return this.ScanNumToMsLevel.Where(x => x.Value == msLevel).Select(x => x.Key).ToList();
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel).Select(x => x.Key).ToList();
         }
 
         private int[] _ms1ScanVector;
@@ -697,7 +688,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public double GetMinIsolationWindowWidth()
         {
-            var minWidth = Double.MaxValue;
+            var minWidth = double.MaxValue;
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
@@ -730,8 +721,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
         {
             var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * IsolationWindowBinningFactor);
-            int[] scanNums;
-            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out var scanNums) ? scanNums : new int[0];
         }
 
         //public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)
@@ -790,7 +780,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var prevMsLevel = int.MinValue;
             var prevScanNum = -1;
-            foreach (var scan in this.ScanNumToMsLevel.OrderBy(x => x.Key))
+            foreach (var scan in ScanNumToMsLevel.OrderBy(x => x.Key))
             {
                 var scanNum = scan.Key;
                 var msLevel = scan.Value;
@@ -825,7 +815,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var nextMsLevel = int.MinValue;
             var nextScanNum = int.MaxValue;
-            foreach (var scan in this.ScanNumToMsLevel.OrderByDescending(x => x.Key))
+            foreach (var scan in ScanNumToMsLevel.OrderByDescending(x => x.Key))
             {
                 var scanNum = scan.Key;
                 var msLevel = scan.Value;

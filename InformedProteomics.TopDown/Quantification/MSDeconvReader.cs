@@ -6,7 +6,7 @@ namespace InformedProteomics.TopDown.Quantification
 {
     public class MSDeconvReader
     {
-        public MSDeconvReader(double minMass = Double.MinValue, double maxMass = Double.MaxValue, int minCharge = Int32.MinValue, int maxCharge = int.MaxValue, int minScan = Int32.MinValue, int maxScan = Int32.MaxValue)
+        public MSDeconvReader(double minMass = double.MinValue, double maxMass = double.MaxValue, int minCharge = Int32.MinValue, int maxCharge = int.MaxValue, int minScan = Int32.MinValue, int maxScan = Int32.MaxValue)
         {
             MinMass = minMass;
             MaxMass = maxMass;

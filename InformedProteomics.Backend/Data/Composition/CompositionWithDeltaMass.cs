@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.Data.Composition
     /// <summary>
     /// A composition with a delta mass
     /// </summary>
-    public class CompositionWithDeltaMass: Composition
+    public class CompositionWithDeltaMass : Composition
     {
         /// <summary>
         /// Constructor
@@ -31,18 +31,12 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Monoisotopic mass
         /// </summary>
-        public override double Mass
-        {
-            get { return base.Mass + _deltaMass; }
-        }
+        public override double Mass => base.Mass + _deltaMass;
 
         /// <summary>
         /// Nominal mass
         /// </summary>
-        public override int NominalMass
-        {
-            get { return base.NominalMass + _deltaNominalMass; }
-        }
+        public override int NominalMass => base.NominalMass + _deltaNominalMass;
 
         /// <summary>
         /// Return a new composition that consists of this composition added to <paramref name="c"/>
@@ -51,10 +45,10 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public new Composition Add(Composition c)
         {
-            var comWithDelta = c as CompositionWithDeltaMass;
-            return comWithDelta == null ?
-                new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass)
-                : new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
+            if (!(c is CompositionWithDeltaMass comWithDelta))
+                return new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass);
+
+            return new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
         }
 
         /// <summary>

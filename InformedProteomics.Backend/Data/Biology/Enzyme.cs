@@ -9,58 +9,37 @@ namespace InformedProteomics.Backend.Data.Biology
     {
         private Enzyme(string name, string residues, bool isNTerm, string description, string psiCvAccession)
         {
-            _name = name;
-            _residues = residues.ToCharArray();
-            _isNTerm = isNTerm;
-            _description = description;
-            _psiCvAccession = psiCvAccession;
+            Name = name;
+            Residues = residues.ToCharArray();
+            IsNTerm = isNTerm;
+            Description = description;
+            PsiCvAccession = psiCvAccession;
         }
-
-        private readonly string _name;
-        private readonly char[] _residues;
-        private readonly bool _isNTerm;
-        private readonly string _description;
-        private readonly string _psiCvAccession;
 
         /// <summary>
         /// Name of the enzyme
         /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Residues cleaved by the enzyme
         /// </summary>
-        public char[] Residues
-        {
-            get { return _residues; }
-        }
+        public char[] Residues { get; }
 
         /// <summary>
         /// If the enzyme affects the N-Terminus
         /// </summary>
-        public bool IsNTerm
-        {
-            get { return _isNTerm; }
-        }
+        public bool IsNTerm { get; }
 
         /// <summary>
         /// Description of the enzyme
         /// </summary>
-        public string Description
-        {
-            get { return _description; }
-        }
+        public string Description { get; }
 
         /// <summary>
         /// PSI-MS CV Accession for the enzyme
         /// </summary>
-        public string PsiCvAccession
-        {
-            get { return _psiCvAccession; }
-        }
+        public string PsiCvAccession { get; }
 
         /// <summary>
         /// Test if the enzyme will cleave at <paramref name="residue"/>
@@ -69,9 +48,9 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns></returns>
         public bool IsCleavable(char residue)
         {
-            if (_residues.Length == 0)
+            if (Residues.Length == 0)
                 return true;
-            return _residues.Any(r => r == residue);
+            return Residues.Any(r => r == residue);
         }
 
         /// <summary>

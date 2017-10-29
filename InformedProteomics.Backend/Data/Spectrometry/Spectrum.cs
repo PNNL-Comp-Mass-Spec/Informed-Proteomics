@@ -68,8 +68,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         public int MsLevel
         {
-            get { return _msLevel; }
-            set { _msLevel = value; }
+            get => _msLevel;
+            set => _msLevel = value;
         }
 
         /// <summary>

@@ -14,27 +14,18 @@ namespace InformedProteomics.Backend.Database
         /// <param name="ntt"></param>
         public PeptideEnumerator(Enzyme enzyme, int ntt)
         {
-            _enzyme = enzyme;
-            _ntt = ntt;
+            Enzyme = enzyme;
+            Ntt = ntt;
         }
 
         /// <summary>
         /// Enzyme
         /// </summary>
-        public Enzyme Enzyme
-        {
-            get { return _enzyme; }
-        }
+        public Enzyme Enzyme { get; }
 
         /// <summary>
         /// Number of tolerable termini
         /// </summary>
-        public int Ntt
-        {
-            get { return _ntt; }
-        }
-
-        private readonly Enzyme _enzyme;
-        private readonly int _ntt;
+        public int Ntt { get; }
     }
 }

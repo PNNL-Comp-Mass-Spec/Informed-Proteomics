@@ -46,7 +46,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns>String representation of the SHA1 hash</returns>
         public static string Sha1Hash(string text)
         {
-            var hash = mSha1Hasher.ComputeHash(System.Text.Encoding.UTF8.GetBytes(text));
+            var hash = mSha1Hasher.ComputeHash(Encoding.UTF8.GetBytes(text));
 
             mSha1StringBuilder.Clear();
             foreach (var b in hash)

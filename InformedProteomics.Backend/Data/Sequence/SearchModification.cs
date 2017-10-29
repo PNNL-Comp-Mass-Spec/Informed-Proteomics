@@ -52,18 +52,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Name of the modification
         /// </summary>
-        public string Name
-        {
-            get { return Modification.Name; }
-        }
+        public string Name => Modification.Name;
 
         /// <summary>
         /// Mass of the modification
         /// </summary>
-        public double Mass
-        {
-            get { return Modification.Mass; }
-        }
+        public double Mass => Modification.Mass;
 
         /// <inheritdoc />
         public override string ToString()

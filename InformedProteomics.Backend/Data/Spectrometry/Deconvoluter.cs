@@ -63,11 +63,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             return GetCombinedDeconvolutedSpectrum(
                         spectrum,
-                        this.minCharge,
-                        this.maxCharge,
-                        this.isotopeOffsetTolerance,
-                        this.tolerance,
-                        this.corrScoreThreshold);
+                        minCharge,
+                        maxCharge,
+                        isotopeOffsetTolerance,
+                        tolerance,
+                        corrScoreThreshold);
         }
 
         /// <summary>
@@ -166,11 +166,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     continue;
                 }
 
-                double bestScore = 0.0;
+                var bestScore = 0.0;
                 DeconvolutedPeak bestPeak = null;
                 Tuple<Peak, int>[] bestObservedPeaks = null;
 
-                for (int charge = minCharge; charge <= maxCharge; charge++)
+                for (var charge = minCharge; charge <= maxCharge; charge++)
                 {
                     var mass = peak.Mz * charge - (charge * Constants.Proton);
                     if (mass > MaxMass)
@@ -387,7 +387,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var windowSpectrum = new Spectrum(window, 1);
                 var peakMz = peak.Mz;
 
-                double bestScore = 0.0;
+                var bestScore = 0.0;
                 DeconvolutedPeak bestPeak = null;
 
                 for (var charge = maxCharge; charge >= minCharge; charge--)

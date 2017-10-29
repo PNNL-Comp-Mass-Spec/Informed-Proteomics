@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class IonTypeFactory
     {
-        private bool removeReduntantIonTypes;
+        private readonly bool _removeReduntantIonTypes;
 
         /// <summary>
         /// Constructor
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 3   // up to charge 3
             )
         {
-            this.removeReduntantIonTypes = removeRedundantIonTypes;
+            _removeReduntantIonTypes = removeRedundantIonTypes;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _baseIons = baseIons;
             _neutralLosses = neutralLosses;
             _maxCharge = maxCharge;
-            this.removeReduntantIonTypes = removeRedundantIonTypes;
+            _removeReduntantIonTypes = removeRedundantIonTypes;
             GenerateAllKnownIonTypes();
         }
 
@@ -102,12 +102,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>List of charged IonTypes</returns>
         public static List<IonType> GetIonTypesFromDecharged(IEnumerable<IonType> ionTypes, int charge)
         {
-            List<IonType> chargedIonTypes = new List<IonType>();
-            foreach (IonType ionType in ionTypes)
+            var chargedIonTypes = new List<IonType>();
+            foreach (var ionType in ionTypes)
             {
-                for (int ch = 1; ch <= charge; ch++)
+                for (var ch = 1; ch <= charge; ch++)
                 {
-                    IonType chargedIonType =
+                    var chargedIonType =
                         new IonType(ionType.Name, ionType.OffsetComposition, ch, ionType.BaseIonType, ionType.NeutralLoss);
                     chargedIonTypes.Add(chargedIonType);
                 }
@@ -134,20 +134,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             _ionTypeMap = new Dictionary<string, IonType>();
 
-            for (int charge = 1; charge <= _maxCharge; charge++)
+            for (var charge = 1; charge <= _maxCharge; charge++)
             {
                 var chargeStr = charge == 1 ? "" : Convert.ToString(charge);
                 foreach (var baseIonType in _baseIons)
                 {
                     foreach (var neutralLoss in _neutralLosses)
                     {
-                        if (this.removeReduntantIonTypes &&
-                            ((baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O) ||
-                            (baseIonType == BaseIonType.C && neutralLoss == NeutralLoss.NH3) ||
-                            (baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O) ||
-                            (baseIonType == BaseIonType.YM1 && neutralLoss == NeutralLoss.NH3) ||
-                            ((baseIonType == BaseIonType.D || baseIonType == BaseIonType.W ||
-                            baseIonType == BaseIonType.V) && neutralLoss != NeutralLoss.NoLoss)))
+                        if (_removeReduntantIonTypes &&
+                            (baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O ||
+                             baseIonType == BaseIonType.C && neutralLoss == NeutralLoss.NH3 ||
+                             baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O ||
+                             baseIonType == BaseIonType.YM1 && neutralLoss == NeutralLoss.NH3 ||
+                             (baseIonType == BaseIonType.D ||
+                              baseIonType == BaseIonType.W ||
+                              baseIonType == BaseIonType.V) && neutralLoss != NeutralLoss.NoLoss)
+                            )
                         {
                             continue;
                         }

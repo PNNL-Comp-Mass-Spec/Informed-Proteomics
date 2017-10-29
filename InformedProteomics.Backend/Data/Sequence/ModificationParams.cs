@@ -39,19 +39,13 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Max number of dynamic modifications per sequence
         /// </summary>
-        public int MaxNumDynModsPerSequence
-        {
-            get { return _maxNumDynModsPerSequence; }
-        }
+        public int MaxNumDynModsPerSequence => _maxNumDynModsPerSequence;
 
         /// <summary>
         /// Gets the number of all possible modification instances
         /// </summary>
         /// <returns>the number of modification instances</returns>
-        public int NumModificationCombinations
-        {
-            get { return _modificationCombinations.Length; }
-        }
+        public int NumModificationCombinations => _modificationCombinations.Length;
 
         /// <summary>
         /// Gets the modificatino combination with the specified modCombIndex
@@ -174,10 +168,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private int[] ToModArray(long hashValue)
         {
-            int digit = _modifications.Length + 1;
+            var digit = _modifications.Length + 1;
             var arr = new int[_maxNumDynModsPerSequence];
-            long val = hashValue;
-            for (int i = 0; i < _maxNumDynModsPerSequence; i++)
+            var val = hashValue;
+            for (var i = 0; i < _maxNumDynModsPerSequence; i++)
             {
                 arr[_maxNumDynModsPerSequence-1-i] = (int)(val % digit);
                 val /= digit;
@@ -187,7 +181,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         private long ToHash(IEnumerable<int> combination)
         {
-            int digit = _modifications.Length + 1;
+            var digit = _modifications.Length + 1;
             return combination.Aggregate<int, long>(0, (current, i) => digit * current + i);
         }
 

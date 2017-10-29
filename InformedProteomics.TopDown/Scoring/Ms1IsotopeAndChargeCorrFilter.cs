@@ -41,7 +41,7 @@ namespace InformedProteomics.TopDown.Scoring
             return _lcMsMatchMap.GetMatchingMs2ScanNums(sequenceMass, _tolerance, _run);
         }
 
-        public int MaxNumPeaksToConsider { get; private set; }
+        public int MaxNumPeaksToConsider { get; }
 
         private readonly LcMsRun _run;
         private readonly int _minCharge;
@@ -65,8 +65,8 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void SetLcMsMatches(int ms2ScanNumber)
         {
-            var productSpec = _run.GetSpectrum(ms2ScanNumber) as ProductSpectrum;
-            if (productSpec == null) return;
+            if (!(_run.GetSpectrum(ms2ScanNumber) is ProductSpectrum productSpec))
+                return;
 
             var isolationWindow = productSpec.IsolationWindow;
             var minMz = isolationWindow.MinMz;

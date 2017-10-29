@@ -27,10 +27,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// The path to the most recent 64-bit ProteoWizard install
         /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
         /// </summary>
-        public static string PwizPath
-        {
-            get { return ProteoWizardReaderImplementation.PwizPath; }
-        }
+        public static string PwizPath => ProteoWizardReaderImplementation.PwizPath;
 
         /// <summary>
         /// Finds the path to the most recent 64-bit ProteoWizard install
@@ -78,19 +75,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
         /// </summary>
-        public PSI_Interface.CV.CV.CVID NativeIdFormat
-        {
-            get { return _pwizReader.NativeIdFormat; }
-        }
+        public PSI_Interface.CV.CV.CVID NativeIdFormat => _pwizReader.NativeIdFormat;
 
         /// <summary>
         /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
         /// </summary>
-        public PSI_Interface.CV.CV.CVID NativeFormat
-        {
-            get { return _pwizReader.NativeFormat; }
-        }
+        public PSI_Interface.CV.CV.CVID NativeFormat => _pwizReader.NativeFormat;
 
         /// <summary>
         /// Try to make the reader random access capable
@@ -123,10 +114,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// The number of spectra in the file.
         /// </summary>
-        public int NumSpectra
-        {
-            get { return _pwizReader.NumSpectra; }
-        }
+        public int NumSpectra => _pwizReader.NumSpectra;
 
         /// <summary>
         /// Close the file
@@ -139,26 +127,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
         /// </summary>
-        public string FilePath
-        {
-            get { return _pwizReader.FilePath; }
-        }
+        public string FilePath => _pwizReader.FilePath;
 
         /// <summary>
         /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public string SrcFileChecksum
-        {
-            get { return _pwizReader.SrcFileChecksum; }
-        }
+        public string SrcFileChecksum => _pwizReader.SrcFileChecksum;
 
         /// <summary>
         /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public string FileFormatVersion
-        {
-            get { return _pwizReader.FileFormatVersion; }
-        }
+        public string FileFormatVersion => _pwizReader.FileFormatVersion;
 
         #endregion
 
@@ -167,108 +146,80 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Filter string designed to be used in a file browser
         /// </summary>
-        public static string ProteoWizardFilterString
-        {
-            get
-            {
-                return "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf"
-                       + "|Thermo .RAW|*.raw"
-                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                       + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
-                       + "|MGF[.gz]|*.mgf;*.mgf.gz"
-                       + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
-                       + "|AB Sciex .wiff|*.wiff"
-                       + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
-                       + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
-                       + "|Shimadzu lcd|*.lcd"
-                       + "|UIMF|*.uimf"
-                    ;
-            }
-        }
+        public static string ProteoWizardFilterString => "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf"
+                                                         + "|Thermo .RAW|*.raw"
+                                                         + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                                                         + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
+                                                         + "|MGF[.gz]|*.mgf;*.mgf.gz"
+                                                         + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
+                                                         + "|AB Sciex .wiff|*.wiff"
+                                                         + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
+                                                         + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
+                                                         + "|Shimadzu lcd|*.lcd"
+                                                         + "|UIMF|*.uimf";
 
         /// <summary>
         /// All files that ProteoWizard supports, either directly, or as part of a folder dataset
         /// </summary>
-        public static List<string> SupportedFilesFilterList
+        public static List<string> SupportedFilesFilterList => new List<string>()
         {
-            get
-            {
-                return new List<string>()
-                {
-                    ".raw", // Thermo (file) or Waters (folder)
-                    "_extern.inf", // Waters .raw folder content
-                    "_inlet.inf", // Waters .raw folder content
-                    "_FUNC*.DAT", // Waters .raw folder content
-                    ".d", // Agilent (folder) or Bruker (folder)
-                    "mspeak.bin", // Agilent .d folder content
-                    "msprofile.bin", // Agilent .d folder content
-                    ".yep", // Bruker
-                    ".baf", // Bruker
-                    "fid", // Bruker
-                    ".lcd", // Shimadzu
-                    ".wiff", // Waters
-                    ".mzml",
-                    ".mzml.gz",
-                    ".mzxml",
-                    ".mzxml.gz",
-                    ".mgf",
-                    ".mgf.gz",
-                    ".uimf",
-                };
-            }
-        }
+            ".raw", // Thermo (file) or Waters (folder)
+            "_extern.inf", // Waters .raw folder content
+            "_inlet.inf", // Waters .raw folder content
+            "_FUNC*.DAT", // Waters .raw folder content
+            ".d", // Agilent (folder) or Bruker (folder)
+            "mspeak.bin", // Agilent .d folder content
+            "msprofile.bin", // Agilent .d folder content
+            ".yep", // Bruker
+            ".baf", // Bruker
+            "fid", // Bruker
+            ".lcd", // Shimadzu
+            ".wiff", // Waters
+            ".mzml",
+            ".mzml.gz",
+            ".mzxml",
+            ".mzxml.gz",
+            ".mgf",
+            ".mgf.gz",
+            ".uimf",
+        };
 
         /// <summary>
         /// List of "folder extensions" that ProteoWizard can read. This does not include all folder type datasets - some require directory listings.
         /// </summary>
-        public static List<string> SupportedDirectoryTypes
-        {
-            get { return new List<string>() {".d", ".raw"}; }
-        }
+        public static List<string> SupportedDirectoryTypes => new List<string>() { ".d", ".raw" };
 
         /// <summary>
         /// List of files that are produced by Bruker instruments that ProteoWizard can read.
         /// </summary>
-        public static List<string> BrukerFiles
+        public static List<string> BrukerFiles => new List<string>()
         {
-            get
-            {
-                return new List<string>()
-                {
-                    ".d",
-                    "analysis.yep",
-                    "analysis.baf",
-                    "fid",
-                };
-            }
-        }
+            ".d",
+            "analysis.yep",
+            "analysis.baf",
+            "fid",
+        };
 
         /// <summary>
         /// All file extensions that ProteoWizard directly reads - i.e., we don't need to back out of a folder
         /// </summary>
-        private static List<string> DirectlySupportedFilesFilterList
+        private static List<string> DirectlySupportedFilesFilterList => new List<string>()
         {
-            get
-            {
-                return new List<string>()
-                {
-                    ".raw", // Thermo (file) or Waters (folder)
-                    ".d", // Agilent (folder) or Bruker (folder)
-                    ".yep", // Bruker
-                    ".baf", // Bruker
-                    "fid", // Bruker
-                    ".lcd", // Shimadzu
-                    ".wiff", // Waters
-                    ".mzml",
-                    ".mzml.gz",
-                    ".mzxml",
-                    ".mzxml.gz",
-                    ".mgf",
-                    ".mgf.gz",
-                    ".uimf",
-                };
-            }
-        }
+            ".raw", // Thermo (file) or Waters (folder)
+            ".d", // Agilent (folder) or Bruker (folder)
+            ".yep", // Bruker
+            ".baf", // Bruker
+            "fid", // Bruker
+            ".lcd", // Shimadzu
+            ".wiff", // Waters
+            ".mzml",
+            ".mzml.gz",
+            ".mzxml",
+            ".mzxml.gz",
+            ".mgf",
+            ".mgf.gz",
+            ".uimf",
+        };
 
         /// <summary>
         /// Check the file path to see if it is to files in a directory dataset type (.raw folder, or .d folder)
@@ -342,12 +293,12 @@ namespace InformedProteomics.Backend.MassSpecData
 #if DEBUG
                 Console.WriteLine("Adding assembly resolver...");
 #endif
-                AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReaderImplementation.ProteoWizardAssemblyResolver;
+                AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardAssemblyResolver;
                 _resolverAdded = true;
             }
         }
 
-        private static bool _resolverAdded = false;
+        private static bool _resolverAdded;
 
         /// <summary>
         /// On a missing DLL event, searches a path specified by FindPwizPath for the ProteoWizard dlls, and loads them
@@ -566,7 +517,7 @@ namespace InformedProteomics.Backend.MassSpecData
             else
             {
                 // Sorting by version failed, try the old method.
-                subFolders.Sort((x, y) => x.FullName.CompareTo(y.FullName));
+                subFolders.Sort((x, y) => string.Compare(x.FullName, y.FullName, StringComparison.Ordinal));
                 subFolders.Reverse(); // reverse the sort order - this should give us the highest installed version of ProteoWizard first
             }
 
@@ -651,8 +602,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Private members and functions
 
-        private bool _loaded = false;
-        private int _numSpectra = 0;
+        private bool _loaded;
+        private int _numSpectra;
 
         private readonly MSData _dataFile = new MSData();
         // Uses the centroiding/peak picking algorithm that the vendor libraries provide, if available; otherwise uses a low-quality centroiding algorithm
@@ -671,7 +622,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var readers = ReaderList.FullReaderList;
             readers.read(FilePath, _dataFile);
-            if ((new string[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt", "uimf", "uimf.gz" })
+            if (new[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt", "uimf", "uimf.gz" }
                 .Any(ext => FilePath.ToLower().EndsWith(ext)))
             {
                 // Files that do not have vendor centroiding available
@@ -698,7 +649,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (string.IsNullOrWhiteSpace(_srcFileChecksum))
             {
-                var fileForChecksum = string.Empty;
+                string fileForChecksum;
                 if (File.Exists(FilePath))
                 {
                     // is file
@@ -741,7 +692,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
             LoadPwizReader();
-            for (int i = 1; i <= _numSpectra; i++)
+            for (var i = 1; i <= _numSpectra; i++)
             {
                 yield return ReadSpectrum(i);
             }
@@ -774,8 +725,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         if (CV.cvIsA(cvParam.cvid, CVID.MS_nativeID_format))
                         {
-                            var cvInt = (int) cvParam.cvid;
-                            var format = (PSI_Interface.CV.CV.CVID) cvInt;
+                            var cvInt = (int)cvParam.cvid;
+                            var format = (PSI_Interface.CV.CV.CVID)cvInt;
                             return format;
                         }
                     }
@@ -842,8 +793,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var msLevel = (int)(pwizSpec.cvParam(CVID.MS_ms_level).value);
             var tic = (double)(pwizSpec.cvParam(CVID.MS_total_ion_current).value);
-            double[] mzArray = new double[0];
-            double[] intensityArray = new double[0];
+            var mzArray = new double[0];
+            var intensityArray = new double[0];
             foreach (var bda in pwizSpec.binaryDataArrays)
             {
                 if (bda.hasCVParam(CVID.MS_m_z_array))
@@ -873,7 +824,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         thermoMonoMass = (double)(up.value);
                     }
                 }
-                ActivationMethod am = ActivationMethod.Unknown;
+                var am = ActivationMethod.Unknown;
                 Data.Spectrometry.IsolationWindow iw = null;
                 foreach (var precursor in pwizSpec.precursors)
                 {

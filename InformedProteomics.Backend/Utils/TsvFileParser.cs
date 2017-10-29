@@ -39,10 +39,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Number of rows
         /// </summary>
-        public int NumData
-        {
-            get { return _rows.Count; }
-        }
+        public int NumData => _rows.Count;
 
         /// <summary>
         /// Get the TSV file headers

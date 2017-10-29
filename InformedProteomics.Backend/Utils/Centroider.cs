@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -25,8 +24,8 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="intensities"></param>
         public Centroider(IList<double> mzs, IList<double> intensities)
         {
-            this.Mzs = mzs;
-            this.Intensities = intensities;
+            Mzs = mzs;
+            Intensities = intensities;
         }
 
         /// <summary>
@@ -38,13 +37,13 @@ namespace InformedProteomics.Backend.Utils
         {
             var list1 = new List<double>();
             var list2 = new List<double>();
-            bool flag = true;
-            double num1 = 0.0;
-            double num2 = 0.0;
-            double num3 = 0.0;
-            for (int index = 0; index < Enumerable.Count<double>((IEnumerable<double>)this.Mzs); ++index)
+            var flag = true;
+            var num1 = 0.0;
+            var num2 = 0.0;
+            var num3 = 0.0;
+            for (var index = 0; index < Mzs.Count; ++index)
             {
-                double num4 = this.Intensities[index];
+                var num4 = Intensities[index];
                 if (num4 < num3)
                 {
                     flag = false;
@@ -62,10 +61,10 @@ namespace InformedProteomics.Backend.Utils
                     }
                     flag = true;
                 }
-                double num5 = num2 + num4;
+                var num5 = num2 + num4;
                 if (num5 > 0.0)
                 {
-                    double num6 = this.Mzs[index];
+                    var num6 = Mzs[index];
                     num1 = (num1 * num2 + num6 * num4) / num5;
                     num2 = num5;
                 }

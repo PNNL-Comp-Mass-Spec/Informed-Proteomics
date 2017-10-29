@@ -94,7 +94,7 @@ namespace InformedProteomics.Backend.MathAndStats
             if (a == null) throw new Exception("Fit must be called before you can evaluate.");
         }
 
-        private int _lastIndex = 0;
+        private int _lastIndex;
 
         /// <summary>
         /// Find where in xOrig the specified x falls, by simultaneous traverse.
@@ -125,9 +125,9 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns>The y value.</returns>
         private float EvalSpline(float x, int j, bool debug = false)
         {
-            float dx = xOrig[j + 1] - xOrig[j];
-            float t = (x - xOrig[j]) / dx;
-            float y = (1 - t) * yOrig[j] + t * yOrig[j + 1] + t * (1 - t) * (a[j] * (1 - t) + b[j] * t); // equation 9
+            var dx = xOrig[j + 1] - xOrig[j];
+            var t = (x - xOrig[j]) / dx;
+            var y = (1 - t) * yOrig[j] + t * yOrig[j + 1] + t * (1 - t) * (a[j] * (1 - t) + b[j] * t); // equation 9
             if (debug) Console.WriteLine("xs = {0}, j = {1}, t = {2}", x, j, t);
             return y;
         }
@@ -174,14 +174,15 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             // Save x and y for eval
-            this.xOrig = x;
-            this.yOrig = y;
+            xOrig = x;
+            yOrig = y;
 
-            int n = x.Length;
-            float[] r = new float[n]; // the right hand side numbers: wikipedia page overloads b
+            var n = x.Length;
+            var r = new float[n]; // the right hand side numbers: wikipedia page overloads b
 
-            TriDiagonalMatrixF m = new TriDiagonalMatrixF(n);
-            float dx1, dx2, dy1, dy2;
+            var m = new TriDiagonalMatrixF(n);
+            float dx1;
+            float dy1;
 
             // First row is different (equation 16 from the article)
             if (float.IsNaN(startSlope))
@@ -198,17 +199,17 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             // Body rows (equation 15 from the article)
-            for (int i = 1; i < n - 1; i++)
+            for (var i = 1; i < n - 1; i++)
             {
                 dx1 = x[i] - x[i - 1];
-                dx2 = x[i + 1] - x[i];
+                var dx2 = x[i + 1] - x[i];
 
                 m.A[i] = 1.0f / dx1;
                 m.C[i] = 1.0f / dx2;
                 m.B[i] = 2.0f * (m.A[i] + m.C[i]);
 
                 dy1 = y[i] - y[i - 1];
-                dy2 = y[i + 1] - y[i];
+                var dy2 = y[i + 1] - y[i];
                 r[i] = 3 * (dy1 / (dx1 * dx1) + dy2 / (dx2 * dx2));
             }
 
@@ -228,17 +229,17 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             if (debug) Console.WriteLine("Tri-diagonal matrix:\n{0}", m.ToDisplayString(":0.0000", "  "));
-            if (debug) Console.WriteLine("r: {0}", ArrayUtil.ToString<float>(r));
+            if (debug) Console.WriteLine("r: {0}", ArrayUtil.ToString(r));
 
             // k is the solution to the matrix
-            float[] k = m.Solve(r);
-            if (debug) Console.WriteLine("k = {0}", ArrayUtil.ToString<float>(k));
+            var k = m.Solve(r);
+            if (debug) Console.WriteLine("k = {0}", ArrayUtil.ToString(k));
 
             // a and b are each spline's coefficients
-            this.a = new float[n - 1];
-            this.b = new float[n - 1];
+            a = new float[n - 1];
+            b = new float[n - 1];
 
-            for (int i = 1; i < n; i++)
+            for (var i = 1; i < n; i++)
             {
                 dx1 = x[i] - x[i - 1];
                 dy1 = y[i] - y[i - 1];
@@ -246,8 +247,8 @@ namespace InformedProteomics.Backend.MathAndStats
                 b[i - 1] = -k[i] * dx1 + dy1; // equation 11 from the article
             }
 
-            if (debug) Console.WriteLine("a: {0}", ArrayUtil.ToString<float>(a));
-            if (debug) Console.WriteLine("b: {0}", ArrayUtil.ToString<float>(b));
+            if (debug) Console.WriteLine("a: {0}", ArrayUtil.ToString(a));
+            if (debug) Console.WriteLine("b: {0}", ArrayUtil.ToString(b));
         }
 
         #endregion
@@ -267,14 +268,14 @@ namespace InformedProteomics.Backend.MathAndStats
         {
             CheckAlreadyFitted();
 
-            int n = x.Length;
-            float[] y = new float[n];
+            var n = x.Length;
+            var y = new float[n];
             _lastIndex = 0; // Reset simultaneous traversal in case there are multiple calls
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 // Find which spline can be used to compute this x (by simultaneous traverse)
-                int j = GetNextXIndex(x[i]);
+                var j = GetNextXIndex(x[i]);
 
                 // Evaluate using j'th spline
                 y[i] = EvalSpline(x[i], j, debug);
@@ -296,19 +297,19 @@ namespace InformedProteomics.Backend.MathAndStats
         {
             CheckAlreadyFitted();
 
-            int n = x.Length;
-            float[] qPrime = new float[n];
+            var n = x.Length;
+            var qPrime = new float[n];
             _lastIndex = 0; // Reset simultaneous traversal in case there are multiple calls
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 // Find which spline can be used to compute this x (by simultaneous traverse)
-                int j = GetNextXIndex(x[i]);
+                var j = GetNextXIndex(x[i]);
 
                 // Evaluate using j'th spline
-                float dx = xOrig[j + 1] - xOrig[j];
-                float dy = yOrig[j + 1] - yOrig[j];
-                float t = (x[i] - xOrig[j]) / dx;
+                var dx = xOrig[j + 1] - xOrig[j];
+                var dy = yOrig[j + 1] - yOrig[j];
+                var t = (x[i] - xOrig[j]) / dx;
 
                 // From equation 5 we could also compute q' (qp) which is the slope at this x
                 qPrime[i] = dy / dx
@@ -337,7 +338,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns>The computed y values for each xs.</returns>
         public static float[] Compute(float[] x, float[] y, float[] xs, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
-            CubicSpline spline = new CubicSpline();
+            var spline = new CubicSpline();
             return spline.FitAndEval(x, y, xs, startSlope, endSlope, debug);
         }
 
@@ -353,35 +354,35 @@ namespace InformedProteomics.Backend.MathAndStats
         public static void FitGeometric(float[] x, float[] y, int nOutputPoints, out float[] xs, out float[] ys)
         {
             // Compute distances
-            int n = x.Length;
-            float[] dists = new float[n]; // cumulative distance
+            var n = x.Length;
+            var dists = new float[n]; // cumulative distance
             dists[0] = 0;
             float totalDist = 0;
 
-            for (int i = 1; i < n; i++)
+            for (var i = 1; i < n; i++)
             {
-                float dx = x[i] - x[i - 1];
-                float dy = y[i] - y[i - 1];
-                float dist = (float)Math.Sqrt(dx * dx + dy * dy);
+                var dx = x[i] - x[i - 1];
+                var dy = y[i] - y[i - 1];
+                var dist = (float)Math.Sqrt(dx * dx + dy * dy);
                 totalDist += dist;
                 dists[i] = totalDist;
             }
 
             // Create 'times' to interpolate to
-            float dt = totalDist / (nOutputPoints - 1);
-            float[] times = new float[nOutputPoints];
+            var dt = totalDist / (nOutputPoints - 1);
+            var times = new float[nOutputPoints];
             times[0] = 0;
 
-            for (int i = 1; i < nOutputPoints; i++)
+            for (var i = 1; i < nOutputPoints; i++)
             {
                 times[i] = times[i - 1] + dt;
             }
 
             // Spline fit both x and y to times
-            CubicSpline xSpline = new CubicSpline();
+            var xSpline = new CubicSpline();
             xs = xSpline.FitAndEval(dists, x, times);
 
-            CubicSpline ySpline = new CubicSpline();
+            var ySpline = new CubicSpline();
             ys = ySpline.FitAndEval(dists, y, times);
         }
 

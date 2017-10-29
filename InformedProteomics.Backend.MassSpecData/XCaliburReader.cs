@@ -45,8 +45,8 @@ namespace InformedProteomics.Backend.MassSpecData
             _msfileReader.OpenRawFile(filePath);
 
             _minLcScan = 1;
-            _numSpectra = ReadNumSpectra();
-            _maxLcScan = _numSpectra;
+            NumSpectra = ReadNumSpectra();
+            _maxLcScan = NumSpectra;
 
             _msLevel = new Dictionary<int, int>();
 
@@ -89,19 +89,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
         /// </summary>
-        public CV.CVID NativeIdFormat
-        {
-            get { return CV.CVID.MS_Thermo_nativeID_format; }
-        }
+        public CV.CVID NativeIdFormat => CV.CVID.MS_Thermo_nativeID_format;
 
         /// <summary>
         /// The Native Format of the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
         /// </summary>
-        public CV.CVID NativeFormat
-        {
-            get { return CV.CVID.MS_Thermo_RAW_format; }
-        }
+        public CV.CVID NativeFormat => CV.CVID.MS_Thermo_RAW_format;
 
         /// <summary>
         /// Path to the file
@@ -129,8 +123,8 @@ namespace InformedProteomics.Backend.MassSpecData
             var scanInfo = GetScanInfo(scanNum);
 
             // default empty arrays, if peak data not requested.
-            double[] mzArr = new double[]{};
-            double[] intensityArr = new double[]{};
+            var mzArr = new double[]{};
+            var intensityArr = new double[]{};
 
             if (includePeaks)
             {
@@ -205,10 +199,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// The number of spectra in the file.
         /// </summary>
-        public int NumSpectra
-        {
-            get { return _numSpectra; }
-        }
+        public int NumSpectra { get; }
 
         /// <summary>
         /// Get the minimum scan number in the file
@@ -226,8 +217,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public int ReadMsLevel(int scanNum)
         {
-            int msLevel;
-            if (_msLevel.TryGetValue(scanNum, out msLevel))
+            if (_msLevel.TryGetValue(scanNum, out var msLevel))
                 return msLevel;
 
             var scanInfo = GetScanInfo(scanNum);
@@ -247,15 +237,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return scanInfo.RetentionTime;
         }
 
-        // Obsolete: Now using ThermoRawFileReader")>
-        //private readonly MSFileReaderLib.IXRawfile5 _msfileReader;
         private readonly XRawFileIO _msfileReader;
 
         private clsScanInfo _cachedScanInfo;
 
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
-        private readonly int _numSpectra;
         private readonly Dictionary<int, int> _msLevel;
 
         /// <summary>
@@ -287,12 +274,11 @@ namespace InformedProteomics.Backend.MassSpecData
             int? charge = null;
 
             var scanInfo = GetScanInfo(scanNum);
-            string valueText;
 
-            if (scanInfo.TryGetScanEvent("Monoisotopic M/Z:", out valueText))
+            if (scanInfo.TryGetScanEvent("Monoisotopic M/Z:", out var valueText))
             {
                 monoIsotopicMz = Convert.ToDouble(valueText);
-                if (monoIsotopicMz == 0.0)
+                if (Math.Abs(monoIsotopicMz.Value) < float.Epsilon)
                     monoIsotopicMz = null;
             }
 
@@ -327,9 +313,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private static double ParseMzValueFromThermoScanInfo(string scanFilterString)
         {
-            const string pattern = @"(?<mz>[0-9.]+)@";
-
-            var matchCid = Regex.Match(scanFilterString, pattern);
+            var matchCid = Regex.Match(scanFilterString, @"(?<mz>[0-9.]+)@");
 
             if (matchCid.Success)
             {
@@ -389,8 +373,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Close()
         {
-            if (_msfileReader != null)
-                _msfileReader.CloseRawFile();
+            _msfileReader?.CloseRawFile();
         }
 
         /// <summary>
@@ -398,8 +381,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Dispose()
         {
-            if (_msfileReader != null)
-                _msfileReader.CloseRawFile();
+            _msfileReader?.CloseRawFile();
         }
     }
 }

@@ -155,7 +155,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short C
         {
-            get { return _c; }
+            get => _c;
             set
             {
                 _c = value;
@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short H
         {
-            get { return _h; }
+            get => _h;
             set
             {
                 _h = value;
@@ -183,7 +183,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short N
         {
-            get { return _n; }
+            get => _n;
             set
             {
                 _n = value;
@@ -197,7 +197,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short O
         {
-            get { return _o; }
+            get => _o;
             set
             {
                 _o = value;
@@ -211,7 +211,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short S
         {
-            get { return _s; }
+            get => _s;
             set
             {
                 _s = value;
@@ -225,7 +225,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public short P
         {
-            get { return _p; }
+            get => _p;
             set
             {
                 _p = value;
@@ -239,7 +239,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public Dictionary<Atom, short> AdditionalElements
         {
-            get { return _additionalElements; }
+            get => _additionalElements;
             set
             {
                 _additionalElements = value;
@@ -251,18 +251,12 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Mass of the composition
         /// </summary>
-        public override double Mass
-        {
-            get { return (double)(_mass ?? (_mass = GetMonoIsotopicMass())); }
-        }
+        public override double Mass => (double)(_mass ?? (_mass = GetMonoIsotopicMass()));
 
         /// <summary>
         /// Nominal mass of the composition
         /// </summary>
-        public override int NominalMass
-        {
-            get { return (int)(_nominalMass ?? (_nominalMass = GetNominalMass())); }
-        }
+        public override int NominalMass => (int)(_nominalMass ?? (_nominalMass = GetNominalMass()));
 
         #endregion
 
@@ -290,8 +284,9 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            var other = obj as Composition;
-            if (other == null) return false;
+            if (!(obj is Composition other))
+                return false;
+
             if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S || _p != other.P)
                 return false;
 
@@ -367,8 +362,8 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public Composition Add(Composition c)
         {
-            var comWithDelta = c as CompositionWithDeltaMass;
-            if (comWithDelta != null) return comWithDelta.Add(this);
+            if (c is CompositionWithDeltaMass comWithDelta)
+                return comWithDelta.Add(this);
 
             return AddComposition(c);
         }
@@ -381,8 +376,9 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public static Composition operator +(Composition c1, Composition c2)
         {
-            var compWithDelta = c1 as CompositionWithDeltaMass;
-            if (compWithDelta == null) return c1.Add(c2);
+            if (!(c1 is CompositionWithDeltaMass compWithDelta))
+                return c1.Add(c2);
+
             return compWithDelta.Add(c2);
         }
 
@@ -406,8 +402,9 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public static Composition operator -(Composition c)
         {
-            var compWithDelta = c as CompositionWithDeltaMass;
-            if (compWithDelta == null) return c.Negate();
+            if (!(c is CompositionWithDeltaMass compWithDelta))
+                return c.Negate();
+
             return compWithDelta.Negate();
         }
 
@@ -572,7 +569,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         private int GetNominalMass()
         {
-            int nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
+            var nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
             if (_additionalElements != null) nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
            return nominalMass;
         }

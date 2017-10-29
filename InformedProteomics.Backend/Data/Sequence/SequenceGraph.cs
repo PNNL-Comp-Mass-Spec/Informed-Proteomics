@@ -53,18 +53,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Amino acid set used in the graph
         /// </summary>
-        public AminoAcidSet AminoAcidSet
-        {
-            get { return _aminoAcidSet; }
-        }
+        public AminoAcidSet AminoAcidSet { get; }
 
         /// <summary>
         /// Modifications used in this graph
         /// </summary>
-        public ModificationParams ModificationParams
-        {
-            get { return _modificationParams; }
-        }
+        public ModificationParams ModificationParams => _modificationParams;
 
         /// <summary>
         /// If the sequence graph is valid
@@ -364,7 +358,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="cTerm"></param>
         protected SequenceGraph(AminoAcidSet aminoAcidSet, AminoAcid nTerm, string sequence, AminoAcid cTerm)
         {
-            _aminoAcidSet = aminoAcidSet;
+            AminoAcidSet = aminoAcidSet;
             _sequence = sequence;
             _nTerm = nTerm;
 
@@ -407,7 +401,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (IsValid) AddAminoAcid(nTerm.Residue);
         }
 
-        private Tuple<double, string> GetFragmentScoreAndModifications(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, Tuple<double, string>[][] maxScoreAndMods)
+        private Tuple<double, string> GetFragmentScoreAndModifications(
+            int seqIndex,
+            int modIndex,
+            IScorer scorer,
+            IReadOnlyList<double?[]> nodeScore,
+            IReadOnlyList<Tuple<double, string>[]> maxScoreAndMods)
         {
             var scoreAndMods = maxScoreAndMods[seqIndex][modIndex];
             if (scoreAndMods != null) return scoreAndMods;
@@ -439,8 +438,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             var modPos = _index - seqIndex;
             var aminoAcid = _aminoAcidSequence[seqIndex];
-            var modAa = aminoAcid as ModifiedAminoAcid;
-            if (modAa != null)
+            if (aminoAcid is ModifiedAminoAcid modAa)
             {
                 var modificationName = modAa.Modification.Name;
                 if (string.IsNullOrEmpty(bestPrevSequence))
@@ -571,7 +569,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         protected readonly int _maxSeqIndex;
 
-        private readonly AminoAcidSet _aminoAcidSet;
         private readonly ModificationParams _modificationParams;
 
         private int _index;

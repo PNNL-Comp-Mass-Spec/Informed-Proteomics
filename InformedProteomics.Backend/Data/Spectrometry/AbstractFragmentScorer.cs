@@ -8,7 +8,7 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
-    using InformedProteomics.Backend.Data.Composition;
+    using Composition;
 
     /// <summary>
     /// Base class for fragment scorers
@@ -31,28 +31,33 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             MinProductCharge = minCharge;
             MaxProductCharge = maxCharge;
 
-            ActivationMethod actToUse = activationMethod;
+            var actToUse = activationMethod;
             if (actToUse == ActivationMethod.Unknown)
             {
-                var spectrum = spec as ProductSpectrum;
-                if (spectrum != null) actToUse = spectrum.ActivationMethod;
-                else actToUse = ActivationMethod.CID;
+                if (spec is ProductSpectrum spectrum)
+                    actToUse = spectrum.ActivationMethod;
+                else
+                    actToUse = ActivationMethod.CID;
             }
 
-            if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD) BaseIonTypes = BaseIonTypesCID;
-            else if (actToUse == ActivationMethod.ETD) BaseIonTypes = BaseIonTypesETD;
-            else if (actToUse == ActivationMethod.UVPD) BaseIonTypes = BaseIonTypesUVPD;
-            else BaseIonTypes = BaseIonTypesCID;
+            if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD)
+                BaseIonTypes = BaseIonTypesCID;
+            else if (actToUse == ActivationMethod.ETD)
+                BaseIonTypes = BaseIonTypesETD;
+            else if (actToUse == ActivationMethod.UVPD)
+                BaseIonTypes = BaseIonTypesUVPD;
+            else
+                BaseIonTypes = BaseIonTypesCID;
 
             if (actToUse == ActivationMethod.UVPD)
             {
-                this.PrefixOffsetMass = this.BaseIonTypes[0].OffsetComposition.Mass;
-                this.SuffixOffsetMass = this.BaseIonTypes[2].OffsetComposition.Mass;
+                PrefixOffsetMass = BaseIonTypes[0].OffsetComposition.Mass;
+                SuffixOffsetMass = BaseIonTypes[2].OffsetComposition.Mass;
             }
             else
             {
-                this.PrefixOffsetMass = this.BaseIonTypes[0].OffsetComposition.Mass;
-                this.SuffixOffsetMass = this.BaseIonTypes[1].OffsetComposition.Mass;
+                PrefixOffsetMass = BaseIonTypes[0].OffsetComposition.Mass;
+                SuffixOffsetMass = BaseIonTypes[1].OffsetComposition.Mass;
             }
 
             RelativeIsotopeIntensityThreshold = relativeIsotopeIntensityThreshold;

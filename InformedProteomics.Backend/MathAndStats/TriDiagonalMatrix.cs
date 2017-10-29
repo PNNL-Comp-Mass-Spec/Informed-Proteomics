@@ -26,7 +26,6 @@
 //
 
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace InformedProteomics.Backend.MathAndStats
@@ -67,10 +66,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <summary>
         /// The width and height of this matrix.
         /// </summary>
-        public int N
-        {
-            get { return (A != null ? A.Length : 0); }
-        }
+        public int N => A?.Length ?? 0;
 
         /// <summary>
         /// Indexer. Setter throws an exception if you try to set any not on the super, main, or sub diagonals.
@@ -79,27 +75,28 @@ namespace InformedProteomics.Backend.MathAndStats
         {
             get
             {
-                int di = row - col;
+                var di = row - col;
 
                 if (di == 0)
                 {
                     return B[row];
                 }
-                else if (di == -1)
+
+                if (di == -1)
                 {
-                    Debug.Assert(row < N - 1);
                     return C[row];
                 }
-                else if (di == 1)
+
+                if (di == 1)
                 {
-                    Debug.Assert(row > 0);
                     return A[row];
                 }
-                else return 0;
+
+                return 0;
             }
             set
             {
-                int di = row - col;
+                var di = row - col;
 
                 if (di == 0)
                 {
@@ -107,12 +104,10 @@ namespace InformedProteomics.Backend.MathAndStats
                 }
                 else if (di == -1)
                 {
-                    Debug.Assert(row < N - 1);
                     C[row] = value;
                 }
                 else if (di == 1)
                 {
-                    Debug.Assert(row > 0);
                     A[row] = value;
                 }
                 else
@@ -127,9 +122,9 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         public TriDiagonalMatrixF(int n)
         {
-            this.A = new float[n];
-            this.B = new float[n];
-            this.C = new float[n];
+            A = new float[n];
+            B = new float[n];
+            C = new float[n];
         }
 
         /// <summary>
@@ -139,16 +134,16 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="prefix">Optional. Per-line indentation prefix.</param>
         public string ToDisplayString(string fmt = "", string prefix = "")
         {
-            if (this.N > 0)
+            if (N > 0)
             {
                 var s = new StringBuilder();
-                string formatString = "{0" + fmt + "}";
+                var formatString = "{0" + fmt + "}";
 
-                for (int r = 0; r < N; r++)
+                for (var r = 0; r < N; r++)
                 {
                     s.Append(prefix);
 
-                    for (int c = 0; c < N; c++)
+                    for (var c = 0; c < N; c++)
                     {
                         s.AppendFormat(formatString, this[r, c]);
                         if (c < N - 1) s.Append(", ");
@@ -159,10 +154,8 @@ namespace InformedProteomics.Backend.MathAndStats
 
                 return s.ToString();
             }
-            else
-            {
-                return prefix + "0x0 Matrix";
-            }
+
+            return prefix + "0x0 Matrix";
         }
 
         /// <summary>
@@ -175,7 +168,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="d">Right side of the equation.</param>
         public float[] Solve(float[] d)
         {
-            int n = this.N;
+            var n = N;
 
             if (d.Length != n)
             {
@@ -183,28 +176,28 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             // cPrime
-            float[] cPrime = new float[n];
+            var cPrime = new float[n];
             cPrime[0] = C[0] / B[0];
 
-            for (int i = 1; i < n; i++)
+            for (var i = 1; i < n; i++)
             {
                 cPrime[i] = C[i] / (B[i] - cPrime[i-1] * A[i]);
             }
 
             // dPrime
-            float[] dPrime = new float[n];
+            var dPrime = new float[n];
             dPrime[0] = d[0] / B[0];
 
-            for (int i = 1; i < n; i++)
+            for (var i = 1; i < n; i++)
             {
                 dPrime[i] = (d[i] - dPrime[i-1]*A[i]) / (B[i] - cPrime[i - 1] * A[i]);
             }
 
             // Back substitution
-            float[] x = new float[n];
+            var x = new float[n];
             x[n - 1] = dPrime[n - 1];
 
-            for (int i = n-2; i >= 0; i--)
+            for (var i = n-2; i >= 0; i--)
             {
                 x[i] = dPrime[i] - cPrime[i] * x[i + 1];
             }

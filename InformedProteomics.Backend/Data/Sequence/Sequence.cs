@@ -122,7 +122,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Mass of the entire sequence
         /// </summary>
-        public double Mass { get { return Composition.Mass; } }
+        public double Mass => Composition.Mass;
 
         private readonly double[] _prefixMass;
 
