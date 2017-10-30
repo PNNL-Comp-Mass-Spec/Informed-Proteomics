@@ -245,13 +245,13 @@ namespace InformedProteomics.Backend.SearchResults
 
             if (!File.Exists(targetResultFilePath))
             {
-                ErrorMessage = errorBase + "target file not found, " + Path.GetFileName(targetResultFilePath);
+                ErrorMessage = errorBase + "target results file not found, " + Path.GetFileName(targetResultFilePath);
                 return false;
             }
 
             if (!File.Exists(decoyResultFilePath))
             {
-                ErrorMessage = errorBase + "decoy file not found, " + Path.GetFileName(decoyResultFilePath);
+                ErrorMessage = errorBase + "decoy results file not found, " + Path.GetFileName(decoyResultFilePath);
                 return false;
             }
 
@@ -266,13 +266,13 @@ namespace InformedProteomics.Backend.SearchResults
             var errorBase = "Cannot compute FDR Scores; ";
             if (targetResults == null || targetResults.Count < 1)
             {
-                ErrorMessage = errorBase + "target file is empty";
+                ErrorMessage = errorBase + "target results file is empty";
                 return false;
             }
 
             if (decoyResults == null || decoyResults.Count < 1)
             {
-                ErrorMessage = errorBase + "decoy file is empty";
+                ErrorMessage = errorBase + "decoy results file is empty";
                 return false;
             }
 
