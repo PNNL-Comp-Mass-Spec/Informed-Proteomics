@@ -200,11 +200,11 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
-        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
-        [TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
-        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
-        public void TestSequenceEnumerationIntact(double size, string dbFile, int expected)
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2399)]  // 1.5MB
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 3711)]  // 3MB
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 8898)]  // 6MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
+        public void TestSequenceEnumerationIntact(string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
@@ -258,11 +258,11 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2700388)]  // 1.5MB
-        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 4165765)]  // 3MB
-        [TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396)]  // 6MB
-        [TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
-        public void TestSequenceEnumerationNCTerm(double size, string dbFile, int expected)
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 2700388)]  // 1.5MB
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 4165765)]  // 3MB
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396)]  // 6MB
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
+        public void TestSequenceEnumerationNCTerm(string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
@@ -321,11 +321,11 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
-        //[TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        //[TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
-        public void TestSequenceEnumerationSerial(double size, string dbFile, int expected)
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        public void TestSequenceEnumerationSerial(string dbFile, int expected)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
