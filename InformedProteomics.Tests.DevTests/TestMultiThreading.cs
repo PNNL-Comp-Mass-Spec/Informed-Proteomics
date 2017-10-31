@@ -7,7 +7,6 @@ using System.Reflection;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace InformedProteomics.Tests.DevTests
 {
@@ -106,12 +105,26 @@ namespace InformedProteomics.Tests.DevTests
             return array.AsParallel().AsUnordered().Sum();
         }
 
+
         [Test]
-        [TestCase(1.5, @"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)]  // 1.5MB
-        [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
-        //[TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
-        //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
-        public void TestSequenceEnumeration(double size, string dbFile, int expectedPeptideCount)
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)] // 1.5MB
+        public void TestSequenceEnumeration(string dbFile, int expectedPeptideCount)
+        {
+            TestSequenceEnumerationWork(dbFile, expectedPeptideCount);
+        }
+
+
+        [Test]
+        [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)] // 3MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
+        //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
+        [Category("Long_Running")]
+        public void TestSequenceEnumerationAddnl(string dbFile, int expectedPeptideCount)
+        {
+            TestSequenceEnumerationWork(dbFile, expectedPeptideCount);
+        }
+
+        private void TestSequenceEnumerationWork(string dbFile, int expectedPeptideCount)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
