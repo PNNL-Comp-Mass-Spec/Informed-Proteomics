@@ -485,7 +485,7 @@ namespace InformedProteomics.Backend.Database
 
             // pre, peptide sequence, next
             // Should probably be run in parallel
-            foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength+2))
+            foreach (var seqAndLcp in SequencesWithLcpAndOffset(minLength, maxLength + 2))
             {
                 var seqArr = Encoding.GetString(seqAndLcp.Sequence);
                 //var seqArr = seqAndLcp.Sequence;
@@ -501,10 +501,10 @@ namespace InformedProteomics.Backend.Database
                     if (!isNTermEnzyme) // C-term enzyme
                     {
                         if (isCleavable[seqArr[0]]) ++ntt;
-                        if (ntt < numTolerableTermini-1) continue;
+                        if (ntt < numTolerableTermini - 1) continue;
 
                         // Could be run in parallel, but probably not worth the cost.
-                        for (var i = 1; i < seqArr.Length-1; i++)
+                        for (var i = 1; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
                             if (!isStandardAminoAcid[code]) break;
@@ -513,7 +513,7 @@ namespace InformedProteomics.Backend.Database
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || seqArr[i + 1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
@@ -548,7 +548,7 @@ namespace InformedProteomics.Backend.Database
                 else    // No enzyme
                 {
                     // Could be run in parallel, but probably not worth the cost.
-                    for (var i = 1; i < seqArr.Length-1; i++)
+                    for (var i = 1; i < seqArr.Length - 1; i++)
                     {
                         var code = seqArr[i];
                         if (!isStandardAminoAcid[code]) break;
@@ -640,10 +640,10 @@ namespace InformedProteomics.Backend.Database
                 if (!isNTermEnzyme) // C-term enzyme
                 {
                     if (isCleavable[seqArr[0]]) ++ntt;
-                    if (!(ntt < numTolerableTermini-1))
+                    if (!(ntt < numTolerableTermini - 1))
                     {
                         // Could be run in parallel, but probably not worth the cost.
-                        for (var i = 1; i < seqArr.Length-1; i++)
+                        for (var i = 1; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
                             if (!isStandardAminoAcid[code]) break;
@@ -652,7 +652,7 @@ namespace InformedProteomics.Backend.Database
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
                             {
-                                if (ntt + (isCleavable[code] || seqArr[i+1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
+                                if (ntt + (isCleavable[code] || seqArr[i + 1] == FastaDatabaseConstants.Delimiter ? 1 : 0) >= numTolerableTermini)
                                 {
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
@@ -689,7 +689,7 @@ namespace InformedProteomics.Backend.Database
             else    // No enzyme
             {
                 // Could be run in parallel, but probably not worth the cost.
-                for (var i = 1; i < seqArr.Length-1; i++)
+                for (var i = 1; i < seqArr.Length - 1; i++)
                 {
                     var code = seqArr[i];
                     if (!isStandardAminoAcid[code]) break;
@@ -776,8 +776,8 @@ namespace InformedProteomics.Backend.Database
 
             var sequence = FastaDatabase.GetSequence();
             //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
-            var suffixArray = new int[sequence.Length-1];
-            SAIS.sufsort(sequence, suffixArray, sequence.Length-1);
+            var suffixArray = new int[sequence.Length - 1];
+            SAIS.sufsort(sequence, suffixArray, sequence.Length - 1);
 
             var prevIndex = sequence.Length - 1;
 
@@ -815,7 +815,7 @@ namespace InformedProteomics.Backend.Database
         {
             var lcp = (byte)0;
 
-            while (sequence[index1+lcp] == sequence[index2+lcp])
+            while (sequence[index1 + lcp] == sequence[index2 + lcp])
             {
                 ++lcp;
                 if (lcp == byte.MaxValue) break;
