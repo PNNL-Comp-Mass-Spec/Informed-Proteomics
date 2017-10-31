@@ -580,7 +580,8 @@ namespace InformedProteomics.Backend.Database
             )
         {
             var isCleavable = new bool[128];
-            var residues = enzymaticResidues as IList<char> ?? enzymaticResidues.ToList();
+
+            var residues = enzymaticResidues?.ToList() ?? new List<char>();
 
             // Could be run in parallel, but probably not worth the cost.
             foreach (var residue in residues)
