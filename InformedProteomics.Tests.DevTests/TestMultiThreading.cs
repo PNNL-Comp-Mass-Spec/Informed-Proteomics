@@ -7,6 +7,7 @@ using System.Reflection;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace InformedProteomics.Tests.DevTests
 {
@@ -19,7 +20,7 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
 
             var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\ID_002216_235ACCEA.fasta"));
 
@@ -110,14 +111,14 @@ namespace InformedProteomics.Tests.DevTests
         [TestCase(3, @"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)]  // 3MB
         //[TestCase(6, @"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 595227563)]  // 6MB
         //[TestCase(15, @"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
-        public void TestSequenceEnumeration(double size, string dbFile, int expected)
+        public void TestSequenceEnumeration(double size, string dbFile, int expectedPeptideCount)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 
             var db = new FastaDatabase(fastaFile.FullName);
@@ -181,8 +182,8 @@ namespace InformedProteomics.Tests.DevTests
             sw.Stop();
 
             Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
-            //Assert.AreEqual(188961836, numSequences);
-            Assert.AreEqual(expected, numSequences);
+
+            Assert.AreEqual(expectedPeptideCount, numSequences);
         }
 
         [Test]
@@ -197,7 +198,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 
             const int numCTermCleavages = 0;
@@ -255,7 +256,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 
             const int numNTermCleavages = 1;
@@ -318,7 +319,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
-            var sw = new System.Diagnostics.Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 
             var db = new FastaDatabase(fastaFile.FullName);
@@ -365,40 +366,96 @@ namespace InformedProteomics.Tests.DevTests
         }
 
         [Test]
-        public void TestPrimesParallel()
+        [TestCase(10000, 1228, 20)]
+        [TestCase(1000000, 78497, 20)]
+        [TestCase(10000000, 664578, 0)]
+        public void TestPrimesParallel(int ceiling, int primeCountExpected, int resultsToPreview)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var numbers = Enumerable.Range(3, 10000000 - 3);
+            var sw = new Stopwatch();
+            sw.Start();
 
-            //var parallelQuery =
-            //  from n in numbers.AsParallel()
-            //  where Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0)
-            //  select n;
-            var parallelQuery =
-                numbers.AsParallel().Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
+            var maxValue = ceiling - 3;
+            var numbers = Enumerable.Range(3, maxValue);
 
-            //var primes = parallelQuery.ToArray();
+            if (resultsToPreview <= 0)
+            {
+
+                var primeCountParallel =
+                    numbers.AsParallel().Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
+
+                sw.Stop();
+                Console.WriteLine("Took {0:F2} seconds to find {1:N0} primes between 3 and {2}", sw.Elapsed.TotalSeconds, primeCountParallel,
+                                  maxValue);
+
+                Assert.AreEqual(primeCountExpected, primeCountParallel);
+
+            }
+            else
+            {
+                var index = 0;
+                foreach (var item in
+                    from n in numbers.AsParallel()
+                    where Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0)
+                    select n)
+                {
+                    Console.WriteLine("{0}: {1}", index, item);
+                    index++;
+
+                    if (index >= resultsToPreview)
+                        break;
+                }
+            }
+
         }
 
         [Test]
-        public void TestPrimesSerial()
+        [TestCase(10000, 1228, 20)]
+        [TestCase(1000000, 78497, 20)]
+        [TestCase(10000000, 664578, 0)]
+        public void TestPrimesSerial(int ceiling, int primeCountExpected, int resultsToPreview)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var numbers = Enumerable.Range(3, 10000000 - 3);
+            var sw = new Stopwatch();
+            sw.Start();
 
-            var parallelQuery =
-                numbers.Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
+            var maxValue = ceiling - 3;
+            var numbers = Enumerable.Range(3, maxValue);
 
-            //var serialQuery =
-            //  from n in numbers
-            //  where Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0)
-            //  select n;
 
-            //var primes = serialQuery.ToArray();
+            if (resultsToPreview <= 0)
+            {
+                var primeCountSerial =
+                    numbers.Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
+
+
+                sw.Stop();
+                Console.WriteLine("Took {0:F2} seconds to find {1:N0} primes between 3 and {2}", sw.Elapsed.TotalSeconds, primeCountSerial, maxValue);
+
+                Assert.AreEqual(primeCountExpected, primeCountSerial);
+
+            }
+            else
+            {
+                var index = 0;
+                foreach (var item in
+                    from n in numbers
+                    where Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0)
+                    select n)
+                {
+                    Console.WriteLine("{0}: {1}", index, item);
+                    index++;
+
+                    if (index >= resultsToPreview)
+                        break;
+                }
+
+            }
+
         }
 
     }
