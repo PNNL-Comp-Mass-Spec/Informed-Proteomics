@@ -770,10 +770,10 @@ namespace InformedProteomics.TopDown.Execution
                 estimatedProteins = 1;
 
             progData.StatusInternal = string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
-                    tempNumProteins,
-                    itemName,
-                    tempNumProteins / (double)estimatedProteins * 100.0,
-                    sw.Elapsed.TotalSeconds);
+                tempNumProteins,
+                itemName,
+                tempNumProteins / (double) estimatedProteins * 100.0,
+                sw.Elapsed.TotalSeconds);
             progData.Report(tempNumProteins, estimatedProteins);
 
             int secondsThreshold;
@@ -799,8 +799,8 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        private void SearchForMatches(AnnotationAndOffset annotationAndOffset,
-            ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages, bool isDecoy, CancellationToken? cancellationToken = null)
+        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            int maxNumNTermCleavages, bool isDecoy, CancellationToken? cancellationToken = null)
         {
             var pfeOptions = new ParallelOptions
             {
@@ -930,8 +930,7 @@ namespace InformedProteomics.TopDown.Execution
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             {
                 sequenceTagGen.Generate(scanNum);
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData,
-                                     "spectra");
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");
             });
 
             progData.StatusInternal = string.Empty;
@@ -941,6 +940,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private LinkedList<Tuple<double, ScoreDistribution>>[] _cachedScoreDistributions;
+
         private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             var progData = new ProgressData(progress)
@@ -998,14 +998,14 @@ namespace InformedProteomics.TopDown.Execution
                     var matchIndex = 0;
                     foreach (var match in prsms)
                     {
-                    var sequence = match.Sequence;
+                        var sequence = match.Sequence;
                         if (match == null)
                         {
                             ReportError("Match is null for index " + matchIndex + " in scan " + scanNum);
                             continue;
                         }
 
-                    var ion = match.Ion;
+                        var ion = match.Ion;
 
                         if (ion == null)
                         {
@@ -1013,31 +1013,31 @@ namespace InformedProteomics.TopDown.Execution
                             continue;
                         }
 
-                    // Re-scoring
-                    var scores = topDownScorer.GetScores(spec, sequence, ion.Composition, ion.Charge, scanNum);
+                        // Re-scoring
+                        var scores = topDownScorer.GetScores(spec, sequence, ion.Composition, ion.Charge, scanNum);
                         if (scores == null)
                         {
                             ReportWarning("scores is null for index " + matchIndex + " in scan " + scanNum);
                             continue;
                         }
 
-                    match.Score = scores.Score;
-                    match.ModificationText = scores.Modifications;
-                    match.NumMatchedFragments = scores.NumMatchedFrags;
-                    if (match.Score > CompositeScorer.ScoreParam.Cutoff)
-                    {
+                        match.Score = scores.Score;
+                        match.ModificationText = scores.Modifications;
+                        match.NumMatchedFragments = scores.NumMatchedFrags;
+                        if (match.Score > CompositeScorer.ScoreParam.Cutoff)
+                        {
                             if (matches[scanNum] == null)
                                 matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
 
-                        matches[scanNum].AddLast(match);
-                    }
+                            matches[scanNum].AddLast(match);
+                        }
 
                         matchIndex++;
-                }
+                    }
 
                     if (matches[scanNum] != null)
                         estimatedSequences += matches[scanNum].Count;
-            }
+                }
 
                 currentTask = "Parallel.ForEach";
                 OnStatusEvent("Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
@@ -1170,7 +1170,7 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <param name="errMsg">Error message</param>
         /// <param name="ex">Exception (can be null)</param>
-        /// <param name="throwException">True to thow an exception</param>
+        /// <param name="throwException">True to throw an exception</param>
         private void ReportError(string errMsg, Exception ex = null, bool throwException = true)
         {
             OnErrorEvent(errMsg, ex);
