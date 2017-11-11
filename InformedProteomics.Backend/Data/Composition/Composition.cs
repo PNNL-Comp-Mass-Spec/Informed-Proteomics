@@ -68,7 +68,6 @@ namespace InformedProteomics.Backend.Data.Composition
             _p = (short)p;
         }
 
-
         /// <summary>
         /// Constructor, with provided counts for C, H, N, O, S
         /// </summary>
@@ -111,7 +110,6 @@ namespace InformedProteomics.Backend.Data.Composition
         {
             _additionalElements = new Dictionary<Atom, short> { { additionalElement.Item1, additionalElement.Item2 } };
         }
-
 
         /// <summary>
         /// Constructor, with provided counts for C, H, N, O, S, P, and tuples of additional elements and respective counts
@@ -595,4 +593,3 @@ namespace InformedProteomics.Backend.Data.Composition
         #endregion
     }
 }
-

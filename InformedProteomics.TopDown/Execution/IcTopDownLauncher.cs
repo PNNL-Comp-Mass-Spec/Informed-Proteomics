@@ -1194,6 +1194,5 @@ namespace InformedProteomics.TopDown.Execution
             OnStatusEvent(message);
             progData.Status = message;
         }
-
     }
 }

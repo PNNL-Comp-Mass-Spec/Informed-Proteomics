@@ -19,7 +19,6 @@ namespace InformedProteomics.Tests.DevTests
     [TestFixture]
     internal class TestLcMsCaching
     {
-
         [OneTimeSetUp]
         public void Setup()
         {
@@ -91,7 +90,6 @@ namespace InformedProteomics.Tests.DevTests
 
             Console.WriteLine("Scans with mass {0}:", massToFind);
             Console.WriteLine(scanNumList);
-
         }
 
         [Test]

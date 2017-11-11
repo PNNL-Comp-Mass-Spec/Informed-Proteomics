@@ -13,7 +13,6 @@ namespace InformedProteomics.Tests.FunctionalTests
     [TestFixture]
     class TestReadingProMex
     {
-
         [OneTimeSetUp]
         public void Setup()
         {

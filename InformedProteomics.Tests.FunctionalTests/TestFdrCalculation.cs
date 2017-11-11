@@ -106,14 +106,12 @@ namespace InformedProteomics.Tests.FunctionalTests
                 VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.01168830);
                 VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.02279440);
 
-
                 // FLIP-based scores:
                 // VerifyQValue(tdaResultPath, qValueByScan, 1808, 9.99e-308);
                 // VerifyQValue(tdaResultPath, qValueByScan, 2565, 1.323038e-38);
                 // VerifyQValue(tdaResultPath, qValueByScan, 1682, 1.912647e-12);
                 // VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.010666);
                 // VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.113394);
-
             }
             Console.WriteLine(@"Done, see " + tdaResultPath);
         }
@@ -138,7 +136,6 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Console.WriteLine("QValue for scan {0} is {1:F8}", scanNumber, qValue);
 
             Assert.AreEqual(expectedValue, qValue, tolerance, "Unexpected QValue for scan {0} in {1}", scanNumber, tdaResultPath);
-
         }
 
         [Ignore("File Missing, test obsolete, or long test")]

@@ -129,7 +129,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _toleranceTh = toleranceTh;
         }
 
-
         /// <summary>
         /// Test 2 peaks for m/z equality, within a tolerance
         /// </summary>

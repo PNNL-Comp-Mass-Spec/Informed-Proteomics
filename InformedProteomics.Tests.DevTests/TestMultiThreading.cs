@@ -105,14 +105,12 @@ namespace InformedProteomics.Tests.DevTests
             return array.AsParallel().AsUnordered().Sum();
         }
 
-
         [Test]
         [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_002216_235ACCEA.fasta", 188961836)] // 1.5MB
         public void TestSequenceEnumeration(string dbFile, int expectedPeptideCount)
         {
             TestSequenceEnumerationWork(dbFile, expectedPeptideCount);
         }
-
 
         [Test]
         [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 323719193)] // 3MB
@@ -395,7 +393,6 @@ namespace InformedProteomics.Tests.DevTests
 
             if (resultsToPreview <= 0)
             {
-
                 var primeCountParallel =
                     numbers.AsParallel().Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
 
@@ -404,7 +401,6 @@ namespace InformedProteomics.Tests.DevTests
                                   maxValue);
 
                 Assert.AreEqual(primeCountExpected, primeCountParallel);
-
             }
             else
             {
@@ -421,7 +417,6 @@ namespace InformedProteomics.Tests.DevTests
                         break;
                 }
             }
-
         }
 
         [Test]
@@ -439,18 +434,15 @@ namespace InformedProteomics.Tests.DevTests
             var maxValue = ceiling - 3;
             var numbers = Enumerable.Range(3, maxValue);
 
-
             if (resultsToPreview <= 0)
             {
                 var primeCountSerial =
                     numbers.Count(n => Enumerable.Range(2, (int)Math.Sqrt(n)).All(i => n % i > 0));
 
-
                 sw.Stop();
                 Console.WriteLine("Took {0:F2} seconds to find {1:N0} primes between 3 and {2}", sw.Elapsed.TotalSeconds, primeCountSerial, maxValue);
 
                 Assert.AreEqual(primeCountExpected, primeCountSerial);
-
             }
             else
             {
@@ -466,10 +458,7 @@ namespace InformedProteomics.Tests.DevTests
                     if (index >= resultsToPreview)
                         break;
                 }
-
             }
-
         }
-
     }
 }

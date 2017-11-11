@@ -117,8 +117,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double?[][] GetNodeScores(double proteinMass)
         {
-
-
             var numNodes = _comparer.GetBinNumber(proteinMass) + 1;
             var nodeScores = new double?[2][];
             var prefixFragScores = nodeScores[0] = new double?[numNodes];

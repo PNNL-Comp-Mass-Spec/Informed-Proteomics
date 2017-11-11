@@ -15,7 +15,6 @@ namespace InformedProteomics.Backend.SearchResults
         private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
         private readonly List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
 
-
         /// <summary>
         /// Number of PSMs with a QValue &lt; 0.01
         /// </summary>

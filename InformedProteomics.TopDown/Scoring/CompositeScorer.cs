@@ -44,7 +44,6 @@ namespace InformedProteomics.TopDown.Scoring
 
             foreach (var baseIonType in BaseIonTypes)
             {
-
                 try
                 {
                     var fragmentComposition = baseIonType.IsPrefix

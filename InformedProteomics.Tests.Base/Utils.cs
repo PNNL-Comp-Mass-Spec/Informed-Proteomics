@@ -144,7 +144,6 @@ namespace InformedProteomics.Tests.Base
                 // Return the default path, despite the fact that the file does not exist
                 return pbfFilePath;
             }
-
         }
 
         private static void CreateLockFile(FileSystemInfo lockFile)
@@ -170,7 +169,6 @@ namespace InformedProteomics.Tests.Base
             {
                 Console.WriteLine("Error in DeleteLockFile: " + ex.Message);
             }
-
         }
 
         private static void WaitForLockFile(FileSystemInfo lockFile, bool createNewLockFile, int waitTimeMinutes = 5)
@@ -199,7 +197,6 @@ namespace InformedProteomics.Tests.Base
                     }
 
                     System.Threading.Thread.Sleep(5000);
-
                 }
 
                 if (createNewLockFile)
@@ -263,7 +260,6 @@ namespace InformedProteomics.Tests.Base
             }
 
             return null;
-
         }
 
         public static void ShowEnding(string methodName)

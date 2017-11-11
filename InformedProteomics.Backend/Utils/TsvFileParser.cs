@@ -130,7 +130,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return -1;
-
         }
 
         private void FindPeptideHeaders(out int peptideColumnIndex, out int proteinColumnIndex, out int qValueColumnIndex, string qValueColumnName)
@@ -188,7 +187,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return peptideSet;
-
         }
 
         private void Parse()
@@ -238,6 +236,5 @@ namespace InformedProteomics.Backend.Utils
                 }
             }
         }
-
     }
 }
