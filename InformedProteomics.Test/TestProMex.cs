@@ -26,7 +26,6 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
-
         private string mFeatureMapPbfFile;
         private string mFeatureMapResultsFile;
 
@@ -434,7 +433,6 @@ namespace InformedProteomics.Test
             Console.WriteLine();
             Console.WriteLine("{0} results with PTMs / {1} total results passing threshold qValue < {2}", ptmList.Count, filterPassingResults, qValueThreshold);
             Assert.AreEqual(expectedPTMListCount, ptmList.Count, "Unexpected number of identifications with at least one PTM at qValue < {0}", qValueThreshold);
-
         }
 
         [Test]
@@ -517,7 +515,6 @@ namespace InformedProteomics.Test
                 {
                     ++numFeaturesWithId;
                 }
-
             }
 
             Console.WriteLine("Filtering on qValue < {0} and mass error < {1} ppm, find {2} features with an ID", qValueThreshold, tolerancePpm, numFeaturesWithId);
@@ -596,12 +593,10 @@ namespace InformedProteomics.Test
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
             thread.Join();
-
         }
 
         private void FeatureMapGeneration()
         {
-
             var resultsFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(mFeatureMapPbfFile) + "_FeatureMap.png");
 
             var map = new LcMsFeatureMap(PbfLcMsRun.GetLcMsRun(mFeatureMapPbfFile), mFeatureMapResultsFile, 2000, 50000);

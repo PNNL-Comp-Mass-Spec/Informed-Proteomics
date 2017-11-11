@@ -45,7 +45,6 @@ namespace InformedProteomics.TopDown.Scoring
 
             foreach (var baseIonType in BaseIonTypes)
             {
-
                 try
                 {
                     var fragmentComposition = baseIonType.IsPrefix
@@ -151,7 +150,6 @@ namespace InformedProteomics.TopDown.Scoring
 
             return score; //GetProbability(score);
         }
-
 
         static CompositeScorer()
         {

@@ -59,31 +59,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Lower mass
         /// </summary>
-        public double MinMz
-        {
-            get
-            {
-                return IsolationWindowTargetMz - IsolationWindowLowerOffset;
-            }
-        }
+        public double MinMz => IsolationWindowTargetMz - IsolationWindowLowerOffset;
+
         /// <summary>
         /// Upper mass
         /// </summary>
-        public double MaxMz
-        {
-            get
-            {
-                return IsolationWindowTargetMz + IsolationWindowUpperOffset;
-            }
-        }
+        public double MaxMz => IsolationWindowTargetMz + IsolationWindowUpperOffset;
 
         /// <summary>
         /// Isolation window width
         /// </summary>
-        public double Width
-        {
-            get { return IsolationWindowUpperOffset + IsolationWindowLowerOffset; }
-        }
+        public double Width => IsolationWindowUpperOffset + IsolationWindowLowerOffset;
 
         /// <summary>
         /// Monoisotopic mass

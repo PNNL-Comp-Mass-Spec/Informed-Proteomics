@@ -19,8 +19,11 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="polynomialOrder"></param>
         public SavitzkyGolaySmoother(int pointsForSmoothing, int polynomialOrder)
         {
-            if (pointsForSmoothing < 3) throw new ArgumentOutOfRangeException("savGolayPoints must be an odd number 3 or higher");
-            if (pointsForSmoothing % 2 == 0) throw new ArgumentOutOfRangeException("savGolayPoints must be an odd number 3 or higher");
+            if (pointsForSmoothing < 3)
+                throw new ArgumentOutOfRangeException(nameof(pointsForSmoothing), "savGolayPoints must be an odd number 3 or higher");
+
+            if (pointsForSmoothing % 2 == 0)
+                throw new ArgumentOutOfRangeException(nameof(pointsForSmoothing), "savGolayPoints must be an odd number 3 or higher");
 
             _mNumPointsForSmoothing = pointsForSmoothing;
             var smoothingFilters = CalculateSmoothingFilters(polynomialOrder, pointsForSmoothing);
@@ -36,12 +39,12 @@ namespace InformedProteomics.Backend.MathAndStats
             // TODO: Using the matrix works, but does a lot of data accesses. Can improve by working out all the data access myself? I might be able to cut down on number of data accesses, but not sure.
             var inputMatrix = new DenseMatrix(inputValues.GetLength(0), inputValues.GetLength(1));
 
-            for (int i = 0; i < inputMatrix.RowCount; i++)
+            for (var i = 0; i < inputMatrix.RowCount; i++)
             {
                 inputMatrix.SetRow(i, Smooth(inputMatrix.Row(i).ToArray()));
             }
 
-            for (int i = 0; i < inputMatrix.ColumnCount; i++)
+            for (var i = 0; i < inputMatrix.ColumnCount; i++)
             {
                 inputMatrix.SetColumn(i, Smooth(inputMatrix.Column(i).ToArray()));
             }
@@ -59,18 +62,18 @@ namespace InformedProteomics.Backend.MathAndStats
             // No need to smooth if all values are 0
             if (IsEmpty(inputValues)) return inputValues;
 
-            int m = (_mNumPointsForSmoothing - 1) / 2;
-            int colCount = inputValues.Length;
-            double[] returnYValues = new double[colCount];
+            var m = (_mNumPointsForSmoothing - 1) / 2;
+            var colCount = inputValues.Length;
+            var returnYValues = new double[colCount];
 
             var conjTransposeMatrix = _mSmoothingFiltersConjugateTranspose;
 
-            for (int i = 0; i <= m; i++)
+            for (var i = 0; i <= m; i++)
             {
                 var conjTransposeColumn = conjTransposeMatrix.Column(i);
 
                 double multiplicationResult = 0;
-                for (int z = 0; z < _mNumPointsForSmoothing; z++)
+                for (var z = 0; z < _mNumPointsForSmoothing; z++)
                 {
                     multiplicationResult += (conjTransposeColumn[z] * inputValues[z]);
                 }
@@ -80,22 +83,22 @@ namespace InformedProteomics.Backend.MathAndStats
 
             var conjTransposeColumnResult = conjTransposeMatrix.Column(m);
 
-            for (int i = m + 1; i < colCount - m - 1; i++)
+            for (var i = m + 1; i < colCount - m - 1; i++)
             {
                 double multiplicationResult = 0;
-                for (int z = 0; z < _mNumPointsForSmoothing; z++)
+                for (var z = 0; z < _mNumPointsForSmoothing; z++)
                 {
                     multiplicationResult += (conjTransposeColumnResult[z] * inputValues[i - m + z]);
                 }
                 returnYValues[i] = multiplicationResult;
             }
 
-            for (int i = 0; i <= m; i++)
+            for (var i = 0; i <= m; i++)
             {
                 var conjTransposeColumn = conjTransposeMatrix.Column(m + i);
 
                 double multiplicationResult = 0;
-                for (int z = 0; z < _mNumPointsForSmoothing; z++)
+                for (var z = 0; z < _mNumPointsForSmoothing; z++)
                 {
                     multiplicationResult += (conjTransposeColumn[z] * inputValues[colCount - _mNumPointsForSmoothing + z]);
                 }
@@ -107,12 +110,12 @@ namespace InformedProteomics.Backend.MathAndStats
 
         private DenseMatrix CalculateSmoothingFilters(int polynomialOrder, int filterLength)
         {
-            int m = (filterLength - 1) / 2;
+            var m = (filterLength - 1) / 2;
             var denseMatrix = new DenseMatrix(filterLength, polynomialOrder + 1);
 
-            for (int i = -m; i <= m; i++)
+            for (var i = -m; i <= m; i++)
             {
-                for (int j = 0; j <= polynomialOrder; j++)
+                for (var j = 0; j <= polynomialOrder; j++)
                 {
                     denseMatrix[i + m, j] = Math.Pow(i, j);
                 }

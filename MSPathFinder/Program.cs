@@ -25,7 +25,7 @@ namespace MSPathFinder
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
         private const uint EnableExtendedFlags = 0x0080;
-       
+
         private static void Main(string[] args)
         {
             var handle = Process.GetCurrentProcess().MainWindowHandle;

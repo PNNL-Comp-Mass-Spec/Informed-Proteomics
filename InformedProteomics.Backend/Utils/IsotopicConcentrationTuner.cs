@@ -20,15 +20,15 @@ namespace InformedProteomics.Backend.Utils
         public IsotopicConcentrationTuner()
         {
             // Set default parameters
-            this.Element = Atom.Get("C");
-            this.IsotopeIndex = 1;
-            this.Tolerance = new Tolerance(10, ToleranceUnit.Ppm);
-            this.ObservedPeaks = new List<Peak>();
-            this.Mass = 0.0;
-            this.Charge = 1;
-            this.StepSize = 0.1;
-            this.MaxConcentration = 20.0;
-            this.RelativeIntensityThreshold = 0.01;
+            Element = Atom.Get("C");
+            IsotopeIndex = 1;
+            Tolerance = new Tolerance(10, ToleranceUnit.Ppm);
+            ObservedPeaks = new List<Peak>();
+            Mass = 0.0;
+            Charge = 1;
+            StepSize = 0.1;
+            MaxConcentration = 20.0;
+            RelativeIntensityThreshold = 0.01;
         }
 
         /// <summary>
@@ -88,19 +88,19 @@ namespace InformedProteomics.Backend.Utils
             // Set up progress reporter
             var progressData = new PRISM.ProgressData(progress);
 
-            this.ValidateParameters();
+            ValidateParameters();
 
             // Get default proportions for the selected element.
             // Copy it to a new array so we can manipulate it.
-            var proportions = this.GetDefaultProportions(this.Element).ToArray();
+            var proportions = GetDefaultProportions(Element).ToArray();
 
             // Make sure this is an isotope we know about and that it isn't the monoisotope
-            if (this.IsotopeIndex < 1 || this.IsotopeIndex >= proportions.Length)
+            if (IsotopeIndex < 1 || IsotopeIndex >= proportions.Length)
             {
-                throw new ArgumentOutOfRangeException("isotopeIndex");
+                throw new ArgumentOutOfRangeException(nameof(IsotopeIndex));
             }
 
-            var defaultProportion = proportions[this.IsotopeIndex];
+            var defaultProportion = proportions[IsotopeIndex];
 
             // Set the default best point (the first one).
             var results = new IsotopeConcentrationCorrelationCurve
@@ -114,20 +114,20 @@ namespace InformedProteomics.Backend.Utils
             };
 
             // Iterate over concentration values
-            int numberOfSteps = (int)(this.MaxConcentration - defaultProportion / this.StepSize);
-            for (int i = 0; i <= numberOfSteps; i++)
+            var numberOfSteps = (int)(MaxConcentration - defaultProportion / StepSize);
+            for (var i = 0; i <= numberOfSteps; i++)
             {
                 // Update percent complete
                 progressData.Report(i, numberOfSteps);
 
                 // Calculate concentration
-                var concentrationStep = i * this.StepSize;
-                proportions[this.IsotopeIndex] += concentrationStep; // Increase isotope of interest
+                var concentrationStep = i * StepSize;
+                proportions[IsotopeIndex] += concentrationStep; // Increase isotope of interest
                 proportions[0] -= concentrationStep;                 // Decrease monoisotope
 
                 // Get theoretical isotope profile and align the observed peaks to it
-                var theoreticalIsotopeProfile = this.GetTheoreticalIsotopeProfile(proportions);
-                var alignedObservedPeaks = this.AlignObservedPeaks(this.ObservedPeaks, theoreticalIsotopeProfile, this.Tolerance);
+                var theoreticalIsotopeProfile = GetTheoreticalIsotopeProfile(proportions);
+                var alignedObservedPeaks = AlignObservedPeaks(ObservedPeaks, theoreticalIsotopeProfile, Tolerance);
 
                 // Break out the intensities of the isotope profiles
                 var theoIntensities = theoreticalIsotopeProfile.Select(peak => peak.Intensity).ToArray();
@@ -139,7 +139,7 @@ namespace InformedProteomics.Backend.Utils
                 // Add data point for this concentration to result curve
                 var dataPoint = new IsotopeConcentrationCorrelationCurve.ConcentrationCorrelationPoint
                 {
-                    IsotopeConcentration = proportions[this.IsotopeIndex],
+                    IsotopeConcentration = proportions[IsotopeIndex],
                     MonoisotopeConcentration = proportions[0],
                     PearsonCorrelation = pearsonCorrelation
                 };
@@ -166,19 +166,19 @@ namespace InformedProteomics.Backend.Utils
         {
             // Get IsoProfilePredictor with updated proportions
             var isoProfilePredictor = new IsoProfilePredictor(
-                this.Element.Code == "C" ? proportions : IsoProfilePredictor.DefaultProbC,
-                this.Element.Code == "H" ? proportions : IsoProfilePredictor.DefaultProbH,
-                this.Element.Code == "N" ? proportions : IsoProfilePredictor.DefaultProbN,
-                this.Element.Code == "O" ? proportions : IsoProfilePredictor.DefaultProbO,
-                this.Element.Code == "S" ? proportions : IsoProfilePredictor.DefaultProbS
+                Element.Code == "C" ? proportions : IsoProfilePredictor.DefaultProbC,
+                Element.Code == "H" ? proportions : IsoProfilePredictor.DefaultProbH,
+                Element.Code == "N" ? proportions : IsoProfilePredictor.DefaultProbN,
+                Element.Code == "O" ? proportions : IsoProfilePredictor.DefaultProbO,
+                Element.Code == "S" ? proportions : IsoProfilePredictor.DefaultProbS
             );
 
             var averagine = new Averagine();
 
             return averagine.GetTheoreticalIsotopeProfileInst(
-                                this.Mass,
-                                this.Charge,
-                                this.RelativeIntensityThreshold,
+                                Mass,
+                                Charge,
+                                RelativeIntensityThreshold,
                                 isoProfilePredictor);
         }
 
@@ -196,19 +196,19 @@ namespace InformedProteomics.Backend.Utils
             // Remove empty peaks
             observedPeaks = observedPeaks.Where(peak => peak.Mz > 0.0).ToList();
 
-            List<Peak> alignedPeaks = new List<Peak> { Capacity = theoreticalPeaks.Count };
+            var alignedPeaks = new List<Peak> { Capacity = theoreticalPeaks.Count };
 
-            int j = 0;
+            var j = 0;
             foreach (var theoPeak in theoreticalPeaks)
             {
-                double tolDa = tolerance.GetToleranceAsMz(theoPeak.Mz);
-                double maxMz = theoPeak.Mz + tolDa;
-                Peak obsPeak = observedPeaks[j];
+                var tolDa = tolerance.GetToleranceAsMz(theoPeak.Mz);
+                var maxMz = theoPeak.Mz + tolDa;
+                var obsPeak = observedPeaks[j];
 
-                Peak selectedPeak = new Peak(theoPeak.Mz, 0);
+                var selectedPeak = new Peak(theoPeak.Mz, 0);
                 while (obsPeak.Mz <= maxMz)
                 {
-                    double diff = Math.Abs(obsPeak.Mz - theoPeak.Mz);
+                    var diff = Math.Abs(obsPeak.Mz - theoPeak.Mz);
                     if (diff < tolDa && obsPeak.Intensity > selectedPeak.Intensity)
                     {
                         selectedPeak = obsPeak;
@@ -263,9 +263,9 @@ namespace InformedProteomics.Backend.Utils
         private void ValidateParameters()
         {
             // Make sure that the selected element is an element that we can manipulate
-            if (this.Element.Code != "C" && this.Element.Code != "H" && this.Element.Code != "N" && this.Element.Code != "O" && this.Element.Code != "S")
+            if (Element.Code != "C" && Element.Code != "H" && Element.Code != "N" && Element.Code != "O" && Element.Code != "S")
             {
-                throw new ArgumentException(string.Format("Cannot manipulate isotope proportions for {0}.", this.Element.Name));
+                throw new ArgumentException(string.Format("Cannot manipulate isotope proportions for {0}.", Element.Name));
             }
         }
 
@@ -279,8 +279,8 @@ namespace InformedProteomics.Backend.Utils
             /// </summary>
             public IsotopeConcentrationCorrelationCurve()
             {
-                this.DataPoints = new List<ConcentrationCorrelationPoint>();
-                this.BestConcentration = new ConcentrationCorrelationPoint();
+                DataPoints = new List<ConcentrationCorrelationPoint>();
+                BestConcentration = new ConcentrationCorrelationPoint();
             }
 
             /// <summary>

@@ -39,10 +39,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Number of rows
         /// </summary>
-        public int NumData
-        {
-            get { return _rows.Count; }
-        }
+        public int NumData => _rows.Count;
 
         /// <summary>
         /// Get the TSV file headers
@@ -133,7 +130,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return -1;
-
         }
 
         private void FindPeptideHeaders(out int peptideColumnIndex, out int proteinColumnIndex, out int qValueColumnIndex, string qValueColumnName)
@@ -191,7 +187,6 @@ namespace InformedProteomics.Backend.Utils
             }
 
             return peptideSet;
-
         }
 
         private void Parse()
@@ -241,6 +236,5 @@ namespace InformedProteomics.Backend.Utils
                 }
             }
         }
-
     }
 }

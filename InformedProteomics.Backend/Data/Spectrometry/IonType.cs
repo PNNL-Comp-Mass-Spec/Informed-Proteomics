@@ -126,8 +126,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public IEnumerable<Ion> GetPossibleIons(Composition.Composition cutComposition, AminoAcid terminalResidue)
         {
-            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
-                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+            return BaseIonType.GetPossibleCompositions(terminalResidue)
+                       .Select(offsetComposition => cutComposition + offsetComposition - NeutralLoss.Composition)
                        .Select(comp => new Ion(comp, Charge));
         }
 
@@ -140,8 +140,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var cutComposition = sequence.Composition;
             var terminalResidue = IsPrefixIon ? sequence[sequence.Count - 1] : sequence[0];
-            return this.BaseIonType.GetPossibleCompositions(terminalResidue)
-                       .Select(offsetComposition => cutComposition + offsetComposition - this.NeutralLoss.Composition)
+            return BaseIonType.GetPossibleCompositions(terminalResidue)
+                       .Select(offsetComposition => cutComposition + offsetComposition - NeutralLoss.Composition)
                        .Select(comp => new Ion(comp, Charge));
         }
 
@@ -210,7 +210,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         protected bool Equals(IonType other)
         {
-            return /*string.Equals(this.Name, other.Name) &&*/ Charge == other.Charge && Equals(this.OffsetComposition, other.OffsetComposition) && this.IsPrefixIon == other.IsPrefixIon;
+            return Charge == other.Charge && Equals(OffsetComposition, other.OffsetComposition) && IsPrefixIon == other.IsPrefixIon;
         }
 
         /// <inheritdoc />
@@ -229,8 +229,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 //var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
                 var hashCode = Charge;
-                hashCode = (hashCode * 397) ^ (this.OffsetComposition != null ? this.OffsetComposition.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.IsPrefixIon.GetHashCode();
+                hashCode = (hashCode * 397) ^ (OffsetComposition != null ? OffsetComposition.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ IsPrefixIon.GetHashCode();
                 return hashCode;
             }
         }

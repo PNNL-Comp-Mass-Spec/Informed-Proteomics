@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// The UNIMOD accession number of the modification
         /// </summary>
-        public int AccessionNum { get; set; }
+        public int AccessionNum { get; }
 
         /// <summary>
         /// The composition of the modification
@@ -33,12 +33,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// The name of the modification
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Mass of the modification
         /// </summary>
-        public double Mass { get { return Composition.Mass; } }
+        public double Mass => Composition.Mass;
 
         /// <summary>
         /// Constructor
@@ -82,8 +82,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            var otherMod = obj as Modification;
-            return otherMod != null && AccessionNum == otherMod.AccessionNum && Composition.Equals(otherMod.Composition);
+            return obj is Modification otherMod && AccessionNum == otherMod.AccessionNum && Composition.Equals(otherMod.Composition);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
@@ -73,18 +74,17 @@ namespace InformedProteomics.Backend.MathAndStats
             return RunOtsuMethod(hist, minX, intervalX);
         }
 
-        private static double RunOtsuMethod(int[] hist, double minX, double intervalX)
+        private static double RunOtsuMethod(IReadOnlyList<int> hist, double minX, double intervalX)
         {
-            var nBins = hist.Length;
+            var nBins = hist.Count;
             var vet = new double[nBins];
-            double p1, p2, p12;
             for (var j = 1; j < nBins; j++)
             {
                 //var th = minX + (j+1) * interval;
-                p1 = Px(0, j, hist);
-                p2 = Px(j + 1, nBins - 1, hist);
+                var p1 = Px(0, j, hist);
+                var p2 = Px(j + 1, nBins - 1, hist);
 
-                p12 = p1 * p2;
+                var p12 = p1 * p2;
                 if (p12 < double.Epsilon) p12 = 1;
 
                 var diff = (Mx(0, j, hist) * p2) - (Mx(j + 1, nBins - 1, hist) * p1);
@@ -98,7 +98,7 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         // function is used to compute the q values in the equation
-        private static double Px(int init, int end, int[] hist)
+        private static double Px(int init, int end, IReadOnlyList<int> hist)
         {
             var sum = 0d;
             int i;
@@ -109,7 +109,7 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         // function is used to compute the mean values in the equation (mu)
-        private static double Mx(int init, int end, int[] hist)
+        private static double Mx(int init, int end, IReadOnlyList<int> hist)
         {
             var sum = 0d;
             int i;
@@ -120,13 +120,13 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         // finds the maximum element in a vector
-        private static int findMax(double[] vec)
+        private static int findMax(IReadOnlyList<double> vec)
         {
             double maxVec = 0;
-            int idx = 0;
+            var idx = 0;
             int i;
 
-            for (i = 1; i < vec.Length; i++)
+            for (i = 1; i < vec.Count; i++)
             {
                 if (vec[i] > maxVec)
                 {

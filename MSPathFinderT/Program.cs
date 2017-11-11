@@ -151,6 +151,5 @@ namespace MSPathFinderT
         {
             ConsoleMsgUtils.ShowWarning("Warning: " + message);
         }
-
     }
 }

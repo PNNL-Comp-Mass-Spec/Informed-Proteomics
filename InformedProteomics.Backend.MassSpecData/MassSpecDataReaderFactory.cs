@@ -153,10 +153,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// The list of directory dataset type extensions that are supported by ProteoWizard (not all-inclusive)
         /// </summary>
-        public static List<string> SupportedDirectoryTypes
-        {
-            get { return ProteoWizardReader.SupportedDirectoryTypes; }
-        }
+        public static List<string> SupportedDirectoryTypes => ProteoWizardReader.SupportedDirectoryTypes;
 
         /// <summary>
         /// Test the supplied path to see if we can read it using available readers
@@ -212,7 +209,8 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (path.ToLower().EndsWith(ext))
                 {
-                    int pos = ext.IndexOf('.', 1);
+                    var pos = ext.IndexOf('.', 1);
+
                     // Remove extra extensions
                     if (pos > 0)
                     {
@@ -307,102 +305,62 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the list of all file types supported as a pair of description and file extensions.
         /// Contains all files supported when ProteoWizard is available.
         /// </summary>
-        private static List<Tuple<string, string[]>> SupportedTypesAll
+        private static List<Tuple<string, string[]>> SupportedTypesAll => new List<Tuple<string, string[]>>
         {
-            get
-            {
-                return new List<Tuple<string, string[]>>
-                {
-                    new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
-                    new Tuple<string, string[]>("mzML", new[] { ".mzml", ".mzml.gz" }),
-                    new Tuple<string, string[]>("mzXML", new[] { ".mzXML", ".mzXML.gz" }),
-                    new Tuple<string, string[]>("Mascot Generic Format", new[] { ".mgf", ".mgf.gz" }),
-                    new Tuple<string, string[]>("Agilent", new[] { ".d", "mspeak.bin", "msprofile.bin" }),
-                    new Tuple<string, string[]>("AB Sciex", new[] { ".wiff" }),
-                    new Tuple<string, string[]>("Bruker", new[] { ".d", ".u2", "FID", "analysis.yep", "analysis.baf" }),
-                    new Tuple<string, string[]>("Waters", new[] { ".raw", "_extern.inf", "_inlet.inf", ".DAT" }),
-                    new Tuple<string, string[]>("Shimadzu", new[] { ".lcd" }),
-                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
-                };
-            }
-        }
+            new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
+            new Tuple<string, string[]>("mzML", new[] { ".mzml", ".mzml.gz" }),
+            new Tuple<string, string[]>("mzXML", new[] { ".mzXML", ".mzXML.gz" }),
+            new Tuple<string, string[]>("Mascot Generic Format", new[] { ".mgf", ".mgf.gz" }),
+            new Tuple<string, string[]>("Agilent", new[] { ".d", "mspeak.bin", "msprofile.bin" }),
+            new Tuple<string, string[]>("AB Sciex", new[] { ".wiff" }),
+            new Tuple<string, string[]>("Bruker", new[] { ".d", ".u2", "FID", "analysis.yep", "analysis.baf" }),
+            new Tuple<string, string[]>("Waters", new[] { ".raw", "_extern.inf", "_inlet.inf", ".DAT" }),
+            new Tuple<string, string[]>("Shimadzu", new[] { ".lcd" }),
+            new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+        };
 
         /// <summary>
         /// Gets the list of all file types supported as a pair of description and file extensions.
         /// Contains all file types supported if only ThermoRawFileReaderDLL is available.
         /// </summary>
-        private static List<Tuple<string, string[]>> SupportedTypesBuiltIn
+        private static List<Tuple<string, string[]>> SupportedTypesBuiltIn => new List<Tuple<string, string[]>>
         {
-            get
-            {
-                return new List<Tuple<string, string[]>>
-                {
-                    new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
-                    new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
-                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
-                };
-            }
-        }
+            new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
+            new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
+            new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+        };
 
         /// <summary>
         /// Gets the list of all file types supported as a pair of description and file extensions.
         /// Contains only file types that are natively supported by InformedProteomics without
         /// any external DLLs available.
         /// </summary>
-        private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll
+        private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll => new List<Tuple<string, string[]>>
         {
-            get
-            {
-                return new List<Tuple<string, string[]>>
-                {
-                    new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
-                    new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
-                };
-            }
-        }
+            new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
+            new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),
+        };
 
-        private static string FilterStringAll
-        {
-            get
-            {
-                // differs from ProteoWizardReader filter string by the *.pbf extension
-                return "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf;*.pbf"
-                       + "|Thermo .RAW|*.raw"
-                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                       + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
-                       + "|MGF[.gz]|*.mgf;*.mgf.gz"
-                       + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
-                       + "|AB Sciex .wiff|*.wiff"
-                       + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
-                       + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
-                       + "|Shimadzu lcd|*.lcd"
-                       + "|UIMF|*.uimf"
-                       + "|PBF|*.pbf"
-                    ;
-            }
-        }
+        private static string FilterStringAll => "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf;*.pbf"
+                                                 + "|Thermo .RAW|*.raw"
+                                                 + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                                                 + "|mzXML[.gz]|*.mzXML;*.mzXML.gz"
+                                                 + "|MGF[.gz]|*.mgf;*.mgf.gz"
+                                                 + "|Agilent .d|*.d;mspeak.bin;msprofile.bin"
+                                                 + "|AB Sciex .wiff|*.wiff"
+                                                 + "|Bruker .d/FID/YEP/BAF|*.d;*.u2;FID;analysis.yep;analysis.baf"
+                                                 + "|Waters .raw|*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT"
+                                                 + "|Shimadzu lcd|*.lcd"
+                                                 + "|UIMF|*.uimf"
+                                                 + "|PBF|*.pbf";
 
-        private static string FilterStringBuiltIn
-        {
-            get
-            {
-                return "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.pbf"
-                       + "|Thermo .RAW|*.raw"
-                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                       + "|PBF|*.pbf"
-                    ;
-            }
-        }
+        private static string FilterStringBuiltIn => "All Supported Spectrum Files|*.raw;*.mzML;*.mzML.gz;*.pbf"
+                                                     + "|Thermo .RAW|*.raw"
+                                                     + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                                                     + "|PBF|*.pbf";
 
-        private static string FilterStringNoExternalDll
-        {
-            get
-            {
-                return "All Supported Spectrum Files|*.mzML;*.mzML.gz;*.pbf"
-                       + "|mzML[.gz]|*.mzML;*.mzML.gz"
-                       + "|PBF|*.pbf"
-                    ;
-            }
-        }
+        private static string FilterStringNoExternalDll => "All Supported Spectrum Files|*.mzML;*.mzML.gz;*.pbf"
+                                                           + "|mzML[.gz]|*.mzML;*.mzML.gz"
+                                                           + "|PBF|*.pbf";
     }
 }

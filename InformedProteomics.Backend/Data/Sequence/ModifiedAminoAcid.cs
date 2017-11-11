@@ -13,22 +13,21 @@
         public ModifiedAminoAcid(AminoAcid aa, Modification modification)
             : base(aa.Residue, aa.Name + "+" + modification.Name, aa.Composition + modification.Composition)
         {
-            var modAa = aa as ModifiedAminoAcid;
-            if (modAa == null) _modification = modification; // aa is not modified
-            else    // aa is already modified
+            if (!(aa is ModifiedAminoAcid modAa))
             {
-                _modification = Modification.RegisterAndGetModification(modAa.Modification.Name + "+" + modification.Name, Composition);
+                // aa is not modified
+                Modification = modification;
+            }
+            else
+            {
+                // aa is already modified
+                Modification = Modification.RegisterAndGetModification(modAa.Modification.Name + "+" + modification.Name, Composition);
             }
         }
-
-        private readonly Modification _modification;
 
         /// <summary>
         /// Modification applied to this amino acid
         /// </summary>
-        public Modification Modification
-        {
-            get { return _modification; }
-        }
+        public Modification Modification { get; }
     }
 }

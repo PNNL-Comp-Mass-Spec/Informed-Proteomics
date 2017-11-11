@@ -326,11 +326,16 @@ namespace InformedProteomics.TopDown.Execution
             progReportTimer = new Timer(ReportOverallProgress, this, 0, 1000 * 60 * 5);
 
             if (string.Equals(Path.GetExtension(Options.SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
+            {
                 UpdateStatus("Reading pbf file...", progData);
+                progData.StepRange(1.0, "Reading spectra file");
+            }
             else
+            {
                 UpdateStatus("Creating and loading pbf file...", progData);
+                progData.StepRange(5.0, "Reading spectra file");
+            }
 
-            progData.StepRange(5.0, "Reading spectra file");
             sw.Start();
 
             _run = PbfLcMsRun.GetLcMsRun(Options.SpecFilePath, 0, 0, prog);
@@ -361,14 +366,13 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
-            progData.StepRange(10, "Reading Fasta File");
+            progData.StepRange(progData.MaxPercentage + 2.0, "Reading Fasta File");
             OnStatusEvent(progData.Status);
 
             // Target database
             var targetDb = new FastaDatabase(Options.DatabaseFilePath);
             targetDb.Read();
 
-            progData.StepRange(20.0);
             ISequenceFilter ms1Filter;
             if (Options.ScanNumbers != null && Options.ScanNumbers.Any())
             {
@@ -380,6 +384,7 @@ namespace InformedProteomics.TopDown.Execution
                 var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, LcMsFeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
+                    progData.StepRange(progData.MaxPercentage + 10.0);
                     UpdateStatus("Running ProMex...", progData);
                     sw.Reset();
                     sw.Start();
@@ -404,6 +409,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else
             {
+                progData.StepRange(progData.MaxPercentage + 1.0);
                 sw.Reset();
                 sw.Start();
                 var extension = Path.GetExtension(Options.FeatureFilePath);
@@ -461,7 +467,7 @@ namespace InformedProteomics.TopDown.Execution
             // Generate sequence tags for all MS/MS spectra
             if (Options.TagBasedSearch)
             {
-                progData.StepRange(25.0, "Generating Sequence Tags");
+                progData.StepRange(progData.MaxPercentage + 2, "Generating Sequence Tags");
 
                 UpdateStatus("Generating sequence tags for MS/MS spectra...", progData);
 
@@ -485,7 +491,7 @@ namespace InformedProteomics.TopDown.Execution
             var tdaOutputFilePath = Path.Combine(Options.OutputDir, specFileName + TdaFileNameEnding);
             var mzidOutputFilePath = Path.Combine(Options.OutputDir, specFileName + MzidFileNameEnding);
 
-            progData.StepRange(60.0, "Running Target search");
+            progData.StepRange(progData.MaxPercentage + ((98.0 - progData.MaxPercentage) / 2.0), "Running Target search");
             List<DatabaseSearchResultData> targetSearchResults = null;
 
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !File.Exists(targetOutputFilePath))
@@ -497,7 +503,7 @@ namespace InformedProteomics.TopDown.Execution
                 OnStatusEvent(string.Format("Target results file '{0}' exists; skipping target search.", targetOutputFilePath));
             }
 
-            progData.StepRange(95.0, "Running Decoy search"); // total to 95%
+            progData.StepRange(98.0, "Running Decoy search"); // total to 98%
             List<DatabaseSearchResultData> decoySearchResults = null;
 
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !File.Exists(decoyOutputFilePath))
@@ -596,9 +602,9 @@ namespace InformedProteomics.TopDown.Execution
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
             var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
-            progData.StepRange(50);
             if (Options.TagBasedSearch)
             {
+                progData.StepRange(10);
                 UpdateStatus(string.Format("Tag-based searching the {0} database", searchModeString), progData);
                 sw.Reset();
                 sw.Start();
@@ -773,10 +779,10 @@ namespace InformedProteomics.TopDown.Execution
                 estimatedProteins = 1;
 
             progData.StatusInternal = string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
-                    tempNumProteins,
-                    itemName,
-                    tempNumProteins / (double)estimatedProteins * 100.0,
-                    sw.Elapsed.TotalSeconds);
+                tempNumProteins,
+                itemName,
+                tempNumProteins / (double) estimatedProteins * 100.0,
+                sw.Elapsed.TotalSeconds);
             progData.Report(tempNumProteins, estimatedProteins);
 
             int secondsThreshold;
@@ -802,8 +808,8 @@ namespace InformedProteomics.TopDown.Execution
             }
         }
 
-        private void SearchForMatches(AnnotationAndOffset annotationAndOffset,
-            ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches, int maxNumNTermCleavages, bool isDecoy, CancellationToken? cancellationToken = null)
+        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            int maxNumNTermCleavages, bool isDecoy, CancellationToken? cancellationToken = null)
         {
             var pfeOptions = new ParallelOptions
             {
@@ -934,8 +940,7 @@ namespace InformedProteomics.TopDown.Execution
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             {
                 sequenceTagGen.Generate(scanNum);
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData,
-                                     "spectra");
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");
             });
 
             progData.StatusInternal = string.Empty;
@@ -945,6 +950,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private LinkedList<Tuple<double, ScoreDistribution>>[] _cachedScoreDistributions;
+
         private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             var progData = new ProgressData(progress)
@@ -1085,7 +1091,6 @@ namespace InformedProteomics.TopDown.Execution
                 currentTask = "Parallel.ForEach";
 
                 OnStatusEvent("Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
-
             }
             catch (Exception ex)
             {
@@ -1106,7 +1111,6 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
-            //foreach (var scanNum in scanNums)
             {
                 currentTask = "Inside Parallel.ForEach";
                 try
@@ -1117,8 +1121,6 @@ namespace InformedProteomics.TopDown.Execution
                         var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
 
-                        //var scorer = _ms2ScorerFactory2.GetScorer(match.ScanNum);
-                        //var graph = this.scoringGraphFactory.GetScoringGraph(scorer, match.Ion.Composition.Mass);
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
                         if (graph == null) continue;
 
@@ -1136,10 +1138,7 @@ namespace InformedProteomics.TopDown.Execution
                         }
 
                         currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
-                        //var ipSequence = Sequence.CreateSequence(match.Sequence, match.ModificationText, topDownScorer.AminoAcidSet);
-                        //var graphScore = graph.ScoreSequence(ipSequence);
-
-                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score); //* 1e-34;
+                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
 
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
@@ -1221,7 +1220,7 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <param name="errMsg">Error message</param>
         /// <param name="ex">Exception (can be null)</param>
-        /// <param name="throwException">True to thow an exception</param>
+        /// <param name="throwException">True to throw an exception</param>
         private void ReportError(string errMsg, Exception ex = null, bool throwException = true)
         {
             OnErrorEvent(errMsg, ex);
@@ -1245,6 +1244,5 @@ namespace InformedProteomics.TopDown.Execution
             OnStatusEvent(message);
             progData.Status = message;
         }
-
     }
 }

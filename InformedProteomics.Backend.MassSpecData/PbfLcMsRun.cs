@@ -23,17 +23,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// File extension used for this type
         /// </summary>
-        protected virtual string FileExtensionVirtual { get { return FileExtensionConst; } }
+        protected virtual string FileExtensionVirtual => FileExtensionConst;
 
         /// <summary>
         /// File extension - overrideable. Returns <see cref="FileExtensionConst"/> for current type. See <see cref="FileExtensionConst"/> for static access.
         /// </summary>
-        public string FileExtension { get { return FileExtensionVirtual; } }
+        public string FileExtension => FileExtensionVirtual;
 
         /// <summary>
         /// True if the file contains precursor or product chromatograms
         /// </summary>
-        public virtual bool ContainsChromatograms { get { return true; } }
+        public virtual bool ContainsChromatograms => true;
 
         /// <summary>
         /// The current FileFormatId, which is written to the file, and checked before a file is read
@@ -148,16 +148,16 @@ namespace InformedProteomics.Backend.MassSpecData
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
             IProgress<ProgressData> progress = null)
         {
-            if (specFilePath.ToLower().EndsWith(PbfLcMsRun.FileExtensionConst))
+            if (specFilePath.ToLower().EndsWith(FileExtensionConst))
             {
                 return specFilePath;
             }
 
-            string pbfPath = pbfFilePath;
-            string fileName = String.Empty;
-            string tempPath = String.Empty;
+            var pbfPath = pbfFilePath;
+            var fileName = string.Empty;
+            var tempPath = string.Empty;
 
-            Progress<ProgressData> prog = new Progress<ProgressData>();
+            var prog = new Progress<ProgressData>();
             var progData = new ProgressData(progress);
             progData.StepRange(75.0);
             if (progress != null)
@@ -173,32 +173,32 @@ namespace InformedProteomics.Backend.MassSpecData
             if (string.IsNullOrWhiteSpace(pbfFilePath))
             {
                 // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
-                pbfPath = PbfLcMsRun.GetPbfFileName(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath));
+                pbfPath = GetPbfFileName(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath));
                 fileName = Path.GetFileName(pbfPath);
                 if (String.IsNullOrEmpty(fileName))
                 {
-                    throw new ArgumentException("Cannot create .pbf cache file", "specFilePath");
+                    throw new ArgumentException("Cannot create .pbf cache file", nameof(specFilePath));
                 }
 
                 tempPath = Path.Combine(Path.GetTempPath(), fileName);
                 // Return the temp path if the pbf file of proper format already exists in the temp directory
-                if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent)
+                if (File.Exists(tempPath) && CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent)
                 {
                     return tempPath;
                 }
             }
 
-            if (!File.Exists(pbfPath) || !(PbfLcMsRun.CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent))
+            if (!File.Exists(pbfPath) || !(CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent))
             {
                 if (specReader == null)
                 {
                     throw new Exception("Unsupported file format!");
                 }
-                InMemoryLcMsRun run = new InMemoryLcMsRun(specReader, 0, 0, prog);
+                var run = new InMemoryLcMsRun(specReader, 0, 0, prog);
                 try
                 {
                     progData.StepRange(100.0);
-                    PbfLcMsRun.WriteAsPbf(run, pbfPath, prog);
+                    WriteAsPbf(run, pbfPath, prog);
                 }
                 catch (UnauthorizedAccessException) // Cannot write to same directory, attempt to write to temp directory
                 {
@@ -210,8 +210,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     //var fileName = Path.GetFileName(pbfFilePath);
                     if (String.IsNullOrEmpty(fileName)) throw; // invalid path?
                     //var tempPath = Path.Combine(Path.GetTempPath(), fileName);
-                    if (!File.Exists(tempPath) || !(PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent))
-                        PbfLcMsRun.WriteAsPbf(run, tempPath, prog);
+                    if (!File.Exists(tempPath) || !(CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent))
+                        WriteAsPbf(run, tempPath, prog);
                     pbfPath = tempPath;
                 }
             }
@@ -247,18 +247,17 @@ namespace InformedProteomics.Backend.MassSpecData
             fileName = Path.GetFileName(pbfPath);
             if (String.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentException("Cannot create .pbf cache file", "specFilePath");
+                throw new ArgumentException("Cannot create .pbf cache file", nameof(specFilePath));
             }
 
             tempPath = Path.Combine(Path.GetTempPath(), fileName);
-            bool isCurrent;
-            if (File.Exists(pbfPath) && PbfLcMsRun.CheckFileFormatVersion(pbfPath, out isCurrent))
+            if (File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out _))
             {
                 return pbfPath;
             }
 
             // Return the temp path if the pbf file of proper format already exists in the temp directory
-            if (File.Exists(tempPath) && PbfLcMsRun.CheckFileFormatVersion(tempPath, out isCurrent))
+            if (File.Exists(tempPath) && CheckFileFormatVersion(tempPath, out _))
             {
                 return tempPath;
             }
@@ -344,15 +343,13 @@ namespace InformedProteomics.Backend.MassSpecData
             int scanStart = 0,
             int scanEnd = 0)
         {
-            string pbfPath2, fileName, tempPath;
-            var pbfPath = GetCheckPbfFilePath(specFileName, out pbfPath2, out fileName, out tempPath);
+            var pbfPath = GetCheckPbfFilePath(specFileName, out _, out _, out var tempPath);
             if (!string.IsNullOrWhiteSpace(pbfFileName))
             {
                 pbfPath = pbfFileName;
             }
 
-            bool isCurrent;
-            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out isCurrent) && isCurrent)
+            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out var isCurrent) && isCurrent)
             {
                 // Use regular construction
                 if (!specFileName.EndsWith(FileExtension))
@@ -591,7 +588,7 @@ namespace InformedProteomics.Backend.MassSpecData
         // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
         private const int NumBytePeak = 16;
 
-        private List<XicPoint> _precursorChromatogramCache = new List<XicPoint>();
+        private readonly List<XicPoint> _precursorChromatogramCache = new List<XicPoint>();
 
         #endregion
 
@@ -651,18 +648,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// The smallest MS1 m/z
         /// </summary>
-        public override double MinMs1Mz
-        {
-            get { return _minMs1Mz; }
-        }
+        public override double MinMs1Mz => _minMs1Mz;
 
         /// <summary>
         /// The largest MS1 m/z
         /// </summary>
-        public override double MaxMs1Mz
-        {
-            get { return _maxMs1Mz; }
-        }
+        public override double MaxMs1Mz => _maxMs1Mz;
 
         /// <summary>
         /// Read the specified spectrum from the file, optionally reading only the metadata
@@ -688,8 +679,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
             {
-                var spec = ReadSpectrum(offset, false) as ProductSpectrum;
-                if (spec != null)
+                if (ReadSpectrum(offset, false) is ProductSpectrum spec)
                 {
                     return spec.IsolationWindow;
                 }
@@ -1085,7 +1075,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (msLevel > 1)
             {
                 double? precursorMass = reader.ReadDouble();
-                if (precursorMass == 0.0) precursorMass = null;
+                if (Math.Abs(precursorMass.Value) < float.Epsilon) precursorMass = null;
                 int? precursorCharge = reader.ReadInt32();
                 if (precursorCharge == 0) precursorCharge = null;
                 var activationMethod = (ActivationMethod)reader.ReadByte();
@@ -1151,8 +1141,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Total Ion Current: 4
             writer.Write(Convert.ToSingle(spec.TotalIonCurrent));
 
-            var productSpec = spec as ProductSpectrum;
-            if (productSpec != null)    // product spectrum
+            if (spec is ProductSpectrum productSpec)    // product spectrum
             {
                 var isolationWindow = productSpec.IsolationWindow;
                 // precursor mass: 8
@@ -1291,16 +1280,14 @@ namespace InformedProteomics.Backend.MassSpecData
         public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             var pbfLcMsRun = new PbfLcMsRun();
-            long countTotal = 1;
-            long counter = 0;
             var progressData = new ProgressData(progress);
 
             var scanNumToSpecOffset = new long[imlr.NumSpectra + 1];
             var scanNumToIsolationWindow = new IsolationWindow[imlr.NumSpectra + 1];
 
             // Spectra
-            countTotal = imlr.NumSpectra;
-            counter = 0;
+            long countTotal = imlr.NumSpectra;
+            long counter = 0;
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             long countMS2Spec = 0;
             for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
@@ -1323,8 +1310,8 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor ion chromatogram (MS1 spectra)
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
 
-            var minMzIndex = imlr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(imlr.Ms1PeakList[0].Mz) : 0;
-            var maxMzIndex = imlr.Ms1PeakList.Any() ? PbfLcMsRun.GetMzBinIndex(imlr.Ms1PeakList[imlr.Ms1PeakList.Count - 1].Mz) : -1;
+            var minMzIndex = imlr.Ms1PeakList.Any() ? GetMzBinIndex(imlr.Ms1PeakList[0].Mz) : 0;
+            var maxMzIndex = imlr.Ms1PeakList.Any() ? GetMzBinIndex(imlr.Ms1PeakList[imlr.Ms1PeakList.Count - 1].Mz) : -1;
 
             var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
@@ -1488,7 +1475,6 @@ namespace InformedProteomics.Backend.MassSpecData
             MinMsLevel = int.MaxValue;
             MaxMsLevel = int.MinValue;
 
-            long counter = 0;
             var progressData = new ProgressData(progress);
 
             var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
@@ -1527,7 +1513,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 countTotal = msdr.NumSpectra;
             }
 
-            counter = 0;
+            long counter = 0;
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             foreach (var spec in msdr.ReadAllSpectra())
             {
@@ -1790,7 +1776,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //     10  million: 1.1 GB
             //     79  million: 6.6 GB
             const int max = 25000000;
-            int maxInMemoryPerSpec = (int)(memFreeKB * 1024 / 2 / scansCount / (20 + 8));
+            var maxInMemoryPerSpec = (int)(memFreeKB * 1024 / 2 / scansCount / (20 + 8));
             if (maxInMemoryPerSpec * scansCount > max) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
                 maxInMemoryPerSpec = max / scansCount;
             if (maxInMemoryPerSpec < 5)
@@ -1798,19 +1784,25 @@ namespace InformedProteomics.Backend.MassSpecData
             return maxInMemoryPerSpec;
         }
 
-        private void CreateAndOutputMsXChromatogram_Merge(BinaryWriter writer, List<int> scansForMsLevelX, long totalPeaksCount, bool isMs1List, double minMz, double maxMz, IProgress<ProgressData> progress)
+        private void CreateAndOutputMsXChromatogram_Merge(
+            BinaryWriter writer,
+            IReadOnlyCollection<int> scansForMsLevelX,
+            long totalPeaksCount,
+            bool isMs1List,
+            double minMz,
+            double maxMz,
+            IProgress<ProgressData> progress)
         {
             // Other thought for a slower, but really low-memory chromatogram creator:
             //   Make sure peaks are sorted ascending when written, and then jump through all spectra, performing a massive merge sort on the peaks and outputting the lowest spectra
             var progData = new ProgressData(progress);
             var count = 0;
             var countTotal = scansForMsLevelX.Count;
-            var prevMzIndex = -1;
 
             // List overhead per item: is array-backed, so item (+ pointer to it)
             // item size: double, double, int, so 20 bytes
-            var memoryFreeKB = PRISM.SystemInfo.GetFreeMemoryMB() / 1024.0;
-            var totalMemKB = PRISM.SystemInfo.GetTotalMemoryMB() / 1024.0;
+            var memoryFreeKB = SystemInfo.GetFreeMemoryMB() / 1024.0;
+            var totalMemKB = SystemInfo.GetTotalMemoryMB() / 1024.0;
 
             // Configure a reserve amount to avoid using all physical memory, which has the cost of excessive paging
             var quarterTotalPhysicalMemory = totalMemKB / 4;
@@ -1826,7 +1818,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // 8 byte (pointer) overhead per item, plus ~30 bytes per list (number of lists is numSpectra / 1,000,000 + 2)
             // item size: double, double, int, so 20 bytes
             // Perform a massive merge-sort style read/write, to minimize memory usage - set a minimum of 5
-            int maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, scansForMsLevelX.Count);
+            var maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, scansForMsLevelX.Count);
 
             progData.Status = "Writing product chromatogram";
             if (isMs1List)
@@ -1875,7 +1867,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 progData.StepRange(100);
                 var peaksToRemove = new List<LcMsPeak>();
                 count = 0;
-                prevMzIndex = -1;
+                var prevMzIndex = -1;
                 if (isMs1List)
                 {
                     _minMs1Mz = minMz;
@@ -1918,18 +1910,16 @@ namespace InformedProteomics.Backend.MassSpecData
                             {
                                 break;
                             }
+
+                            metadata.Remove(datum.ScanNum);
+                            var numDead = datum.NumPeaks < maxInMemoryPerSpec ? datum.NumPeaks : maxInMemoryPerSpec;
+                            if (numDead >= peaksToRemove.Count - 500)
+                            {
+                                peaksToRemove.Clear();
+                            }
                             else
                             {
-                                metadata.Remove(datum.ScanNum);
-                                var numDead = datum.NumPeaks < maxInMemoryPerSpec ? datum.NumPeaks : maxInMemoryPerSpec;
-                                if (numDead >= peaksToRemove.Count - 500)
-                                {
-                                    peaksToRemove.Clear();
-                                }
-                                else
-                                {
-                                    peaksToRemove.RemoveRange(peaksToRemove.Count - numDead - 1, numDead);
-                                }
+                                peaksToRemove.RemoveRange(peaksToRemove.Count - numDead - 1, numDead);
                             }
                         }
                     }
@@ -1950,7 +1940,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (isMs1List)
                 {
                     _chromMzIndexToOffset = new long[_maxMzIndex - _minMzIndex + 2];
-                    for (int i = 0; i < _chromMzIndexToOffset.Length; i++)
+                    for (var i = 0; i < _chromMzIndexToOffset.Length; i++)
                     {
                         if (chromMzIndexToOffset.ContainsKey(i))
                         {
@@ -1967,28 +1957,27 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             private readonly List<List<LcMsPeak>> _lists;
             private readonly List<bool> _sorted;
-            private int _mod = 0;
-            private double _mzMod = 0;
+            private readonly int _mod;
+            private readonly double _mzMod;
             private const int Divisor = 1000000;
-            private double _minMz;
-            private double _maxMz;
+            private readonly double _minMz;
 
             public SplitLcMsPeakLists(double minMz, double maxMz, long peakCount)
             {
                 _minMz = minMz;
-                _maxMz = maxMz;
+                _mzMod = 0;
                 _mod = (int)(peakCount / Divisor + 1);
-                _mzMod = (_maxMz - _minMz) / (_mod - 1);
+                _mzMod = (maxMz - _minMz) / (_mod - 1);
                 _lists = new List<List<LcMsPeak>>(_mod + 2);
                 _sorted = new List<bool>(_mod + 2);
-                for (int i = 0; i <= _mod + 1; i++)
+                for (var i = 0; i <= _mod + 1; i++)
                 {
                     _lists.Add(new List<LcMsPeak>(1000));
                     _sorted.Add(false);
                 }
             }
 
-            public void Add(LcMsPeak peak)
+            private void Add(LcMsPeak peak)
             {
                 if (peak == null)
                 {
@@ -2021,7 +2010,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (_enumerated > 0)
                 {
                     // remove the already-enumerated peaks
-                    for (int i = 0; i < _lists.Count && _enumerated > 0; i++)
+                    for (var i = 0; i < _lists.Count && _enumerated > 0; i++)
                     {
                         if (_lists[i].Count <= 0)
                         {
@@ -2058,7 +2047,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            private long _enumerated = 0;
+            private long _enumerated;
 
             public IEnumerator<LcMsPeak> GetReusableEnumerator()
             {
@@ -2111,58 +2100,55 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             public int ScanNum { get; }
             public int NumPeaks { get; }
-            public int PeaksRead { get { return _numPeaksRead; } }
-            private int _numPeaksRead;
+            private int PeaksRead { get; set; }
+
             private long _nextPeakOffset;
             public int Count { get; private set; }
 
-            public bool MorePeaksToRead
-            {
-                get { return _numPeaksRead < NumPeaks; }
-            }
+            public bool MorePeaksToRead => PeaksRead < NumPeaks;
 
             public ScanPeakMetaData(int scanNum, BinaryReader reader)
             {
                 Count = 0;
                 ScanNum = scanNum;
                 NumPeaks = reader.ReadInt32();
-                _numPeaksRead = 0;
+                PeaksRead = 0;
                 _nextPeakOffset = reader.BaseStream.Position;
             }
 
             public IEnumerable<LcMsPeak> ReadPeaks(BinaryReader reader, int numPeaksToRead)
             {
-                if (_numPeaksRead >= NumPeaks)
+                if (PeaksRead >= NumPeaks)
                 {
                     yield return null;
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
 
-                for (int i = 0; i < numPeaksToRead && _numPeaksRead < NumPeaks; i++)
+                for (var i = 0; i < numPeaksToRead && PeaksRead < NumPeaks; i++)
                 {
                     var mz = reader.ReadDouble();
                     var intensity = reader.ReadSingle();
                     Count++;
-                    _numPeaksRead++;
+                    PeaksRead++;
                     yield return new LcMsPeak(mz, intensity, ScanNum);
                 }
                 _nextPeakOffset = reader.BaseStream.Position;
             }
 
-            public IEnumerable<LcMsPeak> ReadPeaksReuse(BinaryReader reader, int numPeaksToRead, List<LcMsPeak> peakStock)
+            public IEnumerable<LcMsPeak> ReadPeaksReuse(BinaryReader reader, int numPeaksToRead, IList<LcMsPeak> peakStock)
             {
-                if (_numPeaksRead >= NumPeaks)
+                if (PeaksRead >= NumPeaks)
                 {
                     yield return null;
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
 
-                for (int i = 0; i < numPeaksToRead && _numPeaksRead < NumPeaks; i++)
+                for (var i = 0; i < numPeaksToRead && PeaksRead < NumPeaks; i++)
                 {
                     var mz = reader.ReadDouble();
                     var intensity = reader.ReadSingle();
                     Count++;
-                    _numPeaksRead++;
+                    PeaksRead++;
                     var lastIndex = peakStock.Count - 1;
                     if (lastIndex >= 0)
                     {

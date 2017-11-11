@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="maxSequenceMass"></param>
         public ShiftedSequenceGraph(AminoAcidSet aminoAcidSet, double shiftedMass, bool isForward, int maxSequenceLength, double maxSequenceMass = 50000.0)
         {
-            _aminoAcidSet = aminoAcidSet;
+            AminoAcidSet = aminoAcidSet;
             _modificationParams = aminoAcidSet.GetModificationParams();
 
             _isForward = isForward;
@@ -68,18 +68,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// The amino acid set used in this shifted sequence graph
         /// </summary>
-        public AminoAcidSet AminoAcidSet
-        {
-            get { return _aminoAcidSet; }
-        }
+        public AminoAcidSet AminoAcidSet { get; }
 
         /// <summary>
         /// Modifications used in this shifted sequence graph
         /// </summary>
-        public ModificationParams ModificationParams
-        {
-            get { return _modificationParams; }
-        }
+        public ModificationParams ModificationParams => _modificationParams;
 
         /// <summary>
         /// The mass by which this sequence graph is shifted
@@ -190,8 +184,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="nodeScore"></param>
         /// <param name="maxScoreAndMods"></param>
         /// <returns></returns>
-        private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(int seqIndex, int modIndex,
-            IScorer scorer, double?[][] nodeScore, Tuple<double, LinkedList<ModificationInstance>>[][] maxScoreAndMods)
+        private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(
+            int seqIndex,
+            int modIndex,
+            IScorer scorer,
+            IReadOnlyList<double?[]> nodeScore,
+            IReadOnlyList<Tuple<double, LinkedList<ModificationInstance>>[]> maxScoreAndMods)
         {
             var scoreAndMods = maxScoreAndMods[seqIndex][modIndex];
             if (scoreAndMods != null) return scoreAndMods;
@@ -328,19 +326,18 @@ namespace InformedProteomics.Backend.Data.Sequence
                         .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
-            // ReSharper disable PossibleInvalidOperationException
+
+            // ReSharper disable once PossibleInvalidOperationException
             return (double)maxScore[seqIndex][modIndex];
-            // ReSharper restore PossibleInvalidOperationException
         }
 
         private Composition.Composition _sinkSequenceComposition;
         private Composition.Composition _sinkSequenceCompositionWithH2O;
         private int _sinkModIndex;
-        //private readonly Composition.Composition[,] _compNodeComposition;
+
         private readonly Composition.Composition[][] _compNodeComposition;
 
         private readonly int _maxSeqIndex;
-        private readonly AminoAcidSet _aminoAcidSet;
         private readonly ModificationParams _modificationParams;
         private readonly bool _isForward;
         private readonly double _maxSequenceMass;

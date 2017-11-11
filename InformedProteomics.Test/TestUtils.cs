@@ -79,7 +79,6 @@ namespace InformedProteomics.Test
 
             Assert.AreEqual(expectedBinCount1, binCount1, "BinCount mismatch for MzComparerWithBinning");
             Assert.AreEqual(expectedBinCount2, binCount2, "BinCount mismatch for LcMsMatchMap");
-
         }
 
         [Test]
@@ -251,7 +250,6 @@ namespace InformedProteomics.Test
 
             foreach (var mod in expectedMassByMod)
             {
-
                 var modMass = mod.Key.Mass;
                 var modMassFormatted = string.Format("{0:N3}", modMass);
 
@@ -259,7 +257,6 @@ namespace InformedProteomics.Test
 
                 Assert.AreEqual(mod.Value, modMassFormatted);
             }
-
         }
 
         [Test]
@@ -323,7 +320,6 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             aaSet.Display();
-
         }
 
         [Test]
@@ -363,7 +359,6 @@ namespace InformedProteomics.Test
 
             Assert.AreEqual(expectedSecondIsotopeMz, composition.GetIsotopeMass(1), 0.00001, "Second isotope m/z mismatch");
 
-
             Console.WriteLine();
             Console.WriteLine("Isotopomer Envelope:");
 
@@ -390,7 +385,6 @@ namespace InformedProteomics.Test
             ShowIsotopes(ionIsotopes);
 
             Assert.AreEqual(expectedFirstIsotopeIntensity, ionIsotopes.First().Ratio, 0.00001, "First isotope intensity mismatch");
-
         }
 
         [Test]
@@ -417,9 +411,7 @@ namespace InformedProteomics.Test
             ShowIsotopes(isotopes);
 
             Assert.AreEqual(expectedFirstIsotopeIntensity, isotopes.First().Ratio, 0.00001, "First isotope intensity mismatch");
-
         }
-
 
         [Test]
         [TestCase("CCAADDKEACFAVEGPK", 2, 2, "C(78) H(122) N(22) O(29) S(3)", 964.4027858, 136,
@@ -520,11 +512,9 @@ namespace InformedProteomics.Test
 
                 var observedProductIon = observedProductIons[ionIndex];
                 Assert.AreEqual(expectedIonMass, observedProductIon.GetMonoIsotopicMz(), 0.00001, "Product ion mass mismatch for {0}{1}", ionName, ionIndex);
-
             }
 
             Assert.AreEqual(expectedProductIons, productIons.Count, "Product ion count mismatch");
-
         }
 
         [Test]
@@ -659,7 +649,6 @@ namespace InformedProteomics.Test
 
                 Console.WriteLine();
             }
-
         }
 
         [Test]
@@ -717,7 +706,6 @@ namespace InformedProteomics.Test
             }
 
             Assert.True(matchFound, "Match not found to ion {0}", ionTypeName);
-
         }
 
         [Test]
@@ -764,7 +752,6 @@ namespace InformedProteomics.Test
             Assert.AreEqual(expectedIsotopeCount, isotopeIndex, "Isotope count mismatch");
             Assert.AreEqual(expectedMzFourthIsotope, ion.GetIsotopeMz(3), 0.00001, "Isotope m/z count mismatch");
             Assert.AreEqual(expectedIntensityFourthIsotope, isotopeIntensities[3], 0.00001, "Isotope intensity mismatch");
-
         }
 
         [Test]
@@ -782,7 +769,6 @@ namespace InformedProteomics.Test
             {
                 throw new IOException("Problem reading xml file; Expected element 'parameters' but it was not found: " + xmlFile.FullName);
             }
-
 
             var elementItem = parameterBaseElement.Element("ElementIsotopes");
             if (elementItem == null)
@@ -805,12 +791,10 @@ namespace InformedProteomics.Test
 
                 if (symbol.Value == "K")
                     Assert.AreEqual("Potassium", name.Value);
-
             }
 
             Console.WriteLine("Element Count: " + elements.Count);
             Assert.AreEqual(104, elements.Count, "Unexpected element count");
-
         }
 
         [Test]
@@ -837,7 +821,6 @@ namespace InformedProteomics.Test
                 Assert.Greater(lastIntensity, isotopes[index[i]], "Intensities are not in descending order");
                 lastIntensity = isotopes[index[i]];
             }
-
         }
 
         [Test]
@@ -895,13 +878,11 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-
             var isMatch = Regex.IsMatch(empiricalFormula, pattern);
             Console.WriteLine("IsMatch of '{0}' to '{1}' reports {2}", pattern, empiricalFormula, isMatch);
 
             Assert.AreEqual(shouldMatch, isMatch, "Unexpected match result for {0}", empiricalFormula);
         }
-
 
         [Test]
         [TestCase("C2HBr365Ag2", "C,2|H,1|Br,365|Ag,2")]
@@ -938,9 +919,7 @@ namespace InformedProteomics.Test
             }
 
             Console.WriteLine();
-
         }
-
 
         [Test]
         [TestCase("PEPTIDE", "C(10) H(14) N(2) O(4) S(0)", 226.0953570, 132.047327)]
@@ -1175,7 +1154,6 @@ namespace InformedProteomics.Test
                 var plotBar = new string('+', (int)(isotope.Ratio / maxIntensity * 100 / 5));
                 Console.WriteLine("{0,2} {1,8:N5} {2}", isotope.Index, isotope.Ratio, plotBar);
             }
-
         }
 
         private void ShowProductIons(IonType ionType, int indexStart, IEnumerable<Ion> productIons)
@@ -1187,7 +1165,5 @@ namespace InformedProteomics.Test
                 i++;
             }
         }
-
-
     }
 }

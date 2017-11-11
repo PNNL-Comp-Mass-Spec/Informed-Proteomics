@@ -44,8 +44,6 @@ namespace InformedProteomics.Test
             Assert.AreEqual(expectedMaxLen300, totalPeptidesMaxLen300);
             Assert.AreEqual(expectedMaxLen400, totalPeptidesMaxLen400);
             Assert.AreEqual(expectedMaxLen500, totalPeptidesMaxLen500);
-
-
         }
 
         [Test]

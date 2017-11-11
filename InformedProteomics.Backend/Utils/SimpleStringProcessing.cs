@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.Utils
                 }
                 else
                 {
-                    char mutatedResidue = str[i];
+                    var mutatedResidue = str[i];
                     while (mutatedResidue == str[i])
                     {
                         mutatedResidue = AminoAcid.StandardAminoAcidCharacters[Random.Next(AminoAcid.StandardAminoAcidCharacters.Length)];

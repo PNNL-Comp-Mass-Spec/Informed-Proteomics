@@ -347,8 +347,6 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                     foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
                         Console.WriteLine(line);
-
-
                 }
                 Console.WriteLine("Done");
             }

@@ -1,10 +1,22 @@
+using System;
+
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
     /// <summary>
     /// A fragment of a sequence
     /// </summary>
+    [Obsolete("This class appears to be unused")]
     public class Fragment
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="ionSymbol"></param>
+        public Fragment(string ionSymbol)
+        {
+            IonSymbol = ionSymbol;
+        }
+
         /// <summary>
         /// The charge state of the fragment.
         /// </summary>
@@ -33,7 +45,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// The full ion symbol of the fragment. e.g. y6 or y6++ or y6-H2O++
         /// </summary>
-        public string IonSymbol { get; set; }
+        public string IonSymbol { get; }
 
         /// <summary>
         /// Check if 2 fragments are equal

@@ -13,8 +13,7 @@ namespace InformedProteomics.Backend.SearchResults
     {
         private readonly bool _multiplePeptidesPerScan;
         private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
-        private List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
-
+        private readonly List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
 
         /// <summary>
         /// Number of PSMs with a QValue &lt; 0.01
@@ -34,10 +33,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// <summary>
         /// The full list of filtered results, with FDR scores added
         /// </summary>
-        public List<DatabaseSearchResultData> FilteredResults
-        {
-            get { return new List<DatabaseSearchResultData>(filteredResults); }
-        }
+        public List<DatabaseSearchResultData> FilteredResults => new List<DatabaseSearchResultData>(filteredResults);
 
         /// <summary>
         /// Instantiate the FDR calculator
@@ -83,7 +79,10 @@ namespace InformedProteomics.Backend.SearchResults
         /// <param name="targetResults"></param>
         /// <param name="decoyResults"></param>
         /// <param name="multiplePeptidesPerScan"></param>
-        public FdrCalculator(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults, bool multiplePeptidesPerScan = false)
+        public FdrCalculator(
+            IReadOnlyCollection<DatabaseSearchResultData> targetResults,
+            IReadOnlyCollection<DatabaseSearchResultData> decoyResults,
+            bool multiplePeptidesPerScan = false)
         {
             ErrorMessage = string.Empty;
 
@@ -245,13 +244,13 @@ namespace InformedProteomics.Backend.SearchResults
 
             if (!File.Exists(targetResultFilePath))
             {
-                ErrorMessage = errorBase + "target file not found, " + Path.GetFileName(targetResultFilePath);
+                ErrorMessage = errorBase + "target results file not found, " + Path.GetFileName(targetResultFilePath);
                 return false;
             }
 
             if (!File.Exists(decoyResultFilePath))
             {
-                ErrorMessage = errorBase + "decoy file not found, " + Path.GetFileName(decoyResultFilePath);
+                ErrorMessage = errorBase + "decoy results file not found, " + Path.GetFileName(decoyResultFilePath);
                 return false;
             }
 
@@ -261,18 +260,18 @@ namespace InformedProteomics.Backend.SearchResults
             return AddTargetAndDecoyData(targetData, decoyData);
         }
 
-        private bool AddTargetAndDecoyData(List<DatabaseSearchResultData> targetResults, List<DatabaseSearchResultData> decoyResults)
+        private bool AddTargetAndDecoyData(IReadOnlyCollection<DatabaseSearchResultData> targetResults, IReadOnlyCollection<DatabaseSearchResultData> decoyResults)
         {
             var errorBase = "Cannot compute FDR Scores; ";
             if (targetResults == null || targetResults.Count < 1)
             {
-                ErrorMessage = errorBase + "target file is empty";
+                ErrorMessage = errorBase + "target results file is empty";
                 return false;
             }
 
             if (decoyResults == null || decoyResults.Count < 1)
             {
-                ErrorMessage = errorBase + "decoy file is empty";
+                ErrorMessage = errorBase + "decoy results file is empty";
                 return false;
             }
 

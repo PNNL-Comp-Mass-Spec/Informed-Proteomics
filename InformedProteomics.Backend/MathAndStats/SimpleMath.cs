@@ -17,11 +17,11 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static int NChooseK(int n, int k)
         {
-            int num = 1;
-            for (int i = 0; i < k; i++)
+            var num = 1;
+            for (var i = 0; i < k; i++)
                 num *= n - i;
-            int denom = 1;
-            for (int i = 0; i < k; i++)
+            var denom = 1;
+            for (var i = 0; i < k; i++)
                 denom *= k - i;
             return num/denom;
         }
@@ -78,7 +78,7 @@ namespace InformedProteomics.Backend.MathAndStats
             if (length == 1)
             {
                 var combinations = new int[n][];
-                for (int i = 0; i < n; i++)
+                for (var i = 0; i < n; i++)
                 {
                     combinations[i] = new[] { i };
                 }
@@ -90,8 +90,8 @@ namespace InformedProteomics.Backend.MathAndStats
                 var combinations = new List<int[]>();
                 foreach (var combination in prevCombinations)
                 {
-                    int lastValue = combination.Last();
-                    for (int j = lastValue; j < n; j++)
+                    var lastValue = combination.Last();
+                    for (var j = lastValue; j < n; j++)
                     {
                         var newCombination = new int[combination.Length + 1];
                         Array.Copy(combination, newCombination, combination.Length);

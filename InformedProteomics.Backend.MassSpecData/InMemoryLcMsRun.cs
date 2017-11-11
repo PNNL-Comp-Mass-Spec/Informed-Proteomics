@@ -177,7 +177,7 @@ namespace InformedProteomics.Backend.MassSpecData
             ScanNumToMsLevel = new Dictionary<int, int>();
             IsolationMzBinToScanNums = new Dictionary<int, int[]>();
 
-            _ms1PeakList = new List<LcMsPeak>();
+            Ms1PeakList = new List<LcMsPeak>();
             _scanNumSpecMap = new Dictionary<int, Spectrum>();
 
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
@@ -242,7 +242,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     IsolationMzBinToScanNums[binNum] = scanNumList;
                 }
 
-                _ms1PeakList.Sort();
+                Ms1PeakList.Sort();
                 //_ms2PeakList.Sort();
 
                 progressData.Report(99.5);
@@ -280,7 +280,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private void HandleSpectrum(
             ref SpectrumTrackingInfo trackingInfo,
-            Dictionary<int, List<int>> isolationMzBinToScanNums,
+            IDictionary<int, List<int>> isolationMzBinToScanNums,
             Spectrum spec)
         {
             trackingInfo.SpecRead += 1;
@@ -297,14 +297,12 @@ namespace InformedProteomics.Backend.MassSpecData
                 //{
                 //    _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
                 //}
-                _ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
+                Ms1PeakList.AddRange(spec.Peaks.Select(peak => new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum)));
                 _scanNumSpecMap.Add(spec.ScanNum, spec);
             }
             else if (spec.MsLevel == 2)
             {
-                var productSpec = spec as ProductSpectrum;
-
-                if (productSpec != null)
+                if (spec is ProductSpectrum productSpec)
                 {
                     if (trackingInfo.ProductSignalToNoiseRatioThreshold > 0.0)
                         productSpec.FilterNoise(trackingInfo.ProductSignalToNoiseRatioThreshold);
@@ -350,17 +348,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
         /// </summary>
-        public override string FilePath { get; protected set; }
+        public sealed override string FilePath { get; protected set; }
 
         /// <summary>
         /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public override string SrcFileChecksum { get; protected set; }
+        public sealed override string SrcFileChecksum { get; protected set; }
 
         /// <summary>
         /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public override string FileFormatVersion { get; protected set; }
+        public sealed override string FileFormatVersion { get; protected set; }
 
         /// <summary>
         /// Try to make the reader random access capable
@@ -374,17 +372,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// List of all MS1 peaks
         /// </summary>
-        public List<LcMsPeak> Ms1PeakList { get { return _ms1PeakList; } }
+        public List<LcMsPeak> Ms1PeakList { get; }
 
         /// <summary>
         /// The smallest MS1 m/z
         /// </summary>
-        public override double MinMs1Mz { get { return _ms1PeakList[0].Mz; } }
+        public override double MinMs1Mz => Ms1PeakList[0].Mz;
 
         /// <summary>
         /// The largest MS1 m/z
         /// </summary>
-        public override double MaxMs1Mz { get { return _ms1PeakList[_ms1PeakList.Count - 1].Mz; } }
+        public override double MaxMs1Mz => Ms1PeakList[Ms1PeakList.Count - 1].Mz;
 
         /// <summary>
         /// Gets the spectrum of the specified scan number
@@ -451,8 +449,10 @@ namespace InformedProteomics.Backend.MassSpecData
             var spec = GetSpectrum(scanNum);
             if (spec == null) return null;
 
-            var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
-            return productSpec == null ? null : productSpec.IsolationWindow;
+            if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                return null;
+
+            return productSpec.IsolationWindow;
         }
 
         /// <summary>
@@ -630,7 +630,6 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
-        private readonly List<LcMsPeak> _ms1PeakList;
         private readonly Dictionary<int, Spectrum> _scanNumSpecMap;  // scan number -> spectrum
     }
 }

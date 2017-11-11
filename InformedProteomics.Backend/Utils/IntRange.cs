@@ -72,7 +72,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Length of this range
         /// </summary>
-        public int Length { get { return Max - Min + 1; } }
+        public int Length => Max - Min + 1;
 
         /// <summary>
         /// Compare 2 IntRanges

@@ -144,12 +144,12 @@ namespace InformedProteomics.Backend.Database
                             {
                                 var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
                                 decoySequence.Remove(decoySequence.Length - 1, 1);
-                                decoySequence.Append((char) residue);
+                                decoySequence.Append(residue);
                                 decoySequence.Append(residueToBeReplaced);
                             }
                             else
                             {
-                                decoySequence.Append((char) residue);
+                                decoySequence.Append(residue);
                             }
                         }
                         decoyWriter.WriteLine(decoySequence);
@@ -577,7 +577,7 @@ namespace InformedProteomics.Backend.Database
 
                     proteinNamesAndStats.Add(name, proteinInfoCurrent);
 
-                    seqWriter.Write(Encoding.GetBytes((string) sequence));
+                    seqWriter.Write(Encoding.GetBytes(sequence));
 
                     annoWriter.WriteLine("{0}{1}{2}{3}{4}{5}{6}",
                         offset, FastaDatabaseConstants.AnnotationDelimiter,
@@ -638,7 +638,7 @@ namespace InformedProteomics.Backend.Database
                     var length = int.Parse(token[1]);
                     var name = token[2];
 
-                    if (_nameToLength.TryGetValue(name, out var lengthExistingEntry))
+                    if (_nameToLength.TryGetValue(name, out _))
                     {
                         Console.WriteLine("Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
                                           name, offset, Path.GetFileName(_annoFilePath));

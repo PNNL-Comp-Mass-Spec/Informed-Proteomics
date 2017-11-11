@@ -191,7 +191,5 @@ namespace PromexAlign
 
             writer.Close();
         }
-
-
     }
 }

@@ -35,12 +35,12 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Atomic Symbol
         /// </summary>
-        public string Code { get; set; }
+        public string Code { get; }
 
         /// <summary>
         /// Name of element
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Monoisotopic mass of element
@@ -146,6 +146,7 @@ namespace InformedProteomics.Backend.Data.Biology
             }
         }
 
+        [Obsolete("Unused")]
         private static void ReadFromPnnlOmicsElementDataXmlFile()
         {
             const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";

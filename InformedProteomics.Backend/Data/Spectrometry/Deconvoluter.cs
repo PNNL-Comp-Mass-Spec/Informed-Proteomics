@@ -23,8 +23,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         private readonly int isotopeOffsetTolerance;
 
-        private readonly double filteringWindowSize;
-
         private readonly Tolerance tolerance;
 
         private readonly double corrScoreThreshold;
@@ -35,23 +33,40 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="minCharge"></param>
         /// <param name="maxCharge"></param>
         /// <param name="isotopeOffsetTolerance"></param>
-        /// <param name="filteringWindowSize"></param>
         /// <param name="tolerance"></param>
         /// <param name="corrScoreThreshold"></param>
         public Deconvoluter(
             int minCharge,
             int maxCharge,
             int isotopeOffsetTolerance,
-            double filteringWindowSize,
             Tolerance tolerance,
             double corrScoreThreshold = 0.7)
         {
             this.minCharge = minCharge;
             this.maxCharge = maxCharge;
             this.isotopeOffsetTolerance = isotopeOffsetTolerance;
-            this.filteringWindowSize = filteringWindowSize;
             this.tolerance = tolerance;
             this.corrScoreThreshold = corrScoreThreshold;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="minCharge"></param>
+        /// <param name="maxCharge"></param>
+        /// <param name="isotopeOffsetTolerance"></param>
+        /// <param name="filteringWindowSize"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="corrScoreThreshold"></param>
+        [Obsolete("Use the constructor without parameter filteringWindowSize")]
+        public Deconvoluter(
+            int minCharge,
+            int maxCharge,
+            int isotopeOffsetTolerance,
+            double filteringWindowSize,
+            Tolerance tolerance,
+            double corrScoreThreshold = 0.7) : this(minCharge, maxCharge, isotopeOffsetTolerance, tolerance, corrScoreThreshold)
+        {
         }
 
         /// <summary>
@@ -63,11 +78,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             return GetCombinedDeconvolutedSpectrum(
                         spectrum,
-                        this.minCharge,
-                        this.maxCharge,
-                        this.isotopeOffsetTolerance,
-                        this.tolerance,
-                        this.corrScoreThreshold);
+                        minCharge,
+                        maxCharge,
+                        isotopeOffsetTolerance,
+                        tolerance,
+                        corrScoreThreshold);
         }
 
         /// <summary>
@@ -166,11 +181,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     continue;
                 }
 
-                double bestScore = 0.0;
+                var bestScore = 0.0;
                 DeconvolutedPeak bestPeak = null;
                 Tuple<Peak, int>[] bestObservedPeaks = null;
 
-                for (int charge = minCharge; charge <= maxCharge; charge++)
+                for (var charge = minCharge; charge <= maxCharge; charge++)
                 {
                     var mass = peak.Mz * charge - (charge * Constants.Proton);
                     if (mass > MaxMass)
@@ -198,7 +213,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var envelop = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
 
-                        int observedPeakCount = 0;
+                        var observedPeakCount = 0;
                         for (var i = 0; i < observedPeaks.Length; i++)
                         {
                             var observedPeak = observedPeaks[i];
@@ -273,13 +288,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var maxIntensity = envelopePeaks.Max(p => p.Item1.Intensity);
 
             var bins = new double[numBins];
-            int peakIndex = 0;
-            for (int envelopePeakIndex = 1; envelopePeakIndex < envelopePeaks.Length; envelopePeakIndex++)
+            var peakIndex = 0;
+            for (var envelopePeakIndex = 1; envelopePeakIndex < envelopePeaks.Length; envelopePeakIndex++)
             {
                 var lowPeak = envelopePeaks[envelopePeakIndex - 1].Item1;
                 var highPeak = envelopePeaks[envelopePeakIndex].Item1;
                 var binSize = (highPeak.Mz - lowPeak.Mz) / numBins;
-                int prevBin = 0;
+                var prevBin = 0;
                 for (; peakIndex < peaks.Length; peakIndex++)
                 {
                     var noisePeak = peaks[peakIndex];
@@ -293,7 +308,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         break;
                     }
 
-                    for (int i = prevBin; i < numBins; i++)
+                    for (var i = prevBin; i < numBins; i++)
                     {
                         var lowBinMz = lowPeak.Mz + binSize * i;
                         var highBinMz = lowPeak.Mz + binSize * (i + 1);
@@ -307,8 +322,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
             }
 
-            double interferenceScore = 0.0;
-            for (int i = 0; i < numBins; i++)
+            var interferenceScore = 0.0;
+            for (var i = 0; i < numBins; i++)
             {
                 interferenceScore += Math.Pow(2, bins[i]);
             }
@@ -455,7 +470,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var windowSpectrum = new Spectrum(window, 1);
                 var peakMz = peak.Mz;
 
-                double bestScore = 0.0;
+                var bestScore = 0.0;
                 DeconvolutedPeak bestPeak = null;
 
                 for (var charge = maxCharge; charge >= minCharge; charge--)
