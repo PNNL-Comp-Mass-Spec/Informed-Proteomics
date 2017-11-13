@@ -187,8 +187,7 @@ namespace InformedProteomics.Tests.DevTests
                 var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
                 var precursorIon = new Ion(composition, charge);
-                var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
-                var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
+                var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
                 if (!isValid) continue;
                 ++totalSpecs;
 
@@ -311,8 +310,7 @@ namespace InformedProteomics.Tests.DevTests
                 var charge = Convert.ToInt32(charges[i]);
                 var composition = Composition.Parse(compositions[i]);
                 var precursorIon = new Ion(composition, charge);
-                var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
-                var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
+                var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
                 if (!isValid) continue;
 
                 var sequence = sequences[i];
@@ -341,8 +339,7 @@ namespace InformedProteomics.Tests.DevTests
                 var charge = Convert.ToInt32(charges[i]);
                 var composition = Composition.Parse(compositions[i]);
                 var precursorIon = new Ion(composition, charge);
-                var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
-                var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
+                var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
                 if (!isValid) continue;
 
                 ++totalSpecs;
@@ -491,8 +488,7 @@ namespace InformedProteomics.Tests.DevTests
                 var charge = Convert.ToInt32(charges[i]);
 
                 var precursorIon = new Ion(composition, charge);
-                var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
-                var isValid = spec != null && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
+                var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
                 if (!isValid) continue;
 
                 var score = Convert.ToDouble(scores[i]);

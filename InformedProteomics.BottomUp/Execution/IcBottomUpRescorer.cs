@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using InformedProteomics.Backend.Data.Sequence;
+﻿using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Scoring.LikelihoodScoring;
 
 namespace InformedProteomics.BottomUp.Execution
 {

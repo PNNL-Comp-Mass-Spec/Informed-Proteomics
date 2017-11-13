@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Utils;
+using PRISM;
 using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
@@ -189,6 +190,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 Chromatogram,
                 Unknown,
             }
+
             private readonly List<IndexItem> _offsets = new List<IndexItem>();
 
             public List<IndexItem> Offsets => _offsets;
@@ -205,7 +207,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             public void AddOffset(string idRef, string offset)
             {
-                AddOffset(idRef, Int64.Parse(offset));
+                AddOffset(idRef, long.Parse(offset));
             }
 
             public void AddOffset(string idRef, long offset)
@@ -695,7 +697,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         // Schema requirements: zero to many instances of this element
                         // Use reader.ReadSubtree() to provide an XmlReader that is only valid for the element and child nodes
-                        yield return ReadSpectrum(_xmlReaderForYield.ReadSubtree(), true);
+                        yield return ReadSpectrum(_xmlReaderForYield.ReadSubtree());
                         // "spectrum" might not have any child nodes
                         // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                         _xmlReaderForYield.Read();
@@ -732,7 +734,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _reduceMemoryUsage = false; // They called this on a non-random access reader, now they suffer the consequences.
                 ReadMzMl();
             }
-            return _spectra[(int)index];
+            return _spectra[index];
         }
         #endregion
 
@@ -841,7 +843,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1);
             var testPos = stream.Length;
             //stream.Position = testPos; // 300 bytes from the end of the file - should be enough
-            var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8, true, 65536);
+            var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536);
             streamReader.DiscardBufferedData();
             var haveOffset = false;
 
@@ -852,14 +854,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 testPos -= bufSize;
                 stream.Position = testPos;
                 var byteBuffer = new byte[bufSize];
-                var stringBuffer = string.Empty;
-                var bufStart = stream.Position;
-                var bytesRead = 0;
                 while (stream.Position < stream.Length && !haveOffset)
                 {
-                    bufStart = stream.Position;
-                    bytesRead = stream.Read(byteBuffer, 0, bufSize);
-                    stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
+                    var bufStart = stream.Position;
+                    var bytesRead = stream.Read(byteBuffer, 0, bufSize);
+                    var stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
                     // set up the rewind to ensure full tags
                     var lastTagEnd = stringBuffer.LastIndexOf('>');
                     var lastTagStart = stringBuffer.LastIndexOf('<');
@@ -902,14 +901,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     testPos -= bufSize;
                     stream.Position = testPos;
                     var byteBuffer = new byte[bufSize];
-                    var stringBuffer = string.Empty;
-                    var bufStart = stream.Position;
-                    var bytesRead = 0;
                     while (stream.Position < stream.Length && !haveOffset)
                     {
-                        bufStart = stream.Position;
-                        bytesRead = stream.Read(byteBuffer, 0, bufSize);
-                        stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
+                        var bufStart = stream.Position;
+                        var bytesRead = stream.Read(byteBuffer, 0, bufSize);
+                        var stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
                         // set up the rewind to ensure full tags
                         var lastTagEnd = stringBuffer.LastIndexOf('>');
                         var lastTagStart = stringBuffer.LastIndexOf('<');
@@ -966,7 +962,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private void ReadChecksum()
         {
             using (var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1))
-            using (var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8, true, 65536))
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536))
             {
                 try
                 {
@@ -1013,15 +1009,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 const string chromTag = "chromatogram";
                 const int maxRead = 524288; //65536 (17 bits), 131072 (18 bits), 262144 (19 bits), 524288 (20 bits)
                 var byteBuffer = new byte[maxRead];
-                var stringBuffer = string.Empty;
-                var bufStart = file.Position;
-                var bytesRead = 0;
-                var builder = string.Empty;
                 while (file.Position < file.Length)
                 {
-                    bufStart = file.Position;
-                    bytesRead = file.Read(byteBuffer, 0, maxRead);
-                    stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
+                    var bufStart = file.Position;
+                    var bytesRead = file.Read(byteBuffer, 0, maxRead);
+                    var stringBuffer = _encoding.GetString(byteBuffer, 0, bytesRead);
                     // set up the rewind to ensure full tags
                     var lastTagEnd = stringBuffer.LastIndexOf('>');
                     var lastTagStart = stringBuffer.LastIndexOf('<');
@@ -1054,7 +1046,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, searchPoint));
                         var end = stringBuffer.IndexOf('>', searchPoint + 1);
                         // Grab everything between '<' and the next '>'
-                        builder = stringBuffer.Substring(searchPoint + 1, (end - 1) - (searchPoint + 1));
+                        var builder = stringBuffer.Substring(searchPoint + 1, (end - 1) - (searchPoint + 1));
                         // Get the ID of the tag
                         var attribName = "id";
                         if (_version == MzML_Version.mzML1_0_0)
@@ -1779,14 +1771,16 @@ namespace InformedProteomics.Backend.MassSpecData
         private CVParam ReadCvParam(XmlReader reader)
         {
             reader.MoveToContent();
-            var cvParam = new CVParam();
-            cvParam.Accession = reader.GetAttribute("accession");
-            cvParam.CVRef = reader.GetAttribute("cvRef");
-            cvParam.Name = reader.GetAttribute("name");
-            cvParam.Value = reader.GetAttribute("value");
-            cvParam.UnitAccession = reader.GetAttribute("unitAccession");
-            cvParam.UnitCVRef = reader.GetAttribute("unitCVRef");
-            cvParam.UnitName = reader.GetAttribute("unitName");
+            var cvParam = new CVParam
+            {
+                Accession = reader.GetAttribute("accession"),
+                CVRef = reader.GetAttribute("cvRef"),
+                Name = reader.GetAttribute("name"),
+                Value = reader.GetAttribute("value"),
+                UnitAccession = reader.GetAttribute("unitAccession"),
+                UnitCVRef = reader.GetAttribute("unitCVRef"),
+                UnitName = reader.GetAttribute("unitName")
+            };
 
             reader.Close();
             return cvParam;
@@ -1799,13 +1793,15 @@ namespace InformedProteomics.Backend.MassSpecData
         private UserParam ReadUserParam(XmlReader reader)
         {
             reader.MoveToContent();
-            var userParam = new UserParam();
-            userParam.Name = reader.GetAttribute("name");
-            userParam.Type = reader.GetAttribute("type");
-            userParam.Value = reader.GetAttribute("value");
-            userParam.UnitAccession = reader.GetAttribute("unitAccession");
-            userParam.UnitCVRef = reader.GetAttribute("unitCVRef");
-            userParam.UnitName = reader.GetAttribute("unitName");
+            var userParam = new UserParam
+            {
+                Name = reader.GetAttribute("name"),
+                Type = reader.GetAttribute("type"),
+                Value = reader.GetAttribute("value"),
+                UnitAccession = reader.GetAttribute("unitAccession"),
+                UnitCVRef = reader.GetAttribute("unitCVRef"),
+                UnitName = reader.GetAttribute("unitName")
+            };
 
             reader.Close();
             return userParam;
@@ -1913,7 +1909,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     // Schema requirements: zero to many instances of this element
                     // Use reader.ReadSubtree() to provide an XmlReader that is only valid for the element and child nodes
-                    _spectra.Add(ReadSpectrum(reader.ReadSubtree(), true));
+                    _spectra.Add(ReadSpectrum(reader.ReadSubtree()));
                     // "spectrum" might not have any child nodes
                     // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                     reader.Read();
@@ -2107,6 +2103,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
             reader.Close();
+
             // Process the spectrum data
             var scan = new ScanData();
             Spectrum spectrum;
@@ -2276,7 +2273,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single scanList element</param>
         /// <returns></returns>
-        private List<ScanData> ReadScanList(XmlReader reader)
+        private IEnumerable<ScanData> ReadScanList(XmlReader reader)
         {
             reader.MoveToContent();
             // var count = Convert.ToInt32(reader.GetAttribute("count"));
@@ -2462,7 +2459,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single precursorList element</param>
         /// <returns></returns>
-        private List<Precursor> ReadPrecursorList(XmlReader reader)
+        private IEnumerable<Precursor> ReadPrecursorList(XmlReader reader)
         {
             reader.MoveToContent();
             // var count = Convert.ToInt32(reader.GetAttribute("count"));
@@ -2503,7 +2500,6 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             reader.MoveToContent();
             reader.ReadStartElement("precursor"); // Throws exception if we are not at the "precursor" tag.
-            XmlReader innerReader;
             var precursor = new Precursor();
             while (reader.ReadState == ReadState.Interactive)
             {
@@ -2514,6 +2510,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     continue;
                 }
 
+                XmlReader innerReader;
                 switch (reader.Name)
                 {
                     case "isolationWindow":
@@ -2796,7 +2793,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="reader">XmlReader that is only valid for the scope of the single binaryDataArrayList element</param>
         /// <param name="defaultArrayLength">Default array length, coming from spectrum attribute</param>
         /// <returns></returns>
-        private List<BinaryDataArray> ReadBinaryDataArrayList(XmlReader reader, int defaultArrayLength)
+        private IEnumerable<BinaryDataArray> ReadBinaryDataArrayList(XmlReader reader, int defaultArrayLength)
         {
             reader.MoveToContent();
             // var bdArrays = Convert.ToInt32(reader.GetAttribute("count"));
@@ -2837,9 +2834,8 @@ namespace InformedProteomics.Backend.MassSpecData
         private BinaryDataArray ReadBinaryDataArray(XmlReader reader, int defaultLength)
         {
             reader.MoveToContent();
-            var bda = new BinaryDataArray();
-            bda.ArrayLength = defaultLength;
-            var encLength = Convert.ToInt32(reader.GetAttribute("encodedLength"));
+            var bda = new BinaryDataArray {ArrayLength = defaultLength};
+            // var encLength = Convert.ToInt32(reader.GetAttribute("encodedLength"));
             var arrLength = Convert.ToInt32(reader.GetAttribute("arrayLength")); // Override the default; if non-existent, should get 0
             if (arrLength > 0)
             {

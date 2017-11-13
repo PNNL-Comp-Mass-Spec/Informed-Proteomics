@@ -9,6 +9,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using pwiz.CLI.analysis;
 using pwiz.CLI.cv;
 using pwiz.CLI.msdata;
+using PRISM;
 using Spectrum = InformedProteomics.Backend.Data.Spectrometry.Spectrum;
 
 namespace InformedProteomics.Backend.MassSpecData

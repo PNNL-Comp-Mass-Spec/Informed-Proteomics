@@ -162,7 +162,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 if (minScanNum < 0) minScanNum = 0;
 
                 var newFt = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
-                _alignedFeatures[j][dataSetIndex] = (newFt == null) ? featureFinder.GetLcMsPeaksFromNoisePeaks(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge) : newFt;
+                _alignedFeatures[j][dataSetIndex] = newFt ?? featureFinder.GetLcMsPeaksFromNoisePeaks(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
                 /*
                 var ft = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
 
@@ -172,10 +172,9 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 else
                     _alignedFeatures[j][dataSetIndex] = ft;*/
 
-                progressData.Report(j, this.CountAlignedFeatures);
+                progressData.Report(j, CountAlignedFeatures);
             }
 
-            featureFinder = null;
         }
 
         public void RefineAbundance(double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
@@ -186,15 +185,17 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
             for (var i = 0; i < CountDatasets; i++)
             {
-                progressData.StepRange(((i + 1) * 100.0) / this.CountDatasets);
+                progressData.StepRange(((i + 1) * 100.0) / CountDatasets);
                 var subProgress = new Progress<ProgressData>(pd => progressData.Report(pd.Percent));
                 FillMissingFeatures(i, scoreThreshold, subProgress);
                 //Console.WriteLine("{0} has been processed...", RawFileList[i]);
             }
         }
 
-        public int CountDatasets { get { return _runList.Count; } }
-        public int CountAlignedFeatures { get { return (_alignedFeatures == null) ? 0 : _alignedFeatures.Count; } }
+        public int CountDatasets => _runList.Count;
+
+        public int CountAlignedFeatures => _alignedFeatures?.Count ?? 0;
+
         /*
         public void TryFillMissingFeature(List<LcMsFeature[]> alignedFeatures)
         {
@@ -357,7 +358,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
         }
 
         private List<LcMsFeature[]> _alignedFeatures;
-        private List<LcMsFeature[]> GroupFeatures(List<LcMsFeature> features)
+        private List<LcMsFeature[]> GroupFeatures(IReadOnlyList<LcMsFeature> features)
         {
             var adjList = new List<int>[features.Count];
 
@@ -395,7 +396,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
             return ret;
         }
 
-        private List<LcMsFeature> GetAlignedFeatures(ref HashSet<int> component, List<int>[] adjList)
+        private IEnumerable<LcMsFeature> GetAlignedFeatures(ISet<int> component, IReadOnlyList<List<int>> adjList)
         {
             var nDataSet = CountDatasets;
 
@@ -497,9 +498,9 @@ namespace InformedProteomics.FeatureFinding.Alignment
             return alignedFeatures;
         }
 
-        private List<List<int>> GetConnectedComponents(List<int>[] adjList)
+        private IEnumerable<List<int>> GetConnectedComponents(IReadOnlyList<List<int>> adjList)
         {
-            var nNodes = adjList.Length;
+            var nNodes = adjList.Count;
             //var groupedFeaters = new List<AlignedMs1FeatureSet>();
             var nodeSetList = new List<List<int>>();
             var visited = new bool[nNodes];

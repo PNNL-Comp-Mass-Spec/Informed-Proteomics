@@ -68,11 +68,11 @@ namespace InformedProteomics.BottomUp.Execution
         }
 
         public string ErrorMessage { get; private set; }
-        public string SpecFilePath { get; private set; }
-        public string DatabaseFilePath { get; private set; }
-        public string OutputDir { get; private set; }
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public Enzyme Enzyme { get; private set; }
+        public string SpecFilePath { get; }
+        public string DatabaseFilePath { get; }
+        public string OutputDir { get; }
+        public AminoAcidSet AminoAcidSet { get; }
+        public Enzyme Enzyme { get; }
 
         /// <remarks>default 6</remarks>
         public int MinSequenceLength { get; set; }
@@ -143,15 +143,15 @@ namespace InformedProteomics.BottomUp.Execution
         /// <remarks>default 10 ppm</remarks>
         public double PrecursorIonTolerancePpm
         {
-            get { return PrecursorIonTolerance.GetValue(); }
-            set { PrecursorIonTolerance = new Tolerance(value); }
+            get => PrecursorIonTolerance.GetValue();
+            set => PrecursorIonTolerance = new Tolerance(value);
         }
 
         /// <remarks>default 10 ppm</remarks>
         public double ProductIonTolerancePpm
         {
-            get { return ProductIonTolerance.GetValue(); }
-            set { ProductIonTolerance = new Tolerance(value); }
+            get => ProductIonTolerance.GetValue();
+            set => ProductIonTolerance = new Tolerance(value);
         }
 
         private LcMsRun _run;
@@ -382,7 +382,7 @@ namespace InformedProteomics.BottomUp.Execution
             return matches;
         }
 
-        private void WriteResultsToFile(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)
+        private void WriteResultsToFile(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> matches, string outputFilePath, FastaDatabase database)
         {
             using (var writer = new StreamWriter(outputFilePath))
             {
