@@ -4,9 +4,9 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Alignment;
-using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
 using MathNet.Numerics.Statistics;
+using PRISM;
 
 namespace PromexAlign
 {
@@ -14,27 +14,70 @@ namespace PromexAlign
     {
         public static void Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                ShowSyntax();
+                return;
+            }
+
             // Parse file
             var inputFilePath = args[0];
+
+            if (!File.Exists(inputFilePath))
+            {
+                ConsoleMsgUtils.ShowError("File not found: " + inputFilePath);
+                return;
+            }
+
             var datasets = DatasetInfo.ParseDatasetInfoFile(inputFilePath);
+
+            if (datasets.Count == 0)
+            {
+                ConsoleMsgUtils.ShowError("No valid data found in the dataset info file");
+                ShowSyntax();
+                return;
+            }
 
             var fileName = Path.GetFileNameWithoutExtension(inputFilePath);
             var directory = Path.GetDirectoryName(inputFilePath);
-            var outputfilePath = Path.Combine(directory, string.Format("{0}_crosstab.tsv", fileName));
 
-            int nDataset = datasets.Count;
+            var crosstabFilename = string.Format("{0}_crosstab.tsv", fileName);
+
+            string outputfilePath;
+            if (string.IsNullOrWhiteSpace(directory))
+                outputfilePath = crosstabFilename;
+            else
+                outputfilePath= Path.Combine(directory, crosstabFilename);
+
+            var nDataset = datasets.Count;
             var prsmReader = new ProteinSpectrumMatchReader();
             var tolerance = new Tolerance(100);
             var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
 
-            int dataId = 0;
+            var dataId = 0;
             foreach (var dataset in datasets)
             {
+                if (!File.Exists(dataset.RawFilePath))
+                {
+                    ConsoleMsgUtils.ShowError("Instrument file not found: " + dataset.RawFilePath);
+                    continue;
+                }
+
+                if (!File.Exists(dataset.Ms1FtFilePath))
+                {
+                    ConsoleMsgUtils.ShowError("ProMex results file not found: " + dataset.Ms1FtFilePath);
+                    continue;
+                }
+
+                Console.WriteLine("Opening " + dataset.RawFilePath);
                 var run = PbfLcMsRun.GetLcMsRun(dataset.RawFilePath, 0, 0);
+
+                Console.WriteLine("Opening " + dataset.Ms1FtFilePath);
                 var features = LcMsFeatureAlignment.LoadProMexResult(dataId++, dataset.Ms1FtFilePath, run);
 
-                if (File.Exists(dataset.MsPfIdFilePath))
+                if (!string.IsNullOrWhiteSpace(dataset.MsPfIdFilePath) && File.Exists(dataset.MsPfIdFilePath))
                 {
+                    Console.WriteLine("Opening " + dataset.MsPfIdFilePath);
                     var prsmList = prsmReader.LoadIdentificationResult(dataset.MsPfIdFilePath, ProteinSpectrumMatch.SearchTool.MsPathFinder);
 
                     foreach (var match in prsmList)
@@ -43,7 +86,7 @@ namespace PromexAlign
                     }
 
                     // tag features by PrSMs
-                    foreach (LcMsFeature feature in features)
+                    foreach (var feature in features)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
                         var massTol = tolerance.GetToleranceAsMz(feature.Mass);
@@ -64,13 +107,24 @@ namespace PromexAlign
 
             Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
 
-            for (var i = 0; i < nDataset; i++)
+            var validResults = 0;
+            for (var datasetIndex = 0; datasetIndex < nDataset; datasetIndex++)
             {
-                alignment.FillMissingFeatures(i);
-                Console.WriteLine("{0} has been processed", datasets[i].Label);
+                if (datasetIndex >= alignment.CountDatasets)
+                {
+                    ConsoleMsgUtils.ShowWarning(string.Format("Could not align {0}; features not found", datasets[datasetIndex].Label));
+                    continue;
+                }
+
+                alignment.FillMissingFeatures(datasetIndex);
+                Console.WriteLine("{0} has been processed", datasets[datasetIndex].Label);
+                validResults++;
             }
 
-            OutputCrossTabWithId(outputfilePath, alignment, datasets.Select(ds => ds.Label).ToArray());
+            if (validResults > 0)
+            {
+                OutputCrossTabWithId(outputfilePath, alignment, datasets.Select(ds => ds.Label).ToArray());
+            }
         }
 
         public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
@@ -122,9 +176,8 @@ namespace PromexAlign
             writer.Write("\n");
 
             var alignedFeatureList = alignment.GetAlignedFeatures();
-            for (var j = 0; j < alignedFeatureList.Count; j++)
+            foreach (var features in alignedFeatureList)
             {
-                var features = alignedFeatureList[j];
                 var mass = features.Where(f => f != null).Select(f => f.Mass).Median();
                 var minElutionTime = features.Where(f => f != null).Select(f => f.MinElutionTime).Median();
                 var maxElutionTime = features.Where(f => f != null).Select(f => f.MaxElutionTime).Median();
@@ -147,7 +200,7 @@ namespace PromexAlign
                 }
 
                 var prsm = (from f in features
-                            where f != null && f.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
+                            where f?.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
                             select f.ProteinSpectrumMatches[0]).FirstOrDefault();
 
                 if (prsm == null)
@@ -191,5 +244,18 @@ namespace PromexAlign
 
             writer.Close();
         }
+
+        private static void ShowSyntax()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Syntax:");
+            Console.WriteLine("PromexAlign.exe DatasetInfoFile");
+            Console.WriteLine();
+            Console.WriteLine("The dataset info file is a tab delimited text file with the following columns of info");
+            Console.WriteLine("Label  RawFilePath  Ms1FtFilePath  MsPathfinderIdFilePath");
+            Console.WriteLine();
+            Console.WriteLine("The MsPathfinderIdFilePath column is optional");
+        }
+
     }
 }

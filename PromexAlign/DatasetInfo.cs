@@ -38,6 +38,8 @@ namespace PromexAlign
         public static List<DatasetInfo> ParseDatasetInfoFile(string filePath)
         {
             var datasets = new List<DatasetInfo>();
+            var datasetNumber = 0;
+
             foreach (var line in File.ReadLines(filePath))
             {
                 var parts = line.Split('\t');
@@ -46,19 +48,28 @@ namespace PromexAlign
                     continue;
                 }
 
-                string mspfIdFilePath = string.Empty;
+                datasetNumber++;
+
+                var mspfIdFilePath = string.Empty;
                 if (parts.Length > 3)
                 {
                     mspfIdFilePath = parts[3];
                 }
 
-                datasets.Add(new DatasetInfo
-                                 {
-                                     Label = parts[0],
-                                     RawFilePath = parts[1],
-                                     Ms1FtFilePath = parts[2],
-                                     MsPfIdFilePath = mspfIdFilePath
-                                 });
+                var datasetInfo = new DatasetInfo
+                {
+                    Label = parts[0],
+                    RawFilePath = parts[1],
+                    Ms1FtFilePath = parts[2],
+                    MsPfIdFilePath = mspfIdFilePath
+                };
+
+                if (string.IsNullOrWhiteSpace(datasetInfo.Label))
+                {
+                    datasetInfo.Label = "Dataset_" + datasetNumber;
+                }
+
+                datasets.Add(datasetInfo);
             }
 
             return datasets;
