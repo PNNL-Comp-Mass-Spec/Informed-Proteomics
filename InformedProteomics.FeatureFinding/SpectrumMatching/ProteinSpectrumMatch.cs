@@ -128,7 +128,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             {
                 return Backend.Data.Sequence.Sequence.GetSequenceFromMsGfPlusPeptideStr(Sequence);
             }
-            else if (SearchToolType == SearchTool.MsPathFinder)
+
+            if (SearchToolType == SearchTool.MsPathFinder)
             {
                 return Backend.Data.Sequence.Sequence.CreateSequence(Sequence, Modifications, new AminoAcidSet());
             }

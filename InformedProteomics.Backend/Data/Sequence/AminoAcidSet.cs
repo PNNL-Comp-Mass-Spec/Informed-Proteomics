@@ -61,7 +61,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Generate an amino acid map with Cys static modification
         /// </summary>
         /// <param name="cysMod"></param>
-        public AminoAcidSet(Modification cysMod): this()
+        public AminoAcidSet(Modification cysMod) : this()
         {
             foreach (var loc in AllSequenceLocations)
             {
@@ -74,7 +74,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Construct an amino acid map using the 20 standard amino acids and any modifications in mod file at path <paramref name="modFilePath"/>
         /// </summary>
         /// <param name="modFilePath"></param>
-        public AminoAcidSet(string modFilePath): this(new ModFileParser(modFilePath))
+        public AminoAcidSet(string modFilePath) : this(new ModFileParser(modFilePath))
         {
         }
 
@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="searchModifications"></param>
         /// <param name="maxNumModsPerSequence"></param>
-        public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence): this()
+        public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence) : this()
         {
             if (searchModifications == null) return;
 
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             // apply dynamic modifications
             var dynamicModifications = new HashSet<Modification>();
-            var locationSpecificResidueVariableModMap = new Dictionary<SequenceLocation,Dictionary<char, List<Modification>>>();
+            var locationSpecificResidueVariableModMap = new Dictionary<SequenceLocation, Dictionary<char, List<Modification>>>();
             foreach (var loc in AllSequenceLocations)
             {
                 locationSpecificResidueVariableModMap[loc] = new Dictionary<char, List<Modification>>();
@@ -311,7 +311,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var location in AllSequenceLocations)
             {
                 //var keys = _locationSpecificResidueMap[location].Keys.ToArray();
-                for(var i =0; i < AminoAcid.StandardAminoAcidArr.Length; i++)
+                for (var i = 0; i < AminoAcid.StandardAminoAcidArr.Length; i++)
                 {
                     var residue = AminoAcid.StandardAminoAcidArr[i].Residue;
                     var aa = GetAminoAcid(residue, location);
@@ -378,33 +378,46 @@ namespace InformedProteomics.Backend.Data.Sequence
                 {SequenceLocation.ProteinCTerm, AminoAcid.ProteinCTerm.Residue}
             };
 
-            AffectedLocations = new Dictionary<SequenceLocation, IEnumerable<SequenceLocation>>();
-            AffectedLocations[SequenceLocation.Everywhere] = new[]
+            AffectedLocations = new Dictionary<SequenceLocation, IEnumerable<SequenceLocation>>
             {
-                SequenceLocation.Everywhere,
-                SequenceLocation.PeptideNTerm,
-                SequenceLocation.PeptideCTerm,
-                SequenceLocation.ProteinNTerm,
-                SequenceLocation.ProteinCTerm
+                {
+                    SequenceLocation.Everywhere, new[]
+                    {
+                        SequenceLocation.Everywhere,
+                        SequenceLocation.PeptideNTerm,
+                        SequenceLocation.PeptideCTerm,
+                        SequenceLocation.ProteinNTerm,
+                        SequenceLocation.ProteinCTerm
+                    }
+                },
+                {
+                    SequenceLocation.PeptideNTerm, new[]
+                    {
+                        SequenceLocation.PeptideNTerm,
+                        SequenceLocation.ProteinNTerm
+                    }
+                },
+                {
+                    SequenceLocation.PeptideCTerm, new[]
+                    {
+                        SequenceLocation.PeptideCTerm,
+                        SequenceLocation.ProteinCTerm
+                    }
+                },
+                {
+                    SequenceLocation.ProteinNTerm, new[]
+                    {
+                        SequenceLocation.ProteinNTerm
+                    }
+                },
+                {
+                    SequenceLocation.ProteinCTerm, new[]
+                    {
+                        SequenceLocation.ProteinCTerm
+                    }
+                }
             };
-            AffectedLocations[SequenceLocation.PeptideNTerm] = new[]
-            {
-                SequenceLocation.PeptideNTerm,
-                SequenceLocation.ProteinNTerm
-            };
-            AffectedLocations[SequenceLocation.PeptideCTerm] = new[]
-            {
-                SequenceLocation.PeptideCTerm,
-                SequenceLocation.ProteinCTerm
-            };
-            AffectedLocations[SequenceLocation.ProteinNTerm] = new[]
-            {
-                SequenceLocation.ProteinNTerm
-            };
-            AffectedLocations[SequenceLocation.ProteinCTerm] = new[]
-            {
-                SequenceLocation.ProteinCTerm
-            };
+
         }
     }
 }
