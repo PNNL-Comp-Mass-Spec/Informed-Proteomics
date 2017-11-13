@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -52,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             const string outFilePath = @"D:\MassSpecFiles\IMER\promex_crosstab.tsv";
             const string rawFolder = @"D:\MassSpecFiles\IMER";
-            var runLabels = new string[] { "1", "2", "3", "4", "5", "6" };
+            var runLabels = new[] { "1", "2", "3", "4", "5", "6" };
 
             var nDataset = runLabels.Length;
             //CPTAC_Intact_CR32A_24Aug15_Bane_15-02-06-RZ
@@ -67,8 +68,19 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var mspFile = string.Format(@"{0}\Diabetes_iPSC_Beta_{1}_IMER_{2}May14_Alder_14-01-33_msgfdb_syn.txt", rawFolder, runLabels[i], k);
                 var ms1FtFile = string.Format(@"{0}\Diabetes_iPSC_Beta_{1}_IMER_{2}May14_Alder_14-01-33.ms1ft", rawFolder, runLabels[i], k);
 
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1FtFile))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + ms1FtFile);
+                    continue;
+                }
+
                 Console.WriteLine(rawFile);
-                Console.WriteLine(File.Exists(rawFile));
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1FtFile, run, 500, 15000);
@@ -77,28 +89,32 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 {
                     var prsmList = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsGfPlus);
 
-                    for (var j = 0; j < prsmList.Count; j++)
+                    foreach (var match in prsmList)
                     {
-                        var match = prsmList[j];
                         match.ProteinId = match.ProteinName;
                     }
 
                     // tag features by PrSMs
-                    for (var j = 0; j < features.Count; j++)
+                    foreach (var item in features)
                     {
-                        //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
+                        // item.ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
+                        var massTol = tolerance.GetToleranceAsMz(item.Mass);
                         foreach (var match in prsmList)
                         {
-                            if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
+                            if (item.MinScanNum < match.ScanNum && match.ScanNum < item.MaxScanNum && Math.Abs(item.Mass - match.Mass) < massTol)
                             {
-                                features[j].ProteinSpectrumMatches.Add(match);
+                                item.ProteinSpectrumMatches.Add(match);
                             }
                         }
                     }
                 }
 
                 alignment.AddDataSet(i, features, run);
+            }
+
+            if (alignment.CountDatasets == 0)
+            {
+                Assert.Ignore("Skipping test since input data files were found");
             }
 
             alignment.AlignFeatures();
