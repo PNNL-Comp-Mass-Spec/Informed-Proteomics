@@ -177,8 +177,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 _artificialScanNum = 1;
                 _offsets.Clear();
                 OffsetsMapInt.Clear();
-                OffsetsMapNative.Clear();
-                IdToNativeMap.Clear();
+                // OffsetsMapNative.Clear();
+                // IdToNativeMap.Clear();
                 NativeToIdMap.Clear();
             }
 
@@ -190,10 +190,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 Unknown,
             }
             private readonly List<IndexItem> _offsets = new List<IndexItem>();
+
             public List<IndexItem> Offsets => _offsets;
-            private readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
+
+            // Unused
+            // private readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
+
             public readonly Dictionary<long, long> OffsetsMapInt = new Dictionary<long, long>();
-            private readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
+
+            // Unused
+            // private readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
+
             public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
 
             public void AddOffset(string idRef, string offset)
@@ -221,12 +228,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     return;
                 }
-                OffsetsMapNative.Add(offset.Ref, offset.Offset);
+
+                // OffsetsMapNative.Add(offset.Ref, offset.Offset);
 
                 // This won't be sufficient until there is a valid parser for all forms of NativeID.
                 // Using artificial scan number for now.
                 OffsetsMapInt.Add(offset.IdNum, offset.Offset);
-                IdToNativeMap.Add(offset.IdNum, offset.Ref);
+                // IdToNativeMap.Add(offset.IdNum, offset.Ref);
                 NativeToIdMap.Add(offset.Ref, offset.IdNum);
                 /*if (IndexType == IndexListType.Spectrum)
                 {
@@ -239,9 +247,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
             public void RegenerateMaps()
             {
-                OffsetsMapNative.Clear();
+                // OffsetsMapNative.Clear();
                 OffsetsMapInt.Clear();
-                IdToNativeMap.Clear();
+                // IdToNativeMap.Clear();
                 NativeToIdMap.Clear();
                 foreach (var offset in _offsets)
                 {
@@ -653,7 +661,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Proper functionality when not random access
             if (!_randomAccess)
             {
-                return ReadMassSpectrumNonRandom(index, includePeaks);
+                return ReadMassSpectrumNonRandom(index);
             }
             return ReadMassSpectrumRandom(index, includePeaks);
         }
@@ -716,8 +724,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Causes all spectra in the file to be loaded into memory
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="includePeaks"></param>
-        private Spectrum ReadMassSpectrumNonRandom(long index, bool includePeaks = true)
+        private Spectrum ReadMassSpectrumNonRandom(int index)
         {
             if (!_allRead)
             {
@@ -743,7 +750,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             foreach (var specIndex in _spectrumOffsets.Offsets)
             {
-                yield return ReadMassSpectrumRandom(specIndex.IdNum, true);
+                yield return ReadMassSpectrumRandom(specIndex.IdNum);
             }
         }
 
@@ -1702,7 +1709,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _referenceableParamGroups.Clear(); // In case of second read of file, clear out existing.
             reader.MoveToContent();
-            var count = Convert.ToInt32(reader.GetAttribute("count"));
+            // var count = Convert.ToInt32(reader.GetAttribute("count"));
             reader.ReadStartElement("referenceableParamGroupList"); // Throws exception if we are not at the "referenceableParamGroupList" tag.
             while (reader.ReadState == ReadState.Interactive)
             {
@@ -2260,7 +2267,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private List<ScanData> ReadScanList(XmlReader reader)
         {
             reader.MoveToContent();
-            var count = Convert.ToInt32(reader.GetAttribute("count"));
+            // var count = Convert.ToInt32(reader.GetAttribute("count"));
             var scans = new List<ScanData>();
             if (_version == MzML_Version.mzML1_0_0)
             {
@@ -2446,7 +2453,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private List<Precursor> ReadPrecursorList(XmlReader reader)
         {
             reader.MoveToContent();
-            var count = Convert.ToInt32(reader.GetAttribute("count"));
+            // var count = Convert.ToInt32(reader.GetAttribute("count"));
             var precursors = new List<Precursor>();
             reader.ReadStartElement("precursorList"); // Throws exception if we are not at the "precursorList" tag.
             while (reader.ReadState == ReadState.Interactive)
@@ -2780,7 +2787,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private List<BinaryDataArray> ReadBinaryDataArrayList(XmlReader reader, int defaultArrayLength)
         {
             reader.MoveToContent();
-            var bdArrays = Convert.ToInt32(reader.GetAttribute("count"));
+            // var bdArrays = Convert.ToInt32(reader.GetAttribute("count"));
             var bdaList = new List<BinaryDataArray>();
             reader.ReadStartElement("binaryDataArrayList"); // Throws exception if we are not at the "binaryDataArrayList" tag.
             while (reader.ReadState == ReadState.Interactive)

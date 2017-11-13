@@ -16,7 +16,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
     {
         public LcMsFeatureAlignment(INodeComparer<LcMsFeature> featureCompare)
         {
-            _featureSetList = new Dictionary<int, List<LcMsFeature>>();
+            // _featureSetList = new Dictionary<int, List<LcMsFeature>>();
             _featureList = new List<LcMsFeature>();
             _runList = new List<LcMsRun>();
             _featureCompare = featureCompare;
@@ -30,7 +30,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
             {
                 var features = LoadProMexResult(i, featureFileList[i], _runList[i]);
                 features.Sort(new FeatureMassComparer());
-                _featureSetList.Add(i, features);
+                // _featureSetList.Add(i, features);
                 _featureList.AddRange(features);
             }
             _featureList.Sort(new FeatureMassComparer());
@@ -41,7 +41,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
             //RawFileList.Add(rawFilePath);
             _runList.Add(run);
             features.Sort(new FeatureMassComparer());
-            _featureSetList.Add(dataId, features);
+            // _featureSetList.Add(dataId, features);
             _featureList.AddRange(features);
             _featureList.Sort(new FeatureMassComparer());
         }
@@ -356,16 +356,6 @@ namespace InformedProteomics.FeatureFinding.Alignment
             return ret;
         }
 
-        private LcMsFeature GetRepresentativeFeature(IList<LcMsFeature> features)
-        {
-            foreach (var f in features)
-            {
-                if (f == null) continue;
-                return f;
-            }
-            return null;
-        }
-
         private List<LcMsFeature[]> _alignedFeatures;
         private List<LcMsFeature[]> GroupFeatures(List<LcMsFeature> features)
         {
@@ -552,7 +542,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
         }
 
         private const double TolNet = 0.003;
-        private readonly Dictionary<int, List<LcMsFeature>> _featureSetList;
+
+        // Unused
+        //private readonly Dictionary<int, List<LcMsFeature>> _featureSetList;
+
         private readonly List<LcMsFeature> _featureList;
         private readonly List<LcMsRun> _runList;
         //public readonly IList<string> RawFileList;

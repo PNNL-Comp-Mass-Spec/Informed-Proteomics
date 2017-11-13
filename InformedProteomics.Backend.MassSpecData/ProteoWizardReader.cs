@@ -556,7 +556,6 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             catch
             {
-                var bits = Environment.Is64BitProcess ? "64" : "32";
                 var message = CannotFindExceptionMessage();
 
                 ConsoleMsgUtils.ShowError(message);
