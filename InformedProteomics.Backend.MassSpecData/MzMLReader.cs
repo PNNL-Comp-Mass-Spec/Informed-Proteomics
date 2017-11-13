@@ -872,7 +872,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         //file.Position = bufEnd - rewindBy;
                     }
 
-                    var found = stringBuffer.IndexOf("<indexListOffset");
+                    var found = stringBuffer.IndexOf("<indexListOffset", StringComparison.Ordinal);
                     if (found >= 0)
                     {
                         var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, found));
@@ -922,7 +922,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             //file.Position = bufEnd - rewindBy;
                         }
 
-                        var found = stringBuffer.IndexOf("<indexList ");
+                        var found = stringBuffer.IndexOf("<indexList ", StringComparison.Ordinal);
                         if (found >= 0)
                         {
                             var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, found));
@@ -1037,8 +1037,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     var searchPoint = 0;
                     while (searchPoint < stringBuffer.Length)
                     {
-                        var foundSpec = stringBuffer.IndexOf("<" + specTag + " ", searchPoint);
-                        var foundChrom = stringBuffer.IndexOf("<" + chromTag + " ", searchPoint);
+                        var foundSpec = stringBuffer.IndexOf("<" + specTag + " ", searchPoint, StringComparison.Ordinal);
+                        var foundChrom = stringBuffer.IndexOf("<" + chromTag + " ", searchPoint, StringComparison.Ordinal);
                         if (foundSpec >= 0)
                         {
                             searchPoint = foundSpec;
@@ -1061,9 +1061,9 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             attribName = "nativeID";
                         }
-                        var idIndex = builder.IndexOf(attribName + "=\"");
-                        var idOpenQuote = builder.IndexOf("\"", idIndex);
-                        var idCloseQuote = builder.IndexOf("\"", idOpenQuote + 1);
+                        var idIndex = builder.IndexOf(attribName + "=\"", StringComparison.Ordinal);
+                        var idOpenQuote = builder.IndexOf("\"", idIndex, StringComparison.Ordinal);
+                        var idCloseQuote = builder.IndexOf("\"", idOpenQuote + 1, StringComparison.Ordinal);
                         var length = idCloseQuote - idOpenQuote - 1;
                         var id = builder.Substring(idOpenQuote + 1, length);
                         // Add offset to the correct list
