@@ -24,7 +24,7 @@ namespace PbfGen
 
         public static int Main(string[] args)
         {
-            PbfGenInputParameters options = null;
+            PbfGenInputParameters options;
 
             try
             {
@@ -79,8 +79,7 @@ namespace PbfGen
                     var pbfFileName = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, PbfLcMsRun.FileExtensionConst);
                     var pbfFilePath = Path.Combine(options.OutputDir, Path.GetFileName(pbfFileName));
 
-                    bool isCurrent;
-                    if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out isCurrent) && isCurrent)
+                    if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out var isCurrent) && isCurrent)
                     {
                         Console.WriteLine("{0} already exists.", pbfFilePath);
                         continue;

@@ -1950,8 +1950,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 scanNum = (int)(_artificialScanNum++);
                 // Interpret the NativeID (if the format has an interpreter) and use it instead of the artificial number.
                 // TODO: Better handling than the artificial ID for other nativeIDs (ones currently not supported)
-                var num = 0;
-                if (NativeIdConversion.TryGetScanNumberInt(nativeId, out num))
+                if (NativeIdConversion.TryGetScanNumberInt(nativeId, out var num))
                 {
                     scanNum = num;
                 }
@@ -2116,8 +2115,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Centroid spectrum
                 // ProteoWizard
                 var centroider = new Centroider(mzs.Data, intensities.Data);
-                double[] centroidedMzs, centroidedIntensities;
-                centroider.GetCentroidedData(out centroidedMzs, out centroidedIntensities);
+                centroider.GetCentroidedData(out var centroidedMzs, out var centroidedIntensities);
                 mzs.Data = centroidedMzs;
                 intensities.Data = centroidedIntensities;
             }

@@ -50,8 +50,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public List<int> GetMatchingFeatureIds(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            List<int> featureIds;
-            if (_binToFeatureMap.TryGetValue(massBinNum, out featureIds)) return featureIds;
+            if (_binToFeatureMap.TryGetValue(massBinNum, out var featureIds)) return featureIds;
 
             return new List<int>();
         }
@@ -64,8 +63,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            IEnumerable<int> ms2ScanNums;
-            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out ms2ScanNums)) return ms2ScanNums;
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums)) return ms2ScanNums;
 
             return new int[0];
         }
@@ -77,8 +75,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public IEnumerable<double> GetMatchingMass(int ms2ScanNum)
         {
-            List<int> massBinNums;
-            if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out massBinNums)) return massBinNums.Select(s => _comparer.GetMzAverage(s));
+            if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out var massBinNums)) return massBinNums.Select(s => _comparer.GetMzAverage(s));
             return new double[0];
         }
 
@@ -103,14 +100,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         var ms2ScanNum = i + _run.MinLcScan;
                         ms2ScanList.Add(ms2ScanNum);
-                        List<int> massBinNums;
-                        if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out massBinNums))
+                        if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out var massBinNums))
                         {
                             massBinNums.Add(massBin);
                         }
                         else
                         {
-                            _scanNumToMassBin.Add(ms2ScanNum, new List<int>() { massBin });
+                            _scanNumToMassBin.Add(ms2ScanNum, new List<int> { massBin });
                         }
                     }
                 }
@@ -142,8 +138,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var repRt = _run.GetElutionTime(repScanNum);
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
-                IsolationWindow isolationWindow;
-                if (_scanToIsolationWindow.TryGetValue(scanNum, out isolationWindow))
+                if (_scanToIsolationWindow.TryGetValue(scanNum, out var isolationWindow))
                 {
                     var isolationWindowTargetMz = isolationWindow.IsolationWindowTargetMz;
                     var charge = (int)Math.Round(monoIsotopicMass / isolationWindowTargetMz);
@@ -175,8 +170,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                BitArray scanBitArray;
-                if (!_map.TryGetValue(binNum, out scanBitArray))
+                if (!_map.TryGetValue(binNum, out var scanBitArray))
                 {
                     _map.Add(binNum, bitArray);
                     _binToFeatureMap.Add(binNum, new List<int>());

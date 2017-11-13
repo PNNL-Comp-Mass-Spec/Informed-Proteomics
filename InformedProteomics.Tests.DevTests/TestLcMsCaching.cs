@@ -51,8 +51,7 @@ namespace InformedProteomics.Tests.DevTests
             {
                 var qValue = qValues[i];
                 if (qValue > qValueThreshold) break;
-                IList<int> scanNums;
-                if (compScanTable.TryGetValue(compositions[i], out scanNums))
+                if (compScanTable.TryGetValue(compositions[i], out var scanNums))
                 {
                     scanNums.Add(ms2Scans[i]);
                 }
@@ -317,8 +316,7 @@ namespace InformedProteomics.Tests.DevTests
                 if (!isValid) continue;
 
                 var sequence = sequences[i];
-                int count;
-                if (sequenceCount.TryGetValue(sequence, out count)) sequenceCount[sequence] = count + 1;
+                if (sequenceCount.TryGetValue(sequence, out var count)) sequenceCount[sequence] = count + 1;
                 else sequenceCount[sequence] = 1;
             }
             //var sequences = tsvReader.GetData("Annotation");
