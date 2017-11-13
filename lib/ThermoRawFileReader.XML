@@ -774,14 +774,20 @@
             Maximum size of the scan info cache
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.XRawFileIO.mCachedFileName">
+        <member name="F:ThermoRawFileReader.XRawFileIO.mCachedFilePath">
             <summary>
-            The currently loaded .raw file
+            The the full path to the currently loaded .raw file
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.XRawFileIO.mCachedScanInfo">
             <summary>
             The scan info cache
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.XRawFileIO.mCachedScans">
+            <summary>
+            This linked list tracks the scan numbers stored in mCachedScanInfo,
+            allowing for quickly determining the oldest scan added to the cache when the cache limit is reached
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.XRawFileIO.mFileInfo">
@@ -797,6 +803,11 @@
         <member name="F:ThermoRawFileReader.XRawFileIO.mLoadMSTuneInfo">
             <summary>
             MS Tune Information
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.XRawFileIO.mXRawFile">
+            <summary>
+            Cached XRawFile object, for faster accessing
             </summary>
         </member>
         <member name="P:ThermoRawFileReader.XRawFileIO.FileInfo">
@@ -816,7 +827,13 @@
         </member>
         <member name="P:ThermoRawFileReader.XRawFileIO.ScanInfoCacheMaxSize">
             <summary>
-            Changes the maximum number of scan metadata cached. Set to 0 to disable caching. Default 50000.
+            Maximum number of scan metadata cached; defaults to 50000
+            </summary>
+            <remarks>Set to 0 to disable caching</remarks>
+        </member>
+        <member name="P:ThermoRawFileReader.XRawFileIO.TraceMode">
+            <summary>
+            When true, additional messages are reported via Debug events
             </summary>
         </member>
         <member name="E:ThermoRawFileReader.XRawFileIO.ReportError">
@@ -828,7 +845,7 @@
             <summary>
             Event handler delegate for reporting error messages
             </summary>
-            <param name="strMessage"></param>
+            <param name="message"></param>
         </member>
         <member name="E:ThermoRawFileReader.XRawFileIO.ReportWarning">
             <summary>
@@ -839,13 +856,14 @@
             <summary>
             Event handler delegate for reporting warning messages
             </summary>
-            <param name="strMessage"></param>
+            <param name="message"></param>
         </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.RaiseErrorMessage(System.String)">
+        <member name="M:ThermoRawFileReader.XRawFileIO.RaiseErrorMessage(System.String,System.Exception)">
             <summary>
             Report an error message to the error event handler
             </summary>
             <param name="message"></param>
+            <param name="ex">Optional exception</param>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.RaiseWarningMessage(System.String)">
             <summary>
@@ -947,13 +965,17 @@
             <param name="filterText"></param>
             <param name="msLevel"></param>
             <param name="mzText"></param>
-            <returns></returns>
+            <returns>True if found and False if no match</returns>
+            <remarks>
+            Looks for "Full ms2" or "Full ms3" or " p ms2" or "SRM ms2" in filterText
+            Populates msLevel with the number after "ms" and mzText with the text after "ms2"
+            </remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.FillFileInfo">
             <summary>
             Populate mFileInfo
             </summary>
-            <returns></returns>
+            <returns>True if no error, False if an error</returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetCollisionEnergy(System.Int32)">
             <summary>
@@ -966,7 +988,7 @@
             <summary>
             Number of scans in the .raw file
             </summary>
-            <returns>the number of scans, or -1 if an error</returns>
+            <returns>The number of scans, or -1 if an error</returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetRetentionTime(System.Int32,System.Double@)">
             <summary>
@@ -1131,11 +1153,12 @@
             </summary>
             <remarks></remarks>
         </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String)">
+        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String,System.Boolean)">
             <summary>
             Constructor
             </summary>
-            <remarks></remarks>
+            <param name="rawFilePath">Optional .raw file to open</param>
+            <param name="traceMode">When true, additional messages are reported via Debug events</param>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.Dispose">
             <summary>
@@ -1373,13 +1396,28 @@
             <returns></returns>
             <remarks></remarks>
         </member>
+        <member name="P:ThermoRawFileReader.clsScanInfo.ParentIonMonoisotopicMZ">
+            <summary>
+            The monoisotopic parent ion m/z, as determined by the thermo software
+            </summary>
+        </member>
+        <member name="P:ThermoRawFileReader.clsScanInfo.IsolationWindowTargetMZ">
+            <summary>
+            The monoisotopic parent ion m/z, as determined by the thermo software
+            </summary>
+        </member>
+        <member name="P:ThermoRawFileReader.clsScanInfo.ChargeState">
+            <summary>
+            The parent ion charge state, as determined by the thermo software
+            </summary>
+        </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.ActivationType">
             <summary>
             Activation type (aka activation method) as reported by the reader
             </summary>
             <value></value>
             <returns></returns>
-            <remarks></remarks>
+            <remarks>Not applicable for MS1 scans (though will report 0=CID, which should be disregarded)</remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.CollisionMode">
             <summary>
