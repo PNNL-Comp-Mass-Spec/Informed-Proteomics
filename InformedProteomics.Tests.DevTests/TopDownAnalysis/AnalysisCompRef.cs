@@ -205,121 +205,121 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
         {
-            var nDataset = runLabels.Length;
-            var writer = new StreamWriter(outputFilePath);
+            OutputCrossTabWithId(outputFilePath, alignment, runLabels.ToList());
+        }
 
-            writer.Write("MonoMass");
-            writer.Write("\t");
-            writer.Write("MinElutionTime");
-            writer.Write("\t");
-            writer.Write("MaxElutionTime");
+        public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, List<string> runLabels)
+        {
+            var datasetCount = runLabels.Count;
 
-            foreach (var dataName in runLabels)
+            using (var writer = new StreamWriter(outputFilePath))
             {
-                writer.Write("\t");
-                writer.Write(dataName + "_Abundance");
-            }
+                var headerLine = new List<string> {
+                    "MonoMass",
+                    "MinElutionTime",
+                    "MaxElutionTime" };
 
-            foreach (var dataName in runLabels)
-            {
-                writer.Write("\t");
-                writer.Write(dataName + "_Ms1Score");
-            }
-
-            writer.Write("\t");
-            writer.Write("Pre");
-            writer.Write("\t");
-            writer.Write("Sequence");
-            writer.Write("\t");
-            writer.Write("Post");
-            writer.Write("\t");
-            writer.Write("Modifications");
-            writer.Write("\t");
-            writer.Write("ProteinName");
-            writer.Write("\t");
-            writer.Write("ProteinDesc");
-            writer.Write("\t");
-            writer.Write("ProteinLength");
-            writer.Write("\t");
-            writer.Write("Start");
-            writer.Write("\t");
-            writer.Write("End");
-            foreach (var dataName in runLabels)
-            {
-                writer.Write("\t");
-                writer.Write(dataName + "_SpectraCount");
-            }
-            writer.Write("\n");
-
-            var alignedFeatureList = alignment.GetAlignedFeatures();
-            for (var j = 0; j < alignedFeatureList.Count; j++)
-            {
-                var features = alignedFeatureList[j];
-                var mass = features.Where(f => f != null).Select(f => f.Mass).Median();
-                var minElutionTime = features.Where(f => f != null).Select(f => f.MinElutionTime).Median();
-                var maxElutionTime = features.Where(f => f != null).Select(f => f.MaxElutionTime).Median();
-                writer.Write(mass);
-                writer.Write("\t");
-                writer.Write(minElutionTime);
-                writer.Write("\t");
-                writer.Write(maxElutionTime);
-
-                for (var i = 0; i < nDataset; i++)
+                foreach (var dataName in runLabels)
                 {
-                    writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].Abundance);
+                    headerLine.Add(dataName + "_Abundance");
                 }
 
-                for (var i = 0; i < nDataset; i++)
+                foreach (var dataName in runLabels)
                 {
-                    writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].Score);
+                    headerLine.Add(dataName + "_Ms1Score");
                 }
 
-                var prsm = (from f in features
-                    where f != null && f.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
-                    select f.ProteinSpectrumMatches[0]).FirstOrDefault();
+                headerLine.Add("Pre");
+                headerLine.Add("Sequence");
+                headerLine.Add("Post");
+                headerLine.Add("Modifications");
+                headerLine.Add("ProteinName");
+                headerLine.Add("ProteinDesc");
+                headerLine.Add("ProteinLength");
+                headerLine.Add("Start");
+                headerLine.Add("End");
 
-                if (prsm == null)
+                foreach (var dataName in runLabels)
                 {
-                    for (var k = 0; k < 9; k++)
+                    headerLine.Add(dataName + "_SpectraCount");
+                }
+
+                writer.WriteLine(string.Join("\t", headerLine));
+
+                var alignedFeatureList = alignment.GetAlignedFeatures();
+                foreach (var features in alignedFeatureList)
+                {
+                    var mass = features.Where(f => f != null).Select(f => f.Mass).Median();
+                    var minElutionTime = features.Where(f => f != null).Select(f => f.MinElutionTime).Median();
+                    var maxElutionTime = features.Where(f => f != null).Select(f => f.MaxElutionTime).Median();
+
+                    var dataLine = new List<string>
                     {
-                        writer.Write("\t");
-                        writer.Write(" ");
+                        PRISM.StringUtilities.DblToString(mass, 4),
+                        PRISM.StringUtilities.DblToString(minElutionTime, 3),
+                        PRISM.StringUtilities.DblToString(maxElutionTime, 3)
+                    };
+
+                    for (var i = 0; i < datasetCount; i++)
+                    {
+                        if (features[i] == null)
+                            dataLine.Add("0");
+                        else
+                            dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Abundance, 2));
                     }
-                }
-                else
-                {
-                    writer.Write("\t");
-                    writer.Write(prsm.Pre);
-                    writer.Write("\t");
-                    writer.Write(prsm.Sequence);
-                    writer.Write("\t");
-                    writer.Write(prsm.Post);
-                    writer.Write("\t");
-                    writer.Write(prsm.Modifications);
-                    writer.Write("\t");
-                    writer.Write(prsm.ProteinName);
-                    writer.Write("\t");
-                    writer.Write(prsm.ProteinDesc);
-                    writer.Write("\t");
-                    writer.Write(prsm.ProteinLength);
-                    writer.Write("\t");
-                    writer.Write(prsm.FirstResidue);
-                    writer.Write("\t");
-                    writer.Write(prsm.LastResidue);
+
+                    for (var i = 0; i < datasetCount; i++)
+                    {
+                        if (features[i] == null)
+                            dataLine.Add("0");
+                        else
+                        {
+                            if (features[i].Score <= float.MinValue)
+                                dataLine.Add(PRISM.StringUtilities.DblToString(float.MinValue, 2));
+                            else
+                                dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Score, 3));
+                        }
+
+                    }
+
+                    var prsm = (from f in features
+                                where f?.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
+                                select f.ProteinSpectrumMatches[0]).FirstOrDefault();
+
+                    if (prsm == null)
+                    {
+                        for (var k = 0; k < 9; k++)
+                        {
+                            dataLine.Add(" ");
+                        }
+                    }
+                    else
+                    {
+                        dataLine.Add(prsm.Pre);
+                        dataLine.Add(prsm.Sequence);
+                        dataLine.Add(prsm.Post);
+                        dataLine.Add(prsm.Modifications);
+                        dataLine.Add(prsm.ProteinName);
+                        dataLine.Add(prsm.ProteinDesc);
+                        dataLine.Add(prsm.ProteinLength.ToString());
+                        dataLine.Add(prsm.FirstResidue.ToString());
+                        dataLine.Add(prsm.LastResidue.ToString());
+                    }
+
+                    // spectral count from ms2
+                    for (var i = 0; i < datasetCount; i++)
+                    {
+                        if (features[i] == null)
+                            dataLine.Add("0");
+                        else
+                            dataLine.Add(features[i].ProteinSpectrumMatches.Count.ToString());
+                    }
+
+                    writer.WriteLine(string.Join("\t", dataLine));
                 }
 
-                // spectral count from ms2
-                for (var i = 0; i < nDataset; i++)
-                {
-                    writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].ProteinSpectrumMatches.Count);
-                }
-                writer.Write("\n");
             }
 
-            writer.Close();
         }
     }
 }
