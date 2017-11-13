@@ -26,6 +26,7 @@
 //
 
 using System;
+using PRISM;
 
 namespace InformedProteomics.Backend.MathAndStats
 {
@@ -128,7 +129,7 @@ namespace InformedProteomics.Backend.MathAndStats
             var dx = xOrig[j + 1] - xOrig[j];
             var t = (x - xOrig[j]) / dx;
             var y = (1 - t) * yOrig[j] + t * yOrig[j + 1] + t * (1 - t) * (a[j] * (1 - t) + b[j] * t); // equation 9
-            if (debug) Console.WriteLine("xs = {0}, j = {1}, t = {2}", x, j, t);
+            if (debug) ShowDebug(string.Format("xs = {0}, j = {1}, t = {2}", x, j, t));
             return y;
         }
 
@@ -228,12 +229,12 @@ namespace InformedProteomics.Backend.MathAndStats
                 r[n - 1] = endSlope;
             }
 
-            if (debug) Console.WriteLine("Tri-diagonal matrix:\n{0}", m.ToDisplayString(":0.0000", "  "));
-            if (debug) Console.WriteLine("r: {0}", ArrayUtil.ToString(r));
+            if (debug) ShowDebug(string.Format("Tri-diagonal matrix:\n{0}", m.ToDisplayString(":0.0000", "  ")));
+            if (debug) ShowDebug(string.Format("r: {0}", ArrayUtil.ToString(r)));
 
             // k is the solution to the matrix
             var k = m.Solve(r);
-            if (debug) Console.WriteLine("k = {0}", ArrayUtil.ToString(k));
+            if (debug) ShowDebug(string.Format("k = {0}", ArrayUtil.ToString(k)));
 
             // a and b are each spline's coefficients
             a = new float[n - 1];
@@ -247,8 +248,8 @@ namespace InformedProteomics.Backend.MathAndStats
                 b[i - 1] = -k[i] * dx1 + dy1; // equation 11 from the article
             }
 
-            if (debug) Console.WriteLine("a: {0}", ArrayUtil.ToString(a));
-            if (debug) Console.WriteLine("b: {0}", ArrayUtil.ToString(b));
+            if (debug) ShowDebug(string.Format("a: {0}", ArrayUtil.ToString(a)));
+            if (debug) ShowDebug(string.Format("b: {0}", ArrayUtil.ToString(b)));
         }
 
         #endregion
@@ -316,10 +317,15 @@ namespace InformedProteomics.Backend.MathAndStats
                     + (1 - 2 * t) * (a[j] * (1 - t) + b[j] * t) / dx
                     + t * (1 - t) * (b[j] - a[j]) / dx;
 
-                if (debug) Console.WriteLine("[{0}]: xs = {1}, j = {2}, t = {3}", i, x[i], j, t);
+                if (debug) ShowDebug(string.Format("[{0}]: xs = {1}, j = {2}, t = {3}", i, x[i], j, t));
             }
 
             return qPrime;
+        }
+
+        private void ShowDebug(string message)
+        {
+            ConsoleMsgUtils.ShowDebug(message);
         }
 
         #endregion

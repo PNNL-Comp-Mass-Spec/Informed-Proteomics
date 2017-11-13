@@ -69,7 +69,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 catch (System.Runtime.InteropServices.COMException/* ex*/)
                 {
-                    Console.WriteLine("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
+                    ConsoleMsgUtils.ShowWarning(string.Format("[Warning] Ignore corrupted spectrum Scan={0}", scanNum));
                 }
 
                 if (spec != null) yield return spec;

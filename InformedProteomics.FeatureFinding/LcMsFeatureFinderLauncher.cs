@@ -10,6 +10,7 @@ using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.Scoring;
+using PRISM;
 
 namespace InformedProteomics.FeatureFinding
 {
@@ -91,7 +92,7 @@ namespace InformedProteomics.FeatureFinding
                     var returnCode = ProcessFile(fileName);
                     if (returnCode != 0)
                     {
-                        Console.WriteLine(@"  error code {0} for {1}", returnCode, Path.GetFileName(fileName));
+                        ConsoleMsgUtils.ShowWarning(string.Format("  error code {0} for {1}", returnCode, Path.GetFileName(fileName)));
                         errorCount++;
                     }
                 }
@@ -155,22 +156,22 @@ namespace InformedProteomics.FeatureFinding
 
             if (File.Exists(ms1FeaturesFilePath))
             {
-                Console.WriteLine(@"ProMex output already exists: {0}", ms1FeaturesFilePath);
+                ShowErrorMessage("ProMex output already exists: " + ms1FeaturesFilePath);
                 return -2;
             }
 
             if (!File.Exists(rawFile))
             {
-                ShowErrorMessage(@"Cannot find input file: " + rawFile);
+                ShowErrorMessage("Cannot find input file: " + rawFile);
                 return -3;
             }
 
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine(@"Start loading MS1 data from {0}", rawFile);
+            Console.WriteLine("Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
             var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer, 1, 60, Parameters.MaxThreads);
-            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             if (run.GetMs1ScanVector().Length == 0)
             {
@@ -184,7 +185,7 @@ namespace InformedProteomics.FeatureFinding
             var maxSearchMassBin = comparer.GetBinNumber(Parameters.MaxSearchMass);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
-            Console.WriteLine(@"Start MS1 feature extraction.");
+            Console.WriteLine("Start MS1 feature extraction.");
             stopwatch.Restart();
             for (var binNum = minSearchMassBin; binNum <= maxSearchMassBin; binNum++)
             {
@@ -196,16 +197,16 @@ namespace InformedProteomics.FeatureFinding
                     var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
                     var processedPercentage = ((double)processedBins / totalMassBin) * 100;
-                    Console.WriteLine(@"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
+                    Console.WriteLine("Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
                 }
             }
 
-            Console.WriteLine(@"Complete MS1 feature extraction.");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
-            Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
+            Console.WriteLine("Complete MS1 feature extraction.");
+            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Number of extracted features = {0}", container.NumberOfFeatures);
+            Console.WriteLine("Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
 
             var featureId = 0;
@@ -250,14 +251,14 @@ namespace InformedProteomics.FeatureFinding
                 }
             }
 
-            Console.WriteLine(@"Complete feature filtration");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            Console.WriteLine(@" - Number of filtered features = {0}", featureId);
-            Console.WriteLine(@" - ProMex output: {0}", ms1FeaturesFilePath);
+            Console.WriteLine("Complete feature filtration");
+            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Number of filtered features = {0}", featureId);
+            Console.WriteLine(" - ProMex output: {0}", ms1FeaturesFilePath);
 
             if (Parameters.CsvOutput)
             {
-                Console.WriteLine(@" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
+                Console.WriteLine(" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
             }
 
             if (Parameters.FeatureMapImage)
@@ -282,7 +283,7 @@ namespace InformedProteomics.FeatureFinding
         {
             if (!File.Exists(pbfFilePath))
             {
-                Console.WriteLine(@"Error: Data file not found: " + pbfFilePath);
+                ShowErrorMessage("Data file not found: " + pbfFilePath);
                 return -1;
             }
 
@@ -299,11 +300,11 @@ namespace InformedProteomics.FeatureFinding
 
             if (!File.Exists(ms1FeaturesFilePath))
             {
-                Console.WriteLine(@"Error: MS1 features file not found: " + ms1FeaturesFilePath);
+                ShowErrorMessage("MS1 features file not found: " + ms1FeaturesFilePath);
                 return -3;
             }
 
-            Console.WriteLine(@"Start loading MS1 data from {0}", pbfFilePath);
+            Console.WriteLine("Start loading MS1 data from {0}", pbfFilePath);
             var run = PbfLcMsRun.GetLcMsRun(pbfFilePath);
 
             CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
@@ -315,7 +316,7 @@ namespace InformedProteomics.FeatureFinding
         {
             var map = new LcMsFeatureMap(run, featuresFilePath, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
             map.SaveImage(imgFilePath);
-            Console.WriteLine(@" - Feature map image output: {0}", imgFilePath);
+            Console.WriteLine(" - Feature map image output: {0}", imgFilePath);
         }
 
         private string GetOutputDirectory(string dataFilePath)
@@ -324,7 +325,7 @@ namespace InformedProteomics.FeatureFinding
 
             if (string.IsNullOrEmpty(outDirectory))
             {
-                Console.WriteLine(@"Unable to determine the folder path for the data file: {0}", dataFilePath);
+                Console.WriteLine("Unable to determine the folder path for the data file: {0}", dataFilePath);
                 return string.Empty;
             }
 
@@ -416,10 +417,9 @@ namespace InformedProteomics.FeatureFinding
 
         private void ShowErrorMessage(string errorMessage)
         {
-            Console.WriteLine(@"----------------------------------------------------------");
-            Console.WriteLine(@"Error: " + errorMessage);
-            Console.WriteLine(@"----------------------------------------------------------");
+            ConsoleMsgUtils.ShowError("Error: " + errorMessage);
         }
+
         public static readonly string[] TsvHeader = new string[]
         {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge",

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PRISM;
 
 namespace InformedProteomics.Backend.Utils
 {
@@ -212,7 +213,7 @@ namespace InformedProteomics.Backend.Utils
                         {
                             if (_data.ContainsKey(token[i]))
                             {
-                                Console.WriteLine("Warning: header line has duplicate column names; ignoring duplicate " + token[i]);
+                                ConsoleMsgUtils.ShowWarning("Warning: header line has duplicate column names; ignoring duplicate " + token[i]);
                                 continue;
                             }
                             _header.Add(i, token[i]);

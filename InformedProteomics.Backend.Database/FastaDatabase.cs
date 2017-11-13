@@ -5,6 +5,7 @@ using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Utils;
 using ProteinFileReader;
+using PRISM;
 
 namespace InformedProteomics.Backend.Database
 {
@@ -640,8 +641,9 @@ namespace InformedProteomics.Backend.Database
 
                     if (_nameToLength.TryGetValue(name, out _))
                     {
-                        Console.WriteLine("Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
-                                          name, offset, Path.GetFileName(_annoFilePath));
+                        ConsoleMsgUtils.ShowWarning(string.Format(
+                            "Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
+                            name, offset, Path.GetFileName(_annoFilePath)));
 
                         if (_duplicateNameCounts.TryGetValue(name, out var duplicateSuffix))
                         {

@@ -326,7 +326,7 @@ namespace InformedProteomics.BottomUp.Execution
                 var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
                 if (seqGraph == null)
                 {
-                    //                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
+                    // ConsoleMsgUtils.ShowWarning(string.Format("Ignoring illegal protein: {0}", annotation));
                     continue;
                 }
 
@@ -406,11 +406,14 @@ namespace InformedProteomics.BottomUp.Execution
 
                         if (ion == null)
                         {
-                            Console.WriteLine(@"Null ion!");
+                            ConsoleMsgUtils.ShowWarning("Null ion in WriteResultsToFile");
+                            continue;
                         }
+
                         if (scores == null)
                         {
-                            Console.WriteLine(@"Null scores");
+                            ConsoleMsgUtils.ShowWarning("Null scores in WriteResultsToFile");
+                            continue;
                         }
 
                         // Note for DblToString(value, 9, true), by having "9" and "true",

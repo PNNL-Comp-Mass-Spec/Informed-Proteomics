@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using PRISM;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
@@ -44,7 +45,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     else
                     {
-                        Console.WriteLine("WARNING: Could not find a reader for file \"{0}\". Is MSFileReader and/or ProteoWizard installed?", filePath);
+                        ConsoleMsgUtils.ShowWarning(string.Format("WARNING: Could not find a reader for file \"{0}\"." +
+                                                                  " Is MSFileReader and/or ProteoWizard installed?", filePath));
                     }
                     break;
             }

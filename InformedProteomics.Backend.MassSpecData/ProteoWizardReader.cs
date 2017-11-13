@@ -358,28 +358,34 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             catch (BadImageFormatException)
             {
-                Console.WriteLine("Incompatible Assembly: \"" + assemblyFile.FullName + "\"");
+                ConsoleMsgUtils.ShowError("Incompatible Assembly: \"" + assemblyFile.FullName + "\"");
                 throw;
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Assembly not found: \"" + assemblyFile.FullName + "\"");
+                ConsoleMsgUtils.ShowError("Assembly not found: \"" + assemblyFile.FullName + "\"");
                 throw;
             }
             catch (FileLoadException)
             {
-                Console.WriteLine("Invalid Assembly: \"" + assemblyFile.FullName + "\"");
-                Console.WriteLine("The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.");
-                Console.WriteLine("Use the Streams tool (https://technet.microsoft.com/en-us/sysinternals/streams.aspx) to unblock, for example");
+                string streamsCmdLine;
                 if (assemblyFile.DirectoryName == null)
-                    Console.WriteLine("streams -d *");
+                    streamsCmdLine = "streams -d *";
                 else
-                    Console.WriteLine("streams -d \"" + Path.Combine(assemblyFile.DirectoryName, "*") + "\"");
+                    streamsCmdLine = "streams -d \"" + Path.Combine(assemblyFile.DirectoryName, "*") + "\"";
+
+                var msg =
+                    "Invalid Assembly: \"" + assemblyFile.FullName + "\"\n" +
+                    "The assembly may be marked as \"Untrusted\" by Windows. Please unblock and try again.\n" +
+                    "Use the Streams tool (https://technet.microsoft.com/en-us/sysinternals/streams.aspx) to unblock, for example\n" +
+                    streamsCmdLine;
+
+                ConsoleMsgUtils.ShowError(msg);
                 throw;
             }
             catch (SecurityException)
             {
-                Console.WriteLine("Assembly access denied: \"" + assemblyFile.FullName + "\"");
+                ConsoleMsgUtils.ShowError("Assembly access denied: \"" + assemblyFile.FullName + "\"");
                 throw;
             }
 
@@ -553,7 +559,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var bits = Environment.Is64BitProcess ? "64" : "32";
                 var message = CannotFindExceptionMessage();
 
-                Console.WriteLine(message);
+                ConsoleMsgUtils.ShowError(message);
                 throw new TypeLoadException(message);
             }
         }
@@ -564,7 +570,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var message = CannotFindExceptionMessage();
 
-                Console.WriteLine(message);
+                ConsoleMsgUtils.ShowError(message);
                 throw new TypeLoadException(message);
             }
         }
@@ -572,10 +578,11 @@ namespace InformedProteomics.Backend.MassSpecData
         private static string CannotFindExceptionMessage()
         {
             var bits = Environment.Is64BitProcess ? "64" : "32";
-            var message = "Cannot load ProteoWizard dlls. Please ensure that " + bits
-                + "-bit ProteoWizard is installed to its default install directory (\""
-                + Environment.GetEnvironmentVariable("ProgramFiles") + "\\ProteoWizard\\ProteoWizard 3.0.[x]\")."
-                + "\nCurrently trying to load ProteoWizard dlls from path \"" + PwizPath + "\".";
+            var message =
+                "Cannot load ProteoWizard dlls. Please ensure that " + bits +
+                "-bit ProteoWizard is installed to its default install directory (\"" +
+                Environment.GetEnvironmentVariable("ProgramFiles") + "\\ProteoWizard\\ProteoWizard 3.0.[x]\").\n" +
+                "Currently trying to load ProteoWizard dlls from path \"" + PwizPath + "\".";
 
             return message;
         }

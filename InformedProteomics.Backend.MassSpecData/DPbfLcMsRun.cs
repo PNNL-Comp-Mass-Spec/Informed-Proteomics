@@ -280,7 +280,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return;
             }
             warningTracker.Add(code);
-            Console.WriteLine("WARNING: {0}!", message);
+            ConsoleMsgUtils.ShowWarning(string.Format("WARNING: {0}!", message));
         }
     }
 }

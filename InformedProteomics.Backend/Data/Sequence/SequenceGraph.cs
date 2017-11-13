@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
+using PRISM;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -534,7 +535,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
                 if (scorer == null)
                 {
-                    Console.WriteLine("Null scorer");
+                    ConsoleMsgUtils.ShowWarning("Null scorer in GetFragmentScore");
                     curNodeScore = 0;
                 }
                 else
