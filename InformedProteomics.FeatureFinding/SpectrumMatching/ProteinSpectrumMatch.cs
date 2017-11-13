@@ -72,27 +72,27 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public double SpectralEvalue { get; internal set; }
 
-        public string Sequence { get; private set; }
-        public int ScanNum { get; private set; }
-        public double Mass { get; private set; }
-        public int Charge { get; private set; }
+        public string Sequence { get; }
+        public int ScanNum { get; }
+        public double Mass { get; }
+        public int Charge { get; }
 
-        public string ProteinName { get; private set; }
-        public string ProteinDesc { get; private set; }
+        public string ProteinName { get; }
+        public string ProteinDesc { get; }
 
         public int ProteinLength { get; internal set; }
 
         public string Pre { get; internal set; }
         public string Post { get; internal set; }
 
-        public int FirstResidue { get; private set; }
-        public int LastResidue { get; private set; }
-        public double Score { get; private set; }
+        public int FirstResidue { get; }
+        public int LastResidue { get; }
+        public double Score { get; }
         public string SequenceText { get; internal set; }
 
         public string Modifications { get; internal set; }
 
-        public SearchTool SearchToolType { get; private set; }
+        public SearchTool SearchToolType { get; }
         public string ProteinId { get; set; }
 
         public bool Equals(ProteinSpectrumMatch other)
