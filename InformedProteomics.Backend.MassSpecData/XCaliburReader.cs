@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using InformedProteomics.Backend.Data.Spectrometry;
+using PRISM;
 using PSI_Interface.CV;
 using ThermoRawFileReader;
 
@@ -28,6 +29,7 @@ namespace InformedProteomics.Backend.MassSpecData
             _cachedScanInfo = new clsScanInfo(-1);
 
             _msfileReader = new XRawFileIO();
+            _msfileReader.ErrorEvent += _msfileReader_ErrorEvent;
 
             var dataFile = new FileInfo(filePath);
             if (!dataFile.Exists)
@@ -383,5 +385,11 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _msfileReader?.CloseRawFile();
         }
+
+        private void _msfileReader_ErrorEvent(string message, Exception ex)
+        {
+            ConsoleMsgUtils.ShowError(message, ex);
+        }
+
     }
 }
