@@ -2167,7 +2167,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 pspectrum.ActivationMethod = precursor.Activation;
                 // Select mz value to use based on presence of a Thermo-specific user param.
                 // The user param has a slightly higher precision, if that matters.
-                var mz = scan.MonoisotopicMz == 0.0 ? ion.SelectedIonMz : scan.MonoisotopicMz;
+                var mz = Math.Abs(scan.MonoisotopicMz) < float.Epsilon ? ion.SelectedIonMz : scan.MonoisotopicMz;
+
                 pspectrum.IsolationWindow = new IsolationWindow(precursor.IsolationWindowTargetMz, precursor.IsolationWindowLowerOffset, precursor.IsolationWindowUpperOffset, mz, ion.Charge);
                 //pspectrum.IsolationWindow.OldCharge = ion.OldCharge;
                 //pspectrum.IsolationWindow.SelectedIonMz = ion.SelectedIonMz;
