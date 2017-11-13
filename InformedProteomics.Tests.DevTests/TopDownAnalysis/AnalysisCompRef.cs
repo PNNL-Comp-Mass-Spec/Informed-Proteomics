@@ -133,59 +133,68 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
-        public void TestFeatureAlignment()
+        [TestCase("32A, 32B, 33A")]
+        // Long test: [TestCase("32A, 32B, 32C, 32D, 32E, 32F, 32G, 33A, 33B, 33C, 33D, 33E, 33F, 33G")]
+        public void TestFeatureAlignment(string runLabelList)
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\promex_crosstab_temp.tsv";
 
-            var runLabels = new[] {"32A", "32B", "32C", "32D", "32E", "32F", "32G", "33A", "33B", "33C", "33D", "33E", "33F", "33G"};
-            var nDataset = runLabels.Length;
+            var runLabels = new List<string>();
+            foreach (var item in runLabelList.Split(','))
+            {
+                runLabels.Add(item.Trim());
+            }
+
+            var datasetCount = runLabels.Count;
 
             var prsmReader = new ProteinSpectrumMatchReader();
             var tolerance = new Tolerance(10);
             var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
 
-            for (var i = 0; i < nDataset; i++)
+            var datasetId = 0;
+
+            foreach (var runLabel in runLabels)
             {
-                var rawFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ.pbf", RawFolder, runLabels[i]);
-                var mspFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ_IcTda.tsv", MsPfFolder, runLabels[i]);
-                var ms1FtFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ.ms1ft", Ms1FtFolder, runLabels[i]);
+                var rawFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ.pbf", RawFolder, runLabel);
+                var mspFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ_IcTda.tsv", MsPfFolder, runLabel);
+                var ms1FtFile = string.Format(@"{0}\CPTAC_Intact_CR{1}_24Aug15_Bane_15-02-06-RZ.ms1ft", Ms1FtFolder, runLabel);
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
-                var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1FtFile, run);
+                var features = LcMsFeatureAlignment.LoadProMexResult(datasetId, ms1FtFile, run);
 
                 if (File.Exists(mspFile))
                 {
                     var prsmList = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
 
-                    for (var j = 0; j < prsmList.Count; j++)
+                    foreach (var match in prsmList)
                     {
-                        var match = prsmList[j];
                         match.ProteinId = match.ProteinName;
                     }
 
                     // tag features by PrSMs
-                    for (var j = 0; j < features.Count; j++)
+                    foreach (var feature in features)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
+                        var massTol = tolerance.GetToleranceAsMz(feature.Mass);
                         foreach (var match in prsmList)
                         {
-                            if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
+                            if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
                             {
-                                features[j].ProteinSpectrumMatches.Add(match);
+                                feature.ProteinSpectrumMatches.Add(match);
                             }
                         }
                     }
                 }
 
-                alignment.AddDataSet(i, features, run);
+                alignment.AddDataSet(datasetId, features, run);
+                datasetId++;
             }
 
             alignment.AlignFeatures();
 
             Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
 
-            for (var i = 0; i < nDataset; i++)
+            for (var i = 0; i < datasetCount; i++)
             {
                 alignment.FillMissingFeatures(i);
                 Console.WriteLine("{0} has been processed", runLabels[i]);
