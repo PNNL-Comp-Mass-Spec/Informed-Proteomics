@@ -609,6 +609,9 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Long_Running")]
         public void TestNominalMassErrors()
         {
+
+            const int MAX_RUNTIME_SECONDS = 60;
+
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
@@ -640,17 +643,21 @@ namespace InformedProteomics.Tests.DevTests
                 if (errorBin < 0) errorBin = 0;
                 if (errorBin >= hist.Length) errorBin = hist.Length - 1;
                 hist[errorBin]++;
+
+                if (numSequences % 100 == 0 && sw.Elapsed.TotalSeconds > MAX_RUNTIME_SECONDS)
+                    break;
             }
 
-            Console.WriteLine("NumSequences: {0}", numSequences);
+            Console.WriteLine("Sequence count: {0:N0}", numSequences);
+            Console.WriteLine("{0,10}  {1,10}  {2,10}", "Bin ", "Count", "Fraction");
             for (var i = 0; i < hist.Length; i++)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", i - hist.Length / 2, hist[i], hist[i] / (double)numSequences);
+                Console.WriteLine("{0,10:F1}  {1,10:N0}  {2,10:F1}%", i - hist.Length / 2, hist[i], hist[i] / (double)numSequences * 100);
             }
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine(@"Elapsed Time: {0:F1} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }
