@@ -164,7 +164,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     //foreach (var f in fSet) Console.WriteLine("*\t{0}\t{1}\t{2}\t{3}", f.RepresentativeMass, f.MinScanNum, f.MaxScanNum, f.Score);
                     //Console.WriteLine("**\t{0}\t{1}\t{2}\t{3}", maxScoredCluster.RepresentativeMass, maxScoredCluster.MinScanNum, maxScoredCluster.MaxScanNum, maxScoredCluster.Score);
                     if (maxScoredCluster == null) maxScoredCluster = maxScoredClusterOriginal;
-                    if (maxScoredCluster.Score < maxScore) maxScoredCluster.Score = maxScore;
+                    if (maxScoredCluster != null && maxScoredCluster.Score < maxScore) maxScoredCluster.Score = maxScore;
                     mergedFeatures.Add(maxScoredCluster);
                 }
                 //if (selectedFeature != null) postFilteredSet.Add(selectedFeature);

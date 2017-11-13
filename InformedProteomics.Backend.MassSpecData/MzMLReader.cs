@@ -1194,11 +1194,11 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.MoveToContent();
             var iType = reader.GetAttribute("name");
             var eType = IndexList.IndexListType.Unknown;
-            if (iType.ToLower() == "spectrum")
+            if (iType != null && iType.ToLower() == "spectrum")
             {
                 eType = IndexList.IndexListType.Spectrum;
             }
-            else if (iType.ToLower() == "chromatogram")
+            else if (iType != null && iType.ToLower() == "chromatogram")
             {
                 eType = IndexList.IndexListType.Chromatogram;
             }
@@ -1284,7 +1284,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var schemaName = reader.GetAttribute("xsi:schemaLocation");
             // We automatically assume it uses the mzML_1.1.0 schema. Check for the old version.
             //if (!schemaName.Contains("mzML1.1.0.xsd"))
-            if (schemaName.Contains("mzML1.0.0.xsd"))
+            if (schemaName != null && schemaName.Contains("mzML1.0.0.xsd"))
             {
                 _version = MzML_Version.mzML1_0_0;
             }
@@ -1594,7 +1594,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 {
                                     cv = "MS";
                                 }
-                                if (CV.TermAccessionLookup[cv].ContainsKey(accession))
+                                if (!string.IsNullOrWhiteSpace(accession) && CV.TermAccessionLookup[cv].ContainsKey(accession))
                                 {
                                     var cvid = CV.TermAccessionLookup[cv][accession];
                                     if (CV.CvidIsA(cvid, CV.CVID.MS_native_spectrum_identifier_format))
@@ -1719,6 +1719,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader.Read();
                     continue;
                 }
+
                 if (reader.Name == "referenceableParamGroup")
                 {
                     // Schema requirements: one to many instances of this element
@@ -1754,7 +1755,14 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     innerReader.Close();
                     reader.Read();
-                    _referenceableParamGroups.Add(id, paramList);
+                    if (string.IsNullOrWhiteSpace(id))
+                    {
+                        ConsoleMsgUtils.ShowWarning("Encountered referenceable param group with null or empty id");
+                    }
+                    else
+                    {
+                        _referenceableParamGroups.Add(id, paramList);
+                    }
                 }
                 else
                 {
@@ -1939,7 +1947,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 nativeId = reader.GetAttribute("nativeID"); // Native ID in mzML_1.0.0
             }
 
-            var scanNum = -1;
+            if (string.IsNullOrWhiteSpace(nativeId))
+            {
+                throw new Exception("nativeID is empty for spectrum index " + index);
+            }
+
+            int scanNum;
+
             // If a random access reader, there is already a scan number stored, based on the order of the index. Use it instead.
             if (_randomAccess)
             {
@@ -2848,7 +2862,16 @@ namespace InformedProteomics.Backend.MassSpecData
                     case "referenceableParamGroupRef":
                         // Schema requirements: zero to many instances of this element
                         var rpgRef = reader.GetAttribute("ref");
-                        paramList.AddRange(_referenceableParamGroups[rpgRef]);
+
+                        if (string.IsNullOrWhiteSpace(rpgRef))
+                        {
+                            ConsoleMsgUtils.ShowWarning("Encountered referenceableParamGroupRef with null or empty ref attribute");
+                        }
+                        else
+                        {
+                            paramList.AddRange(_referenceableParamGroups[rpgRef]);
+                        }
+
                         reader.Read();
                         break;
                     case "cvParam":
