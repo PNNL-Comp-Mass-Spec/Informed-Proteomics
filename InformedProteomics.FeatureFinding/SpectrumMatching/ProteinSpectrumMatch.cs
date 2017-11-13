@@ -97,6 +97,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public bool Equals(ProteinSpectrumMatch other)
         {
+            if (other == null)
+                return false;
+
             if (SearchToolType == other.SearchToolType)
             {
                 return SequenceText.Equals(other.SequenceText);
