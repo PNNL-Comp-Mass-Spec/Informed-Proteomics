@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Scoring.Interfaces;
 
 namespace InformedProteomics.TopDown.Scoring.FlipScoring
 {
-    using InformedProteomics.Scoring.Interfaces;
-
     /// <summary>
     /// Top down scorer that uses the FLIP scoring model.
     /// </summary>

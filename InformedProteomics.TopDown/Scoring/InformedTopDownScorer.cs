@@ -3,12 +3,11 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Scoring.Interfaces;
 using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    using InformedProteomics.Scoring.Interfaces;
-
     public class InformedTopDownScorer
     {
         public InformedTopDownScorer(LcMsRun run, AminoAcidSet aaSet, int minProductCharge, int maxProductCharge, Tolerance tolerance, double ms2CorrThreshold = 0.7, ActivationMethod activationMethod = ActivationMethod.Unknown)

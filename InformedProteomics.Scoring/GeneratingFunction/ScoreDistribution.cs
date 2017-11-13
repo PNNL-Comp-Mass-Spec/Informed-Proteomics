@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Linq;
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
-    using System.Linq;
-
     public class ScoreDistribution
     {
         public ScoreDistribution(int minScore, int maxScore)

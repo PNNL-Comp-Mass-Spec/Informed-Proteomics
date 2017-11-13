@@ -450,7 +450,7 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             // Deconvolute spectra
-            var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, 0.1, Options.ProductIonTolerance);
+            var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, Options.ProductIonTolerance);
             var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
             var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
 

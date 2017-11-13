@@ -41,7 +41,7 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
-            var ionsFound = new Dictionary<bool, double>();
+            //var ionsFound = new Dictionary<bool, double>();
 
             foreach (var baseIonType in BaseIonTypes)
             {
