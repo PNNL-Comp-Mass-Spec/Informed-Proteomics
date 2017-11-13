@@ -381,13 +381,13 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
             var ret = new List<LcMsFeature[]>();
             var components = GetConnectedComponents(adjList);
-            for (var i = 0; i < components.Count; i++)
+            foreach (var item in components)
             {
-                var component = new HashSet<int>(components[i]);
+                var component = new HashSet<int>(item);
                 while (component.Count > 0)
                 {
                     var featureGroup = new LcMsFeature[CountDatasets];
-                    var featureSet = GetAlignedFeatures(ref component, adjList);
+                    var featureSet = GetAlignedFeatures(component, adjList);
                     foreach (var f in featureSet) featureGroup[f.DataSetId] = f;
                     ret.Add(featureGroup);
                 }
