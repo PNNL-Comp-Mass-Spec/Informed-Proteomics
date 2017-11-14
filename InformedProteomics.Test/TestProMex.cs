@@ -52,10 +52,8 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
 
-            for (var d = 0; d < TrainSetFileLists.Length; d++)
+            foreach (var dataset in TrainSetFileLists)
             {
-                var dataset = TrainSetFileLists[d];
-
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
                 var outFileName = string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset));
