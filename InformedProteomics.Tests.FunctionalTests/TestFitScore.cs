@@ -93,8 +93,8 @@ namespace InformedProteomics.Tests.FunctionalTests
             Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
-            Console.WriteLine("FitScore: {0}", fitScore);
-            Assert.True(fitScore < 0.15);
+            Console.WriteLine("FitScore: {0:F3}", fitScore);
+            Assert.True(fitScore < 0.15, "Fit score ({0}) was not less than 0.15; this is unexpected", fitScore);
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
 
             Console.WriteLine(@"SmallestFit=" + smallestFit);
-            Assert.IsTrue(smallestFit > 0.94);
+            Assert.IsTrue(smallestFit > 0.94, "Smallest fit ({0}) is not greater than 0.94; this is unexpected", smallestFit);
 
             sw.Stop();
 
