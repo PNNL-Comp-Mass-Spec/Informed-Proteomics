@@ -175,7 +175,7 @@ namespace InformedProteomics.Test
 
                     var binMass = featureFinder.Comparer.GetMzAverage(binNum);
 
-                    var binNumList = (mass < binMass) ? new int[] { binNum, binNum - 1, binNum + 1 } : new int[] { binNum, binNum + 1, binNum - 1 };
+                    var binNumList = (mass < binMass) ? new[] { binNum, binNum - 1, binNum + 1 } : new[] { binNum, binNum + 1, binNum - 1 };
                     LcMsPeakCluster refinedFeature = null;
 
                     foreach (var bi in binNumList)
@@ -276,7 +276,7 @@ namespace InformedProteomics.Test
             }
         }
 
-        private void OutputEnvelopPeakStat(int id, LcMsPeakCluster feature, StreamWriter writer)
+        private void OutputEnvelopPeakStat(int id, LcMsPeakCluster feature, TextWriter writer)
         {
             /*
             public double[] EnvelopeDistanceScoreAcrossCharge { get; internal set; }
@@ -586,7 +586,7 @@ namespace InformedProteomics.Test
             mFeatureMapPbfFile = pbfFile.FullName;
             mFeatureMapResultsFile = promexFile.FullName;
 
-            var thread = new Thread(new ThreadStart(FeatureMapGeneration));
+            var thread = new Thread(FeatureMapGeneration);
 
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -693,8 +693,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("Results are in file " + resultsFilePath);
         }
 
-        public static string[] TrainSetFileLists = new string[]
-            {
+        public static string[] TrainSetFileLists = {
                 @"D:\MassSpecFiles\bottom_up\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw",  // bottom-up datasets
                 @"D:\MassSpecFiles\bottom_up\QC_Shew_13_05_2_17Apr14_Samwise_13-07-17.raw",
 

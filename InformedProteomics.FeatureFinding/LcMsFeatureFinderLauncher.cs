@@ -32,7 +32,6 @@ namespace InformedProteomics.FeatureFinding
             catch (FileNotFoundException fe)
             {
                 ShowErrorMessage(fe.Message);
-                return;
             }
         }
 
@@ -196,7 +195,7 @@ namespace InformedProteomics.FeatureFinding
                 {
                     var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
-                    var processedPercentage = ((double)processedBins / totalMassBin) * 100;
+                    var processedPercentage = processedBins / totalMassBin * 100;
                     Console.WriteLine("Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
@@ -244,8 +243,8 @@ namespace InformedProteomics.FeatureFinding
                             if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
 
                             var fitscore = 1.0 - feature.BestCorrelationScore;
-                            csvWriter.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
-                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureId));
+                            csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
+                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureId);
                         }
                     }
                 }
@@ -420,16 +419,14 @@ namespace InformedProteomics.FeatureFinding
             ConsoleMsgUtils.ShowError("Error: " + errorMessage);
         }
 
-        public static readonly string[] TsvHeader = new string[]
-        {
+        public static readonly string[] TsvHeader = {
             "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge",
             "MonoMass", "RepScan", "RepCharge", "RepMz", "Abundance",
             "ApexScanNum", "ApexIntensity",
             "MinElutionTime", "MaxElutionTime", "ElutionLength", "Envelope", "LikelihoodRatio"
         };
 
-        public static readonly string[] TsvExtraScoreHeader = new string[]
-        {
+        public static readonly string[] TsvExtraScoreHeader = {
             "BestEvenCharge", "BestOddCharge",
             "CorrEvenCharge", "CorrOddCharge",
             "IntensityEvenCharge", "IntensityOddCharge",
