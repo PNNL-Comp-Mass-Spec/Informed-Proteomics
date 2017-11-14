@@ -37,12 +37,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             FilePath = filePath;
 
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var sha1 = new SHA1Managed())
-            {
-                var hash = sha1.ComputeHash(fs);
-                SrcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
-            }
+            _checkSum = string.Empty;
 
             _msfileReader.OpenRawFile(filePath);
 
@@ -107,7 +102,19 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// SHA-1 Checksum of the raw file
         /// </summary>
-        public string SrcFileChecksum { get; }
+        /// <remarks>
+        /// It can take some time to compute this value for .raw files over 500 MB,
+        /// particularly if they're located on a remote share
+        /// </remarks>
+        public string SrcFileChecksum {
+            get
+            {
+                if (string.IsNullOrEmpty(_checkSum))
+                    ComputeChecksum();
+
+                return _checkSum;
+            }
+        }
 
         /// <summary>
         /// Version of the file format
@@ -246,6 +253,21 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly int _minLcScan;
         private readonly int _maxLcScan;
         private readonly Dictionary<int, int> _msLevel;
+        private string _checkSum;
+
+        /// <summary>
+        /// Compute the SHA-1 checksum for this data file
+        /// </summary>
+        private void ComputeChecksum()
+        {
+
+            using (var fs = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var sha1 = new SHA1Managed())
+            {
+                var hash = sha1.ComputeHash(fs);
+                _checkSum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+            }
+        }
 
         /// <summary>
         /// Reads the isolation window target m/z
