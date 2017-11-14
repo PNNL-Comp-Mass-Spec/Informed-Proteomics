@@ -39,6 +39,18 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             var destPath = @"D:\MassSpecFiles\CompRef_Kelleher\Study2";
 
+            if (!Directory.Exists(DataPath))
+            {
+                Assert.Ignore("Skipped since source directory not found: " + DataPath);
+            }
+
+            if (!Directory.Exists(destPath))
+            {
+                Assert.Ignore("Skipped since destination directory not found: " + destPath);
+            }
+
+            var filesCopied = 0;
+
             for (var i = 1; i <= 1; i++)
             {
                 for (var j = 1; j <= 3; j++)
@@ -49,24 +61,42 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         var dataName = string.Format(@"RP4H_P33_WHIM16_biorep{0}_techrep{1}", j, k); // Study-2
                         var dataDir = string.Format(@"{0}\{1}", DataPath, dataName);
 
+                        if (!Directory.Exists(dataDir))
+                        {
+                            Console.WriteLine("Skipping dataset since directory not found: " + dataDir);
+                            continue;
+                        }
+
                         var directories = Directory.GetDirectories(dataDir);
 
                         foreach (var dir in directories)
                         {
                             if (dir.Contains("MSP"))
                             {
-                                var filePath = string.Format(@"{0}\{1}_IcTsv.zip", dir, dataName);
-                                var destFilePath = string.Format(@"{0}\{1}_IcTsv.zip", destPath, dataName);
-                                File.Copy(filePath, destFilePath);
+                                var icTsvFile = string.Format(@"{0}\{1}_IcTsv.zip", dir, dataName);
 
-                                filePath = string.Format(@"{0}\{1}.ms1ft", dir, dataName);
-                                destFilePath = string.Format(@"{0}\{1}.ms1ft", destPath, dataName);
-                                File.Copy(filePath, destFilePath);
+                                if (File.Exists(icTsvFile))
+                                {
+                                    var destFilePath = string.Format(@"{0}\{1}_IcTsv.zip", destPath, dataName);
+                                    File.Copy(icTsvFile, destFilePath);
+                                    filesCopied++;
+                                }
+
+                                var featuresFile = string.Format(@"{0}\{1}.ms1ft", dir, dataName);
+                                if (File.Exists(featuresFile))
+                                {
+                                    var destFilePath = string.Format(@"{0}\{1}.ms1ft", destPath, dataName);
+                                    File.Copy(featuresFile, destFilePath);
+                                    filesCopied++;
+                                }
                             }
                         }
                     }
                 }
             }
+
+            if (filesCopied == 0)
+                Assert.Ignore(@"Skipping since data files were not found");
         }
 
         [Test]
@@ -78,6 +108,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             const int Nfraction1 = 3;
             const int Nfraction2 = 5;
+            var filesProcessed = 0;
 
             for (var frac1 = 1; frac1 <= Nfraction1; frac1++)
             {
@@ -96,7 +127,31 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         var ms1FtFile = string.Format(@"{0}\{1}.ms1ft", ms1ftFolder, datasets[i]);
                         var outPath = string.Format(@"{0}\{1}.seqtag.ms1ft", ms1ftFolder, datasets[i]);
 
-                        if (File.Exists(outPath)) continue;
+                        if (!File.Exists(rawFile))
+                        {
+                            Console.WriteLine(@"Skipping dataset since file not found: " + rawFile);
+                            continue;
+                        }
+
+                        if (!File.Exists(ms1FtFile))
+                        {
+                            Console.WriteLine(@"Skipping dataset since file not found: " + ms1FtFile);
+                            continue;
+                        }
+
+                        if (!File.Exists(mspFile))
+                        {
+                            Console.WriteLine(@"Skipping dataset since file not found: " + mspFile);
+                            continue;
+                        }
+
+                        if (File.Exists(outPath))
+                        {
+                            Console.WriteLine(@"Skipping dataset since results file already exists: " + outPath);
+                            continue;
+                        }
+
+                        filesProcessed++;
 
                         var run = PbfLcMsRun.GetLcMsRun(rawFile);
                         var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1FtFile, run);
@@ -123,9 +178,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                         FeatureFind(missingPrsm, run, outPath);
                         Console.WriteLine(outPath);
+
                     }
                 }
             }
+
+            if (filesProcessed == 0)
+                Assert.Ignore(@"Skipping since data files were not found");
         }
 
         private void FeatureFind(List<ProteinSpectrumMatch> prsms, LcMsRun run, string outTsvFilePath)
@@ -161,18 +220,26 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             const int Nfraction1 = 3;
             const int Nfraction2 = 5;
 
+            var filesProcessed = 0;
+
             for (var frac1 = 1; frac1 <= Nfraction1; frac1++)
             {
                 for (var frac2 = 1; frac2 <= Nfraction2; frac2++)
                 {
                     var datasets = GetDataSetNamesStudy3(frac1, frac2);
-                    var outFilePath = string.Format(@"D:\MassSpecFiles\CompRef_Kelleher\study3_GFrep{0}_Gfrac{1}.tsv", frac1.ToString("D2"), frac2.ToString("D2"));
-                    if (File.Exists(outFilePath)) continue;
+                    var outFilePath = string.Format(@"D:\MassSpecFiles\CompRef_Kelleher\study3_GFrep{0:D2}_Gfrac{1:D2}.tsv", frac1, frac2);
+                    if (!File.Exists(outFilePath))
+                        continue;
 
                     AlignFeatures(datasets, mspfFolder, ms1ftFolder, outFilePath);
                     Console.WriteLine("############ {0}-{1} has been completed", frac1, frac2);
+
+                    filesProcessed++;
                 }
             }
+
+            if (filesProcessed == 0)
+                Assert.Ignore("Skipped since data files not found");
         }
 
         private void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)

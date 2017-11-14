@@ -72,7 +72,33 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var mspFile = string.Format(@"{0}\{1}_IcTda.tsv", MsPfFolder, GetDataSetNames(i));
                 var mspFile2 = string.Format(@"{0}\{1}_IcTda.tsv", MsPfFolder2, GetDataSetNames(i));
                 var ms1FtFile = string.Format(@"{0}\{1}.ms1ft", Ms1FtFolder, GetDataSetNames(i));
+
+                if (!File.Exists(rawFile))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + rawFile);
+                    continue;
+                }
+
+                if (!File.Exists(ms1FtFile))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + ms1FtFile);
+                    continue;
+                }
+
+                if (!File.Exists(mspFile))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + mspFile);
+                    continue;
+                }
+
+                if (!File.Exists(mspFile2))
+                {
+                    Console.WriteLine("Skipping test since file not found: " + mspFile2);
+                    continue;
+                }
+
                 Console.WriteLine(rawFile);
+
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
                 var prsmList1 = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                 var prsmList2 = prsmReader.LoadIdentificationResult(mspFile2, ProteinSpectrumMatch.SearchTool.MsPathFinder);
@@ -102,6 +128,11 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
 
                 alignment.AddDataSet(i, features, run);
+            }
+
+            if (alignment.CountDatasets == 0)
+            {
+                Assert.Ignore("Skipping test since input data files were found");
             }
 
             alignment.AlignFeatures();

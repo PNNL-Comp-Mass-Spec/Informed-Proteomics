@@ -363,6 +363,16 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string decoyResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy_Rescored.tsv";
             const string tdaResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda_Rescored.tsv";
 
+            if (!File.Exists(targetResultPath))
+            {
+                Assert.Ignore("Skipping test since data file not found");
+            }
+
+            if (!File.Exists(decoyResultPath))
+            {
+                Assert.Ignore("Skipping test since data file not found");
+            }
+
             //const string targetResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.icresult";
             //const string decoyResultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);

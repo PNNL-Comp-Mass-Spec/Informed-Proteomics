@@ -51,6 +51,8 @@ namespace InformedProteomics.Tests.DevTests
 
             var prsmReader = new ProteinSpectrumMatchReader(0.01);
 
+            var filesProcessed = 0;
+
             var tolerance = new Tolerance(10);
             for (var i = 0; i < dataset.Length; i++)
             {
@@ -70,6 +72,8 @@ namespace InformedProteomics.Tests.DevTests
                 }
 
                 var prsmList = prsmReader.LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
+
+                filesProcessed++;
 
                 for (var j = 0; j < prsmList.Count; j++)
                 {
@@ -187,7 +191,11 @@ namespace InformedProteomics.Tests.DevTests
                 writer.Close();
 
                 Console.WriteLine(ms1ftFilePath);
+
             }
+
+            if (filesProcessed == 0)
+                Assert.Ignore("Skipped since data files not found");
         }
 
         [Test]
@@ -218,7 +226,7 @@ namespace InformedProteomics.Tests.DevTests
             var ftComparer = new UtexFeatureComparer(tolerance);
             var align = new LcMsFeatureAlignment(ftComparer);
             var prsmReader = new ProteinSpectrumMatchReader(0.01);
-            var validCount = 0;
+            var filesProcessed = 0;
 
             for (var i = 0; i < dataset.Length; i++)
             {
@@ -244,7 +252,7 @@ namespace InformedProteomics.Tests.DevTests
                     continue;
                 }
 
-                validCount++;
+                filesProcessed++;
 
                 //var map = new ProteinSpectrumMathMap(run, i, dataset[i]);
                 //map.LoadIdentificationResult(path, ProteinSpectrumMatch.SearchTool.MsAlign);
@@ -277,9 +285,9 @@ namespace InformedProteomics.Tests.DevTests
                 align.AddDataSet(i, features, run);
             }
 
-            if (validCount == 0)
+            if (filesProcessed == 0)
             {
-                Assert.Ignore("No files found!");
+                Assert.Ignore("Skipped since input files not found");
             }
 
             align.AlignFeatures();
@@ -532,6 +540,11 @@ namespace InformedProteomics.Tests.DevTests
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, mspDir);
             }
 
+            if (!File.Exists(outFile))
+            {
+                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, outFile);
+            }
+
             var dataset = GetDataList(featureDir);
 
             var tsvParser = new TsvFileParser(outFile);
@@ -669,13 +682,8 @@ namespace InformedProteomics.Tests.DevTests
 
             foreach (var data in dataset)
             {
-                var dname = String.Format(@"{0}\{1}", dmsDir, data);
-                var destFname = String.Format(@"{0}\MSP\{1}.zip", featureDir, data);
-
-                if (File.Exists(destFname))
-                {
-                    File.Delete(destFname);
-                }
+                var dname = string.Format(@"{0}\{1}", dmsDir, data);
+                var targetFile = new FileInfo(string.Format(@"{0}\MSP\{1}.zip", featureDir, data));
 
                 var directories = Directory.GetDirectories(dname);
                 //Console.WriteLine(dname);
@@ -683,19 +691,25 @@ namespace InformedProteomics.Tests.DevTests
                 {
                     var subDir = Path.GetFileName(dir);
 
-                    if (subDir.StartsWith("MSP"))
-                    {
-                        //var dname2 = string.Format(@"{0}\{1}\{2}", dmsDir, data, dir);
-                        var mspFiles = Directory.GetFiles(dir);
+                    if (subDir == null || !subDir.StartsWith("MSP")) continue;
 
-                        foreach (var fname in mspFiles)
+                    //var dname2 = string.Format(@"{0}\{1}\{2}", dmsDir, data, dir);
+                    var mspFiles = Directory.GetFiles(dir);
+
+                    foreach (var sourceFilePath in mspFiles)
+                    {
+                        if (!sourceFilePath.ToLower().EndsWith(".zip")) continue;
+
+                        var sourceFile = new FileInfo(sourceFilePath);
+
+                        if (targetFile.Exists && targetFile.Length == sourceFile.Length)
                         {
-                            if (fname.EndsWith("zip"))
-                            {
-                                Console.WriteLine(fname);
-                                File.Copy(fname, destFname);
-                            }
+                            Console.WriteLine("Skipping file since it already exists and the size matches: " + targetFile.FullName);
+                            continue;
                         }
+                        Console.WriteLine("Copying " + sourceFile.FullName);
+
+                        sourceFile.CopyTo(targetFile.FullName, true);
                     }
                 }
             }
