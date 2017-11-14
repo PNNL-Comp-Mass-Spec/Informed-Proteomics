@@ -14,8 +14,17 @@ namespace InformedProteomics.Backend.Utils
         /// <returns></returns>
         public static DateTime GetBuildDateFromVersion()
         {
-            var version = Assembly.GetEntryAssembly().GetName().Version;
-            return GetBuildDateFromVersion(version);
+            try
+            {
+                var version = Assembly.GetEntryAssembly().GetName().Version;
+                return GetBuildDateFromVersion(version);
+            }
+            catch
+            {
+                // This method was likely invoked by NUnit
+                var version = new Version(1, 0);
+                return GetBuildDateFromVersion(version);
+            }
         }
 
         /// <summary>
@@ -38,8 +47,18 @@ namespace InformedProteomics.Backend.Utils
         /// <returns></returns>
         public static string GetBuildDateTextFromVersion()
         {
-            var version = Assembly.GetEntryAssembly().GetName().Version;
-            return GetBuildDateTextFromVersion(version);
+            try
+            {
+                var version = Assembly.GetEntryAssembly().GetName().Version;
+                return GetBuildDateTextFromVersion(version);
+            }
+            catch
+            {
+                // This method was likely invoked by NUnit
+                var version = new Version(1, 0);
+                return GetBuildDateTextFromVersion(version);
+            }
+
         }
 
         /// <summary>

@@ -36,7 +36,17 @@ namespace MSPathFinderT
                 var handle = Process.GetCurrentProcess().MainWindowHandle;
                 SetConsoleMode(handle, EnableExtendedFlags);
 
-                var entryAsmName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                string entryAsmName;
+                try
+                {
+                    entryAsmName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                }
+                catch
+                {
+                    // This method was likely invoked by NUnit
+                    entryAsmName = "Unknown_Assembly";
+                }
+
                 var parser = new CommandLineParser<TopDownInputParameters>(entryAsmName, Version);
                 parser.UsageExamples.Add(string.Format("Perform a target+decoy search with default parameters and a mods file:\n{0}.exe -s testfile.raw -d sampleProteins.fasta -mod mods.txt -tda 1", entryAsmName));
                 // TODO: add more examples, maybe a link to GitHub?
