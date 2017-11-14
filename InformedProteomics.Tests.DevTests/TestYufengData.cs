@@ -28,6 +28,8 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Long_Running")]
         public void AddMostAbundantIsotopePeakIntensity()
         {
+            const int MAX_RUNTIME_SECONDS = 12;
+
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
@@ -48,6 +50,10 @@ namespace InformedProteomics.Tests.DevTests
             var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
             var precursorIntensities = new double[parser.NumData];
             var tolerance = new Tolerance(10);
+
+            var sw = new Stopwatch();
+            sw.Start();
+
             for (var i = 0; i < parser.NumData; i++)
             {
                 var scanNum = scanNums[i];
@@ -68,6 +74,9 @@ namespace InformedProteomics.Tests.DevTests
                     }
                     precursorIntensities[i] = maxIntensity;
                 }
+
+                if (i % 100 == 0 && sw.Elapsed.TotalSeconds > MAX_RUNTIME_SECONDS)
+                    break;
             }
 
             // Writing
@@ -80,7 +89,10 @@ namespace InformedProteomics.Tests.DevTests
                     writer.WriteLine(parser.GetRows()[i]+"\t"+precursorIntensities[i]);
                 }
             }
-            Console.WriteLine("Done");
+
+            sw.Stop();
+
+            Console.WriteLine("Done; results at " + newResultFilePath);
         }
 
         [Test]

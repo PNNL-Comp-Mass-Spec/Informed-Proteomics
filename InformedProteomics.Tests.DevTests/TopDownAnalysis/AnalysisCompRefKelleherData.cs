@@ -21,8 +21,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var ret = new List<string>();
             for (var k = 1; k <= 5; k++)
             {
-                var dataName1 = string.Format(@"WHIM16_GFrep{0}_GFfrac{1}_inj{2}", i.ToString("D2"), j.ToString("D2"), k.ToString("D2")); // Study-3
-                var dataName2 = string.Format(@"WHIM2_GFrep{0}_GFfrac{1}_inj{2}", i.ToString("D2"), j.ToString("D2"), k.ToString("D2")); // Study-3
+                var dataName1 = string.Format(@"WHIM16_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k); // Study-3
+                var dataName2 = string.Format(@"WHIM2_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k);  // Study-3
                 ret.Add(dataName1);
                 ret.Add(dataName2);
             }
@@ -158,16 +158,16 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         var prsmList = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                         var prsmFeatureMatch = new bool[prsmList.Count];
 
-                        for (var j = 0; j < features.Count; j++)
+                        foreach (var feature in features)
                         {
-                            //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                            var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
+                            // feature.ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
+                            var massTol = tolerance.GetToleranceAsMz(feature.Mass);
                             for (var k = 0; k < prsmList.Count; k++)
                             {
                                 var match = prsmList[k];
-                                if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
+                                if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
                                 {
-                                    features[j].ProteinSpectrumMatches.Add(match);
+                                    feature.ProteinSpectrumMatches.Add(match);
                                     prsmFeatureMatch[k] = true;
                                 }
                             }
@@ -192,7 +192,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
             // write result files
             var tsvWriter = new StreamWriter(outTsvFilePath);
-            tsvWriter.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString(false));
+            tsvWriter.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
 
             var featureId = 1;
             foreach (var match in prsms)
@@ -203,7 +203,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                 if (feature == null) continue;
 
-                tsvWriter.WriteLine("{0}\t{1}", featureId, LcMsFeatureFinderLauncher.GetString(feature, false));
+                tsvWriter.WriteLine("{0}\t{1}", featureId, LcMsFeatureFinderLauncher.GetString(feature));
                 featureId++;
             }
 
@@ -265,23 +265,21 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     var prsmList = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                     //var prsmFeatureMatch = new bool[prsmList.Count];
 
-                    for (var j = 0; j < prsmList.Count; j++)
+                    foreach (var match in prsmList)
                     {
-                        var match = prsmList[j];
                         match.ProteinId = match.ProteinName;
                     }
 
                     // tag features by PrSMs
-                    for (var j = 0; j < features.Count; j++)
+                    foreach (var feature in features)
                     {
                         //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
-                        for(var k = 0; k < prsmList.Count; k++)
+                        var massTol = tolerance.GetToleranceAsMz(feature.Mass);
+                        foreach (var match in prsmList)
                         {
-                            var match = prsmList[k];
-                            if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
+                            if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
                             {
-                                features[j].ProteinSpectrumMatches.Add(match);
+                                feature.ProteinSpectrumMatches.Add(match);
                                 //prsmFeatureMatch[k] = true;
                             }
                         }
@@ -301,7 +299,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 Console.WriteLine("{0} has been processed", datasets[i]);
             }
 
-            AnalysisCompRef.OutputCrossTabWithId(outFilePath, alignment, datasets.ToArray());
+            AnalysisCompRef.OutputCrossTabWithId(outFilePath, alignment, datasets);
         }
     }
 }

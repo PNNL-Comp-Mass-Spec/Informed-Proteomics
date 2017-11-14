@@ -203,7 +203,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
-        public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
+        private void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
         {
             OutputCrossTabWithId(outputFilePath, alignment, runLabels.ToList());
         }
@@ -275,7 +275,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         else
                         {
                             if (features[i].Score <= float.MinValue)
-                                dataLine.Add(PRISM.StringUtilities.DblToString(float.MinValue, 2));
+                                dataLine.Add(PRISM.StringUtilities.DblToStringScientific(float.MinValue, 2));
                             else
                                 dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Score, 3));
                         }
@@ -320,6 +320,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             }
 
+            Console.WriteLine("Results written to " + outputFilePath);
         }
     }
 }

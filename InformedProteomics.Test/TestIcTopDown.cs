@@ -217,7 +217,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
+            var tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
