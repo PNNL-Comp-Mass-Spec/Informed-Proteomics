@@ -149,14 +149,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public string SrcFileChecksum
-        {
-            get
-            {
-                var run = this.dataReader as IPbfLcMsRun;
-                return run != null ? run.PbfFileChecksum : this.dataReader.SrcFileChecksum;
-            }
-        }
+        public string SrcFileChecksum => this.dataReader is IPbfLcMsRun run ? run.PbfFileChecksum : this.dataReader.SrcFileChecksum;
 
         /// <summary>
         /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
