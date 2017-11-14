@@ -23,7 +23,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
         /// <param name="title">Plot title</param>
         /// <param name="minMass">Minimum mass</param>
         /// <param name="maxMass">Maximum mass</param>
-        public LcMsFeatureMap(LcMsRun run, IEnumerable<LcMsFeature> features, string title, double minMass, double maxMass) :
+        public LcMsFeatureMap(ILcMsRun run, IList<LcMsFeature> features, string title, double minMass, double maxMass) :
             this(features, title,
             minMass, maxMass,
             Math.Max(run.GetElutionTime(run.MinLcScan) - 5, 0),
@@ -40,7 +40,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
         /// <param name="maxMass">Maximum mass</param>
         /// <param name="minTime">Minimum time (minutes)</param>
         /// <param name="maxTime">Maximum time (minutes)</param>
-        public LcMsFeatureMap(IEnumerable<LcMsFeature> features, string title, double minMass, double maxMass, double minTime, double maxTime)
+        public LcMsFeatureMap(IList<LcMsFeature> features, string title, double minMass, double maxMass, double minTime, double maxTime)
         {
             _features = features;
 
@@ -76,7 +76,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
             var annotation = new TextAnnotation
             {
                 TextPosition = new DataPoint(txtX, txtY),
-                Text = string.Format("Number of LCMS features = {0}", _features.Count()),
+                Text = string.Format("Number of LCMS features = {0}", _features.Count),
                 FontSize = 25,
             };
 
@@ -131,8 +131,13 @@ namespace InformedProteomics.FeatureFinding.Graphics
             return OxyColor.FromHsv(hue, 1, 1);
         }
 
-        public double[] GetColorBreaksTable(int nColors, IEnumerable<LcMsFeature> features)
+        public double[] GetColorBreaksTable(int nColors, IList<LcMsFeature> features)
         {
+            if (!features.Any())
+            {
+                return new double[1];
+            }
+
             var abundanceArray = features.Select(f => f.Abundance).ToArray();
             Array.Sort(abundanceArray);
             var qIndex = (int)Math.Floor(abundanceArray.Length / 4.0);
@@ -163,6 +168,6 @@ namespace InformedProteomics.FeatureFinding.Graphics
         }
 
         private readonly PlotModel _featureMap;
-        private readonly IEnumerable<LcMsFeature> _features;
+        private readonly IList<LcMsFeature> _features;
     }
 }
