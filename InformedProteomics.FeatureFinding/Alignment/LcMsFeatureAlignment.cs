@@ -134,13 +134,11 @@ namespace InformedProteomics.FeatureFinding.Alignment
             {
                 if (_alignedFeatures[j][dataSetIndex] != null) continue;
 
-                var mass = 0d;
-                var charge = 0;
                 var minScanNum = -1;
                 var maxScanNum = ms1ScanNums.Last();
                 var repFt = GetRepFeatureInfo(_alignedFeatures[j]);
-                mass = repFt.Mass;
-                charge = repFt.Charge;
+                var mass = repFt.Mass;
+                var charge = repFt.Charge;
                 var minNet = repFt.MinNet;
                 var maxNet = repFt.MaxNet;
 
