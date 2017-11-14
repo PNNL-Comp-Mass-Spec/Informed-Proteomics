@@ -360,7 +360,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 OpenPbfFile(specFileName);
                 if (!keepDataReaderOpen)
                 {
-                    msdr.Dispose();
+                    msdr?.Dispose();
                 }
                 return;
             }
