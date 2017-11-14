@@ -323,7 +323,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var dataSetName = Path.GetFileNameWithoutExtension(rawFiles[i]);
                 //writer.Write("\t{0}", dataSetName);
                 // now output results!!
-                var ms1ftFilePath = String.Format(@"{0}\{1}.aligned.ms1ft", outDirectory, dataSetName);
+                var ms1ftFilePath = string.Format(@"{0}\{1}.aligned.ms1ft", outDirectory, dataSetName);
                 var writer2 = new StreamWriter(ms1ftFilePath);
                 writer2.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
 

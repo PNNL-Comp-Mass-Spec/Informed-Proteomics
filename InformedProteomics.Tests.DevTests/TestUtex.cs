@@ -45,7 +45,7 @@ namespace InformedProteomics.Tests.DevTests
             var dataset = new string[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
-                dataset[i] = String.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i + 1);
+                dataset[i] = string.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i + 1);
                 //var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
             }
 
@@ -54,7 +54,7 @@ namespace InformedProteomics.Tests.DevTests
             var tolerance = new Tolerance(10);
             for (var i = 0; i < dataset.Length; i++)
             {
-                var rawFile = String.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 if (!File.Exists(rawFile))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
@@ -62,7 +62,7 @@ namespace InformedProteomics.Tests.DevTests
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-                var path = String.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
+                var path = string.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
@@ -133,7 +133,7 @@ namespace InformedProteomics.Tests.DevTests
                     featureToPrsm.Add(prsmSet);
                 }
 
-                // overalp between features???
+                // Overlap between features???
                 for (var j = 0; j < featureList.Count; j++)
                 {
                     var f1 = featureList[j];
@@ -167,7 +167,7 @@ namespace InformedProteomics.Tests.DevTests
                 }
 
                 // now output results!!
-                var ms1ftFilePath = String.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
+                var ms1ftFilePath = string.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftFilePath);
                 writer.WriteLine(LcMsFeatureFinderLauncher.GetHeaderString());
 
@@ -210,7 +210,7 @@ namespace InformedProteomics.Tests.DevTests
             var dataset = new string[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
-                dataset[i] = String.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i + 1);
+                dataset[i] = string.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i + 1);
                 //var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
             }
 
@@ -222,7 +222,7 @@ namespace InformedProteomics.Tests.DevTests
 
             for (var i = 0; i < dataset.Length; i++)
             {
-                var rawFile = String.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 if (!File.Exists(rawFile))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
@@ -230,14 +230,14 @@ namespace InformedProteomics.Tests.DevTests
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-                var path = String.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
+                var path = string.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
                     continue;
                 }
 
-                var ms1ftPath = String.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
+                var ms1ftPath = string.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 if (!File.Exists(ms1ftPath))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1ftPath);
@@ -289,7 +289,7 @@ namespace InformedProteomics.Tests.DevTests
             var alignedFeatureList = align.GetAlignedFeatures();
             for (var i = 0; i < nDataset; i++)
             {
-                var ms1ftPath = String.Format(@"{0}\{1}_aligned.ms1ft", promexOutFolder, dataset[i]);
+                var ms1ftPath = string.Format(@"{0}\{1}_aligned.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftPath);
                 writer.Write(LcMsFeatureFinderLauncher.GetHeaderString());
                 writer.WriteLine("\tIdedMs2ScanNums");
@@ -466,8 +466,8 @@ namespace InformedProteomics.Tests.DevTests
             var runArray = new LcMsRun[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
-                dataset[i] = String.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i+1);
-                var rawFile = String.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
+                dataset[i] = string.Format("Syn_utex2973_Top_{0,2:D2}_TopDown_7May15_Bane_14-09-01RZ", i+1);
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 runArray[i] = PbfLcMsRun.GetLcMsRun(rawFile);
             }
 
@@ -476,7 +476,7 @@ namespace InformedProteomics.Tests.DevTests
             var prsmGroup = new List<ProteinSpectrumMatcheSet>[runArray.Length];
             for (var i = 0; i < dataset.Length; i++)
             {
-                var rawFile = String.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
+                var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 if (!File.Exists(rawFile))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
@@ -487,7 +487,7 @@ namespace InformedProteomics.Tests.DevTests
                 var map = new ProteinSpectrumMathMap(run, i, dataset[i]);
                 // load identification results
                 Console.WriteLine(dataset[i]);
-                var path = String.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_MSAlign_ResultTable.txt", dataset[i]);
+                var path = string.Format(@"D:\MassSpecFiles\UTEX\MSA\{0}_MSAlign_ResultTable.txt", dataset[i]);
                 if (!File.Exists(path))
                 {
                     Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
@@ -547,10 +547,10 @@ namespace InformedProteomics.Tests.DevTests
             for (var d = 0; d < dataset.Count; d++)
             {
                 var data = dataset[d];
-                var minScanColName = String.Format("{0}_minScan", d);
-                var maxScanColName = String.Format("{0}_maxScan", d);
+                var minScanColName = string.Format("{0}_minScan", d);
+                var maxScanColName = string.Format("{0}_maxScan", d);
 
-                var fname = String.Format(@"{0}\{1}_IcTda.tsv", mspDir, data);
+                var fname = string.Format(@"{0}\{1}_IcTda.tsv", mspDir, data);
                 var idParser = new TsvFileParser(fname);
                 var idRows = idParser.GetRows();
                 if (headers.Count < 1) headers.AddRange(idParser.GetHeaders());
@@ -615,7 +615,7 @@ namespace InformedProteomics.Tests.DevTests
                 writer.Write(featureIdMap[key]);
                 for (var i = 0; i < 32; i++)
                 {
-                    writer.Write("\t"); writer.Write("{0}", tsvParser.GetData(String.Format("{0}", i))[key]);
+                    writer.Write("\t"); writer.Write("{0}", tsvParser.GetData(string.Format("{0}", i))[key]);
                 }
                 writer.Write("\n");
                 id++;

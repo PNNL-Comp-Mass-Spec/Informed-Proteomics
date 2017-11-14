@@ -2163,8 +2163,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     ion = precursor.Ions[0];
                 }
 
-                var pspectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum);
-                pspectrum.ActivationMethod = precursor.Activation;
+                var pspectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum) {
+                    ActivationMethod = precursor.Activation
+                };
+
                 // Select mz value to use based on presence of a Thermo-specific user param.
                 // The user param has a slightly higher precision, if that matters.
                 var mz = Math.Abs(scan.MonoisotopicMz) < float.Epsilon ? ion.SelectedIonMz : scan.MonoisotopicMz;
