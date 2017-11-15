@@ -33,12 +33,12 @@ namespace InformedProteomics.FeatureFinding.Data
             }
         }
 
-        public Ms1Spectrum(int scanNum, int index, Peak[] peaks) : base(scanNum)
+        public Ms1Spectrum(int scanNum, int index, IReadOnlyList<Peak> peaks) : base(scanNum)
         {
             Index = index;
             MsLevel = 1;
-            Peaks = new Peak[peaks.Length];
-            if (peaks.Length > 0)
+            Peaks = new Peak[peaks.Count];
+            if (peaks.Count > 0)
             {
                 var sIndex = (ushort)index;
                 for (var i = 0; i < Peaks.Length; i++)
@@ -110,7 +110,7 @@ namespace InformedProteomics.FeatureFinding.Data
             return observedPeaks;
         }
 
-        internal int Index { private set; get; }
+        internal int Index { get; }
 
         private int[][] _peakStartIndex;
         private int[][][] _peakRanking;
@@ -179,8 +179,7 @@ namespace InformedProteomics.FeatureFinding.Data
                 {
                     if (intensities[i][binIdx].Count < 1) continue;
 
-                    double medianIntensity, highestIntensity;
-                    _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out medianIntensity, out highestIntensity);
+                    _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out var medianIntensity, out var highestIntensity);
                     _medianIntensity[i][binIdx] = medianIntensity;
                     _highestIntensity[i][binIdx] = highestIntensity;
 
@@ -292,13 +291,13 @@ namespace InformedProteomics.FeatureFinding.Data
     {
         public static void Shuffle<T>(this IList<T> list)
         {
-            int n = list.Count;
+            var n = list.Count;
             var rnd = new Random();
             while (n > 1)
             {
-                int k = (rnd.Next(0, n) % n);
+                var k = (rnd.Next(0, n) % n);
                 n--;
-                T value = list[k];
+                var value = list[k];
                 list[k] = list[n];
                 list[n] = value;
             }
@@ -444,7 +443,7 @@ namespace InformedProteomics.FeatureFinding.Data
             var n1 = IntensePeakCount;
             var k1 = numberOfMatchedIsotopePeaks; // # of matched ions generating isotope envelope profile
 
-            var lambda = ((double)n1 / (double)n) * k;
+            var lambda = n1 / (double)n * k;
             var pvalue = 1 - Poisson.CDF(lambda, k1);
 
             return pvalue;

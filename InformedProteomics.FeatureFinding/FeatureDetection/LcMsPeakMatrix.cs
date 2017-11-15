@@ -232,7 +232,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             return cluster;
         }
 
-        private double[] SetAbundanceByAuc(ref LcMsPeakCluster feature)
+        private void SetAbundanceByAuc(ref LcMsPeakCluster feature)
         {
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var ms1ScanNums = Run.GetMs1ScanVector();
@@ -290,7 +290,6 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             feature.SetAbundance(abundance, apexScanNum, apexIntensity, boundaryIntensity*0.5);
 
-            return smoothedXic;
         }
 
         public double GetMs1EvidenceScore(int ms2ScanNum, double targetMass, int charge)
@@ -314,7 +313,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             var bcDistances = new List<double>();
             var correlations = new List<double>();
-            var maxSearchScans = (int)Math.Max(ms1ScanNums.Length - ms1ScanIndex + 1, ms1ScanIndex);
+            var maxSearchScans = Math.Max(ms1ScanNums.Length - ms1ScanIndex + 1, ms1ScanIndex);
 
             for (var i = 0; i <= maxSearchScans; i++)
             {
@@ -530,7 +529,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
                 for (var col = 0; col < NColumns; col++)
                 {
-                    if (!(_featureMatrix[row][col].Exist)) continue;
+                    if (!_featureMatrix[row][col].Exist) continue;
 
                     if (_featureMatrix[row][col].CountActivePeaks >= nPeaksCutoff)
                     {
@@ -645,8 +644,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     var cell = neighbors.Dequeue();
                     var charge = cell.Charge;
 
-                    var minRw = (int)Math.Max(charge - _targetMinCharge - chargeNeighborGap, _rows.First());
-                    var maxRw = (int)Math.Min(charge - _targetMinCharge + chargeNeighborGap, _rows.Last());
+                    var minRw = Math.Max(charge - _targetMinCharge - chargeNeighborGap, _rows.First());
+                    var maxRw = Math.Min(charge - _targetMinCharge + chargeNeighborGap, _rows.Last());
                     var currCol = ms1ScanNumToIndex[cell.ScanNum];
 
                     for (var k = 0; k < 5; k++)
@@ -902,7 +901,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             // for each carge state, find and evaluate optimial summed envelope
             // find column range
-            var bestCharge = new int[] { 0, 0 };
+            var bestCharge = new[] { 0, 0 };
             var bestChargeDist = new double[] { 0, 0 };
             var minRow = _rows.Last();
             var maxRow = _rows.First();
@@ -1291,7 +1290,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             return summedEnvelope;
         }
 
-        private bool CorrectChargeState(ObservedIsotopeEnvelope envelope, Ms1Spectrum spectrum)
+        private bool CorrectChargeState(ObservedIsotopeEnvelope envelope, Spectrum spectrum)
         {
             if (envelope.Charge > 20) return true; //high charge (> +20), just pass
 
@@ -1359,8 +1358,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         private Tuple<int, int> GetElutionWindow(int refCol, double halfWindowSize, int minScanCount = 5)
         {
-            var maxCol = (int)Math.Min(minScanCount + refCol, _cols.Last());
-            var minCol = (int)Math.Max(refCol - minScanCount, _cols.First());
+            var maxCol = Math.Min(minScanCount + refCol, _cols.Last());
+            var minCol = Math.Max(refCol - minScanCount, _cols.First());
             maxCol = Math.Max(maxCol, ShiftColoumByElutionTime(refCol, halfWindowSize));
             minCol = Math.Max(minCol, ShiftColoumByElutionTime(refCol, -halfWindowSize));
             return new Tuple<int, int>(minCol, maxCol);
@@ -1379,14 +1378,12 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 }
                 return _cols.Last();
             }
-            else
+
+            for (var j = refCol - 1; j >= _cols.First(); j--)
             {
-                for (var j = refCol - 1; j >= _cols.First(); j--)
-                {
-                    if (Run.GetElutionTime(ms1ScanNums[j]) < elutionTime + elutionShift) return j;
-                }
-                return _cols.First();
+                if (Run.GetElutionTime(ms1ScanNums[j]) < elutionTime + elutionShift) return j;
             }
+            return _cols.First();
         }
 
         public Tuple<int, int> GetDetectableMinMaxCharge(double mass, double minMs1Mz, double maxMs1Mz)
@@ -1403,13 +1400,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             const double p3 = 9.35391578169730;
 
             var chargeMin = (int)Math.Round((c1 * mass) * (c1 * mass) + c2 * mass + c3);
-            var chargeMax = (int) Math.Round((p1 * mass) * (p1 * mass) + p2 * mass + p3);
+            var chargeMax = (int)Math.Round((p1 * mass) * (p1 * mass) + p2 * mass + p3);
 
             var chargeUb = (int)Math.Min(Math.Floor(mass / minMs1Mz), MaxSearchCharge);
-            var chargeLb = (int) Math.Max(Math.Ceiling(mass/maxMs1Mz), MinSearchCharge);
+            var chargeLb = (int)Math.Max(Math.Ceiling(mass / maxMs1Mz), MinSearchCharge);
 
-            var minCharge = (int) Math.Max(chargeLb, chargeMin);
-            var maxCharge = (int) Math.Min(chargeUb, chargeMax);
+            var minCharge = Math.Max(chargeLb, chargeMin);
+            var maxCharge = Math.Min(chargeUb, chargeMax);
 
             if (maxCharge - minCharge + 1 > MaxSearchChargeLength)
             {
