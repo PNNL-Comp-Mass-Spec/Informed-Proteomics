@@ -350,7 +350,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         public readonly int MinSearchCharge;
         public readonly int MaxSearchCharge;
-        public int MaxSearchChargeLength { get { return NRows;  } }
+        public int MaxSearchChargeLength => NRows;
 
         public readonly int NColumns;
         public readonly int NRows;
@@ -1439,10 +1439,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 CheckedOutFlag = false;
             }
 
-            internal bool Exist
-            {
-                get { return (AccurateMass > 0d); }
-            }
+            internal bool Exist => (AccurateMass > 0d);
 
             internal int CountActivePeaks
             {

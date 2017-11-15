@@ -13,15 +13,9 @@ namespace InformedProteomics.FeatureFinding.Data
     {
         public readonly double MedianIntensity;
 
-        public double MinMz
-        {
-            get { return Peaks.Length > 0 ? Peaks[0].Mz : 0; }
-        }
+        public double MinMz => Peaks.Length > 0 ? Peaks[0].Mz : 0;
 
-        public double MaxMz
-        {
-            get { return Peaks.Length > 0 ? Peaks[Peaks.Length - 1].Mz : 0; }
-        }
+        public double MaxMz => Peaks.Length > 0 ? Peaks[Peaks.Length - 1].Mz : 0;
 
         public Ms1Spectrum(int scanNum, int index, Ms1Peak[] peaks) : base(scanNum)
         {
@@ -405,7 +399,7 @@ namespace InformedProteomics.FeatureFinding.Data
         public double MaxMz { get; internal set; }
         public int PeakStartIndex { get; internal set; }
         public int PeakCount { get; internal set; }
-        public int PeakEndIndex { get { return PeakStartIndex + PeakCount - 1; }}
+        public int PeakEndIndex => PeakStartIndex + PeakCount - 1;
 
         public double MedianIntensity { get; internal set; }
         public double HighestIntensity { get; internal set; }
