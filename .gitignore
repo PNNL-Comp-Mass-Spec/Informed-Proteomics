@@ -14,4 +14,7 @@ Installer/Output/
 /UnitTest_Files/ID_003962_71E1A1D4.icseq
 /UnitTest_Files/NUnit*.txt
 /UnitTest_Files/NUnit*.xml
-UnitTest_Files/QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf
+/UnitTest_Files/QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf
+/Executables/MSPathFinder
+/Executables/PbfGen
+/Executables/ProMex
