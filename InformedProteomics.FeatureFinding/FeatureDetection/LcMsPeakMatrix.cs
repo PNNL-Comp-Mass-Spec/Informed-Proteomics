@@ -441,7 +441,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var bcSeedCutoff = GetSeedBcDistThreshold();
             var corrSeedCutoff = GetSeedCorrThreshold();
             var ms1ScanNums = Run.GetMs1ScanVector();
-            var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
+            // var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
 
             var options = new ParallelOptions();
             if (_maxThreadCount > 0) options.MaxDegreeOfParallelism = _maxThreadCount;
@@ -1006,7 +1006,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             ////////////////// 1) First Half
             var ms1ScanNums = Run.GetMs1ScanVector();
             var oneSigIntensity = apexIntensity * Math.Exp(-1);
-            var threeSigIntensity = apexIntensity * Math.Exp(-4.5);
+            // var threeSigIntensity = apexIntensity * Math.Exp(-4.5);
 
             // estimate sigma for Gaussian shaped elution profile for the first half
             var elutionStartColByOneSigma = apexCol;
@@ -1046,7 +1046,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 //if (smoothedXic[j - minCol + xicStartIndex] < threeSigIntensity) break;
                 if (smoothedXic[j - minCol + xicStartIndex] <= double.Epsilon && xic[j - minCol + xicStartIndex] <= double.Epsilon) break;
-                var elutionLen = Run.GetElutionTime(ms1ScanNums[apexCol]) - Run.GetElutionTime(ms1ScanNums[j]);
+                // var elutionLen = Run.GetElutionTime(ms1ScanNums[apexCol]) - Run.GetElutionTime(ms1ScanNums[j]);
                 //if (elutionLen > 3 && elutionLen > 4 * oneSigPeriod) break;
 
                 var needBreak = true;
