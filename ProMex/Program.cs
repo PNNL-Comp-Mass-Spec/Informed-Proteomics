@@ -71,6 +71,9 @@ namespace ProMex
             try
             {
 #endif
+
+                // Example text:  ProMex version 1.0.6527 (November 14, 2017)
+                // (the build date is computed automatically)
                 Console.WriteLine("************ {0} {1} ************", Name, Version);
                 parameters.Display();
                 var launcher = new LcMsFeatureFinderLauncher(parameters);

@@ -54,10 +54,10 @@ namespace InformedProteomics.FeatureFinding
 
             if (string.IsNullOrEmpty(ExistingFeaturesFilePath))
             {
-                Console.WriteLine("MinMass      {0}", MinSearchMass);
-                Console.WriteLine("MaxMass      {0}", MaxSearchMass);
-                Console.WriteLine("MinCharge    {0}", MinSearchCharge);
-                Console.WriteLine("MaxCharge    {0}", MaxSearchCharge);
+                Console.WriteLine("MinMass     {0,7:N0} Da", MinSearchMass);
+                Console.WriteLine("MaxMass     {0,7:N0} Da", MaxSearchMass);
+                Console.WriteLine("MinCharge    {0,2}", MinSearchCharge);
+                Console.WriteLine("MaxCharge    {0,2}", MaxSearchCharge);
 
                 Console.WriteLine("FeatureMap   {0}", FeatureMapImage);
 

@@ -692,7 +692,10 @@ namespace InformedProteomics.Backend.MassSpecData
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
+
+                // ReSharper disable once UseNullPropagation
                 if (productSpec == null) continue;
+
                 if (productSpec.IsolationWindow.Width < minWidth) minWidth = productSpec.IsolationWindow.Width;
             }
             return minWidth;

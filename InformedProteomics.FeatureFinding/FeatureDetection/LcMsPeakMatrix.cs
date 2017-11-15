@@ -56,7 +56,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             // ToDo: reduce the memory footprint of this caching
             // Related to this, note that the following for loop exits after 65,535 MS1 spectra are cached (for memory reasons)
 
-            Console.WriteLine("Caching peaks in MS1 spectra: " + ms1ScanNums.Length + " scans");
+            Console.WriteLine("Caching peaks in MS1 spectra: {0:N0} scans", ms1ScanNums.Length);
             var scansCached = 0;
 
             foreach (var ms1Scan in ms1ScanNums)
@@ -558,7 +558,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         _featureMatrix[row][col].AccurateMass = 0d;
                     }
                 }
-            }// end or row for-loop
+            }// end of row for-loop
             );
 
             var temp = new List<int>();
