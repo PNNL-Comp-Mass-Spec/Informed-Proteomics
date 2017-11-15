@@ -425,7 +425,12 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var mostAbuInternalIdx = _theoreticalEnvelope.IndexOrderByRanking[0];
             var totalElutionLength = Run.GetElutionTime(Run.MaxLcScan);
             var elutionSamplingHalfLen = Math.Max(Math.Min(totalElutionLength * 0.003, 5.0), 0.5);
-            var neighborHalfColumns = (int) Math.Max((elutionSamplingHalfLen/totalElutionLength)*NColumns, 5);
+
+            int neighborHalfColumns;
+            if (totalElutionLength > 0)
+                neighborHalfColumns = (int)Math.Max(elutionSamplingHalfLen / totalElutionLength * NColumns, 5);
+            else
+                neighborHalfColumns = 5;
 
             var targetMassBinNum = Comparer.GetBinNumber(targetMass);
             var tolerance = new Tolerance(Comparer.Ppm*0.5);
@@ -545,7 +550,14 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         var mostAbuPeak = _featureMatrix[row][col].EnvelopePeaks[mostAbuInternalIdx];
                         if (mostAbuPeak != null && (bcDist < bcSeedCutoff || corr < corrSeedCutoff))
                         {
-                            var signalToNoiseRatio = mostAbuPeak.Intensity / Ms1Spectra[col].MedianIntensity;
+                            var medianIntensity = Ms1Spectra[col].MedianIntensity;
+
+                            double signalToNoiseRatio;
+                            if (medianIntensity > 0)
+                                signalToNoiseRatio = mostAbuPeak.Intensity / medianIntensity;
+                            else
+                                signalToNoiseRatio = 0;
+
                             if (signalToNoiseRatio > 3)
                             {
                                 var seed = new ObservedIsotopeEnvelope(_featureMatrix[row][col].AccurateMass, row + _targetMinCharge, ms1ScanNums[col], _featureMatrix[row][col].EnvelopePeaks, _theoreticalEnvelope);
