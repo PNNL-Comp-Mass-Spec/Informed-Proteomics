@@ -109,6 +109,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         }
 
         /// <summary>
+        /// Number of data points (aka peaks) being tracked in MS1 spectra
+        /// </summary>
+        public int Ms1PeakCount => _ms1PeakList.Count;
+
+        /// <summary>
         /// find Lc-Ms feature for a specified mass, charge state, and range of scan
         /// </summary>
         /// <param name="targetMass"></param>
@@ -592,6 +597,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             // todo : bottom up dataset??
             if (_rows.Length < 2 || _cols.Length < 1) return clusters;
+
+            if (_seedEnvelopes.Count == 0) return clusters;
 
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
             var tempEnvelope2 = new double[_theoreticalEnvelope.Size];

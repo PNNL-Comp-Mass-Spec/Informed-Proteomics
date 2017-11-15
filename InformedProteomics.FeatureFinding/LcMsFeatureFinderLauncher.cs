@@ -178,6 +178,12 @@ namespace InformedProteomics.FeatureFinding
                 return -4;
             }
 
+            if (featureFinder.Ms1PeakCount == 0)
+            {
+                ShowErrorMessage(@"Data file has no MS1 peaks: " + Path.GetFileName(rawFile));
+                return -5;
+            }
+
             var comparer = featureFinder.Comparer;
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, _likelihoodScorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
             var minSearchMassBin = comparer.GetBinNumber(Parameters.MinSearchMass);
