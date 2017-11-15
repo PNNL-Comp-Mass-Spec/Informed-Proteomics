@@ -135,7 +135,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             if (Run.GetMsLevel(targetMaxScanNum) > 1) targetMaxScanNum = Run.GetNextScanNum(targetMaxScanNum, 1);
 
             var row = targetCharge - _targetMinCharge;
-            if (row < _rows.First() || row > _rows.Last()) row = _rows[(int) (_rows.Length*0.5)];
+            if (row < _rows.First() || row > _rows.Last()) row = _rows[(int)(_rows.Length * 0.5)];
 
             var minCol = ms1ScanNumToIndex[targetMinScanNum];
             var maxCol = ms1ScanNumToIndex[targetMaxScanNum];
@@ -274,7 +274,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 if (!(centerIntensity > 0)) continue;
 
                 var timeInterval = Run.GetElutionTime(ms1ScanNums[col + 1]) - Run.GetElutionTime(ms1ScanNums[col]);
-                var abu = centerIntensity*timeInterval;
+                var abu = centerIntensity * timeInterval;
                 //abuList.Add(abu);
                 abundance += abu;
                 if (col >= minCol && col <= maxCol && apexIntensity < abu)
@@ -288,13 +288,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 }
             }
 
-            feature.SetAbundance(abundance, apexScanNum, apexIntensity, boundaryIntensity*0.5);
+            feature.SetAbundance(abundance, apexScanNum, apexIntensity, boundaryIntensity * 0.5);
 
         }
 
         public double GetMs1EvidenceScore(int ms2ScanNum, double targetMass, int charge)
         {
-            var tolerance = new Tolerance(Comparer.Ppm*0.5);
+            var tolerance = new Tolerance(Comparer.Ppm * 0.5);
             if (_ms1Filter != null)
             {
                 var ms2ScanNums = _ms1Filter.GetMatchingMs2ScanNums(targetMass);
@@ -412,15 +412,14 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             }
         }
 
-        //public const double SNRthreshold = 1.4826;
         private void BuildFeatureMatrix(double targetMass)
         {
             InitFeatureMatrix();
 
             SetTargetMass(targetMass);
 
-            var observedRows        = new BitArray(NRows);
-            var observedCols        = new BitArray(NColumns);
+            var observedRows = new BitArray(NRows);
+            var observedCols = new BitArray(NColumns);
 
             var mostAbuInternalIdx = _theoreticalEnvelope.IndexOrderByRanking[0];
             var totalElutionLength = Run.GetElutionTime(Run.MaxLcScan);
@@ -433,7 +432,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 neighborHalfColumns = 5;
 
             var targetMassBinNum = Comparer.GetBinNumber(targetMass);
-            var tolerance = new Tolerance(Comparer.Ppm*0.5);
+            var tolerance = new Tolerance(Comparer.Ppm * 0.5);
 
             var minMs1Mz = _ms1PeakList.First().Mz;
             var maxMs1Mz = _ms1PeakList.Last().Mz;
@@ -448,6 +447,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             if (_maxThreadCount > 0) options.MaxDegreeOfParallelism = _maxThreadCount;
             _seedEnvelopes.Clear();
 
+            // foreach (var row in _rows)
             Parallel.ForEach(_rows, options, row =>
             {
                 var charge = row + _targetMinCharge;
@@ -468,7 +468,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
                     for (var j = st; j < _ms1PeakList.Count; j++)
                     {
-                        var ms1Peak         = _ms1PeakList[j];
+                        var ms1Peak = _ms1PeakList[j];
                         if (ms1Peak.Mz > isotopeMzUb) break;
                         var col = ms1Peak.Ms1SpecIndex;
 
@@ -617,9 +617,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var ms1ScanNums = Run.GetMs1ScanVector();
             var ms1ScanNumToIndex = Run.GetMs1ScanNumToIndex();
             var mostAbuInternalIndex = _theoreticalEnvelope.IndexOrderByRanking[0];
-            var tolerance = new Tolerance(Comparer.Ppm*0.5);
+            var tolerance = new Tolerance(Comparer.Ppm * 0.5);
 
-            foreach (var seed in _seedEnvelopes.OrderBy(s=>s.Key).Select(s=> s.Value))
+            foreach (var seed in _seedEnvelopes.OrderBy(s => s.Key).Select(s => s.Value))
             {
                 var row = seed.Charge - _targetMinCharge;
                 var col = ms1ScanNumToIndex[seed.ScanNum];
@@ -663,8 +663,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     for (var k = 0; k < 5; k++)
                     {
                         var j = currCol;
-                        if (k < 3) j += k;
-                        else j -= (k - 2);
+                        if (k < 3)
+                            j += k;
+                        else
+                            j -= (k - 2);
 
                         if (j < _cols.First() || j > _cols.Last()) continue;
 
@@ -680,7 +682,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                             var newDivergence = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
                             var newCorrelation = _theoreticalEnvelope.GetPearsonCorrelation(tempEnvelope);
 
-                            if (_featureMatrix[i][j].DivergenceDist < 0.02 ||_featureMatrix[i][j].CorrelationCoeff > 0.7 || newDivergence < summedBcDist || newCorrelation > summedCorr)
+                            if (_featureMatrix[i][j].DivergenceDist < 0.02 || _featureMatrix[i][j].CorrelationCoeff > 0.7 || newDivergence < summedBcDist || newCorrelation > summedCorr)
                             {
                                 var envelope = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass,
                                     i + _targetMinCharge, ms1ScanNums[j], _featureMatrix[i][j].EnvelopePeaks,
@@ -724,7 +726,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         private void SetCheckOutFlag(int minRow, int maxRow, int minCol, int maxCol, bool flag)
         {
-            for(var i = minRow; i <= maxRow; i++)
+            for (var i = minRow; i <= maxRow; i++)
                 for (var j = minCol; j <= maxCol; j++) _featureMatrix[i][j].CheckedOutFlag = flag;
         }
 
@@ -829,7 +831,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             if (_targetMass > 25000) return 0.2;
             if (_targetMass > 15000) return 0.15;
             if (_targetMass > 10000) return 0.1;
-            if (_targetMass > 3000) return 0.07;;
+            if (_targetMass > 3000) return 0.07;
             return 0.05;
         }
 
@@ -854,7 +856,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             // expand seed min/max col when the period is too short
             var elutionSamplingPeriod = Math.Max(Math.Min(Run.GetElutionTime(Run.MaxLcScan) * 0.003, 5.0), 0.5);
-            var tempWindow = GetElutionWindow((int)(0.5*(seedMinCol+seedMaxCol)), elutionSamplingPeriod);
+            var tempWindow = GetElutionWindow((int)(0.5 * (seedMinCol + seedMaxCol)), elutionSamplingPeriod);
             for (var t = seedMinCol - 1; t >= tempWindow.Item1; t--)
             {
                 if (_featureMatrix[seedRow][t].CheckedOutFlag) break;
@@ -907,8 +909,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 }
                 minColList.Sort();
                 maxColList.Sort();
-                minCol = minColList[(int) (minColList.Count * 0.5)];
-                maxCol = maxColList[(int) (maxColList.Count * 0.5)];
+                minCol = minColList[(int)(minColList.Count * 0.5)];
+                maxCol = maxColList[(int)(maxColList.Count * 0.5)];
             }
 
             // for each carge state, find and evaluate optimial summed envelope
@@ -1106,20 +1108,20 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var elutionLen = Run.GetElutionTime(ms1ScanNums[j]) - Run.GetElutionTime(ms1ScanNums[apexCol]);
                 if (elutionLen > 3 && elutionLen > 8 * oneSigPeriod) break;
 
-                    var needBreak = true;
-                    for (var k = j + 1; k <= j + 3; k++)
+                var needBreak = true;
+                for (var k = j + 1; k <= j + 3; k++)
+                {
+                    if (k >= NColumns) break;
+                    if (smoothedXic[j - minCol + xicStartIndex] * 1.3 > smoothedXic[k - minCol + xicStartIndex])
                     {
-                        if (k >= NColumns) break;
-                        if (smoothedXic[j - minCol + xicStartIndex] * 1.3 > smoothedXic[k - minCol + xicStartIndex])
-                        {
-                            needBreak = false;
-                            break;
-                        }
-                    }
-                    if (needBreak)
-                    {
+                        needBreak = false;
                         break;
                     }
+                }
+                if (needBreak)
+                {
+                    break;
+                }
 
                 elutionEndCol = j;
             }
@@ -1169,7 +1171,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var tempEnvelope = new double[_theoreticalEnvelope.Size];
 
             var n = 0;
-            for(var col = seedCol; col < NColumns; col++)
+            for (var col = seedCol; col < NColumns; col++)
             {
                 if (_featureMatrix[row][col].CheckedOutFlag) break;
 

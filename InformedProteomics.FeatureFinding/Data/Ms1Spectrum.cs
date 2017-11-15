@@ -75,7 +75,7 @@ namespace InformedProteomics.FeatureFinding.Data
                 {
                     bestIntensity = Peaks[i].Intensity;
                     bestPeakIndex = i;
-                    observedPeaks[0] = (Ms1Peak) Peaks[bestPeakIndex];
+                    observedPeaks[0] = (Ms1Peak)Peaks[bestPeakIndex];
                 }
                 ++i;
             }
@@ -102,7 +102,7 @@ namespace InformedProteomics.FeatureFinding.Data
                         if (observedPeaks[j] == null ||
                             peak.Intensity > observedPeaks[j].Intensity)
                         {
-                            observedPeaks[j] = (Ms1Peak) peak;
+                            observedPeaks[j] = (Ms1Peak)peak;
                         }
                     }
                 }
@@ -129,34 +129,34 @@ namespace InformedProteomics.FeatureFinding.Data
             }
             var numberOfbins = (int)Math.Round((MaxMz - MinMz) / MzWindowSize) + 1;
 
-            _peakStartIndex     = new int[2][];
+            _peakStartIndex = new int[2][];
             _medianIntensity = new double[2][];
             _highestIntensity = new double[2][];
-            _peakRanking        = new int[2][][];
+            _peakRanking = new int[2][][];
             _intensePeakCount = new int[2][];
-            var intensities     = new List<double>[2][];
+            var intensities = new List<double>[2][];
 
             for (var i = 0; i < 2; i++)
             {
-                _peakStartIndex[i]      = new int[numberOfbins];
-                _medianIntensity[i]     = new double[numberOfbins];
-                _highestIntensity[i]    = new double[numberOfbins];
-                _peakRanking[i]         = new int[numberOfbins][];
+                _peakStartIndex[i] = new int[numberOfbins];
+                _medianIntensity[i] = new double[numberOfbins];
+                _highestIntensity[i] = new double[numberOfbins];
+                _peakRanking[i] = new int[numberOfbins][];
                 _intensePeakCount[i] = new int[numberOfbins];
 
-                intensities[i]          = new List<double>[numberOfbins];
+                intensities[i] = new List<double>[numberOfbins];
 
                 for (var j = 0; j < numberOfbins; j++)
                 {
-                    _peakStartIndex[i][j]   = Peaks.Length - 1;
-                    intensities[i][j]       = new List<double>();
+                    _peakStartIndex[i][j] = Peaks.Length - 1;
+                    intensities[i][j] = new List<double>();
                 }
             }
 
             for (var i = 0; i < Peaks.Length; i++)
             {
-                var binIdx = (int) Math.Round((Peaks[i].Mz - MinMz)/MzWindowSize);
-                var binCenterMz = MinMz + MzWindowSize*binIdx;
+                var binIdx = (int)Math.Round((Peaks[i].Mz - MinMz) / MzWindowSize);
+                var binCenterMz = MinMz + MzWindowSize * binIdx;
 
                 intensities[0][binIdx].Add(Peaks[i].Intensity);
                 if (i < _peakStartIndex[0][binIdx]) _peakStartIndex[0][binIdx] = i;
@@ -209,7 +209,7 @@ namespace InformedProteomics.FeatureFinding.Data
             var binIndex = (int)Math.Round((mz - MinMz) / MzWindowSize);
 
             var binCenterMz = MinMz + MzWindowSize * binIndex;
-            var binStartMz = binCenterMz - MzWindowSize*0.5;
+            var binStartMz = binCenterMz - MzWindowSize * 0.5;
             var binEndMz = binCenterMz + MzWindowSize * 0.5;
 
             var numberOfbins = (int)Math.Round((MaxMz - MinMz) / MzWindowSize) + 1;
@@ -244,7 +244,7 @@ namespace InformedProteomics.FeatureFinding.Data
                     PeakStartIndex = -1,
                     PeakCount = 0,
                     MedianIntensity = 0,
-                    HighestIntensity =  0,
+                    HighestIntensity = 0,
                     IntensePeakCount = 0,
                     PeakRanking = null,
                 };
@@ -274,7 +274,7 @@ namespace InformedProteomics.FeatureFinding.Data
             var index = Enumerable.Range(0, values.Length).ToArray();
             Array.Sort(values, index);
 
-            medianValue = values[values.Length/2];
+            medianValue = values[values.Length / 2];
             highestValue = values[index.Length - 1];
 
             var ranking = 1;
@@ -432,9 +432,9 @@ namespace InformedProteomics.FeatureFinding.Data
         {
             if (PeakRanking == null) return 1.0d;
 
-            var intensePeakThreshold = HighestIntensity*0.1;
+            var intensePeakThreshold = HighestIntensity * 0.1;
             var numberOfMatchedIsotopePeaks = peaks.Count(p => p != null && p.Active && p.Intensity > intensePeakThreshold);
-            var numberOfPossiblePeaks = (int) Math.Ceiling(100*(MaxMz - MinMz));
+            var numberOfPossiblePeaks = (int)Math.Ceiling(100 * (MaxMz - MinMz));
 
             // calculate poisson test score
             var n = numberOfPossiblePeaks;
