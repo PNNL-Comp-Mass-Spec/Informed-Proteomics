@@ -293,10 +293,20 @@ namespace InformedProteomics.TopDown.Execution
 
             var progData = searchClass.searchProgressData;
             var timeElapsed = searchClass.searchStopwatch.Elapsed;
-            var minutes = timeElapsed.TotalMinutes - ((int)timeElapsed.TotalHours * 60);
 
-            var progMsg = string.Format("Total Progress: {0:F2}%, {1}d {2}h {3:F2}m elapsed, Current Task: {4}",
-                progData.Percent, timeElapsed.Days, timeElapsed.Hours, minutes, progData.Status);
+            TimeSpan estimatedRemaining;
+            if (progData.Percent > 5)
+            {
+                var estimatedTotal = TimeSpan.FromSeconds(timeElapsed.TotalSeconds / progData.Percent * 100.0);
+                estimatedRemaining = estimatedTotal.Subtract(timeElapsed);
+            }
+            else
+            {
+                estimatedRemaining = TimeSpan.FromSeconds(0);
+            }
+
+            var progMsg = string.Format("Total Progress: {0:F2}%, {1:%d}d {1:%h}h {1:%m}.{2:00}m elapsed, Current Task: {3}, estimated remaining: {4:%d}d {4:%h}h {4:%m}.{5:00}m",
+                progData.Percent, timeElapsed, timeElapsed.Seconds / 60.0 * 100, progData.Status, estimatedRemaining, estimatedRemaining.Seconds / 60.0 * 100);
 
             OnProgressUpdate(progMsg, (float)progData.Percent);
         }
@@ -595,7 +605,7 @@ namespace InformedProteomics.TopDown.Execution
             var matches = new SortedSet<DatabaseSequenceSpectrumMatch>[_run.MaxLcScan + 1];
             if (Options.TagBasedSearch)
             {
-                progData.StepRange(10);
+                progData.StepRange(3);
                 UpdateStatus(string.Format("Tag-based searching the {0} database", searchModeString), progData);
                 sw.Reset();
                 sw.Start();
@@ -607,7 +617,7 @@ namespace InformedProteomics.TopDown.Execution
                 RunTagBasedSearch(matches, searchDb, null, progTag);
                 OnStatusEvent(string.Format("{1} database tag-based search elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap));
             }
-            progData.StepRange(100);
+            progData.StepRange(88);
 
             UpdateStatus(string.Format("Searching the {0} database", searchModeString), progData);
             sw.Reset();
@@ -624,7 +634,13 @@ namespace InformedProteomics.TopDown.Execution
             UpdateStatus(string.Format("Calculating spectral E-values for {0}-spectrum matches", searchModeString), progData);
             sw.Reset();
             sw.Start();
-            var bestMatches = RunGeneratingFunction(matches);
+            progData.StepRange(100);
+            var progGen = new Progress<ProgressData>(p =>
+            {
+                progData.StatusInternal = p.Status;
+                progData.Report(p.Percent);
+            });
+            var bestMatches = RunGeneratingFunction(matches, null, progGen);
             var results = WriteResultsToFile(bestMatches, outputFilePath, searchDb);
             sw.Stop();
 
