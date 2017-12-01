@@ -63,6 +63,17 @@
     <Compile Include="Scoring\CompositeScorerBasedOnDeconvolutedSpectrum.cs" />
     <Compile Include="Scoring\CompositeScorerFactory.cs" />
     <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
+    <Compile Include="Scoring\FlipScoringGraphEdge.cs" />
+    <Compile Include="Scoring\FlipScoring\FeatureWeights.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScorer.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScorerFactory.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScoringGraph.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScoringGraphFactory.cs" />
+    <Compile Include="Scoring\FlipScoring\IonWeights.cs" />
+    <Compile Include="Scoring\FlipScoring\PrecursorPeakFilter.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameterDescription.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameters.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameterSet.cs" />
     <Compile Include="Scoring\InformedTopDownScorer.cs" />
     <Compile Include="Scoring\IsosFilter.cs" />
     <Compile Include="Scoring\LikelihoodScoringModel.cs" />
@@ -77,6 +88,7 @@
     <Compile Include="Scoring\MsDeconvFilter.cs" />
     <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
     <Compile Include="Scoring\ProteinScoringGraphFactory.cs" />
+    <Compile Include="Scoring\ScoringGraphFactory.cs" />
     <Compile Include="Scoring\SubScoreFactory.cs" />
     <Compile Include="Scoring\TopDownScorer.cs" />
     <Compile Include="Scoring\TopDownTrainer.cs" />

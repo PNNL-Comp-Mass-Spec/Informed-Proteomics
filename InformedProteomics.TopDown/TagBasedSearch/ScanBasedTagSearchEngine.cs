@@ -62,7 +62,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         public IEnumerable<TagSequenceMatch> RunSearch(int ms2ScanNum)
         {
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            var scorer = (_ms2ScorerFactory != null) ? _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum) : new CorrMatchedPeakCounter(spec, _tolerance, _minProductIonCharge, _maxProductIonCharge);
+            var scorer = (_ms2ScorerFactory != null) ? _ms2ScorerFactory.GetScorer(ms2ScanNum) : new CorrMatchedPeakCounter(spec, _tolerance, _minProductIonCharge, _maxProductIonCharge);
             var tags = _seqTagFinder.GetAllSequenceTagString(ms2ScanNum);
 
             if (spec == null)

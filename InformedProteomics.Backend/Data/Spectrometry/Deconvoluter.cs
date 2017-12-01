@@ -213,6 +213,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var envelop = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
 
+                        var observedPeakCount = 0;
                         for (var i = 0; i < observedPeaks.Length; i++)
                         {
                             var observedPeak = observedPeaks[i];
@@ -222,16 +223,30 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 observedPeaks[i] = null;
                             }
 
+                            observedPeakCount += observedPeak != null ? 1 : 0;
                             observedIntensities[i] = observedPeak != null ? (float)observedPeak.Item1.Intensity : 0.0;
                         }
 
                         var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
                         var bcDist = sim.Item1;
                         var corr = sim.Item2;
+                        var foundPeakRatio = observedPeakCount / ((double)envelop.Length);
 
-                        if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+                        var interferenceScore = 10.0;
 
-                        var score = corr / (bcDist * (Math.Abs(mostAbundantIsotopeIndex - isotopeIndex) + 1));
+                        var filteredObserved = observedPeaks.Where(p => p != null).ToArray();
+                        if (filteredObserved.Length >= 2)
+                        {
+                            var allPeaks =
+                                spectrum.Peaks.Where(p => p.Mz >= filteredObserved[0].Item1.Mz && p.Mz <= filteredObserved[filteredObserved.Length - 1].Item1.Mz).ToArray();
+                            interferenceScore = CalculateInterferenceScore(allPeaks, filteredObserved);
+                        }
+
+                        bcDist = Math.Max(bcDist, double.Epsilon);
+
+                        if (corr < corrScoreThreshold && bcDist > 0.1) continue;
+
+                        var score = (foundPeakRatio * corr) / (bcDist * (Math.Abs(mostAbundantIsotopeIndex - isotopeIndex) + 1) * interferenceScore);
 
                         //if (corr < corrScoreThreshold) continue;
 
@@ -261,6 +276,59 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             monoIsotopePeakList.Sort();
             return monoIsotopePeakList;
+        }
+
+        private static double CalculateInterferenceScore(Peak[] peaks, Tuple<Peak, int>[] envelopePeaks, int numBins = 10)
+        {
+            if (envelopePeaks.Length < 2)
+            {
+                return 10.0;
+            }
+
+            var maxIntensity = envelopePeaks.Max(p => p.Item1.Intensity);
+
+            var bins = new double[numBins];
+            var peakIndex = 0;
+            for (var envelopePeakIndex = 1; envelopePeakIndex < envelopePeaks.Length; envelopePeakIndex++)
+            {
+                var lowPeak = envelopePeaks[envelopePeakIndex - 1].Item1;
+                var highPeak = envelopePeaks[envelopePeakIndex].Item1;
+                var binSize = (highPeak.Mz - lowPeak.Mz) / numBins;
+                var prevBin = 0;
+                for (; peakIndex < peaks.Length; peakIndex++)
+                {
+                    var noisePeak = peaks[peakIndex];
+                    if (noisePeak.Mz.Equals(lowPeak.Mz))
+                    {
+                        continue;
+                    }
+
+                    if (noisePeak.Mz.Equals(highPeak.Mz))
+                    {
+                        break;
+                    }
+
+                    for (var i = prevBin; i < numBins; i++)
+                    {
+                        var lowBinMz = lowPeak.Mz + binSize * i;
+                        var highBinMz = lowPeak.Mz + binSize * (i + 1);
+                        if ((i == 0 && noisePeak.Mz < lowBinMz) || (noisePeak.Mz >= lowBinMz && noisePeak.Mz <= highBinMz)
+                            || (i == numBins - 1 && noisePeak.Mz > highBinMz))
+                        {
+                            prevBin = i;
+                            bins[i] += noisePeak.Intensity / maxIntensity;
+                        }
+                    }
+                }
+            }
+
+            var interferenceScore = 0.0;
+            for (var i = 0; i < numBins; i++)
+            {
+                interferenceScore += Math.Pow(2, bins[i]);
+            }
+
+            return interferenceScore / envelopePeaks.Length;
         }
 
         private static Tuple<Peak, int>[] GetAllIsotopePeaks(

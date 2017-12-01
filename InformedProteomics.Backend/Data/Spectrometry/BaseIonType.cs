@@ -85,7 +85,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public delegate IEnumerable<Composition> CompositionCalculator(AminoAcid aminoAcid = null);
 
         /// <summary>
-        /// Ion symble
+        /// Ion symbol
         /// </summary>
         public string Symbol { get; }
 

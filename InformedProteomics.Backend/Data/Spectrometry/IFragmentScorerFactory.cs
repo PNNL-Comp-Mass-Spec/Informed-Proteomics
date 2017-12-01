@@ -11,8 +11,9 @@
         /// <param name="spectrum"></param>
         /// <param name="precursorMass"></param>
         /// <param name="precursorCharge"></param>
+        /// <param name="activationMethod"></param>
         /// <returns></returns>
-        IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge);
+        IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown);
 
         /// <summary>
         /// Get a scorer for the provided scan number

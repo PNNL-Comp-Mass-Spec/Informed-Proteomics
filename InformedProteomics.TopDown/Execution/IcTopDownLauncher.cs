@@ -18,7 +18,7 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using TopDownTrainer;
+using InformedProteomics.Scoring.Interfaces;
 using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
@@ -277,7 +277,8 @@ namespace InformedProteomics.TopDown.Execution
 
         private LcMsRun _run;
         private CompositeScorerFactory _ms2ScorerFactory2;
-        //private IFragmentScorerFactory fragmentScorerFactory;
+
+        //private ScoringGraphFactory scoringGraphFactory;
         private IMassBinning _massBinComparer;
         private ScanBasedTagSearchEngine _tagSearchEngine;
         private double[] _isolationWindowTargetMz; // spec.IsolationWindow.IsolationWindowTargetMz
@@ -447,8 +448,7 @@ namespace InformedProteomics.TopDown.Execution
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
             //this.fragmentScorerFactory = new CompositionScorerFactory(_run, true);
-            _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
-                                                               Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+
             sw.Reset();
 
             UpdateStatus("Generating deconvoluted spectra for MS/MS spectra...", progData);
@@ -458,10 +458,23 @@ namespace InformedProteomics.TopDown.Execution
                 MaxDegreeOfParallelism = Options.MaxNumThreads,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
-            Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+
+            // Deconvolute spectra
+            var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, Options.ProductIonTolerance);
+            var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
+            if (!File.Exists(MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, DPbfLcMsRun.FileExtensionConst)))
             {
-                _ms2ScorerFactory2.DeconvonluteProductSpectrum(ms2ScanNum, Options.ActivationMethod);
-            });
+                progData.StepRange(progData.MaxPercentage + 2.0);
+            }
+            var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
+
+            _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
+                                                   Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+            //Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+            //{
+            //    _ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
+            //});
+
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
@@ -861,7 +874,8 @@ namespace InformedProteomics.TopDown.Execution
                         if (!(isoTargetMz > 0)) return;
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
-                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
+                        //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
+                        var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
@@ -880,7 +894,7 @@ namespace InformedProteomics.TopDown.Execution
                         }
                         else ms2FeatureIds = featureIds;
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, nTermCleavages,
-                            modCombinations, precursorIon, score, isDecoy, featureId: ms2FeatureIds.FirstOrDefault());
+                            modCombinations, precursorIon, score, isDecoy, featureId: Math.Max(ms2FeatureIds.FirstOrDefault(), 1));
 
                         AddMatch(matches, ms2ScanNum, prsm);
                     });
@@ -1056,6 +1070,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
 
                 currentTask = "Parallel.ForEach";
+
                 OnStatusEvent("Estimated matched sequences: " + estimatedSequences.ToString("#,##0"));
             }
             catch (Exception ex)
