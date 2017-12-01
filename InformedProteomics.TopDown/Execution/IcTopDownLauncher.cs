@@ -469,7 +469,7 @@ namespace InformedProteomics.TopDown.Execution
             var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
 
             _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
-                                                   Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+                                                   Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, fullRun: _run as PbfLcMsRun);
             //Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
             //{
             //    _ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);

@@ -118,7 +118,7 @@ namespace InformedProteomics.TopDown.Scoring
             return eta / (eta + 1);
         }
 
-        internal static ScoreWeight ScoreParam; // score weights without mass error temrs for generating function evaluation
+        internal static ScoreWeight ScoreParam; // score weights without mass error terms for generating function evaluation
         private const double WeightScaleFactor = 4.0;
 
         public int GetNumMatchedFragments(Sequence sequence)

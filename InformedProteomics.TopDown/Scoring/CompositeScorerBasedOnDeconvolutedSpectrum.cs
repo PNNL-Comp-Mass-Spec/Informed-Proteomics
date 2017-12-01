@@ -10,9 +10,14 @@ namespace InformedProteomics.TopDown.Scoring
     public class CompositeScorerBasedOnDeconvolutedSpectrum : CompositeScorer
     {
         public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, ProductSpectrum spec, Tolerance productTolerance, IMassBinning comparer, ActivationMethod actMethod = ActivationMethod.Unknown)
+            : this(deconvolutedSpectrum, GetRefIntensity(spec.Peaks), productTolerance, comparer, actMethod)
+        {
+        }
+
+        public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, double refPeakIntensity, Tolerance productTolerance, IMassBinning comparer, ActivationMethod actMethod = ActivationMethod.Unknown)
             : base(deconvolutedSpectrum, productTolerance, activationMethod: actMethod)
         {
-            ReferencePeakIntensity = GetRefIntensity(spec.Peaks);
+            ReferencePeakIntensity = refPeakIntensity;
             _comparer = comparer;
             _massBinToPeakMap = new Dictionary<int, DeconvolutedPeak>();
 
