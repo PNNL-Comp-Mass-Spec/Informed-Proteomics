@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Sequence;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.FeatureFinding.SpectrumMatching
@@ -119,7 +120,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             return prsmList;
         }
 
-        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath, int maxPrsm, double minScore = 3, double maxScore = int.MaxValue)
+        public List<ProteinSpectrumMatch> ReadMsPathFinderResultOld(string msPathFinderResultPath, int maxPrsm, double minScore = 3, double maxScore = int.MaxValue)
         {
             var parser = new TsvFileParser(msPathFinderResultPath);
             var prsmList = new List<ProteinSpectrumMatch>();
@@ -171,6 +172,41 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 prsmList.Add(prsm);
 
                 if (prsmList.Count >= maxPrsm) break;
+            }
+
+            return prsmList;
+        }
+
+        public List<ProteinSpectrumMatch> ReadMsPathFinderResult(string msPathFinderResultPath, int maxPrsm, double minScore = 3, double maxScore = int.MaxValue)
+        {
+            var prsmList = new List<ProteinSpectrumMatch>();
+
+            foreach (var result in DatabaseSearchResultData.ReadResultsFromFile(msPathFinderResultPath))
+            {
+                if (result.NumMatchedFragments < minScore || maxScore < result.NumMatchedFragments)
+                {
+                    continue;
+                }
+
+                if (result.HasTdaScores && result.QValue > FdrCutoff)
+                {
+                    continue;
+                }
+
+                var prsm = new ProteinSpectrumMatch(result.Sequence, result.ScanNum, result.Mass, result.Charge, result.ProteinName, result.ProteinDescription, result.Start, result.End, result.NumMatchedFragments, ProteinSpectrumMatch.SearchTool.MsPathFinder)
+                {
+                    SequenceText = GetSequenceText(result.Sequence, result.Modifications),
+                    Modifications = result.Modifications,
+                    Pre = result.Pre,
+                    Post = result.Post,
+                    ProteinLength = result.ProteinLength,
+                    SpectralEvalue = result.SpecEValue,
+                };
+
+                prsmList.Add(prsm);
+
+                if (prsmList.Count >= maxPrsm)
+                    break;
             }
 
             return prsmList;

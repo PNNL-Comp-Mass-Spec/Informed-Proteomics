@@ -69,6 +69,7 @@
     <Compile Include="SpectrumMatching\ProteinSpectrumMatchMap.cs" />
     <Compile Include="SpectrumMatching\ProteinSpectrumMatchReader.cs" />
     <Compile Include="Training\LcMsFeatureTrain.cs" />
+    <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\INodeComparer.cs" />
     <Compile Include="Util\NodeSet.cs" />
   </ItemGroup>

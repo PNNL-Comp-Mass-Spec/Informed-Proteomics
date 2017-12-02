@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
+using InformedProteomics.Backend.FeatureFindingResults;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.FeatureDetection;
@@ -53,7 +54,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
         }
         */
 
-        public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run, double minMass = 2000, double maxMass = 50000)
+        public static List<LcMsFeature> LoadProMexResultOld(int dataId, string featureFilePath, LcMsRun run, double minMass = 2000, double maxMass = 50000)
         {
             var featureList = new List<LcMsFeature>();
             var tsvReader = new Backend.Utils.TsvFileParser(featureFilePath);
@@ -103,6 +104,28 @@ namespace InformedProteomics.FeatureFinding.Alignment
                     DataSetId = dataId,
                     Score = score,
                 };
+
+                featureList.Add(feature);
+            }
+
+            return featureList;
+        }
+
+        public static List<LcMsFeature> LoadProMexResult(int dataId, string featureFilePath, LcMsRun run, double minMass = 2000, double maxMass = 50000)
+        {
+            var featureList = new List<LcMsFeature>();
+
+            var totalDatasetRunTime = run.GetElutionTime(run.MaxLcScan);
+
+            foreach (var entry in Ms1FtEntry.ReadFromFile(featureFilePath, false))
+            {
+                if (entry.MonoMass < minMass || maxMass < entry.MonoMass)
+                {
+                    continue;
+                }
+
+                var feature = entry.ToLcMsFeature(totalDatasetRunTime);
+                feature.DataSetId = dataId;
 
                 featureList.Add(feature);
             }

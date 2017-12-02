@@ -269,11 +269,11 @@ namespace InformedProteomics.Backend.SearchResults
                 ColumnCount = 0;
                 Map(x => x.ScanNum).Index(ColumnCount++).Name("Scan");
                 Map(x => x.Pre).Index(ColumnCount++).Name("Pre");                                                                                                                          // Pre
-                Map(x => x.Sequence).Index(ColumnCount++).Name("Sequence");                                                                                                                // Sequence
+                Map(x => x.Sequence).Index(ColumnCount++).Name("Sequence", "Peptide", "#Peptide");                                                                                         // Sequence
                 Map(x => x.Post).Index(ColumnCount++).Name("Post");                                                                                                                        // Post
                 Map(x => x.Modifications).Index(ColumnCount++).Name("Modifications");                                                                                                      // Modifications
                 Map(x => x.Composition).Index(ColumnCount++).Name("Composition");                                                                                                          // Composition
-                Map(x => x.ProteinName).Index(ColumnCount++).Name("ProteinName");                                                                                                          // ProteinName
+                Map(x => x.ProteinName).Index(ColumnCount++).Name("ProteinName", "Protein");                                                                                               // ProteinName
                 Map(x => x.ProteinDescription).Index(ColumnCount++).Name("ProteinDesc");                                                                                                   // ProteinDescription
                 Map(x => x.ProteinLength).Index(ColumnCount++).Name("ProteinLength");                                                                                                      // ProteinLength
                 Map(x => x.Start).Index(ColumnCount++).Name("Start");                                                                                                                      // Start position in protein
@@ -282,7 +282,7 @@ namespace InformedProteomics.Backend.SearchResults
                 Map(x => x.MostAbundantIsotopeMz).Index(ColumnCount++).Name("MostAbundantIsotopeMz").ConvertUsing(x => StringUtilities.DblToString(x.MostAbundantIsotopeMz, 9, true));     // MostAbundantIsotopeMz
                 Map(x => x.Mass).Index(ColumnCount++).Name("Mass").ConvertUsing(x => StringUtilities.DblToString(x.Mass, 9, true));                                                        // Mass
                 Map(x => x.Ms1Feature).Index(ColumnCount++).Name("Ms1Features");
-                Map(x => x.NumMatchedFragments).Index(ColumnCount++).Name("#MatchedFragments");                                                                                            // (Number of matched fragments)
+                Map(x => x.NumMatchedFragments).Index(ColumnCount++).Name("#MatchedFragments", "Score");                                                                                   // (Number of matched fragments)
                 Map(x => x.Probability).Index(ColumnCount++).Name("Probability").ConvertUsing(x => StringUtilities.DblToString(x.Probability, 4));                                         // Probability
                 Map(x => x.SpecEValue).Index(ColumnCount++).Name("SpecEValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.SpecEValue), 6, true, 0.001)); // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
                 Map(x => x.EValue).Index(ColumnCount++).Name("EValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.EValue), 6, true, 0.001));             // EValue; will be displayed using scientific notation if the value is less than 0.001

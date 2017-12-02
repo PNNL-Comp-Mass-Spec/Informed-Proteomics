@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.FeatureFindingResults;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Clustering;
 using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.FeatureFinding.Graphics;
 using InformedProteomics.FeatureFinding.Scoring;
+using InformedProteomics.FeatureFinding.Util;
 using PRISM;
 
 namespace InformedProteomics.FeatureFinding
@@ -214,6 +217,28 @@ namespace InformedProteomics.FeatureFinding
             Console.WriteLine("Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
 
+            var featureId = FilterAndOutputFeatures(container, featureFinder, outCsvFilePath, ms1FeaturesFilePath);
+
+            Console.WriteLine("Complete feature filtration");
+            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Number of filtered features = {0}", featureId);
+            Console.WriteLine(" - ProMex output: {0}", ms1FeaturesFilePath);
+
+            if (Parameters.CsvOutput)
+            {
+                Console.WriteLine(" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
+            }
+
+            if (Parameters.FeatureMapImage)
+            {
+                CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
+            }
+
+            return 0;
+        }
+
+        private int FilterAndOutputFeaturesOld(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, string ms1FeaturesFilePath)
+        {
             var featureId = 0;
 
             Stream csvStream = new MemoryStream();
@@ -256,22 +281,66 @@ namespace InformedProteomics.FeatureFinding
                 }
             }
 
-            Console.WriteLine("Complete feature filtration");
-            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            Console.WriteLine(" - Number of filtered features = {0}", featureId);
-            Console.WriteLine(" - ProMex output: {0}", ms1FeaturesFilePath);
+            return featureId;
+        }
 
+        private int FilterAndOutputFeatures(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, string ms1FeaturesFilePath)
+        {
+            var featureCounter = new int[1];
+            Ms1FtEntry.WriteToFile(ms1FeaturesFilePath, FilterFeaturesWithOutput(container, featureFinder, outCsvFilePath, featureCounter), Parameters.ScoreReport);
+
+            return featureCounter[0];
+        }
+
+        /// <summary>
+        /// Create <see cref="Ms1FtEntry"/> objects for the features, and output to csv (if desired).
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="featureFinder"></param>
+        /// <param name="outCsvFilePath"></param>
+        /// <param name="featureCounter"></param>
+        /// <returns></returns>
+        private IEnumerable<Ms1FtEntry> FilterFeaturesWithOutput(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, int[] featureCounter)
+        {
+            // Using an array, since we can't use ref or out parameters
+            featureCounter[0] = 0;
+
+            Stream csvStream = new MemoryStream();
             if (Parameters.CsvOutput)
             {
-                Console.WriteLine(" - ProMex output in ICR2LS format: {0}", outCsvFilePath);
+                csvStream = new FileStream(outCsvFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             }
-
-            if (Parameters.FeatureMapImage)
+            using (var csvWriter = new StreamWriter(csvStream))
             {
-                CreateFeatureMapImage(run, ms1FeaturesFilePath, pngFilePath);
-            }
+                if (Parameters.CsvOutput)
+                {
+                    csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
+                }
 
-            return 0;
+                var filteredFeatures = container.GetFilteredFeatures(featureFinder);
+                foreach (var feature in filteredFeatures)
+                {
+                    featureCounter[0]++;
+
+                    if (Parameters.CsvOutput)
+                    {
+                        var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
+
+                        foreach (var envelope in feature.EnumerateEnvelopes())
+                        {
+                            //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
+                            var mostAbuPeak = envelope.Peaks[mostAbuIdx];
+                            if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
+
+                            var fitscore = 1.0 - feature.BestCorrelationScore;
+                            csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
+                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureCounter);
+                        }
+                    }
+
+                    yield return feature.ToMs1FtEntry(featureCounter[0]);
+                }
+            }
         }
 
         /// <summary>

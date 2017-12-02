@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.FeatureFindingResults;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 
@@ -37,7 +38,7 @@ namespace InformedProteomics.TopDown.Scoring
             return _lcMsChargeMap.GetMatchingMass(ms2Scan);
         }
 
-        private void Read(string ms1FtFileName)
+        private void ReadOld(string ms1FtFileName)
         {
             var ftFileParser = new TsvFileParser(ms1FtFileName);
             var featureIdArr = ftFileParser.GetData("FeatureID").Select(s => Convert.ToInt32(s)).ToArray();
@@ -74,6 +75,28 @@ namespace InformedProteomics.TopDown.Scoring
 
             // NOTE: The DMS Analysis Manager looks for this statistic; do not change it
             Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
+            _lcMsChargeMap.CreateMassToScanNumMap();
+        }
+
+        private void Read(string ms1FtFileName)
+        {
+            var featureCountFiltered = 0;
+            var totalFeatureCount = 0;
+
+            foreach (var entry in Ms1FtEntry.ReadFromFile(ms1FtFileName))
+            {
+                totalFeatureCount++;
+
+                if (entry.LikelihoodRatio < _minLikelihoodRatio)
+                    continue;
+
+                featureCountFiltered++;
+                _lcMsChargeMap.SetMatches(entry.FeatureId, entry.MonoMass, entry.MinScan, entry.MaxScan, entry.RepresentativeScan, entry.MinCharge, entry.MaxCharge);
+                Ms1FtIndexToScanRange.Add(entry.FeatureId, new Tuple<int, int>(entry.MinScan, entry.MaxScan));
+            }
+
+            // NOTE: The DMS Analysis Manager looks for this statistic; do not change it
+            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, totalFeatureCount);
             _lcMsChargeMap.CreateMassToScanNumMap();
         }
 
