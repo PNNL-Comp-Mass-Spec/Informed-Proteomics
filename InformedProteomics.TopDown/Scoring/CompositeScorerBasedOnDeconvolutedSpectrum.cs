@@ -145,7 +145,7 @@ namespace InformedProteomics.TopDown.Scoring
                     var compNodeSet = !ionType.IsPrefix ? prefixFragScores : suffixFragScores;
                     if (binIndex < 0 || binIndex >= numNodes) continue;
                     nodeSet[binIndex] = GetMatchedIonPeakScore(ionType.IsPrefix, peak);
-                    if (compNodeSet[binIndex] != null) suffixFragScores[binIndex] += ScoreParam.ComplementaryIonCount;
+                    if (compNodeSet[binIndex] != null) nodeSet[binIndex] += ScoreParam.ComplementaryIonCount;
                 }
             }
 
