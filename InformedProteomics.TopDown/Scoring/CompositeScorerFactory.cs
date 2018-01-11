@@ -10,10 +10,10 @@ using InformedProteomics.Scoring.TopDown;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class CompositeScorerFactory : IFragmentScorerFactory
+    public class CompositeScorerFactory
     {
         public CompositeScorerFactory(
-            DPbfLcMsRun run,
+            ILcMsRun run,
             IMassBinning comparer,
             AminoAcidSet aaSet,
             int minProductCharge = 1, int maxProductCharge = 20,
@@ -26,14 +26,13 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         public CompositeScorerFactory(
-            DPbfLcMsRun run,
+            ILcMsRun run,
             IMassBinning comparer,
             AminoAcidSet aaSet,
             int minProductCharge, int maxProductCharge,
             Tolerance productTolerance,
             int isotopeOffsetTolerance = 2,
-            double filteringWindowSize = 1.1,
-            PbfLcMsRun fullRun = null)
+            double filteringWindowSize = 1.1)
         {
             _run = run;
             _minProductCharge = minProductCharge;
@@ -41,20 +40,9 @@ namespace InformedProteomics.TopDown.Scoring
             _productTolerance = productTolerance;
             FilteringWindowSize = filteringWindowSize;
             IsotopeOffsetTolerance = isotopeOffsetTolerance;
-            _ms2Scorer = new ConcurrentDictionary<int, IScorer>();
+            _ms2Scorer = new Dictionary<int, IScorer>();
             _comparer = comparer;
             _scoringGraphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
-            _fullRun = fullRun ?? _run;
-
-            foreach (var specNum in _fullRun.AllScanNumbers.Where(x => _fullRun.GetMsLevel(x) > 1))
-            {
-                var spec = _fullRun.GetSpectrum(specNum) as ProductSpectrum;
-                if (spec != null && spec.Peaks.Length > 0)
-                {
-                    var refPeakInt = CompositeScorer.GetRefIntensity(spec.Peaks);
-                    _referencePeakIntensities.Add(specNum, refPeakInt);
-                }
-            }
         }
 
         private readonly IMassBinning _comparer;
@@ -63,61 +51,38 @@ namespace InformedProteomics.TopDown.Scoring
         public double FilteringWindowSize { get; private set; }    // 1.1
         public int IsotopeOffsetTolerance { get; private set; }   // 2
 
-        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass)
         {
             if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass) return null;
 
-            var deconvScorer = GetScorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum;
+            var deconvScorer = GetMs2Scorer(scanNum) as CompositeScorerBasedOnDeconvolutedSpectrum;
             //var deconvSpec = deconvScorer.Ms2Spectrum as DeconvolutedSpectrum;
             return _scoringGraphFactory.CreateScoringGraph(deconvScorer, precursorMass);
         }
 
-        public IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public IScorer GetMs2Scorer(int scanNum)
         {
             IScorer scorer;
-            if (_ms2Scorer.TryGetValue(scanNum, out scorer))
-            {
-                return scorer;
-            }
-
-            scorer = this.GetMs2Scorer(scanNum, precursorCharge, activationMethod);
-            this._ms2Scorer.TryAdd(scanNum, scorer);
-            return scorer;
+            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
+            return null;
         }
 
-        public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public void DeconvoluteProductSpectrum(int scanNum)
         {
-            IScorer scorer = null;
-            if (spectrum is DeconvolutedSpectrum)
+            var scorer = GetScorer(scanNum);
+            if (scorer == null) return;
+            lock (_ms2Scorer)
             {
-                var deconSpec = spectrum as DeconvolutedSpectrum;
-                scorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconSpec, spectrum, _productTolerance, _comparer, spectrum.ActivationMethod);
+                _ms2Scorer.Add(scanNum, scorer);
             }
-            else
-            {
-                scorer = new CompositeScorer(
-                                spectrum,
-                                this._productTolerance,
-                                activationMethod: activationMethod,
-                                minCharge: _minProductCharge,
-                                maxCharge: _maxProductCharge);
-            }
-            return scorer;
         }
 
-        private IScorer GetMs2Scorer(int scanNum, int precursorCharge = 1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public IScorer GetScorer(int scanNum)
         {
-            //var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-            //var spec = _fullRun.GetSpectrum(scanNum) as ProductSpectrum;
-            //if (spec == null || spec.Peaks.Length == 0)
-            //    return null;
-            if (!_referencePeakIntensities.TryGetValue(scanNum, out var refPeakInt))
-                return null;
-            var deconvolutedSpec = this._run.GetSpectrum(scanNum) as DeconvolutedSpectrum;
-            //var deconvolutedSpec = Deconvoluter.GetCombinedDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, IsotopeOffsetTolerance, _productTolerance, 0.7);
-            //var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
-            //return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer, activationMethod) : null;
-            return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, refPeakInt, _productTolerance, _comparer, activationMethod) : null;
+            var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
+            if (spec == null) return null;
+            var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
+            return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
         }
 
         public void WriteToFile(string outputFilePath)
@@ -129,13 +94,11 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private readonly ConcurrentDictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
-        private readonly DPbfLcMsRun _run;
-        private readonly PbfLcMsRun _fullRun;
+        private readonly Dictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
+        private readonly ILcMsRun _run;
         private readonly int _minProductCharge;
         private readonly int _maxProductCharge;
         private readonly Tolerance _productTolerance;
-        private readonly Dictionary<int, double> _referencePeakIntensities = new Dictionary<int, double>();
 
         /*
               * Scoring based on deconvoluted spectrum

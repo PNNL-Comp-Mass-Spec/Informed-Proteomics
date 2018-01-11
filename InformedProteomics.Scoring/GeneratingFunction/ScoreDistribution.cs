@@ -48,9 +48,9 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                 area += _eValueDistribution[index];
             }
 
-            if (area.Equals(0.0)) area = this._eValueDistribution.Last(v => v > 0);
+            //if (area.Equals(0.0)) area = this._eValueDistribution.Last(v => v > 0);
 
-            var spectralEValue = area / _scoreTotal;
+            var spectralEValue = area; // / _scoreTotal;
             if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
             return spectralEValue;
         }

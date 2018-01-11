@@ -522,7 +522,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (score != null) return (double)score;
 
             var node = _graph[seqIndex][modIndex];
-            double? curNodeScore;
+            /*double? curNodeScore;
 
             if (nodeScore[seqIndex][modIndex] != null)
             {
@@ -544,20 +544,14 @@ namespace InformedProteomics.Backend.Data.Sequence
                                                                             suffixFragmentComposition);
                     curNodeScore = nodeScore[seqIndex][modIndex];
                 }
-            }
+            }*/
+            var curNodeScore = nodeScore[seqIndex][modIndex] ??
+                (nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex)));
 
             var prevNodeScore = 0.0;
-            if (node.GetPrevNodeIndices().Any())
+            if (node.GetPrevNodeIndices().Any() && seqIndex > 0)
             {
-                foreach (var previousNode in node.GetPrevNodeIndices())
-                {
-                    if (seqIndex == 0)
-                        continue;
-
-                    var prevScore = GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore);
-                    if (prevScore > prevNodeScore)
-                        prevNodeScore = prevScore;
-                }
+                prevNodeScore = node.GetPrevNodeIndices().Max(previousNode => GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
             // ReSharper disable PossibleInvalidOperationException
