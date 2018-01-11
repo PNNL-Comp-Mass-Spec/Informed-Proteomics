@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
+using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
 
@@ -17,7 +15,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
     {
         public const int MaxNumProteinMatchesPerTag = 100;
         public const int DefaultMinMatchedTagLength = 6;
-     
+
         public ScanBasedTagSearchEngine(
             LcMsRun run,
             ISequenceTagFinder seqTagFinder,
@@ -33,7 +31,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         {
             _run = run;
             _featureFinder = featureFinder;
-            
+
             _searchableDb = new SearchableDatabase(fastaDb);
 
             _tolerance = tolerance;
@@ -47,7 +45,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             _ms2ScorerFactory = ms2ScorerFactory;
             _seqTagFinder = seqTagFinder;
         }
-        
+
         public int MinScan { get; private set; }
         public int MaxScan { get; private set; }
         private readonly CompositeScorerFactory _ms2ScorerFactory;
@@ -64,7 +62,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         public IEnumerable<TagSequenceMatch> RunSearch(int ms2ScanNum)
         {
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            var scorer = (_ms2ScorerFactory != null) ? _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum) : new CorrMatchedPeakCounter(spec, _tolerance, _minProductIonCharge, _maxProductIonCharge);
+            var scorer = (_ms2ScorerFactory != null) ? _ms2ScorerFactory.GetScorer(ms2ScanNum) : new CorrMatchedPeakCounter(spec, _tolerance, _minProductIonCharge, _maxProductIonCharge);
             var tags = _seqTagFinder.GetAllSequenceTagString(ms2ScanNum);
 
             if (spec == null)
@@ -73,11 +71,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             }
             return GetMatches(tags, spec, scorer);
         }
-        
+
         public void RunSearch()
         {
             Console.WriteLine("Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStart\tEnd\tProteinLength");
-            
+
             foreach(var ms2ScanNum in _run.GetScanNumbers(2))
             {
                 if (ms2ScanNum >= MinScan && ms2ScanNum <= MaxScan)
@@ -98,13 +96,13 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                                                                tagMatch.StartIndex,
                                                                tagMatch.EndIndex,
                                                                FastaDatabase.GetProteinLength(tagSequenceMatch.ProteinName)
-                                                               );                               
+                                                               );
                     }
                 }
             }
         }
 
-        private IEnumerable<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
+        private IEnumerable<TagSequenceMatch> GetMatches(IEnumerable<SequenceTag.SequenceTag> tags, ProductSpectrum spec, IScorer scorer)
         {
             // Match tags against the database
             var proteinsToTags = GetProteinToMatchedTagsMap(tags, _searchableDb, _aaSet, _tolerance, _tolerance);
@@ -125,7 +123,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     if (matchedTag.NTermFlankingMass == null && matchedTag.CTermFlankingMass == null) continue;
 
                     var matches = tagFinder.FindMatches(matchedTag).ToArray();
-                    var prevScore = double.NegativeInfinity;
+                    //var prevScore = double.NegativeInfinity;
                     //foreach (var match in matches.OrderByDescending(m => m.Score))
                     foreach(var match in matches)
                     {
@@ -139,7 +137,6 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         //score += (matchedTag.NumReliableNTermFlankingMasses > 0)
                           //  ? matchedTag.Length*CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch
                             //: matchedTag.Length*CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;
-                        
 
                         // Poisson p-value score
                         //var n = (match.EndIndex - match.StartIndex - 1)*2;
@@ -162,7 +159,6 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             //return tagSequenceMatchList;
         }
 
-
         public class TagSequenceMatch
         {
             public TagSequenceMatch(string sequence, string proteinName, TagMatch tagMatch, char pre, char post)
@@ -176,16 +172,16 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
             public char Pre { get; private set; }
             public char Post { get; private set; }
-            
+
             public string Sequence { get; private set; }
             public string ProteinName { get; private set; }
             public TagMatch TagMatch { get; private set; }
         }
 
         public static Dictionary<string, MatchedTagSet> GetProteinToMatchedTagsMap(
-            IEnumerable<SequenceTag> tags, 
-            SearchableDatabase searchableDb, 
-            AminoAcidSet aaSet, 
+            IEnumerable<SequenceTag.SequenceTag> tags,
+            SearchableDatabase searchableDb,
+            AminoAcidSet aaSet,
             Tolerance tolerance,
             Tolerance relaxedTolerance)
         {
@@ -209,6 +205,9 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     else
                     {
                         var proteinSequence = fastaDb.GetProteinSequence(proteinName);
+                        if (proteinSequence == null)
+                            proteinSequence = proteinName;
+
                         var matchedTagSet = new MatchedTagSet(proteinSequence, aaSet, tolerance, relaxedTolerance);
                         matchedTagSet.Add(matchedTag);
                         proteinsToTags.Add(proteinName, matchedTagSet);

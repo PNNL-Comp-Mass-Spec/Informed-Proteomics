@@ -8,21 +8,41 @@ using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// LC-MS spectrum and sequence matches
+    /// </summary>
     public class LcMsMatchMap
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public LcMsMatchMap()
         {
             _map = new Dictionary<int, IList<IntRange>>();
         }
 
+        /// <summary>
+        /// Get the MS2 scan numbers that match the sequence mass
+        /// </summary>
+        /// <param name="sequenceMass"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="run"></param>
+        /// <returns></returns>
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            IEnumerable<int> ms2ScanNums;
-            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out ms2ScanNums)) return ms2ScanNums;
+
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums)) return ms2ScanNums;
             return new int[0];
         }
 
+        /// <summary>
+        /// Create a map of sequence masses and MS2 scans
+        /// </summary>
+        /// <param name="run"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="minMass"></param>
+        /// <param name="maxMass"></param>
         public void CreateSequenceMassToMs2ScansMap(LcMsRun run, Tolerance tolerance, double minMass, double maxMass)
         {
             // Make a bin to scan numbers map without considering tolerance
@@ -31,8 +51,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var maxBinNum = GetBinNumber(maxMass);
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                IList<IntRange> scanRanges;
-                if (!_map.TryGetValue(binNum, out scanRanges)) continue;
+                if (!_map.TryGetValue(binNum, out var scanRanges)) continue;
                 var sequenceMass = GetMass(binNum);
                 var ms2ScanNums = new List<int>();
 
@@ -40,7 +59,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     for (var scanNum = scanRange.Min; scanNum <= scanRange.Max; scanNum++)
                     {
-                        
                         if (scanNum < run.MinLcScan || scanNum > run.MaxLcScan) continue;
                         if (run.GetMsLevel(scanNum) == 2)
                         {
@@ -75,8 +93,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 for (var curBinNum = curMinBinNum; curBinNum <= curMaxBinNum; curBinNum++)
                 {
                     if (curBinNum < minBinNum || curBinNum > maxBinNum) continue;
-                    List<int> existingMs2ScanNums;
-                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out existingMs2ScanNums)) continue;
+
+                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out var existingMs2ScanNums)) continue;
                     foreach (var ms2ScanNum in existingMs2ScanNums)
                     {
                         ms2ScanNums.Add(ms2ScanNum);
@@ -89,13 +107,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _map = null;
         }
 
+        /// <summary>
+        /// Set the matches
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="minScanNum"></param>
+        /// <param name="maxScanNum"></param>
         public void SetMatches(double monoIsotopicMass, int minScanNum, int maxScanNum)
         {
             var range = new IntRange(minScanNum, maxScanNum);
 
             var binNum = GetBinNumber(monoIsotopicMass);
-            IList<IntRange> ranges;
-            if (_map.TryGetValue(binNum, out ranges))
+
+            if (_map.TryGetValue(binNum, out var ranges))
             {
                 var newRanges = new List<IntRange>();
                 foreach (var existingRange in ranges)
@@ -118,11 +142,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
         }
 
+        /// <summary>
+        /// Get the bin number for the provided mass
+        /// </summary>
+        /// <param name="mass"></param>
+        /// <returns></returns>
         public static int GetBinNumber(double mass)
         {
             return (int)Math.Round(mass * Constants.RescalingConstantHighPrecision);
         }
 
+        /// <summary>
+        /// Get the mass for the provided bin number
+        /// </summary>
+        /// <param name="binNum"></param>
+        /// <returns></returns>
         public static double GetMass(int binNum)
         {
             return binNum / Constants.RescalingConstantHighPrecision;

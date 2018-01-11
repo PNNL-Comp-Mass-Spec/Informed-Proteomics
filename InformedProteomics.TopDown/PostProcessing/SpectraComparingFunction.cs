@@ -14,17 +14,14 @@ namespace InformedProteomics.TopDown.PostProcessing
 {
     public class SpectraComparingFunction
     {
-
         public double DotProduct(Peak[] spectrum1, Peak[] spectrum2, FilteredProteinMassBinning comparer)
         {
-
             spectrum1 = GuassianFilter(spectrum1,.5);
             spectrum2 = GuassianFilter(spectrum2,.5);
             var vectorLength = comparer.GetBinNumber(10000.0);
             var featureVector1 = ConvertToFullIntensityVector(spectrum1,vectorLength,comparer);
             var featureVector2 = ConvertToFullIntensityVector(spectrum2, vectorLength,comparer);
 
-  
             var sum = 0d;
             for (int i = 0; i < vectorLength; i++)
             {
@@ -38,17 +35,15 @@ namespace InformedProteomics.TopDown.PostProcessing
 
         public double PearsonCorrelation(Peak[] spectrum1, Peak[] spectrum2,FilteredProteinMassBinning comparer)
         {
-            
             var spec1Bar = 0d;
             var spec2Bar = 0d;
 
             spectrum1 = GuassianFilter(spectrum1, .5);
             spectrum2 = GuassianFilter(spectrum2, .5);
-            var vectorLength = comparer.GetBinNumber(10000.0); 
+            var vectorLength = comparer.GetBinNumber(10000.0);
 
             spec1Bar = spectrum1.Sum(x => x.Intensity)/vectorLength;
             spec2Bar = spectrum1.Sum(y => y.Intensity)/vectorLength;
-
 
             var intensityVector1 = ConvertToFullIntensityVector(spectrum1, vectorLength, comparer);
             var intensityVector2 = ConvertToFullIntensityVector(spectrum2, vectorLength, comparer);
@@ -72,7 +67,6 @@ namespace InformedProteomics.TopDown.PostProcessing
 
         public double RootMeanSquareDeviation(Peak[] spectrum1, Peak[] spectrum2, FilteredProteinMassBinning comparer)
         {
-
             spectrum1 = GuassianFilter(spectrum1, .5);
             spectrum2 = GuassianFilter(spectrum2, .5);
             var vectorLength = comparer.GetBinNumber(10000.0);
@@ -90,7 +84,6 @@ namespace InformedProteomics.TopDown.PostProcessing
 
             return Math.Sqrt(sum/vectorLength);
         }
-
 
         public double[] ConvertToFullIntensityVector(Peak[] spectrum, int length, FilteredProteinMassBinning comparer)
         {
@@ -157,11 +150,9 @@ namespace InformedProteomics.TopDown.PostProcessing
             return newPeak;
         }
 
-
         public Peak[] RemovePeaks(double mass, Peak[] peakList)
         {
             return peakList.Where(p => p.Mz <= mass).ToArray();
         }
-
     }
 }

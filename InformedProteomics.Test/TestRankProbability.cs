@@ -7,6 +7,7 @@ using InformedProteomics.Scoring.LikelihoodScoring;
 using InformedProteomics.Scoring.LikelihoodScoring.Config;
 using InformedProteomics.Scoring.LikelihoodScoring.Data;
 using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -15,17 +16,18 @@ namespace InformedProteomics.Test
     public class TestRankProbability
     {
         [Test]
+        [Category("Local_Testing")]
         public void RankProbability()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string configurationFile = @"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini";
             if (!File.Exists(configurationFile))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configurationFile);
             }
-            
+
             var config = new TrainerConfiguration(configurationFile);
 
             var trainingParameters = new TrainingParameters(config);

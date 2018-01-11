@@ -2,12 +2,19 @@
 
 namespace InformedProteomics.Backend.Data.Composition
 {
-    using System;
-
-    [Serializable]
+    /// <summary>
+    /// Composition base class
+    /// </summary>
     public abstract class AbstractComposition
     {
+        /// <summary>
+        /// Composition mass
+        /// </summary>
         public abstract double Mass { get; }
+
+        /// <summary>
+        /// Composition nominal mass
+        /// </summary>
         public abstract int NominalMass { get; }
 
         #region Methods to get masses
@@ -36,25 +43,37 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Methods to get Isotopomer Envelpops
 
+        /// <summary>
+        /// Get the <see cref="IsotopomerEnvelope"/> for this composition
+        /// </summary>
+        /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelope()
         {
-            return _isotopomerEnvelop ??
-                   (_isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass));
+            return _isotopomerEnvelope ??
+                   (_isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass));
         }
 
+        /// <summary>
+        /// Get the relative intensities of the Isotopomer envelope for this composition
+        /// </summary>
+        /// <returns></returns>
         public double[] GetIsotopomerEnvelopeRelativeIntensities()
         {
-            if (_isotopomerEnvelop == null) _isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            return _isotopomerEnvelop.Envolope;
+            if (_isotopomerEnvelope == null) _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
+            return _isotopomerEnvelope.Envelope;
         }
 
+        /// <summary>
+        /// Get the zero-based index of the most abundant isotope, according to the isotopomer envelope
+        /// </summary>
+        /// <returns></returns>
         public int GetMostAbundantIsotopeZeroBasedIndex()
         {
-            if (_isotopomerEnvelop == null) _isotopomerEnvelop = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            return _isotopomerEnvelop.MostAbundantIsotopeIndex;
+            if (_isotopomerEnvelope == null) _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
+            return _isotopomerEnvelope.MostAbundantIsotopeIndex;
         }
 
-        private IsotopomerEnvelope _isotopomerEnvelop;
+        private IsotopomerEnvelope _isotopomerEnvelope;
 
         #endregion
     }

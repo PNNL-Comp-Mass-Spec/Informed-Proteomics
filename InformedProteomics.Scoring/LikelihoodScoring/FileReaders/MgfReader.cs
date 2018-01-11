@@ -14,7 +14,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
             _decoy = decoy;
         }
         private enum MgfState { Label, Parameter, Peak };
-        public IList<SpectrumMatch> Read() 
+        public IList<SpectrumMatch> Read()
         {
             var specMatches = new List<SpectrumMatch>();
             var file = File.ReadLines(_fileName);

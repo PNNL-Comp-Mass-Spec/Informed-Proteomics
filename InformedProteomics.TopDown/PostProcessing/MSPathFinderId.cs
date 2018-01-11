@@ -28,22 +28,22 @@ namespace InformedProteomics.TopDown.PostProcessing
             PepQValue = pepQValue;
         }
 
-        public int Scan { get; private set; }
-        public char Pre { get; private set; }
-        public string Sequence { get; private set; }
-        public char Post { get; private set; }
-        public string Modifications { get; private set; }
-        public Composition Composition { get; private set; }
-        public string ProteinName { get; private set; }
-        public string ProteinDesc { get; private set; }
-        public int ProteinLength { get; private set; }
-        public int Start { get; private set; }
-        public int End { get; private set; }
-        public int Charge { get; private set; }
-        public double MostAbundantIsotopeMz { get; private set; }
-        public double Mass { get; private set; }
-        public int NumMatchedFragments { get; private set; }
-        public double QValue { get; private set; }
-        public double PepQValue { get; private set; }
+        public int Scan { get; }
+        public char Pre { get; }
+        public string Sequence { get; }
+        public char Post { get; }
+        public string Modifications { get; }
+        public Composition Composition { get; }
+        public string ProteinName { get; }
+        public string ProteinDesc { get; }
+        public int ProteinLength { get; }
+        public int Start { get; }
+        public int End { get; }
+        public int Charge { get; }
+        public double MostAbundantIsotopeMz { get; }
+        public double Mass { get; }
+        public int NumMatchedFragments { get; }
+        public double QValue { get; }
+        public double PepQValue { get; }
     }
 }

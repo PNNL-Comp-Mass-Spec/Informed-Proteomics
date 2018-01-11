@@ -1,0 +1,19 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+before_build:
+- cmd: nuget.exe restore InformedProteomics.sln
+build:
+  verbosity: minimal
+test:
+  categories:
+    except:
+    - PNL_Domain
+    - Local_Testing
+    - Long_Running
+artifacts:
+- path: PbfGen\bin\Debug
+  name: PbfGen
+- path: ProMex\bin\Debug
+  name: ProMex
+- path: MSPathFinderT\bin\Debug
+  name: MSPathFinder

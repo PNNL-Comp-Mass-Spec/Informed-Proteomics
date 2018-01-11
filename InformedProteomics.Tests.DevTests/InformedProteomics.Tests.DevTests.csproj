@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TestProjectType>UnitTest</TestProjectType>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A4CA8A0-F4C9-4756-9166-C04E66A5BADA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InformedProteomics.Tests.DevTests</RootNamespace>
+    <AssemblyName>InformedProteomics.Tests.DevTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Obsolete\TestEdrn.cs" />
+    <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
+    <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestIprg.cs" />
+    <Compile Include="TestLcMsCaching.cs" />
+    <Compile Include="TestLcMsFeatureFind.cs" />
+    <Compile Include="TestLcMsMap.cs" />
+    <Compile Include="TestMisc.cs" />
+    <Compile Include="TestMultiThreading.cs" />
+    <Compile Include="TestUtex.cs" />
+    <Compile Include="TestYufengData.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisCompRef.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisCompRefKelleherData.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisLewy.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisSpikeIn.cs" />
+    <Compile Include="TopDownAnalysis\AnalysisTopDownMatchedPeaks.cs" />
+    <Compile Include="TopDownAnalysis\TestLcMsFeatureAlignment.cs" />
+    <Compile Include="TopDownAnalysis\TestLikelihoodScorer.cs" />
+    <Compile Include="TopDownAnalysis\TestMsDeconvDecon2LS.cs" />
+    <Compile Include="UnidentifiedFeatureAnalysisTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj">
+      <Project>{451d1ce9-97d2-4898-9f59-4d058223637a}</Project>
+      <Name>InformedProteomics.Backend.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj">
+      <Project>{05b37516-2b5c-4c60-bfe2-d6854a19478a}</Project>
+      <Name>InformedProteomics.Backend.MassSpecData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj">
+      <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
+      <Name>InformedProteomics.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomics.FeatureFinding.csproj">
+      <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
+      <Name>InformedProteomics.FeatureFinding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Scoring\InformedProteomics.Scoring.csproj">
+      <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
+      <Name>InformedProteomics.Scoring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Tests.Base\InformedProteomics.Tests.Base.csproj">
+      <Project>{8edf4429-251a-416d-bb68-93f227191bcf}</Project>
+      <Name>InformedProteomics.Tests.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.TopDown\InformedProteomics.TopDown.csproj">
+      <Project>{97b9f853-1b2a-4101-af09-68e0b4cf19ec}</Project>
+      <Name>InformedProteomics.TopDown</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\UnitTest_Files\PNNLOmicsElementData.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics">
+      <Version>3.20.0</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit">
+      <Version>3.8.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

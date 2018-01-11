@@ -15,7 +15,6 @@ namespace InformedProteomics.Test
         [Test]
         public void LogisticRegressionTest()
         {
-
             var obsverationFile = @"\\protoapps\UserData\Jungkap\Joshua\score_training\observations.txt";
             var categoriesFile = @"\\protoapps\UserData\Jungkap\Joshua\score_training\category_label.txt";
 
@@ -74,7 +73,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine(x);
             }
             Console.WriteLine();
-            
+
             var oneCount = 0;
             var zeroCount = 0;
             var totalRight = 0;

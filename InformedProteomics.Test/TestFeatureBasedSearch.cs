@@ -5,17 +5,16 @@ using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.PostProcessing;
 using InformedProteomics.TopDown.Scoring;
+using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
-//using SequenceTag = InformedProteomics.TopDown.PostProcessing.SequenceTag;
 
 namespace InformedProteomics.Test
 {
@@ -23,10 +22,11 @@ namespace InformedProteomics.Test
     class TestFeatureBasedSearch
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestFeatureId()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
 
@@ -144,16 +144,14 @@ namespace InformedProteomics.Test
                 break;
             }
         }
-        
+
         [Test]
+        [Category("Local_Testing")]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
-            const string dataSet = @"H:\Research\Lewy\raw\Lewy_intact_07";
-            //            const int scanNum = 5158;
-            const int minTagLength = 7;
             const int minNumTagMatches = 1;
             var aminoAcidSet = AminoAcidSet.GetStandardAminoAcidSet();
 
@@ -220,21 +218,21 @@ namespace InformedProteomics.Test
                     var nTermMass = protein.GetMass(0, matchedTag.StartIndex);
                     var cTermMass = protein.GetMass(matchedTag.EndIndex, protein.Count);
                     Console.WriteLine("\t{0} ({1})\t{2}\t{3} ({4})\t{5}\t{6}\t{7}",
-                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass), 
-                        seq, 
-                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass), 
+                        matchedTag.NTermFlankingMass, (matchedTag.NTermFlankingMass - nTermMass),
+                        seq,
+                        matchedTag.CTermFlankingMass, (matchedTag.CTermFlankingMass - cTermMass),
                         matchedTag.StartIndex,
                         matchedTag.IsNTermFlankingMassReliable, matchedTag.IsCTermFlankingMassReliable);
-
                 }
             }
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagMatchingSingleSpec()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
             const int scanNum = 4533;
@@ -271,10 +269,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestFeatureIdMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string resultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V092\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
 
@@ -297,11 +296,9 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
-            var idList =
-                resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
+            var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
             var idMassList = idList.Select(id => id.Mass).ToList();
             var idFlag = new bool[idList.Count];
-
 
             // Parse sequence tags
             var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
@@ -457,17 +454,17 @@ namespace InformedProteomics.Test
                 }
             }
 
-
 //            Console.WriteLine(string.Join(",", filter.GetMatchingMs2ScanNums(8115.973001)));
 //
 //            Console.WriteLine(featureFileName);
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagMatching()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // Parse sequence tags
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";

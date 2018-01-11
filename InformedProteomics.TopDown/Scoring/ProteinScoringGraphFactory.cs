@@ -40,7 +40,7 @@ namespace InformedProteomics.TopDown.Scoring
                             j = _comparer.GetBinNumber(fineNodeMass + modifiedAa.Mass);
                             if (j < 0 || j >= _comparer.NumberOfBins) continue;
                             _adjList[j].AddLast(new ScoringGraphEdge(i));
-                        }                        
+                        }
                     }
                 }
             }
@@ -49,9 +49,9 @@ namespace InformedProteomics.TopDown.Scoring
         public IScoringGraph CreateScoringGraph(CompositeScorerBasedOnDeconvolutedSpectrum scorer, double proteinMass)
         {
             if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
-            
+
             var nodeScores = scorer.GetNodeScores(proteinMass);
-            var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList);
+            var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList, _comparer);
 
             return graph;
         }
@@ -67,11 +67,12 @@ namespace InformedProteomics.TopDown.Scoring
 
         internal class ProteinScoringGraph : IScoringGraph
         {
-            internal ProteinScoringGraph(double?[] nodeScoresByPrefixIon, double?[] nodeScoresBySuffixIon, LinkedList<ScoringGraphEdge>[] adjList)
+            internal ProteinScoringGraph(double?[] nodeScoresByPrefixIon, double?[] nodeScoresBySuffixIon, LinkedList<ScoringGraphEdge>[] adjList, IMassBinning comparer)
             {
                 _nodeScoresByPrefixIon = nodeScoresByPrefixIon;
                 _nodeScoresBySuffixIon = nodeScoresBySuffixIon;
                 _adjList = adjList;
+                this._comparer = comparer;
             }
 
             public double GetNodeScore(int nodeIndex)
@@ -93,7 +94,7 @@ namespace InformedProteomics.TopDown.Scoring
                 return edgeScore;
             }
 
-            public IEnumerable<ScoringGraphEdge> GetEdges(int nodeIndex)
+            public IEnumerable<IScoringGraphEdge> GetEdges(int nodeIndex)
             {
                 return nodeIndex >= GetNumNodes() ? Enumerable.Empty<ScoringGraphEdge>() : _adjList[nodeIndex];
             }
@@ -102,7 +103,32 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 return _nodeScoresByPrefixIon.Length;
             }
-         
+
+            public double ScoreSequence(Sequence sequence)
+            {
+                var cleavages = sequence.GetInternalCleavages();
+                double score = 0.0;
+                int prevNTermBin = 0;
+                foreach (var cleavage in cleavages)
+                {
+                    int nTermBin = _comparer.GetBinNumber(cleavage.PrefixComposition.Mass);
+
+                    if (nTermBin < 0)
+                    {
+                        prevNTermBin = nTermBin;
+                        continue;
+                    }
+
+                    score += this.GetNodeScore(nTermBin);
+                    score += prevNTermBin >= 0 ? this.GetEdgeScore(prevNTermBin, nTermBin) : 0;
+
+                    prevNTermBin = nTermBin;
+                }
+
+                return score;
+            }
+
+            private readonly IMassBinning _comparer;
             private readonly double?[] _nodeScoresByPrefixIon;
             private readonly double?[] _nodeScoresBySuffixIon;
             private readonly LinkedList<ScoringGraphEdge>[] _adjList;
@@ -143,5 +169,4 @@ namespace InformedProteomics.TopDown.Scoring
             return nodeScores;
         }*/
     }
-
 }

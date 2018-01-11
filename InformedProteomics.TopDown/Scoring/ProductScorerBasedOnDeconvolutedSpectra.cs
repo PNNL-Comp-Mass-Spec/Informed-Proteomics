@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 
@@ -11,7 +12,7 @@ namespace InformedProteomics.TopDown.Scoring
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
         public ProductScorerBasedOnDeconvolutedSpectra(
-            ILcMsRun run, 
+            ILcMsRun run,
             int minProductCharge = 1, int maxProductCharge = 20,
             double productTolerancePpm = 10,
             int isotopeOffsetTolerance = 2,
@@ -25,7 +26,7 @@ namespace InformedProteomics.TopDown.Scoring
             ILcMsRun run,
             int minProductCharge, int maxProductCharge,
             Tolerance productTolerance,
-            int isotopeOffsetTolerance = 2, 
+            int isotopeOffsetTolerance = 2,
             double filteringWindowSize = 1.1)
         {
             _run = run;
@@ -75,7 +76,7 @@ namespace InformedProteomics.TopDown.Scoring
         public static Spectrum GetDeconvolutedSpectrum(Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold,
                                                        int isotopeOffsetTolerance, double filteringWindowSize = 1.1)
         {
-            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrThreshold);
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, 1.1, tolerance, corrThreshold);
             var peakList = new List<Peak>();
             var binHash = new HashSet<int>();
             foreach (var deconvolutedPeak in deconvolutedPeaks)
@@ -101,14 +102,16 @@ namespace InformedProteomics.TopDown.Scoring
         }
 
         /*
-         * Scorign based on deconvoluted spectrum
+         * Scoring based on deconvoluted spectrum
          */
         internal class DeconvScorer : IScorer
         {
             private readonly double _prefixOffsetMass;
             private readonly double _suffixOffsetMass;
             private readonly HashSet<int> _ionMassBins;
-            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance)
+            internal DeconvScorer(ProductSpectrum deconvolutedSpectrum, Tolerance productTolerance,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 if (deconvolutedSpectrum.ActivationMethod != ActivationMethod.ETD)
                 {
@@ -143,7 +146,9 @@ namespace InformedProteomics.TopDown.Scoring
                 return 0.0;
             }
 
-            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+            public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
             {
                 var score = 0.0;
 

@@ -6,6 +6,7 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 
 namespace InformedProteomics.TopDown.Execution

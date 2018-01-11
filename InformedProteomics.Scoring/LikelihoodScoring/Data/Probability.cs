@@ -19,7 +19,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             Total = total;
         }
 
-
         public static Probability<T1> operator +(Probability<T1> l, Probability<T1> r)
         {
             var added = new Probability<T1>(l.Label, l.Found + r.Found, l.Total + r.Total);

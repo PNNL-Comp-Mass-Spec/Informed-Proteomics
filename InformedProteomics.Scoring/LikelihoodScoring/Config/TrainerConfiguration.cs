@@ -19,7 +19,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public string DataPath { get; private set; }
         public string OutputPath { get; private set; }
         public DataFileFormat DataFormat { get; private set; }
-        
+
         public int MaxRanks { get; private set; }
         public double RelativeIntensityThreshold { get; private set; }
 
@@ -38,7 +38,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public double WindowWidth { get; private set; }
         public double PrecursorOffsetWidth { get; private set; }
         public double PrecursorOffsetThreshold { get; private set; }
-        
+
         public const double BinWidth = 1.005;
         public int MassBinSize { get; private set; }
         public const double MassErrorBinWidth = 0.01;
@@ -75,7 +75,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     break;
                 case "cid":
                     ActivationMethod = ActivationMethod.CID;
-                    Tolerance = _defaultToleranceTh;
+                    Tolerance = _defaultToleranceMz;
                     break;
                 case "etd":
                     ActivationMethod = ActivationMethod.ETD;
@@ -98,7 +98,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     throw new FormatException("Invalid Acquisition Method.");
             }
 
-            MassErrorTolerance = _defaultToleranceTh;
+            MassErrorTolerance = _defaultToleranceMz;
 
             MaxRanks = Convert.ToInt32(config.Contents["maxranks"]);
 
@@ -199,7 +199,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         }
 
         private readonly Tolerance _defaultTolerancePpm = new Tolerance(10, ToleranceUnit.Ppm);
-        private readonly Tolerance _defaultToleranceTh = new Tolerance(0.5, ToleranceUnit.Th);
+        private readonly Tolerance _defaultToleranceMz = new Tolerance(0.5, ToleranceUnit.Mz);
         private IonTypeFactory _ionTypeFactory;
     }
 }

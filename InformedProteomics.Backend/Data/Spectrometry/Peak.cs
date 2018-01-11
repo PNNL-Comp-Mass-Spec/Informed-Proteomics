@@ -1,30 +1,38 @@
 using System;
-using System.Collections.Generic;
-using InformedProteomics.Backend.Data.Biology;
-using MathNet.Numerics.Distributions;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
+    /// <summary>
+    /// Peak data
+    /// </summary>
     public class Peak: IComparable<Peak>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mz"></param>
+        /// <param name="intensity"></param>
         public Peak(double mz, double intensity)
         {
             Mz = mz;
             Intensity = intensity;
         }
 
-        public Peak() { } // For use in generics
-
+        /// <summary>
+        /// Peak m/z
+        /// </summary>
         public double Mz { get; protected set; }
+
+        /// <summary>
+        /// Peak intensity
+        /// </summary>
         public double Intensity { get; protected set; }
 
-        // For setting values in generics
-        internal void SetMzAndIntensity(double mz, double intensity)
-        {
-            Mz = mz;
-            Intensity = intensity;
-        }
-
+        /// <summary>
+        /// Compare 2 peaks (for sorting by m/z)
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public int CompareTo(Peak other)
         {
             var t = this as LcMsPeak;
@@ -43,251 +51,53 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return mzCompare;
         }
 
-    	public bool Equals(Peak other)
-    	{
-    		if (ReferenceEquals(null, other)) return false;
-    		if (ReferenceEquals(this, other)) return true;
-			return Math.Abs(Mz - other.Mz) < 1e-9;
-    	}
-
-    	public override bool Equals(object obj)
-    	{
-    		if (ReferenceEquals(null, obj)) return false;
-    		if (ReferenceEquals(this, obj)) return true;
-    		if (obj.GetType() != typeof (Peak)) return false;
-    		return Equals((Peak) obj);
-    	}
-
-    	public override int GetHashCode()
-    	{
-    		return Mz.GetHashCode();
-    	}
-
-    	public static bool operator ==(Peak left, Peak right)
-    	{
-    		return Equals(left, right);
-    	}
-
-    	public static bool operator !=(Peak left, Peak right)
-    	{
-    		return !Equals(left, right);
-    	}
-    }
-
-    public class LcMsPeak : Peak, IComparable<LcMsPeak>
-    {
-        public LcMsPeak(double mz, double intensity, int scanNum)
-            : base(mz, intensity)
+        /// <summary>
+        /// Test 2 peaks for equality
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Peak other)
         {
-            ScanNum = scanNum;
-        }
-        public int ScanNum { get; private set; }
-
-        public LcMsPeak ReplaceData(double mz, double intensity, int scanNum)
-        {
-            Mz = mz;
-            Intensity = intensity;
-            ScanNum = scanNum;
-            return this;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Math.Abs(Mz - other.Mz) < 1e-9;
         }
 
-        public int CompareTo(LcMsPeak other)
+        /// <inheritdoc />
+        public override bool Equals(object obj)
         {
-            var mzCompare = Mz.CompareTo(other.Mz);
-            if (mzCompare == 0)
-            {
-                // Force a stable sort
-                return ScanNum.CompareTo(other.ScanNum);
-            }
-            return mzCompare;
-        }
-    }
-
-    /// <summary>
-    /// Sort by reverse order of intensities (highest intensity comes first)
-    /// </summary>
-    public class IntensityComparer : IComparer<Peak>
-    {
-        public int Compare(Peak x, Peak y)
-        {
-	        return y.Intensity.CompareTo(x.Intensity);
-        }
-    }
-
-    /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
-    /// </summary>
-    public class MzComparerWithTolerance : IComparer<Peak>, IEqualityComparer<Peak>
-    {
-        public MzComparerWithTolerance(Tolerance tolerance)
-        {
-            if (tolerance.GetUnit() == ToleranceUnit.Ppm)
-            {
-                _equalityComparer = new MzComparerWithPpmTolerance(tolerance.GetValue());
-            }
-            else if (tolerance.GetUnit() == ToleranceUnit.Th)
-            {
-                _equalityComparer = new MzComparerWithToleranceMz(tolerance.GetValue());
-            }
-            else throw new NotSupportedException("The tolerance unite must be ppm or Th.");
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (Peak)) return false;
+            return Equals((Peak) obj);
         }
 
-        public MzComparerWithTolerance(double ppmTolerance): this(new Tolerance(ppmTolerance))
+        /// <inheritdoc />
+        public override int GetHashCode()
         {
+            return Mz.GetHashCode();
         }
 
-        public int Compare(Peak x, Peak y)
+        /// <summary>
+        /// Overloaded equality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator ==(Peak left, Peak right)
         {
-            if (Equals(x, y)) return 0;
-            return x.Mz.CompareTo(y.Mz);
+            return Equals(left, right);
         }
 
-        public bool Equals(Peak x, Peak y)
+        /// <summary>
+        /// Overloaded inequality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator !=(Peak left, Peak right)
         {
-            return _equalityComparer.Equals(x, y);
+            return !Equals(left, right);
         }
-
-        public int GetHashCode(Peak p)
-        {
-            return p.Mz.GetHashCode();
-        }
-
-        private readonly IEqualityComparer<Peak> _equalityComparer;
-    }
-
-    /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
-    /// </summary>
-    public class MzComparerWithPpmTolerance : IEqualityComparer<Peak>
-    {
-        public MzComparerWithPpmTolerance(double ppmTolerance)
-        {
-            _ppmTolerance = ppmTolerance;
-        }
-
-        public bool Equals(Peak x, Peak y)
-        {
-            return Math.Abs((x.Mz - y.Mz) / x.Mz * 1E6) <= _ppmTolerance;
-        }
-
-        public int GetHashCode(Peak p)
-        {
-            return p.Mz.GetHashCode();
-        }
-
-        private readonly double _ppmTolerance;
-    }
-
-    /// <summary>
-    /// Compare by m/z. Two peaks within toleranceTh Th are considered to be equal.
-    /// </summary>
-    public class MzComparerWithToleranceMz : IEqualityComparer<Peak>
-    {
-        public MzComparerWithToleranceMz(double toleranceTh)
-        {
-            _toleranceTh = toleranceTh;
-        }
-
-        public bool Equals(Peak x, Peak y)
-        {
-            return Math.Abs((x.Mz - y.Mz)) <= _toleranceTh;
-        }
-
-        public int GetHashCode(Peak p)
-        {
-            return p.Mz.GetHashCode();
-        }
-
-        private readonly double _toleranceTh;
-    }
-
-    /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
-    /// </summary>
-    public class MzComparerWithBinning : IComparer<Peak>, IEqualityComparer<Peak>
-    {
-        // 27 bits: max error = 16 ppm, 28 bits (8 ppm), 26 bits (32 ppm)
-        public MzComparerWithBinning(int numBits = 27)
-        {
-            NumBits = numBits;
-            _numShifts = sizeof(double)*8 - numBits;
-        }
-
-        public bool Equals(Peak x, Peak y)
-        {
-            return GetBinNumber(x.Mz) == GetBinNumber(y.Mz);
-        }
-
-        public bool Equals(double x, double y)
-        {
-            return GetBinNumber(x) == GetBinNumber(y);
-        }
-
-        public int GetHashCode(Peak p)
-        {
-            return GetBinNumber(p.Mz);
-        }
-
-        public int Compare(Peak x, Peak y)
-        {
-            return GetBinNumber(x.Mz).CompareTo(GetBinNumber(y.Mz));
-        }
-
-        public double GetRoundedValue(double mz)
-        {
-            var converted = BitConverter.DoubleToInt64Bits(mz);
-            var rounded = (converted >> _numShifts) << _numShifts;
-            var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
-            return roundedDouble;
-        }
-
-        public int GetBinNumber(double mz)
-        {
-            var converted = BitConverter.DoubleToInt64Bits(mz);
-            return (int) (converted >> _numShifts);
-            //var rounded = (converted >> _numShifts) << _numShifts;
-            //return (int)(rounded >> _numShifts);
-        }
-
-        // inclusive
-        public double GetMzStart(int binNum)
-        {
-            var rounded = (long)binNum << _numShifts;
-            return BitConverter.Int64BitsToDouble(rounded);
-        }
-
-        // exclusive
-        public double GetMzEnd(int binNum)
-        {
-            var rounded = (long)(binNum+1) << _numShifts;
-            return BitConverter.Int64BitsToDouble(rounded);
-        }
-
-        public double GetMzAverage(int binNum)
-        {
-            return (GetMzStart(binNum) + GetMzEnd(binNum))*0.5;
-        }
-
-        public Tolerance GetTolerance()
-        {
-            // 27 bits: max error = 16 ppm, 28 bits (8 ppm), 26 bits (32 ppm)
-            var numBits = sizeof(double) * 8 - _numShifts;
-            var ppm = 16*Math.Pow(2, 27 - numBits);
-
-            return new Tolerance(ppm);
-        }
-
-        public int Ppm 
-        {
-            get
-            {
-                var numBits = sizeof(double) * 8 - _numShifts;
-                var ppm = (int)(16 * Math.Pow(2, 27 - numBits));
-                return ppm;
-            } 
-        }
-
-        public readonly int NumBits;
-        private readonly int _numShifts;
     }
 }

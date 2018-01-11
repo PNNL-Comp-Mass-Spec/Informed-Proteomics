@@ -2,6 +2,7 @@
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 
@@ -23,7 +24,9 @@ namespace InformedProteomics.Scoring.BottomUp
             return 0;
         }
 
-        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
 
@@ -68,7 +71,7 @@ namespace InformedProteomics.Scoring.BottomUp
 
         internal RankedPeak FindPeak(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
 
@@ -117,6 +120,4 @@ namespace InformedProteomics.Scoring.BottomUp
 
         internal int Rank { get; private set; }
     }
-
-
 }

@@ -3,52 +3,80 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
-    public class CompositionWithDeltaMass: Composition
+    /// <summary>
+    /// A composition with a delta mass
+    /// </summary>
+    public class CompositionWithDeltaMass : Composition
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mass"></param>
+        /// <param name="nominalMass"></param>
         public CompositionWithDeltaMass(double mass, int nominalMass) : base(0, 0, 0, 0, 0)
         {
             _deltaMass = mass;
             _deltaNominalMass = nominalMass;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mass"></param>
         public CompositionWithDeltaMass(double mass)
             : this(mass, (int)Math.Round(mass * Constants.RescalingConstant))
         {
         }
 
-        public override double Mass
-        {
-            get { return base.Mass + _deltaMass; }
-        }
+        /// <summary>
+        /// Monoisotopic mass
+        /// </summary>
+        public override double Mass => base.Mass + _deltaMass;
 
-        public override int NominalMass
-        {
-            get { return base.NominalMass + _deltaNominalMass; }
-        }
+        /// <summary>
+        /// Nominal mass
+        /// </summary>
+        public override int NominalMass => base.NominalMass + _deltaNominalMass;
 
+        /// <summary>
+        /// Return a new composition that consists of this composition added to <paramref name="c"/>
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public new Composition Add(Composition c)
         {
-            var comWithDelta = c as CompositionWithDeltaMass;
-            return comWithDelta == null ? 
-                new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass)
-                : new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
+            if (!(c is CompositionWithDeltaMass comWithDelta))
+                return new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass);
+
+            return new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
         }
 
+        /// <summary>
+        /// Return the negation of this composition
+        /// </summary>
+        /// <returns></returns>
         public new Composition Negate()
         {
             return new CompositionWithDeltaMass(base.Negate(), -_deltaMass, -_deltaNominalMass);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + " " + string.Format("{0:N3}", _deltaMass);
         }
 
+        /// <summary>
+        /// Check 2 CompositionWithDeltaMasses for equality
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         protected bool Equals(CompositionWithDeltaMass other)
         {
             return base.Equals(other) && _deltaMass.Equals(other._deltaMass);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -57,6 +85,7 @@ namespace InformedProteomics.Backend.Data.Composition
             return Equals((CompositionWithDeltaMass)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked
@@ -74,6 +103,5 @@ namespace InformedProteomics.Backend.Data.Composition
 
         private readonly double _deltaMass;
         private readonly int _deltaNominalMass;
-
     }
 }

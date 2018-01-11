@@ -173,6 +173,5 @@ namespace InformedProteomics.TopDown.Scoring
             internal int ScanNum { get; private set; }
             internal int Charge { get; private set; }
         }
-
     }
 }

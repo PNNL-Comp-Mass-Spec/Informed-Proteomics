@@ -1,23 +1,30 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace InformedProteomics.Backend.Database
 {
+    /// <summary>
+    /// Available database search modes
+    /// </summary>
     [Flags]
     public enum DatabaseSearchMode
     {
         /// <summary>
         /// Target search only
         /// </summary>
+        [Description("Target search only")]
         Target = 1,
 
         /// <summary>
         /// Decoy search only
         /// </summary>
+        [Description("Decoy search only (shuffled database)")]
         Decoy = 2,
 
         /// <summary>
         /// Target and Decoy search
         /// </summary>
-        Both = 3,
+        [Description("Target and Decoy search")]
+        Both = Target | Decoy,
     }
 }

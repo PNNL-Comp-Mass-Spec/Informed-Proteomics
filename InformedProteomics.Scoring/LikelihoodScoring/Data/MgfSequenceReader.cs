@@ -8,49 +8,41 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class MgfSequenceReader: ISequenceReader
     {
-        private readonly static Dictionary<string, Tuple<AminoAcid, List<Modification>>> Modifications;
-        private readonly static AminoAcidSet StandardAminoAcidSet;
+        private static readonly Dictionary<string, Tuple<AminoAcid, List<Modification>>> Modifications;
+
+        private static readonly AminoAcidSet StandardAminoAcidSet;
+
         static MgfSequenceReader()
         {
             StandardAminoAcidSet = new AminoAcidSet(Modification.Carbamidomethylation);
             Modifications = new Dictionary<string, Tuple<AminoAcid, List<Modification>>>();
-            Modifications.Add("99.032",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('G'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("113.048",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('A'), 
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("129.043",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('S'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("141.079",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('V'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("143.059",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('T'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("147.035",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('M'),
-                                                        new List<Modification> { Modification.Oxidation }));
-            Modifications.Add("157.038",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('D'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("160.03",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('C'),
-                                                        new List<Modification> { Modification.Carbamidomethylation }));
-            Modifications.Add("171.054",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('E'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("173.051",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('M'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("189.046",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('F'),
-                                                        new List<Modification> { Modification.Acetylation }));
-            Modifications.Add("202.041",
-                new Tuple<AminoAcid, List<Modification>>(StandardAminoAcidSet.GetAminoAcid('C'),
-                                                        new List<Modification> { Modification.Carbamidomethylation,
-                                                                                 Modification.Acetylation }));
+
+            AddModification("99.032", 'G', Modification.Acetylation);
+            AddModification("113.048", 'A', Modification.Acetylation);
+            AddModification("129.043", 'S', Modification.Acetylation);
+            AddModification("141.079", 'V', Modification.Acetylation);
+            AddModification("143.059", 'T', Modification.Acetylation);
+            AddModification("147.035", 'M', Modification.Oxidation);
+            AddModification("157.038", 'D', Modification.Acetylation);
+            AddModification("160.03", 'C', Modification.Carbamidomethylation);
+            AddModification("171.054", 'E', Modification.Acetylation);
+            AddModification("173.051", 'M', Modification.Acetylation);
+            AddModification("189.046", 'F', Modification.Acetylation);
+            AddModification("202.041", 'C', new List<Modification> { Modification.Carbamidomethylation, Modification.Acetylation });
+        }
+
+        private static void AddModification(string modMass, char residue, Modification modType)
+        {
+            var aminoAcid = StandardAminoAcidSet.GetAminoAcid(residue);
+            var modList = new Tuple<AminoAcid, List<Modification>>(aminoAcid, new List<Modification> {modType});
+            Modifications.Add(modMass, modList);
+        }
+
+        private static void AddModification(string modMass, char residue, List<Modification> modifications)
+        {
+            var aminoAcid = StandardAminoAcidSet.GetAminoAcid(residue);
+            var modList = new Tuple<AminoAcid, List<Modification>>(aminoAcid, modifications);
+            Modifications.Add(modMass, modList);
         }
 
         public Sequence GetSequence(string sequence)

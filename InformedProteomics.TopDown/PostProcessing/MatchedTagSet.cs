@@ -4,13 +4,12 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.SequenceTag;
 
 namespace InformedProteomics.TopDown.PostProcessing
 {
     public class MatchedTagSet
     {
-        public MatchedTagSet(string sequence, 
+        public MatchedTagSet(string sequence,
             AminoAcidSet aminoAcidSet, Tolerance tolerance, Tolerance relaxedTolerance)
         {
             _sequence = sequence;
@@ -116,7 +115,6 @@ namespace InformedProteomics.TopDown.PostProcessing
             return true;
         }
 
-
         // startIndex: inclusive, endIndex: exclusive
         // This method is inefficient
         private double GetSequenceMass(int startIndex, int endIndex)
@@ -135,11 +133,11 @@ namespace InformedProteomics.TopDown.PostProcessing
 
     public class MatchedTag
     {
-        public MatchedTag(SequenceTag tag, int startIndex): this(tag, startIndex, null)
+        public MatchedTag(SequenceTag.SequenceTag tag, int startIndex): this(tag, startIndex, null)
         {
         }
 
-        public MatchedTag(SequenceTag tag, int startIndex, double? featureMass)
+        public MatchedTag(SequenceTag.SequenceTag tag, int startIndex, double? featureMass)
         {
             StartIndex = startIndex;
             EndIndex = startIndex + tag.Sequence.Length;
@@ -151,7 +149,7 @@ namespace InformedProteomics.TopDown.PostProcessing
             NumReliableCTermFlankingMasses = tag.IsPrefix ? 0 : 1;
         }
 
-        public MatchedTag(int startIndex, int endIndex, double nTermFlankingMass, double cTermFlankingMass, 
+        public MatchedTag(int startIndex, int endIndex, double nTermFlankingMass, double cTermFlankingMass,
             int numMergedSequenceTags, int numReliableNTermFlankingMasses, int numReliableCTermFlankingMasses)
         {
             StartIndex = startIndex;
@@ -225,7 +223,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                 }
             }
             EndIndex = newEndIndex;
-            
+
             ++NumMergedSequenceTags;
 
             return this;

@@ -8,8 +8,15 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// A sequence of Amino Acids, with modifications
+    /// </summary>
     public class Sequence : List<AminoAcid>, IMolecule
     {
+        /// <summary>
+        /// Build a sequence from the supplied list of amino acids
+        /// </summary>
+        /// <param name="aaArr"></param>
         public Sequence(IEnumerable<AminoAcid> aaArr)
         {
             var aminoAcids = aaArr as IList<AminoAcid> ?? aaArr.ToList();
@@ -27,10 +34,19 @@ namespace InformedProteomics.Backend.Data.Sequence
             _prefixMass = PrefixComposition.Select(c => c.Mass).ToArray();
         }
 
+        /// <summary>
+        /// Build a sequence from the supplied character sequence, using the provided amino acid set
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="aminoAcidSet"></param>
         public Sequence(string sequence, AminoAcidSet aminoAcidSet): this(sequence.Select(aminoAcidSet.GetAminoAcid))
         {
         }
 
+        /// <summary>
+        /// Get the list (as a string) of the modifications and their locations in this sequence
+        /// </summary>
+        /// <returns></returns>
         public string GetModificationString()
         {
             var sb = new StringBuilder();
@@ -45,7 +61,13 @@ namespace InformedProteomics.Backend.Data.Sequence
             return sb.ToString();
         }
 
-        // modStr: E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27
+        /// <summary>
+        /// Create a sequence using the supplied character sequence, modifications, and amino acid set
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="modStr">E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27</param>
+        /// <param name="aminoAcidSet"></param>
+        /// <returns></returns>
         public static Sequence CreateSequence(string sequence, string modStr, AminoAcidSet aminoAcidSet)
         {
             if(string.IsNullOrEmpty(modStr)) return new Sequence(sequence, aminoAcidSet);
@@ -62,7 +84,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             var aaList = new List<AminoAcid>();
-            
+
             for (var i=0; i<sequence.Length; i++)
             {
                 var residue = sequence[i];
@@ -72,8 +94,8 @@ namespace InformedProteomics.Backend.Data.Sequence
                     var nTermMod = indexModMap[-1];
                     aa = new ModifiedAminoAcid(aa, nTermMod);
                 }
-                Modification mod;
-                if (indexModMap.TryGetValue(i, out mod))
+
+                if (indexModMap.TryGetValue(i, out var mod))
                 {
                     var modifiedAa = new ModifiedAminoAcid(aa, mod);
                     aaList.Add(modifiedAa);
@@ -87,27 +109,49 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Sequence(aaList);
         }
 
-        // 1-based: PrefixComposition[0] = Composition.Zero
-        public Composition.Composition[] PrefixComposition { get; private set; }
-        public Composition.Composition Composition { get; private set; }
-        public double Mass { get { return Composition.Mass; } }
+        /// <summary>
+        /// 1-based: PrefixComposition[0] = Composition.Zero
+        /// </summary>
+        public Composition.Composition[] PrefixComposition { get; }
+
+        /// <summary>
+        /// Composition of the entire sequence
+        /// </summary>
+        public Composition.Composition Composition { get; }
+
+        /// <summary>
+        /// Mass of the entire sequence
+        /// </summary>
+        public double Mass => Composition.Mass;
 
         private readonly double[] _prefixMass;
 
-        // from: inclusive
-        // to: exclusive
+        /// <summary>
+        /// Get the mass from residue <paramref name="from"/> (inclusive) to residue <paramref name="to"/> (exclusive)
+        /// </summary>
+        /// <param name="from">inclusive</param>
+        /// <param name="to">exclusive</param>
+        /// <returns></returns>
         public double GetMass(int from, int to)
         {
             return _prefixMass[to] - _prefixMass[from];
         }
 
-        // from: inclusive
-        // to: exclusive
+        /// <summary>
+        /// Get the composition from residue <paramref name="from"/> (inclusive) to residue <paramref name="to"/> (exclusive)
+        /// </summary>
+        /// <param name="from">inclusive</param>
+        /// <param name="to">exclusive</param>
+        /// <returns></returns>
         public Composition.Composition GetComposition(int from, int to)
         {
             return PrefixComposition[to] - PrefixComposition[from];
         }
 
+        /// <summary>
+        /// Get the internal cleavages
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Cleavage> GetInternalCleavages()
         {
             var cleavages = new Cleavage[Count-1];
@@ -117,12 +161,18 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 cleavages[index] = new Cleavage(
                     prefixComposition += this[index].Composition,   // prefix
-                    suffixComposition += this[Count - 1 - index].Composition    // suffix
+                    this[index],
+                    suffixComposition += this[Count - 1 - index].Composition,    // suffix
+                    this[index + 1]
                     );
             }
             return cleavages;
         }
 
+        /// <summary>
+        /// Get the prefix compositions
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Composition.Composition> GetPrefixCompositions()
         {
             //var compositions = new Composition.Composition[Count];
@@ -136,6 +186,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return PrefixComposition.Skip(1);
         }
 
+        /// <summary>
+        /// Get the suffix compositions
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Composition.Composition> GetSuffixCompositions()
         {
             //var compositions = new Composition.Composition[Count];
@@ -148,11 +202,21 @@ namespace InformedProteomics.Backend.Data.Sequence
             return PrefixComposition.Reverse().Select(c => Composition - c).Take(Count);
         }
 
+        /// <summary>
+        /// Get the precursor ion
+        /// </summary>
+        /// <param name="charge"></param>
+        /// <returns></returns>
         public Ion GetPrecursorIon(int charge)
         {
             return new Ion(Composition + Data.Composition.Composition.H2O, charge);
         }
 
+        /// <summary>
+        /// Get the product ions of the specified types
+        /// </summary>
+        /// <param name="ionTypes"></param>
+        /// <returns></returns>
         public Dictionary<Tuple<IonType,int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
         {
             var ionTypeArr = ionTypes as IonType[] ?? ionTypes.ToArray();
@@ -184,8 +248,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             return productIonMap;
         }
 
-        // Parse peptide string from MS-GF+ results
-        // e.g. +229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163
+        /// <summary>
+        /// Parse peptide string from MS-GF+ results
+        /// </summary>
+        /// <param name="msgfPlusPeptideStr">string of format "+229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163"</param>
+        /// <returns></returns>
         public static Sequence GetSequenceFromMsGfPlusPeptideStr(string msgfPlusPeptideStr)
         {
             const string aminoAcidRegex = @"[" + AminoAcid.StandardAminoAcidCharacters + "]";

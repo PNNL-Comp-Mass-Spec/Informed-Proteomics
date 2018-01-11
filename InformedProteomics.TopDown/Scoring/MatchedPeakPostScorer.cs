@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.Utils;
-
+using InformedProteomics.Backend.MathAndStats;
 
 namespace InformedProteomics.TopDown.Scoring
 {
@@ -22,7 +20,6 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double ComputeScore(ProductSpectrum ms2Spec, Sequence sequence)
         {
-            
             _baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
             _sequence = sequence;
             _ms2Spec = ms2Spec;
@@ -49,7 +46,7 @@ namespace InformedProteomics.TopDown.Scoring
         private const double RelativeIsotopeIntensityThreshold = 0.8;
         private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
         private static readonly MzComparerWithBinning Comparer;
-        
+
         private int[] _peakRanking;
         private ProductSpectrum _ms2Spec;
         private Sequence _sequence;
@@ -81,7 +78,6 @@ namespace InformedProteomics.TopDown.Scoring
             return 50;
         }
 
-
         private void FindMatchedPeaks()
         {
             var cleavages = _sequence.GetInternalCleavages();
@@ -91,7 +87,7 @@ namespace InformedProteomics.TopDown.Scoring
             _nTheoreticalIonPeaks = 0;
             _nObservedIonPeaks = 0;
 
-            int index = 0; // cleavage index 
+            int index = 0; // cleavage index
             foreach (var c in cleavages)
             {
                 foreach (var baseIonType in _baseIonTypes)
@@ -145,7 +141,7 @@ namespace InformedProteomics.TopDown.Scoring
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex - 1; i >= 0; i--)
@@ -174,7 +170,7 @@ namespace InformedProteomics.TopDown.Scoring
                 if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
-                var tolTh = tolerance.GetToleranceAsTh(isotopeMz);
+                var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
                 var maxMz = isotopeMz + tolTh;
                 for (var i = peakIndex + 1; i < _ms2Spec.Peaks.Length; i++)

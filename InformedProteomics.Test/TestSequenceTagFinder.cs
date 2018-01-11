@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DeconTools.Backend.Core;
 using InformedProteomics.Backend.Data.Composition;
-using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Tests.Base;
+using InformedProteomics.TopDown.SequenceTag;
 using NUnit.Framework;
-using InformedProteomics.Backend.SequenceTag;
 
 namespace InformedProteomics.Test
 {
@@ -19,10 +18,11 @@ namespace InformedProteomics.Test
     public class TestSequenceTagFinder
     {
         [Test]
+        [Category("Local_Testing")]
         public void TestSequenceTag()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             //const string TestRawFile = @"D:\\Vlad_TopDown\\raw\\yufeng_column_test2.raw";
             //const string TestResultFile = @"D:\\Vlad_TopDown\\results\\yufeng_column_test2_IcTda.tsv";
@@ -42,23 +42,21 @@ namespace InformedProteomics.Test
             }
 
             // Configure amino acid set
-            
+
             var aminoAcidList = new List<AminoAcid>();
             foreach (var aa in AminoAcid.StandardAminoAcidArr)
             {
                 aminoAcidList.Add(aa);
                 aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Acetylation));
                 aminoAcidList.Add(new ModifiedAminoAcid(aa, Modification.Oxidation));
-
             }
-
 
             //const int MaxTags = 100000;
             var tsvParser = new TsvFileParser(TestResultFile);
             var headerList = tsvParser.GetHeaders();
             var tsvData = tsvParser.GetAllData();
             var ms2ScanNumbers = tsvData["Scan"];
-        
+
             var run = PbfLcMsRun.GetLcMsRun(TestRawFile);
             var nSpec = 0;
             var nHitSpec = 0;
@@ -69,7 +67,7 @@ namespace InformedProteomics.Test
                 var scanNum = Int32.Parse(ms2ScanNumbers[i]);
 
                 //if (scanNum != 4672) continue;
-                
+
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
                 int tsvIndex = ms2ScanNumbers.FindIndex(x => Int32.Parse(x) == scanNum);
@@ -92,7 +90,6 @@ namespace InformedProteomics.Test
                 {
                     if (seqStr.Contains(seqTagStr.Sequence)) //|| seqStr.Contains(Reverse(tagStr)))
                     {
-
                         //var idx = seqStr.IndexOf(seqTagStr.Sequence);
 
                         //seqStr.Substring(0, idx)
@@ -110,9 +107,9 @@ namespace InformedProteomics.Test
                         */
                         if (seqStr.Contains(seqTagStr.Sequence)) nHit++;
                     }
-                    nTags++;                    
+                    nTags++;
                 }
-                
+
                 nSpec++;
                 if (nHit > 0) nHitSpec++;
 
@@ -128,7 +125,5 @@ namespace InformedProteomics.Test
             Array.Reverse(charArray);
             return new string(charArray);
         }
-        
-        
     }
 }

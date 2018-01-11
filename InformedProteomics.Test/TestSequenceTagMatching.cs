@@ -7,11 +7,10 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
-using InformedProteomics.Backend.MassFeature;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
-using InformedProteomics.TopDown.PostProcessing;
-using InformedProteomics.TopDown.Scoring;
+using InformedProteomics.FeatureFinding.FeatureDetection;
+using InformedProteomics.Tests.Base;
 using InformedProteomics.TopDown.TagBasedSearch;
 using NUnit.Framework;
 
@@ -20,13 +19,12 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestSequenceTagMatching
     {
-
-
         [Test]
+        [Category("Local_Testing")]
         public void TestSearchWithTagGeneration()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
 
@@ -63,16 +61,14 @@ namespace InformedProteomics.Test
                 Console.Write(match.Sequence);
                 Console.WriteLine("\t{0}\t{1}\t{2}", match.TagMatch.StartIndex, match.TagMatch.EndIndex, match.TagMatch.Mass);
             }
-
-
         }
-        
-        
+
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchForLewy()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"D:\MassSpecFiles\Lewy\Lewy_AT_AD1_21May15_Bane_14-09-01RZ.pbf";
             if (!File.Exists(rawFilePath))
@@ -82,7 +78,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 4;
+            //const int minTagLength = 4;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 10000);
 
@@ -101,16 +97,17 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
 
-            var aaSet = new AminoAcidSet(modsFilePath);            
+            var aaSet = new AminoAcidSet(modsFilePath);
 
             TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearchCompRef()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string dataSetPath = @"D:\MassSpecFiles\CompRef";
             const string fastaFilePath = @"D:\MassSpecFiles\CompRef\ID_003278_4B4B3CB1.fasta";
@@ -133,8 +130,7 @@ namespace InformedProteomics.Test
 
             var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
-          
-            
+
             var fastaDb = new FastaDatabase(fastaFilePath);
             var tolerance = new Tolerance(10);
             var aaSet = new AminoAcidSet(modsFilePath);
@@ -146,7 +142,7 @@ namespace InformedProteomics.Test
                 var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFile, ".seqtag");
 
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
-                const int minTagLength = 5;
+                //const int minTagLength = 5;
                 //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
                 Console.WriteLine("-----------------{0}--------------------", rawFile);
@@ -155,16 +151,14 @@ namespace InformedProteomics.Test
 
                 Console.WriteLine("-----------------------------------------------------------------------");
             }
-
         }
 
-        
-        
         [Test]
+        [Category("Local_Testing")]
         public void TestTagBasedSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
 //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
 //            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
@@ -181,7 +175,7 @@ namespace InformedProteomics.Test
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
 
-            const int minTagLength = 5;
+            //const int minTagLength = 5;
             var tagFilePath = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, ".seqtag");
             //var tagParser = new SequenceTagParser(tagFilePath, minTagLength, 100);
 
@@ -209,7 +203,7 @@ namespace InformedProteomics.Test
             TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
         }
 
-        private void TestTagBasedSearch(LcMsRun run, 
+        private void TestTagBasedSearch(LcMsRun run,
             FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
         {
             var engine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)), new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
@@ -219,10 +213,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             if (!File.Exists(fastaFilePath))
@@ -268,10 +263,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedProteins()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int minTagLength = 3;
 
@@ -322,7 +318,7 @@ namespace InformedProteomics.Test
             }
 
             var hist = new Dictionary<int, int>();
-            
+
             var scanSet = new HashSet<int>();
             HashSet<string> proteinSetForThisScan = null;
             var prevScan = -1;
@@ -387,7 +383,7 @@ namespace InformedProteomics.Test
                 if (hist.TryGetValue(numMatches, out numOcc)) hist[numMatches] = numOcc + 1;
                 else hist.Add(numMatches, 1);
             }
-            
+
             Console.WriteLine("AvgNumMatches: {0}", totalNumMatches/(float)scanSet.Count);
             Console.WriteLine("Histogram:");
             foreach (var entry in hist.OrderBy(e => e.Key))
@@ -400,10 +396,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountMatchedScansPerProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const int minTagLength = 6;
 
@@ -468,10 +465,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void FindProteinDeltaMass()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string folderPath = @"D:\MassSpecFiles\Glyco\";
             if (!Directory.Exists(folderPath))
@@ -538,7 +536,7 @@ namespace InformedProteomics.Test
                         {
                             var seqStr = fastaDb.GetProteinSequence(protName);
                             var oriSeq = new Sequence(seqStr, AminoAcidSet.GetStandardAminoAcidSet());
-                            
+
                             var startIdx = 0;
                             while (true)
                             {
@@ -547,7 +545,7 @@ namespace InformedProteomics.Test
                                 if (idx < 0) break; //no matching
 
                                 //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
-                                var nClv = (nTerminal) ? 2 : 1; 
+                                var nClv = (nTerminal) ? 2 : 1;
 
                                 for (var j = 0; j < nClv; j++)
                                 {
@@ -564,7 +562,7 @@ namespace InformedProteomics.Test
 
                                     if (massDiff > 2000) break;
                                 }
-                                
+
                                 startIdx = idx + tag.Length;
                             }
                         }
@@ -578,6 +576,5 @@ namespace InformedProteomics.Test
                 Console.WriteLine(@"Done");
             }
         }
-
     }
 }

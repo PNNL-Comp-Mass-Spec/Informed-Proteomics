@@ -5,17 +5,36 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Biology
 {
+    /// <summary>
+    /// Ion class: a biological component with a charge
+    /// </summary>
     public class Ion
     {
-        public Composition.Composition Composition { get; private set; }
-        public int Charge { get; private set; }
+        /// <summary>
+        /// Elemental composition of the ion
+        /// </summary>
+        public Composition.Composition Composition { get; }
 
+        /// <summary>
+        /// Electrical charge of the ion
+        /// </summary>
+        public int Charge { get; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <param name="charge"></param>
         public Ion(Composition.Composition composition, int charge)
         {
             Composition = composition;
             Charge = charge;
         }
 
+        /// <summary>
+        /// Get the monoisotopic m/z of the ion
+        /// </summary>
+        /// <returns></returns>
         public double GetMonoIsotopicMz()
         {
             return (Composition.Mass + Charge * Constants.Proton) / Charge;
@@ -53,15 +72,15 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Gets theoretical isotope peaks whose intensities are relative to the most intense isotope
         /// </summary>
-        /// <param name="relativeIntensityThreshold">relative isotope intensity threshold</param>
+        /// <param name="minimumRelativeIntensity">Minimum intensity threshold for including the isotope in the results</param>
         /// <returns>Enumerable of isotope peaks</returns>
-        public IEnumerable<Isotope> GetIsotopes(double relativeIntensityThreshold)
+        public IEnumerable<Isotope> GetIsotopes(double minimumRelativeIntensity)
         {
             var isotopeIndex = -1;
             foreach (var isotopeRatio in Composition.GetIsotopomerEnvelopeRelativeIntensities())
             {
                 ++isotopeIndex;
-                if (isotopeRatio > relativeIntensityThreshold)
+                if (isotopeRatio >= minimumRelativeIntensity)
                 {
                     yield return new Isotope(isotopeIndex, isotopeRatio);
                 }
@@ -86,6 +105,10 @@ namespace InformedProteomics.Backend.Data.Biology
             }
         }
 
+        /// <summary>
+        /// Get the top 3 isotopes for this ion
+        /// </summary>
+        /// <returns></returns>
         public IList<Isotope> GetTop3Isotopes()
         {
             var isotopes = Composition.GetIsotopomerEnvelopeRelativeIntensities();
@@ -110,18 +133,31 @@ namespace InformedProteomics.Backend.Data.Biology
             return top3;
         }
 
+        /// <summary>
+        /// Get the m/z of the specified isotope
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="charge"></param>
+        /// <param name="isotopeIndex"></param>
+        /// <returns></returns>
         public static double GetIsotopeMz(double monoIsotopicMass, int charge, int isotopeIndex)
         {
             var isotopeMass = monoIsotopicMass + isotopeIndex*Constants.C13MinusC12;
             return isotopeMass/charge + Constants.Proton;
         }
 
+        /// <summary>
+        /// Get the monoisotopic mass of the specified isotope
+        /// </summary>
+        /// <param name="isotopeMz"></param>
+        /// <param name="charge"></param>
+        /// <param name="isotopeIndex"></param>
+        /// <returns></returns>
         public static double GetMonoIsotopicMass(double isotopeMz, int charge, int isotopeIndex)
         {
             var isotopeMass = (isotopeMz - Constants.Proton) * charge;
             var monoIsotopeMass = isotopeMass - isotopeIndex * Constants.C13MinusC12;
             return monoIsotopeMass;
         }
-
     }
 }

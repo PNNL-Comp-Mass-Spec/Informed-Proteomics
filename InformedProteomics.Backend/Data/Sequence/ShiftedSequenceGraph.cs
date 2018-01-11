@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
+    /// <summary>
+    /// A shifted mass sequence graph
+    /// </summary>
     public class ShiftedSequenceGraph
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="aminoAcidSet"></param>
+        /// <param name="shiftedMass"></param>
+        /// <param name="isForward"></param>
+        /// <param name="maxSequenceLength"></param>
+        /// <param name="maxSequenceMass"></param>
         public ShiftedSequenceGraph(AminoAcidSet aminoAcidSet, double shiftedMass, bool isForward, int maxSequenceLength, double maxSequenceMass = 50000.0)
         {
-            _aminoAcidSet = aminoAcidSet;
+            AminoAcidSet = aminoAcidSet;
             _modificationParams = aminoAcidSet.GetModificationParams();
 
             _isForward = isForward;
@@ -33,7 +43,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _graph = new Node[_maxSeqIndex][];
             _graph[0] = new[] { new Node(0) };
 
-            _nodeComposition = new Composition.Composition[_maxSeqIndex][]; 
+            _nodeComposition = new Composition.Composition[_maxSeqIndex][];
             _compNodeComposition = new Composition.Composition[_maxSeqIndex][];
             for (var i = 0; i < _maxSeqIndex; i++)
             {
@@ -44,24 +54,36 @@ namespace InformedProteomics.Backend.Data.Sequence
             IsValid = true;
         }
 
+        /// <summary>
+        /// Add an amino acid to this shifted sequence graph
+        /// </summary>
+        /// <param name="residue"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
         public bool AddAminoAcid(char residue, SequenceLocation location = SequenceLocation.Everywhere)
         {
             return PutAminoAcid(_index, residue, location);
         }
 
-        public AminoAcidSet AminoAcidSet
-        {
-            get { return _aminoAcidSet; }
-        }
-        public ModificationParams ModificationParams
-        {
-            get { return _modificationParams; }
-        }
+        /// <summary>
+        /// The amino acid set used in this shifted sequence graph
+        /// </summary>
+        public AminoAcidSet AminoAcidSet { get; }
 
-        public double ShiftMass { get; private set; }
+        /// <summary>
+        /// Modifications used in this shifted sequence graph
+        /// </summary>
+        public ModificationParams ModificationParams => _modificationParams;
 
-        public bool IsValid { get; private set; }
+        /// <summary>
+        /// The mass by which this sequence graph is shifted
+        /// </summary>
+        public double ShiftMass { get; }
 
+        /// <summary>
+        /// If this shifted sequence graph is valid
+        /// </summary>
+        public bool IsValid { get; }
 
         /// <summary>
         /// Gets all possible compositions of the current sequence
@@ -87,6 +109,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _graph[_index].Length;
         }
 
+        /// <summary>
+        /// Set the sink to the provided modification index
+        /// </summary>
+        /// <param name="modIndex"></param>
         public void SetSink(int modIndex)
         {
             _sinkModIndex = modIndex;
@@ -96,10 +122,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (var t in _compNodeComposition) Array.Clear(t, 0, t.Length);
         }
 
+        /// <summary>
+        /// Get the sink sequence composition with H2O added
+        /// </summary>
+        /// <returns></returns>
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
         {
             return _sinkSequenceCompositionWithH2O;
         }
+
+        /// <summary>
+        /// Get the fragment score using the provided scorer
+        /// </summary>
+        /// <param name="scorer"></param>
+        /// <returns></returns>
         public double GetFragmentScore(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -116,6 +152,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             return fragmentScore;
         }
 
+        /// <summary>
+        /// Get the score and modifications
+        /// </summary>
+        /// <param name="scorer"></param>
+        /// <returns></returns>
         public Tuple<double, LinkedList<ModificationInstance>> GetScoreAndModifications(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -134,8 +175,21 @@ namespace InformedProteomics.Backend.Data.Sequence
             return new Tuple<double, LinkedList<ModificationInstance>>(fragmentScore.Item1, fragmentScore.Item2);
         }
 
-        private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(int seqIndex, int modIndex,
-            IScorer scorer, double?[][] nodeScore, Tuple<double, LinkedList<ModificationInstance>>[][] maxScoreAndMods)
+        /// <summary>
+        /// Get the fragment score and modifications
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <param name="scorer"></param>
+        /// <param name="nodeScore"></param>
+        /// <param name="maxScoreAndMods"></param>
+        /// <returns></returns>
+        private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(
+            int seqIndex,
+            int modIndex,
+            IScorer scorer,
+            IReadOnlyList<double?[]> nodeScore,
+            IReadOnlyList<Tuple<double, LinkedList<ModificationInstance>>[]> maxScoreAndMods)
         {
             var scoreAndMods = maxScoreAndMods[seqIndex][modIndex];
             if (scoreAndMods != null) return scoreAndMods;
@@ -202,6 +256,12 @@ namespace InformedProteomics.Backend.Data.Sequence
                 ((double)curNodeScore + bestPrevNodeScore, newMods ?? bestPrevMods);
         }
 
+        /// <summary>
+        /// Get the composition at the provided sequence index and mod index
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
             if (_nodeComposition[seqIndex][modIndex] == null)
@@ -214,6 +274,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _nodeComposition[seqIndex][modIndex];
         }
 
+        /// <summary>
+        /// Get the complementary composition at the provided sequence index and mod index
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <returns></returns>
         protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
             if (_compNodeComposition[seqIndex][modIndex] == null)
@@ -221,7 +287,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var nodeComposition = GetComposition(seqIndex, modIndex);
                 _compNodeComposition[seqIndex][modIndex] = _sinkSequenceComposition - nodeComposition;
             }
-            return _compNodeComposition[seqIndex][modIndex];            
+            return _compNodeComposition[seqIndex][modIndex];
             /*
             if (_compNodeComposition[seqIndex, modIndex] == null)
             {
@@ -231,6 +297,15 @@ namespace InformedProteomics.Backend.Data.Sequence
             return _compNodeComposition[seqIndex, modIndex];*/
         }
 
+        /// <summary>
+        /// Get the fragment score at the provided sequence index and mod index, using the provided scorer
+        /// </summary>
+        /// <param name="seqIndex"></param>
+        /// <param name="modIndex"></param>
+        /// <param name="scorer"></param>
+        /// <param name="nodeScore"></param>
+        /// <param name="maxScore"></param>
+        /// <returns></returns>
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
@@ -238,7 +313,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             var node = _graph[seqIndex][modIndex];
             var curNodeScore = nodeScore[seqIndex][modIndex] ??
-                (nodeScore[seqIndex][modIndex] = 
+                (nodeScore[seqIndex][modIndex] =
                     _isForward ? scorer.GetFragmentScore(GetComposition(seqIndex, modIndex), GetComplementaryComposition(seqIndex, modIndex))
                     : scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex))
                     );
@@ -251,19 +326,18 @@ namespace InformedProteomics.Backend.Data.Sequence
                         .Max(prevNodeIndex => GetFragmentScore(seqIndex - 1, prevNodeIndex, scorer, nodeScore, maxScore));
             }
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
-            // ReSharper disable PossibleInvalidOperationException
+
+            // ReSharper disable once PossibleInvalidOperationException
             return (double)maxScore[seqIndex][modIndex];
-            // ReSharper restore PossibleInvalidOperationException
         }
 
         private Composition.Composition _sinkSequenceComposition;
         private Composition.Composition _sinkSequenceCompositionWithH2O;
         private int _sinkModIndex;
-        //private readonly Composition.Composition[,] _compNodeComposition;
+
         private readonly Composition.Composition[][] _compNodeComposition;
 
         private readonly int _maxSeqIndex;
-        private readonly AminoAcidSet _aminoAcidSet;
         private readonly ModificationParams _modificationParams;
         private readonly bool _isForward;
         private readonly double _maxSequenceMass;
@@ -316,11 +390,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                     var prevNodeIndex = i;
                     var prevNode = _graph[_index - 1][i];
                     var prevModCombIndex = prevNode.ModificationCombinationIndex;
-                    Node newNode;
+
                     // unmodified edge
-                    if (modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out newNode))
+                    if (modCombIndexToNodeMap.TryGetValue(prevModCombIndex, out var unmodifiedEdgeNode))
                     {
-                        newNode.AddPrevNodeIndex(prevNodeIndex);
+                        unmodifiedEdgeNode.AddPrevNodeIndex(prevNodeIndex);
                     }
                     else
                     {
@@ -334,9 +408,9 @@ namespace InformedProteomics.Backend.Data.Sequence
                                                     prevNode.ModificationCombinationIndex, modIndex);
                         if (modCombIndex < 0)   // too many modifications
                             continue;
-                        if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out newNode))
+                        if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out var modifiedEdgeNode))
                         {
-                            newNode.AddPrevNodeIndex(prevNodeIndex);
+                            modifiedEdgeNode.AddPrevNodeIndex(prevNodeIndex);
                         }
                         else
                         {

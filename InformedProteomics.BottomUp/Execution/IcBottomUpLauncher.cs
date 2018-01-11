@@ -7,11 +7,11 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
-using InformedProteomics.Backend.Utils;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.BottomUp.Scoring;
 using InformedProteomics.TopDown.Execution;
 using InformedProteomics.TopDown.Scoring;
-using PNNLOmics.Utilities;
+using PRISM;
 
 namespace InformedProteomics.BottomUp.Execution
 {
@@ -68,11 +68,11 @@ namespace InformedProteomics.BottomUp.Execution
         }
 
         public string ErrorMessage { get; private set; }
-        public string SpecFilePath { get; private set; }
-        public string DatabaseFilePath { get; private set; }
-        public string OutputDir { get; private set; }
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public Enzyme Enzyme { get; private set; }
+        public string SpecFilePath { get; }
+        public string DatabaseFilePath { get; }
+        public string OutputDir { get; }
+        public AminoAcidSet AminoAcidSet { get; }
+        public Enzyme Enzyme { get; }
 
         /// <remarks>default 6</remarks>
         public int MinSequenceLength { get; set; }
@@ -130,7 +130,7 @@ namespace InformedProteomics.BottomUp.Execution
 
         /// <remarks>default Both</remarks>
         public DatabaseSearchMode RunTargetDecoyAnalysis { get; set; }
-        
+
         /// <remarks>default 1</remarks>
         public int NumTolerableTermini { get; set; }
 
@@ -143,15 +143,15 @@ namespace InformedProteomics.BottomUp.Execution
         /// <remarks>default 10 ppm</remarks>
         public double PrecursorIonTolerancePpm
         {
-            get { return PrecursorIonTolerance.GetValue(); }
-            set { PrecursorIonTolerance = new Tolerance(value); }
+            get => PrecursorIonTolerance.GetValue();
+            set => PrecursorIonTolerance = new Tolerance(value);
         }
 
         /// <remarks>default 10 ppm</remarks>
         public double ProductIonTolerancePpm
         {
-            get { return ProductIonTolerance.GetValue(); }
-            set { ProductIonTolerance = new Tolerance(value); }
+            get => ProductIonTolerance.GetValue();
+            set => ProductIonTolerance = new Tolerance(value);
         }
 
         private LcMsRun _run;
@@ -283,7 +283,7 @@ namespace InformedProteomics.BottomUp.Execution
             {
                 annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
             }
-            else 
+            else
             {
                 annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength,
                     NumTolerableTermini, 2, Enzyme);
@@ -326,10 +326,9 @@ namespace InformedProteomics.BottomUp.Execution
                 var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, annotation);
                 if (seqGraph == null)
                 {
-                    //                    Console.WriteLine("Ignoring illegal protein: {0}", annotation);
+                    // ConsoleMsgUtils.ShowWarning(string.Format("Ignoring illegal protein: {0}", annotation));
                     continue;
                 }
-                
 
                 //var protCompositions = seqGraph.GetSequenceCompositions();
                 var numProteoforms = seqGraph.GetNumProteoformCompositions();
@@ -383,7 +382,7 @@ namespace InformedProteomics.BottomUp.Execution
             return matches;
         }
 
-        private void WriteResultsToFile(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, string outputFilePath, FastaDatabase database)
+        private void WriteResultsToFile(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> matches, string outputFilePath, FastaDatabase database)
         {
             using (var writer = new StreamWriter(outputFilePath))
             {
@@ -407,11 +406,14 @@ namespace InformedProteomics.BottomUp.Execution
 
                         if (ion == null)
                         {
-                            Console.WriteLine(@"Null ion!");
+                            ConsoleMsgUtils.ShowWarning("Null ion in WriteResultsToFile");
+                            continue;
                         }
+
                         if (scores == null)
                         {
-                            Console.WriteLine(@"Null scores");
+                            ConsoleMsgUtils.ShowWarning("Null scores in WriteResultsToFile");
+                            continue;
                         }
 
                         // Note for DblToString(value, 9, true), by having "9" and "true",
@@ -436,11 +438,9 @@ namespace InformedProteomics.BottomUp.Execution
                             match.Score,
                             scores.Score    // Score (re-scored)
                             );
-
                     }
                 }
             }
         }
-
     }
 }

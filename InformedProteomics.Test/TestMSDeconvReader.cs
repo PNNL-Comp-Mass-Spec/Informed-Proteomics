@@ -9,20 +9,18 @@ using NUnit.Framework;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.TopDown.Quantification;
 
-
 namespace InformedProteomics.Test
 {
     [TestFixture]
     class TestMSDeconvReader
     {
-
         [Test]
         public void MsDeconvReaderTest()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
-            /*var txtFiles = new[] 
+            /*var txtFiles = new[]
             {
                 @"C:\Users\mend645\Documents\Raw_Files\CPTAC_Intact_rep10_15Jan15_Bane_C2-14-08-02RZ_msdeconv.txt",
                 @"C:\Users\mend645\Documents\Raw_Files\CPTAC_Intact_rep9_15Jan15_Bane_C2-14-08-02RZ_msdeconv.txt",
@@ -81,7 +79,6 @@ namespace InformedProteomics.Test
                 @"C:\Users\mend645\Documents\Raw_Files2\CPTAC_Intact_Spike_10x_3_2May15_Bane_14-09-01RZ_msdeconv.txt",
                 @"C:\Users\mend645\Documents\Raw_Files2\CPTAC_Intact_Spike_10x_4_27Apr15_Bane_14-09-01RZ_msdeconv.txt",
                 @"C:\Users\mend645\Documents\Raw_Files2\CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ_msdeconv.txt"
-
             };
 
         var csvFiles = new[]
@@ -103,7 +100,6 @@ namespace InformedProteomics.Test
                 @"\\proto-4\VOrbiETD02\2015_2\CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ\DLS201505061337_Auto1193446\CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ_isos.csv"
             };
 
-
             var rawFiles = new[]
             {
                 @"C:\Users\mend645\Documents\Raw_Files2\CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ.raw",
@@ -123,8 +119,6 @@ namespace InformedProteomics.Test
                 @"C:\Users\mend645\Documents\Raw_Files2\CPTAC_Intact_Spike_10x_5_27Apr15_Bane_14-09-01RZ.raw"
             };
 
-
-
             var filePath = @"C:\Users\mend645\Documents\Cluster_Files2\";
 
             var msDeconvReader = new MSDeconvReader();
@@ -132,12 +126,9 @@ namespace InformedProteomics.Test
             msDeconvReader.MinCharge = 2;
             msDeconvReader.MinMass = 2000.0;
 
-                     
-            
-
             for (int i = 0; i < rawFiles.Length; i++)
             {
-                var nodeList = msDeconvReader.GetDeconvNodesForMsDeconv(txtFiles[i]); 
+                var nodeList = msDeconvReader.GetDeconvNodesForMsDeconv(txtFiles[i]);
                 //var nodeList = msDeconvReader.GetDeconvNodesForDecon2Ls(csvFiles[i]);
                 var run = PbfLcMsRun.GetLcMsRun(rawFiles[i]);
                 var tol = new Tolerance(10);
@@ -149,7 +140,7 @@ namespace InformedProteomics.Test
                 Console.WriteLine("start file {0}", i);
                 var connectedComponents = clusterer.GetClustersList(tol, elutionInterval, nodeList);
                 Console.WriteLine("end file {0}", i);
-                clusterer.SaveClusterInfoToFile(fileName,connectedComponents);  
+                clusterer.SaveClusterInfoToFile(fileName,connectedComponents);
             }
         }
     }

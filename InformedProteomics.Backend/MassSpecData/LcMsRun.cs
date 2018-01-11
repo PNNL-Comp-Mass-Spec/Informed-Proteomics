@@ -5,32 +5,70 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Statistics;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public abstract class LcMsRun: ILcMsRun
+    /// <summary>
+    /// Base class for objects that provide access to LCMS run data
+    /// </summary>
+    public abstract class LcMsRun: ILcMsRun, IMassSpecDataReader
     {
+        /// <summary>
+        /// Number of unique isolation windows kept for DIA data
+        /// </summary>
         public const int NumUniqueIsolationWindowThresholdForDia = 1000;
+
+        /// <summary>
+        /// Factor used to bin isolation window data
+        /// </summary>
         public const double IsolationWindowBinningFactor = 10;
         //public const double DefaultSpectrumFilteringWindowSize = 100.0;
 
+        /// <summary>
+        /// Index of first LC scan in the dataset
+        /// </summary>
         public int MinLcScan { get; protected set; }
+
+        /// <summary>
+        /// Index of last LC scan in the dataset
+        /// </summary>
         public int MaxLcScan { get; protected set; }
+
+        /// <summary>
+        /// The number of spectra in the file.
+        /// </summary>
         public int NumSpectra { get; protected set; }
 
+        /// <summary>
+        /// Lowest MS Level in the dataset. Usually 1.
+        /// </summary>
         public int MinMsLevel { get; protected set; }
+
+        /// <summary>
+        /// Highest MS Level in the dataset.
+        /// </summary>
         public int MaxMsLevel { get; protected set; }
 
+        /// <summary>
+        /// List of all scan numbers in the dataset
+        /// </summary>
+        public IEnumerable<int> AllScanNumbers { get { return ScanNumToMsLevel.Select(x => x.Key); } }
+
+        /// <summary>
+        /// The smallest MS1 m/z
+        /// </summary>
         public abstract double MinMs1Mz { get; }
+
+        /// <summary>
+        /// The largest MS1 m/z
+        /// </summary>
         public abstract double MaxMs1Mz { get; }
 
-        public bool IsDia
-        {
-            get
-            {
-                return IsDiaOrNull ?? (bool)(IsDiaOrNull = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia);
-            }
-        }
+        /// <summary>
+        /// True if the dataset is DIA data
+        /// </summary>
+        public bool IsDia => IsDiaOrNull ?? (bool)(IsDiaOrNull = GetNumUniqueIsoWindows() < NumUniqueIsolationWindowThresholdForDia);
 
         /// <summary>
         /// Default values for configuration properties
@@ -41,12 +79,104 @@ namespace InformedProteomics.Backend.MassSpecData
             LowerPrecursorChromatogramCacheSize = 0;
         }
 
+        #region IMassSpecDataReader
+
+        /// <summary>
+        /// Close the reader
+        /// </summary>
+        public abstract void Close();
+
+        /// <summary>
+        /// Properly dispose of all unmanaged resources (specifically, file handles)
+        /// </summary>
+        public abstract void Dispose();
+
+        /// <summary>
+        /// Gets all spectra
+        /// </summary>
+        /// <returns>all spectra</returns>
+        public IEnumerable<Spectrum> ReadAllSpectra()
+        {
+            return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
+        }
+
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
+        public CV.CVID NativeIdFormat { get; protected set; }
+
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
+        public CV.CVID NativeFormat { get; protected set; }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        public abstract string FilePath { get; protected set; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public abstract string SrcFileChecksum { get; protected set; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        public abstract string FileFormatVersion { get; protected set; }
+
+        /// <summary>
+        /// Returns the spectrum specified by the scan number.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return GetSpectrum(scanNum, includePeaks);
+        }
+
+        /// <summary>
+        /// Try to make the reader random access capable
+        /// </summary>
+        /// <returns>true if is random access capable, false if not</returns>
+        public abstract bool TryMakeRandomAccessCapable();
+
+        #endregion
+
         #region Spectra and scan operations
 
+        /// <summary>
+        /// Return the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
-        public abstract Ms1Spectrum GetMs1Spectrum(int scanNum);
+
+        /// <summary>
+        /// If <paramref name="scanNum"/> is a MS1 scan, return it; otherwise, return null.
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="ms1ScanIndex"></param>
+        /// <returns></returns>
+        public abstract Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex);
+
+        /// <summary>
+        /// Return the isolation window for the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
 
+        /// <summary>
+        /// Create a summed MS1 spectrum from the scans within <paramref name="elutionTimeTolerance"/> of <paramref name="scanNum"/>
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="elutionTimeTolerance"></param>
+        /// <returns></returns>
         public Spectrum GetSummedMs1Spectrum(int scanNum, double elutionTimeTolerance)
         {
             var elutionTime = GetElutionTime(scanNum);
@@ -71,7 +201,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSummedMs1Spectrum(minScanNum, maxScanNum);
         }
 
-        // minScanNum, maxScanNum: inclusive
+        /// <summary>
+        /// Create a summed MS1 spectrum from the scans in the supplied range
+        /// </summary>
+        /// <param name="minScanNum">min scan number, inclusive</param>
+        /// <param name="maxScanNum">max scan number, inclusive</param>
+        /// <returns></returns>
         public SummedSpectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
         {
             if (minScanNum < MinLcScan) minScanNum = MinLcScan;
@@ -87,6 +222,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return GetSummedSpectrum(scanNums, minScanNum);
         }
 
+        /// <summary>
+        /// Produce a summed spectrum using the data in the scans specified by <paramref name="scanNums"/>
+        /// </summary>
+        /// <param name="scanNums"></param>
+        /// <param name="repScanNum">Representative scan number</param>
+        /// <returns></returns>
         public SummedSpectrum GetSummedSpectrum(IList<int> scanNums, int repScanNum = 0)
         {
             var mzComparer = new MzComparerWithBinning();
@@ -102,8 +243,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     var mzBin = mzComparer.GetBinNumber(peak.Mz);
 
-                    List<double> mzList;
-                    if (mzDic.TryGetValue(mzBin, out mzList))
+                    if (mzDic.TryGetValue(mzBin, out var mzList))
                     {
                         mzList.Add(peak.Mz);
                         intDic[mzBin] += peak.Intensity;
@@ -130,7 +270,16 @@ namespace InformedProteomics.Backend.MassSpecData
             return summedSpec;
         }
 
-        // minScanNum, maxScanNum, minCharge, maxCharge: inclusive
+        /// <summary>
+        /// Get a summed MS2 spectrum from the dataset, with the provided limits
+        /// </summary>
+        /// <param name="monoIsotopicMass"></param>
+        /// <param name="minScanNum">min scan number, inclusive</param>
+        /// <param name="maxScanNum">max scan number, inclusive</param>
+        /// <param name="minCharge">min charge, inclusive</param>
+        /// <param name="maxCharge">max charge, inclusive</param>
+        /// <param name="activationMethod"></param>
+        /// <returns></returns>
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass,
             int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
@@ -140,15 +289,15 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
                 ms2ScanNums.AddRange(GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
-                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum && 
-                        (activationMethod == ActivationMethod.Unknown || 
+                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum &&
+                        (activationMethod == ActivationMethod.Unknown ||
                         ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod)))
                         ;
             }
             var summedSpec = GetSummedSpectrum(ms2ScanNums);
             return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
         }
-        
+
         /*
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, Ms1Feature range,
             ActivationMethod activationMethod = ActivationMethod.Unknown)
@@ -168,14 +317,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>MS level</returns>
         public int GetMsLevel(int scanNum)
         {
-            int msLevel;
-            return ScanNumToMsLevel.TryGetValue(scanNum, out msLevel) ? msLevel : 0;
+            return ScanNumToMsLevel.TryGetValue(scanNum, out var msLevel) ? msLevel : 0;
         }
 
+        /// <summary>
+        /// Get the elution time of the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
         public double GetElutionTime(int scanNum)
         {
-            double elutionTime;
-            return ScanNumElutionTimeMap.TryGetValue(scanNum, out elutionTime) ? elutionTime : 0.0;
+            return ScanNumElutionTimeMap.TryGetValue(scanNum, out var elutionTime) ? elutionTime : 0.0;
         }
 
         #endregion
@@ -189,7 +341,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>precursor scan number or 0 for MS1</returns>
         public int GetPrecursorScanNum(int scanNum)
         {
-            return _precursorScan[scanNum - MinLcScan];
+            if (_precursorScan.ContainsKey(scanNum))
+            {
+                return _precursorScan[scanNum];
+            }
+            return 0;
         }
 
         /// <summary>
@@ -199,7 +355,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number or MaxLc for MS1</returns>
         public int GetNextScanNum(int scanNum)
         {
-            return _nextScan[scanNum - MinLcScan];
+            if (_nextScan.ContainsKey(scanNum))
+            {
+                return _nextScan[scanNum];
+            }
+            return MaxLcScan;
         }
 
         /// <summary>
@@ -210,11 +370,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>previous scan number at the specified level</returns>
         public int GetPrevScanNum(int scanNum, int msLevel)
         {
-            for (var curScanNum = scanNum - 1; curScanNum >= MinLcScan; curScanNum--)
-            {
-                if (GetMsLevel(curScanNum) == msLevel) return curScanNum;
-            }
-            return MinLcScan - 1;
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key < scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MinLcScan - 1, 0)).Max(x => x.Key);
         }
 
         /// <summary>
@@ -225,14 +381,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>next scan number at the specified level</returns>
         public int GetNextScanNum(int scanNum, int msLevel)
         {
-            for (var curScanNum = scanNum + 1; curScanNum <= MaxLcScan; curScanNum++)
-            {
-                if (GetMsLevel(curScanNum) == msLevel)
-                {
-                    return curScanNum;
-                }
-            }
-            return MaxLcScan + 1;
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel && x.Key > scanNum).DefaultIfEmpty(new KeyValuePair<int, int>(MaxLcScan + 1, 0)).Min(x => x.Key);
         }
 
         /// <summary>
@@ -242,15 +391,15 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>scan numbers of the specified msLevel</returns>
         public IList<int> GetScanNumbers(int msLevel)
         {
-            var scanNumbers = new List<int>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
-            {
-                if (GetMsLevel(scanNum) == msLevel) scanNumbers.Add(scanNum);
-            }
-            return scanNumbers;
+            return ScanNumToMsLevel.Where(x => x.Value == msLevel).Select(x => x.Key).ToList();
         }
 
         private int[] _ms1ScanVector;
+
+        /// <summary>
+        /// An array of all of the MS1 scan numbers
+        /// </summary>
+        /// <returns></returns>
         public int[] GetMs1ScanVector()
         {
             return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
@@ -272,7 +421,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
             var ms1ScanNums = GetMs1ScanVector();
             _ms1ScanNumToIndex = new int[MaxLcScan + 1];
-            for (var i = 0; i < ms1ScanNums.Length; i++) 
+            for (var i = 0; i < ms1ScanNums.Length; i++)
                 _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
 
             return _ms1ScanNumToIndex;
@@ -305,7 +454,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetFullPrecursorIonExtractedIonChromatogram(minMz, maxMz);
@@ -333,6 +482,12 @@ namespace InformedProteomics.Backend.MassSpecData
             return xic;
         }
 
+        /// <summary>
+        /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
+        /// </summary>
+        /// <param name="minMz">min m/z</param>
+        /// <param name="maxMz">max m/z</param>
+        /// <returns>An array of doubles, with every intensity value in the provided m/z range</returns>
         public double[] GetFullPrecursorIonExtractedIonChromatogramVector(double minMz, double maxMz)
         {
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -351,18 +506,23 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
         }
 
+        /// <summary>
+        /// Returns selected peaks between minMz and maxMz. The biggest peak per scan is selected.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
         public abstract Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz);
-
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
-        /// Only XicPeaks around the targetScanNum are returned 
+        /// Only XicPeaks around the targetScanNum are returned
         /// </summary>
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
@@ -371,7 +531,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC around targetScanNum</returns>
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance, int targetScanNum, int maxNumConsecutiveScansWithoutPeak = 3)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             if (targetScanNum < 0) return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -380,7 +540,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Gets the extracted ion chromatogram of the specified m/z range (using only MS1 spectra)
-        /// Only XicPeaks around the targetScanNum are returned 
+        /// Only XicPeaks around the targetScanNum are returned
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
@@ -416,12 +576,19 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>XIC as an Xic object</returns>
         public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return GetFullProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz);
         }
 
+        /// <summary>
+        /// Returns a xic for the chosen range that covers the entire run.
+        /// </summary>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <param name="precursorMz"></param>
+        /// <returns></returns>
         public abstract Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz);
 
         #endregion
@@ -499,10 +666,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Isolation Windows
 
+        /// <summary>
+        /// Return the number of unique isolation windows in the dataset
+        /// </summary>
+        /// <returns></returns>
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
                 if (productSpec == null) continue;
@@ -511,13 +682,20 @@ namespace InformedProteomics.Backend.MassSpecData
             return isoWindowSet.Count;
         }
 
+        /// <summary>
+        /// Get the narrowest isolation window width
+        /// </summary>
+        /// <returns></returns>
         public double GetMinIsolationWindowWidth()
         {
-            var minWidth = Double.MaxValue;
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            var minWidth = double.MaxValue;
+            foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
                 var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
+
+                // ReSharper disable once UseNullPropagation
                 if (productSpec == null) continue;
+
                 if (productSpec.IsolationWindow.Width < minWidth) minWidth = productSpec.IsolationWindow.Width;
             }
             return minWidth;
@@ -546,8 +724,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
         {
             var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * IsolationWindowBinningFactor);
-            int[] scanNums;
-            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out scanNums) ? scanNums : new int[0];
+            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out var scanNums) ? scanNums : new int[0];
         }
 
         //public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)
@@ -565,18 +742,36 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Protected members and functions
 
         // Fields to be defined in a child
+        /// <summary>
+        /// Dictionary to map IsolationMzBins to scan numbers
+        /// </summary>
         protected Dictionary<int, int[]> IsolationMzBinToScanNums;
+
+        /// <summary>
+        /// Dictionary to map scan numbers to MS Levels
+        /// </summary>
         protected Dictionary<int, int> ScanNumToMsLevel;
+
+        /// <summary>
+        /// Dictionary to map scan numbers to elution times
+        /// </summary>
         protected Dictionary<int, double> ScanNumElutionTimeMap;
+
+        /// <summary>
+        /// True if DIA data, false if not, null if unknown
+        /// </summary>
         protected bool? IsDiaOrNull;
 
-        private int[] _precursorScan;
-        private int[] _nextScan;
+        private Dictionary<int, int> _precursorScan;
+        private Dictionary<int, int> _nextScan;
 
+        /// <summary>
+        /// Create the maps for linking MSn scans to their precursors, and for getting the next MS1 scan number given a scan number
+        /// </summary>
         protected void CreatePrecursorNextScanMap()
         {
-            _precursorScan = new int[MaxLcScan - MinLcScan + 1];
-            _nextScan = new int[MaxLcScan - MinLcScan + 1];
+            _precursorScan = new Dictionary<int, int>(NumSpectra + 1);
+            _nextScan = new Dictionary<int, int>(NumSpectra + 1);
 
             var precursorMap = new Dictionary<int, int>();
             var nextScanMap = new Dictionary<int, int>();
@@ -587,51 +782,73 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var prevMsLevel = int.MinValue;
-            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
+            var prevScanNum = -1;
+            foreach (var scan in ScanNumToMsLevel.OrderBy(x => x.Key))
             {
-                var index = scanNum - MinLcScan;
+                var scanNum = scan.Key;
+                var msLevel = scan.Value;
 
-                var msLevel = GetMsLevel(scanNum);
                 if (msLevel == 0) continue; // corrupted scan
+
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
                 {
-                    _precursorScan[index] = _precursorScan[index - 1];
+                    if (prevScanNum < 0)
+                    {
+                        // We shouldn't encounter this, but better safe than sorry.
+                        _precursorScan[scanNum] = MinLcScan;
+                    }
+                    else
+                    {
+                        _precursorScan[scanNum] = _precursorScan[prevScanNum];
+                    }
                 }
                 else if (msLevel > prevMsLevel)
                 {
-                    _precursorScan[index] = scanNum - 1;
+                    _precursorScan[scanNum] = scanNum - 1;
                     precursorMap[msLevel] = scanNum - 1;
                 }
                 else // msLevel < prevMsLevel
                 {
-                    _precursorScan[index] = precursorMap[msLevel];
+                    _precursorScan[scanNum] = precursorMap[msLevel];
                 }
                 prevMsLevel = msLevel;
+                prevScanNum = scanNum;
             }
 
             var nextMsLevel = int.MinValue;
-            for (var scanNum = MaxLcScan; scanNum >= MinLcScan; scanNum--)
+            var nextScanNum = int.MaxValue;
+            foreach (var scan in ScanNumToMsLevel.OrderByDescending(x => x.Key))
             {
-                var index = scanNum - MinLcScan;
-                var msLevel = GetMsLevel(scanNum);
+                var scanNum = scan.Key;
+                var msLevel = scan.Value;
+
                 if (msLevel == 0) continue; // corrupted scan
 
                 // determine next scan
                 if (msLevel == nextMsLevel)
                 {
-                    _nextScan[index] = _nextScan[index + 1];
+                    if (nextScanNum == int.MaxValue)
+                    {
+                        // We shouldn't encounter this, but better safe than sorry.
+                        _nextScan[scanNum] = MaxLcScan;
+                    }
+                    else
+                    {
+                        _nextScan[scanNum] = _nextScan[nextScanNum];
+                    }
                 }
                 else if (msLevel > nextMsLevel)
                 {
-                    _nextScan[index] = scanNum + 1;
+                    _nextScan[scanNum] = scanNum + 1;
                     nextScanMap[msLevel] = scanNum + 1;
                 }
                 else // msLevel < prevMsLevel
                 {
-                    _nextScan[index] = nextScanMap[msLevel];
+                    _nextScan[scanNum] = nextScanMap[msLevel];
                 }
                 nextMsLevel = msLevel;
+                nextScanNum = scanNum;
             }
         }
 

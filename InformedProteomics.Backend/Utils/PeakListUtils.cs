@@ -1,21 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
+using InformedProteomics.Backend.MathAndStats;
 using MathNet.Numerics.Statistics;
 
 namespace InformedProteomics.Backend.Utils
 {
+    /// <summary>
+    /// Peak List utilities
+    /// </summary>
     public class PeakListUtils
     {
+        /// <summary>
+        /// Find the highest-intensity peak that matches <paramref name="mz"/> within a tolerance
+        /// </summary>
+        /// <param name="peakList"></param>
+        /// <param name="mz"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
         public static Peak FindPeak(List<Peak> peakList, double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return FindPeak(peakList, minMz, maxMz);
         }
 
+        /// <summary>
+        /// Find the highest-intensity peak with the m/z range specified
+        /// </summary>
+        /// <param name="peakList"></param>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
         public static Peak FindPeak(List<Peak> peakList, double minMz, double maxMz)
         {
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
@@ -54,14 +71,28 @@ namespace InformedProteomics.Backend.Utils
             return bestPeakIndex == -1 ? null : peakList[bestPeakIndex];
         }
 
+        /// <summary>
+        /// Find all peaks that are in the range specified by <paramref name="mz"/> and a tolerance
+        /// </summary>
+        /// <param name="peakList"></param>
+        /// <param name="mz"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
         public static IList<Peak> FindAllPeaks(List<Peak> peakList, double mz, Tolerance tolerance)
         {
-            var tolTh = tolerance.GetToleranceAsTh(mz);
+            var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
             return FindAllPeaks(peakList, minMz, maxMz);
         }
 
+        /// <summary>
+        /// Find all peaks that are in the range provided
+        /// </summary>
+        /// <param name="peakList"></param>
+        /// <param name="minMz"></param>
+        /// <param name="maxMz"></param>
+        /// <returns></returns>
         public static IList<Peak> FindAllPeaks(List<Peak> peakList, double minMz, double maxMz)
         {
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
@@ -91,6 +122,13 @@ namespace InformedProteomics.Backend.Utils
             return matchedPeakList;
         }
 
+        /// <summary>
+        /// Get the Pearson correlation for the provided experimental and theoretical peaks
+        /// </summary>
+        /// <param name="spec"></param>
+        /// <param name="isoProfile"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
         public static double GetPearsonCorrelation(IList<Peak> spec, IList<Peak> isoProfile,
             IComparer<Peak> comparer)
         {
@@ -106,7 +144,7 @@ namespace InformedProteomics.Backend.Utils
             {
                 var comp = comparer.Compare(spec[index1], isoProfile[index2]);
                 if (comp < 0) ++index1;
-                else if (comp > 0) 
+                else if (comp > 0)
                 {
                     ++index2;
                 }
@@ -124,7 +162,14 @@ namespace InformedProteomics.Backend.Utils
             return FitScoreCalculator.GetPearsonCorrelation(theoIntensities, observedIntensities);
         }
 
-        public static double GetCosine(IList<Peak> spec, IList<Peak> isoProfile,IComparer<Peak> comparer)
+        /// <summary>
+        /// Get the cosine score for the provided experimental and theoretical peaks
+        /// </summary>
+        /// <param name="spec"></param>
+        /// <param name="isoProfile"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public static double GetCosine(IList<Peak> spec, IList<Peak> isoProfile, IComparer<Peak> comparer)
         {
             var numPeaksSpec = spec.Count;
             var numTheoProfilePeaks = isoProfile.Count;
@@ -156,6 +201,13 @@ namespace InformedProteomics.Backend.Utils
             return FitScoreCalculator.GetCosine(theoIntensities, observedIntensities);
         }
 
+        /// <summary>
+        /// Get the intersection of the provided peak lists
+        /// </summary>
+        /// <param name="peakList1"></param>
+        /// <param name="peakList2"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
         public static List<Peak> GetIntersection(List<Peak> peakList1, List<Peak> peakList2,
             IComparer<Peak> comparer)
         {
@@ -181,6 +233,13 @@ namespace InformedProteomics.Backend.Utils
             return intersection;
         }
 
+        /// <summary>
+        /// Get the exceptwith of the 2 peak lists
+        /// </summary>
+        /// <param name="peakList1"></param>
+        /// <param name="peakList2"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
         public static List<Peak> GetExceptWith(List<Peak> peakList1, List<Peak> peakList2,
             IComparer<Peak> comparer)
         {
@@ -209,6 +268,13 @@ namespace InformedProteomics.Backend.Utils
             return exceptWith;
         }
 
+        /// <summary>
+        /// Get the sum of the 2 peak lists
+        /// </summary>
+        /// <param name="peakList1"></param>
+        /// <param name="peakList2"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
         public static List<Peak> Sum(IList<Peak> peakList1, IList<Peak> peakList2,
             IComparer<Peak> comparer)
         {
@@ -248,9 +314,13 @@ namespace InformedProteomics.Backend.Utils
             return sum;
         }
 
-        // startIndex: inclusive
-        // endIndex: exclusive
-        public static void FilterNoise(IList<Peak> peakList, 
+        /// <summary>
+        /// Get a peak list where peaks before a threshold are removed
+        /// </summary>
+        /// <param name="peakList"></param>
+        /// <param name="filteredPeakList"></param>
+        /// <param name="signalToMedianRatio"></param>
+        public static void FilterNoise(IList<Peak> peakList,
             ref List<Peak> filteredPeakList, double signalToMedianRatio = 1.4826)
         {
             //var medianIntensity = peakList.OrderByDescending(p => p.Intensity).Select(p => p.Intensity).Median();

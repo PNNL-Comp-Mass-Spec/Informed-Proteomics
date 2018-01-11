@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.SequenceTag;
 using InformedProteomics.Backend.Utils;
 
 namespace InformedProteomics.TopDown.PostProcessing
@@ -13,17 +10,17 @@ namespace InformedProteomics.TopDown.PostProcessing
         public SequenceTagParser(string tagFilePath, int minTagLength = 0, int numTagsPerScan = int.MaxValue)
         {
             TagFilePath = tagFilePath;
-            _scanToTags = new Dictionary<int, IList<SequenceTag>>();
+            _scanToTags = new Dictionary<int, IList<SequenceTag.SequenceTag>>();
             _minTagLength = minTagLength;
             _numTagsPerScan = numTagsPerScan;
             Parse(tagFilePath);
         }
 
-        public IEnumerable<SequenceTag> GetSequenceTags(int scanNum)
+        public IEnumerable<SequenceTag.SequenceTag> GetSequenceTags(int scanNum)
         {
-            IList<SequenceTag> tags;
+            IList<SequenceTag.SequenceTag> tags;
             if (_scanToTags.TryGetValue(scanNum, out tags)) return tags;
-            return new List<SequenceTag>();
+            return new List<SequenceTag.SequenceTag>();
         }
 
         public IEnumerable<int> GetScanNums()
@@ -34,7 +31,7 @@ namespace InformedProteomics.TopDown.PostProcessing
         public string TagFilePath { get; private set; }
         private readonly int _minTagLength;
         private readonly int _numTagsPerScan;
-        private readonly Dictionary<int, IList<SequenceTag>> _scanToTags;
+        private readonly Dictionary<int, IList<SequenceTag.SequenceTag>> _scanToTags;
 
         private void Parse(string tagFilePath)
         {
@@ -46,16 +43,16 @@ namespace InformedProteomics.TopDown.PostProcessing
             for (var i = 0; i < tagParser.NumData; i++)
             {
                 if (sequence[i].Length < _minTagLength) continue;
-                var tag = new SequenceTag(scan[i], sequence[i], isPrefix[i], flankingMass[i]);
+                var tag = new SequenceTag.SequenceTag(scan[i], sequence[i], isPrefix[i], flankingMass[i]);
 
-                IList<SequenceTag> tagList;
+                IList<SequenceTag.SequenceTag> tagList;
                 if (_scanToTags.TryGetValue(scan[i], out tagList))
                 {
                     if (tagList.Count < _numTagsPerScan) tagList.Add(tag);
                 }
                 else
                 {
-                    _scanToTags.Add(scan[i], new List<SequenceTag> { tag });
+                    _scanToTags.Add(scan[i], new List<SequenceTag.SequenceTag> { tag });
                 }
             }
         }

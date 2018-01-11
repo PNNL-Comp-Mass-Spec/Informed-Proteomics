@@ -16,7 +16,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
     public class CompareFitScoreByIntensity : IComparer<FitScore>
     {
-
         public int Compare(FitScore x, FitScore y)
         {
             return x.Intensity.CompareTo(y.Intensity);

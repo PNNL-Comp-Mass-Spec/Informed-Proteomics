@@ -1,0 +1,14 @@
+# Examples:
+C2H2O,     *,   opt, Prot-N-term, Acetyl             # Acetylation Protein N-term (C2H2O can be replaced with "H(2) C(2) O")
+O1,        M,   opt, any,         Oxidation          # Oxidation M
+H-1,       C,   opt, any,         Dehydro            # Dehydro C
+HO3P,      STY, opt, any,         Phospho            # Phosphorylation STY
+C2H3NO,    C,   fix, any,         Carbamidomethyl    # Fixed Carbamidomethyl C
+H-1N-1O1,  NQ,  opt, any,         Deamidated         # Negative numbers are allowed.
+C2H3NO,    *,   opt, N-term,      Carbamidomethyl    # Variable Carbamidomethyl N-term
+H-2O-1,    E,   opt, N-term,      Glu->pyro-Glu      # Pyro-glu from E
+H-3N-1,    Q,   opt, N-term,      Gln->pyro-Glu      # Pyro-glu from Q
+C2H2O1,    K,   opt, any,         Acetyl             # Acetylation K
+CH2,       K,   opt, any,         Methyl             # Methylation K
+H(12) C(4) 13C(3) N 15N O,   K, any,    iTRAQ4plex   # iTRAQ K
+H(12) C(4) 13C(3) N 15N O,   *, N-term, iTRAQ4plex   # iTRAQ N-term

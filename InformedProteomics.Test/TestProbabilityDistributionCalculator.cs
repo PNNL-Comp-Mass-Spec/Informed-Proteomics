@@ -12,7 +12,6 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProbabilityDistributionCalculator
     {
-
         [Test]
         public void TestProbabilityDistribution()
         {
@@ -24,8 +23,7 @@ namespace InformedProteomics.Test
             var testDecoyObsFile = @"\\protoapps\UserData\Jungkap\Joshua\LcMsFeatureScoreTrain\decoy_trainset.tsv";
             var testTargetObsFile = @"\\protoapps\UserData\Jungkap\Joshua\LcMsFeatureScoreTrain\target_trainset.tsv";
 
-
-            string line; 
+            string line;
             var file = new System.IO.StreamReader(testDecoyObsFile);
             while ((line = file.ReadLine()) != null)
             {
@@ -77,10 +75,6 @@ namespace InformedProteomics.Test
                 var outPutFile = @"C:\Users\mend645\Desktop\Likelihood\" + variableNames[i] + "_likelihood.tsv";
                 probabilityCalc.GetLikelihoods(targetFile, decoyFile, outPutFile);
             }
-
-            
-
-
         }
     }
 }

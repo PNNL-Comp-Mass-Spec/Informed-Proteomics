@@ -1,5 +1,6 @@
 ﻿using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
+using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
@@ -12,7 +13,9 @@ namespace InformedProteomics.TopDown.Scoring
             _corrScoreThreshold = corrScoreThreshold;
         }
 
-        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition)
+        public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null)
         {
             var score = 0.0;
 

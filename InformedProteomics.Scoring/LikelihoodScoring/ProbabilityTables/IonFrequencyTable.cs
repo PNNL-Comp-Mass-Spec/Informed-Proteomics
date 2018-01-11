@@ -74,9 +74,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     if (ionTypeFound[key]) found = 1;
                     AddIonProbability(new Probability<IonType>(key, found, total));
                 }
-            }            
+            }
         }
-
 
         /// <summary>
         /// Add list of Peptide-Spectrum matches to ion probability table.

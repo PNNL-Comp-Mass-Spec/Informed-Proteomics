@@ -16,7 +16,6 @@ using InformedProteomics.TopDown.Scoring;
 
 namespace InformedProteomics.Test
 {
-
     [TestFixture]
     class TestSequenceScoring
     {
@@ -49,7 +48,6 @@ namespace InformedProteomics.Test
 
             for (int i = 0; i < 1; i++)
             {
-
                 var scanNum = Int32.Parse(ms2ScanNumbers[i]);
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
                 int tsvIndex = ms2ScanNumbers.FindIndex(x => Int32.Parse(x) == scanNum);
@@ -61,7 +59,6 @@ namespace InformedProteomics.Test
                 Console.WriteLine(sequence.Count);
                 var score = GetScoreTest(sequence, spectrum);
                 Console.WriteLine(scanNum + ":" + score);
-
             }
         }
 
@@ -82,6 +79,5 @@ namespace InformedProteomics.Test
             }
             return score;
         }
-
     }
 }

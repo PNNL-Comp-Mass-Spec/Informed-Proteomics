@@ -7,20 +7,57 @@ using InformedProteomics.Backend.Data.Biology;
 
 namespace InformedProteomics.Backend.Data.Composition
 {
-    [Serializable]
+    /// <summary>
+    /// Composition, consisting of elements C, H, N, O, S, or P, and optionally additional elements
+    /// </summary>
     public class Composition: AbstractComposition
     {
+        /// <summary>
+        /// Empty composition
+        /// </summary>
         public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
-        public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
-        public static readonly Composition NH3 = new Composition(0, 3, 1, 0, 0);
-        public static readonly Composition NH2 = new Composition(0, 2, 1, 0, 0);
-        public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
-        public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
-        public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
+        /// <summary>
+        /// Water
+        /// </summary>
+        public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
+
+        /// <summary>
+        /// Ammonia
+        /// </summary>
+        public static readonly Composition NH3 = new Composition(0, 3, 1, 0, 0);
+
+        /// <summary>
+        /// Amide
+        /// </summary>
+        public static readonly Composition NH2 = new Composition(0, 2, 1, 0, 0);
+
+        /// <summary>
+        /// Hydroxide
+        /// </summary>
+        public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
+
+        /// <summary>
+        /// Carbon Monoxide
+        /// </summary>
+        public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
+
+        /// <summary>
+        /// Hydrogen
+        /// </summary>
+        public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
 
         #region Constructors
 
+        /// <summary>
+        /// Constructor, with provided counts for C, H, N, O, S, P
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
+        /// <param name="p"></param>
         public Composition(int c, int h, int n, int o, int s, int p)
         {
             _c = (short)c;
@@ -31,11 +68,23 @@ namespace InformedProteomics.Backend.Data.Composition
             _p = (short)p;
         }
 
+        /// <summary>
+        /// Constructor, with provided counts for C, H, N, O, S
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
         public Composition(int c, int h, int n, int o, int s)
             : this(c, h, n, o, s, 0)
         {
         }
 
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="composition"></param>
         public Composition(Composition composition)
             : this(composition.C, composition.H,
                 composition.N, composition.O, composition.S, composition.P)
@@ -46,12 +95,32 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Constructor, with provided counts for C, H, N, O, S, P, and a tuple of additional element and count
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
+        /// <param name="p"></param>
+        /// <param name="additionalElement"></param>
         public Composition(int c, int h, int n, int o, int s, int p, Tuple<Atom, short> additionalElement)
             : this(c, h, n, o, s, p)
         {
             _additionalElements = new Dictionary<Atom, short> { { additionalElement.Item1, additionalElement.Item2 } };
         }
 
+        /// <summary>
+        /// Constructor, with provided counts for C, H, N, O, S, P, and tuples of additional elements and respective counts
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="h"></param>
+        /// <param name="n"></param>
+        /// <param name="o"></param>
+        /// <param name="s"></param>
+        /// <param name="p"></param>
+        /// <param name="additionalElements"></param>
         public Composition(int c, int h, int n, int o, int s, int p, IEnumerable<Tuple<Atom, short>> additionalElements)
             : this(c, h, n, o, s, p)
         {
@@ -62,6 +131,9 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public Composition()
         {
             _additionalElements = new Dictionary<Atom, short>();
@@ -76,9 +148,12 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #region Properties
 
+        /// <summary>
+        /// Count of Carbon atoms in the composition
+        /// </summary>
         public short C
         {
-            get { return _c; }
+            get => _c;
             set
             {
                 _c = value;
@@ -87,9 +162,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Count of Hydrogen atoms in the composition
+        /// </summary>
         public short H
         {
-            get { return _h; }
+            get => _h;
             set
             {
                 _h = value;
@@ -98,9 +176,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Count of Nitrogen atoms in the composition
+        /// </summary>
         public short N
         {
-            get { return _n; }
+            get => _n;
             set
             {
                 _n = value;
@@ -109,9 +190,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Count of Oxygen atoms in the composition
+        /// </summary>
         public short O
         {
-            get { return _o; }
+            get => _o;
             set
             {
                 _o = value;
@@ -120,9 +204,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Count of Sulfur atoms in the composition
+        /// </summary>
         public short S
         {
-            get { return _s; }
+            get => _s;
             set
             {
                 _s = value;
@@ -131,9 +218,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Count of Phosphorus atoms in the composition
+        /// </summary>
         public short P
         {
-            get { return _p; }
+            get => _p;
             set
             {
                 _p = value;
@@ -142,9 +232,12 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
+        /// <summary>
+        /// Map of additional elements in the composition and their respective counts
+        /// </summary>
         public Dictionary<Atom, short> AdditionalElements
         {
-            get { return _additionalElements; }
+            get => _additionalElements;
             set
             {
                 _additionalElements = value;
@@ -153,17 +246,15 @@ namespace InformedProteomics.Backend.Data.Composition
             }
         }
 
-        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
-        public override double Mass
-        {
-            get { return (double)(_mass ?? (_mass = GetMonoIsotopicMass())); }
-        }
+        /// <summary>
+        /// Mass of the composition
+        /// </summary>
+        public override double Mass => (double)(_mass ?? (_mass = GetMonoIsotopicMass()));
 
-        [System.Runtime.Serialization.IgnoreDataMemberAttribute]
-        public override int NominalMass
-        {
-            get { return (int)(_nominalMass ?? (_nominalMass = GetNominalMass())); }
-        }
+        /// <summary>
+        /// Nominal mass of the composition
+        /// </summary>
+        public override int NominalMass => (int)(_nominalMass ?? (_nominalMass = GetNominalMass()));
 
         #endregion
 
@@ -182,15 +273,18 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #endregion
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return Mass.GetHashCode();
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            var other = obj as Composition;
-            if (other == null) return false;
+            if (!(obj is Composition other))
+                return false;
+
             if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S || _p != other.P)
                 return false;
 
@@ -201,16 +295,19 @@ namespace InformedProteomics.Backend.Data.Composition
             // Both have additional elements
             foreach (var entry in _additionalElements)
             {
-                short num;
-                if (!(_additionalElements.TryGetValue(entry.Key, out num))) return false;
-                if (entry.Value != num) return false;
+                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue))) return false;
+                if (entry.Value != otherValue) return false;
             }
             return true;
         }
 
-
         #region Operators
 
+        /// <summary>
+        /// Return a new composition that consists of this composition and <paramref name="c"/>
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         protected Composition AddComposition(Composition c)
         {
             var numC = _c + c._c;
@@ -230,8 +327,8 @@ namespace InformedProteomics.Backend.Data.Composition
                 foreach (var element in c._additionalElements)
                 {
                     var atom = element.Key;
-                    short numAtoms;
-                    if (_additionalElements.TryGetValue(atom, out numAtoms))
+
+                    if (_additionalElements.TryGetValue(atom, out var numAtoms))
                     {
                         // atom was in _additionalElements
                         additionalElements[atom] = (short)(numAtoms + element.Value);
@@ -253,24 +350,40 @@ namespace InformedProteomics.Backend.Data.Composition
 
             var newComposition = new Composition(numC, numH, numN, numO, numS, numP, additionalElements);
 
-            return newComposition;              
+            return newComposition;
         }
 
+        /// <summary>
+        /// Return a new composition that consists of this composition and <paramref name="c"/>
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public Composition Add(Composition c)
         {
-            var comWithDelta = c as CompositionWithDeltaMass;
-            if (comWithDelta != null) return comWithDelta.Add(this);
+            if (c is CompositionWithDeltaMass comWithDelta)
+                return comWithDelta.Add(this);
 
             return AddComposition(c);
         }
 
+        /// <summary>
+        /// Overloaded '+' operator to add 2 compositions
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
         public static Composition operator +(Composition c1, Composition c2)
         {
-            var compWithDelta = c1 as CompositionWithDeltaMass;
-            if (compWithDelta == null) return c1.Add(c2);
+            if (!(c1 is CompositionWithDeltaMass compWithDelta))
+                return c1.Add(c2);
+
             return compWithDelta.Add(c2);
         }
 
+        /// <summary>
+        /// Return the inverse composition (all counts negative)
+        /// </summary>
+        /// <returns></returns>
         public Composition Negate()
         {
             if (_additionalElements == null)
@@ -287,11 +400,18 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public static Composition operator -(Composition c)
         {
-            var compWithDelta = c as CompositionWithDeltaMass;
-            if (compWithDelta == null) return c.Negate();
+            if (!(c is CompositionWithDeltaMass compWithDelta))
+                return c.Negate();
+
             return compWithDelta.Negate();
         }
 
+        /// <summary>
+        /// Overloaded '-' operator to subtract one composition from another
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
         public static Composition operator -(Composition c1, Composition c2)
         {
             return c1 + (-c2);
@@ -300,6 +420,8 @@ namespace InformedProteomics.Backend.Data.Composition
         #endregion
 
         #region ToString and Parsing from String
+
+        /// <inheritdoc />
         public override string ToString()
         {
             var basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + (P != 0 ? ") P(" + P + ")" : ")");
@@ -314,6 +436,10 @@ namespace InformedProteomics.Backend.Data.Composition
             return buf.ToString();
         }
 
+        /// <summary>
+        /// Return the composition as an empirical formula
+        /// </summary>
+        /// <returns></returns>
         public string ToPlainString()
         {
             var basicCompositionStr =
@@ -335,7 +461,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return buf.ToString();
         }
 
-        // Parses plain string (e.g. C2H3N1O1S)
+        /// <summary>
+        /// Parse a plain-string empirical formula, for example
+        /// C2H3N1O1S
+        /// </summary>
+        /// <param name="plaincompositionStr"></param>
+        /// <remarks>Empirical formula cannot have parentheses or spaces</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition ParseFromPlainString(string plaincompositionStr)
         {
             if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
@@ -356,8 +488,13 @@ namespace InformedProteomics.Backend.Data.Composition
             return Parse(unimodString.ToString());
         }
 
-        // Initially implemented by Kyowon, re-implemented by Sangtae
-        // Parses Unimod-like string (e.g. H(117) C(77) N(17) O(26) S(2))
+        /// <summary>
+        /// Parse unimod-like composition string, for example
+        /// H(117) C(77) N(17) O(26) S(2)
+        /// </summary>
+        /// <param name="compositionStr"></param>
+        /// <remarks>Requires the use of parentheses for element counts.  Also requires whitespace (typically a space) between each element and count</remarks>
+        /// <returns>Composition object, or null if a parse error</returns>
         public static Composition Parse(string compositionStr)
         {
             var c = 0;
@@ -385,18 +522,23 @@ namespace InformedProteomics.Backend.Data.Composition
                         element = e.Substring(0, e.IndexOf('('));
                         num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
                     }
-                    if (element.Equals("C")) c = num;
-                    else if (element.Equals("H")) h = num;
-                    else if (element.Equals("N")) n = num;
-                    else if (element.Equals("O")) o = num;
-                    else if (element.Equals("S")) s = num;
-                    else if (element.Equals("P")) p = num;
+                    if (element.Equals("C")) c += num;
+                    else if (element.Equals("H")) h += num;
+                    else if (element.Equals("N")) n += num;
+                    else if (element.Equals("O")) o += num;
+                    else if (element.Equals("S")) s += num;
+                    else if (element.Equals("P")) p += num;
                     else
                     {
                         var atom = Atom.Get(element);
                         if (atom == null) return null;
-                        if (additionalElements == null) additionalElements = new Dictionary<Atom, short>();
-                        additionalElements.Add(atom, (short)num);
+                        if (additionalElements == null)
+                            additionalElements = new Dictionary<Atom, short>();
+
+                        if (additionalElements.TryGetValue(atom, out var currentAtomCount))
+                            additionalElements[atom] = (short)(currentAtomCount + num);
+                        else
+                            additionalElements.Add(atom, (short)num);
                     }
                 }
                 else // illegal string
@@ -425,7 +567,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         private int GetNominalMass()
         {
-            int nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
+            var nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
             if (_additionalElements != null) nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
            return nominalMass;
         }
@@ -449,7 +591,5 @@ namespace InformedProteomics.Backend.Data.Composition
         private static readonly int NominalMassS = Atom.Get("S").NominalMass;
         private static readonly int NominalMassP = Atom.Get("P").NominalMass;
         #endregion
-
     }
 }
-

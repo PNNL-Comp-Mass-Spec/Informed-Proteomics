@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Enum;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Backend.MassFeature;
+using InformedProteomics.FeatureFinding.FeatureDetection;
 using InformedProteomics.TopDown.PostProcessing;
 
 namespace InformedProteomics.TopDown.TagBasedSearch
@@ -21,9 +21,9 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             ProductSpectrum spec,
             IScorer ms2Scorer,
             LcMsPeakMatrix featureFinder,
-            string proteinSequence, 
-            Tolerance tolerance, 
-            AminoAcidSet aaSet, 
+            string proteinSequence,
+            Tolerance tolerance,
+            AminoAcidSet aaSet,
             double maxSequenceMass)
         {
             _spec = spec;
@@ -75,14 +75,14 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
 
                     var tagMatch = new TagMatch(
-                        backwardMatch.Index, 
-                        forwardMatch.Index, 
+                        backwardMatch.Index,
+                        forwardMatch.Index,
                         matchedTag.Length,
                         backwardMatch.Charge,
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
-                        new ModificationCombination(modList), 
+                        new ModificationCombination(modList),
                         modStr);
                     yield return tagMatch;
                 }
@@ -114,20 +114,20 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
-                    
+
                     var modList = new List<Modification>();
                     foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
                     foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
 
                     var tagMatch = new TagMatch(
-                        backwardMatch.Index, 
+                        backwardMatch.Index,
                         forwardMatch.Index,
                         matchedTag.Length,
                         forwardMatch.Charge,
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
-                        new ModificationCombination(modList), 
+                        new ModificationCombination(modList),
                         modStr);
                     yield return tagMatch;
                 }
@@ -164,14 +164,14 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
 
                     var tagMatch = new TagMatch(
-                        backwardMatch.Index, 
+                        backwardMatch.Index,
                         forwardMatch.Index,
                         matchedTag.Length,
                         backwardMatch.Charge,
                         backwardMatch.Score,
                         forwardMatch.Score,
                         mass,
-                        new ModificationCombination(modList), 
+                        new ModificationCombination(modList),
                         modStr);
                     yield return tagMatch;
                 }
@@ -180,7 +180,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         private readonly ProductSpectrum _spec;
         private readonly IScorer _ms2Scorer;
-        
+
         private readonly LcMsPeakMatrix _featureFinder;
         private readonly string _proteinSequence;
 
@@ -262,7 +262,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 if (!spec.IsolationWindow.Contains(mostAbundantIsotopeMz)) continue;
 
                 //var feature = new TargetFeature(sequenceMass, charge, spec.ScanNum);
-                
+
                 if (_featureFinder != null)
                 {
                     var ms1Corr = _featureFinder.GetMs1EvidenceScore(spec.ScanNum, sequenceMass, charge);
@@ -301,5 +301,10 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         internal int Charge { get; set; }
         internal IEnumerable<ModificationInstance> Modifications { get; set; }
         internal int Index { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0}+, {1:F1} Da, Score {2:F1}", Charge, Mass, Score);
+        }
     }
 }

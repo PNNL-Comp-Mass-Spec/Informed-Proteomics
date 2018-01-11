@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Spectrometry;
+using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
 {
-    public interface IMassSpecDataReader
+    /// <summary>
+    /// Interface for objects that can supply mass spectrometry data, usually from a file
+    /// </summary>
+    public interface IMassSpecDataReader : IDisposable
     {
         /// <summary>
         /// Gets all spectra
@@ -34,5 +39,32 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <returns>true if is random access capable, false if not</returns>
         bool TryMakeRandomAccessCapable();
+
+        /// <summary>
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </summary>
+        CV.CVID NativeIdFormat { get; }
+
+        /// <summary>
+        /// The Native Format of the source file - needed for tracking purposes.
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </summary>
+        CV.CVID NativeFormat { get; }
+
+        /// <summary>
+        /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
+        /// </summary>
+        string FilePath { get; }
+
+        /// <summary>
+        /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.) - lower case, hex characters only (no dashes)
+        /// </summary>
+        string SrcFileChecksum { get; }
+
+        /// <summary>
+        /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
+        /// </summary>
+        string FileFormatVersion { get; }
     }
 }

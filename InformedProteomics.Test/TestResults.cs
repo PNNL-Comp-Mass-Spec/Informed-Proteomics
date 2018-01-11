@@ -5,7 +5,10 @@ using System.Linq;
 using System.Reflection;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
+using InformedProteomics.Backend.MathAndStats;
+using InformedProteomics.Backend.SearchResults;
 using InformedProteomics.Backend.Utils;
+using InformedProteomics.Tests.Base;
 using NUnit.Framework;
 
 namespace InformedProteomics.Test
@@ -14,10 +17,11 @@ namespace InformedProteomics.Test
     public class TestResults
     {
         [Test]
+        [Category("Local_Testing")]
         public void SummarizeAnilResults()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string resultFolder = @"H:\Research\Anil\Oct28";
             if (!Directory.Exists(resultFolder))
@@ -71,10 +75,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void CountIdentifiedPeptides()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             //const string targetResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcTarget.tsv";
             //const string decoyResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcDecoy.tsv";
@@ -99,7 +104,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, decoyResultPath);
             }
 
-            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);         
+            var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath, false);
             if (fdrCalculator.HasError())
             {
                 throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
@@ -111,10 +116,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             // DIA
             const string dir = @"H:\Research\DDAPlus\NTT2";
@@ -151,10 +157,11 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [Category("Local_Testing")]
         public void TestIcrTools()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
-            TestUtils.ShowStarting(methodName);
+            Utils.ShowStarting(methodName);
 
             const string icrToolsPath = @"H:\Research\Yufeng\TopDownYufeng\ICRTools\yufeng_column_test2_Isos.csv";
             if (!File.Exists(icrToolsPath))
@@ -168,7 +175,7 @@ namespace InformedProteomics.Test
             var scanArray = icrToolsparser.GetData("scan_num").Select(s => Convert.ToInt32(s)).ToArray();
             var fitArray = icrToolsparser.GetData("fit").Select(Convert.ToDouble).ToArray();
             var peakList = fitArray.Where(fit => fit < fitScoreThreshold).Select((fit, i) => new Peak(monoMassArr[i], scanArray[i])).OrderBy(p => p.Mz).ToList();
-            Console.WriteLine("FitScoreThreshold: {0}", fitScoreThreshold); 
+            Console.WriteLine("FitScoreThreshold: {0}", fitScoreThreshold);
             Console.WriteLine("NumFeatures: {0}", peakList.Count);
             //var peakList = monoMassArr.Select((mass, i) => new Peak(mass, scanArray[i])).OrderBy(p => p.Mz).ToList();
             var massTolerance = new Tolerance(10);
