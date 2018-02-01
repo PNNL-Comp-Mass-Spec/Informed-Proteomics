@@ -150,6 +150,12 @@ namespace PromexAlign
                 writer.Write(dataName + "_Ms1Score");
             }
 
+            foreach (var dataName in runLabels)
+            {
+                writer.Write("\t");
+                writer.Write(dataName + "_FeatureId");
+            }
+
             writer.Write("\t");
             writer.Write("Pre");
             writer.Write("\t");
@@ -197,6 +203,12 @@ namespace PromexAlign
                 {
                     writer.Write("\t");
                     writer.Write(features[i] == null ? 0 : features[i].Score);
+                }
+
+                for (var i = 0; i < nDataset; i++)
+                {
+                    writer.Write("\t");
+                    writer.Write(features[i] == null ? 0 : features[i].FeatureId);
                 }
 
                 var prsm = (from f in features

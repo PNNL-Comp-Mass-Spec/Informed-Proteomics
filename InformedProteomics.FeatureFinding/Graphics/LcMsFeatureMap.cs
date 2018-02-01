@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Alignment;
 using InformedProteomics.FeatureFinding.Data;
@@ -106,10 +107,18 @@ namespace InformedProteomics.FeatureFinding.Graphics
                 line.StrokeThickness = 0.3;
                 _featureMap.Series.Add(line);
             }
-            using (var stream = File.Create(imgPath))
+
+            // OxyPlot WPF PngExporter requires STA Thread. Running it as below a separate thread means that the exe no longer needs to be flagged STAThread.
+            var thread = new Thread(() =>
             {
-                OxyPlot.Wpf.PngExporter.Export(_featureMap, stream, 1200, 900, OxyColor.FromRgb(byte.MaxValue, byte.MaxValue, byte.MaxValue));
-            }
+                using (var stream = File.Create(imgPath))
+                {
+                    OxyPlot.Wpf.PngExporter.Export(_featureMap, stream, 1200, 900, OxyColor.FromRgb(byte.MaxValue, byte.MaxValue, byte.MaxValue));
+                }
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
         }
 
         public int GetTableIndex(double abundance, double[] breakTable)
