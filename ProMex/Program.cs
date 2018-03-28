@@ -30,8 +30,12 @@ namespace ProMex
 
             try
             {
-                var handle = Process.GetCurrentProcess().MainWindowHandle;
-                SetConsoleMode(handle, EnableExtendedFlags);
+                var osVersionInfo = new clsOSVersionInfo();
+                if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
+                {
+                    var handle = Process.GetCurrentProcess().MainWindowHandle;
+                    SetConsoleMode(handle, EnableExtendedFlags);
+                }
 
                 //args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "3000", "-maxMass", "30000"};
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.BottomUp.Execution;
+using PRISM;
 
 namespace MSPathFinder
 {
@@ -23,13 +24,16 @@ namespace MSPathFinder
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-
         private const uint EnableExtendedFlags = 0x0080;
 
         private static void Main(string[] args)
         {
-            var handle = Process.GetCurrentProcess().MainWindowHandle;
-            SetConsoleMode(handle, EnableExtendedFlags);
+            var osVersionInfo = new clsOSVersionInfo();
+            if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
+            {
+                var handle = Process.GetCurrentProcess().MainWindowHandle;
+                SetConsoleMode(handle, EnableExtendedFlags);
+            }
 
             if (args.Length % 2 != 0)
             {

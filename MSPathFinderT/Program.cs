@@ -22,7 +22,6 @@ namespace MSPathFinderT
 
         [DllImport("kernel32.dll")]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-
         private const uint EnableExtendedFlags = 0x0080;
 
         public static int Main(string[] args)
@@ -33,8 +32,12 @@ namespace MSPathFinderT
             try
 #endif
             {
-                var handle = Process.GetCurrentProcess().MainWindowHandle;
-                SetConsoleMode(handle, EnableExtendedFlags);
+                var osVersionInfo = new clsOSVersionInfo();
+                if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
+                {
+                    var handle = Process.GetCurrentProcess().MainWindowHandle;
+                    SetConsoleMode(handle, EnableExtendedFlags);
+                }
 
                 string entryAsmName;
                 try

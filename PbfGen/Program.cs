@@ -28,8 +28,12 @@ namespace PbfGen
 
             try
             {
-                var handle = Process.GetCurrentProcess().MainWindowHandle;
-                SetConsoleMode(handle, EnableExtendedFlags);
+                var osVersionInfo = new clsOSVersionInfo();
+                if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
+                {
+                    var handle = Process.GetCurrentProcess().MainWindowHandle;
+                    SetConsoleMode(handle, EnableExtendedFlags);
+                }
 
                 var exeName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
 
