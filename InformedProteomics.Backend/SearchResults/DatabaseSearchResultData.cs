@@ -267,6 +267,7 @@ namespace InformedProteomics.Backend.SearchResults
             public DatabaseSearchResultDataMap()
             {
                 ColumnCount = 0;
+                // ReSharper disable VirtualMemberCallInConstructor
                 Map(x => x.ScanNum).Index(ColumnCount++).Name("Scan");
                 Map(x => x.Pre).Index(ColumnCount++).Name("Pre");                                                                                                                          // Pre
                 Map(x => x.Sequence).Index(ColumnCount++).Name("Sequence", "Peptide", "#Peptide");                                                                                         // Sequence
@@ -286,14 +287,15 @@ namespace InformedProteomics.Backend.SearchResults
                 Map(x => x.Probability).Index(ColumnCount++).Name("Probability").ConvertUsing(x => StringUtilities.DblToString(x.Probability, 4));                                         // Probability
                 Map(x => x.SpecEValue).Index(ColumnCount++).Name("SpecEValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.SpecEValue), 6, true, 0.001)); // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
                 Map(x => x.EValue).Index(ColumnCount++).Name("EValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.EValue), 6, true, 0.001));             // EValue; will be displayed using scientific notation if the value is less than 0.001
+                // ReSharper restore VirtualMemberCallInConstructor
             }
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
-        private class DatabaseSearchResultDataTdaMap : DatabaseSearchResultDataMap
+        private sealed class DatabaseSearchResultDataTdaMap : DatabaseSearchResultDataMap
         {
             // Adds in the columns expected for TDA results
-            public DatabaseSearchResultDataTdaMap() : base()
+            public DatabaseSearchResultDataTdaMap()
             {
                 Map(x => x.QValue).Index(ColumnCount++).Name("QValue").ConvertUsing(x => StringUtilities.DblToString(x.QValue, 7));
                 Map(x => x.PepQValue).Index(ColumnCount++).Name("PepQValue").ConvertUsing(x => StringUtilities.DblToString(x.PepQValue, 7));
