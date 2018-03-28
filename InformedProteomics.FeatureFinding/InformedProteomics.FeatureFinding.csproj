@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics">
-      <Version>3.20.0</Version>
+      <Version>3.20.2</Version>
     </PackageReference>
     <PackageReference Include="OxyPlot.Wpf">
       <Version>1.0.0</Version>

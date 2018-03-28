@@ -21,8 +21,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="4.0.3" />
-    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+    <PackageReference Include="CsvHelper" Version="7.1.0" />
+    <PackageReference Include="MathNet.Numerics" Version="3.20.2" />
     <PackageReference Include="PRISM-Library" Version="2.4.82" />
     <PackageReference Include="PSI_Interface" Version="1.3.8" />
   </ItemGroup>
