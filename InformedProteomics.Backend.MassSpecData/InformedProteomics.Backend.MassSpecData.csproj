@@ -64,10 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
-      <Version>2.4.40</Version>
+      <Version>2.4.82</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
-      <Version>1.3.1</Version>
+      <Version>1.3.8</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

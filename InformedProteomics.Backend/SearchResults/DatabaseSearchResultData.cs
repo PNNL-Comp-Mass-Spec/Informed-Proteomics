@@ -309,7 +309,8 @@ namespace InformedProteomics.Backend.SearchResults
         {
             var databaseSearchResultData = ReadResultsFromFile(idFilePath);
 
-            var simpleMzIdentMLData = new SimpleMZIdentMLReader.SimpleMZIdentMLData(idFilePath);
+            var reader = new SimpleMZIdentMLReader();
+            var simpleMzIdentMLData = reader.Read(idFilePath);
 
             foreach (var databaseSearchResult in databaseSearchResultData)
             {
