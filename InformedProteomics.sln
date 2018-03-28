@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformedProteomics.Backend", "InformedProteomics.Backend\InformedProteomics.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Test", "InformedProteomics.Test\InformedProteomics.Test.csproj", "{800535C0-E5A3-4A05-8ED6-FDF02658D999}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -49,7 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BAB01DF1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromexAlign", "PromexAlign\PromexAlign.csproj", "{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend.Database", "InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj", "{451D1CE9-97D2-4898-9F59-4D058223637A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformedProteomics.Backend.Database", "InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj", "{451D1CE9-97D2-4898-9F59-4D058223637A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Backend.MassSpecData", "InformedProteomics.Backend.MassSpecData\InformedProteomics.Backend.MassSpecData.csproj", "{05B37516-2B5C-4C60-BFE2-D6854A19478A}"
 EndProject
