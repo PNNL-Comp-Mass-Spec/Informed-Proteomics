@@ -18,13 +18,14 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using InformedProteomics.Scoring.Interfaces;
 using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDownLauncher : PRISM.clsEventNotifier
     {
+        private const bool USE_PARALLEL_FOREACH = true;
+
         //public const int NumMatchesPerSpectrum = 1;
         public const string TargetFileNameEnding = "_IcTarget.tsv";
         public const string DecoyFileNameEnding = "_IcDecoy.tsv";
@@ -250,11 +251,24 @@ namespace InformedProteomics.TopDown.Execution
             //                                       Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, fullRun: _run as PbfLcMsRun);
             _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
                                                             Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
-            Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+
+#pragma warning disable 162
+            if (USE_PARALLEL_FOREACH)
             {
-                //_ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
-                _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
-            });
+                Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+                {
+                    //_ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
+                    _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
+                });
+            }
+            else
+            {
+                foreach (var ms2ScanNum in _ms2ScanNums)
+                {
+                    _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
+                }
+            }
+#pragma warning restore 162
 
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
