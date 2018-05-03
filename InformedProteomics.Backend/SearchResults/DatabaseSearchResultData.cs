@@ -348,7 +348,7 @@ namespace InformedProteomics.Backend.SearchResults
                         var modification = new SimpleMZIdentMLReader.Modification
                         {
                             Mass = ipMod.Mass,
-                            Tag = modName,
+                            Name = modName,
                         };
 
                         peptide.ModsAdd(modIndex, modification);
