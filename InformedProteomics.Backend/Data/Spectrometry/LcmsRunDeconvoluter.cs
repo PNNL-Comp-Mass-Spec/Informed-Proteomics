@@ -28,6 +28,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// The maximum number of threads the deconvoluter can use.
         /// </summary>
+        /// <remarks>
+        /// If -1, the system will decide the max thread count
+        /// Otherwise, must be 1 or larger
+        /// </remarks>
         private readonly int maxDegreeOfParallelism;
 
         /// <summary>
@@ -46,7 +50,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             this.deconvoluter = deconvoluter;
             this.dataReader = dataReader;
-            this.maxDegreeOfParallelism = maxDegreeOfParallelism;
+            this.maxDegreeOfParallelism = maxDegreeOfParallelism > 0 ? maxDegreeOfParallelism : -1;
             this.msLevelSet = msLevels == null ? new HashSet<int> { 1, 2 } : new HashSet<int>(msLevels);
         }
 

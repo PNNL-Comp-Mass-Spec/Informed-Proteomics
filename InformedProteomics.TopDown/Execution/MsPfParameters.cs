@@ -242,11 +242,27 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         public IEnumerable<int> ScanNumbers { get; set; }
 
-        /// <remarks>default 3</remarks>
+        /// <summary>
+        /// Number of matches to track for each spectrum
+        /// </summary>
+        /// <remarks>Defaults to 3</remarks>
         public int NumMatchesPerSpectrum { get; set; }
 
-        /// <remarks>default 4</remarks>
+        /// <summary>
+        /// Maximum number of threads
+        /// </summary>
+        /// <remarks>Defaults to 4</remarks>
         public virtual int MaxNumThreads { get; set; }
+
+        /// <summary>
+        /// Maximum degree of parallelism (MaxDOP), i.e.
+        /// the maximum number of concurrent tasks when running a parallel operation
+        /// </summary>
+        /// <remarks>
+        /// Equivalent to MaxNumThreads if MaxNumThreads is greater than 0.
+        /// Otherwise, -1, meaning to let the system decide the number of threads to use
+        /// </remarks>
+        public int MaxDegreeOfParallelism => MaxNumThreads > 0 ? MaxNumThreads : -1;
 
         /// <summary>
         /// 0: all internal sequences,

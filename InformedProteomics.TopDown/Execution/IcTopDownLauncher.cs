@@ -234,7 +234,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Start();
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -492,7 +492,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -549,7 +549,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Start();
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -615,7 +615,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -736,7 +736,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
@@ -870,7 +870,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var pfeOptions = new ParallelOptions
             {
-                MaxDegreeOfParallelism = Options.MaxNumThreads,
+                MaxDegreeOfParallelism = Options.MaxDegreeOfParallelism,
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
