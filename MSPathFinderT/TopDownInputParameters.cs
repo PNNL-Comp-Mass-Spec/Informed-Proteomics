@@ -14,7 +14,7 @@ namespace MSPathFinderT
 {
     public class TopDownInputParameters : MsPfParameters
     {
-        [Option("s", "specFile", Required = true, HelpText = "Spectrum File (*.raw)", HelpShowsDefault = false)]
+        [Option("s", "specFile", ArgPosition = 1, Required = true, HelpText = "Spectrum File (*.raw)", HelpShowsDefault = false)]
         public override string SpecFilePath { get; set; }
 
         public IEnumerable<string> SpecFilePaths { get; set; }
