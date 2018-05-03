@@ -60,6 +60,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Test]
         [Category("Local_Testing")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestFeatureAlignment()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\Lewy\aligned\promex_crosstab_temp.tsv";
@@ -270,6 +271,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("Local_Testing")]
+        [Ignore("Local files")]
         public void CountTagMatches()
         {
             for (var i = 1; i < 52; i++)

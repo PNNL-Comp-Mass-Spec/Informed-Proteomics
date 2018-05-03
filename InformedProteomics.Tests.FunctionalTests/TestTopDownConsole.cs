@@ -10,6 +10,7 @@ namespace InformedProteomics.Tests.FunctionalTests
     {
         [Test]
         [Category("PNL_Domain")]
+        [Ignore("Long running")]
         public void TestManyModSearch()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

@@ -22,6 +22,7 @@ namespace InformedProteomics.Tests.DevTests
     public class TestYufengData
     {
         public readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\yufeng_column_test2.raw");
+        public readonly string TestRawFilePath2 = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
 
         [Test]
         [Category("PNL_Domain")]
@@ -98,6 +99,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void Test43KProtein()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -204,6 +206,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestDeconvolution()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -235,16 +238,16 @@ namespace InformedProteomics.Tests.DevTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            if (!File.Exists(TestRawFilePath))
+            if (!File.Exists(TestRawFilePath2))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath2);
             }
 
-            const int minScanNum = 46454;
-            const int maxScanNum = 46661;
+            const int minScanNum = 6454;
+            const int maxScanNum = 6661;
             const int MAX_POINTS = 50;
 
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath2) as PbfLcMsRun;
             if (run == null) return;
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
 
@@ -253,18 +256,17 @@ namespace InformedProteomics.Tests.DevTests
 
         [Test]
         [Category("PNL_Domain")]
-        [Category("Long_Running")]
         public void TestRunningTimeSummingSpectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            if (!File.Exists(TestRawFilePath))
+            if (!File.Exists(TestRawFilePath2))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath2);
             }
 
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 1.4826, 1.4826) as PbfLcMsRun;
+            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath2, 1.4826, 1.4826) as PbfLcMsRun;
 
             var sw = new Stopwatch();
             sw.Start();
@@ -284,6 +286,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -331,6 +334,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestSmartIsoWindowSumming()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -420,6 +424,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestGeneratingXicsOfAllCharges()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -487,6 +492,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestAbpSumMs1Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -531,6 +537,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestSumMs2Spectra()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

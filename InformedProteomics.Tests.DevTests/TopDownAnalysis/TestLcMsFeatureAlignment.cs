@@ -18,6 +18,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestPeptidomics()
         {
             const string ms1ftFolder = @"\\protoapps\UserData\Jungkap\Mowei\Quant";
@@ -122,6 +123,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Test]
         [Category("PNL_Domain")]
         [Category("Long_Running")]
+        [Ignore("Slow")]
         public void TestCompRef()
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\CompRef\aligned\aligned_features_requant.tsv";
@@ -139,6 +141,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("Local_Testing")]
+        [Ignore("Local files")]
         public void TestIMER()
         {
             const string outFilePath = @"D:\MassSpecFiles\IMER\aligned_features.tsv";
@@ -156,6 +159,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         [Test]
         [Category("Local_Testing")]
+        [Ignore("Local files")]
         public void TestTempCompRefLcMsFeatureAlign()
         {
             const string dataFolder = @"D:\MassSpecFiles\CompRef";

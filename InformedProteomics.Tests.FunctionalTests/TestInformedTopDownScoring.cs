@@ -23,8 +23,8 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
-        [TestCase(4177, 6, "MLILTRRVGETLMIGDEVTVTVLGVKGNQVRIGVNAPKEVSVHREEIYQRIQSEKS", 70.97136)]
-        [TestCase(4265, 15, "ALRLKDLVKKTERQLSDYQRQLSMVKTTESVQKATATITDSFASSNSKLLNAKDSLERIKARQQQFDDRLKAAETLAEEGSDKSLQAKLAEAGIGEQKSNANAVLERIKARKS", 41.95799)]
+        [TestCase(4177, 6, "MLILTRRVGETLMIGDEVTVTVLGVKGNQVRIGVNAPKEVSVHREEIYQRIQSEKS", 114.36886559)]
+        [TestCase(4265, 15, "ALRLKDLVKKTERQLSDYQRQLSMVKTTESVQKATATITDSFASSNSKLLNAKDSLERIKARQQQFDDRLKAAETLAEEGSDKSLQAKLAEAGIGEQKSNANAVLERIKARKS", 63.5591347)]
         public void TestRescoring(int scanNum, int charge, string sequence, double expectedScore)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -57,7 +57,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             Console.WriteLine("Total Score = " + scores.Score);
             Console.WriteLine("#Fragments = " + scores.NumMatchedFrags);
 
-            Assert.AreEqual(expectedScore, scores.Score, 0.0001);
+            Assert.AreEqual(expectedScore, scores.Score, 0.001);
         }
     }
 }
