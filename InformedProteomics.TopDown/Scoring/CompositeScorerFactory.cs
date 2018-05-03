@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Sequence;
@@ -61,8 +61,11 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScorer GetMs2Scorer(int scanNum)
         {
-            IScorer scorer;
-            if (_ms2Scorer.TryGetValue(scanNum, out scorer)) return scorer;
+            lock (_ms2Scorer)
+            {
+                if (_ms2Scorer.TryGetValue(scanNum, out var scorer)) return scorer;
+            }
+
             return null;
         }
 
