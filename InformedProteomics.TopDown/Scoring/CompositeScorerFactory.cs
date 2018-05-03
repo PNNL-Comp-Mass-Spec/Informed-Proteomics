@@ -68,20 +68,33 @@ namespace InformedProteomics.TopDown.Scoring
 
         public void DeconvoluteProductSpectrum(int scanNum)
         {
-            var scorer = GetScorer(scanNum);
-            if (scorer == null) return;
-            lock (_ms2Scorer)
+            try
             {
-                _ms2Scorer.Add(scanNum, scorer);
+                var scorer = GetScorer(scanNum);
+                if (scorer == null) return;
+                lock (_ms2Scorer)
+                {
+                    _ms2Scorer.Add(scanNum, scorer);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error deconvoluting scan {0} in DeconvoluteProductSpectrum: {1}", scanNum, ex.Message), ex);
             }
         }
 
         public IScorer GetScorer(int scanNum)
         {
-            var spec = _run.GetSpectrum(scanNum) as ProductSpectrum;
-            if (spec == null) return null;
-            var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
-            return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
+            try
+            {
+                if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec)) return null;
+                var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
+                return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error getting the scorer for scan {0} in GetScorer: {1}", scanNum, ex.Message), ex);
+            }
         }
 
         public void WriteToFile(string outputFilePath)
