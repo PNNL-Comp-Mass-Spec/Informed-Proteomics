@@ -82,7 +82,7 @@ namespace InformedProteomics.TopDown.Scoring
         public IcScores GetScores(ProductSpectrum spec, string seqStr, Composition composition, int charge, int ms2ScanNum)
         {
             if (spec == null) return null;
-            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge), activationMethod: ActivationMethod);
+            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge));
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
             if (seqGraph == null) return null;
 
@@ -126,7 +126,7 @@ namespace InformedProteomics.TopDown.Scoring
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
 
-            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge+2), activationMethod: ActivationMethod);
+            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge + 2));
             var cleavages = sequence.GetInternalCleavages();
             var cleavageIndex = 0;
 

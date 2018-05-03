@@ -14,7 +14,11 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             var baseIonTypes = spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
             var ionTypeFactory = new IonTypeFactory(baseIonTypes, new List<NeutralLoss> { NeutralLoss.NoLoss }, MaxCharge);
-            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToArray();
+
+            // ReSharper disable once UnusedVariable
+            // This call is used to validate the ion types returned by ionTypeFactory
+            var _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToArray();
+
             _aminoAcidsArray = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
             _tolerance = tolerance;
 
@@ -88,15 +92,13 @@ namespace InformedProteomics.TopDown.SequenceTag
         private readonly double _maxAminoAcidMass;
         private readonly double _minAminoAcidMass;
 
-        // constant varialbes
+        // Constants
         private const int MaxCharge = 15;
         private const int MinCharge = 1;
-        private const double FilteringWindowSize = 1.1;
         private const int IsotopeOffsetTolerance = 2;
 
         private readonly Tolerance _tolerance;
         private readonly AminoAcid[] _aminoAcidsArray;
-        private readonly IonType[] _ionTypes;
         private readonly int _minTagLength;
         private readonly ProductSpectrum _spectrum;
         private readonly HashSet<SequenceTag> _seqTagSet;
