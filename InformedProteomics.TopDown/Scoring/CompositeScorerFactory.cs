@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
@@ -48,8 +47,8 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly IMassBinning _comparer;
         private readonly ProteinScoringGraphFactory _scoringGraphFactory;
 
-        public double FilteringWindowSize { get; private set; }    // 1.1
-        public int IsotopeOffsetTolerance { get; private set; }   // 2
+        public double FilteringWindowSize { get; }    // 1.1
+        public int IsotopeOffsetTolerance { get; }   // 2
 
         public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass)
         {

@@ -624,7 +624,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public override string FilePath
         {
-            get { return PbfFilePath; }
+            get => PbfFilePath;
             protected set
             {
                 // DO NOT USE!!!
@@ -1192,8 +1192,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 // skip nativeId
                 _reader.BaseStream.Seek(NativeIdLength, SeekOrigin.Current);
                 var msLevel = _reader.ReadByte();
+
+                // ReSharper disable UnusedVariable
                 var elutionTime = _reader.ReadDouble();
                 var tic = _reader.ReadSingle();
+                // ReSharper restore UnusedVariable
 
                 if (msLevel > 1)
                 {
@@ -1346,8 +1349,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 progressData.Report(counter, countTotal);
                 counter++;
-                var productSpec = imlr.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                if (productSpec == null) continue;
+                if (!(imlr.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec)) continue;
                 foreach (var peak in productSpec.Peaks)
                 {
                     ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
@@ -1893,6 +1895,10 @@ namespace InformedProteomics.Backend.MassSpecData
                         var peak = peaksEnum.Current;
                         progData.Report(count, peaksCount);
                         count++;
+
+                        if (peak == null)
+                            continue;
+
                         if (isMs1List)
                         {
                             _maxMs1Mz = peak.Mz;

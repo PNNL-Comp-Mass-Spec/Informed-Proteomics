@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -10,8 +11,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
     public class TestMsDeconvDecon2LS
     {
-        private string[] spikeDatasets = new string[]
-        {
+        private readonly string[] spikeDatasets = {
             "CPTAC_Intact_Spike_1x_1_27Apr15_Bane_14-09-03RZ",
             "CPTAC_Intact_Spike_1x_2_27Apr15_Bane_14-09-03RZ",
             "CPTAC_Intact_Spike_1x_3_27Apr15_Bane_14-09-03RZ",
@@ -35,8 +35,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             const string featureFolder = @"D:\MassSpecFiles\CPTAC_spike_in\promex";
             const string rawFolder = @"D:\MassSpecFiles\CPTAC_spike_in\raw";
-            var outFilePath = string.Format(@"{0}\aligned_features.tsv", featureFolder);
-            var align = new LcMsFeatureAlignment(new LcMsFeatureAlignComparer(new Tolerance(10)));
+            // var outFilePath = string.Format(@"{0}\aligned_features.tsv", featureFolder);
+            // var align = new LcMsFeatureAlignment(new LcMsFeatureAlignComparer(new Tolerance(10)));
 
             for (var i = 0; i < spikeDatasets.Length; i++)
             {
@@ -121,7 +121,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             OutputAlignmentResult(align, outFilePath, dataNames);
         }
 
-        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, string[] dataName)
+        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, IReadOnlyList<string> dataName)
         {
             var alignedFeatureList = align.GetAlignedFeatures();
 
@@ -143,7 +143,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 {
                     var feature = features[j];
                     writer.Write("\t");
-                    writer.Write(feature != null ? feature.Abundance : 0d);
+                    writer.Write(feature?.Abundance ?? 0d);
                 }
                 writer.Write("\n");
             }

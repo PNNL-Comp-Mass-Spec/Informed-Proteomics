@@ -42,7 +42,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var tsvReader = new TsvFileParser(resultFile.FullName);
 
-            var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32((string)s)).ToArray();
+            var ms2Scans = tsvReader.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var compositions = tsvReader.GetData("Composition").ToArray();
             var qValues = tsvReader.GetData("QValue").Select(Convert.ToDouble).ToArray();
 

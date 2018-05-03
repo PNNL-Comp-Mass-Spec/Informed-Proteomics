@@ -283,12 +283,12 @@ namespace InformedProteomics.Tests.FunctionalTests
             if (pbfFile.DirectoryName == null)
                 Assert.Ignore("Ignoring test since cannot determine the parent directory of " + pbfFile.FullName);
 
-            var fileExt = new string[] {"IcTarget", "IcDecoy"};
+            var fileExt = new[] {"IcTarget", "IcDecoy"};
             foreach (var ext in fileExt)
             {
                 var resultFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}.tsv", ext);
                 var parser = new TsvFileParser(resultFileName);
-                var scans = parser.GetData("Scan").Select(s => Convert.ToInt32((string) s)).ToArray();
+                var scans = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
                 var charges = parser.GetData("Charge").Select(s => Convert.ToInt32(s)).ToArray();
                 var protSequences = parser.GetData("Sequence").ToArray();
                 var modStrs = parser.GetData("Modifications").ToArray();
@@ -312,9 +312,8 @@ namespace InformedProteomics.Tests.FunctionalTests
                         var modStr = modStrs[i];
                         var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
                         // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
-                        var ms2Spec = run.GetSpectrum(scan) as ProductSpectrum;
 
-                        if (ms2Spec == null)
+                        if (!(run.GetSpectrum(scan) is ProductSpectrum ms2Spec))
                         {
                             Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
                         }

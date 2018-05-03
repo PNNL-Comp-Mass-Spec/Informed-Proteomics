@@ -17,7 +17,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         public const int DefaultMinMatchedTagLength = 6;
 
         public ScanBasedTagSearchEngine(
-            LcMsRun run,
+            ILcMsRun run,
             ISequenceTagFinder seqTagFinder,
             LcMsPeakMatrix featureFinder,
             FastaDatabase fastaDb,
@@ -46,19 +46,20 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             _seqTagFinder = seqTagFinder;
         }
 
-        public int MinScan { get; private set; }
-        public int MaxScan { get; private set; }
+        public int MinScan { get; }
+        public int MaxScan { get; }
         private readonly CompositeScorerFactory _ms2ScorerFactory;
         private readonly ISequenceTagFinder _seqTagFinder;
 
-        public long NumTags { get { return _seqTagFinder.NumberOfGeneratedTags();  } }
+        public long NumTags => _seqTagFinder.NumberOfGeneratedTags();
 
         public void SetDatabase(FastaDatabase fastaDb)
         {
             _searchableDb = new SearchableDatabase(fastaDb);
         }
 
-        public FastaDatabase FastaDatabase { get { return _searchableDb.FastaDatabase; } }
+        public FastaDatabase FastaDatabase => _searchableDb.FastaDatabase;
+
         public IEnumerable<TagSequenceMatch> RunSearch(int ms2ScanNum)
         {
             var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
@@ -170,12 +171,12 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 Post = post;
             }
 
-            public char Pre { get; private set; }
-            public char Post { get; private set; }
+            public char Pre { get; }
+            public char Post { get; }
 
-            public string Sequence { get; private set; }
-            public string ProteinName { get; private set; }
-            public TagMatch TagMatch { get; private set; }
+            public string Sequence { get; }
+            public string ProteinName { get; }
+            public TagMatch TagMatch { get; }
         }
 
         public static Dictionary<string, MatchedTagSet> GetProteinToMatchedTagsMap(
@@ -197,16 +198,13 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     var startIndex = fastaDb.GetZeroBasedPositionInProtein(index);
                     var mass = aaSet.GetComposition(tag.Sequence).Mass;
                     var matchedTag = new MatchedTag(tag, startIndex) { Mass = mass };
-                    MatchedTagSet existingMatchedTagSet;
-                    if (proteinsToTags.TryGetValue(proteinName, out existingMatchedTagSet))
+                    if (proteinsToTags.TryGetValue(proteinName, out var existingMatchedTagSet))
                     {
                         existingMatchedTagSet.Add(matchedTag);
                     }
                     else
                     {
-                        var proteinSequence = fastaDb.GetProteinSequence(proteinName);
-                        if (proteinSequence == null)
-                            proteinSequence = proteinName;
+                        var proteinSequence = fastaDb.GetProteinSequence(proteinName) ?? proteinName;
 
                         var matchedTagSet = new MatchedTagSet(proteinSequence, aaSet, tolerance, relaxedTolerance);
                         matchedTagSet.Add(matchedTag);

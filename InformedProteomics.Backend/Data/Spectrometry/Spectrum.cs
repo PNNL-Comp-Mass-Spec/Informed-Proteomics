@@ -66,11 +66,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// MS Level
         /// </summary>
-        public int MsLevel
-        {
-            get => _msLevel;
-            set => _msLevel = value;
-        }
+        public int MsLevel { get; set; } = 1;
 
         /// <summary>
         /// Elution time (minutes)
@@ -607,7 +603,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public void FilterNoiseByIntensityHistogram()
         {
             var filteredPeaks = new List<Peak>();
-            var intensities = new double[Peaks.Length];
             var tolerance = new Tolerance(10000);
 
             var st = 0;
@@ -652,9 +647,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var mzData = new float[Peaks.Length];
             var intensityData = new float[Peaks.Length];
-            var i = 0;
 
-            for (i = 0; i < Peaks.Length; i++)
+            for (var i = 0; i < Peaks.Length; i++)
             {
                 mzData[i] = (float) Peaks[i].Mz;
                 intensityData[i] = (float) Peaks[i].Intensity;
@@ -667,7 +661,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var filteredPeaks = new List<Peak>();
 
-            for (i = 0; i < Peaks.Length; i++)
+            for (var i = 0; i < Peaks.Length; i++)
             {
                 if (Math.Abs(intensitySlope[i]) > slopeThreshold)
                     filteredPeaks.Add(Peaks[i]);
@@ -711,8 +705,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             filteredSpec.FilterNoiseByLocalWindow(signalToNoiseRatio, windowPpm);
             return filteredSpec;
         }
-
-        private int _msLevel = 1;
 
         /// <summary>
         /// Find the index of the peak that matches the m/z and tolerance

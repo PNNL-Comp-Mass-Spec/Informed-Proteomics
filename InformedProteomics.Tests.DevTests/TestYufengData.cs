@@ -68,10 +68,10 @@ namespace InformedProteomics.Tests.DevTests
                 if (isotopePeaks != null)
                 {
                     var maxIntensity = 0.0;
-                    for (var j = 0; j < isotopePeaks.Length; j++)
+                    foreach (var peak in isotopePeaks)
                     {
-                        if (isotopePeaks[j] != null && isotopePeaks[j].Intensity > maxIntensity)
-                            maxIntensity = isotopePeaks[j].Intensity;
+                        if (peak != null && peak.Intensity > maxIntensity)
+                            maxIntensity = peak.Intensity;
                     }
                     precursorIntensities[i] = maxIntensity;
                 }
@@ -172,8 +172,7 @@ namespace InformedProteomics.Tests.DevTests
 
                     foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                     {
-                        var spec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                        if (spec == null) continue;
+                        if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec)) continue;
                         var charge =
                             (int)
                                 Math.Round(sequenceMass /
@@ -221,8 +220,7 @@ namespace InformedProteomics.Tests.DevTests
             const int maxScanNum = 46661;   // 638.90
             const int MAX_POINTS = 50;
 
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath) as PbfLcMsRun;
-            if (run == null) return;
+            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath) is PbfLcMsRun run)) return;
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
             summedSpec.FilterNoise(50.0);
             // summedSpec.Display(MAX_POINTS);

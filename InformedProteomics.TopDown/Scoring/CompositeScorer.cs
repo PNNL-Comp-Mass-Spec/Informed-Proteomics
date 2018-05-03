@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
-using InformedProteomics.Scoring.Interfaces;
 
 namespace InformedProteomics.TopDown.Scoring
 {
     public class CompositeScorer : AbstractFragmentScorer
     {
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1)
             : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold)
         {
             ReferencePeakIntensity = GetRefIntensity(ms2Spec.Peaks);
@@ -28,8 +26,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public override double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition, AminoAcid nTerminalResidue = null, AminoAcid cTerminalResidue = null)
         {
-            bool prefixHit, suffixHit;
-            return GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition, out prefixHit, out suffixHit);
+            return GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition, out _, out _);
         }
 
         public double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition, out bool prefixHit, out bool suffixHit)
@@ -93,7 +90,7 @@ namespace InformedProteomics.TopDown.Scoring
         public int GetNumMatchedFragments(Sequence sequence)
         {
             var cleavages = sequence.GetInternalCleavages();
-            int count = 0;
+            var count = 0;
             foreach (var cl in cleavages)
             {
                 foreach (var baseIonType in BaseIonTypes)
@@ -111,10 +108,10 @@ namespace InformedProteomics.TopDown.Scoring
         public double GetUserVisibleScore(Sequence sequence)
         {
             var cleavages = sequence.GetInternalCleavages();
-            double score = 0.0;
+            var score = 0.0;
             foreach (var cl in cleavages)
             {
-                score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
+                score += GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
             }
 
             return score; //GetProbability(score);

@@ -147,8 +147,7 @@ namespace InformedProteomics.TopDown.Execution
             _isolationWindowTargetMz = new double[_run.MaxLcScan + 1];
             foreach (var ms2Scan in _ms2ScanNums)
             {
-                var ms2Spec = _run.GetSpectrum(ms2Scan) as ProductSpectrum;
-                if (ms2Spec == null) continue;
+                if (!(_run.GetSpectrum(ms2Scan) is ProductSpectrum ms2Spec)) continue;
                 _isolationWindowTargetMz[ms2Scan] = ms2Spec.IsolationWindow.IsolationWindowTargetMz;
             }
 

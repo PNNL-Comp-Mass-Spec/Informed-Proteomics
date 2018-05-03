@@ -45,17 +45,14 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             Modification.RegisterAndGetModification(Modification.DiMethylation.Name, Modification.DiMethylation.Composition);
             Modification.RegisterAndGetModification(Modification.TriMethylation.Name, Modification.TriMethylation.Composition);
             Modification.RegisterAndGetModification("Trioxidation", new Composition(0, 0, 0, 3, 0));
-            var aaSet = new AminoAcidSet(@"D:\MassSpecFiles\training\Mods.txt");
+            // var aaSet = new AminoAcidSet(@"D:\MassSpecFiles\training\Mods.txt");
 
-            var n = 0;
-
-            for (var d = 0; d < TrainSetFileLists.Length; d++)
+            foreach (var dataset in TrainSetFileLists)
             {
-                var dataset = TrainSetFileLists[d];
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
                 var decoyFile = string.Format(@"{0}\{1}_IcDecoy.tsv", idFileFolder, dataname);
-                var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
+               //  var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
 
                 if (!File.Exists(idFile)) continue;
 
@@ -88,7 +85,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     GetMatchStatistics(spec, sequence, match.Charge, writer);
                 }
                 writer.Close();
-                n++;
+
             }
         }
 
@@ -475,8 +472,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             return observedPeaks;
         }
 
-        public static string[] TrainSetFileLists = new string[]
-            {
+        public static string[] TrainSetFileLists = {
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_1_11Feb15_Bane_C2Column5.pbf",// top-down datasets
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_2_11Feb15_Bane_C2Column5.pbf",
                 @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_BE100_PO4_3_11Feb15_Bane_C2Column5.pbf",

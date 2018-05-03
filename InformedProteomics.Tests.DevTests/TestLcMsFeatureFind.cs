@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests
             foreach (var feature in features.OrderBy(f => f.Mass))
             {
                 writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}", id, feature.MinScanNum, feature.MaxScanNum, feature.MinCharge,
-                    feature.MaxCharge, feature.Mass,  feature.Abundance, feature.RepresentativeScanNum, feature.MinElutionTime, feature.MaxElutionTime, 0);
+                    feature.MaxCharge, feature.Mass, feature.Abundance, feature.RepresentativeScanNum, feature.MinElutionTime, feature.MaxElutionTime, 0);
                 id++;
             }
             writer.Close();
@@ -90,36 +90,39 @@ namespace InformedProteomics.Tests.DevTests
             //var maxRow = feature.MaxCharge - LcMsPeakMatrix.MinScanCharge;
 
             Console.WriteLine("---------------------------------------------------------------");
-            for (var i = 0; i < feature.Envelopes.Length; i++)
+            foreach (var envelope in feature.Envelopes)
             {
-                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                foreach (var isotope in envelope)
                 {
-                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].PearsonCorrelation : 0);
+                    Console.Write(isotope?.PearsonCorrelation ?? 0);
                     Console.Write("\t");
                 }
+
                 Console.Write("\n");
             }
             Console.WriteLine("---------------------------------------------------------------");
 
-            for (var i = 0; i < feature.Envelopes.Length; i++)
+            foreach (var envelope in feature.Envelopes)
             {
-                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                foreach (var isotope in envelope)
                 {
-                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].BhattacharyyaDistance : 0);
+                    Console.Write(isotope?.BhattacharyyaDistance ?? 0);
                     Console.Write("\t");
                 }
+
                 Console.Write("\n");
             }
 
             Console.WriteLine("---------------------------------------------------------------");
 
-            for (var i = 0; i < feature.Envelopes.Length; i++)
+            foreach (var envelope in feature.Envelopes)
             {
-                for (var j = 0; j < feature.Envelopes[i].Length; j++)
+                foreach (var isotope in envelope)
                 {
-                    Console.Write(feature.Envelopes[i][j] != null ? feature.Envelopes[i][j].Abundance : 0);
+                    Console.Write(isotope?.Abundance ?? 0);
                     Console.Write("\t");
                 }
+
                 Console.Write("\n");
             }
         }
@@ -142,7 +145,7 @@ namespace InformedProteomics.Tests.DevTests
             var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
             Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
-                (stopwatch.ElapsedMilliseconds)/1000.0d);
+                (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
             var minSearchMassBin = featureFinder.Comparer.GetBinNumber(11180.33677);
@@ -157,11 +160,11 @@ namespace InformedProteomics.Tests.DevTests
                 var clusters = featureFinder.FindFeatures(binNum);
                 container.Add(clusters);
 
-                if (binNum > minSearchMassBin && (binNum - minSearchMassBin)%1000 == 0)
+                if (binNum > minSearchMassBin && (binNum - minSearchMassBin) % 1000 == 0)
                 {
-                    var elapsed = (stopwatch.ElapsedMilliseconds)/1000.0d;
+                    var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
-                    var processedPercentage = ((double) processedBins/totalMassBin)*100;
+                    var processedPercentage = processedBins / totalMassBin * 100;
                     Console.WriteLine(
                         @"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
@@ -170,7 +173,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             Console.WriteLine(@"Complete MS1 feature extraction.");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds)/1000.0d);
+            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
 
             // write result files
@@ -185,6 +188,8 @@ namespace InformedProteomics.Tests.DevTests
             //var quantResult = new List<Ms1Feature>();
 
             var featureId = 0;
+
+            // ReSharper disable once UnusedVariable
             var ms1ScanNums = run.GetMs1ScanVector();
             //tsvWriter.WriteLine(GetHeaderString() + "\tQMinScanNum\tQMaxScanNum\tQMinCharge\tQMaxCharge\tQAbundance");
 

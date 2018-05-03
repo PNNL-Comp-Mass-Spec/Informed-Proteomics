@@ -36,10 +36,9 @@ namespace InformedProteomics.Tests.DevTests
             //var num = arr.AsParallel().Where(c => c == 'W').LongCount();
             var num = 0;
             var sum = 0L;
-            //foreach (var c in arr)
-            for (var a = 0; a < arr.Length; a++)
+
+            foreach (var c in arr)
             {
-                var c = arr[a];
                 for (var i = 0; i < c * 10000; i++) sum += i;
                 //                Interlocked.Increment(ref num);
                 if (++num == 1000) break;
@@ -95,9 +94,9 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("{0:F2} msec/sum, on average for parallel", s2.Elapsed.TotalMilliseconds / m);
         }
 
-        static int SumDefault(IEnumerable<int> array)
+        static void SumDefault(IEnumerable<int> array)
         {
-            return array.Sum();
+            return;
         }
 
         static int SumAsParallel(IEnumerable<int> array)
@@ -215,7 +214,6 @@ namespace InformedProteomics.Tests.DevTests
             const int numCTermCleavages = 0;
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
-            var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
             var estimatedAnnOff = indexedDb.EstimateTotalPeptides(2, 21, 300, 1, numCTermCleavages);
@@ -243,7 +241,7 @@ namespace InformedProteomics.Tests.DevTests
             //        fout.WriteLine(annOff.Annotation);
             //    }
             //}
-            numSequences = annotationsAndOffsets.Count();
+            long numSequences = annotationsAndOffsets.Count();
             var timeParForEach = sw.Elapsed;
             Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 
@@ -274,7 +272,6 @@ namespace InformedProteomics.Tests.DevTests
             const int numCTermCleavages = 0;
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
-            var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
             var estimatedAnnOff = indexedDb.EstimateTotalPeptides(1, 21, 300, numNTermCleavages, numCTermCleavages);
@@ -306,7 +303,7 @@ namespace InformedProteomics.Tests.DevTests
             //{
             //    numSequences++;
             //}
-            numSequences = annotationsAndOffsets.Count();
+            long numSequences = annotationsAndOffsets.Count();
             var timeParForEach = sw.Elapsed;
             Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 
@@ -336,7 +333,6 @@ namespace InformedProteomics.Tests.DevTests
             var db = new FastaDatabase(fastaFile.FullName);
             var indexedDb = new IndexedDatabase(db);
             indexedDb.Read();
-            var numSequences = 0L;
             var timeDB = sw.Elapsed;
             Console.WriteLine("Read DB in " + timeDB.TotalSeconds + " Seconds");
             var estimatedAnnOff = indexedDb.EstimateTotalPeptides(0, 30, 250);
@@ -364,7 +360,7 @@ namespace InformedProteomics.Tests.DevTests
             //        fout.WriteLine(annOff.Annotation);
             //    }
             //}
-            numSequences = annotationsAndOffsets.Count();
+            long numSequences = annotationsAndOffsets.Count();
             var timeParForEach = sw.Elapsed;
             Console.WriteLine("Parallel ForEach in " + (timeParForEach - timeGetAnn).TotalSeconds + " Seconds");
 

@@ -675,8 +675,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var isoWindowSet = new HashSet<IsolationWindow>();
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
-                if (productSpec == null) continue;
+                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec)) continue;
                 isoWindowSet.Add(productSpec.IsolationWindow);
             }
             return isoWindowSet.Count;
@@ -691,10 +690,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var minWidth = double.MaxValue;
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                var productSpec = GetSpectrum(scanNum) as ProductSpectrum;
-
-                // ReSharper disable once UseNullPropagation
-                if (productSpec == null) continue;
+                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec)) continue;
 
                 if (productSpec.IsolationWindow.Width < minWidth) minWidth = productSpec.IsolationWindow.Width;
             }

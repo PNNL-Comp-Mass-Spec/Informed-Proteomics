@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="mzArr"></param>
         /// <param name="intensityArr"></param>
         /// <param name="scanNum"></param>
-        public ProductSpectrum(double[] mzArr, double[] intensityArr, int scanNum) : base(mzArr, intensityArr, scanNum)
+        public ProductSpectrum(IList<double> mzArr, IList<double> intensityArr, int scanNum) : base(mzArr, intensityArr, scanNum)
         {
         }
 

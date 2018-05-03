@@ -56,8 +56,7 @@ namespace InformedProteomics.TopDown.Scoring
         private void UpdateDeconvPeak(int binNum, DeconvolutedPeak newPeak)
         {
             if (newPeak == null) return;
-            DeconvolutedPeak existingPeak;
-            if (_massBinToPeakMap.TryGetValue(binNum, out existingPeak))
+            if (_massBinToPeakMap.TryGetValue(binNum, out var existingPeak))
             {
                 if (existingPeak.Intensity < newPeak.Intensity) _massBinToPeakMap[binNum] = newPeak;
             }
@@ -86,8 +85,7 @@ namespace InformedProteomics.TopDown.Scoring
                 var massBinNum = _comparer.GetBinNumber(fragmentComposition.Mass);
                 if (massBinNum >= 0 && massBinNum < _comparer.NumberOfBins)
                 {
-                    DeconvolutedPeak existingPeak;
-                    if (_massBinToPeakMap.TryGetValue(massBinNum, out existingPeak))
+                    if (_massBinToPeakMap.TryGetValue(massBinNum, out var existingPeak))
                     {
                         var massErrorPpm = 1e6 * (Math.Abs(existingPeak.Mass - fragmentComposition.Mass)/fragmentComposition.Mass);
                         score += param.Count;

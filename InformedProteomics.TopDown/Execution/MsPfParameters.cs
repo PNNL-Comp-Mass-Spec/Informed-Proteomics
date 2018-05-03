@@ -25,11 +25,13 @@ namespace InformedProteomics.TopDown.Execution
         /// <param name="featureFilePath"></param>
         public MsPfParameters(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, string featureFilePath = null) : this()
         {
+            // ReSharper disable VirtualMemberCallInConstructor
             SpecFilePath = specFilePath;
             DatabaseFilePath = dbFilePath;
             AminoAcidSet = aaSet;
             OutputDir = outputDir;
             FeatureFilePath = featureFilePath;
+            // ReSharper restore VirtualMemberCallInConstructor
         }
 
         /// <summary>
@@ -37,11 +39,11 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         public MsPfParameters()
         {
-            this.Modifications = new List<SearchModification>();
+            Modifications = new List<SearchModification>();
             SetDefaults();
         }
 
-        protected void SetDefaults()
+        private void SetDefaults()
         {
             FeatureFilePath = null;
             MinSequenceLength = 21;
@@ -123,8 +125,8 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         public virtual double PrecursorIonTolerancePpm
         {
-            get { return PrecursorIonTolerance.GetValue(); }
-            set { PrecursorIonTolerance = new Tolerance(value); }
+            get => PrecursorIonTolerance.GetValue();
+            set => PrecursorIonTolerance = new Tolerance(value);
         }
 
         /// <summary>
@@ -137,8 +139,8 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         public virtual double ProductIonTolerancePpm
         {
-            get { return ProductIonTolerance.GetValue(); }
-            set { ProductIonTolerance = new Tolerance(value); }
+            get => ProductIonTolerance.GetValue();
+            set => ProductIonTolerance = new Tolerance(value);
         }
 
         /// <summary>
@@ -231,8 +233,8 @@ namespace InformedProteomics.TopDown.Execution
         [Obsolete("Use TargetDecoySearchMode")]
         public DatabaseSearchMode RunTargetDecoyAnalysis
         {
-            get { return TargetDecoySearchMode; }
-            set { TargetDecoySearchMode = value; }
+            get => TargetDecoySearchMode;
+            set => TargetDecoySearchMode = value;
         }
 
         public virtual bool TagBasedSearch { get; set; }
@@ -381,7 +383,7 @@ namespace InformedProteomics.TopDown.Execution
                         param.InternalCleavageMode = (InternalCleavageType)Enum.Parse(typeof(InternalCleavageType), parts[1]);
                         break;
                     case "Tda":
-                        int tda = 0;
+                        var tda = 0;
                         tda += Convert.ToInt32(parts[1].Contains("Target"));
                         tda += Convert.ToInt32(parts[1].Contains("Decoy")) * 2;
                         param.TargetDecoySearchMode = (DatabaseSearchMode)tda;

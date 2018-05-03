@@ -98,15 +98,15 @@ namespace MSPathFinderT
         [Option("t", "precursorTol", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
         public override double PrecursorIonTolerancePpm
         {
-            get { return PrecursorIonTolerance.GetValue(); }
-            set { PrecursorIonTolerance = new Tolerance(value); }
+            get => PrecursorIonTolerance.GetValue();
+            set => PrecursorIonTolerance = new Tolerance(value);
         }
 
         [Option("f", "fragmentTol", /*Min = 1,*/ HelpText = "Fragment Ion Tolerance (in PPM)")]
         public override double ProductIonTolerancePpm
         {
-            get { return ProductIonTolerance.GetValue(); }
-            set { ProductIonTolerance = new Tolerance(value); }
+            get => ProductIonTolerance.GetValue();
+            set => ProductIonTolerance = new Tolerance(value);
         }
 
         [Option("minLength", Min = 0, HelpText = "Minimum Sequence Length")]
@@ -145,7 +145,7 @@ namespace MSPathFinderT
         [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
         public string ScansFilePath { get; set; }
 
-        public TopDownInputParameters() : base()
+        public TopDownInputParameters()
         {
             ScansFilePath = "";
         }
@@ -443,7 +443,7 @@ namespace MSPathFinderT
                     var dataValues = dataLine.Split(delimiters);
                     foreach (var value in dataValues)
                     {
-                        if (!int.TryParse(value, out int scanNumber))
+                        if (!int.TryParse(value, out var scanNumber))
                             continue;
 
                         if (!scanNumbers.Contains(scanNumber))

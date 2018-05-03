@@ -192,7 +192,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             }
         }*/
 
-        private IEnumerable<SequenceTag> EnumerateAllSequenceTags(List<SequenceTagGraphEdge> edges)
+        private IEnumerable<SequenceTag> EnumerateAllSequenceTags(IReadOnlyList<SequenceTagGraphEdge> edges)
         {
             var tagLength = edges.Count;
             var listOfAminoAcids = new List<List<AminoAcid>>(tagLength);
@@ -249,7 +249,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public static string Reverse(string s)
         {
-            char[] charArray = s.ToCharArray();
+            var charArray = s.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);
         }

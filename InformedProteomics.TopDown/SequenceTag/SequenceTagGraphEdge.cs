@@ -7,9 +7,9 @@ namespace InformedProteomics.TopDown.SequenceTag
 {
     public class SequenceTagGraphEdge : GraphEdge
     {
-        public double Mass { get; private set; }
-        public byte NominalMass { get; private set; }
-        public List<AminoAcid> AminoAcidList { get; private set; }
+        public double Mass { get; }
+        public byte NominalMass { get; }
+        public List<AminoAcid> AminoAcidList { get; }
 
         public SequenceTagGraphEdge(int peak1Index, int peak2Index, double peakGapDistance)
             : base(peak1Index, peak2Index)

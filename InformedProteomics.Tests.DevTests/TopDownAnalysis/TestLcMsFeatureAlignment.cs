@@ -169,14 +169,14 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             var fileEntries = Directory.GetFiles(dataFolder);
 
-            var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
-            dataset.Sort();
+            var datasets = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            datasets.Sort();
 
-            for (var i = 0; i < dataset.Count; i++)
+            foreach (var datasetFile in datasets)
             {
                 var writer =
                     new StreamWriter(string.Format(@"D:\MassSpecFiles\CompRef\MsPathFinderMerged\{0}_IcTda.tsv",
-                        dataset[i]));
+                                                   datasetFile));
 
                 writer.Write("Scan");
                 writer.Write("\t");
@@ -199,18 +199,18 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 writer.Write("QValue");
                 writer.Write("\n");
 
-                var path1 = string.Format(@"D:\MassSpecFiles\CompRef\MsPathFinder\{0}_IcTda.tsv", dataset[i]);
+                var path1 = string.Format(@"D:\MassSpecFiles\CompRef\MsPathFinder\{0}_IcTda.tsv", datasetFile);
                 var parser1 = new TsvFileParser(path1);
                 OutputMergedResult(writer, parser1, fastaDb);
 
-                var path2 = string.Format(@"D:\MassSpecFiles\CompRef\seqtag\{0}_tagmatch.tsv", dataset[i]);
+                var path2 = string.Format(@"D:\MassSpecFiles\CompRef\seqtag\{0}_tagmatch.tsv", datasetFile);
                 var parser2 = new TsvFileParser(path2);
                 OutputMergedResult(writer, parser2, fastaDb);
                 writer.Close();
             }
         }
 
-        private void OutputMergedResult(StreamWriter writer, TsvFileParser parser, FastaDatabase fastaDb)
+        private void OutputMergedResult(TextWriter writer, TsvFileParser parser, FastaDatabase fastaDb)
         {
             var scoreColumn = parser.GetData("#MatchedFragments") ?? parser.GetData("Score");
             var qValColumn = parser.GetData("QValue");
@@ -252,7 +252,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
         }
 
-        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, List<string> rawFiles, bool isTemp = true)
+        private void OutputAlignmentResult(LcMsFeatureAlignment align, string outFilePath, IReadOnlyList<string> rawFiles, bool isTemp = true)
         {
             var alignedFeatureList = align.GetAlignedFeatures();
 
@@ -289,14 +289,14 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 {
                     var feature = features[j];
                     writer.Write("\t");
-                    writer.Write(feature != null ? feature.Abundance : 0d);
+                    writer.Write(feature?.Abundance ?? 0d);
                 }
 
                 for (var j = 0; j < align.CountDatasets; j++)
                 {
                     var feature = features[j];
                     writer.Write("\t");
-                    writer.Write(feature != null ? feature.Score : 0d);
+                    writer.Write(feature?.Score ?? 0d);
                 }
                 /*
                 for (var j = 0; j < align.CountDatasets; j++)
@@ -341,7 +341,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
         }
 
-        private void RunFeatureAlignment(List<string> ms1FtFiles, List<string> rawFiles, string outFilePath)
+        private void RunFeatureAlignment(IList<string> ms1FtFiles, IReadOnlyList<string> rawFiles, string outFilePath)
         {
             var runList = new List<LcMsRun>();
 

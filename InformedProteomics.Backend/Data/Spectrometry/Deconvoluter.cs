@@ -278,9 +278,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             return monoIsotopePeakList;
         }
 
-        private static double CalculateInterferenceScore(Peak[] peaks, Tuple<Peak, int>[] envelopePeaks, int numBins = 10)
+        private static double CalculateInterferenceScore(IReadOnlyList<Peak> peaks, IReadOnlyList<Tuple<Peak, int>> envelopePeaks, int numBins = 10)
         {
-            if (envelopePeaks.Length < 2)
+            if (envelopePeaks.Count < 2)
             {
                 return 10.0;
             }
@@ -289,13 +289,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var bins = new double[numBins];
             var peakIndex = 0;
-            for (var envelopePeakIndex = 1; envelopePeakIndex < envelopePeaks.Length; envelopePeakIndex++)
+            for (var envelopePeakIndex = 1; envelopePeakIndex < envelopePeaks.Count; envelopePeakIndex++)
             {
                 var lowPeak = envelopePeaks[envelopePeakIndex - 1].Item1;
                 var highPeak = envelopePeaks[envelopePeakIndex].Item1;
                 var binSize = (highPeak.Mz - lowPeak.Mz) / numBins;
                 var prevBin = 0;
-                for (; peakIndex < peaks.Length; peakIndex++)
+                for (; peakIndex < peaks.Count; peakIndex++)
                 {
                     var noisePeak = peaks[peakIndex];
                     if (noisePeak.Mz.Equals(lowPeak.Mz))
@@ -328,7 +328,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 interferenceScore += Math.Pow(2, bins[i]);
             }
 
-            return interferenceScore / envelopePeaks.Length;
+            return interferenceScore / envelopePeaks.Count;
         }
 
         private static Tuple<Peak, int>[] GetAllIsotopePeaks(

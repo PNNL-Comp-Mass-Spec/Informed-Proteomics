@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -71,7 +72,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             const string outFilePath = @"\\protoapps\UserData\Jungkap\Quant\aligned\promex_crosstab.tsv";
             //const string outFolder = @"\\protoapps\UserData\Jungkap\CompRef\aligned";
-            var runLabels = new string[] { "1x1", "1x2", "1x3", "1x4", "1x5", "5x1", "5x2", "5x3", "5x4", "5x5", "10x1", "10x2", "10x3", "10x4", "10x5", };
+            var runLabels = new[] { "1x1", "1x2", "1x3", "1x4", "1x5", "5x1", "5x2", "5x3", "5x4", "5x5", "10x1", "10x2", "10x3", "10x4", "10x5", };
             var nDataset = runLabels.Length;
 
             var prsmReader = new ProteinSpectrumMatchReader();
@@ -88,22 +89,21 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var prsmList = prsmReader.LoadIdentificationResult(mspFile, ProteinSpectrumMatch.SearchTool.MsPathFinder);
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1FtFile, run);
 
-                for (var j = 0; j < prsmList.Count; j++)
+                foreach (var match in prsmList)
                 {
-                    var match = prsmList[j];
                     match.ProteinId = match.ProteinName;
                 }
 
                 // tag features by PrSMs
-                for (var j = 0; j < features.Count; j++)
+                foreach (var feature in features)
                 {
                     //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                    var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
+                    var massTol = tolerance.GetToleranceAsMz(feature.Mass);
                     foreach (var match in prsmList)
                     {
-                        if (features[j].MinScanNum < match.ScanNum && match.ScanNum < features[j].MaxScanNum && Math.Abs(features[j].Mass - match.Mass) < massTol)
+                        if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
                         {
-                            features[j].ProteinSpectrumMatches.Add(match);
+                            feature.ProteinSpectrumMatches.Add(match);
                         }
                     }
                 }
@@ -124,9 +124,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             OutputCrossTabWithId(outFilePath, alignment, runLabels);
         }
 
-        private void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
+        private void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, IReadOnlyCollection<string> runLabels)
         {
-            var nDataset = runLabels.Length;
+            var nDataset = runLabels.Count;
             var writer = new StreamWriter(outputFilePath);
 
             writer.Write("MonoMass");
@@ -175,9 +175,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             writer.Write("\n");
 
             var alignedFeatureList = alignment.GetAlignedFeatures();
-            for (var j = 0; j < alignedFeatureList.Count; j++)
+            foreach (var features in alignedFeatureList)
             {
-                var features = alignedFeatureList[j];
                 var mass = features.Where(f => f != null).Select(f => f.Mass).Median();
                 var minElutionTime = features.Where(f => f != null).Select(f => f.MinElutionTime).Median();
                 var maxElutionTime = features.Where(f => f != null).Select(f => f.MaxElutionTime).Median();
@@ -200,7 +199,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
 
                 var prsm = (from f in features
-                            where f != null && f.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
+                            where f?.ProteinSpectrumMatches != null && f.ProteinSpectrumMatches.Count > 0
                             select f.ProteinSpectrumMatches[0]).FirstOrDefault();
 
                 if (prsm == null)

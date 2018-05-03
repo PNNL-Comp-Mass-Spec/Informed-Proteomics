@@ -5,7 +5,6 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Alignment;
-using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
 using MathNet.Numerics.Statistics;
 using NUnit.Framework;
@@ -32,7 +31,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             return dataName;
         }
 
-        private List<ProteinSpectrumMatch> MergePrsm(List<ProteinSpectrumMatch> targetList)
+        private List<ProteinSpectrumMatch> MergePrsm(IReadOnlyCollection<ProteinSpectrumMatch> targetList)
         {
             //var sortedList = targetList.OrderBy(prsm => prsm.ScanNum).ToList();
             //var minScan = sortedList.First().ScanNum;
@@ -193,9 +192,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 writer.WriteLine(string.Join("\t", headerLine));
 
                 var alignedFeatureList = alignment.GetAlignedFeatures();
-                for (var j = 0; j < alignedFeatureList.Count; j++)
+                foreach (var features in alignedFeatureList)
                 {
-                    var features = alignedFeatureList[j];
                     var mass = features.Where(f => f != null).Select(f => f.Mass).Median();
                     var minElutionTime = features.Where(f => f != null).Select(f => f.MinElutionTime).Median();
                     var maxElutionTime = features.Where(f => f != null).Select(f => f.MaxElutionTime).Median();
@@ -309,7 +307,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var newMspDir = "";
                 for (var j = directories.Length - 1; j >= 0; j--)
                 {
-                    if (directories[j].IndexOf("Auto10889") > 0)
+                    if (directories[j].IndexOf("Auto10889", StringComparison.OrdinalIgnoreCase) > 0)
                     {
                         newMspDir = directories[j];
                         break;
@@ -385,7 +383,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var newMspDir = "";
                 for (var j = directories.Length - 1; j >= 0; j--)
                 {
-                    if (directories[j].IndexOf("MSP201502") > 0)
+                    if (directories[j].IndexOf("MSP201502", StringComparison.OrdinalIgnoreCase) > 0)
                     {
                         newMspDir = directories[j];
                         break;

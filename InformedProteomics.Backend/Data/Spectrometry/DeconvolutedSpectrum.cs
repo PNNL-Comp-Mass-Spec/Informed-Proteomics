@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="originalSpec"></param>
         /// <param name="peaks"></param>
-        public DeconvolutedSpectrum(Spectrum originalSpec, DeconvolutedPeak[] peaks)
+        public DeconvolutedSpectrum(Spectrum originalSpec, IReadOnlyList<DeconvolutedPeak> peaks)
             : base(originalSpec.ScanNum)
         {
             MsLevel = originalSpec.MsLevel;

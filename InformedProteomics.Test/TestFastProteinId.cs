@@ -52,11 +52,11 @@ namespace InformedProteomics.Test
 
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
-                var productSpec = run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                if (productSpec == null) continue;
+                if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec))
+                    continue;
 
                 productSpec.FilterNoise();
-                var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(productSpec.Peaks, minCharge, maxCharge, 2, 1.1, tolerance, corrThreshold);
+                var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(productSpec.ScanNum, productSpec.Peaks, minCharge, maxCharge, 2, 1.1, tolerance, corrThreshold);
 
                 if (deconvolutedPeaks == null) continue;
 

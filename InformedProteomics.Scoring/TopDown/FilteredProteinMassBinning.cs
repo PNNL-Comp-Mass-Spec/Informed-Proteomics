@@ -13,7 +13,7 @@ namespace InformedProteomics.Scoring.TopDown
     {
         public FilteredProteinMassBinning(AminoAcidSet aaSet, double maxProteinMass = 50000, int numBits = 27)
         {
-            _aminoAcidSet = aaSet;
+            // _aminoAcidSet = aaSet;
             var terminalModifications = GetTerminalModifications(aaSet);
             var extendedAminoAcidArray = GetExtendedAminoAcidArray(aaSet);
 
@@ -39,6 +39,8 @@ namespace InformedProteomics.Scoring.TopDown
             for (var i = 0; i < numberOfMzBins; i++) _mzBinToFilteredBinMap[i] = -1;
 
             var tempMap = new int[numberOfMzBins];
+
+            // ReSharper disable once UseObjectOrCollectionInitializer
             var fineNodes = new BitArray(Constants.GetBinNumHighPrecision(MaxMass));
             fineNodes[0] = true;
 
@@ -86,13 +88,11 @@ namespace InformedProteomics.Scoring.TopDown
             Array.Copy(tempMap, _filteredBinToMzBinMap, effectiveBinCounter);
         }
 
-        private readonly AminoAcidSet _aminoAcidSet;
-
         public static Modification[] GetTerminalModifications(AminoAcidSet aminoAcidSet)
         {
             var terminalModifications = new HashSet<Modification>();
             var terminalLocations = new[] {SequenceLocation.ProteinNTerm, SequenceLocation.ProteinCTerm};
-            var terminalResidues = new char[] {AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinCTerm.Residue};
+            var terminalResidues = new[] {AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinCTerm.Residue};
             var modParam = aminoAcidSet.GetModificationParams();
 
             for (var i = 0; i < terminalLocations.Length; i++)
@@ -126,7 +126,7 @@ namespace InformedProteomics.Scoring.TopDown
             return ret.ToArray();
         }
 
-        public bool Filtered { get { return true;  } }
+        public bool Filtered => true;
 
         public int GetBinNumber(double mass)
         {
@@ -166,9 +166,10 @@ namespace InformedProteomics.Scoring.TopDown
             return _mzComparer.GetMzEnd(mzBinNum);
         }
 
-        public double MaxMass { get; private set; }
-        public double MinMass { get; private set; }
-        public int NumberOfBins { get { return _filteredBinToMzBinMap.Length; } }
+        public double MaxMass { get; }
+        public double MinMass { get; }
+        public int NumberOfBins => _filteredBinToMzBinMap.Length;
+
         /*
         private static double[] GetUniqueMass(IEnumerable<Composition> compSet)
         {

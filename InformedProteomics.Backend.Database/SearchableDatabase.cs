@@ -223,6 +223,7 @@ namespace InformedProteomics.Backend.Database
         /// </returns>
         private int Compare(IList<byte> pattern, int index, byte startIndex)
         {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             for (var offset = startIndex; offset <= byte.MaxValue; offset++)
             {
                 if (offset >= pattern.Count) return -offset - 1;
