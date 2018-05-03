@@ -11,27 +11,6 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class QuickProteinId
     {
-        public LcMsRun Run { get; private set; }
-
-        public string SpecFilePath { get; private set; }
-        public string DatabaseFilePath { get; private set; }
-        public string OutputDir { get; private set; }
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public string FeatureFilePath { get; private set; }
-        public double MinFeatureProbability { get; private set; }
-        public int MinSequenceLength { get; private set; }
-        public int MaxSequenceLength { get; private set; }
-        public int MaxNumNTermCleavages { get; private set; }
-        public int MaxNumCTermCleavages { get; private set; }
-        public int MinPrecursorIonCharge { get; private set; }
-        public int MaxPrecursorIonCharge { get; private set; }
-        public double MinSequenceMass { get; private set; }
-        public double MaxSequenceMass { get; private set; }
-        public int MinProductIonCharge { get; private set; }
-        public int MaxProductIonCharge { get; private set; }
-        public Tolerance PrecursorIonTolerance { get; private set; }
-        public Tolerance ProductIonTolerance { get; private set; }
-        public bool? RunTargetDecoyAnalysis { get; private set; } // true: target and decoy, false: target only, null: decoy only
 
         public void QuickId()
         {
