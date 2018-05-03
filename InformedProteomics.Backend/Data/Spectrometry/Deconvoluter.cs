@@ -101,7 +101,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     int isotopeOffsetTolerance, double filteringWindowSize,
                     Tolerance tolerance, double corrScoreThreshold = 0.7)
         {
-            var peaks = GetDeconvolutedPeaks(spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrScoreThreshold);
+            var peaks = GetDeconvolutedPeaks(spec.ScanNum, spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrScoreThreshold);
 
             return new DeconvolutedSpectrum(spec, peaks.ToArray());
         }
