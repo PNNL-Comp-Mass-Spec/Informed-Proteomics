@@ -61,11 +61,16 @@ namespace InformedProteomics.Backend.Database
         /// <param name="isDecoy"></param>
         public FastaDatabase(string databaseFilePath, bool isDecoy = false)
         {
+            if (string.IsNullOrWhiteSpace(databaseFilePath))
+                throw new FileNotFoundException("Null or empty string passed to FastaDatabase");
+
             if (!File.Exists(databaseFilePath))
                 throw new FileNotFoundException("File not found: " + databaseFilePath);
 
-            if (string.Compare(Path.GetExtension(databaseFilePath), ".fasta", StringComparison.OrdinalIgnoreCase) != 0)
+            if (!FastaDatabaseConstants.ValidFASTAExtension(databaseFilePath))
+            {
                 throw new FormatException("Not a fasta file: " + databaseFilePath);
+            }
 
             _databaseFilePath = databaseFilePath;
             _lastWriteTimeHash = File.GetLastWriteTimeUtc(_databaseFilePath).GetHashCode();

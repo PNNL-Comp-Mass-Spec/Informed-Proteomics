@@ -19,7 +19,7 @@ namespace MSPathFinderT
 
         public IEnumerable<string> SpecFilePaths { get; set; }
 
-        [Option("d", "database", Required = true, HelpText = "Database File (*.fasta or *.fa)", HelpShowsDefault = false)]
+        [Option("d", "database", Required = true, HelpText = "Database File (*.fasta or *.fa or *.faa)", HelpShowsDefault = false)]
         public override string DatabaseFilePath { get; set; }
 
         [Option("o", "outputDir", HelpText = "Output Folder", HelpShowsDefault = false)]
@@ -194,11 +194,10 @@ namespace MSPathFinderT
                 PrintError("File not found: " + DatabaseFilePath);
                 return false;
             }
-            var dbExtension = Path.GetExtension(DatabaseFilePath).ToLower();
-            if (!dbExtension.Equals(".fa") &&
-                !dbExtension.Equals(".fasta"))
+
+            if (!FastaDatabaseConstants.ValidFASTAExtension(DatabaseFilePath))
             {
-                PrintError("Invalid extension for the database file path (" + dbExtension + ")");
+                PrintError("Invalid extension for the database file path (" + Path.GetExtension(DatabaseFilePath) + ")");
                 return false;
             }
 
