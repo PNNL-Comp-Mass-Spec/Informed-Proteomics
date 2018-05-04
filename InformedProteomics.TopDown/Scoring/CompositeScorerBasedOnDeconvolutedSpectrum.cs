@@ -9,8 +9,10 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class CompositeScorerBasedOnDeconvolutedSpectrum : CompositeScorer
     {
+        // ReSharper disable SuggestBaseTypeForParameter
         public CompositeScorerBasedOnDeconvolutedSpectrum(DeconvolutedSpectrum deconvolutedSpectrum, ProductSpectrum spec, Tolerance productTolerance, IMassBinning comparer)
             : base(deconvolutedSpectrum, productTolerance)
+        // ReSharper restore SuggestBaseTypeForParameter
         {
             ReferencePeakIntensity = GetRefIntensity(spec.Peaks);
             _comparer = comparer;

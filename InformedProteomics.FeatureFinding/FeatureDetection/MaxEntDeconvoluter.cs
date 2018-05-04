@@ -70,7 +70,6 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <summary>
         /// Finds mass features from deconvoluted spectrum. Monoiosotopic mass is estimated using averaging algorithm described in Mann et al., Anal. Chem. 1989
         /// </summary>
-        /// <param name="deconvSpectrum">deconvoluted spectrum</param>
         /// <returns>mass features sorted by their abundancy</returns>
         public IEnumerable<Ms1Feature> GetMassFeatures()
         {
