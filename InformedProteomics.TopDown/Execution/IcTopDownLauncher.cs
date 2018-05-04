@@ -303,11 +303,12 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(progData.MaxPercentage + ((98.0 - progData.MaxPercentage) / 2.0), "Running Target search");
             List<DatabaseSearchResultData> targetSearchResults = null;
 
-            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !File.Exists(targetOutputFilePath))
+            var validTargetResults = ResultsFileHasData(targetOutputFilePath);
+            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !validTargetResults)
             {
                 targetSearchResults = RunDatabaseSearch(targetDb, targetOutputFilePath, ms1Filter, "target", prog);
             }
-            else if (File.Exists(targetOutputFilePath))
+            else if (validTargetResults)
             {
                 OnStatusEvent(string.Format("Target results file '{0}' exists; skipping target search.", targetOutputFilePath));
             }
@@ -315,12 +316,13 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(98.0, "Running Decoy search"); // total to 98%
             List<DatabaseSearchResultData> decoySearchResults = null;
 
-            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !File.Exists(decoyOutputFilePath))
+            var validDecoyResults = ResultsFileHasData(decoyOutputFilePath);
+            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !validDecoyResults)
             {
                 var decoyDb = targetDb.Decoy(null, true);
                 decoySearchResults = RunDatabaseSearch(decoyDb, decoyOutputFilePath, ms1Filter, "decoy", prog);
             }
-            else if (File.Exists(decoyOutputFilePath))
+            else if (validDecoyResults)
             {
                 OnStatusEvent(string.Format("Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath));
             }
@@ -946,6 +948,48 @@ namespace InformedProteomics.TopDown.Execution
                 nMatches += _ms2ScanNums.Where(scanNum => matches[scanNum] != null).Sum(scanNum => matches[scanNum].Count);
             }
             return nMatches;
+        }
+
+        private bool ResultsFileHasData(string targetOutputFilePath)
+        {
+            try
+            {
+                var outputFile = new FileInfo(targetOutputFilePath);
+                if (!outputFile.Exists || outputFile.Length == 0)
+                    return false;
+
+                using (var reader = new StreamReader(new FileStream(outputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                {
+                    var resultCount = 0;
+                    while (!reader.EndOfStream)
+                    {
+
+                        var dataLine = reader.ReadLine();
+                        if (string.IsNullOrWhiteSpace(dataLine))
+                            continue;
+
+                        resultCount++;
+                    }
+
+                    if (resultCount > 1)
+                        return true;
+
+                    if (resultCount == 1)
+                        ReportWarning("Results file only has a header line; will re-generate " + targetOutputFilePath);
+
+                    ReportWarning("Results file is empty: " + targetOutputFilePath);
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ReportWarning(string.Format(
+                                  "Error validating existing results in file {0}: {1}",
+                                  targetOutputFilePath, ex.Message));
+                return false;
+            }
+
         }
 
         private List<DatabaseSearchResultData> WriteResultsToFile(IReadOnlyList<DatabaseSequenceSpectrumMatch> matches, string outputFilePath, FastaDatabase database)
