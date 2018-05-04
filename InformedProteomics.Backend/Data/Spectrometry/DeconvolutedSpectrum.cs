@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace InformedProteomics.Backend.Data.Spectrometry
 {
@@ -31,14 +32,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             else
                 ActivationMethod = ActivationMethod.Unknown;
 
-
-            Peaks = new Peak[peaks.Count];
-
-            for (var i = 0; i < peaks.Count; i++)
-            {
-                Peaks[i] = peaks[i];
-            }
-
+            StorePeaks(peaks);
         }
 
         /// <summary>
@@ -48,13 +42,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="scanNum"></param>
         public DeconvolutedSpectrum(ICollection<DeconvolutedPeak> peaks, int scanNum) : base(scanNum)
         {
-            Peaks = new Peak[peaks.Count];
-            var i = 0;
-            foreach (var peak in peaks)
-            {
-                Peaks[i] = peak;
-                i++;
-            }
+            StorePeaks(peaks.ToList());
         }
 
         /// <summary>
@@ -66,6 +54,29 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
         {
             return base.FindPeak(composition.Mass, tolerance) as DeconvolutedPeak;
+        }
+
+        /// <summary>
+        /// Store the peaks in the Peaks, assuring that each peak is an instance of DeconvolutedPeak
+        /// </summary>
+        /// <param name="peaks"></param>
+        private void StorePeaks(IReadOnlyList<DeconvolutedPeak> peaks)
+        {
+            var dPeaks = new DeconvolutedPeak[peaks.Count];
+            for (var i = 0; i < peaks.Count; i++)
+            {
+                dPeaks[i] = peaks[i];
+            }
+
+            // Store the deconvoluted peaks in Peaks
+            // ReSharper disable once CoVariantArrayConversion
+            Peaks = new DeconvolutedPeak[dPeaks.Length];
+
+            for (var i = 0; i < dPeaks.Length; i++)
+            {
+                Peaks[i] = dPeaks[i];
+            }
+
         }
     }
 }
