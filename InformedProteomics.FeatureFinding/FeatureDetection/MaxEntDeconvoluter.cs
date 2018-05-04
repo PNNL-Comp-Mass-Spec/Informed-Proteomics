@@ -163,9 +163,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             for (var i = 0; i < peakSet.Count; i++)
             {
                 var iPeak = peakSet[i];
-                for (var j = 0; j < peakSet.Count; j++)
+                foreach (var jPeak in peakSet)
                 {
-                    var jPeak = peakSet[j];
                     if (iPeak.Charge == jPeak.Charge) continue;
                     var denominator = (double)iPeak.Charge / jPeak.Charge;
                     var numerator = Math.Abs(denominator - jPeak.MzWithoutAdductIonMass / iPeak.MzWithoutAdductIonMass);
