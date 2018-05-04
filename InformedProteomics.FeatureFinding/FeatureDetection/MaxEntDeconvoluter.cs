@@ -12,6 +12,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <summary>
         /// MaxEnt deconvolution algorithm constructor
         /// </summary>
+        /// <param name="spec">Specrum</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="massBinning">mass binning interface</param>
         /// <param name="minCharge">maximum charge to be considered</param>
@@ -33,7 +34,6 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <summary>
         /// Deconvolute mass spectrum using deconvolution algorithm described in Mann et al., Anal. Chem. 1989
         /// </summary>
-        /// <param name="spec">spectrum</param>
         /// <returns>deconvoluted spectrum</returns>
         public DeconvolutedSpectrum GetDeconvolutedSpectrum()
         {
