@@ -537,7 +537,7 @@ namespace InformedProteomics.TopDown.Execution
                     AddMatch(matches, ms2ScanNum, prsm);
                 }
 
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, matches, "spectra");
             });
 
             OnStatusEvent(string.Format("Collected candidate matches: {0}", GetNumberOfMatches(matches)));
@@ -578,7 +578,7 @@ namespace InformedProteomics.TopDown.Execution
                     return;
                 }
 
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData);
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, matches);
                 SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages, db.IsDecoy, cancellationToken);
             });
 
@@ -588,7 +588,12 @@ namespace InformedProteomics.TopDown.Execution
             progData.Report(100.0);
         }
 
-        private void SearchProgressReport(ref int numProteins, ref DateTime lastUpdate, long estimatedProteins, Stopwatch sw, ProgressData progData, string itemName = "proteins")
+        private void SearchProgressReport(
+            ref int numProteins, ref DateTime lastUpdate,
+            long estimatedProteins, Stopwatch sw,
+            ProgressData progData,
+            SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            string itemName = "proteins")
         {
             var tempNumProteins = Interlocked.Increment(ref numProteins) - 1;
 
@@ -613,16 +618,32 @@ namespace InformedProteomics.TopDown.Execution
             else
                 secondsThreshold = 300;     // Every 5 minutes
 
-            if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds >= secondsThreshold)
-            {
-                lastUpdate = DateTime.UtcNow;
+            if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds < secondsThreshold)
+                return;
 
-                OnStatusEvent(string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
-                    tempNumProteins,
-                    itemName,
-                    tempNumProteins / (double)estimatedProteins * 100.0,
-                    sw.Elapsed.TotalSeconds));
+            lastUpdate = DateTime.UtcNow;
+
+            string matchCountStats;
+            if (matches != null)
+            {
+                var numMatches = GetNumberOfMatches(matches);
+                if (numMatches == 1)
+                    matchCountStats = ", 1 match";
+                else
+                    matchCountStats = string.Format(", {0} matches", numMatches);
             }
+            else
+            {
+                matchCountStats = string.Empty;
+            }
+
+            // Processing, 633 proteins done, 34.2% complete, 60.4 sec elapsed, 48 matches
+            OnStatusEvent(string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed{4}",
+                                        tempNumProteins,
+                                        itemName,
+                                        tempNumProteins / (double)estimatedProteins * 100.0,
+                                        sw.Elapsed.TotalSeconds,
+                                        matchCountStats));
         }
 
         private void SearchForMatches(AnnotationAndOffset annotationAndOffset, ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
@@ -758,7 +779,7 @@ namespace InformedProteomics.TopDown.Execution
             Parallel.ForEach(scanNums, pfeOptions, scanNum =>
             {
                 sequenceTagGen.Generate(scanNum);
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, "spectra");
+                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, null, "spectra");
             });
 
             progData.StatusInternal = string.Empty;
@@ -813,7 +834,8 @@ namespace InformedProteomics.TopDown.Execution
                 foreach (var scanNum in _ms2ScanNums)
                 {
                     var prsms = sortedMatches[scanNum];
-                    if (prsms == null) continue;
+                    if (prsms == null)
+                        continue;
 
                     if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
                         continue;
@@ -827,11 +849,6 @@ namespace InformedProteomics.TopDown.Execution
                     foreach (var match in prsms)
                     {
                         var sequence = match.Sequence;
-                        if (match == null)
-                        {
-                            ReportError("Match is null for index " + matchIndex + " in scan " + scanNum);
-                            continue;
-                        }
 
                         var ion = match.Ion;
 
@@ -920,7 +937,7 @@ namespace InformedProteomics.TopDown.Execution
                         match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
 
                         currentTask = "Reporting progress " + currentIteration;
-                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
+                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData, null);
                     }
                 }
                 catch (Exception ex)
