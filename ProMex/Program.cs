@@ -23,7 +23,6 @@ namespace ProMex
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
-        [STAThread]
         static int Main(string[] args)
         {
             LcMsFeatureFinderInputParameters parameters;
