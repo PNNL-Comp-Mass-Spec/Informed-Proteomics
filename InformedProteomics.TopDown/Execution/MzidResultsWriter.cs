@@ -57,8 +57,7 @@ namespace InformedProteomics.TopDown.Execution
             CreateMzidSettings(settings);
 
             var path = options.SpecFilePath;
-            var run = lcmsRun as PbfLcMsRun;
-            if (run != null)
+            if (lcmsRun is PbfLcMsRun run)
             {
                 var rawPath = run.RawFilePath;
                 if (!string.IsNullOrWhiteSpace(rawPath))
