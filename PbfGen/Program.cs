@@ -28,7 +28,7 @@ namespace PbfGen
 
             try
             {
-                var osVersionInfo = new clsOSVersionInfo();
+                var osVersionInfo = new OSVersionInfo();
                 if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
                 {
                     var handle = Process.GetCurrentProcess().MainWindowHandle;

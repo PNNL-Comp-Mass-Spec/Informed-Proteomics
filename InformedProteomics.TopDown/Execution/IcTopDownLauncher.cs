@@ -22,7 +22,7 @@ using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
 {
-    public class IcTopDownLauncher : clsEventNotifier
+    public class IcTopDownLauncher : EventNotifier
     {
         private const bool USE_PARALLEL_FOREACH = true;
 
