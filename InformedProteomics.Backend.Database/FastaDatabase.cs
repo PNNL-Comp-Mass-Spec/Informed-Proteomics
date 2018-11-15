@@ -137,6 +137,18 @@ namespace InformedProteomics.Backend.Database
             var decoyDatabaseFileName = GetDecoyDatabasePath(enzyme, shuffle);
 
             Console.WriteLine("Creating " + decoyDatabaseFileName);
+
+            // Base the random number generator seed on the FASTA file size.
+            // This assures that the same input FASTA file always gets the same shuffled sequences
+            var seed = fastaFile.Length;
+
+            while (seed > int.MaxValue)
+            {
+                seed = (long)Math.Floor(seed / 2.0);
+            }
+
+            SimpleStringProcessing.DefineRandomNumberGeneratorSeed((int)seed);
+
             using (var decoyWriter = new StreamWriter(decoyDatabaseFileName))
             {
                 while (reader.ReadNextProteinEntry())

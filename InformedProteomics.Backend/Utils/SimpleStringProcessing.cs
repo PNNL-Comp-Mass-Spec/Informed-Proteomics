@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Utils
         /// <returns></returns>
         public static string Shuffle(string str)
         {
-            var indices = Enumerable.Range(0, str.Length).OrderBy(r => Random.Next()).ToArray();
+            var indices = Enumerable.Range(0, str.Length).OrderBy(r => _random.Next()).ToArray();
             var sflStr = new StringBuilder(str.Length);
             foreach (var index in indices) sflStr.Append(str[index]);
             return sflStr.ToString();
@@ -36,7 +36,7 @@ namespace InformedProteomics.Backend.Utils
             var selectedIndexSet = new HashSet<int>();
             while(selectedIndexSet.Count < numMutations)
             {
-                selectedIndexSet.Add(Random.Next(length));
+                selectedIndexSet.Add(_random.Next(length));
             }
             var mutated = new StringBuilder(length);
             for (var i = 0; i < length; i++)
@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.Utils
                     var mutatedResidue = str[i];
                     while (mutatedResidue == str[i])
                     {
-                        mutatedResidue = AminoAcid.StandardAminoAcidCharacters[Random.Next(AminoAcid.StandardAminoAcidCharacters.Length)];
+                        mutatedResidue = AminoAcid.StandardAminoAcidCharacters[_random.Next(AminoAcid.StandardAminoAcidCharacters.Length)];
                     }
                     mutated.Append(mutatedResidue);
                 }
@@ -71,6 +71,16 @@ namespace InformedProteomics.Backend.Utils
             if (firstDotIndex >= lastDotIndex) return null;
             return str.Substring(firstDotIndex + 1, lastDotIndex - firstDotIndex - 1);
         }
-        private static readonly Random Random = new Random();
+
+        /// <summary>
+        /// Re-initialize the random number generator using the specified seed
+        /// </summary>
+        /// <param name="seed"></param>
+        public static void DefineRandomNumberGeneratorSeed(int seed)
+        {
+            _random = new Random(seed);
+        }
+
+        private static Random _random = new Random();
     }
 }
