@@ -116,13 +116,21 @@ namespace InformedProteomics.Backend.Database
         }
 
         /// <summary>
-        /// Create the decoy version of this databse
+        /// Create the decoy version of this database
         /// </summary>
         /// <param name="enzyme"></param>
         /// <param name="shuffle"></param>
         public void CreateDecoyDatabase(Enzyme enzyme, bool shuffle)
         {
             var reader = new FastaFileReader();
+
+            var fastaFile = new FileInfo(_databaseFilePath);
+
+            if (!fastaFile.Exists)
+            {
+                throw new FileNotFoundException("FASTA file not found: " + fastaFile.FullName);
+            }
+
             if (!reader.OpenFile(_databaseFilePath))
                 return;
 
