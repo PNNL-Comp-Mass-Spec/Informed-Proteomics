@@ -18,7 +18,6 @@ Source: InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend
 Source: InformedProteomics.Backend\bin\Release\net451\MathNet.Numerics.dll                                                                        ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net451\PRISM.dll                                                                                   ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net451\PSI_Interface.dll                                                                           ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\net451\DotNetZip.dll                                                                               ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net451\CsvHelper.dll                                                                               ; DestDir: {app}
 
 ; InformedProteomics.Backend.Database
