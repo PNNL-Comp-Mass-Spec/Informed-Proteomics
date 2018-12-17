@@ -2,6 +2,8 @@
 
 The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. Although the back-end data access and some of the scoring routines are general purpose, this repository is currently maintained for top down MS/MS datasets.
 
+[![DOI](https://zenodo.org/badge/21950650.svg)](https://zenodo.org/badge/latestdoi/21950650)
+
 ## Install/Tutorials
 #### [See the Informed Proteomics GitHub wiki for usage, tutorials, and more!](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki)
 
