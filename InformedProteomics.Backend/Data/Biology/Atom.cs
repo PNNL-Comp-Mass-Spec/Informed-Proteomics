@@ -150,9 +150,9 @@ namespace InformedProteomics.Backend.Data.Biology
         private static void ReadFromPnnlOmicsElementDataXmlFile()
         {
             const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
-            var xdocument = XDocument.Load(xmlFileName);
+            var xDoc = XDocument.Load(xmlFileName);
 
-            var parameterBaseElement = xdocument.Element("parameters");
+            var parameterBaseElement = xDoc.Element("parameters");
             if (parameterBaseElement == null)
             {
                 throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'parameters' but it was not found");
@@ -172,9 +172,10 @@ namespace InformedProteomics.Backend.Data.Biology
 
             foreach (var element in elements)
             {
-                var symbol = element.Element("Symbol").Value;
-                var name = element.Element("Name").Value;
-                var numIsotopes = int.Parse(element.Element("NumIsotopes").Value);
+                var symbol = element.Element("Symbol")?.Value;
+                var name = element.Element("Name")?.Value;
+                if (int.TryParse(element.Element("NumIsotopes")?.Value, out var numIsotopes)) {
+                }
             }
         }
 
