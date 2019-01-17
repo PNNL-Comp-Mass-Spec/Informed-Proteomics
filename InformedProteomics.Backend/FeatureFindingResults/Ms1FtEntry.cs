@@ -170,7 +170,10 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         private static void SetCsvReaderConfig(IReaderConfiguration config)
         {
             config.Delimiter = "\t";
-            config.PrepareHeaderForMatch = header => header?.Trim().ToLower();
+
+            //    delegate(string header, int i) { return header?.Trim().ToLower(); };
+            config.PrepareHeaderForMatch = (header, i) => header?.Trim().ToLower();
+
             config.HeaderValidated = null;
             config.MissingFieldFound = null;
             //config.BadDataFound = null;
