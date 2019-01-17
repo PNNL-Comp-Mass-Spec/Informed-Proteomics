@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using CsvHelper;
@@ -99,7 +100,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <summary>
         /// Extended data for the feature
         /// </summary>
-        public Ms1FtEntryExtendedData ExtendedData { get; set; } = null;
+        public Ms1FtEntryExtendedData ExtendedData { get; set; }
 
         /// <summary>
         /// Write the data to a ms1ft file
@@ -239,7 +240,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
             /// Constructor: Create the mapping, inheriting the base mapping
             /// </summary>
             [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-            public Ms1FtExtendedEntryMap() : base()
+            public Ms1FtExtendedEntryMap()
             {
                 //References<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>(x => x.ExtendedData); // Not working, but should (in theory) provide the same result
                 Map(x => x.ExtendedData.BestEvenCharge).Index(ColumnCount++).Name("BestEvenCharge");

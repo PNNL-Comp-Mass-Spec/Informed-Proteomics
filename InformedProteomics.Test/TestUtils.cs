@@ -15,6 +15,7 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.MathAndStats;
 using InformedProteomics.Tests.Base;
 using NUnit.Framework;
+// ReSharper disable IdentifierTypo
 
 namespace InformedProteomics.Test
 {
@@ -138,7 +139,9 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        // ReSharper disable StringLiteralTypo
         [TestCase("+229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163", 968.95333373)]
+        // ReSharper restore StringLiteralTypo
         public void ParseMsGfString(string msgfPepStr, double expectedMonoMz)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
@@ -323,6 +326,7 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        // ReSharper disable once StringLiteralTypo
         [TestCase("IRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG",
             "C(185) H(299) N(55) O(53) S(1)", 13, 7, 4171.211301, 4172.214656, 0.370361, 0.366639)]
         [TestCase("METTKPSFQDVLEFVRLFRRKNKLQREIQDVEKKIRDNQKRVLLLDNLSDYIKPGMSVEAIQGIIASMKGDYEDRVDDYIIKNAELSKERRDISKKLKAMGEMKNGEAK",
@@ -414,10 +418,12 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        // ReSharper disable StringLiteralTypo
         [TestCase("CCAADDKEACFAVEGPK", 2, 2, "C(78) H(122) N(22) O(29) S(3)", 964.4027858, 136,
             "b,3,463.142800|y,14,1536.699885|b-H2O,10,1310.459854|y2,10,554.260599")]
         [TestCase("IRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG", 3, 2, "C(185) H(299) N(55) O(53) S(1)", 1391.4110436, 296,
             "b,3,456.256508|y,16,1785.975864|b-H2O, 8,1031.515636|y2,12,670.365110")]
+        // ReSharper enable StringLiteralTypo
         public void TestGetProductIons(
             string peptide, int precursorCharge, int maxCharge,
             string expectedEmpiricalFormula, double expectedMz, int expectedProductIons,

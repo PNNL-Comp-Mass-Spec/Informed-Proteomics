@@ -57,7 +57,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// </summary>
         public static readonly Atom[] AtomArr =
             {
-                // Use Unimod values
+                // Use UniMod values
                 new Atom("H", H, 1, "Hydrogen"),
                 new Atom("2H", 2.014101779, 2, "Deuterium"),
                 new Atom("D", 2.014101779, 2, "Deuterium"),
@@ -91,7 +91,9 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("Mg",  23.985043, 24, "Magnesium"),
 
                 // Compounds
+
                 // TODO: Move to somewhere more appropriate
+                // ReSharper disable StringLiteralTypo
                 new Atom("Hex", 162.052824, 162, "Hexose"),
                 new Atom("HexNAc", 203.079373, 203, "N-Acetylhexosamine"),
                 new Atom("dHex", 146.057909, 146, "Fucose"),
@@ -99,6 +101,7 @@ namespace InformedProteomics.Backend.Data.Biology
                 new Atom("NeuGc", 307.090331, 307, "N-glycoyl neuraminic acid"),
                 new Atom("Hep", 192.063388, 192, "Heptose"),
                 new Atom("Pent", 132.042257, 85, "Pentose"),
+                // ReSharper restore StringLiteralTypo
             };
 
         /// <summary>
