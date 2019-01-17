@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
             {
                 var hasExtended = false;
                 var line = stream.ReadLine();
-                if (!string.IsNullOrWhiteSpace(line) && line.ToLower().Contains("BestEvenCharge"))
+                if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("BestEvenCharge", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     hasExtended = true;
                 }

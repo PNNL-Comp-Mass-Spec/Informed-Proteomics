@@ -213,7 +213,7 @@ namespace InformedProteomics.Backend.SearchResults
                 // check for QValue header, to determine the mapping used for reading
                 var hasTda = false;
                 var line = stream.ReadLine();
-                if (!string.IsNullOrWhiteSpace(line) && line.ToLower().Contains("qvalue"))
+                if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("QValue", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     hasTda = true;
                 }
