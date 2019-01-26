@@ -12,7 +12,6 @@ namespace InformedProteomics.Backend.Data.Sequence
     {
         private readonly Modification[] _modifications;
         private ModificationCombination[] _modificationCombinations;
-        private readonly int _maxNumDynModsPerSequence;
         private Dictionary<int, int> _modCombMap;
         private Dictionary<int, int> _modCombsToModMap;
 
@@ -31,7 +30,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public ModificationParams(Modification[] modifications, int maxNumDynModsPerSequence)
         {
             _modifications = modifications;
-            _maxNumDynModsPerSequence = maxNumDynModsPerSequence;
+            MaxNumDynModsPerSequence = maxNumDynModsPerSequence;
             CatalogPossibleModificationCombinations();
             GenerateModCombMap();
         }
@@ -39,7 +38,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Max number of dynamic modifications per sequence
         /// </summary>
-        public int MaxNumDynModsPerSequence => _maxNumDynModsPerSequence;
+        public int MaxNumDynModsPerSequence { get; }
 
         /// <summary>
         /// Gets the number of all possible modification instances
@@ -120,7 +119,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _indexToHashValue = new Dictionary<int, long>();
             _hashValueToModCombIndex = new Dictionary<long, int>();
 
-            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, _maxNumDynModsPerSequence);
+            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, MaxNumDynModsPerSequence);
             _modificationCombinations = new ModificationCombination[combinations.Length];
             var index = -1;
             foreach (var combination in combinations)
@@ -169,11 +168,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         private int[] ToModArray(long hashValue)
         {
             var digit = _modifications.Length + 1;
-            var arr = new int[_maxNumDynModsPerSequence];
+            var arr = new int[MaxNumDynModsPerSequence];
             var val = hashValue;
-            for (var i = 0; i < _maxNumDynModsPerSequence; i++)
+            for (var i = 0; i < MaxNumDynModsPerSequence; i++)
             {
-                arr[_maxNumDynModsPerSequence-1-i] = (int)(val % digit);
+                arr[MaxNumDynModsPerSequence-1-i] = (int)(val % digit);
                 val /= digit;
             }
             return arr;

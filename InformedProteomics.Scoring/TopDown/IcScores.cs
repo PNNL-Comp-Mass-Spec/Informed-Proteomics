@@ -9,10 +9,10 @@
             Modifications = modifications;
         }
 
-        public int NumMatchedFrags { get; private set; }
-        public double Score { get; private set; } // this score is used to calculate p-value by generating function
+        public int NumMatchedFrags { get; }
+        public double Score { get; } // this score is used to calculate p-value by generating function
 
-        public string Modifications { get; private set; }
+        public string Modifications { get; }
 
         public override string ToString()
         {

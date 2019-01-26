@@ -34,7 +34,7 @@
         /// <summary>
         /// Prefix residue
         /// </summary>
-        public AminoAcid PrefixResidue { get; private set; }
+        public AminoAcid PrefixResidue { get; }
 
         /// <summary>
         /// Suffix residue
