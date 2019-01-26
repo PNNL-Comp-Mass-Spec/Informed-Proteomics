@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 
+// ReSharper disable UnusedMember.Global
 namespace InformedProteomics.Backend.Data.Biology
 {
     /// <summary>

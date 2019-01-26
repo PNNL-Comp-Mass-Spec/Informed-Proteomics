@@ -3,6 +3,7 @@ using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Composition;
 
+// ReSharper disable UnusedMember.Global
 namespace InformedProteomics.Backend.Data.Sequence
 {
     /// <summary>
@@ -164,6 +165,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// No modification
         /// </summary>
         public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
+
+        // ReSharper disable IdentifierTypo
+        // ReSharper disable CommentTypo
+        // ReSharper disable StringLiteralTypo
 
         /// <summary>
         /// Acetylation
@@ -333,6 +338,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                 Nethylmaleimide,
                 Nitrosyl
             };
+
+        // ReSharper restore StringLiteralTypo
+        // ReSharper restore CommentTypo
+        // ReSharper restore IdentifierTypo
 
         /// <summary>
         /// Heavy peptide

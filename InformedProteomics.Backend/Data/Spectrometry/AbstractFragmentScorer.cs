@@ -13,6 +13,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Base class for fragment scorers
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public abstract class AbstractFragmentScorer : IScorer
     {
         /// <summary>

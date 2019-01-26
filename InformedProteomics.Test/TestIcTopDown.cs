@@ -68,6 +68,10 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
+            // ReSharper disable IdentifierTypo
+            // ReSharper disable CommentTypo
+            // ReSharper disable UnusedVariable
+
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
@@ -84,11 +88,13 @@ namespace InformedProteomics.Test
             var phosphoT = new SearchModification(Modification.Phosphorylation, 'T', SequenceLocation.Everywhere, false);
             var phosphoY = new SearchModification(Modification.Phosphorylation, 'Y', SequenceLocation.Everywhere, false);
 
+            // ReSharper restore UnusedVariable
+
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>
             {
                 dehydroC,
-//                glutathioneC,
+                //                glutathioneC,
                 oxM,
 //                dethiomethylM,
                 acetylN,
@@ -103,8 +109,11 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const InternalCleavageType searchMode = InternalCleavageType.SingleInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
+            // ReSharper restore CommentTypo
+            // ReSharper restore IdentifierTypo
+
+            const InternalCleavageType searchMode = InternalCleavageType.SingleInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
+            var tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
@@ -131,6 +140,9 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
+            // ReSharper disable IdentifierTypo
+            // ReSharper disable CommentTypo
+
             // Configure amino acid set
             //var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             //var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
@@ -150,6 +162,8 @@ namespace InformedProteomics.Test
             //};
             //var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
+            // ReSharper restore CommentTypo
+            // ReSharper restore IdentifierTypo
 
             var aaSet = new AminoAcidSet();
             const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
@@ -201,11 +215,15 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outputDir);
             }
 
+            // ReSharper disable IdentifierTypo
+
             // Configure amino acid set
             var acetylN = new SearchModification(Modification.Acetylation, '*', SequenceLocation.ProteinNTerm, false);
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);
             var dehydroC = new SearchModification(Modification.Dehydro, 'C', SequenceLocation.Everywhere, false);
             var glutathioneC = new SearchModification(Modification.Glutathione, 'C', SequenceLocation.Everywhere, false);
+
+            // ReSharper restore IdentifierTypo
 
             const int numMaxModsPerProtein = 4;
             var searchModifications = new List<SearchModification>

@@ -1,5 +1,6 @@
 using System.Linq;
 
+// ReSharper disable UnusedMember.Global
 namespace InformedProteomics.Backend.Data.Biology
 {
     /// <summary>
@@ -66,6 +67,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Chymotrypsin enzyme
         /// </summary>
+        // ReSharper disable once StringLiteralTypo
         public static readonly Enzyme Chymotrypsin = new Enzyme("Chymotrypsin", "FYWL", false, "Chymotrypsin", "MS:1001306");
 
         /// <summary>

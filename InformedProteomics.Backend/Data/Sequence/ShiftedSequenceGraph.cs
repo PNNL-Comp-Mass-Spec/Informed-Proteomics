@@ -10,6 +10,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// <summary>
     /// A shifted mass sequence graph
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class ShiftedSequenceGraph
     {
         /// <summary>

@@ -292,6 +292,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override int GetHashCode()
         {
+            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
             return base.GetHashCode();
         }
     }

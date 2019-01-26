@@ -84,6 +84,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var spec = run.GetSpectrum(810) as ProductSpectrum;
             Assert.True(spec != null);
 
+            // ReSharper disable once StringLiteralTypo
             const string suf54 = "ENIKTLPAKRNEQDQKQLIVPLADSLKPGTYTVDWHVVSVDGHKTKGHYTFSVK";
             var suf54Comp = new AminoAcidSet().GetComposition(suf54);
             Assert.True(suf54Comp != null);
