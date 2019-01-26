@@ -285,7 +285,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 else
                 {
                     var modList = Modification.GetFromMass(element);
-                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modificaion mass: " + element);
+                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
                     var mod = modList[0];
                     mods.Add(mod);
 //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);
@@ -333,7 +333,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         //        else
         //        {
         //            var modList = Modification.GetFromMass(element);
-        //            if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modificaion mass: " + element);
+        //            if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
         //            var mod = modList[0];
         //            mods.Add(mod);
         //            //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);

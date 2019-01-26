@@ -549,7 +549,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var rank = 1;
                 var thisPeak = peaks[peakIndex];
                 var thisMass = thisPeak.Mass;
-                var thisInten = thisPeak.Intensity;
+                var thisIntensity = thisPeak.Intensity;
 
                 // move left
                 var prevIndex = peakIndex - 1;
@@ -557,7 +557,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     var prevPeak = peaks[prevIndex];
                     if (thisMass - prevPeak.Mass > windowSize) break;
-                    if (prevPeak.Intensity > thisInten) rank++;
+                    if (prevPeak.Intensity > thisIntensity) rank++;
                     prevIndex--;
                 }
 
@@ -567,7 +567,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     var nextPeak = peaks[nextIndex];
                     if (nextPeak.Mass - thisMass > windowSize) break;
-                    if (nextPeak.Intensity > thisInten) rank++;
+                    if (nextPeak.Intensity > thisIntensity) rank++;
                     nextIndex++;
                 }
                 if (rank <= topRankCutoff) retSpec.Add(thisPeak);

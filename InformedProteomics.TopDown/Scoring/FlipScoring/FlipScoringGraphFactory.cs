@@ -18,7 +18,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         private readonly IMassBinning massBins;
 
         /// <summary>
-        /// The precalculated edges for the scoring graph.
+        /// The pre-calculated edges for the scoring graph.
         /// </summary>
         private readonly List<FlipScoringGraphEdge> edges;
 

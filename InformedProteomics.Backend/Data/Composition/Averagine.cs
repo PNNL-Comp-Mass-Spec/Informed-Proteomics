@@ -125,12 +125,12 @@ namespace InformedProteomics.Backend.Data.Composition
 
         private IsotopomerEnvelope ComputeIsotopomerEnvelope(double mass, IsoProfilePredictor isoProfilePredictor = null)
         {
-            var numAveragines = mass / AveragineMass;
-            var numC = (int)Math.Round(C * numAveragines);
-            var numH = (int)Math.Round(H * numAveragines);
-            var numN = (int)Math.Round(N * numAveragines);
-            var numO = (int)Math.Round(O * numAveragines);
-            var numS = (int)Math.Round(S * numAveragines);
+            var averagineCount = mass / AveragineMass;
+            var numC = (int)Math.Round(C * averagineCount);
+            var numH = (int)Math.Round(H * averagineCount);
+            var numN = (int)Math.Round(N * averagineCount);
+            var numO = (int)Math.Round(O * averagineCount);
+            var numS = (int)Math.Round(S * averagineCount);
 
             if (numH == 0) numH = 1;
 

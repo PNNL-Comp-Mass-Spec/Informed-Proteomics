@@ -132,7 +132,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Checks whether this spectrum contains all isotope peaks whose relative intensity is equal or larter than the threshold
+        /// Checks whether this spectrum contains all isotope peaks whose relative intensity is equal or larger than the threshold
         /// </summary>
         /// <param name="ion">ion</param>
         /// <param name="tolerance">tolerance</param>
@@ -142,8 +142,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
-            var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
-            var baseIsotopePeakIndex = FindPeakIndex(baseIsotopMz, tolerance);
+            var baseIsotopeMz = ion.GetIsotopeMz(baseIsotopeIndex);
+            var baseIsotopePeakIndex = FindPeakIndex(baseIsotopeMz, tolerance);
             if (baseIsotopePeakIndex < 0) return false;
 
             // go down
@@ -401,7 +401,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
         /// <returns>cosine value</returns>
-        public double GetConsineScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
+        public double GetCosineScore(Ion ion, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var observedPeaks = GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             if (observedPeaks == null) return 0;
@@ -505,11 +505,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var filteredPeaks = new List<Peak>();
             var tolerance = new Tolerance(windowPpm);
-            var st = 0;
-            var ed = 0;
+            var indexStart = 0;
+            var indexEnd = 0;
 
-            var prevSt = 0;
-            var prevEd = 0;
+            var prevIndexStart = 0;
+            var prevIndexEnd = 0;
 
             var intensityValues = new SortedSet<double>();
 
@@ -519,18 +519,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var mzStart = peak.Mz - mzWindowWidth;
                 var mzEnd = peak.Mz + mzWindowWidth;
 
-                while (st < Peaks.Length)
+                while (indexStart < Peaks.Length)
                 {
-                    if (st < Peaks.Length - 1 && Peaks[st].Mz < mzStart) st++;
+                    if (indexStart < Peaks.Length - 1 && Peaks[indexStart].Mz < mzStart) indexStart++;
                     else break;
                 }
-                while (ed < Peaks.Length)
+                while (indexEnd < Peaks.Length)
                 {
-                    if (ed < Peaks.Length - 1 && Peaks[ed].Mz < mzEnd) ed++;
+                    if (indexEnd < Peaks.Length - 1 && Peaks[indexEnd].Mz < mzEnd) indexEnd++;
                     else break;
                 }
 
-                if (ed - st + 1 < 2)
+                if (indexEnd - indexStart + 1 < 2)
                 {
                     filteredPeaks.Add(peak);
                     continue;
@@ -538,26 +538,26 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                 if (intensityValues.Count < 1)
                 {
-                    for (var i = st; i <= ed; i++) intensityValues.Add(Peaks[i].Intensity);
+                    for (var i = indexStart; i <= indexEnd; i++) intensityValues.Add(Peaks[i].Intensity);
                 }
                 else
                 {
-                    if (prevEd >= st)
+                    if (prevIndexEnd >= indexStart)
                     {
-                        for (var i = prevSt; i < ed; i++) intensityValues.Remove(Peaks[i].Intensity);
-                        for (var i = prevEd+1; i <= ed; i++) intensityValues.Add(Peaks[i].Intensity);
+                        for (var i = prevIndexStart; i < indexEnd; i++) intensityValues.Remove(Peaks[i].Intensity);
+                        for (var i = prevIndexEnd+1; i <= indexEnd; i++) intensityValues.Add(Peaks[i].Intensity);
                     }
                     else
                     {
-                        for (var i = prevSt; i <= prevEd; i++) intensityValues.Remove(Peaks[i].Intensity);
+                        for (var i = prevIndexStart; i <= prevIndexEnd; i++) intensityValues.Remove(Peaks[i].Intensity);
                     }
                 }
 
                 var intensityMedian = intensityValues.Median();
                 if (peak.Intensity > intensityMedian*signalToNoiseRatio) filteredPeaks.Add(peak);
 
-                prevSt = st;
-                prevEd = ed;
+                prevIndexStart = indexStart;
+                prevIndexEnd = indexEnd;
             }
             filteredPeaks.Sort();
             Peaks = filteredPeaks.ToArray();
@@ -605,8 +605,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var filteredPeaks = new List<Peak>();
             var tolerance = new Tolerance(10000);
 
-            var st = 0;
-            var ed = 0;
+            var indexStart = 0;
+            var indexEnd = 0;
 
             foreach (var peak in Peaks)
             {
@@ -616,18 +616,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var mzStart = peak.Mz - mzWindowWidth;
                 var mzEnd = peak.Mz + mzWindowWidth;
 
-                while (st < Peaks.Length)
+                while (indexStart < Peaks.Length)
                 {
-                    if (st < Peaks.Length - 1 && Peaks[st].Mz < mzStart) st++;
+                    if (indexStart < Peaks.Length - 1 && Peaks[indexStart].Mz < mzStart) indexStart++;
                     else break;
                 }
-                while (ed < Peaks.Length)
+                while (indexEnd < Peaks.Length)
                 {
-                    if (ed < Peaks.Length - 1 && Peaks[ed].Mz < mzEnd) ed++;
+                    if (indexEnd < Peaks.Length - 1 && Peaks[indexEnd].Mz < mzEnd) indexEnd++;
                     else break;
                 }
 
-                var abundantIntensityBucket = GetMostAbundantIntensity(st, ed);
+                var abundantIntensityBucket = GetMostAbundantIntensity(indexStart, indexEnd);
                 if (abundantIntensityBucket.LowerBound < intensity && intensity < abundantIntensityBucket.UpperBound)
                     continue;
 

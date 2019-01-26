@@ -276,7 +276,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Check 2 Xics for equality
+        /// Check 2 XICs for equality
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>

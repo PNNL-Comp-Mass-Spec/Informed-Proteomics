@@ -6,7 +6,7 @@ using InformedProteomics.Backend.MathAndStats;
 namespace InformedProteomics.Backend.Data.Sequence
 {
     /// <summary>
-    /// This class catalogues all possible combinations of modifications
+    /// This class catalogs all possible combinations of modifications
     /// </summary>
     public class ModificationParams
     {
@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             _modifications = modifications;
             _maxNumDynModsPerSequence = maxNumDynModsPerSequence;
-            CataloguePossibleModificationCombinations();
+            CatalogPossibleModificationCombinations();
             GenerateModCombMap();
         }
 
@@ -48,7 +48,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public int NumModificationCombinations => _modificationCombinations.Length;
 
         /// <summary>
-        /// Gets the modificatino combination with the specified modCombIndex
+        /// Gets the modification combination with the specified modCombIndex
         /// </summary>
         /// <param name="modCombIndex">modification combination modCombIndex</param>
         /// <returns>modification combination</returns>
@@ -115,7 +115,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Private methods
 
-        private void CataloguePossibleModificationCombinations()
+        private void CatalogPossibleModificationCombinations()
         {
             _indexToHashValue = new Dictionary<int, long>();
             _hashValueToModCombIndex = new Dictionary<long, int>();

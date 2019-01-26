@@ -186,7 +186,7 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Gets or sets the minimum possible MS1 feature probability threshold.
         /// </summary>
-        public double MinFeatureProbablility { get; set; }
+        public double MinFeatureProbability { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum possible modification combinations per sequence.
@@ -194,7 +194,7 @@ namespace InformedProteomics.TopDown.Execution
         public int MaxDynamicModificationsPerSequence { get; set; }
 
         /// <summary>
-        /// Gets or sets the DB search mode, using a 'tribool'
+        /// Gets or sets the DB search mode, using a 'tri state bool'
         /// </summary>
         /// <remarks>default true
         /// true: target and decoy, false: target only, null: decoy only</remarks>
@@ -419,7 +419,7 @@ namespace InformedProteomics.TopDown.Execution
                         param.MaxSequenceMass = Convert.ToDouble(parts[1]);
                         break;
                     case "MinFeatureProbability":
-                        param.MinFeatureProbablility = Convert.ToDouble(parts[1]);
+                        param.MinFeatureProbability = Convert.ToDouble(parts[1]);
                         break;
                     case "MaxDynamicModificationsPerSequence":
                         param.MaxDynamicModificationsPerSequence = Convert.ToInt32(parts[1]);

@@ -1,7 +1,7 @@
 namespace InformedProteomics.Backend.Data.Biology
 {
     /// <summary>
-    /// Interface for biological components that have a elemental composition
+    /// Interface for biological components that have an elemental composition
     /// </summary>
     public interface IMolecule : IMatter
     {

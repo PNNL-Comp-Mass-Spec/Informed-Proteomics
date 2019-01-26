@@ -286,7 +286,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Constructor for creating and/or opening a PBF file
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <param name="msdr"></param>
+        /// <param name="msDataReader"></param>
         /// <param name="pbfFileName"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
@@ -294,14 +294,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="keepDataReaderOpen">use 'true' if the data reader should not be closed when finished creating the PBF file</param>
         /// <param name="scanStart">Minimum scan number to include in the .PBF file; 0 to disable this filter</param>
         /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
-        public PbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
+        public PbfLcMsRun(string specFileName, IMassSpecDataReader msDataReader, string pbfFileName = null,
                           double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0,
                           IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false, int scanStart = 0, int scanEnd = 0)
         {
             _precursorSignalToNoiseRatioThreshold = precursorSignalToNoiseRatioThreshold;
             _productSignalToNoiseRatioThreshold = productSignalToNoiseRatioThreshold;
 
-            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen, scanStart, scanEnd);
+            GetPbfFile(specFileName, msDataReader, pbfFileName, progress, keepDataReaderOpen, scanStart, scanEnd);
         }
 
         /// <summary>
@@ -328,7 +328,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Given a spec file path and other information, either open an existing pbf corresponding to the spec file path, or create a new one
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <param name="msdr"></param>
+        /// <param name="msDataReader"></param>
         /// <param name="pbfFileName"></param>
         /// <param name="progress"></param>
         /// <param name="keepDataReaderOpen"></param>
@@ -336,7 +336,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
         protected internal void GetPbfFile(
             string specFileName,
-            IMassSpecDataReader msdr,
+            IMassSpecDataReader msDataReader,
             string pbfFileName,
             IProgress<ProgressData> progress,
             bool keepDataReaderOpen = false,
@@ -360,19 +360,19 @@ namespace InformedProteomics.Backend.MassSpecData
                 OpenPbfFile(specFileName);
                 if (!keepDataReaderOpen)
                 {
-                    msdr?.Dispose();
+                    msDataReader?.Dispose();
                 }
                 return;
             }
 
-            BuildPbfFile(specFileName, msdr, pbfPath, tempPath, progress, keepDataReaderOpen, scanStart, scanEnd);
+            BuildPbfFile(specFileName, msDataReader, pbfPath, tempPath, progress, keepDataReaderOpen, scanStart, scanEnd);
         }
 
         /// <summary>
         /// Code for writing a PBF file. Should only be called from a constructor.
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <param name="msdr"></param>
+        /// <param name="msDataReader"></param>
         /// <param name="pbfPath"></param>
         /// <param name="tempPath"></param>
         /// <param name="progress"></param>
@@ -381,7 +381,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="scanEnd">Maximum scan number to include to the .PBF file; 0 to disable this filter</param>
         protected internal void BuildPbfFile(
             string specFileName,
-            IMassSpecDataReader msdr,
+            IMassSpecDataReader msDataReader,
             string pbfPath,
             string tempPath,
             IProgress<ProgressData> progress,
@@ -389,15 +389,15 @@ namespace InformedProteomics.Backend.MassSpecData
             int scanStart = 0,
             int scanEnd = 0)
         {
-            if (msdr == null)
+            if (msDataReader == null)
             {
-                msdr = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
+                msDataReader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
             }
-            NumSpectra = msdr.NumSpectra;
+            NumSpectra = msDataReader.NumSpectra;
             RawFilePath = specFileName;
-            NativeIdFormat = msdr.NativeIdFormat;
-            NativeFormat = msdr.NativeFormat;
-            SrcFileChecksum = msdr.SrcFileChecksum.ToLower().Replace("-", "");
+            NativeIdFormat = msDataReader.NativeIdFormat;
+            NativeFormat = msDataReader.NativeFormat;
+            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", "");
 
             try
             {
@@ -405,7 +405,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 using (var writer =
                     new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
-                    WriteToPbf(msdr, writer, scanStart, scanEnd, progress);
+                    WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -414,14 +414,14 @@ namespace InformedProteomics.Backend.MassSpecData
                 using (var writer =
                     new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
-                    WriteToPbf(msdr, writer, scanStart, scanEnd, progress);
+                    WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
                 }
             }
             finally
             {
                 if (!keepDataReaderOpen)
                 {
-                    msdr.Dispose();
+                    msDataReader.Dispose();
                 }
             }
             FileFormatVersion = FileFormatId.ToString();
@@ -450,7 +450,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _reader = new BinaryReader(File.Open(specFileName, FileMode.Open, FileAccess.Read, FileShare.Read));
 
-            lock (_filelock)
+            lock (_fileLock)
             {
                 if (ReadMetaInfo() == false)
                 {
@@ -559,7 +559,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         protected internal const int NativeIdLength = 50;
 
-        private readonly object _filelock = new object();
+        private readonly object _fileLock = new object();
         private BinaryReader _reader;
 
         private readonly double _precursorSignalToNoiseRatioThreshold;
@@ -733,9 +733,9 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
             {
-                var xicl = new Xic();
-                xicl.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
-                return Xic.GetSelectedXic(xicl);
+                var localXic = new Xic();
+                localXic.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
+                return Xic.GetSelectedXic(localXic);
             }
 
             var minBinIndex = GetMzBinIndex(minMz);
@@ -775,9 +775,9 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
             {
-                var xicl = new Xic();
-                xicl.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
-                return xicl;
+                var localXic = new Xic();
+                localXic.AddRange(_precursorChromatogramCache.Where(peak => minMz <= peak.Mz && peak.Mz <= maxMz));
+                return localXic;
             }
 
             var minBinIndex = GetMzBinIndex(minMz);
@@ -852,7 +852,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Read the byte offset of the start of the precursor chromatogram
             _offsetPrecursorChromatogramBegin = _reader.ReadInt64();
 
-            // Read the byte offset of the start of the product chromatogram (which is the end ofthe precursor chromatogram)
+            // Read the byte offset of the start of the product chromatogram (which is the end of the precursor chromatogram)
             _offsetPrecursorChromatogramEnd = _offsetProductChromatogramBegin = _reader.ReadInt64();
 
             // Read the byte offset of the end of the product chromatogram
@@ -1030,7 +1030,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private Spectrum ReadSpectrum(long offset, bool includePeaks = true)
         {
-            lock (_filelock)
+            lock (_fileLock)
             {
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 while (_reader.BaseStream.Position != (_reader.BaseStream.Length - sizeof(int)))
@@ -1184,7 +1184,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             ScanPeakMetaData data;
-            lock (_filelock)
+            lock (_fileLock)
             {
                 _reader.BaseStream.Seek(offset, SeekOrigin.Begin);
 
@@ -1261,50 +1261,50 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Old PBF file creation workflow
         /// </summary>
-        /// <param name="imlr"></param>
+        /// <param name="lcmsRun"></param>
         /// <param name="outputFilePath"></param>
         /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
-        public static void WriteAsPbf(InMemoryLcMsRun imlr, string outputFilePath, IProgress<ProgressData> progress = null)
+        public static void WriteAsPbf(InMemoryLcMsRun lcmsRun, string outputFilePath, IProgress<ProgressData> progress = null)
         {
             using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
             {
-                WriteAsPbf(imlr, writer, progress);
+                WriteAsPbf(lcmsRun, writer, progress);
             }
         }
 
         /// <summary>
         /// Old PBF file creation workflow
         /// </summary>
-        /// <param name="imlr"></param>
+        /// <param name="lcmsRun"></param>
         /// <param name="writer"></param>
         /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
-        public static void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
+        public static void WriteAsPbf(InMemoryLcMsRun lcmsRun, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             var pbfLcMsRun = new PbfLcMsRun();
             var progressData = new ProgressData(progress);
 
-            var scanNumToSpecOffset = new long[imlr.NumSpectra + 1];
-            var scanNumToIsolationWindow = new IsolationWindow[imlr.NumSpectra + 1];
+            var scanNumToSpecOffset = new long[lcmsRun.NumSpectra + 1];
+            var scanNumToIsolationWindow = new IsolationWindow[lcmsRun.NumSpectra + 1];
 
             // Spectra
-            long countTotal = imlr.NumSpectra;
+            long countTotal = lcmsRun.NumSpectra;
             long counter = 0;
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             long countMS2Spec = 0;
-            for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
+            for (var scanNum = lcmsRun.MinLcScan; scanNum <= lcmsRun.MaxLcScan; scanNum++)
             {
                 progressData.Report(counter, countTotal);
                 counter++;
-                scanNumToSpecOffset[scanNum - imlr.MinLcScan] = writer.BaseStream.Position;
-                var spec = imlr.GetSpectrum(scanNum);
+                scanNumToSpecOffset[scanNum - lcmsRun.MinLcScan] = writer.BaseStream.Position;
+                var spec = lcmsRun.GetSpectrum(scanNum);
                 if (spec == null) continue;
                 var productSpec = spec as ProductSpectrum;
-                scanNumToIsolationWindow[scanNum - imlr.MinLcScan] = null;
+                scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan] = null;
                 if (productSpec != null)
                 {
-                    scanNumToIsolationWindow[scanNum - imlr.MinLcScan] = productSpec.IsolationWindow;
+                    scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan] = productSpec.IsolationWindow;
                     countMS2Spec++;
                 }
                 pbfLcMsRun.WriteSpectrum(spec, writer);
@@ -1313,18 +1313,18 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor ion chromatogram (MS1 spectra)
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
 
-            var minMzIndex = imlr.Ms1PeakList.Any() ? GetMzBinIndex(imlr.Ms1PeakList[0].Mz) : 0;
-            var maxMzIndex = imlr.Ms1PeakList.Any() ? GetMzBinIndex(imlr.Ms1PeakList[imlr.Ms1PeakList.Count - 1].Mz) : -1;
+            var minMzIndex = lcmsRun.Ms1PeakList.Any() ? GetMzBinIndex(lcmsRun.Ms1PeakList[0].Mz) : 0;
+            var maxMzIndex = lcmsRun.Ms1PeakList.Any() ? GetMzBinIndex(lcmsRun.Ms1PeakList[lcmsRun.Ms1PeakList.Count - 1].Mz) : -1;
 
             var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
             counter = 0;
-            countTotal = imlr.Ms1PeakList.Count;
+            countTotal = lcmsRun.Ms1PeakList.Count;
 
             // All MS1 data sorted by mass, then scan number
-            // In rare instances, imlr.Ms1PeakList will be blank (no MS1 spectra); that's OK
+            // In rare instances, lcmsRun.Ms1PeakList will be blank (no MS1 spectra); that's OK
             progressData.StepRange(42.9 + 15.7, "Writing precursor chromatogram"); // Approximately 16% of total file size
-            foreach (var peak in imlr.Ms1PeakList)
+            foreach (var peak in lcmsRun.Ms1PeakList)
             {
                 progressData.Report(counter, countTotal);
                 counter++;
@@ -1345,11 +1345,11 @@ namespace InformedProteomics.Backend.MassSpecData
             counter = 0;
             countTotal = countMS2Spec;
             progressData.StepRange(42.9 + 15.7 + (41.2 / 2), "Processing product ion chromatogram"); // Approximately 41% of total file size
-            foreach (var ms2ScanNum in imlr.GetScanNumbers(2))
+            foreach (var ms2ScanNum in lcmsRun.GetScanNumbers(2))
             {
                 progressData.Report(counter, countTotal);
                 counter++;
-                if (!(imlr.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec)) continue;
+                if (!(lcmsRun.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec)) continue;
                 foreach (var peak in productSpec.Peaks)
                 {
                     ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
@@ -1378,20 +1378,20 @@ namespace InformedProteomics.Backend.MassSpecData
             var warnedInvalidScanNum = false;
             var warnedNullScanToIsolationWindow = false;
 
-            writer.Write(imlr.MinLcScan);
-            writer.Write(imlr.MaxLcScan);
-            for (var scanNum = imlr.MinLcScan; scanNum <= imlr.MaxLcScan; scanNum++)
+            writer.Write(lcmsRun.MinLcScan);
+            writer.Write(lcmsRun.MaxLcScan);
+            for (var scanNum = lcmsRun.MinLcScan; scanNum <= lcmsRun.MaxLcScan; scanNum++)
             {
-                var msLevel = imlr.GetMsLevel(scanNum);
-                writer.Write(imlr.GetMsLevel(scanNum));
-                writer.Write(imlr.GetElutionTime(scanNum));
+                var msLevel = lcmsRun.GetMsLevel(scanNum);
+                writer.Write(lcmsRun.GetMsLevel(scanNum));
+                writer.Write(lcmsRun.GetElutionTime(scanNum));
 
                 if (msLevel == 2)
                 {
                     float minMz = 0;
                     float maxMz = 0;
 
-                    if (scanNum - imlr.MinLcScan < 0 || scanNum - imlr.MinLcScan >= scanNumToIsolationWindow.Length)
+                    if (scanNum - lcmsRun.MinLcScan < 0 || scanNum - lcmsRun.MinLcScan >= scanNumToIsolationWindow.Length)
                     {
                         if (!warnedInvalidScanNum)
                         {
@@ -1404,7 +1404,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     else
                     {
-                        if (scanNumToIsolationWindow[scanNum - imlr.MinLcScan] == null)
+                        if (scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan] == null)
                         {
                             if (!warnedNullScanToIsolationWindow)
                             {
@@ -1417,15 +1417,15 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                         else
                         {
-                            minMz = (float)scanNumToIsolationWindow[scanNum - imlr.MinLcScan].MinMz;
-                            maxMz = (float)scanNumToIsolationWindow[scanNum - imlr.MinLcScan].MaxMz;
+                            minMz = (float)scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan].MinMz;
+                            maxMz = (float)scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan].MaxMz;
                         }
                     }
 
                     writer.Write(minMz);
                     writer.Write(maxMz);
                 }
-                writer.Write(scanNumToSpecOffset[scanNum - imlr.MinLcScan]);
+                writer.Write(scanNumToSpecOffset[scanNum - lcmsRun.MinLcScan]);
             }
 
             // Precursor chromatogram index
@@ -1459,22 +1459,22 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Bulk of code to write a PBF file. Protected internal to support DPbfLcMsRun.
         /// </summary>
-        /// <param name="msdr"></param>
+        /// <param name="msDataReader"></param>
         /// <param name="writer"></param>
         /// <param name="endScan"></param>
         /// <param name="progress"></param>
         /// <param name="startScan"></param>
         private void WriteToPbf(
-            IMassSpecDataReader msdr,
+            IMassSpecDataReader msDataReader,
             BinaryWriter writer,
             int startScan,
             int endScan,
             IProgress<ProgressData> progress = null)
         {
-            ScanNumToMsLevel = new Dictionary<int, int>(msdr.NumSpectra + 1);
-            ScanNumElutionTimeMap = new Dictionary<int, double>(msdr.NumSpectra + 1);
+            ScanNumToMsLevel = new Dictionary<int, int>(msDataReader.NumSpectra + 1);
+            ScanNumElutionTimeMap = new Dictionary<int, double>(msDataReader.NumSpectra + 1);
             IsolationMzBinToScanNums = new Dictionary<int, int[]>();
-            _scanNumToSpecOffset = new Dictionary<int, long>(msdr.NumSpectra + 1);
+            _scanNumToSpecOffset = new Dictionary<int, long>(msDataReader.NumSpectra + 1);
 
             MinLcScan = int.MaxValue;
             MaxLcScan = int.MinValue;
@@ -1483,7 +1483,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var progressData = new ProgressData(progress);
 
-            var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msdr.NumSpectra + 1);
+            var scanNumToIsolationWindow = new Dictionary<int, IsolationWindow>(msDataReader.NumSpectra + 1);
             var ms1Scans = new List<int>();
             var ms2Scans = new List<int>();
 
@@ -1494,10 +1494,10 @@ namespace InformedProteomics.Backend.MassSpecData
             var minMs1Mz = double.MaxValue;
             var maxMs2Mz = double.MinValue;
             var minMs2Mz = double.MaxValue;
-            var scanMetadata = new List<ScanMetadata>(msdr.NumSpectra);
+            var scanMetadata = new List<ScanMetadata>(msDataReader.NumSpectra);
             int countTotal;
 
-            if (endScan > 0 && endScan > msdr.NumSpectra)
+            if (endScan > 0 && endScan > msDataReader.NumSpectra)
                 endScan = 0;
 
             if (startScan > 0)
@@ -1508,7 +1508,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 else
                 {
-                    countTotal = msdr.NumSpectra - startScan + 1;
+                    countTotal = msDataReader.NumSpectra - startScan + 1;
                 }
             } else if (endScan > 0)
             {
@@ -1516,12 +1516,12 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                countTotal = msdr.NumSpectra;
+                countTotal = msDataReader.NumSpectra;
             }
 
             long counter = 0;
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
-            foreach (var spec in msdr.ReadAllSpectra())
+            foreach (var spec in msDataReader.ReadAllSpectra())
             {
                 if (startScan > 0 && spec.ScanNum < startScan)
                     continue;
@@ -1754,7 +1754,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Checksum: 40 bytes (could store in 20 bytes, but conversion from hex string to bytes isn't simple)
-            SrcFileChecksum = msdr.SrcFileChecksum.ToLower().Replace("-", "");
+            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", "");
             writer.Write(SrcFileChecksum.PadRight(FileChecksumLength).ToCharArray(0, FileChecksumLength), 0, FileChecksumLength);
 
             // RawFilePath: 200
@@ -1835,7 +1835,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 progData.Status = "Writing precursor chromatogram";
             }
-            lock (_filelock)
+            lock (_fileLock)
             {
                 var peaks = new SplitLcMsPeakLists(minMz, maxMz, totalPeaksCount);
                 var peaksCount = 0;
@@ -2203,7 +2203,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var minOffset = beginOffset;
             var maxOffset = endOffset;
             var curOffset = -1L;
-            lock (_filelock)
+            lock (_fileLock)
             {
                 // binary search
                 while (minOffset <= maxOffset)
@@ -2279,9 +2279,10 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             var doCache = cacheLower || cacheHigher;
 
-            lock (_filelock)
+            lock (_fileLock)
             {
                 var cacheCount = 0;
+
                 // go down
                 while (curOffset >= beginOffset)
                 {
@@ -2315,6 +2316,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
 
                 cacheCount = 0;
+
                 // go up
                 curOffset = targetOffset;
                 while (curOffset < endOffset)

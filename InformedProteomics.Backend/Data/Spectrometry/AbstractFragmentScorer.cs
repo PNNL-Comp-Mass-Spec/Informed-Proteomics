@@ -106,7 +106,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Find the praks that match the provided composition
+        /// Find the peaks that match the provided composition
         /// </summary>
         /// <param name="fragmentComposition"></param>
         /// <param name="corrThreshold"></param>

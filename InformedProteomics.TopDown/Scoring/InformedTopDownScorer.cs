@@ -29,9 +29,9 @@ namespace InformedProteomics.TopDown.Scoring
         public double Ms2CorrThreshold { get; }
         public ActivationMethod ActivationMethod { get; }
 
-        public IcScores GetScores(Sequence sequence, int parentIoncharge, int ms2ScanNum)
+        public IcScores GetScores(Sequence sequence, int parentIonCharge, int ms2ScanNum)
         {
-            GetCompositeScores(sequence, parentIoncharge, ms2ScanNum, out var score, out var nMatchedFragments);
+            GetCompositeScores(sequence, parentIonCharge, ms2ScanNum, out var score, out var nMatchedFragments);
             return new IcScores(nMatchedFragments, score, sequence.GetModificationString());
         }
 
@@ -51,14 +51,14 @@ namespace InformedProteomics.TopDown.Scoring
 
             var bestScore = double.NegativeInfinity;
             Tuple<double, string> bestScoreAndModifications = null;
-            var protCompositions = seqGraph.GetSequenceCompositions();
+            var proteinCompositions = seqGraph.GetSequenceCompositions();
 
-            for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+            for (var modIndex = 0; modIndex < proteinCompositions.Length; modIndex++)
             {
                 seqGraph.SetSink(modIndex);
-                var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+                var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
 
-                if (!protCompositionWithH2O.Equals(composition)) continue;
+                if (!proteinCompositionWithH2O.Equals(composition)) continue;
 
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
                 var curScore = curScoreAndModifications.Item1;
@@ -88,14 +88,14 @@ namespace InformedProteomics.TopDown.Scoring
 
             var bestScore = double.NegativeInfinity;
             Tuple<double, string> bestScoreAndModifications = null;
-            var protCompositions = seqGraph.GetSequenceCompositions();
+            var proteinCompositions = seqGraph.GetSequenceCompositions();
 
-            for (var modIndex = 0; modIndex < protCompositions.Length; modIndex++)
+            for (var modIndex = 0; modIndex < proteinCompositions.Length; modIndex++)
             {
                 seqGraph.SetSink(modIndex);
-                var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+                var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
 
-                if (!protCompositionWithH2O.Equals(composition)) continue;
+                if (!proteinCompositionWithH2O.Equals(composition)) continue;
 
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
                 var curScore = curScoreAndModifications.Item1;
@@ -115,7 +115,7 @@ namespace InformedProteomics.TopDown.Scoring
             return new IcScores(nMatchedFragments, score, modifications);
         }
 
-        public void GetCompositeScores(Sequence sequence, int parentIoncharge, int ms2ScanNum, out double score, out int nMatchedFragments)
+        public void GetCompositeScores(Sequence sequence, int parentIonCharge, int ms2ScanNum, out double score, out int nMatchedFragments)
         {
             score = 0d;
             nMatchedFragments = 0;
@@ -126,7 +126,7 @@ namespace InformedProteomics.TopDown.Scoring
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
 
-            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge + 2));
+            var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIonCharge + 2));
             var cleavages = sequence.GetInternalCleavages();
             var cleavageIndex = 0;
 
@@ -161,7 +161,7 @@ namespace InformedProteomics.TopDown.Scoring
             //var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
             //if (spec == null) return;
 
-            //var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIoncharge + 2), activationMethod: ActivationMethod);
+            //var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, parentIonCharge + 2), activationMethod: ActivationMethod);
             var cleavages = sequence.GetInternalCleavages();
 
             foreach (var c in cleavages)

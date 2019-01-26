@@ -47,22 +47,22 @@ namespace InformedProteomics.Backend.Data.Composition
         {
             var dist = new double[MaxNumIsotopes];
             var means = new double[_possibleIsotopeCombinations[0][0].Length + 1];
-            var exps = new double[means.Length];
-            for (var i = 0; i < means.Length; i++) // precalculate means and thier exps
+            var exponents = new double[means.Length];
+            for (var i = 0; i < means.Length; i++) // pre-calculate means and their exponents
             {
                 means[i] = c * ProbC[i] + h * ProbH[i] + n * ProbN[i] + o * ProbO[i] + s * ProbS[i];
-                exps[i] = Math.Exp(means[i]);
+                exponents[i] = Math.Exp(means[i]);
             }
 
-            // This assumes that the envelop is unimodal.
+            // This assumes that the envelop is uni-modal.
             var maxHeight = 0.0;
             var isotopeIndex = 0;
             var mostIntenseIsotopomerIndex = -1;
             for (; isotopeIndex < MaxNumIsotopes; isotopeIndex++)
             {
-                foreach (var isopeCombinations in _possibleIsotopeCombinations[isotopeIndex])
+                foreach (var isotopeCombinations in _possibleIsotopeCombinations[isotopeIndex])
                 {
-                    dist[isotopeIndex] += GetIsotopeProbability(isopeCombinations, means, exps);
+                    dist[isotopeIndex] += GetIsotopeProbability(isotopeCombinations, means, exponents);
                 }
                 if (Double.IsInfinity(dist[isotopeIndex]))
                 {
@@ -111,8 +111,8 @@ namespace InformedProteomics.Backend.Data.Composition
             ProbO = DefaultProbO;
             ProbS = DefaultProbS;
 
-            this.IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
-            this.MaxNumIsotopes = maxNumIsotopes;
+            IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
+            MaxNumIsotopes = maxNumIsotopes;
 
             if (_possibleIsotopeCombinations == null)
             {
@@ -145,8 +145,8 @@ namespace InformedProteomics.Backend.Data.Composition
             ProbO = probO;
             ProbS = probS;
 
-            this.IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
-            this.MaxNumIsotopes = maxNumIsotopes;
+            IsotopeRelativeIntensityThreshold = relativeIntensityThreshold;
+            MaxNumIsotopes = maxNumIsotopes;
 
             if (_possibleIsotopeCombinations == null)
             {
@@ -242,17 +242,17 @@ namespace InformedProteomics.Backend.Data.Composition
             _possibleIsotopeCombinations = possibleIsotopeCombinations;
         }
 
-        private double GetIsotopeProbability(int[] number, double[] means, double[] exps)
+        private double GetIsotopeProbability(IReadOnlyList<int> number, IReadOnlyList<double> means, IReadOnlyList<double> exponents)
         {
             var prob = 1.0;
-            for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Length); i++)
+            for (var i = 1; i <= Math.Min(ProbC.Length - 1, number.Count); i++)
             {
                 var mean = means[i];
-                var exp = exps[i];
+                var exp = exponents[i];
                 if (number[i - 1] == 0) prob *= exp;
                 else
                     prob *=
-                        (Math.Pow(mean, number[i - 1]) * exp / SpecialFunctions.Factorial(number[i - 1]));
+                        Math.Pow(mean, number[i - 1]) * exp / SpecialFunctions.Factorial(number[i - 1]);
             }
             return prob;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
@@ -64,9 +63,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 var prefixes = match.Prefixes;
                 var suffixes = match.Suffixes;
 
-                StreamWriter debugFile = File.AppendText(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\bCID.txt");
+                var debugFile = File.AppendText(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\bCID.txt");
 
-                for (int i = 0; i < prefixes.Count; i++)
+                for (var i = 0; i < prefixes.Count; i++)
                 {
                     var ionTypeScores = new Dictionary<string, FitScoreList>();
                     foreach (var ionType in ionTypes)
@@ -76,9 +75,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         var ion = ionType.GetIon(cleavagePoints[i]);
 
                         var mostIntensePeak = GetHighestPeak(ion, spectrum, tolerance, relativeIntensityThreshold);
-                        double score = GetScore(ion, spectrum, tolerance, relativeIntensityThreshold);
+                        var score = GetScore(ion, spectrum, tolerance, relativeIntensityThreshold);
 
-                        double intensity = -1.0;
+                        var intensity = -1.0;
 
                         if (mostIntensePeak != null)
                             intensity = mostIntensePeak.Intensity;
@@ -93,16 +92,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         ionTypeScores[name].Add(new FitScore(intensity, score));
                     }
                     var bestScores = SelectBestScores(ionTypeScores);
-                    foreach (var bestscore in bestScores)
+                    foreach (var bestScore in bestScores)
                     {
-                        var score = bestscore.Score;
+                        var score = bestScore.Score;
                         if (_method == ScoreMethod.FitScore)
                             score = 1 - score;
                         WorstScore.Total++;
                         if (score.Equals(0))
                             WorstScore.Found++;
 
-                        debugFile.WriteLine("{0}\t{1}", bestscore.Intensity, score);
+                        debugFile.WriteLine("{0}\t{1}", bestScore.Intensity, score);
                     }
                     _intensityHistogram.AddData(bestScores);
                 }
@@ -114,7 +113,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var peaks = spectrum.GetAllIsotopePeaks(ion, tolerance, relativeIntensityThreshold);
             Peak highestPeak = null;
-            double highestIntensity = 0.0;
+            var highestIntensity = 0.0;
 
             if (peaks == null) return null;
 
@@ -131,7 +130,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private static string ReducedChargeName(IonType ionType)
         {
-            string name = ionType.Name;
+            var name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)
                 name = name.Remove(1, 1);
             if (ionType.Charge >= 10)
@@ -144,22 +143,22 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             return ionTypeScores.Values.Select(scoreList => scoreList.MaxScore(_method)).ToList();
         }
 
-        private double GetScore(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntenistyThreshold)
+        private double GetScore(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntensityThreshold)
         {
             double score;
             switch (_method)
             {
                 case ScoreMethod.Cosine:
-                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
+                    score = spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold);
                     break;
                 case ScoreMethod.FitScore:
-                    score = spectrum.GetFitScore(ion, tolerance, relativeIntenistyThreshold);
+                    score = spectrum.GetFitScore(ion, tolerance, relativeIntensityThreshold);
                     break;
                 case ScoreMethod.Pearson:
-                    score = spectrum.GetCorrScore(ion, tolerance, relativeIntenistyThreshold);
+                    score = spectrum.GetCorrScore(ion, tolerance, relativeIntensityThreshold);
                     break;
                 default:
-                    score = spectrum.GetConsineScore(ion, tolerance, relativeIntenistyThreshold);
+                    score = spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold);
                     break;
             }
             return score;

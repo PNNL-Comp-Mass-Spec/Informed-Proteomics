@@ -465,31 +465,31 @@ namespace InformedProteomics.Backend.Data.Composition
         /// Parse a plain-string empirical formula, for example
         /// C2H3N1O1S
         /// </summary>
-        /// <param name="plaincompositionStr"></param>
+        /// <param name="plainCompositionStr"></param>
         /// <remarks>Empirical formula cannot have parentheses or spaces</remarks>
         /// <returns>Composition object, or null if a parse error</returns>
-        public static Composition ParseFromPlainString(string plaincompositionStr)
+        public static Composition ParseFromPlainString(string plainCompositionStr)
         {
-            if (!Regex.IsMatch(plaincompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
+            if (!Regex.IsMatch(plainCompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
 
-            var unimodString = new StringBuilder();
+            var uniModString = new StringBuilder();
 
-            var matches = Regex.Matches(plaincompositionStr, @"[A-Z][a-z]?-?\d*");
+            var matches = Regex.Matches(plainCompositionStr, @"[A-Z][a-z]?-?\d*");
             foreach (Match match in matches)
             {
                 var element = match.Value;
                 var atom = Regex.Match(element, @"[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
                 if (num.Length == 0) num = "1";
-                if (unimodString.Length != 0) unimodString.Append(" ");
-                unimodString.AppendFormat("{0}({1})", atom, num);
+                if (uniModString.Length != 0) uniModString.Append(" ");
+                uniModString.AppendFormat("{0}({1})", atom, num);
             }
 
-            return Parse(unimodString.ToString());
+            return Parse(uniModString.ToString());
         }
 
         /// <summary>
-        /// Parse unimod-like composition string, for example
+        /// Parse UniMod-like composition string, for example
         /// H(117) C(77) N(17) O(26) S(2)
         /// </summary>
         /// <param name="compositionStr"></param>

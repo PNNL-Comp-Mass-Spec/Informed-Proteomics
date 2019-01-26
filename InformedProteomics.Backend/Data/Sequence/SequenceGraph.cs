@@ -142,7 +142,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Get number of possible proteoform sequences for the speicified modification combination
+        /// Get number of possible proteoform sequences for the specified modification combination
         /// </summary>
         /// <param name="modIndex">index of modification combination</param>
         /// <returns>number of sequences</returns>

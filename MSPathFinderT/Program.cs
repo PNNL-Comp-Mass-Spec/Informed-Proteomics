@@ -51,7 +51,7 @@ namespace MSPathFinderT
                 }
 
                 var parser = new CommandLineParser<TopDownInputParameters>(entryAsmName, Version);
-                parser.UsageExamples.Add(string.Format("Perform a target+decoy search with default parameters and a mods file:\n{0}.exe -s testfile.raw -d sampleProteins.fasta -mod mods.txt -tda 1", entryAsmName));
+                parser.UsageExamples.Add(string.Format("Perform a target+decoy search with default parameters and a mods file:\n{0}.exe -s TestFile.raw -d sampleProteins.fasta -mod mods.txt -tda 1", entryAsmName));
                 // TODO: add more examples, maybe a link to GitHub?
                 var results = parser.ParseArgs(args);
                 if (!results.Success)

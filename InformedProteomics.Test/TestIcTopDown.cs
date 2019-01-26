@@ -150,9 +150,10 @@ namespace InformedProteomics.Test
             //};
             //var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
+
             var aaSet = new AminoAcidSet();
-            const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
+            const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
+            var tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
 
             const int minSequenceLength = 21; // 7
             const int maxSequenceLength = 500; // 1000
@@ -175,7 +176,7 @@ namespace InformedProteomics.Test
         [Test]
         [Category("PNL_Domain")]
         [Category("Local_Testing")]
-        public void TestForSbepData()
+        public void TestForSystemsBiologyData()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -216,7 +217,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
-            const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
+            const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
             var tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
@@ -565,12 +566,12 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             var tolerance = new Tolerance(10.0);
 
-            var rescorer = new IcRescorer(specFilePath, icResultPath, outputPath, aaSet, tolerance, 0.7);
+            var reScorer = new IcRescorer(specFilePath, icResultPath, outputPath, aaSet, tolerance, 0.7);
             Console.WriteLine("Done");
         }
 
         //[Test]
-        //public void TestHistonSearch()
+        //public void TestHistoneSearch()
         //{
         //    const bool isDecoy = true;
         //    // Search parameters

@@ -21,7 +21,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private const int UNKNOWN_PSI_MOD_ACCESSION = 1001460;
 
         /// <summary>
-        /// The UNIMOD accession number of the modification
+        /// The UniMod accession number of the modification
         /// </summary>
         public int AccessionNum { get; }
 
@@ -345,7 +345,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static readonly Modification ArgToHeavyArg = new Modification(267, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-4) 15N(4)"), "Label:13C(6)15N(4)");
 
         /// <summary>
-        /// For Aaron's data
+        /// Protein Probe
         /// </summary>
         public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
 
@@ -448,7 +448,6 @@ namespace InformedProteomics.Backend.Data.Sequence
             return modification;
         }
 
-        // Added by Chris
         /// <summary>
         /// Unregister a modification by name.
         /// Added by Chris.

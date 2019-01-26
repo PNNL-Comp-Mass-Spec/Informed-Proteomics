@@ -32,18 +32,18 @@ namespace InformedProteomics.Tests.FunctionalTests
             Assert.True(spec != null);
 
             const string protein = "MRIILLGAPGAGKGTQAQFIMEKYGIPQISTGDMLRAAVKSGSELGKQAKDIMDAGKLVTDELVIALVKERIAQEDCRNGFLLDGFPRTIPQADAMKEAGIVVDYVLEFDVPDELIVDRIVGRRVHAASGRVYHVKFNPPKVEGKDDVTGEDLTTRKDDQEETVRKRLVEYHQMTAPLIGYYQKEAEAGNTKYAKVDGTQAVADVRAALEKILG";
-            var protComp = new AminoAcidSet().GetComposition(protein) + Composition.H2O;
-            Assert.True(protComp != null);
-            Assert.True(protComp.C == 1035);
-            Assert.True(protComp.H == 1683);
-            Assert.True(protComp.N == 289);
-            Assert.True(protComp.O == 318);
-            Assert.True(protComp.P == 0);
-            Assert.True(protComp.S == 7);
-            Assert.True(Math.Abs(protComp.Mass - 23473.245267145) < 0.0000001);
-            Assert.True(protComp.NominalMass == 23461);
+            var proteinComp = new AminoAcidSet().GetComposition(protein) + Composition.H2O;
+            Assert.True(proteinComp != null);
+            Assert.True(proteinComp.C == 1035);
+            Assert.True(proteinComp.H == 1683);
+            Assert.True(proteinComp.N == 289);
+            Assert.True(proteinComp.O == 318);
+            Assert.True(proteinComp.P == 0);
+            Assert.True(proteinComp.S == 7);
+            Assert.True(Math.Abs(proteinComp.Mass - 23473.245267145) < 0.0000001);
+            Assert.True(proteinComp.NominalMass == 23461);
 
-            var ion = new Ion(protComp, 20);
+            var ion = new Ion(proteinComp, 20);
 //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             Console.WriteLine(@"MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
@@ -55,7 +55,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Console.WriteLine(@"{0,3}  {1,10:F4}  {2,10:F3}  {3,10:F3}", i, ion.GetIsotopeMz(i), isotopomerEnvelope[i], intensity);
             }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
-            var cosine = spec.GetConsineScore(ion, new Tolerance(15), 0.1);
+            var cosine = spec.GetCosineScore(ion, new Tolerance(15), 0.1);
             var corr = spec.GetCorrScore(ion, new Tolerance(15), 0.1);
 
             Console.WriteLine(@"FitScore: {0}", fitScore);
@@ -69,7 +69,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
         [Test]
         [Category("PNL_Domain")]
-        [Ignore("Fit score no longer lesss than 0.15")]
+        [Ignore("Fit score no longer less than 0.15")]
         public void TestFitScoreCalculationEtd()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

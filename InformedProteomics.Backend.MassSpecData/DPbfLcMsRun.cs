@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassSpecData
     public class DPbfLcMsRun : PbfLcMsRun
     {
         /// <summary>
-        /// File extension
+        /// File extension for a deconvoluted pbf file
         /// </summary>
         public new const string FileExtensionConst = ".dpbf";
 
@@ -52,7 +52,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Constructor for opening a DPBF file
+        /// Constructor for opening a DPbf file
         /// </summary>
         /// <param name="specFileName"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
@@ -65,35 +65,35 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Constructor for creating and/or opening a DPBF file
+        /// Constructor for creating and/or opening a DPbf file
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <param name="msdr"></param>
+        /// <param name="msDataReader"></param>
         /// <param name="pbfFileName"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
         /// <param name="keepDataReaderOpen"></param>
-        public DPbfLcMsRun(string specFileName, IMassSpecDataReader msdr, string pbfFileName = null,
+        public DPbfLcMsRun(string specFileName, IMassSpecDataReader msDataReader, string pbfFileName = null,
             double precursorSignalToNoiseRatioThreshold = 0.0, double productSignalToNoiseRatioThreshold = 0.0,
             IProgress<ProgressData> progress = null, bool keepDataReaderOpen = false)
             : base(precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold)
         {
-            GetPbfFile(specFileName, msdr, pbfFileName, progress, keepDataReaderOpen);
+            GetPbfFile(specFileName, msDataReader, pbfFileName, progress, keepDataReaderOpen);
         }
 
         /// <summary>
-        /// Reads a Spectrum from the DPBF file with isotope peaks populated
+        /// Reads a Spectrum from the DPbf file with isotope peaks populated
         /// </summary>
-        /// <param name="fullData">The file used to create the DPBF file (throws <see cref="System.ArgumentException"/> if it is not) - PBF file preferred.</param>
+        /// <param name="fullData">The file used to create the DPbf file (throws <see cref="System.ArgumentException"/> if it is not) - PBF file preferred.</param>
         /// <param name="scanNum">The scan to read</param>
         /// <returns></returns>
-        /// <exception cref="System.ArgumentException">If the checksum of the source file does not match the checksum stored in the DPBF file</exception>
+        /// <exception cref="System.ArgumentException">If the checksum of the source file does not match the checksum stored in the DPbf file</exception>
         public DeconvolutedSpectrum GetSpectrumWithIsotopePeaks(IMassSpecDataReader fullData, int scanNum)
         {
-            if (SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun && SrcFileChecksum != ((PbfLcMsRun)fullData).PbfFileChecksum))
+            if (SrcFileChecksum != fullData.SrcFileChecksum || (fullData is PbfLcMsRun lcmsRun && SrcFileChecksum != lcmsRun.PbfFileChecksum))
             {
-                throw new ArgumentException("Supplied file was not used to create this DPBF file!", nameof(fullData));
+                throw new ArgumentException("Supplied file was not used to create this DPbf file!", nameof(fullData));
             }
 
             if (!(GetSpectrum(scanNum, true) is DeconvolutedSpectrum spec))

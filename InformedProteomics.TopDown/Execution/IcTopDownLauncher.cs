@@ -330,7 +330,7 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(100.0, "Writing combined results file");
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Both))
             {
-                // Add "Qvalue" and "PepQValue"
+                // Add "QValue" and "PepQValue"
                 FdrCalculator fdrCalculator;
                 if (targetSearchResults == null && decoySearchResults == null)
                 {
@@ -658,8 +658,8 @@ namespace InformedProteomics.TopDown.Execution
             var annotation = annotationAndOffset.Annotation;
             var offset = annotationAndOffset.Offset;
             //var protein = db.GetProteinName(offset);
-            var protSequence = annotation.Substring(2, annotation.Length - 4);
-            var seqGraph = SequenceGraph.CreateGraph(Options.AminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
+            var proteinSequence = annotation.Substring(2, annotation.Length - 4);
+            var seqGraph = SequenceGraph.CreateGraph(Options.AminoAcidSet, AminoAcid.ProteinNTerm, proteinSequence,
                 AminoAcid.ProteinCTerm);
 
             if (seqGraph == null) return; // No matches will be found without a sequence graph.
@@ -672,8 +672,8 @@ namespace InformedProteomics.TopDown.Execution
                 for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
                 {
                     seqGraph.SetSink(modIndex);
-                    var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                    var sequenceMass = protCompositionWithH2O.Mass;
+                    var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
+                    var sequenceMass = proteinCompositionWithH2O.Mass;
 
                     if (sequenceMass < Options.MinSequenceMass || sequenceMass > Options.MaxSequenceMass) continue;
 
@@ -697,8 +697,8 @@ namespace InformedProteomics.TopDown.Execution
                         var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
 
-                        var precursorIon = new Ion(protCompositionWithH2O, charge);
-                        var sequence = protSequence.Substring(nTermCleavages);
+                        var precursorIon = new Ion(proteinCompositionWithH2O, charge);
+                        var sequence = proteinSequence.Substring(nTermCleavages);
                         var pre = nTermCleavages == 0 ? annotation[0] : annotation[nTermCleavages + 1];
                         var post = annotation[annotation.Length - 1];
 
@@ -762,7 +762,7 @@ namespace InformedProteomics.TopDown.Execution
 
             var sw = new Stopwatch();
 
-            // Rescore and Estimate #proteins for GF calculation
+            // Re-score and Estimate #proteins for GF calculation
             long estimatedProteins = scanNums.Count;
             OnStatusEvent("Number of spectra: " + estimatedProteins);
             var numProteins = 0;
@@ -829,7 +829,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 var topDownScorer = new InformedTopDownScorer(_run, Options.AminoAcidSet, Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, activationMethod: Options.ActivationMethod);
 
-                currentTask = "Rescore and Estimate #proteins for GF calculation";
+                currentTask = "Re-score and Estimate #proteins for GF calculation";
 
                 foreach (var scanNum in _ms2ScanNums)
                 {
@@ -843,7 +843,7 @@ namespace InformedProteomics.TopDown.Execution
                     if (spec.Peaks.Length == 0)
                         continue;
 
-                    currentTask = "Looping over prmsms for scan " + scanNum;
+                    currentTask = "Looping over prsms for scan " + scanNum;
 
                     var matchIndex = 0;
                     foreach (var match in prsms)
