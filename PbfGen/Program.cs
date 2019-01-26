@@ -81,6 +81,13 @@ namespace PbfGen
                 foreach (var rawFilePath in specFilePaths)
                 {
                     var pbfFileName = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, PbfLcMsRun.FileExtensionConst);
+
+                    if (string.IsNullOrWhiteSpace(pbfFileName))
+                    {
+                        Console.WriteLine("MassSpecDataReaderFactory.ChangeExtension could not determine the pbf filename for {0}", rawFilePath);
+                        continue;
+                    }
+
                     var pbfFilePath = Path.Combine(options.OutputDir, Path.GetFileName(pbfFileName));
 
                     if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out var isCurrent) && isCurrent)
@@ -107,7 +114,16 @@ namespace PbfGen
                             Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
                         }
                     });
-                    var run = new PbfLcMsRun(rawFilePath, reader, pbfFilePath, 0, 0, progress, false, options.StartScan, options.EndScan);
+
+                    var precursorSignalToNoiseRatioThreshold = 0.0;
+                    var productSignalToNoiseRatioThreshold = 0.0;
+                    const bool keepDataReaderOpen = false;
+
+                    var run = new PbfLcMsRun(
+                        rawFilePath, reader, pbfFilePath,
+                        precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold,
+                        progress, keepDataReaderOpen, options.StartScan, options.EndScan);
+
                     Console.WriteLine();
                 }
 
