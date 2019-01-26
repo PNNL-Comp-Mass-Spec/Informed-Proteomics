@@ -28,7 +28,6 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <param name="massBins">The mass bins for constructing the nodes of the graph.</param>
         /// <param name="aminoAcidSet">Amino acid set to build the graph edges from.</param>
         /// <param name="aminoAcidProbabilities">The amino acid probabilities.</param>
-        public FlipScoringGraphFactory(IMassBinning massBins, AminoAcidSet aminoAcidSet, Dictionary<char, double> aminoAcidProbabilities)
         public FlipScoringGraphFactory(IMassBinning massBins, AminoAcidSet aminoAcidSet, IReadOnlyDictionary<char, double> aminoAcidProbabilities)
         {
             this.massBins = massBins;
