@@ -151,17 +151,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Statistical frequency (per UniProt) of the standard amino acids
         /// </summary>
-        public static readonly double[] StandardAminoAcidFrequency = new double[20]
-        {
+        public static readonly double[] StandardAminoAcidFrequency = {
             //Ala (A) 8.26   Gln (Q) 3.93   Leu (L) 9.66   Ser (S) 6.58
             //Arg (R) 5.53   Glu (E) 6.74   Lys (K) 5.83   Thr (T) 5.34
             //Asn (N) 4.06   Gly (G) 7.08   Met (M) 2.41   Trp (W) 1.09
             //Asp (D) 5.46   His (H) 2.27   Phe (F) 3.86   Tyr (Y) 2.92
             //Cys (C) 1.37   Ile (I) 5.94   Pro (P) 4.71   Val (V) 6.87
-            0.082674407,0.013712341,0.054649184,0.067460715,0.038634771,
-            0.070863777,0.022720448,0.059453508,0.058352517,0.096687018,
-            0.02412171,0.040636573,0.047142428,0.039335402,0.055349815,
-            0.065859273,0.053448103,0.068761886,0.010909819,0.029226304
+            0.082674407, 0.013712341, 0.054649184, 0.067460715, 0.038634771,
+            0.070863777, 0.022720448, 0.059453508, 0.058352517, 0.096687018,
+            0.02412171,  0.040636573, 0.047142428, 0.039335402, 0.055349815,
+            0.065859273, 0.053448103, 0.068761886, 0.010909819, 0.029226304
         };
 
         /// <summary>
@@ -187,7 +186,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <inheritdoc />
         public override string ToString()
         {
-            return this.Residue.ToString();
+            return Residue.ToString();
         }
     }
 }

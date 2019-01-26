@@ -19,7 +19,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         public Averagine()
         {
-            this.IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
+            IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
         }
 
         /// <summary>

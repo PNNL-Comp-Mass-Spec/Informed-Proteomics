@@ -29,9 +29,10 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <param name="aminoAcidSet">Amino acid set to build the graph edges from.</param>
         /// <param name="aminoAcidProbabilities">The amino acid probabilities.</param>
         public FlipScoringGraphFactory(IMassBinning massBins, AminoAcidSet aminoAcidSet, Dictionary<char, double> aminoAcidProbabilities)
+        public FlipScoringGraphFactory(IMassBinning massBins, AminoAcidSet aminoAcidSet, IReadOnlyDictionary<char, double> aminoAcidProbabilities)
         {
             this.massBins = massBins;
-            this.edges = this.InitEdges(aminoAcidSet, aminoAcidProbabilities);
+            edges = InitEdges(aminoAcidSet, aminoAcidProbabilities);
         }
 
         /// <summary>
@@ -42,18 +43,18 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The scoring graph that uses the FLIP scoring model.</returns>
         public FlipScoringGraph GetScoringGraph(FlipScorer<DeconvolutedSpectrum> flipScorer, double proteinMass)
         {
-            var proteinMassBin = this.massBins.GetBinNumber(proteinMass);
+            var proteinMassBin = massBins.GetBinNumber(proteinMass);
 
-            // Precalculate scores for all nodes
-            var nodeScores = this.InitNodeScores(flipScorer, proteinMass);
+            // Pre-calculate scores for all nodes
+            var nodeScores = InitNodeScores(flipScorer, proteinMass);
 
             // Filter the edges for the scoring graph.
-            var graphEdges = this.edges.Where(edge => edge.SinkNodeIndex <= proteinMassBin)
-                                       .Select(edge => new FlipScoringGraphEdge(edge.PrevNodeIndex, edge.SinkNodeIndex, edge.Weight, edge.Label, flipScorer))
-                                       .GroupBy(edge => edge.SinkNodeIndex)
-                                       .ToDictionary(edgeGroup => edgeGroup.Key, edgeGroup => edgeGroup.ToList());
+            var graphEdges = edges.Where(edge => edge.SinkNodeIndex <= proteinMassBin)
+                                  .Select(edge => new FlipScoringGraphEdge(edge.PrevNodeIndex, edge.SinkNodeIndex, edge.Weight, edge.Label, flipScorer))
+                                  .GroupBy(edge => edge.SinkNodeIndex)
+                                  .ToDictionary(edgeGroup => edgeGroup.Key, edgeGroup => edgeGroup.ToList());
 
-            return new FlipScoringGraph(this.massBins, nodeScores[0], nodeScores[1], graphEdges);
+            return new FlipScoringGraph(massBins, nodeScores[0], nodeScores[1], graphEdges);
         }
 
         /// <summary>
@@ -62,23 +63,23 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <param name="aminoAcidSet">Amino acid set to build the graph edges from.</param>
         /// <param name="aminoAcidProbabilities">The amino acid probabilities.</param>
         /// <returns>A list of all scoring graph edges.</returns>
-        private List<FlipScoringGraphEdge> InitEdges(AminoAcidSet aminoAcidSet, Dictionary<char, double> aminoAcidProbabilities)
+        private List<FlipScoringGraphEdge> InitEdges(AminoAcidSet aminoAcidSet, IReadOnlyDictionary<char, double> aminoAcidProbabilities)
         {
-            var adjList = new LinkedList<FlipScoringGraphEdge>[this.massBins.NumberOfBins];
-            for (var i = 0; i < this.massBins.NumberOfBins; i++) adjList[i] = new LinkedList<FlipScoringGraphEdge>();
+            var adjList = new LinkedList<FlipScoringGraphEdge>[massBins.NumberOfBins];
+            for (var i = 0; i < massBins.NumberOfBins; i++) adjList[i] = new LinkedList<FlipScoringGraphEdge>();
 
             var terminalModifications = FilteredProteinMassBinning.GetTerminalModifications(aminoAcidSet);
             var aminoAcidArray = FilteredProteinMassBinning.GetExtendedAminoAcidArray(aminoAcidSet);
 
-            for (var i = 0; i < this.massBins.NumberOfBins; i++)
+            for (var i = 0; i < massBins.NumberOfBins; i++)
             {
-                var mi = this.massBins.GetMass(i);
+                var mi = massBins.GetMass(i);
                 var fineNodeMass = mi;
 
                 foreach (var aa in aminoAcidArray)
                 {
-                    var j = this.massBins.GetBinNumber(fineNodeMass + aa.Mass);
-                    if (j < 0 || j >= this.massBins.NumberOfBins) continue;
+                    var j = massBins.GetBinNumber(fineNodeMass + aa.Mass);
+                    if (j < 0 || j >= massBins.NumberOfBins) continue;
                     var aaWeight = aminoAcidProbabilities.ContainsKey(aa.Residue) ? Math.Log10(aminoAcidProbabilities[aa.Residue]) : 0;
                     adjList[j].AddLast(new FlipScoringGraphEdge(i, j, aaWeight, aa, null));
 
@@ -87,8 +88,8 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
                         foreach (var terminalMod in terminalModifications)
                         {
                             var modifiedAa = new ModifiedAminoAcid(aa, terminalMod);
-                            j = this.massBins.GetBinNumber(fineNodeMass + modifiedAa.Mass);
-                            if (j < 0 || j >= this.massBins.NumberOfBins) continue;
+                            j = massBins.GetBinNumber(fineNodeMass + modifiedAa.Mass);
+                            if (j < 0 || j >= massBins.NumberOfBins) continue;
                             adjList[j].AddLast(new FlipScoringGraphEdge(i, j, aaWeight, modifiedAa, null));
                         }
                     }
@@ -105,23 +106,23 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <param name="proteinMass">The precursor mass.</param>
         private double?[][] InitNodeScores(FlipScorer<DeconvolutedSpectrum> scorer, double proteinMass)
         {
-            var numNodes = this.massBins.GetBinNumber(proteinMass) + 1;
+            var numNodes = massBins.GetBinNumber(proteinMass) + 1;
             var nodeScores = new double?[2][];
             var nTerminalFragScores = nodeScores[0] = new double?[numNodes];
             var cTerminalFragScores = nodeScores[1] = new double?[numNodes];
 
             var deconvPeaks = (DeconvolutedPeak[]) scorer.ProductSpectrum.Peaks;
 
-            // transform all peaks into being nterminal ions
+            // transform all peaks into being N-terminal ions
             foreach (var peak in deconvPeaks)
             {
                 foreach (var ionType in scorer.SelectedIonTypes)
                 {
                     var scores = ionType.IsPrefix ? nTerminalFragScores : cTerminalFragScores;
-                    double ionMass = peak.Mass;
-                    double fragmentMass = ionMass - ionType.OffsetComposition.Mass;
+                    var ionMass = peak.Mass;
+                    var fragmentMass = ionMass - ionType.OffsetComposition.Mass;
                     var binMass = ionType.IsPrefix ? fragmentMass : proteinMass - fragmentMass;
-                    var binIndex = this.massBins.GetBinNumber(binMass);
+                    var binIndex = massBins.GetBinNumber(binMass);
                     if (binIndex >= 0 && binIndex < numNodes)
                     {
                         var score = scorer.GetFragmentScore(peak, ionType); // Error score will come from the edge weight

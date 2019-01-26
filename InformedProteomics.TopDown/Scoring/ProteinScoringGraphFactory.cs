@@ -25,11 +25,12 @@ namespace InformedProteomics.TopDown.Scoring
                 var mi = _comparer.GetMass(i);
                 var fineNodeMass = mi;
 
-                for (var a = 0; a < aminoAcidArray.Length; a++)
+                foreach (var aa in aminoAcidArray)
                 {
-                    var aa = aminoAcidArray[a];
                     var j = _comparer.GetBinNumber(fineNodeMass + aa.Mass);
-                    if (j < 0 || j >= _comparer.NumberOfBins) continue;
+                    if (j < 0 || j >= _comparer.NumberOfBins)
+                        continue;
+
                     _adjList[j].AddLast(new ScoringGraphEdge(i));
 
                     if (i == 0 && !(aa is ModifiedAminoAcid))
@@ -72,7 +73,7 @@ namespace InformedProteomics.TopDown.Scoring
                 _nodeScoresByPrefixIon = nodeScoresByPrefixIon;
                 _nodeScoresBySuffixIon = nodeScoresBySuffixIon;
                 _adjList = adjList;
-                this._comparer = comparer;
+                _comparer = comparer;
             }
 
             public double GetNodeScore(int nodeIndex)
@@ -107,11 +108,11 @@ namespace InformedProteomics.TopDown.Scoring
             public double ScoreSequence(Sequence sequence)
             {
                 var cleavages = sequence.GetInternalCleavages();
-                double score = 0.0;
-                int prevNTermBin = 0;
+                var score = 0.0;
+                var prevNTermBin = 0;
                 foreach (var cleavage in cleavages)
                 {
-                    int nTermBin = _comparer.GetBinNumber(cleavage.PrefixComposition.Mass);
+                    var nTermBin = _comparer.GetBinNumber(cleavage.PrefixComposition.Mass);
 
                     if (nTermBin < 0)
                     {
@@ -119,8 +120,8 @@ namespace InformedProteomics.TopDown.Scoring
                         continue;
                     }
 
-                    score += this.GetNodeScore(nTermBin);
-                    score += prevNTermBin >= 0 ? this.GetEdgeScore(prevNTermBin, nTermBin) : 0;
+                    score += GetNodeScore(nTermBin);
+                    score += prevNTermBin >= 0 ? GetEdgeScore(prevNTermBin, nTermBin) : 0;
 
                     prevNTermBin = nTermBin;
                 }
