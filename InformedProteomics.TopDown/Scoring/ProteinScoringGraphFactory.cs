@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
-using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 
@@ -59,12 +57,12 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly LinkedList<ScoringGraphEdge>[] _adjList;
         private readonly IMassBinning _comparer;
 
-        private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
-        static ProteinScoringGraphFactory()
-        {
-            BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
-            BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
-        }
+        //private static readonly BaseIonType[] BaseIonTypesCID, BaseIonTypesETD;
+        // static ProteinScoringGraphFactory()
+        // {
+        //     BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
+        //     BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
+        // }
 
         internal class ProteinScoringGraph : IScoringGraph
         {
