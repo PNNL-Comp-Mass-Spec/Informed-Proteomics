@@ -380,29 +380,29 @@ namespace InformedProteomics.FeatureFinding.Clustering
         public void ExpandElutionRange()
         {
             // considering DDA instrument
-            if (_run.MaxMsLevel > 1 && NetLength < 0.01)
+            if (_run.MaxMsLevel <= 1 || NetLength >= 0.01)
+                return;
+
+            var ms1ScanNums = _run.GetMs1ScanVector();
+            var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
+
+            var minCol = ms1ScanNumToIndex[MinScanNum];
+            var maxCol = ms1ScanNumToIndex[MaxScanNum];
+
+            for (var i = minCol - 1; i >= 0; i--)
             {
-                var ms1ScanNums = _run.GetMs1ScanVector();
-                var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
-
-                var minCol = ms1ScanNumToIndex[MinScanNum];
-                var maxCol = ms1ScanNumToIndex[MaxScanNum];
-
-                for (var i = minCol - 1; i >= 0; i--)
+                if (MinScanNum - ms1ScanNums[i] > (minCol - i))
                 {
-                    if (MinScanNum - ms1ScanNums[i] > (minCol - i))
-                    {
-                        MinScanNum = ms1ScanNums[i];
-                        break;
-                    }
+                    MinScanNum = ms1ScanNums[i];
+                    break;
                 }
-                for (var i = maxCol + 1; i < ms1ScanNums.Length; i++)
+            }
+            for (var i = maxCol + 1; i < ms1ScanNums.Length; i++)
+            {
+                if (ms1ScanNums[i] - MaxScanNum > (i - maxCol))
                 {
-                    if (ms1ScanNums[i] - MaxScanNum > (i - maxCol))
-                    {
-                        MaxScanNum = ms1ScanNums[i];
-                        break;
-                    }
+                    MaxScanNum = ms1ScanNums[i];
+                    break;
                 }
             }
         }
