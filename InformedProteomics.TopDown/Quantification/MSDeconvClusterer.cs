@@ -59,9 +59,9 @@ namespace InformedProteomics.TopDown.Quantification
                 var minScanNum = c.Min(x => x.ScanNumber);
 
                 var sortedMono = c.OrderBy(x => x.RealMonoMass);
-                var halfIndex = c.Count() / 2;
+                var halfIndex = c.Count / 2;
                 var medianMass = c[0].RealMonoMass;
-                if (c.Count()%2 == 0)
+                if (c.Count % 2 == 0)
                 {
                     medianMass = (sortedMono.ElementAt(halfIndex).RealMonoMass +
                                   sortedMono.ElementAt(halfIndex - 1).RealMonoMass) / 2;
@@ -108,8 +108,10 @@ namespace InformedProteomics.TopDown.Quantification
             IDictionary<MSDeconvNode, int> connectedNodes)
         {
             var connectedComp = new List<MSDeconvNode>();
-            var toVisit = new List<MSDeconvNode>();
-            toVisit.Add(node);
+            var toVisit = new List<MSDeconvNode> {
+                node
+            };
+
             while (toVisit.Count != 0)
             {
                 var current = toVisit[0];

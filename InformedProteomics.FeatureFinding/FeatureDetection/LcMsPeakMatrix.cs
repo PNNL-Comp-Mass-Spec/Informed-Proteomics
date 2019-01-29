@@ -87,7 +87,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             _summedEnvelopeColRange = new int[NRows, 2];
 
             _featureMatrix = null;
-            Comparer = new MzComparerWithBinning(27); // 16ppm
+            const int numBits = 27;
+            Comparer = new MzComparerWithBinning(numBits); // 16ppm
             _scorer = scorer;
             _seedEnvelopes = new List<KeyValuePair<double, ObservedIsotopeEnvelope>>();
             _ms1Filter = null;

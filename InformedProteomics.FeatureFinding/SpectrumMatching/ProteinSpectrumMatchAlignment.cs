@@ -8,15 +8,16 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
     {
         public List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataId, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
         {
+            var prsmSet = new NodeSet<ProteinSpectrumMatch>();
             prsmSet.AddRange(matches);
-            return groupList.Select(@group => new ProteinSpectrumMatchSet(dataid, @group)).ToList();
             var groupList = prsmSet.ConnectedComponents(prsmComparer);
+            return groupList.Select(group => new ProteinSpectrumMatchSet(dataId, group)).ToList();
         }
 
         public ProteinSpectrumMatchSet[][] GroupAcrossRuns(List<ProteinSpectrumMatchSet>[] prsmGroup, INodeComparer<ProteinSpectrumMatchSet> prsmGroupComparer)
         {
             var nDataset = prsmGroup.Length;
-            var prsmSet = new NodeSet<ProteinSpectrumMatchSet>() { };
+            var prsmSet = new NodeSet<ProteinSpectrumMatchSet>();
 
             for (var i = 0; i < nDataset; i++)
             {

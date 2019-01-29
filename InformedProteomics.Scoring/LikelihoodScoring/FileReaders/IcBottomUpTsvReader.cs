@@ -38,10 +38,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 //                    var spectrum = lcms.GetSpectrum(scanNum);
 //                    var spec = spectrum as ProductSpectrum;
 //                    if (spec == null || spec.ActivationMethod != Act) continue;
-                specMatches.Add((formulas != null && formulas[i] != null)
-                    ? new SpectrumMatch(peptides[i], DataFileFormat.IcBottomUp, _lcms, scanNum, precursorCharge, _decoy, formulas[i])
-                    : new SpectrumMatch(peptides[i], DataFileFormat.IcBottomUp, _lcms, scanNum, precursorCharge, _decoy));
                 var precursorCharge = Convert.ToInt32(precursorCharges[i]);
+
+                var formula = formulas?[i] != null ? formulas[i] : string.Empty;
+
+                specMatches.Add(new SpectrumMatch(peptides[i], DataFileFormat.IcBottomUp, _lcms, scanNum, precursorCharge, _decoy, formula));
             }
             return specMatches;
         }

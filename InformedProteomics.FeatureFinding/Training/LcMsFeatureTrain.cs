@@ -48,7 +48,8 @@ namespace InformedProteomics.FeatureFinding.Training
         {
             Modification.RegisterAndGetModification(Modification.Cysteinyl.Name, Modification.Cysteinyl.Composition);
 
-            var prsmReader = new ProteinSpectrumMatchReader(0.01);
+            const double fdrCutoff = 0.01;
+            var prsmReader = new ProteinSpectrumMatchReader(fdrCutoff);
 
             var prsmList = prsmReader.LoadIdentificationResult(idFilePath);
             var run = PbfLcMsRun.GetLcMsRun(pbfFilePath);
@@ -83,10 +84,10 @@ namespace InformedProteomics.FeatureFinding.Training
 
         public static List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataId, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
         {
-            var prsmSet = new NodeSet<ProteinSpectrumMatch>() { };
+            var prsmSet = new NodeSet<ProteinSpectrumMatch>();
             prsmSet.AddRange(matches);
-            return groupList.Select(@group => new ProteinSpectrumMatchSet(dataid, @group)).ToList();
             var groupList = prsmSet.ConnectedComponents(prsmComparer);
+            return groupList.Select(group => new ProteinSpectrumMatchSet(dataId, group)).ToList();
         }
 
         private static bool IsGoodTarget(ProductSpectrum ms2Spec, Sequence sequence)
