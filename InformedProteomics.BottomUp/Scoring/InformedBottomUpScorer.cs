@@ -25,11 +25,11 @@ namespace InformedProteomics.BottomUp.Scoring
             _scoredSpectra = new Dictionary<int, ScoredSpectrum>();
         }
 
-        public LcMsRun Run { get; private set; }
-        public AminoAcidSet AminoAcidSet { get; private set; }
-        public int MinProductCharge { get; private set; }
-        public int MaxProductCharge { get; private set; }
-        public Tolerance Tolerance { get; private set; }
+        public LcMsRun Run { get; }
+        public AminoAcidSet AminoAcidSet { get; }
+        public int MinProductCharge { get; }
+        public int MaxProductCharge { get; }
+        public Tolerance Tolerance { get; }
 
         private readonly RankScore _rankScorer;
         private readonly Dictionary<int, ScoredSpectrum> _scoredSpectra;

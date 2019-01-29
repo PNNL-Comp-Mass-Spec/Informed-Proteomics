@@ -19,8 +19,8 @@ namespace InformedProteomics.TopDown.PostProcessing
             _tags = new List<MatchedTag>();
         }
 
-        public string Sequence { get { return _sequence; } }
-        public List<MatchedTag> Tags { get { return _tags; } }
+        public string Sequence => _sequence;
+        public List<MatchedTag> Tags => _tags;
 
         /// <summary>
         /// Adds a tag to this tag set.
@@ -164,15 +164,15 @@ namespace InformedProteomics.TopDown.PostProcessing
 
         public int StartIndex { get; internal set; }
         public int EndIndex { get; internal set; }    // exclusive
-        public int Length { get { return EndIndex - StartIndex; } }
+        public int Length => EndIndex - StartIndex;
         public double Mass { get; set; }
 
         public int NumMergedSequenceTags { get; internal set; }
         public double? NTermFlankingMass { get; internal set; }
         public double? CTermFlankingMass { get; internal set; }
 
-        public bool IsNTermFlankingMassReliable { get { return NumReliableNTermFlankingMasses > 0; } }
-        public bool IsCTermFlankingMassReliable { get { return NumReliableCTermFlankingMasses > 0; } }
+        public bool IsNTermFlankingMassReliable => NumReliableNTermFlankingMasses > 0;
+        public bool IsCTermFlankingMassReliable => NumReliableCTermFlankingMasses > 0;
 
         public int NumReliableNTermFlankingMasses { get; internal set; }
         public int NumReliableCTermFlankingMasses { get; internal set; }

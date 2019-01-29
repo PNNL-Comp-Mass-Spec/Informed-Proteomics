@@ -59,10 +59,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             _scoreDistribution = gfTable[gfTable.Length - 1];
         }
 
-        public int MaximumScore
-        {
-            get { return _scoreDistribution.MaxScore; }
-        }
+        public int MaximumScore => _scoreDistribution.MaxScore;
 
         private IScoringGraph _graph;
         private ScoreDistribution _scoreDistribution;

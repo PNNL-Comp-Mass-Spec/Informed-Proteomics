@@ -14,10 +14,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public Sequence Sequence { get; private set; }
         public string Peptide { get; private set; }
-        public int PrecursorCharge { get; private set; }
-        public int ScanNum { get; private set; }
-        public Composition PrecursorComposition { get { return Sequence.Composition + Composition.H2O; }}
-        public bool Decoy { get; private set; }
+        public int PrecursorCharge { get; }
+        public int ScanNum { get; }
+        public Composition PrecursorComposition => Sequence.Composition + Composition.H2O;
+        public bool Decoy { get; }
         public class MismatchException : Exception {}
 
         public SpectrumMatch(Sequence sequence, Spectrum spectrum, int scanNum=0, int precursorCharge=1, bool decoy=false)
@@ -102,14 +102,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             if (decoy) CreateDecoy();
         }
 
-        public Spectrum Spectrum
-        {
-            get { return _spectrum ?? (_spectrum = _lcms.GetSpectrum(ScanNum)); }
-        }
-        public Composition PeptideComposition
-        {
-            get { return Sequence.Composition; }
-        }
+        public Spectrum Spectrum => _spectrum ?? (_spectrum = _lcms.GetSpectrum(ScanNum));
+
+        public Composition PeptideComposition => Sequence.Composition;
 
         public List<Composition> Prefixes
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace InformedProteomics.TopDown.Quantification
 {
     public class MSDeconvNode
@@ -16,9 +11,9 @@ namespace InformedProteomics.TopDown.Quantification
             Charge = charge;
         }
 
-        public int ScanNumber { get; private set; }
-        public int Charge { get; private set; }
-        public double RealMonoMass { get; private set; }
-        public double RealIntensitySum { get; private set; }
+        public int ScanNumber { get; }
+        public int Charge { get; }
+        public double RealMonoMass { get; }
+        public double RealIntensitySum { get; }
     }
 }

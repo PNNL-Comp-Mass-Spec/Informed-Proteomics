@@ -30,8 +30,8 @@ namespace InformedProteomics.TopDown.Scoring
             return MinBinCenter + binNumber * BinWidth;
         }
 
-        public double LowerBound { get { return MinBinCenter - BinWidth * 0.5; } }
-        public double UpperBound { get { return MaxBinCenter + BinWidth * 0.5; } }
+        public double LowerBound => MinBinCenter - BinWidth * 0.5;
+        public double UpperBound => MaxBinCenter + BinWidth * 0.5;
 
         public readonly double BinWidth;
         public readonly double MaxBinCenter;

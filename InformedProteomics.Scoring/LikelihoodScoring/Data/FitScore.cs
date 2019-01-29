@@ -4,8 +4,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class FitScore
     {
-        public double Intensity { get; private set; }
-        public double Score { get; private set; }
+        public double Intensity { get; }
+        public double Score { get; }
 
         public FitScore(double intensity, double score)
         {

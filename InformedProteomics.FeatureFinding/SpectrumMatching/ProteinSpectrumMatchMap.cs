@@ -103,8 +103,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public readonly List<ProteinSpectrumMatch> ProteinSpectrumMatches;
         public readonly LcMsRun Run;
-        public int DataId { get; private set; }
-        public string DataDesc { get; private set; }
+        public int DataId { get; }
+        public string DataDesc { get; }
         public const double FdrCutoff = 0.01;
         private readonly Dictionary<int, ProteinSpectrumMatch> _scanNumToMatchMap;
     }

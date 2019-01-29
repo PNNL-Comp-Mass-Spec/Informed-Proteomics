@@ -13,8 +13,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             _scoreTotal = 0.0;
         }
 
-        public int MinScore { get; private set; }   // inclusive
-        public int MaxScore { get; private set; }   // exclusive
+        public int MinScore { get; }   // inclusive
+        public int MaxScore { get; }   // exclusive
 
         public void SetEValue(int score, double eValue)
         {

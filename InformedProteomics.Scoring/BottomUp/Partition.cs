@@ -16,9 +16,9 @@ namespace InformedProteomics.Scoring.BottomUp
             SegmentIndex = segmentIndex;
         }
 
-        public int Charge { get; private set; }
-        public float NeutralPeptideMass { get; private set; }
-        public int SegmentIndex { get; private set; }
+        public int Charge { get; }
+        public float NeutralPeptideMass { get; }
+        public int SegmentIndex { get; }
 
         public int CompareTo(Partition other)
         {

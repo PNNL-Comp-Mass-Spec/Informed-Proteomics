@@ -264,7 +264,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             return featureSet;
         }
-        public int NumberOfFeatures { get { return _featureList.Count; } }
+        public int NumberOfFeatures => _featureList.Count;
 
         private readonly LcMsFeatureLikelihood _scorer;
 

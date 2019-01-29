@@ -37,19 +37,19 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public int DataSetId
         {
-            get { return ProteinSpectrumMatches.DataId; }
-            set { ProteinSpectrumMatches.SetDataId(value); }
+            get => ProteinSpectrumMatches.DataId;
+            set => ProteinSpectrumMatches.SetDataId(value);
         }
 
         public int FeatureId { get; set; }
 
         public int MinCharge { get; protected set; }
         public int MaxCharge { get; protected set; }
-        public int ChargeLength { get { return MaxCharge - MinCharge + 1; } }
+        public int ChargeLength => MaxCharge - MinCharge + 1;
 
         public int MinScanNum { get; protected set; }
         public int MaxScanNum { get; protected set; }
-        public int ScanLength { get { return MaxScanNum - MinScanNum + 1; } }
+        public int ScanLength => MaxScanNum - MinScanNum + 1;
 
         public double Abundance { get; protected set; }
 
@@ -58,16 +58,16 @@ namespace InformedProteomics.FeatureFinding.Data
         /// </summary>
         public double Score { get; set; }
 
-        public double Mass { get { return RepresentativeMass;  } }
+        public double Mass => RepresentativeMass;
         public double RepresentativeMass { get; protected set; }
         public int RepresentativeCharge { get; protected set; }
         public int RepresentativeScanNum { get; protected set; }
         public double RepresentativeMz { get; protected set; }
 
-        public virtual double MinElutionTime { get; private set; }
-        public virtual double MaxElutionTime { get; private set; }
-        public double ElutionTime { get { return 0.5 * (MinElutionTime + MaxElutionTime); } }
-        public double ElutionLength { get { return MaxElutionTime - MinElutionTime; } }
+        public virtual double MinElutionTime { get; }
+        public virtual double MaxElutionTime { get; }
+        public double ElutionTime => 0.5 * (MinElutionTime + MaxElutionTime);
+        public double ElutionLength => MaxElutionTime - MinElutionTime;
 
         /*
         public double MinElutionTime { get { return (Run == null) ? _minElution : Run.GetElutionTime(MinScanNum); } }
@@ -82,8 +82,8 @@ namespace InformedProteomics.FeatureFinding.Data
         */
         public virtual double MaxNet { get; private set; }
         public virtual double MinNet { get; private set; }
-        public double NetLength { get { return MaxNet - MinNet; } }
-        public double Net { get { return 0.5 * (MinNet + MaxNet); } }
+        public double NetLength => MaxNet - MinNet;
+        public double Net => 0.5 * (MinNet + MaxNet);
 
         public void SetNet(int minNet, int maxNet)
         {

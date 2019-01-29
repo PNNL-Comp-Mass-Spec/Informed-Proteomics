@@ -501,30 +501,18 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 return BestCorrelationScore > 0.7;
             }
         }
-        public double ApexElutionTime { get { return _run.GetElutionTime(ApexScanNum); } }
+        public double ApexElutionTime => _run.GetElutionTime(ApexScanNum);
         public int ApexScanNum { get; protected set; }
         public double ApexIntensity { get; protected set; }
         public double BoundaryIntensity { get; protected set; }
 
-        public override double MaxElutionTime
-        {
-            get { return _run.GetElutionTime(MaxScanNum); }
-        }
+        public override double MaxElutionTime => _run.GetElutionTime(MaxScanNum);
 
-        public override double MinElutionTime
-        {
-            get { return _run.GetElutionTime(MinScanNum); }
-        }
+        public override double MinElutionTime => _run.GetElutionTime(MinScanNum);
 
-        public override double MaxNet
-        {
-            get { return MaxElutionTime/_run.GetElutionTime(_run.MaxLcScan); }
-        }
+        public override double MaxNet => MaxElutionTime/_run.GetElutionTime(_run.MaxLcScan);
 
-        public override double MinNet
-        {
-            get { return MinElutionTime / _run.GetElutionTime(_run.MaxLcScan); }
-        }
+        public override double MinNet => MinElutionTime / _run.GetElutionTime(_run.MaxLcScan);
 
         //public readonly int DetectableMaxCharge;
         //public readonly int DetectableMinCharge;
@@ -555,7 +543,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
         public const int EvenCharge = 0;
         public const int OddCharge = 1;
 
-        public double BestCorrelationScore { get { return Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());  } }
+        public double BestCorrelationScore => Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
         private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
         public byte Flag;

@@ -40,10 +40,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             }
         }
 
-        public override double[] Probability
-        {
-            get { return _probability; }
-        }
+        public override double[] Probability => _probability;
 
         public Isotope GetIsotopeRankedAt(int ranking)
         {

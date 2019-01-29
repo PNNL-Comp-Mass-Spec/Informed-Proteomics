@@ -34,7 +34,7 @@ namespace InformedProteomics.TopDown.Scoring
             return _lcMsMatchMap.GetMatchingMs2ScanNums(sequenceMass, _tolerance, _run);
         }
 
-        public int MaxNumPeaksToConsider { get; private set; }
+        public int MaxNumPeaksToConsider { get; }
 
         private readonly InMemoryLcMsRun _run;
         private readonly int _minCharge;

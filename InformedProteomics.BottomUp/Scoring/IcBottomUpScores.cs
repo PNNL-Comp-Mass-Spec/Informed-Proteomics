@@ -8,8 +8,8 @@
             Modifications = modifications;
         }
 
-        public double Score { get; private set; }
-        public string Modifications { get; private set; }
+        public double Score { get; }
+        public string Modifications { get; }
         public override string ToString()
         {
             return Score+"\t"+Modifications;

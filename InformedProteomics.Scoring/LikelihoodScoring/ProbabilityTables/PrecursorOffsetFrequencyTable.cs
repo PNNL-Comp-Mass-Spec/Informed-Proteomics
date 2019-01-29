@@ -7,7 +7,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
     public class PrecursorOffsetFrequencyTable
     {
-        public int Charge { get; private set; }
+        public int Charge { get; }
         public int Total { get; protected set; }
         public PrecursorOffsetFrequencyTable(double searchWidth, int charge = 1, double binWidth = 1.005)
         {

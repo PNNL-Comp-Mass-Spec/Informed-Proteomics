@@ -21,7 +21,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         private readonly LcMsChargeMap _lcMsChargeMap;
 
-        public Dictionary<int, Tuple<int, int>> Ms1FtIndexToScanRange { get; private set; }
+        public Dictionary<int, Tuple<int, int>> Ms1FtIndexToScanRange { get; }
 
         public IEnumerable<int> GetMatchingFeatureIds(double sequenceMass)
         {

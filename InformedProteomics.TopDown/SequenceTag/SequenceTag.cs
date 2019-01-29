@@ -42,19 +42,12 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         private static readonly MzComparerWithBinning _mzComparer = new MzComparerWithBinning(28);
 
-        public int ScanNum { get; private set; }
-        public string Sequence { get; private set; }
-        public bool IsPrefix { get; private set; }
-        public double FlankingMass { get; private set; }
+        public int ScanNum { get; }
+        public string Sequence { get; }
+        public bool IsPrefix { get; }
+        public double FlankingMass { get; }
 
-        public double TagMass
-        {
-            get
-            {
-                return _tagMass ??
-                       (double)(_tagMass = AminoAcidSet.GetStandardAminoAcidSet().GetComposition(Sequence).Mass);
-            }
-        }
+        public double TagMass => _tagMass ?? (double)(_tagMass = AminoAcidSet.GetStandardAminoAcidSet().GetComposition(Sequence).Mass);
 
         public double? GetNTermFlankingMass(double? sequenceMass)
         {

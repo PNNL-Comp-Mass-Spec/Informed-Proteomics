@@ -4,8 +4,8 @@ namespace InformedProteomics.TopDown.SequenceTag
 {
     public class GraphEdge : IEquatable<GraphEdge>
     {
-        public int Node1 { get; private set; }
-        public int Node2 { get; private set; }
+        public int Node1 { get; }
+        public int Node2 { get; }
 
         public GraphEdge(int node1, int node2)
         {

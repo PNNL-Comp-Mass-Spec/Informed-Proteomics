@@ -76,7 +76,7 @@ namespace InformedProteomics.FeatureFinding.Data
             for (var i = 0; i < _countMajorTaggedFeatures; i++) yield return _majorTaggedFeatures[i];
         }
 
-        public int IndexInSpectrum { get; private set; }
+        public int IndexInSpectrum { get; }
         public bool Active { get; private set; }
         public int Ms1SpecIndex { get; set; }
         //private List<LcMsPeakCluster> _minorTaggedFeatures;

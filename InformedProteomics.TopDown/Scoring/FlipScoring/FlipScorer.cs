@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
@@ -37,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Gets or sets the deconvoluted spectrum to get ions to calculate scores for.
         /// </summary>
-        public TNeutralMonoSpectrum ProductSpectrum { get; private set; }
+        public TNeutralMonoSpectrum ProductSpectrum { get; }
 
         /// <summary>
         /// Gets the score at sequence cleavage summed for all ions that were selected during training.
@@ -150,6 +149,6 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Gets the score cut off for filtering out PSMs before they are passed into the generating function.
         /// </summary>
-        public double ScoreCutOff { get { return 0.0; } }
+        public double ScoreCutOff => 0.0;
     }
 }

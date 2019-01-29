@@ -10,7 +10,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
     public class RankTable
     {
         public int MaxRanks { get; private set; }
-        public IonType[] IonTypes { get { return _rankTable.Keys.ToArray(); }}
+        public IonType[] IonTypes => _rankTable.Keys.ToArray();
 
         /// <summary>
         /// RankTable constructor for new RankTable without any previously calculated data.

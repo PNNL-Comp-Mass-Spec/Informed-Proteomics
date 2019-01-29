@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.TopDown
             NumberOfBins = (_padZeroMassBin) ? _maxBinIndex - _minBinIndex + 2 : _maxBinIndex - _minBinIndex + 1;
         }
 
-        public bool Filtered { get { return false; } }
+        public bool Filtered => false;
 
         public bool CheckMassRange(double mass)
         {
@@ -71,8 +71,8 @@ namespace InformedProteomics.Scoring.TopDown
         private readonly int _maxBinIndex;
         private readonly bool _padZeroMassBin;
 
-        public int NumberOfBins { get; private set; }
-        public double MaxMass { get; private set; }
-        public double MinMass { get; private set; }
+        public int NumberOfBins { get; }
+        public double MaxMass { get; }
+        public double MinMass { get; }
     }
 }

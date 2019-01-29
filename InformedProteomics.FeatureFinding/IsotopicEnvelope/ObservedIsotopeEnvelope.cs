@@ -19,15 +19,9 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             GoodEnough = false;
         }
 
-        public double BhattacharyyaDistance
-        {
-            get { return TheoreticalEnvelope.GetBhattacharyyaDistance(Peaks); }
-        }
+        public double BhattacharyyaDistance => TheoreticalEnvelope.GetBhattacharyyaDistance(Peaks);
 
-        public double PearsonCorrelation
-        {
-            get { return TheoreticalEnvelope.GetPearsonCorrelation(Peaks); }
-        }
+        public double PearsonCorrelation => TheoreticalEnvelope.GetPearsonCorrelation(Peaks);
 
         public override Isotope GetMostAbundantIsotope()
         {
@@ -45,7 +39,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             }
         }
 
-        public Ms1Peak[] Peaks { get; private set; }
+        public Ms1Peak[] Peaks { get; }
         public Ms1Peak MinMzPeak { get { return Peaks.FirstOrDefault(t => t != null && t.Active); } }
         public Ms1Peak MaxMzPeak { get { return Peaks.LastOrDefault(t => t != null && t.Active); } }
         public int NumberOfPeaks { get { return Peaks.Count(x => x != null && x.Active); } }

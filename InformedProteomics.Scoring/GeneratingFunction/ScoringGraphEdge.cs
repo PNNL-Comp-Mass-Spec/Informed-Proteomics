@@ -8,8 +8,8 @@
             //Score = score;
         }
 
-        public int PrevNodeIndex { get; private set; }
+        public int PrevNodeIndex { get; }
         //public int Score { get; private set; }
-        public double Weight { get { return 0.05; } }
+        public double Weight => 0.05;
     }
 }

@@ -6,13 +6,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 {
     public class Node
     {
-        public string Header { get; private set; }      // The header tag
+        public string Header { get; }      // The header tag
 
         // All of the key/value pairs:
-        public Dictionary<String, String> Contents { get; private set; }
+        public Dictionary<string, string> Contents { get; }
 
         // constructor
-        public Node(string header, Dictionary<String, String> contents)
+        public Node(string header, Dictionary<string, string> contents)
         {
             Header = header;
             Contents = contents;

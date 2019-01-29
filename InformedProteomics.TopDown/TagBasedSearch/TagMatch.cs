@@ -18,12 +18,12 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             ModificationText = modificationText;
         }
 
-        public int StartIndex { get; private set; } // Inclusive
-        public int EndIndex { get; private set; }   // Exclusive
-        public int MatchedTagLength { get; private set; }
-        public int Charge { get; private set; }
-        public double NTermScore { get; private set; }
-        public double CTermScore { get; private set; }
+        public int StartIndex { get; } // Inclusive
+        public int EndIndex { get; }   // Exclusive
+        public int MatchedTagLength { get; }
+        public int Charge { get; }
+        public double NTermScore { get; }
+        public double CTermScore { get; }
 
         public double Score { get; internal set; }
         /*
@@ -32,8 +32,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             get { return NTermScore + CTermScore + MatchedTagLength*2; }
         }*/
 
-        public double Mass { get; private set; }
-        public ModificationCombination Modifications { get; private set; }
-        public string ModificationText { get; private set; }
+        public double Mass { get; }
+        public ModificationCombination Modifications { get; }
+        public string ModificationText { get; }
     }
 }

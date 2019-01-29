@@ -6,10 +6,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
     public class SpectrumMatchList: List<SpectrumMatch>
     {
-        public int MaxCharge { get; private set; }
-        public bool Decoy { get; private set; }
+        public int MaxCharge { get; }
+        public bool Decoy { get; }
 //        public ActivationMethod Act { get; private set; }
-        public DataFileFormat SequenceFormat { get; private set; }
+        public DataFileFormat SequenceFormat { get; }
 
         public SpectrumMatchList(LazyLcMsRun lcms, string tsvFile, DataFileFormat sequenceFormat,
                                  int maxCharge=0, bool useDecoy=false)

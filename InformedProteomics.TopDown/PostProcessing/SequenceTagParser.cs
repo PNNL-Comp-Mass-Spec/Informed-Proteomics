@@ -28,7 +28,7 @@ namespace InformedProteomics.TopDown.PostProcessing
             return _scanToTags.Keys.OrderBy(s => s);
         }
 
-        public string TagFilePath { get; private set; }
+        public string TagFilePath { get; }
         private readonly int _minTagLength;
         private readonly int _numTagsPerScan;
         private readonly Dictionary<int, IList<SequenceTag.SequenceTag>> _scanToTags;

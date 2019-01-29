@@ -12,7 +12,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         public int CleavageIndex2;
         private readonly Sequence _sequence;
         public IonType[] IonTypeArray;
-        public bool DerivedFromPrefix { get; private set; }
+        public bool DerivedFromPrefix { get; }
 
         public IdentifiedSequenceTag(Sequence seq, int c1, int c2, IonType[] ionTypes)
         {

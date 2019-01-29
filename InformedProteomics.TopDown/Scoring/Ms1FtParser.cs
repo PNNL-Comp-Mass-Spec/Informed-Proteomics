@@ -26,7 +26,7 @@ namespace InformedProteomics.TopDown.Scoring
             return _featureArr[featureId - 1];
         }
 
-        public string Ms1FtFileName { get; private set; }
+        public string Ms1FtFileName { get; }
 
         private static readonly string[] RequiredColumns = { "FeatureID" , "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "Abundance"};
 
@@ -97,12 +97,12 @@ namespace InformedProteomics.TopDown.Scoring
             Abundance = abundance;
         }
 
-        public int FeatureId { get; private set; }
-        public int MinScan { get; private set; }
-        public int MaxScan { get; private set; }
-        public int MinCharge { get; private set; }
-        public int MaxCharge { get; private set; }
-        public double MonoMass { get; private set; }
-        public double Abundance { get; private set; }
+        public int FeatureId { get; }
+        public int MinScan { get; }
+        public int MaxScan { get; }
+        public int MinCharge { get; }
+        public int MaxCharge { get; }
+        public double MonoMass { get; }
+        public double Abundance { get; }
     }
 }

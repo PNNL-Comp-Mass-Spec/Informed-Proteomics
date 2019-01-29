@@ -71,7 +71,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// </summary>
         public T1[] BinEdges
         {
-            get { return _binEdges; }
+            get => _binEdges;
             set
             {
                 _binEdges = value;

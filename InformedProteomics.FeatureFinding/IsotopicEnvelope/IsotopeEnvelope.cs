@@ -10,7 +10,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
         public abstract double[] Probability { get; }
 
         public double MonoMass { get; protected set;  }
-        public int Size { get { return Probability.Length; } }
+        public int Size => Probability.Length;
 
         public const double MaxBhattacharyyaDistance = 10.0d;
 

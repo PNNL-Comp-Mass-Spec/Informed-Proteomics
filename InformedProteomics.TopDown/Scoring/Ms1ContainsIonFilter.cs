@@ -12,8 +12,9 @@ namespace InformedProteomics.TopDown.Scoring
             MzTolerance = mzTolerance;
         }
 
-        public LcMsRun Run { get; private set; }
-        public Tolerance MzTolerance { get; private set; }
+        public LcMsRun Run { get; }
+
+        public Tolerance MzTolerance { get; }
 
         public const double RelativeIsotopeIntensityThreshold = 0.8;    // 0.5
 

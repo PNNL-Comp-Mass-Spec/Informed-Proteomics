@@ -11,7 +11,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
     public class CorrelationScoreTable
     {
         public double[] IntensityBins { get; private set; }
-        public Probability<int> WorstScore { get; private set; }
+        public Probability<int> WorstScore { get; }
 
         public CorrelationScoreTable(ScoreMethod method, int intensityBins, double[] binEdges)
         {

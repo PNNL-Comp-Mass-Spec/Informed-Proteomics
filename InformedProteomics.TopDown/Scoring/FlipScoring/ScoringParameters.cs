@@ -31,12 +31,12 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Gets the maximum bin mass for the scoring parameters.
         /// </summary>
-        public double Mass { get; private set; }
+        public double Mass { get; }
 
         /// <summary>
         /// Gets the trained precursor peak filter for removing precursor ions selected for this bin.
         /// </summary>
-        public PrecursorPeakFilter PrecursorPeakFilter { get; private set; }
+        public PrecursorPeakFilter PrecursorPeakFilter { get; }
 
         /// <summary>
         /// Gets the weights for the selected ion features.

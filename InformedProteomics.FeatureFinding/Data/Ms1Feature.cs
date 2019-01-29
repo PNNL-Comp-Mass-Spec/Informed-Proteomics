@@ -17,10 +17,10 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public readonly int ScanNum;
         public readonly int[] Charges;
-        public double Mass { get; private set; }
-        public int MinCharge { get { return Charges.Min(); } }
-        public int MaxCharge { get { return Charges.Max(); } }
-        public double Abundance { get; private set; }
-        public ICollection<DeconvolutedPeak> DeconvolutedPeaks { get; private set; }
+        public double Mass { get; }
+        public int MinCharge => Charges.Min();
+        public int MaxCharge => Charges.Max();
+        public double Abundance { get; }
+        public ICollection<DeconvolutedPeak> DeconvolutedPeaks { get; }
     }
 }
