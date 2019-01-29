@@ -64,13 +64,13 @@ namespace InformedProteomics.Test
             for (var i = 0; i < ms2ScanNumbers.Count; i++)
             //foreach(var scanNum in targetScans)
             {
-                var scanNum = Int32.Parse(ms2ScanNumbers[i]);
+                var scanNum = int.Parse(ms2ScanNumbers[i]);
 
                 //if (scanNum != 4672) continue;
 
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
-                int tsvIndex = ms2ScanNumbers.FindIndex(x => Int32.Parse(x) == scanNum);
+                int tsvIndex = ms2ScanNumbers.FindIndex(x => int.Parse(x) == scanNum);
                 var qValue = double.Parse(tsvData["QValue"].ElementAt(tsvIndex));
                 if (qValue > 0.01) break;
 

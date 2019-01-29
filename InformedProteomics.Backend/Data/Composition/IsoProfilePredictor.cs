@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Data.Composition
                 {
                     dist[isotopeIndex] += GetIsotopeProbability(isotopeCombinations, means, exponents);
                 }
-                if (Double.IsInfinity(dist[isotopeIndex]))
+                if (double.IsInfinity(dist[isotopeIndex]))
                 {
                     throw new NotFiniteNumberException();
                 }

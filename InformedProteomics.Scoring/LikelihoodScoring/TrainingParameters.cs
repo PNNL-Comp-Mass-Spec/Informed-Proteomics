@@ -149,7 +149,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
-                        var max = Double.PositiveInfinity;
+                        var max = double.PositiveInfinity;
                         if (i < _massBins[charge]-1) max = _massSorter[charge].BinEdges[i+1];
                         file.Write("\t"+max);
                         file.WriteLine();

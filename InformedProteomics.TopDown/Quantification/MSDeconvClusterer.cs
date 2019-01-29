@@ -43,7 +43,7 @@ namespace InformedProteomics.TopDown.Quantification
             return connectedComponents;
         }
 
-        public void SaveClusterInfoToFile(String filename, List<List<MSDeconvNode>> clusters)
+        public void SaveClusterInfoToFile(string filename, List<List<MSDeconvNode>> clusters)
         {
             var tsv = new StringBuilder();
             tsv.Append("FeatureID \t MinScan \t MaxScan \t MinCharge \t MaxCharge \t MonoMass \t Abundance \t MinElutionTime \t MaxElutionTime \t \n");
@@ -68,7 +68,7 @@ namespace InformedProteomics.TopDown.Quantification
                 }
                 else medianMass = sortedMono.ElementAt(halfIndex).RealMonoMass;
 
-                var info = String.Format("{0} \t {1} \t {2} \t {3} \t {4} \t {5} \t {6} \t {7} \t {8} \t \n", id, minScan, maxScan, minCharge, maxCharge, medianMass, abundance, _run.GetElutionTime(minScanNum), _run.GetElutionTime(maxScanNum));
+                var info = string.Format("{0} \t {1} \t {2} \t {3} \t {4} \t {5} \t {6} \t {7} \t {8} \t \n", id, minScan, maxScan, minCharge, maxCharge, medianMass, abundance, _run.GetElutionTime(minScanNum), _run.GetElutionTime(maxScanNum));
                 tsv.Append(info);
                 id++;
             }

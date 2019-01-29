@@ -6,7 +6,7 @@ namespace InformedProteomics.TopDown.Quantification
 {
     public class MSDeconvReader
     {
-        public MSDeconvReader(double minMass = double.MinValue, double maxMass = double.MaxValue, int minCharge = Int32.MinValue, int maxCharge = int.MaxValue, int minScan = Int32.MinValue, int maxScan = Int32.MaxValue)
+        public MSDeconvReader(double minMass = double.MinValue, double maxMass = double.MaxValue, int minCharge = int.MinValue, int maxCharge = int.MaxValue, int minScan = int.MinValue, int maxScan = int.MaxValue)
         {
             MinMass = minMass;
             MaxMass = maxMass;
@@ -16,9 +16,9 @@ namespace InformedProteomics.TopDown.Quantification
             MaxScanNum = maxScan;
         }
 
-        public List<MSDeconvNode> GetDeconvNodesForMsDeconv(String filePath)
+        public List<MSDeconvNode> GetDeconvNodesForMsDeconv(string filePath)
         {
-            var txtFile = String.Format(@"{0}", filePath);
+            var txtFile = string.Format(@"{0}", filePath);
             var lineInfoList = new List<MSDeconvNode>();
 
             if (!File.Exists(txtFile))
@@ -28,12 +28,12 @@ namespace InformedProteomics.TopDown.Quantification
             }
 
             var file = new StreamReader(txtFile);
-            var line = "";
+            string line;
             var isInfoLine = false;
             while ((line = file.ReadLine()) != null)
             {
                 //checks for ending of info
-                if (String.IsNullOrWhiteSpace(line))
+                if (string.IsNullOrWhiteSpace(line))
                 {
                     isInfoLine = false;
                     continue;
@@ -43,7 +43,7 @@ namespace InformedProteomics.TopDown.Quantification
                 var splitString = line.Split(' ');
                 if (splitString[0] == "Ms")
                 {
-                    var msLevel = Int32.Parse(splitString[splitString.Length - 1]);
+                    var msLevel = int.Parse(splitString[splitString.Length - 1]);
                     if (MsLevel == 0 || msLevel == MsLevel)
                     {
                         isInfoLine = true;
@@ -65,7 +65,7 @@ namespace InformedProteomics.TopDown.Quantification
             return lineInfoList;
         }
 
-        public List<MSDeconvNode> GetDeconvNodesForDecon2Ls(String filePath)
+        public List<MSDeconvNode> GetDeconvNodesForDecon2Ls(string filePath)
         {
             var nodeList = new List<MSDeconvNode>();
 
@@ -87,14 +87,14 @@ namespace InformedProteomics.TopDown.Quantification
             return nodeList;
         }
 
-        private MSDeconvNode GetDeconvLineMsDeconv(String[] line)
+        private MSDeconvNode GetDeconvLineMsDeconv(IReadOnlyList<string> line)
         {
-            var scanNum = Int32.Parse(line[0]);
-            var charge = Int32.Parse(line[4]);
-            var mass =  Double.Parse(line[11]);
-            var intensity = Double.Parse(line[13]);
+            var scanNum = int.Parse(line[0]);
+            var charge = int.Parse(line[4]);
+            var mass =  double.Parse(line[11]);
+            var intensity = double.Parse(line[13]);
 
-            if (Double.IsNaN(intensity)) intensity = 0;
+            if (double.IsNaN(intensity)) intensity = 0;
 
             if (scanNum < MinScanNum || scanNum > MaxScanNum) return null;
             if (charge < MinCharge || charge > MaxCharge) return null;
@@ -105,10 +105,10 @@ namespace InformedProteomics.TopDown.Quantification
 
         private MSDeconvNode GetDeconvLineDecon2Ls(String[] line)
         {
-            var scanNum = Int32.Parse(line[0]);
-            var charge = Int32.Parse(line[1]);
-            var mass = Double.Parse(line[6]);
-            var intensity = Double.Parse(line[10]);
+            var scanNum = int.Parse(line[0]);
+            var charge = int.Parse(line[1]);
+            var mass = double.Parse(line[6]);
+            var intensity = double.Parse(line[10]);
 
             if (scanNum < MinScanNum || scanNum > MaxScanNum) return null;
             if (charge < MinCharge || charge > MaxCharge) return null;

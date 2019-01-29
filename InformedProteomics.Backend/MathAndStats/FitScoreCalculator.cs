@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.MathAndStats
                 s2 += v2[i + v2Index];
             }
 
-            if (!(s1 > 0) || !(s2 > 0)) return Double.PositiveInfinity;
+            if (!(s1 > 0) || !(s2 > 0)) return double.PositiveInfinity;
 
             var bc = 0d;
             for (var i = 0; i < count; i++)

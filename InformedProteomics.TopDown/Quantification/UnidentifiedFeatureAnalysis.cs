@@ -41,8 +41,8 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var featureElements = featureLine.Split('\t');
                 var sequence = featureElements[1];
-                var pVal = Double.Parse(featureElements[9]);
-                var logFc = Double.Parse(featureElements[10]);
+                var pVal = double.Parse(featureElements[9]);
+                var logFc = double.Parse(featureElements[10]);
                 if (!(string.IsNullOrEmpty(sequence) && pVal > .01)) continue;
                 var mass = featureElements[12];
                 var minElution = featureElements[13];
@@ -209,11 +209,11 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var filteredElements = filterLine.Split('\t');
                 var id = int.Parse(filteredElements[0]);
-                var mass = Double.Parse(filteredElements[1]);
-                var minElution = Double.Parse(filteredElements[2]);
-                var maxElution = Double.Parse(filteredElements[3]);
-                var pVal = Double.Parse(filteredElements[4]);
-                var fVal = Double.Parse(filteredElements[5]);
+                var mass = double.Parse(filteredElements[1]);
+                var minElution = double.Parse(filteredElements[2]);
+                var maxElution = double.Parse(filteredElements[3]);
+                var pVal = double.Parse(filteredElements[4]);
+                var fVal = double.Parse(filteredElements[5]);
                 _filteredFeatures.Add(new Tuple<int, double, double,double,double,double>(id, mass, minElution, maxElution,pVal,fVal));
             }
         }

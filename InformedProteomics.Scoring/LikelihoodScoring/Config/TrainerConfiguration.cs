@@ -56,8 +56,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public void ReadConfigurationFile(string configurationFile)
         {
             var reader = new ConfigFileReader(configurationFile);
+
             // Read program variables
             var config = reader.GetNodes("vars").First();
+
+            // ReSharper disable StringLiteralTypo
             PrecursorCharge = Convert.ToInt32(config.Contents["precursorcharge"]);
             PrecursorOffsetThreshold = Convert.ToDouble(config.Contents["precursoroffsetthreshold"]);
             WindowWidth = Convert.ToInt32(config.Contents["searchwidth"]);
@@ -66,6 +69,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             RelativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
             SelectedIonThreshold = Convert.ToDouble(config.Contents["selectedionthreshold"]);
             MassBinSize = Convert.ToInt32(config.Contents["massbinsize"]);
+
             var actStr = config.Contents["activationmethod"].ToLower();
             switch (actStr)
             {
@@ -104,14 +108,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 
             var smoothingRanksStr = config.Contents["smoothingranks"].Split(',');
             SmoothingRanks = new int[smoothingRanksStr.Length];
+
             var smoothingWindowSizeStr = config.Contents["smoothingwindowsize"].Split(',');
             SmoothingWindowSize = new int[smoothingWindowSizeStr.Length];
+
             if (SmoothingRanks.Length != SmoothingWindowSize.Length)
                 throw new ArgumentException("SmoothingRanks and SmoothingWindowSize unequal lengths.");
 
             for (var i = 0; i < SmoothingRanks.Length; i++)
             {
-                if (smoothingRanksStr[i] == "Max") SmoothingRanks[i] = Int32.MaxValue;
+                if (smoothingRanksStr[i] == "Max") SmoothingRanks[i] = int.MaxValue;
                 else SmoothingRanks[i] = Convert.ToInt32(smoothingRanksStr[i]);
                 SmoothingWindowSize[i] = Convert.ToInt32(smoothingWindowSizeStr[i]);
             }
@@ -196,6 +202,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             OutputPath = fileInfo.Contents["outpath"];
 
             OutputFileName = OutputPath + fileInfo.Contents["outputfile"];
+
+            // ReSharper restore StringLiteralTypo
+
         }
 
         private readonly Tolerance _defaultTolerancePpm = new Tolerance(10, ToleranceUnit.Ppm);

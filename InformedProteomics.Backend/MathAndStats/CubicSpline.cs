@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="debug">Turn on console output. Default is false.</param>
         public void Fit(float[] x, float[] y, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
-            if (Single.IsInfinity(startSlope) || Single.IsInfinity(endSlope))
+            if (float.IsInfinity(startSlope) || float.IsInfinity(endSlope))
             {
                 throw new Exception("startSlope and endSlope cannot be infinity.");
             }

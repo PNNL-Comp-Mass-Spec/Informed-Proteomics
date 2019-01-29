@@ -22,7 +22,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             _aminoAcidsArray = aminoAcidsArray ?? AminoAcid.StandardAminoAcidArr;
             _tolerance = tolerance;
 
-            if (_aminoAcidsArray.Length - 1 > Byte.MaxValue)
+            if (_aminoAcidsArray.Length - 1 > byte.MaxValue)
                 throw new Exception("Too many amino acid types");
 
             _maxAminoAcidMass = 0d;

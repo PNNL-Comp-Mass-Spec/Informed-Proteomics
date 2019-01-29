@@ -159,7 +159,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public string GetName(int index)
         {
-            String chargeStr;
+            string chargeStr;
             if (Charge == 1) chargeStr = "";
             else
             {

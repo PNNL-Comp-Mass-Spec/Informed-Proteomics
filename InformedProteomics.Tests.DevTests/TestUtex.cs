@@ -570,7 +570,7 @@ namespace InformedProteomics.Tests.DevTests
 
                 for (var i = 0; i < idParser.NumData; i++)
                 {
-                    var scan = Int32.Parse(idParser.GetData("Scan")[i]);
+                    var scan = int.Parse(idParser.GetData("Scan")[i]);
                     var mass = Double.Parse(idParser.GetData("Mass")[i]);
                     var qvalue = Double.Parse(idParser.GetData("QValue")[i]);
 
@@ -588,7 +588,7 @@ namespace InformedProteomics.Tests.DevTests
 
                         if (tsvParser.GetData(minScanColName)[j].Length < 1) continue;
 
-                        if (Int32.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < Int32.Parse(tsvParser.GetData(maxScanColName)[j]))
+                        if (int.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < int.Parse(tsvParser.GetData(maxScanColName)[j]))
                         {
                             found = true;
                             if (!featureIdMap.ContainsKey(j)) featureIdMap.Add(j, idRows[i]);
@@ -601,7 +601,7 @@ namespace InformedProteomics.Tests.DevTests
                     {
                         if (Math.Abs(mass - massList[j]) > massTol) break;
                         if (tsvParser.GetData(minScanColName)[j].Length < 1) continue;
-                        if (Int32.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < Int32.Parse(tsvParser.GetData(maxScanColName)[j]))
+                        if (int.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < int.Parse(tsvParser.GetData(maxScanColName)[j]))
                         {
                             found = true;
                             if (!featureIdMap.ContainsKey(j)) featureIdMap.Add(j, idRows[i]);

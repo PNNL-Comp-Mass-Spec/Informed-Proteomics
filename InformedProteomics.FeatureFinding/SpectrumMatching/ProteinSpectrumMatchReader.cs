@@ -63,7 +63,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var charge = int.Parse(parser.GetData("Charge")[i]);
                 var eValue = double.Parse(parser.GetData("E-value")[i]);
 
-                var fdr = Double.Parse(parser.GetData("FDR")[i]);
+                var fdr = double.Parse(parser.GetData("FDR")[i]);
                 if (fdr > FdrCutoff) continue;
 
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsAlign)
@@ -105,7 +105,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var mass = (mz - Constants.Proton)*charge;
                 var firstResId = 0;
                 var lastResId = 0;
-                var fdr = Double.Parse(parser.GetData("QValue")[i]);
+                var fdr = double.Parse(parser.GetData("QValue")[i]);
                 if (fdr > FdrCutoff) continue;
 
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsGfPlus)
