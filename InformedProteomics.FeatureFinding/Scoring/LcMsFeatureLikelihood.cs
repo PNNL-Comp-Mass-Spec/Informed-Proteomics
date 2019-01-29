@@ -41,7 +41,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
         public double GetScore(LcMsPeakCluster feature)
         {
             var mi = (int)Math.Round((feature.Mass - _massBins[0]) / (_massBins[1] - _massBins[0]));
-            mi = (int) Math.Min(Math.Max(mi, 0), _massBins.Length - 1);
+            mi = Math.Min(Math.Max(mi, 0), _massBins.Length - 1);
             var score = 0d;
             var abundance = feature.AbundanceDistributionAcrossCharge;
 
