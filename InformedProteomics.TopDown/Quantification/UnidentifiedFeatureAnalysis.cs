@@ -228,11 +228,10 @@ namespace InformedProteomics.TopDown.Quantification
             return Enumerable.Range(2, chargeLimit - 1).Select(x => ((mass + x) / x)).ToArray();
         }
 
-        private readonly string _databaseFile;
         private readonly string[] _rawFiles;
         private readonly string _crossTabFile;
         private string _filteredFile;
-        private SearchableDatabase _searchableDB;
+        private readonly SearchableDatabase _searchableDB;
         private readonly List<Tuple<int,double, double, double,double,double>> _filteredFeatures;
         private Tuple<int, double, int>[][] _identifiedFeatures;
         private int[][] _spectrumMatchesMatrix;
