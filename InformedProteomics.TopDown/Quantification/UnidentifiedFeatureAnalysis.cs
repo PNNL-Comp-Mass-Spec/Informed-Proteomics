@@ -140,9 +140,9 @@ namespace InformedProteomics.TopDown.Quantification
             var maxElution = feature.Item4;
             var featureId = feature.Item1 - 1;
             var det = new Tuple<int, double, int>(-1, -1.0, -1);
-            for (var i = 0; i < ms2List.Count; i++)
+            foreach (var scanNum in ms2List)
             {
-                var scanElutionTime = run.GetElutionTime(ms2List[i]);
+                var scanElutionTime = run.GetElutionTime(scanNum);
                 if (scanElutionTime < minElution || scanElutionTime > maxElution) continue;
 
                 var spectrum = run.GetSpectrum(ms2List[i]) as ProductSpectrum;
@@ -156,7 +156,7 @@ namespace InformedProteomics.TopDown.Quantification
                     var mz = mzTable[j];
                     if (mz < minMz || mz > maxMz) continue;
                     spectrumList.Add(spectrum);
-                    if(!(det.Item1 > -1)) det = new Tuple<int, double, int>(ms2List[i],mz,j+2);
+                    if(!(det.Item1 > -1)) det = new Tuple<int, double, int>(scanNum,mz,j+2);
                     break;
                 }
                 _identifiedFeatures[featureId][fileIndex] = det;
@@ -185,9 +185,9 @@ namespace InformedProteomics.TopDown.Quantification
         {
             var hits = 0;
             if (tags.Count == 0) return hits;
-            for (var i = 0; i < tags.Count; i++)
+            foreach (var tag in tags)
             {
-                var index = _searchableDB.Search(tags[i].Sequence);
+                var index = _searchableDB.Search(tag.Sequence);
                 if (index >= 0) hits++;
             }
             return hits;

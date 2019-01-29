@@ -409,11 +409,11 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
         public IEnumerable<ObservedIsotopeEnvelope> EnumerateEnvelopes()
         {
-            for (var i = 0; i < Envelopes.Length; i++)
+            foreach (var isotopeEnvelope in Envelopes)
             {
-                for (var j = 0; j < Envelopes[0].Length; j++)
+                for (var i = 0; i < Envelopes[0].Length; i++)
                 {
-                    var envelope = Envelopes[i][j];
+                    var envelope = isotopeEnvelope[i];
                     if (envelope != null) yield return envelope;
                 }
             }

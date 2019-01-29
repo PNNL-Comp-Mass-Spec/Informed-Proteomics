@@ -49,17 +49,17 @@ namespace InformedProteomics.Backend.MathAndStats
             var s = new StringBuilder();
             var formatString = "{0" + format + "}";
 
-            for (var i = 0; i < array.Length; i++)
+            foreach (var item in array)
             {
-                for (var j = 0; j < array[i].Length; j++)
+                for (var i = 0; i < item.Length; i++)
                 {
-                    if (j < array[i].Length - 1)
+                    if (i < item.Length - 1)
                     {
-                        s.AppendFormat(formatString + delimiter, array[i][j]);
+                        s.AppendFormat(formatString + delimiter, item[i]);
                     }
                     else
                     {
-                        s.AppendFormat(formatString, array[i][j]);
+                        s.AppendFormat(formatString, item[i]);
                     }
                 }
                 s.Append("\n");

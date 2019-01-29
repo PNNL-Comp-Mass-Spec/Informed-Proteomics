@@ -151,11 +151,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
 
             var excludeLow = new List<T1>();
-            for (int i = 0; i < datacollection.Count; i++)
+            foreach (var item in dataCollection)
             {
-                if (_compare.Compare(datacollection[i], minimum) >= 0)
+                if (_compare.Compare(item, minimum) >= 0)
                 {
-                    excludeLow.Add(datacollection[i]);
+                    excludeLow.Add(item);
                 }
             }
             Equalize(bins, excludeLow);

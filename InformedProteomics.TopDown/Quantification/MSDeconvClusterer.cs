@@ -22,7 +22,7 @@ namespace InformedProteomics.TopDown.Quantification
             var connectedComponents = new List<List<MSDeconvNode>>();
             var nodesInComponents = new Dictionary<MSDeconvNode, int>();
 
-            for (int i = 0; i < nodeList.Count; i++)
+            foreach (var node in nodeList)
             {
                 if (!nodesInComponents.ContainsKey(node))
                 {
