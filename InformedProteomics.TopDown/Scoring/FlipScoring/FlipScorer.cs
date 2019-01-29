@@ -26,13 +26,13 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         public FlipScorer(ScoringParameters scoringParameters, TNeutralMonoSpectrum productSpectrum)
         {
             this.scoringParameters = scoringParameters;
-            this.ProductSpectrum = productSpectrum;
+            ProductSpectrum = productSpectrum;
         }
 
         /// <summary>
         /// Gets the the ions selected for scoring for this bin.
         /// </summary>
-        public BaseIonType[] SelectedIonTypes => this.scoringParameters.SelectedIonTypes;
+        public BaseIonType[] SelectedIonTypes => scoringParameters.SelectedIonTypes;
 
         /// <summary>
         /// Gets or sets the deconvoluted spectrum to get ions to calculate scores for.
@@ -53,8 +53,8 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             AminoAcid nTerminalResidue = null,
             AminoAcid cTerminalResidue = null)
         {
-            double score = this.scoringParameters.FeatureWeights.Intercept;
-            foreach (BaseIonType ionType in this.scoringParameters.SelectedIonTypes)
+            var score = scoringParameters.FeatureWeights.Intercept;
+            foreach (var ionType in scoringParameters.SelectedIonTypes)
             {
                 FeatureWeights featureVector = this.scoringParameters.FeatureWeights;
                 Composition composition = ionType.IsPrefix ? nTerminalFragmentComposition : cTerminalFragmentComposition;
@@ -65,7 +65,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
                 foreach (Composition offsetComp in offsetCompositions)  // Iterate over possible compositions for the current base ion type
                 {
                     var ionComp = composition + offsetComp;
-                    var peak = this.ProductSpectrum.FindPeak(ionComp, this.scoringParameters.TrainerTolerance);
+                    var peak = ProductSpectrum.FindPeak(ionComp, scoringParameters.TrainerTolerance);
                     if (peak == null)
                     {
                         continue;
@@ -105,7 +105,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The </returns>
         public double GetErrorScore(double massError)
         {
-            return massError * this.scoringParameters.FeatureWeights.MassErrorWeight;
+            return massError * scoringParameters.FeatureWeights.MassErrorWeight;
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             var cleavages = sequence.GetInternalCleavages();
             foreach (var cl in cleavages)
             {
-                var fragScore = this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
+                var fragScore = GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
                 count += !fragScore.Equals(0.0) ? 1 : 0;
             }
 
@@ -139,11 +139,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             var cleavages = sequence.GetInternalCleavages();
             foreach (var cl in cleavages)
             {
-                score += this.GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
+                score += GetFragmentScore(cl.PrefixComposition, cl.SuffixComposition, cl.PrefixResidue, cl.SuffixResidue);
             }
 
             // Calculate probability
-            var eta = Math.Exp(this.scoringParameters.FeatureWeights.Intercept + score);
+            var eta = Math.Exp(scoringParameters.FeatureWeights.Intercept + score);
             return eta / (eta + 1);
         }
 

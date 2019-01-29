@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             this.deconvoluter = deconvoluter;
             this.dataReader = dataReader;
             this.maxDegreeOfParallelism = maxDegreeOfParallelism > 0 ? maxDegreeOfParallelism : -1;
-            this.msLevelSet = msLevels == null ? new HashSet<int> { 1, 2 } : new HashSet<int>(msLevels);
+            msLevelSet = msLevels == null ? new HashSet<int> { 1, 2 } : new HashSet<int>(msLevels);
         }
 
         /// <summary>
@@ -78,12 +78,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>Deconvoluted spectra.</returns>
         public IEnumerable<Spectrum> ReadAllSpectra()
         {
-            return this.dataReader.ReadAllSpectra()
-                       .Where(spec => this.msLevelSet.Contains(spec.MsLevel))
+            return dataReader.ReadAllSpectra()
+                       .Where(spec => msLevelSet.Contains(spec.MsLevel))
                        .AsParallel()
                        .AsOrdered()
-                       .WithDegreeOfParallelism(this.maxDegreeOfParallelism)
-                       .Select(spec => this.deconvoluter.GetCombinedDeconvolutedSpectrum(spec));
+                       .WithDegreeOfParallelism(maxDegreeOfParallelism)
+                       .Select(spec => deconvoluter.GetCombinedDeconvolutedSpectrum(spec));
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>Deconvoluted spectrum.</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
-            var spectrum = this.dataReader.ReadMassSpectrum(scanNum, includePeaks);
+            var spectrum = dataReader.ReadMassSpectrum(scanNum, includePeaks);
             if (includePeaks)
             {
-                return this.deconvoluter.GetCombinedDeconvolutedSpectrum(spectrum);
+                return deconvoluter.GetCombinedDeconvolutedSpectrum(spectrum);
             }
 
             return spectrum;
@@ -106,14 +106,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Gets the number of spectra in the file.
         /// </summary>
-        public int NumSpectra => this.dataReader.NumSpectra;
+        public int NumSpectra => dataReader.NumSpectra;
 
         /// <summary>
         /// Close the reader.
         /// </summary>
         public void Close()
         {
-            this.dataReader.Close();
+            dataReader.Close();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         public void Dispose()
         {
-            this.dataReader.Dispose();
+            dataReader.Dispose();
         }
 
         /// <summary>
@@ -130,34 +130,35 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>true if is random access capable, false if not</returns>
         public bool TryMakeRandomAccessCapable()
         {
-            return this.dataReader.TryMakeRandomAccessCapable();
+            return dataReader.TryMakeRandomAccessCapable();
         }
 
         /// <summary>
         /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
         /// </summary>
-        public CV.CVID NativeIdFormat => this.dataReader.NativeIdFormat;
+        public CV.CVID NativeIdFormat => dataReader.NativeIdFormat;
 
         /// <summary>
         /// The Native Format of the source file - needed for tracking purposes.
         /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
         /// </summary>
-        public CV.CVID NativeFormat => this.dataReader.NativeFormat;
+        public CV.CVID NativeFormat => dataReader.NativeFormat;
 
         /// <summary>
         /// Path to the file; is <see cref="string.Empty"/> if the reader is in-memory
         /// </summary>
-        public string FilePath => this.dataReader.FilePath;
+        public string FilePath => dataReader.FilePath;
 
         /// <summary>
         /// SHA-1 Checksum of the original input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public string SrcFileChecksum => this.dataReader is IPbfLcMsRun run ? run.PbfFileChecksum : this.dataReader.SrcFileChecksum;
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        public string SrcFileChecksum => dataReader is IPbfLcMsRun run ? run.PbfFileChecksum : dataReader.SrcFileChecksum;
 
         /// <summary>
         /// Version of the immediate prior input file (raw, mzML, .d folder, etc.)
         /// </summary>
-        public string FileFormatVersion => this.dataReader.FileFormatVersion;
+        public string FileFormatVersion => dataReader.FileFormatVersion;
     }
 }

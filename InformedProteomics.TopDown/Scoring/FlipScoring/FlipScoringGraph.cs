@@ -58,7 +58,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The node score of the sink node.</returns>
         public double GetNodeScore(int nodeIndex)
         {
-            return this.nTerminalNodes[nodeIndex] ?? 0 + this.cTerminalNodes[nodeIndex] ?? 0;
+            return nTerminalNodes[nodeIndex] ?? 0 + cTerminalNodes[nodeIndex] ?? 0;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns><see cref="List{T}" /> of <see ref="FlipScoringGraphEdge" />.</returns>
         public IEnumerable<IScoringGraphEdge> GetEdges(int nodeIndex)
         {
-            return this.edges[nodeIndex];
+            return edges[nodeIndex];
         }
 
         /// <summary>
@@ -100,11 +100,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             int prevNTermBin = 0, prevCTermBin = 0;
             foreach (var cleavage in cleavages)
             {
-                int nTermBin = this.massBins.GetBinNumber(cleavage.PrefixComposition.Mass);
-                int cTermBin = this.massBins.GetBinNumber(cleavage.SuffixComposition.Mass);
+                var nTermBin = massBins.GetBinNumber(cleavage.PrefixComposition.Mass);
+                var cTermBin = massBins.GetBinNumber(cleavage.SuffixComposition.Mass);
 
-                score += this.GetNodeScore(nTermBin) + this.GetNodeScore(cTermBin);
-                score += this.GetEdgeScore(prevNTermBin, nTermBin) + this.GetEdgeScore(prevCTermBin, cTermBin);
+                score += GetNodeScore(nTermBin) + GetNodeScore(cTermBin);
+                score += GetEdgeScore(prevNTermBin, nTermBin) + GetEdgeScore(prevCTermBin, cTermBin);
 
                 prevNTermBin = nTermBin;
                 prevCTermBin = cTermBin;
@@ -119,7 +119,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The total number of nodes (mass bins) in the scoring graph.</returns>
         public int GetNumNodes()
         {
-            return this.nTerminalNodes.Length;
+            return nTerminalNodes.Length;
         }
     }
 }

@@ -30,8 +30,8 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         public string GetPath(string paramPath = null)
         {
             paramPath = paramPath ?? "scoringParams";
-            string topdown = this.IsTopDown ? "topDown" : "bottomUp";
-            return Path.Combine(paramPath, string.Format("{0}_{1}", this.ActivationMethod, topdown));
+            var topDown = IsTopDown ? "topDown" : "bottomUp";
+            return Path.Combine(paramPath, string.Format("{0}_{1}", ActivationMethod, topDown));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>A value indicating whether the scoring parameter is equal to the other parameter.</returns>
         protected bool Equals(ScoringParameterDescription other)
         {
-            return this.ActivationMethod == other.ActivationMethod && this.IsTopDown == other.IsTopDown;
+            return ActivationMethod == other.ActivationMethod && IsTopDown == other.IsTopDown;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         {
             unchecked
             {
-                return ((int)this.ActivationMethod * 397) ^ this.IsTopDown.GetHashCode();
+                return ((int)ActivationMethod * 397) ^ IsTopDown.GetHashCode();
             }
         }
     }

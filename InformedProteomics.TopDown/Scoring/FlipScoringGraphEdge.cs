@@ -32,10 +32,10 @@ namespace InformedProteomics.TopDown.Scoring
                     AminoAcid label,
                     FlipScorer<DeconvolutedSpectrum> scorer)
         {
-            this.PrevNodeIndex = prevNodeIndex;
-            this.SinkNodeIndex = sinkNodeIndex;
-            this.Weight = weight;
-            this.Label = label;
+            PrevNodeIndex = prevNodeIndex;
+            SinkNodeIndex = sinkNodeIndex;
+            Weight = weight;
+            Label = label;
             this.scorer = scorer;
         }
 
@@ -76,7 +76,7 @@ namespace InformedProteomics.TopDown.Scoring
             double massError = Math.Abs(this.SinkNodeIndex - (this.PrevNodeIndex + this.Label.Mass)) / this.SinkNodeIndex * 1e6;
             double errorScore = this.scorer.GetErrorScore(massError);
 
-            return errorScore + this.Weight;
+            return errorScore + Weight;
         }
     }
 }

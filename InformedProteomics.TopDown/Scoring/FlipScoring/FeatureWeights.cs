@@ -33,11 +33,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The score.</returns>
         public double GetMatchedIonPeakScoreWithError(BaseIonType baseIonType, DeconvolutedPeak peak, double theoreticalMass)
         {
-            var featureVector = this.IonWeights[baseIonType];
             double score = featureVector.GetMatchedIonPeakScoreWithoutError(peak);
+            var featureVector = IonWeights[baseIonType];
 
-            score += this.MassErrorWeight * ppmError;
             var ppmError = Math.Abs(peak.Mass - theoreticalMass) / theoreticalMass * 1e6;
+            score += MassErrorWeight * ppmError;
 
             return score;
         }

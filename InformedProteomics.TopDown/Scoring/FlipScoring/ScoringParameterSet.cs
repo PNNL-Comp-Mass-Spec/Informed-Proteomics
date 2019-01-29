@@ -27,7 +27,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         public ScoringParameterSet(bool isTopDown = true)
         {
             this.isTopDown = isTopDown;
-            this.scoringParameters = new Dictionary<ScoringParameterDescription, ScoringParameters[]>();
+            scoringParameters = new Dictionary<ScoringParameterDescription, ScoringParameters[]>();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The scoring parameters for the given activation method and mass bin.</returns>
         public ScoringParameters GetScoringParameters(ActivationMethod activationMethod, double precursorMass)
         {
-            var parameters = this.GetScoringParameters(activationMethod);
+            var parameters = GetScoringParameters(activationMethod);
 
             // Select bin edges for searching:
             var binEdges = parameters.Select(param => param.Mass).ToArray();
@@ -61,16 +61,16 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>Array of scoring parameters sorted by the mass of each parameter bin.</returns>
         public ScoringParameters[] GetScoringParameters(ActivationMethod activationMethod)
         {
-            var searchParamDesc = new ScoringParameterDescription { ActivationMethod = activationMethod, IsTopDown = this.isTopDown };
+            var searchParamDesc = new ScoringParameterDescription { ActivationMethod = activationMethod, IsTopDown = isTopDown };
             ScoringParameters[] parameters;
-            if (this.scoringParameters.ContainsKey(searchParamDesc))
+            if (scoringParameters.ContainsKey(searchParamDesc))
             {   // Seen this activation method already.
-                parameters = this.scoringParameters[searchParamDesc];
+                parameters = scoringParameters[searchParamDesc];
             }
             else
             {   // Haven't seen this activation method yet. Try to load it from file.
                 parameters = ScoringParameters.Parse(searchParamDesc.GetPath());
-                this.scoringParameters.Add(searchParamDesc, parameters);
+                scoringParameters.Add(searchParamDesc, parameters);
             }
 
             return parameters;

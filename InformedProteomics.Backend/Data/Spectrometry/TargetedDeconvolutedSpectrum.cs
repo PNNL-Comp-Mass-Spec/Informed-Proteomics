@@ -49,12 +49,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             double mass = composition.Mass;
             DeconvolutedPeak deconvolutedPeak = null;
             double maxIntensity = 0.0;
-            for (int charge = this.minCharge; charge <= this.maxCharge; charge++)
+            for (var charge = minCharge; charge <= maxCharge; charge++)
             {
                 var ion = new Ion(composition, charge);
-                var isotopePeaks = this.spectrum.GetAllIsotopePeaks(ion, tolerance);
+                var isotopePeaks = spectrum.GetAllIsotopePeaks(ion, tolerance);
                 var intensity = isotopePeaks.Max(peak => peak.Intensity);
-                var corrCos = this.GetCorrCos(ion, isotopePeaks);
+                var corrCos = GetCorrCos(ion, isotopePeaks);
                 if (intensity > maxIntensity)
                 {
                     deconvolutedPeak = new DeconvolutedPeak(mass, intensity, charge, corrCos.Item1, corrCos.Item2, isotopePeaks);

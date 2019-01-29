@@ -29,7 +29,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             Symbol = symbol;
             IsPrefix = isPrefix;
             OffsetComposition = offsetComposition;
-            _compositionCalculator = compositionCalculator ?? (_ => new List<Composition> { this.OffsetComposition });
+            _compositionCalculator = compositionCalculator ?? (_ => new List<Composition> { OffsetComposition });
         }
 
         static BaseIonType()

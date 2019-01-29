@@ -187,7 +187,7 @@ namespace InformedProteomics.Backend.Data.Biology
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return this.Name.Equals(other.Name);
+            return Name.Equals(other.Name);
         }
 
         /// <inheritdoc />
