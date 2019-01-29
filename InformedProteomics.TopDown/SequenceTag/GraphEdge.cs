@@ -15,14 +15,14 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public bool Equals(GraphEdge other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Node1 == other.Node1 && Node2 == other.Node2;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj == null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((GraphEdge)obj);

@@ -51,7 +51,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>A value indicating if this scoring parameter object is equal to the other object.</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj == null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return this.Equals((ScoringParameterDescription)obj);

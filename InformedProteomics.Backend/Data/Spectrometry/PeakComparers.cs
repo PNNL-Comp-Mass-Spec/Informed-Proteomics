@@ -16,6 +16,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public int Compare(Peak x, Peak y)
         {
+            if (x == null) return y == null ? 0 : -1;
+            if (y == null) return 1;
+
             return y.Intensity.CompareTo(x.Intensity);
         }
     }
@@ -58,6 +61,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public int Compare(Peak x, Peak y)
         {
+            if (x == null) return y == null ? 0 : -1;
+            if (y == null) return 1;
+
             if (Equals(x, y)) return 0;
             return x.Mz.CompareTo(y.Mz);
         }
@@ -104,6 +110,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public bool Equals(Peak x, Peak y)
         {
+            if (x == null || y == null)
+                return false;
+
             return Math.Abs((x.Mz - y.Mz) / x.Mz * 1E6) <= _ppmTolerance;
         }
 
@@ -137,7 +146,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public bool Equals(Peak x, Peak y)
         {
-            return Math.Abs((x.Mz - y.Mz)) <= _toleranceTh;
+            if (x == null || y == null)
+                return false;
+
+            return Math.Abs(x.Mz - y.Mz) <= _toleranceTh;
         }
 
         /// <inheritdoc />
@@ -172,6 +184,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public bool Equals(Peak x, Peak y)
         {
+            if (x == null || y == null)
+                return false;
+
             return GetBinNumber(x.Mz) == GetBinNumber(y.Mz);
         }
 
@@ -200,6 +215,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public int Compare(Peak x, Peak y)
         {
+            if (x == null) return y == null ? 0 : -1;
+            if (y == null) return 1;
+
             return GetBinNumber(x.Mz).CompareTo(GetBinNumber(y.Mz));
         }
 

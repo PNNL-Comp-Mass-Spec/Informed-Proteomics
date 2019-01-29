@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public bool Equals(Fragment other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(other.IonSymbol, IonSymbol);
         }
@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj == null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof(Fragment)) return false;
             return Equals((Fragment)obj);

@@ -24,7 +24,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj == null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals(obj as SequenceTag);
@@ -32,6 +32,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public bool Equals(SequenceTag other)
         {
+            if (other == null) return false;
             if (other.ScanNum != ScanNum) return false;
             if (other.IsPrefix != IsPrefix) return false;
             if (!other.Sequence.Equals(Sequence)) return false;
@@ -202,7 +203,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
           public override bool Equals(object obj)
           {
-              if (ReferenceEquals(null, obj)) return false;
+              if (obj == null) return false;
               if (ReferenceEquals(this, obj)) return true;
               if (obj.GetType() != this.GetType()) return false;
               return Equals((SequenceTag)obj);

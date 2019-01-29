@@ -277,6 +277,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         {
             public int Compare(LcMsPeakCluster x, LcMsPeakCluster y)
             {
+                if (x == null) return y == null ? 0 : -1;
+                if (y == null) return 1;
+
                 return (y.Score.CompareTo(x.Score));
             }
         }

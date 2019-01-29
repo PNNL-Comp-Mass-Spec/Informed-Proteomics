@@ -30,6 +30,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public int Compare(Probability<T1> x, Probability<T1> y)
         {
+            if (x == null) return y == null ? 0 : -1;
+            if (y == null) return 1;
+
             return x.Prob.CompareTo(y.Prob);
         }
     }

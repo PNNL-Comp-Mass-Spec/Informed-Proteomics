@@ -17,11 +17,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="comparison">The Comparison to be used for the binary search.</param>
         public AnonymousComparer(Comparison<T> comparison)
         {
-            if (comparison == null)
-            {
-                throw new ArgumentNullException("comparison");
-            }
-            _mComparison = comparison;
+            _mComparison = comparison ?? throw new ArgumentNullException(nameof(comparison));
         }
 
         /// <summary>

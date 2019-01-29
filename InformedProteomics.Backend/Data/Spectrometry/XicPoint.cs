@@ -63,7 +63,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public bool Equals(XicPoint other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
             return other.ScanNum == ScanNum && Math.Abs(other.Mz - Mz) < 0.001 && Math.Abs(other.Intensity - Intensity) < 0.001;
         }
@@ -77,7 +77,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj == null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof(XicPoint)) return false;
             return Equals((XicPoint)obj);

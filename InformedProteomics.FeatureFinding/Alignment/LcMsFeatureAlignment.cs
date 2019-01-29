@@ -577,6 +577,9 @@ namespace InformedProteomics.FeatureFinding.Alignment
         {
             public int Compare(LcMsFeature x, LcMsFeature y)
             {
+                if (x == null) return y == null ? 0 : -1;
+                if (y == null) return 1;
+
                 return (x.Mass.CompareTo(y.Mass));
             }
         }

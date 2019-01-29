@@ -185,7 +185,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <inheritdoc />
         public bool Equals(Atom other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other == null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Name.Equals(other.Name);
         }
