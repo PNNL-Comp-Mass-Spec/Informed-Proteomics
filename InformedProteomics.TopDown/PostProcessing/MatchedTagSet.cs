@@ -69,7 +69,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                         (existingTag.NumMergedSequenceTags + newTag.NumMergedSequenceTags);
                 }
             }
-            else if (existingTag.NTermFlankingMass != newTag.NTermFlankingMass) return false;
+            else if (!Nullable.Equals(existingTag.NTermFlankingMass, newTag.NTermFlankingMass)) return false;
 
             // C-term
             var newEndIndex = Math.Max(existingTag.EndIndex, newTag.EndIndex);
@@ -101,7 +101,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                         (existingTag.NumMergedSequenceTags + newTag.NumMergedSequenceTags);
                 }
             }
-            else if (existingTag.CTermFlankingMass != newTag.CTermFlankingMass) return false;
+            else if (!Nullable.Equals(existingTag.CTermFlankingMass, newTag.CTermFlankingMass)) return false;
 
             existingTag.Mass += GetSequenceMass(newStartIndex, existingTag.StartIndex) + GetSequenceMass(existingTag.EndIndex, newEndIndex);
             existingTag.StartIndex = newStartIndex;
