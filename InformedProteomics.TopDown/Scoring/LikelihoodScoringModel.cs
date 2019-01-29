@@ -185,9 +185,15 @@ namespace InformedProteomics.TopDown.Scoring
 
                 var a = GetActivationMethodIndex(line);
                 line = reader.ReadLine();
-                var token = line.Split('\t');
+                if (line != null)
+                {
+                    var token = line.Split('\t');
 
-                for (var j = 0; j < IonTypeBinLength; j++) IonTypeScoreTable[a][j] = GetBoundedLkScore(token[j]);
+                    for (var j = 0; j < IonTypeBinLength; j++)
+                    {
+                        IonTypeScoreTable[a][j] = GetBoundedLkScore(token[j]);
+                    }
+                }
             }
         }
 
@@ -206,9 +212,12 @@ namespace InformedProteomics.TopDown.Scoring
                 var t = GetIonTypeIndex(tokens[1]);
 
                 line = reader.ReadLine();
-                var token = line.Split('\t');
+                if (line != null)
+                {
+                    var token = line.Split('\t');
 
-                for (var j = 0; j < MassBinning.BinCount; j++) MassScoreTable[a][t][j] = GetBoundedLkScore(token[j]);
+                    for (var j = 0; j < MassBinning.BinCount; j++) MassScoreTable[a][t][j] = GetBoundedLkScore(token[j]);
+                }
             }
         }
 
@@ -223,9 +232,15 @@ namespace InformedProteomics.TopDown.Scoring
                 var m = MassBinning.GetBinIndex(double.Parse(line));
 
                 line = reader.ReadLine();
-                var token = line.Split('\t');
+                if (line != null)
+                {
+                    var token = line.Split('\t');
 
-                for (var j = 0; j < ChargeBinLength; j++) ChargeScoreTable[m][j] = GetBoundedLkScore(token[j]);
+                    for (var j = 0; j < ChargeBinLength; j++)
+                    {
+                        ChargeScoreTable[m][j] = GetBoundedLkScore(token[j]);
+                    }
+                }
             }
         }
 
@@ -245,9 +260,15 @@ namespace InformedProteomics.TopDown.Scoring
                 var m = MassBinning.GetBinIndex(double.Parse(tokens[1]));
 
                 line = reader.ReadLine();
-                var token = line.Split('\t');
+                if (line != null)
+                {
+                    var token = line.Split('\t');
 
-                for (var j = 0; j < binLen; j++) table[c][m][j] = GetBoundedLkScore(token[j]);
+                    for (var j = 0; j < binLen; j++)
+                    {
+                        table[c][m][j] = GetBoundedLkScore(token[j]);
+                    }
+                }
             }
         }
 

@@ -88,16 +88,17 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
         private double[][] LoadTableFromResource(string resourceName)
         {
-            //if (!File.Exists(fname)) throw new FileNotFoundException("Missing score datafile: " + fname);
-            //var parser = new TsvFileParser(fname);
             var assembly = Assembly.GetExecutingAssembly();
-            var textStreamReader = new StreamReader(assembly.GetManifestResourceStream(resourceName));
+            var textStreamReader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException());
             var table = new double[_massBins.Length][];
 
             for (var i = 0; i < _massBins.Length; i++)
             {
                 table[i] = new double[NumberOfBins];
                 var line = textStreamReader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
                 var token = line.Split('\t');
                 for (var k = 0; k < NumberOfBins; k++)
                 {

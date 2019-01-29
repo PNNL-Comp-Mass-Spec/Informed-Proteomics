@@ -58,8 +58,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         private List<LcMsFeature> ClusterMs1Features()
         {
-            var clusters = _ms1Features.ConnnectedComponents(new Ms1FeatureComparer(Run, _tolerance));
             var ret = new List<LcMsFeature>();
+
+            if (_ms1Features == null)
+                return ret;
+
+            // ReSharper disable once InconsistentlySynchronizedField
+            var clusters = _ms1Features.ConnectedComponents(new Ms1FeatureComparer(Run, _tolerance));
 
             foreach (var cluster in clusters)
             {
