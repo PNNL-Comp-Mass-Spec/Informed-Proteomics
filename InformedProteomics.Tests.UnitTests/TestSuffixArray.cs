@@ -107,7 +107,7 @@ namespace InformedProteomics.Tests.UnitTests
             var indexedDb = new IndexedDatabase(db);
             //var numPeptides = indexedDb.IntactSequenceAnnotationsAndOffsets(21, 300, 0).LongCount()*31;
             var peptides = indexedDb
-                    .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+                    .SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
                         100, 300, 1, 0);
             var numPeptides = 0;
 

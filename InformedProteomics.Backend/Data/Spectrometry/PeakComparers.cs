@@ -204,7 +204,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Get the m/z rounded by <see cref="NumBits"/> using bitshifting magic
+        /// Get the m/z rounded by <see cref="NumBits"/> using bit shifting magic
         /// </summary>
         /// <param name="mz"></param>
         /// <returns></returns>

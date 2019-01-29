@@ -253,12 +253,12 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
                         if (altFt != null)
                         {
-                            var newOnew = new LcMsFeature(featureInfoList[i].Mass, altFt.RepresentativeCharge,
+                            var newOne = new LcMsFeature(featureInfoList[i].Mass, altFt.RepresentativeCharge,
                                 altFt.RepresentativeMz, altFt.RepresentativeScanNum,
                                 altFt.Abundance, altFt.MinCharge, altFt.MaxCharge, altFt.MinScanNum, altFt.MaxScanNum,
                                 altFt.MinElutionTime, altFt.MaxElutionTime, );
 
-                            alignedFeatures[i][j] = newOnew;
+                            alignedFeatures[i][j] = newOne;
                         }
                     }
                 }
@@ -522,7 +522,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
         private IEnumerable<List<int>> GetConnectedComponents(IReadOnlyList<List<int>> adjList)
         {
             var nNodes = adjList.Count;
-            //var groupedFeaters = new List<AlignedMs1FeatureSet>();
+            //var groupedFeatures = new List<AlignedMs1FeatureSet>();
             var nodeSetList = new List<List<int>>();
             var visited = new bool[nNodes];
             for (var i = 0; i < nNodes; i++)
@@ -548,7 +548,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                         neighbors.Enqueue(k);
                     }
                 }
-                //groupedFeaters.Add(featureSet);
+                //groupedFeatures.Add(featureSet);
                 nodeSetList.Add(nodeSet);
             }
             return nodeSetList;

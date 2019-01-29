@@ -9,6 +9,7 @@ namespace InformedProteomics.Backend.SearchResults
     {
         /// <summary>
         /// File extensions supported by the results reader.
+        /// These extensions need to be lowercase
         /// </summary>
         public static readonly string[] SupportedResultsFiles = { ".mzid", ".mzid.gz", "_ictda.tsv" };
 

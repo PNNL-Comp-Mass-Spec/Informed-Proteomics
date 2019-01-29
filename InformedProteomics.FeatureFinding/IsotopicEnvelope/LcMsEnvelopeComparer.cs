@@ -11,9 +11,9 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             //var tolerance = new Tolerance(5);
             //if (massDiff > tolerance.GetToleranceAsTh(e1.MonoMass)) return false;
 
-            //var summedEnvelop = new double[e1.Size];
-            //e1.SumEnvelopeTo(summedEnvelop);
-            //e2.SumEnvelopeTo(summedEnvelop);
+            //var summedEnvelope = new double[e1.Size];
+            //e1.SumEnvelopeTo(summedEnvelope);
+            //e2.SumEnvelopeTo(summedEnvelope);
 
             var scanDiff = Math.Abs(e2.ScanNum - e1.ScanNum);
             if (scanDiff > 3) return false;

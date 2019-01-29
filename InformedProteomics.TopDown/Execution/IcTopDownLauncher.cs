@@ -478,7 +478,7 @@ namespace InformedProteomics.TopDown.Execution
             else
             {
                 annotationsAndOffsets = indexedDb
-                    .SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+                    .SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
                         Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
             }
 

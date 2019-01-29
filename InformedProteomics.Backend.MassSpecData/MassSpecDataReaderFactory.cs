@@ -27,7 +27,7 @@ namespace InformedProteomics.Backend.MassSpecData
             switch (type)
             {
                 case MassSpecDataType.XCaliburRun:
-                    reader = new XCaliburReader(filePath);
+                    reader = new XcaliburReader(filePath);
                     break;
                 case MassSpecDataType.MzMLFile:
                     reader = new MzMLReader(filePath);
@@ -63,26 +63,26 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
             filePath = NormalizeDatasetPath(filePath);
-            var lower = filePath.ToLower();
-            if (lower.EndsWith("\\") || lower.EndsWith("/"))
+            var pathLower = filePath.ToLower();
+            if (pathLower.EndsWith("\\") || pathLower.EndsWith("/"))
             {
-                lower = lower.Remove(lower.Length - 1);
+                pathLower = pathLower.Remove(pathLower.Length - 1);
             }
 
-            if (_thermoRawAvailable && lower.EndsWith(".raw") && !Directory.Exists(filePath))
+            if (_thermoRawAvailable && pathLower.EndsWith(".raw") && !Directory.Exists(filePath))
             {
                 return MassSpecDataType.XCaliburRun;
             }
             // If it is an mzML file that is gzipped, use the ProteoWizardReader, since it does random access without extracting.
-            if (lower.EndsWith(".mzml") || (lower.EndsWith(".mzml.gz") && !_pwizAvailable))
+            if (pathLower.EndsWith(".mzml") || (pathLower.EndsWith(".mzml.gz") && !_pwizAvailable))
             {
                 return MassSpecDataType.MzMLFile;
             }
-            if (lower.EndsWith(".pbf"))
+            if (pathLower.EndsWith(".pbf"))
             {
                 return MassSpecDataType.PbfFile;
             }
-            if (lower.EndsWith(".dpbf"))
+            if (pathLower.EndsWith(".dpbf"))
             {
                 return MassSpecDataType.DeconvolutedPbfFile;
             }
@@ -138,7 +138,8 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                var internalSupported = new List<string>() {".mzml", ".mzml.gz", ".pbf"};
+                // These file extensions need to be lowercase due to Linq queries of the form "types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()"
+                var internalSupported = new List<string> {".mzml", ".mzml.gz", ".pbf"};
                 if (_thermoRawAvailable)
                 {
                     internalSupported.Add(".raw");
@@ -258,6 +259,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 try
                 {
                     var pwizCLI = Assembly.LoadFrom(pwizBindingsCLI);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (pwizCLI != null)
                     {
                         return true;

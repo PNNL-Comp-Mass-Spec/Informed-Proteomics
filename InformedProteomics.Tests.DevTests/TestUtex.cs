@@ -27,7 +27,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         [Category("PNL_Domain")]
         [Category("Local_Testing")]
-        public void TestQuantifyIdedProteoforms()
+        public void TestQuantifyIdentifiedProteoforms()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
@@ -300,7 +300,7 @@ namespace InformedProteomics.Tests.DevTests
                 var ms1ftPath = string.Format(@"{0}\{1}_aligned.ms1ft", promexOutFolder, dataset[i]);
                 var writer = new StreamWriter(ms1ftPath);
                 writer.Write(LcMsFeatureFinderLauncher.GetHeaderString());
-                writer.WriteLine("\tIdedMs2ScanNums");
+                writer.WriteLine("\tIdentifiedMs2ScanNums");
 
                 for (var j = 0; j < alignedFeatureList.Count; j++)
                 {
@@ -455,13 +455,13 @@ namespace InformedProteomics.Tests.DevTests
            private readonly LcMsRun[] _runArray;
        }
         [Test]
-        public void TestQunatifyMsAlignResult()
+        public void TestQuantifyMsAlignResult()
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
             TestUtils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
-            const string msaOutFile = @"D:\MassSpecFiles\UTEX\msalign_ided.tsv";
+            const string msaOutFile = @"D:\MassSpecFiles\UTEX\msalign_identified.tsv";
 
             if (!Directory.Exists(rawFolder))
             {

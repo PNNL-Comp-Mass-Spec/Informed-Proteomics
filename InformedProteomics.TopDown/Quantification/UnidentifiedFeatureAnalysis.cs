@@ -14,7 +14,7 @@ namespace InformedProteomics.TopDown.Quantification
     {
         /*
          * This is a class that Jung Kap asked me to complete to analyze unidentified features from a cross tab file
-         * This class checks to see for each feature how many spectrum contained it, from the spectrum how many tags were genereated, and then
+         * This class checks to see for each feature how many spectrum contained it, from the spectrum how many tags were generated, and then
          * how many of those tags exist in our data base.
          *
          */
@@ -28,16 +28,16 @@ namespace InformedProteomics.TopDown.Quantification
         }
 
         /*
-         * This filters the features to get the undidentifed features that have a p-val > .01
+         * This filters the features to get the unidentified features that have a p-val > .01
          * */
         public void FilterFeatures(string outputFolder)
         {
             var filteredCount = 0;
             string featureLine;
             var tsv = new StringBuilder();
-            var featueFile = new StreamReader(_crossTabFile);
-            featueFile.ReadLine();
-            while (((featureLine = featueFile.ReadLine()) != null))
+            var featureFile = new StreamReader(_crossTabFile);
+            featureFile.ReadLine();
+            while (((featureLine = featureFile.ReadLine()) != null))
             {
                 var featureElements = featureLine.Split('\t');
                 var sequence = featureElements[1];
@@ -70,7 +70,7 @@ namespace InformedProteomics.TopDown.Quantification
          * This prints two files:
          *
          * 1) a general file that looks at each feature and gives the spectrum match count, tag count and database hit count
-         * 2) a more specific file that matches a featuer to a scan # and then the mz and charge value being looked at.
+         * 2) a more specific file that matches a feature to a scan # and then the mz and charge value being looked at.
          *
          * Format is specific to data Jung gave me
          */
@@ -107,9 +107,9 @@ namespace InformedProteomics.TopDown.Quantification
 
         public void DoAnalysis()
         {
-            InitilizeMatrix(_spectrumMatchesMatrix);
-            InitilizeMatrix(_tagsGeneratedMatrix);
-            InitilizeMatrix(_dataBaseHitMatrix);
+            InitializeMatrix(_spectrumMatchesMatrix);
+            InitializeMatrix(_tagsGeneratedMatrix);
+            InitializeMatrix(_dataBaseHitMatrix);
             GetFilteredFeatures(_filteredFile);
 
             for (var i = 0; i < _rawFiles.Length; i++)
@@ -120,7 +120,7 @@ namespace InformedProteomics.TopDown.Quantification
                 Console.WriteLine("# of scans {0}",ms2List.Count);
                 for (var j = 0; j < _filteredFeatures.Count; j++)
                 {
-                    var matchedSpecList = GetMatchedSpectrums(run, ms2List, _filteredFeatures[j],i);
+                    var matchedSpecList = GetMatchedSpectra(run, ms2List, _filteredFeatures[j],i);
                     _spectrumMatchesMatrix[j][i] = matchedSpecList.Count;
 
                     var tags = GetTags(matchedSpecList);
@@ -132,7 +132,7 @@ namespace InformedProteomics.TopDown.Quantification
             }
         }
 
-        private List<ProductSpectrum> GetMatchedSpectrums(LcMsRun run, IList<int> ms2List ,Tuple<int,double, double, double, double,double> feature, int fileIndex)
+        private List<ProductSpectrum> GetMatchedSpectra(ILcMsRun run, IList<int> ms2List ,Tuple<int,double, double, double, double,double> feature, int fileIndex)
         {
             var spectrumList = new List<ProductSpectrum>();
             var mass = feature.Item2;
@@ -167,10 +167,10 @@ namespace InformedProteomics.TopDown.Quantification
         private List<SequenceTag.SequenceTag> GetTags(List<ProductSpectrum> spectrums)
         {
             var tagDict = new Dictionary<string,SequenceTag.SequenceTag>();
-            if (spectrums.Count == 0) return tagDict.Values.ToList();
-            foreach (var spect in spectrums)
+            if (spectra.Count == 0) return tagDict.Values.ToList();
+            foreach (var spectrum in spectra)
             {
-                var tagFinder = new SequenceTagFinder(spect, new Tolerance(10), 4);
+                var tagFinder = new SequenceTagFinder(spectrum, new Tolerance(10), 4);
                 var tags = tagFinder.GetAllSequenceTagString();
                 foreach (var t in tags)
                 {
@@ -193,7 +193,7 @@ namespace InformedProteomics.TopDown.Quantification
             return hits;
         }
 
-        private void InitilizeMatrix(int[][] matrix)
+        private void InitializeMatrix(IList<int[]> matrix)
         {
             for (var i = 0; i < matrix.Length; i++)
             {

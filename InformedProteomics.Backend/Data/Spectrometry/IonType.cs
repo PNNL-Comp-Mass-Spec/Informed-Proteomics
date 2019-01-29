@@ -88,7 +88,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Geth the m/z of <paramref name="cutMass"/> + (the offset mass)
+        /// Get the m/z of <paramref name="cutMass"/> + (the offset mass)
         /// </summary>
         /// <param name="cutMass"></param>
         /// <returns></returns>

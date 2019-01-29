@@ -87,10 +87,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                     }
                     catch (KeyNotFoundException)
                     {
-                        throw new Exception("Unrecognized modificaion mass: " + element);
+                        throw new Exception("Unrecognized modification mass: " + element);
                     }
 
-//                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modificaion mass: " + element);
+//                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
                     aa = modAa;
                     mods.AddRange(modList);
                     //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);

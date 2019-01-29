@@ -5,7 +5,7 @@ namespace InformedProteomics.FeatureFinding.Util
 {
     public class NodeSet<T> : List<T>
     {
-        public List<List<T>> ConnnectedComponents(INodeComparer<T> comparer)
+        public List<List<T>> ConnectedComponents(INodeComparer<T> comparer)
         {
             SetAdjacentList(comparer);
             var componentSet = new List<List<T>>();

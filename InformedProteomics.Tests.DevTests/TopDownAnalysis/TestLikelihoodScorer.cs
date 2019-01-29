@@ -17,10 +17,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
     class TestLikelihoodScorer
     {
-        public void TestLoadTariningParam()
+        public void TestLoadTrainingParam()
         {
             //const string paramPath = @"D:\MassSpecFiles\training\IdScoring\likelihoodTable";
-            //var model = new LikelihoodScoringModel(paramPath);
+            //var model = new LikelihoodScoringModel();
         }
 
         [Test]

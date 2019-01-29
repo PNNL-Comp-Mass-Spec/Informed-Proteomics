@@ -273,9 +273,9 @@ namespace InformedProteomics.FeatureFinding
                             var mostAbuPeak = envelope.Peaks[mostAbuIdx];
                             if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
 
-                            var fitscore = 1.0 - feature.BestCorrelationScore;
+                            var fitScore = 1.0 - feature.BestCorrelationScore;
                             csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
-                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureId);
+                                mostAbuPeak.Mz, fitScore, envelope.MonoMass, featureId);
                         }
                     }
                 }
@@ -332,9 +332,9 @@ namespace InformedProteomics.FeatureFinding
                             var mostAbuPeak = envelope.Peaks[mostAbuIdx];
                             if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
 
-                            var fitscore = 1.0 - feature.BestCorrelationScore;
+                            var fitScore = 1.0 - feature.BestCorrelationScore;
                             csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
-                                mostAbuPeak.Mz, fitscore, envelope.MonoMass, featureCounter);
+                                mostAbuPeak.Mz, fitScore, envelope.MonoMass, featureCounter);
                         }
                     }
 

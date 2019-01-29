@@ -6,8 +6,9 @@
     public enum MassSpecDataType
     {
         /// <summary>
-        /// Thermo Finnigan .RAW data, read with XCaliburReader if DLLs are available
+        /// Thermo .raw data, read with XcaliburReader if DLLs are available
         /// </summary>
+        // ReSharper disable once IdentifierTypo
         XCaliburRun,
 
         /// <summary>

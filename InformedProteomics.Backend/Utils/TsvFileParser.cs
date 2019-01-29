@@ -19,11 +19,11 @@ namespace InformedProteomics.Backend.Utils
         /// Constructor
         /// </summary>
         /// <param name="filePath">File to read</param>
-        /// <param name="delimeter">Delimeter, tab by default</param>
-        public TsvFileParser(string filePath, char delimeter = '\t')
+        /// <param name="delimiter">Delimiter, tab by default</param>
+        public TsvFileParser(string filePath, char delimiter = '\t')
         {
             FileName = filePath;
-            _delimeter = delimeter;
+            _delimiter = delimiter;
 
             _header = new Dictionary<int, string>();
             _rows = new List<string>();
@@ -118,7 +118,7 @@ namespace InformedProteomics.Backend.Utils
 
         private readonly Dictionary<string, List<string>> _data;
 
-        private readonly char _delimeter;
+        private readonly char _delimiter;
 
         private int FindColumnIgnoreCase(Dictionary<int, string> headers, string headerName)
         {
@@ -206,7 +206,7 @@ namespace InformedProteomics.Backend.Utils
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
-                    var token = line.Split(_delimeter);
+                    var token = line.Split(_delimiter);
                     if (!headerParsed)
                     {
                         for (var i = 0; i < token.Length; i++)

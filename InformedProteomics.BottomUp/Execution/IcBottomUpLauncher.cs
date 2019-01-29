@@ -404,11 +404,14 @@ namespace InformedProteomics.BottomUp.Execution
 
                         var scores = _bottomUpScorer.GetScores(match, ion.Composition, ion.Charge, scanNum);
 
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        // ReSharper disable HeuristicUnreachableCode
                         if (ion == null)
                         {
                             ConsoleMsgUtils.ShowWarning("Null ion in WriteResultsToFile");
                             continue;
                         }
+                        // ReSharper restore HeuristicUnreachableCode
 
                         if (scores == null)
                         {

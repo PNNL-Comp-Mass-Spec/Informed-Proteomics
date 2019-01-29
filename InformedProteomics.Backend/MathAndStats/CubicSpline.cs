@@ -361,8 +361,8 @@ namespace InformedProteomics.Backend.MathAndStats
         {
             // Compute distances
             var n = x.Length;
-            var dists = new float[n]; // cumulative distance
-            dists[0] = 0;
+            var cumulativeDistances = new float[n];
+            cumulativeDistances[0] = 0;
             float totalDist = 0;
 
             for (var i = 1; i < n; i++)
@@ -371,7 +371,7 @@ namespace InformedProteomics.Backend.MathAndStats
                 var dy = y[i] - y[i - 1];
                 var dist = (float)Math.Sqrt(dx * dx + dy * dy);
                 totalDist += dist;
-                dists[i] = totalDist;
+                cumulativeDistances[i] = totalDist;
             }
 
             // Create 'times' to interpolate to
@@ -386,10 +386,10 @@ namespace InformedProteomics.Backend.MathAndStats
 
             // Spline fit both x and y to times
             var xSpline = new CubicSpline();
-            xs = xSpline.FitAndEval(dists, x, times);
+            xs = xSpline.FitAndEval(cumulativeDistances, x, times);
 
             var ySpline = new CubicSpline();
-            ys = ySpline.FitAndEval(dists, y, times);
+            ys = ySpline.FitAndEval(cumulativeDistances, y, times);
         }
 
         #endregion

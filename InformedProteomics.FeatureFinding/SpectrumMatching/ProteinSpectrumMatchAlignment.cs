@@ -6,12 +6,11 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchAlignment
     {
-        public List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataid, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
+        public List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataId, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
         {
-            var prsmSet = new NodeSet<ProteinSpectrumMatch>(){};
             prsmSet.AddRange(matches);
-            var groupList = prsmSet.ConnnectedComponents(prsmComparer);
             return groupList.Select(@group => new ProteinSpectrumMatchSet(dataid, @group)).ToList();
+            var groupList = prsmSet.ConnectedComponents(prsmComparer);
         }
 
         public ProteinSpectrumMatchSet[][] GroupAcrossRuns(List<ProteinSpectrumMatchSet>[] prsmGroup, INodeComparer<ProteinSpectrumMatchSet> prsmGroupComparer)
@@ -26,7 +25,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 prsmSet.AddRange(groupedPrsms);
             }
 
-            var alignedPrsms = prsmSet.ConnnectedComponents(prsmGroupComparer);
+            var alignedPrsms = prsmSet.ConnectedComponents(prsmGroupComparer);
             var alignedResult = new ProteinSpectrumMatchSet[alignedPrsms.Count][];
             for (var i = 0; i < alignedResult.Length; i++) alignedResult[i] = new ProteinSpectrumMatchSet[nDataset];
 
@@ -49,7 +48,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
         }
 
         /*
-        public LcMsFeature[][] GetLcMsFeatures(ProteinSpectrumMatcheSet[][] alignedPrsmSet, LcMsRun[] runs)
+        public LcMsFeature[][] GetLcMsFeatures(ProteinSpectrumMatchedSet[][] alignedPrsmSet, LcMsRun[] runs)
         {
             var nDataset = runs.Length;
 
@@ -65,14 +64,14 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 {
                     var region = minMaxRegions[j];
 
-                    //scanregions
+                    //scan regions
                 }
             }
 
             Console.WriteLine(alignedPrsmSet.Length);
         }
 
-        private Tuple<double, int, double, double> GetMinMaxScanRegion(LcMsRun[] runs, ProteinSpectrumMatcheSet[] matches)
+        private Tuple<double, int, double, double> GetMinMaxScanRegion(LcMsRun[] runs, ProteinSpectrumMatchedSet[] matches)
         {
             var minElutionTime = double.MaxValue;
             var maxElutionTime = 0d;

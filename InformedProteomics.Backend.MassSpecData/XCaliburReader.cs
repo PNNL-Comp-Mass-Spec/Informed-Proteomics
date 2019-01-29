@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// Class for reading spectra from Thermo .RAW files, using an installed MSFileReader DLL
     /// </summary>
-    public class XCaliburReader : IMassSpecDataReader
+    public class XcaliburReader : IMassSpecDataReader
     {
         /// <summary>
         /// Parameters for centroiding spectra
@@ -24,12 +24,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Constructor - open the file, and prepare to read
         /// </summary>
         /// <param name="filePath"></param>
-        public XCaliburReader(string filePath)
+        public XcaliburReader(string filePath)
         {
             _cachedScanInfo = new clsScanInfo(-1);
 
-            _msfileReader = new XRawFileIO();
-            _msfileReader.ErrorEvent += _msfileReader_ErrorEvent;
+            _msFileReader = new XRawFileIO();
+            _msFileReader.ErrorEvent += _msFileReader_ErrorEvent;
 
             var dataFile = new FileInfo(filePath);
             if (!dataFile.Exists)
@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _checkSum = string.Empty;
 
-            _msfileReader.OpenRawFile(filePath);
+            _msFileReader.OpenRawFile(filePath);
 
             _minLcScan = 1;
             NumSpectra = ReadNumSpectra();
@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _msLevel = new Dictionary<int, int>();
 
-            FileFormatVersion = _msfileReader.FileInfo.VersionNumber.ToString();
+            FileFormatVersion = _msFileReader.FileInfo.VersionNumber.ToString();
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (includePeaks)
             {
-                _msfileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
+                _msFileReader.GetScanData(scanNum, out mzArr, out intensityArr, 0, true);
             }
 
             var elutionTime = RtFromScanNum(scanNum);
@@ -246,7 +246,7 @@ namespace InformedProteomics.Backend.MassSpecData
             return scanInfo.RetentionTime;
         }
 
-        private readonly XRawFileIO _msfileReader;
+        private readonly XRawFileIO _msFileReader;
 
         private clsScanInfo _cachedScanInfo;
 
@@ -277,7 +277,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private double ReadIsolationWindowTargetMz(int scanNum)
         {
             // string scanFilterString = null;
-            // _msfileReader.GetFilterForScanNum(scanNum, ref scanFilterString);
+            // _msFileReader.GetFilterForScanNum(scanNum, ref scanFilterString);
 
             var scanInfo = GetScanInfo(scanNum);
 
@@ -348,7 +348,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private int ReadNumSpectra()
         {
-            var numSpectra = _msfileReader.GetNumScans();
+            var numSpectra = _msFileReader.GetNumScans();
 
             return numSpectra;
         }
@@ -387,7 +387,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private clsScanInfo GetScanInfo(int scanNum)
         {
             if (_cachedScanInfo == null || _cachedScanInfo.ScanNumber != scanNum)
-                _msfileReader.GetScanInfo(scanNum, out _cachedScanInfo);
+                _msFileReader.GetScanInfo(scanNum, out _cachedScanInfo);
 
             return _cachedScanInfo;
         }
@@ -397,7 +397,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Close()
         {
-            _msfileReader?.CloseRawFile();
+            _msFileReader?.CloseRawFile();
         }
 
         /// <summary>
@@ -405,10 +405,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Dispose()
         {
-            _msfileReader?.CloseRawFile();
+            _msFileReader?.CloseRawFile();
         }
 
-        private void _msfileReader_ErrorEvent(string message, Exception ex)
+        private void _msFileReader_ErrorEvent(string message, Exception ex)
         {
             ConsoleMsgUtils.ShowError(message, ex);
         }

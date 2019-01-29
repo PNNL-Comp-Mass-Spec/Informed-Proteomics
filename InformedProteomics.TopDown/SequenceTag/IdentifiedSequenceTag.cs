@@ -14,12 +14,12 @@ namespace InformedProteomics.TopDown.SequenceTag
         public IonType[] IonTypeArray;
         public bool DerivedFromPrefix { get; private set; }
 
-        public IdentifiedSequenceTag(Sequence seq, int c1, int c2, IonType[] iontypes)
+        public IdentifiedSequenceTag(Sequence seq, int c1, int c2, IonType[] ionTypes)
         {
             CleavageIndex1 = c1;
             CleavageIndex2 = c2;
-            DerivedFromPrefix = iontypes[0].IsPrefixIon;
-            IonTypeArray = iontypes;
+            DerivedFromPrefix = ionTypes[0].IsPrefixIon;
+            IonTypeArray = ionTypes;
             _sequence = seq;
         }
 
@@ -65,16 +65,16 @@ namespace InformedProteomics.TopDown.SequenceTag
                 return new Sequence(seqStr, aaSet);
 
             int residueIndex = 0;
-            string[] ptms = modStr.Split(',');
-            var modificaitonInfo = new Dictionary<int, Modification>();
+            var modList = modStr.Split(',');
+            var modificationInfo = new Dictionary<int, Modification>();
 
-            foreach (var ptm in ptms)
+            foreach (var ptm in modList)
             {
                 string[] ptmPair = ptm.Split(' ');
                 residueIndex = Int32.Parse(ptmPair[1]);
                 if (residueIndex == 0) residueIndex++;
 
-                modificaitonInfo.Add(residueIndex, Modification.Get(ptmPair[0]));
+                modificationInfo.Add(residueIndex, Modification.Get(ptmPair[0]));
             }
 
             var aaList = new List<AminoAcid>();
@@ -83,8 +83,8 @@ namespace InformedProteomics.TopDown.SequenceTag
             foreach (var residue in seqStr)
             {
                 var aa = aaSet.GetAminoAcid(residue);
-                if (modificaitonInfo.ContainsKey(residueIndex))
-                    aaList.Add(new ModifiedAminoAcid(aa, modificaitonInfo[residueIndex]));
+                if (modificationInfo.ContainsKey(residueIndex))
+                    aaList.Add(new ModifiedAminoAcid(aa, modificationInfo[residueIndex]));
                 else
                     aaList.Add(aa);
 

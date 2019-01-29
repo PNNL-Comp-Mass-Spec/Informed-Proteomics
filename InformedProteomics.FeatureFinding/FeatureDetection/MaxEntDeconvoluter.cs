@@ -12,7 +12,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <summary>
         /// MaxEnt deconvolution algorithm constructor
         /// </summary>
-        /// <param name="spec">Specrum</param>
+        /// <param name="spec">Spectrum</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="massBinning">mass binning interface</param>
         /// <param name="minCharge">maximum charge to be considered</param>
@@ -68,9 +68,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         }
 
         /// <summary>
-        /// Finds mass features from deconvoluted spectrum. Monoiosotopic mass is estimated using averaging algorithm described in Mann et al., Anal. Chem. 1989
+        /// Finds mass features from deconvoluted spectrum. Monoisotopic mass is estimated using averaging algorithm described in Mann et al., Anal. Chem. 1989
         /// </summary>
-        /// <returns>mass features sorted by their abundancy</returns>
+        /// <returns>mass features sorted by their abundance</returns>
         public IEnumerable<Ms1Feature> GetMassFeatures()
         {
             var deconvSpectrum = GetDeconvolutedSpectrum();

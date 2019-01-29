@@ -54,7 +54,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         }
 
         /// <summary>
-        /// Constructor for creating TrainingParamters from resource file stream parameter file.
+        /// Constructor for creating TrainingParameters from resource file stream parameter file.
         /// </summary>
         /// <param name="resourceStream"></param>
         /// <param name="config"></param>

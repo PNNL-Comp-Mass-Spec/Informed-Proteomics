@@ -110,7 +110,7 @@ namespace InformedProteomics.Test
                 throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
             }
 
-            Console.WriteLine("NumPSMs: {0}", fdrCalculator.NumPsms);
+            Console.WriteLine("NumPSMs: {0}", fdrCalculator.NumPSMs);
             Console.WriteLine("NumPeptides: {0}", fdrCalculator.NumPeptides);
             Console.WriteLine("Done");
         }

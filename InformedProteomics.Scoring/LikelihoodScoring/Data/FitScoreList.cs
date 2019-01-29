@@ -27,11 +27,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             }
         }
 
-        public FitScoreList(IEnumerable<FitScore> fitscores)
+        public FitScoreList(IEnumerable<FitScore> fitScores)
         {
-            foreach (var fitscore in fitscores)
+            foreach (var fitScore in fitScores)
             {
-                Add(fitscore);
+                Add(fitScore);
             }
         }
 

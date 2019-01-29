@@ -34,15 +34,15 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             const string qeDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
 
             const string specFileDda = @"D:\Research\Data\UW\QExactive\82593_lv_mcx_DDA.raw";
-            var ddaReader = new XCaliburReader(specFileDda);
+            var ddaReader = new XcaliburReader(specFileDda);
 
-            var specFileToReader = new Dictionary<string, XCaliburReader>();
+            var specFileToReader = new Dictionary<string, XcaliburReader>();
             var specFilesDia = Directory.GetFiles(@"D:\Research\Data\UW\QExactive\", "*_DIA_*.raw");
             foreach (var specFile in specFilesDia)
             {
                 var specFileNoExt = Path.GetFileNameWithoutExtension(specFile);
                 if (specFileNoExt == null) continue;
-                var reader = new XCaliburReader(specFile);
+                var reader = new XcaliburReader(specFile);
                 specFileToReader.Add(specFileNoExt, reader);
             }
 
@@ -96,10 +96,10 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             const string qeDiaResult = @"D:\Research\Data\UW\Fusion\DIA_Summary.tsv";
 
             const string specFileDda = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
-            var ddaReader = new XCaliburReader(specFileDda);
+            var ddaReader = new XcaliburReader(specFileDda);
 
             const string specFileDia = @"D:\Research\Data\UW\Fusion\WT_D_DIA_130412091220.raw";
-            var diaReader = new XCaliburReader(specFileDia);
+            var diaReader = new XcaliburReader(specFileDia);
 
             const string resultPath1 = qeDdaResult;
             const string resultPath2 = qeDiaResult;

@@ -26,7 +26,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
-        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available.
         /// </summary>
         public static string PwizPath => ProteoWizardReaderImplementation.PwizPath;
 
@@ -147,6 +147,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Filter string designed to be used in a file browser
         /// </summary>
+        // ReSharper disable StringLiteralTypo
         public static string ProteoWizardFilterString => "All Supported|*.raw;*.mzML;*.mzML.gz;*.mzXML;*.mzXML.gz;*.mgf;*.mgf.gz;*.d;mspeak.bin;msprofile.bin;*.wiff;*.d;*.u2;FID;analysis.yep;analysis.baf;*.raw;_extern.inf;_inlet.inf;_FUNC*.DAT;*.lcd;*.uimf"
                                                          + "|Thermo .RAW|*.raw"
                                                          + "|mzML[.gz]|*.mzML;*.mzML.gz"
@@ -159,11 +160,14 @@ namespace InformedProteomics.Backend.MassSpecData
                                                          + "|Shimadzu lcd|*.lcd"
                                                          + "|UIMF|*.uimf";
 
+        // ReSharper restore StringLiteralTypo
+
         /// <summary>
         /// All files that ProteoWizard supports, either directly, or as part of a folder dataset
         /// </summary>
         public static List<string> SupportedFilesFilterList => new List<string>()
         {
+            // ReSharper disable StringLiteralTypo
             ".raw", // Thermo (file) or Waters (folder)
             "_extern.inf", // Waters .raw folder content
             "_inlet.inf", // Waters .raw folder content
@@ -183,7 +187,9 @@ namespace InformedProteomics.Backend.MassSpecData
             ".mgf",
             ".mgf.gz",
             ".uimf",
+            // ReSharper restore StringLiteralTypo
         };
+
 
         /// <summary>
         /// List of "folder extensions" that ProteoWizard can read. This does not include all folder type datasets - some require directory listings.
@@ -206,6 +212,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         private static List<string> DirectlySupportedFilesFilterList => new List<string>()
         {
+            // ReSharper disable StringLiteralTypo
             ".raw", // Thermo (file) or Waters (folder)
             ".d", // Agilent (folder) or Bruker (folder)
             ".yep", // Bruker
@@ -220,6 +227,7 @@ namespace InformedProteomics.Backend.MassSpecData
             ".mgf",
             ".mgf.gz",
             ".uimf",
+            // ReSharper restore StringLiteralTypo
         };
 
         /// <summary>
@@ -302,7 +310,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private static bool _resolverAdded;
 
         /// <summary>
-        /// On a missing DLL event, searches a path specified by FindPwizPath for the ProteoWizard dlls, and loads them
+        /// On a missing DLL event, searches a path specified by FindPwizPath for the ProteoWizard DLLs, and loads them
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -330,26 +338,26 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Retrieve the list of referenced assemblies in an array of AssemblyName.
-            var strTempAssmbPath = "";
+            var tempAssemblyPath = "";
 
-            var arrReferencedAssmbNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
+            var referencedAssemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
 
             // Loop through the array of referenced assembly names.
-            foreach (var strAssmbName in arrReferencedAssmbNames)
+            foreach (var assemblyName in referencedAssemblyNames)
             {
                 //Check for the assembly names that have raised the "AssemblyResolve" event.
-                if (strAssmbName.FullName.Substring(0, strAssmbName.FullName.IndexOf(',')) == args.Name.Substring(0, args.Name.IndexOf(',')))
+                if (assemblyName.FullName.Substring(0, assemblyName.FullName.IndexOf(',')) == args.Name.Substring(0, args.Name.IndexOf(',')))
                 {
                     //Console.WriteLine("Attempting to load DLL \"" + Path.Combine(pwizPath, args.Name.Substring(0, args.Name.IndexOf(",")) + ".dll") + "\"");
                     //Build the path of the assembly from where it has to be loaded.
-                    strTempAssmbPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(',')) + ".dll");
+                    tempAssemblyPath = Path.Combine(PwizPath, args.Name.Substring(0, args.Name.IndexOf(',')) + ".dll");
                     break;
                 }
             }
 #if DEBUG
-            Console.WriteLine("Loading file \"" + strTempAssmbPath + "\"");
+            Console.WriteLine("Loading file \"" + tempAssemblyPath + "\"");
 #endif
-            var assemblyFile = new FileInfo(strTempAssmbPath);
+            var assemblyFile = new FileInfo(tempAssemblyPath);
 
             // Load the assembly from the specified path.
             Assembly myAssembly;
@@ -405,7 +413,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
-        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard dlls are available.
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available.
         /// </summary>
         public static readonly string PwizPath;
 
@@ -548,7 +556,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Checks to make sure the path to ProteoWizard files is set. If not, throws an exception.
         /// </summary>
         /// <remarks>This function should generally only be called inside of a conditional statement to prevent the
-        /// exception from being thrown when the ProteoWizard dlls will not be needed.</remarks>
+        /// exception from being thrown when the ProteoWizard DLLs will not be needed.</remarks>
         public static void ValidateLoader()
         {
             try
@@ -579,10 +587,10 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var bits = Environment.Is64BitProcess ? "64" : "32";
             var message =
-                "Cannot load ProteoWizard dlls. Please ensure that " + bits +
+                "Cannot load ProteoWizard DLLs. Please ensure that " + bits +
                 "-bit ProteoWizard is installed to its default install directory (\"" +
                 Environment.GetEnvironmentVariable("ProgramFiles") + "\\ProteoWizard\\ProteoWizard 3.0.[x]\").\n" +
-                "Currently trying to load ProteoWizard dlls from path \"" + PwizPath + "\".";
+                "Currently trying to load ProteoWizard DLLs from path \"" + PwizPath + "\".";
 
             return message;
         }
@@ -629,6 +637,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var readers = ReaderList.FullReaderList;
             readers.read(FilePath, _dataFile);
+            // ReSharper disable StringLiteralTypo
             if (new[] { ".mzml", ".mzml.gz", ".mzxml", ".mzxml.gz", ".mgf", ".mgf.gz", ".txt", "uimf", "uimf.gz" }
                 .Any(ext => FilePath.ToLower().EndsWith(ext)))
             {
@@ -636,6 +645,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 Console.WriteLine("Using cwt Centroiding");
                 _filters.Add(_cwtCentroiding);
             }
+            // ReSharper restore StringLiteralTypo
             else
             {
                 Console.WriteLine("Using vendor Centroiding");

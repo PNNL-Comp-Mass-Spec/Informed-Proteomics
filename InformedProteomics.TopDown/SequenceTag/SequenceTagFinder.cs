@@ -257,7 +257,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         }
 
         /*
-        public List<IdentifiedSequenceTag> ExtractExistingSequneceTags(Sequence sequence, int minTagLength = 5)
+        public List<IdentifiedSequenceTag> ExtractExistingSequenceTags(Sequence sequence, int minTagLength = 5)
         {
             var cleavages = sequence.GetInternalCleavages();
 

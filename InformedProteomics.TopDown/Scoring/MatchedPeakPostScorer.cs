@@ -64,8 +64,8 @@ namespace InformedProteomics.TopDown.Scoring
             foreach (var peakIndex in _prefixIonPeakIndex) rankSum += _peakRanking[peakIndex];
             foreach (var peakIndex in _suffixIonPeakIndex) rankSum += _peakRanking[peakIndex];
 
-            var pvalue = FitScoreCalculator.GetRankSumPvalue(nObservedPeaks, nMatchedIons, rankSum);
-            if (pvalue > 0) return -Math.Log(pvalue, 2);
+            var pValue = FitScoreCalculator.GetRankSumPValue(nObservedPeaks, nMatchedIons, rankSum);
+            if (pValue > 0) return -Math.Log(pValue, 2);
             return 50;
         }
 
@@ -73,8 +73,8 @@ namespace InformedProteomics.TopDown.Scoring
         {
             var nPossiblePeaks = Comparer.GetBinNumber(_ms2Spec.Peaks.Last().Mz) - Comparer.GetBinNumber(_ms2Spec.Peaks.First().Mz) + 1;
             var nObservedPeaks = _ms2Spec.Peaks.Length;
-            var pvalue = FitScoreCalculator.GetHyperGeometricPvalue(nPossiblePeaks, nObservedPeaks, _nTheoreticalIonPeaks, _nObservedIonPeaks);
-            if (pvalue > 0) return -Math.Log(pvalue, 2);
+            var pValue = FitScoreCalculator.GetHyperGeometricPValue(nPossiblePeaks, nObservedPeaks, _nTheoreticalIonPeaks, _nObservedIonPeaks);
+            if (pValue > 0) return -Math.Log(pValue, 2);
             return 50;
         }
 
@@ -123,8 +123,8 @@ namespace InformedProteomics.TopDown.Scoring
             //matchedPeakIndex = new List<int>();
             var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
-            var baseIsotopMz = ion.GetIsotopeMz(baseIsotopeIndex);
-            baseIsotopePeakIndex = _ms2Spec.FindPeakIndex(baseIsotopMz, tolerance);
+            var baseIsotopeMz = ion.GetIsotopeMz(baseIsotopeIndex);
+            baseIsotopePeakIndex = _ms2Spec.FindPeakIndex(baseIsotopeMz, tolerance);
 
             nIsotopes = isotopomerEnvelope.Select(x => x >= relativeIntensityThreshold).Count();
             nMatchedIsotopes = 0;

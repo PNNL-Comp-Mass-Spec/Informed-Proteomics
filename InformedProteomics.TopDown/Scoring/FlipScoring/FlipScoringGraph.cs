@@ -52,7 +52,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
 
         /// <summary>
         /// Gets the node score for a particular sink node index.
-        /// Node score is the ion score WITHOUT the mass error score or amino acid probablity score.
+        /// Node score is the ion score WITHOUT the mass error score or amino acid probability score.
         /// </summary>
         /// <param name="nodeIndex">The index (nominal mass) of the sink node.</param>
         /// <returns>The node score of the sink node.</returns>

@@ -142,7 +142,7 @@ namespace InformedProteomics.Tests.UnitTests
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            var xcaliburReader = new XCaliburReader(FilePaths.TestTopDownRawFilePathCid);
+            var xcaliburReader = new XcaliburReader(FilePaths.TestTopDownRawFilePathCid);
             var scans = new[] {423, 425};
             foreach (var scan in scans)
             {
@@ -320,7 +320,7 @@ namespace InformedProteomics.Tests.UnitTests
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
-            var reader = new XCaliburReader(rawFilePath);
+            var reader = new XcaliburReader(rawFilePath);
             reader.ReadMassSpectrum(17957);
             try
             {

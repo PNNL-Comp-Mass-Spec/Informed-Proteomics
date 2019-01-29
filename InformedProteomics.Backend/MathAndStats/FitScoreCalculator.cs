@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="k1"></param>
         /// <param name="upperTailProb"></param>
         /// <returns></returns>
-        public static double GetHyperGeometricPvalue(int n, int k, int n1, int k1, bool upperTailProb = true)
+        public static double GetHyperGeometricPValue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
             if (k >= n) return 1.0d;
 
@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="r1"></param>
         /// <param name="upperTailProb"></param>
         /// <returns></returns>
-        public static double GetRankSumPvalue(double n, double n1, double r1, bool upperTailProb = true)
+        public static double GetRankSumPValue(double n, double n1, double r1, bool upperTailProb = true)
         {
             var n2 = n - n1;
             var u1 = n1 * n2 + n1 * (n1 + 1) * 0.5 - r1;
@@ -243,19 +243,19 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <summary>
         /// Calculate the cosine score for the provided data. Larger scores are better.
         /// </summary>
-        /// <param name="theorPeakList"></param>
+        /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
         /// <returns></returns>
-        public static double GetCosine(double[] theorPeakList, double[] observedPeakList)
+        public static double GetCosine(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 0;
 
             var innerProduct = 0.0;
             var magnitudeTheo = 0.0;
             var magnitudeObs = 0.0;
-            for (var i = 0; i < theorPeakList.Length; i++)
+            for (var i = 0; i < theoreticalPeakList.Length; i++)
             {
-                var theo = theorPeakList[i];
+                var theo = theoreticalPeakList[i];
                 var obs = observedPeakList[i];
                 innerProduct += theo * obs;
                 magnitudeTheo += theo * theo;
@@ -268,17 +268,17 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <summary>
         /// Calculate the dot product of the provided data
         /// </summary>
-        /// <param name="theorPeakList"></param>
+        /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
         /// <returns></returns>
-        public static double GetDotProduct(double[] theorPeakList, double[] observedPeakList)
+        public static double GetDotProduct(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 0;
 
             var innerProduct = 0.0;
-            for (var i = 0; i < theorPeakList.Length; i++)
+            for (var i = 0; i < theoreticalPeakList.Length; i++)
             {
-                var theo = theorPeakList[i];
+                var theo = theoreticalPeakList[i];
                 var obs = observedPeakList[i];
                 innerProduct += theo * obs;
             }
@@ -289,28 +289,28 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <summary>
         /// Calculate the Decon Tools fit score for the provided data. Smaller scores are better.
         /// </summary>
-        /// <param name="theorPeakList"></param>
+        /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
         /// <returns></returns>
-        public static double GetDeconToolsFit(double[] theorPeakList, double[] observedPeakList)
+        public static double GetDeconToolsFit(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theorPeakList.Length != observedPeakList.Length || theorPeakList.Length == 0) return 1.0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 1.0;
 
             var maxObs = observedPeakList.Max();
             if (Math.Abs(maxObs - 0) < float.Epsilon) maxObs = double.PositiveInfinity;
             var normalizedObs = observedPeakList.Select(p => p / maxObs).ToList();
 
             double sumSquareOfDiffs = 0;
-            double sumSquareOfTheor = 0;
-            for (var i = 0; i < theorPeakList.Length; i++)
+            double sumSquareOfTheoretical = 0;
+            for (var i = 0; i < theoreticalPeakList.Length; i++)
             {
-                var diff = normalizedObs[i] - theorPeakList[i];
+                var diff = normalizedObs[i] - theoreticalPeakList[i];
 
                 sumSquareOfDiffs += (diff * diff);
-                sumSquareOfTheor += (theorPeakList[i] * theorPeakList[i]);
+                sumSquareOfTheoretical += (theoreticalPeakList[i] * theoreticalPeakList[i]);
             }
 
-            var fitScore = sumSquareOfDiffs / sumSquareOfTheor;
+            var fitScore = sumSquareOfDiffs / sumSquareOfTheoretical;
             if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
 
             return fitScore;
@@ -319,23 +319,23 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <summary>
         /// Calculate the fit of Normalized vectors using the provided data.
         /// </summary>
-        /// <param name="normTheorPeakList"></param>
+        /// <param name="normTheoreticalPeakList"></param>
         /// <param name="normObservedPeakList"></param>
         /// <returns></returns>
-        public static double GetFitOfNormalizedVectors(double[] normTheorPeakList, double[] normObservedPeakList)
+        public static double GetFitOfNormalizedVectors(double[] normTheoreticalPeakList, double[] normObservedPeakList)
         {
-            if (normTheorPeakList.Length != normObservedPeakList.Length || normTheorPeakList.Length == 0) return 1.0;
+            if (normTheoreticalPeakList.Length != normObservedPeakList.Length || normTheoreticalPeakList.Length == 0) return 1.0;
             double sumSquareOfDiffs = 0;
-            double sumSquareOfTheor = 0;
-            for (var i = 0; i < normTheorPeakList.Length; i++)
+            double sumSquareOfTheoretical = 0;
+            for (var i = 0; i < normTheoreticalPeakList.Length; i++)
             {
-                var diff = normTheorPeakList[i] - normObservedPeakList[i];
+                var diff = normTheoreticalPeakList[i] - normObservedPeakList[i];
 
                 sumSquareOfDiffs += (diff * diff);
-                sumSquareOfTheor += (normTheorPeakList[i] * normTheorPeakList[i]);
+                sumSquareOfTheoretical += (normTheoreticalPeakList[i] * normTheoreticalPeakList[i]);
             }
 
-            var fitScore = sumSquareOfDiffs / sumSquareOfTheor;
+            var fitScore = sumSquareOfDiffs / sumSquareOfTheoretical;
             if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
 
             return fitScore;

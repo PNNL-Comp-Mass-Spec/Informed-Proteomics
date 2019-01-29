@@ -109,11 +109,11 @@ namespace InformedProteomics.FeatureFinding.Scoring
             return table;
         }
 
-        private double[][] LoadTable(string fname)
+        private double[][] LoadTable(string fileName)
         {
-            if (!File.Exists(fname)) throw new FileNotFoundException("Missing score datafile: " + fname);
+            if (!File.Exists(fileName)) throw new FileNotFoundException("Missing score datafile: " + fileName);
 
-            var parser = new TsvFileParser(fname);
+            var parser = new TsvFileParser(fileName);
             var table = new double[_massBins.Length][];
 
             for (var i = 0; i < _massBins.Length; i++)

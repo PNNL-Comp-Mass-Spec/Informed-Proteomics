@@ -140,7 +140,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var totalCombinations = listOfAminoAcids.Aggregate(1, (current, x) => current * x.Count);
             TagStrings = new HashSet<string>();
             //var result = new string[totalCombinations];
-            //var rmse = new double[totalCombinations];
+            //var rootMeanSquareError = new double[totalCombinations];
             var massTh = _tolerance.GetToleranceAsTh(_peaks[this[0].Node1].Mass);
 
             for (var e = 0; e < totalCombinations; e++)
@@ -172,7 +172,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                     }
                 }
                 //result[e] = sb.ToString();
-                //rmse[e] = Math.Sqrt(rmse[e] / Count);
+                //rootMeanSquareError[e] = Math.Sqrt(rootMeanSquareError[e] / Count);
             }
             return TagStrings;
         }

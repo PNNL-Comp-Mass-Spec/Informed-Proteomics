@@ -23,7 +23,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         public bool Add(LcMsPeakCluster newFeature)
         {
             if (newFeature.Score < _scorer.ScoreThreshold) return false;
-            if (!newFeature.GoodEnougth) return false;
+            if (!newFeature.GoodEnough) return false;
 
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
@@ -123,7 +123,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var featureSet = new NodeSet<LcMsPeakCluster>();
             featureSet.AddRange(features);
 
-            var connectedFeatureSet = featureSet.ConnnectedComponents(_mergeComparer);
+            var connectedFeatureSet = featureSet.ConnectedComponents(_mergeComparer);
             var mergedFeatures = new List<LcMsPeakCluster>();
 
             foreach (var fSet in connectedFeatureSet)
@@ -180,8 +180,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var minScore = Math.Min(f1.Score, f2.Score);
             if (minScore > 0 && maxScore > minScore*5) return false;*/
 
-            if (f1.Score >= _scorer.ScoreThreshold && f1.GoodEnougth
-             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnougth) return true;
+            if (f1.Score >= _scorer.ScoreThreshold && f1.GoodEnough
+             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnough) return true;
 
             return false;
         }
@@ -220,7 +220,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 {
                     f.UpdateScore(_spectra);
                     f.Score = _scorer.GetScore(f);
-                    if (f.Score > _scorer.ScoreThreshold && f.GoodEnougth)
+                    if (f.Score > _scorer.ScoreThreshold && f.GoodEnough)
                     {
                         featureSet.Add(f);
                     }

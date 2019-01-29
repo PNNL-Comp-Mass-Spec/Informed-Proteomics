@@ -29,7 +29,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                 const double filterThreshold = QValueThreshold;
                 var filterValues = tsvFile.GetData(QValueHeader);
 
-                var aset = new AminoAcidSet();
+                var aminoAcidSet = new AminoAcidSet();
 
                 for (int i = 0; i < peptides.Count; i++)
                 {
@@ -37,7 +37,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                     peptideSet.Add(peptides[i]);
                     var scanNum = Convert.ToInt32(scans[i]);
                     int precursorCharge = Convert.ToInt32(precursorCharges[i]);
-                    specMatches.Add(new SpectrumMatch(new Sequence(peptides[i], aset), _lcms, scanNum, precursorCharge, _decoy));
+                    specMatches.Add(new SpectrumMatch(new Sequence(peptides[i], aminoAcidSet), _lcms, scanNum, precursorCharge, _decoy));
                 }
             }
             return specMatches;

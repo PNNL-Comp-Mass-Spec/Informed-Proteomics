@@ -36,10 +36,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         private void Read(string fileName)
         {
             Node currentNode = null;
-            var keyvalue = new Dictionary<String, String>();
-            string[] lines = System.IO.File.ReadAllLines(fileName);
-            char[] headerbrackets = { '[', ']' };
-            string header = "";
+            var keyValue = new Dictionary<string, string>();
+            var lines = System.IO.File.ReadAllLines(fileName);
+            char[] headerBrackets = { '[', ']' };
+            var header = "";
             foreach (var line in lines)
             {
                 string commentsStripped = line.Split('#')[0];      // remove comments
@@ -55,15 +55,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     {
                         // first node in the file
                         currentNode = new Node(null, null);
-                        header = parts[0].Trim(headerbrackets);
+                        header = parts[0].Trim(headerBrackets);
                     }
                     else
                     {
                         // this isn't the first node in the file
-                        currentNode = new Node(header, keyvalue);
-                        keyvalue = new Dictionary<String, String>();
+                        currentNode = new Node(header, keyValue);
+                        keyValue = new Dictionary<string, string>();
                         Nodes.Add(currentNode);
-                        header = parts[0].Trim(headerbrackets);
+                        header = parts[0].Trim(headerBrackets);
                     }
 
                     if (!ValidHeader(parts[0]))
@@ -75,10 +75,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     // key value pair
                     string key = parts[0].Trim().ToLower();
                     string value = parts[1].Trim();
-                    keyvalue.Add(key, value);
+                    keyValue.Add(key, value);
                 }
             }
-            currentNode = new Node(header, keyvalue);
+            currentNode = new Node(header, keyValue);
             Nodes.Add(currentNode);
         }
 

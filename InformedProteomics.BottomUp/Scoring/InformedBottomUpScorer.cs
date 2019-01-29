@@ -50,9 +50,8 @@ namespace InformedProteomics.BottomUp.Scoring
 
         public IcBottomUpScores GetScores(char pre, string sequence, char post, AminoAcid nTerm, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
-            ScoredSpectrum scoredSpectrum;
-            var index = GetChargetScanNumPairIndex(charge, ms2ScanNum);
-            if (!_scoredSpectra.TryGetValue(index, out scoredSpectrum))
+            var index = GetChargeScanNumPairIndex(charge, ms2ScanNum);
+            if (!_scoredSpectra.TryGetValue(index, out var scoredSpectrum))
             {
                 var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
                 if (spec == null) return null;
@@ -109,7 +108,7 @@ namespace InformedProteomics.BottomUp.Scoring
             return new IcBottomUpScores(ms2Score, modifications);
         }
 
-        private int GetChargetScanNumPairIndex(int charge, int scanNum)
+        private int GetChargeScanNumPairIndex(int charge, int scanNum)
         {
             return charge * (Run.MaxLcScan + 1) + scanNum;
         }

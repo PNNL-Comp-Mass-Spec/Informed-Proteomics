@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Find a neutral monoisotopic peak corrsponding to a single compound/
+        /// Find a neutral monoisotopic peak corresponding to a single compound
         /// </summary>
         /// <param name="composition">The compound to look for.</param>
         /// <param name="tolerance">The peak tolerance to use.</param>

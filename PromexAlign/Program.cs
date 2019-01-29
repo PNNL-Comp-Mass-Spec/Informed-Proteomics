@@ -43,11 +43,11 @@ namespace PromexAlign
 
             var crosstabFilename = string.Format("{0}_crosstab.tsv", fileName);
 
-            string outputfilePath;
+            string outputFilePath;
             if (string.IsNullOrWhiteSpace(directory))
-                outputfilePath = crosstabFilename;
+                outputFilePath = crosstabFilename;
             else
-                outputfilePath= Path.Combine(directory, crosstabFilename);
+                outputFilePath = Path.Combine(directory, crosstabFilename);
 
             var nDataset = datasets.Count;
             var prsmReader = new ProteinSpectrumMatchReader();
@@ -123,7 +123,7 @@ namespace PromexAlign
 
             if (validResults > 0)
             {
-                OutputCrossTabWithId(outputfilePath, alignment, datasets.Select(ds => ds.Label).ToArray());
+                OutputCrossTabWithId(outputFilePath, alignment, datasets.Select(ds => ds.Label).ToArray());
             }
         }
 

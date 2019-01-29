@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get the string between 2 periods, so A.BCDEFGHI.J returns BCDEFGHI
+        /// Get the string between 2 periods, so A.PEPTIDE.J returns PEPTIDE
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>

@@ -60,7 +60,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var score = double.Parse(parser.GetData("#matched_fragment_ions")[i]);
                 var sequenceText = parser.GetData("Peptide")[i];
                 var charge = int.Parse(parser.GetData("Charge")[i]);
-                var evalue = double.Parse(parser.GetData("E-value")[i]);
+                var eValue = double.Parse(parser.GetData("E-value")[i]);
 
                 var fdr = Double.Parse(parser.GetData("FDR")[i]);
                 if (fdr > FdrCutoff) continue;
@@ -68,7 +68,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsAlign)
                 {
                     SequenceText = sequenceText,
-                    SpectralEvalue = evalue,
+                    SpectralEValue = eValue,
                 };
 
                 prsmList.Add(prsm);
@@ -128,7 +128,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             var scoreColumn = parser.GetData("#MatchedFragments") ?? parser.GetData("Score");
             var qValColumn = parser.GetData("QValue");
 
-            var evalueColumn = parser.GetData("SpecEValue");
+            var eValueColumn = parser.GetData("SpecEValue");
 
             for (var i = 0; i < parser.NumData; i++)
             {
@@ -143,7 +143,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var lastResId = int.Parse(parser.GetData("End")[i]);
                 var score = double.Parse(scoreColumn[i]);
                 var mod = parser.GetData("Modifications")[i];
-                var evalue = (evalueColumn != null) ? double.Parse(parser.GetData("SpecEValue")[i]) : 0;
+                var eValue = (eValueColumn != null) ? double.Parse(parser.GetData("SpecEValue")[i]) : 0;
 
                 var pre = parser.GetData("Pre")[i];
                 var post = parser.GetData("Post")[i];
@@ -166,7 +166,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                     Pre = pre,
                     Post = post,
                     ProteinLength = proteinLen,
-                    SpectralEvalue = evalue,
+                    SpectralEValue = eValue,
                 };
 
                 prsmList.Add(prsm);
@@ -200,7 +200,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                     Pre = result.Pre,
                     Post = result.Post,
                     ProteinLength = result.ProteinLength,
-                    SpectralEvalue = result.SpecEValue,
+                    SpectralEValue = result.SpecEValue,
                 };
 
                 prsmList.Add(prsm);

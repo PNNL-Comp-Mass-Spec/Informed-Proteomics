@@ -19,7 +19,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
             _windowComparer = new MzComparerWithBinning(numBits4WinSize);
             _minBinNum = _windowComparer.GetBinNumber(peaks[0].Mz);
             _maxBinNum = _windowComparer.GetBinNumber(peaks[peaks.Length - 1].Mz);
-            var numberOfbins = _maxBinNum - _minBinNum + 1;
+            var numberOfBins = _maxBinNum - _minBinNum + 1;
 
             _peakStartIndex     = new int[2][];
             _peakRanking        = new int[2][][];
@@ -27,11 +27,11 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
             for (var i = 0; i < 2; i++)
             {
-                _peakStartIndex[i]  = new int[numberOfbins];
-                _peakRanking[i]     = new int[numberOfbins][];
-                intensities[i]      = new List<double>[numberOfbins];
+                _peakStartIndex[i]  = new int[numberOfBins];
+                _peakRanking[i]     = new int[numberOfBins][];
+                intensities[i]      = new List<double>[numberOfBins];
 
-                for (var j = 0; j < numberOfbins; j++)
+                for (var j = 0; j < numberOfBins; j++)
                 {
                     _peakStartIndex[i][j]   = peaks.Length - 1;
                     intensities[i][j]       = new List<double>();
@@ -61,7 +61,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
             for (var i = 0; i < 2; i++)
             {
-                for (var binIdx = 0; binIdx < numberOfbins; binIdx++)
+                for (var binIdx = 0; binIdx < numberOfBins; binIdx++)
                 {
                     if (intensities[i][binIdx].Count < 1) continue;
 
@@ -143,35 +143,35 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 NumberOfIsotopePeaks = envelope.Size,
             };
 
-            // calculate ranksum test score
-            var ranksum = 0;
+            // calculate rankSum test score
+            var rankSum = 0;
             var nRankSum = 0;
             for (var i = 0; i < envelope.Size; i++)
             {
                 if (envelope.Peaks[i] == null || !envelope.Peaks[i].Active) continue;
                 ret.NumberOfMatchedIsotopePeaks++;
 
-                //if (isotopeList[i].Ratio > RelativeIntesnityThresholdForRankSum)
+                //if (isotopeList[i].Ratio > RelativeIntensityThresholdForRankSum)
                 //{
                 var localIndex = envelope.Peaks[i].IndexInSpectrum - peakStartIndex;
                 if (localIndex >= rankings.Length || localIndex < 0) continue;
-                ranksum += rankings[localIndex];
+                rankSum += rankings[localIndex];
                 nRankSum++;
                 //}
             }
 
-            var pvalue = FitScoreCalculator.GetRankSumPvalue(ret.NumberOfLocalPeaks, nRankSum, ranksum);
-            ret.RankSumScore = (pvalue > 0) ? -Math.Log(pvalue, 2) : 50;
+            var pValue = FitScoreCalculator.GetRankSumPValue(ret.NumberOfLocalPeaks, nRankSum, rankSum);
+            ret.RankSumScore = (pValue > 0) ? -Math.Log(pValue, 2) : 50;
 
             // calculate poisson test score
             var n = ret.NumberOfPossiblePeaks;
-            var k = ret.NumberOfIsotopePeaks; // # of theretical isotope ions of the mass within the local window
+            var k = ret.NumberOfIsotopePeaks; // # of theoretical isotope ions of the mass within the local window
             var n1 = ret.NumberOfLocalPeaks; // # of detected ions within the local window
             var k1 = ret.NumberOfMatchedIsotopePeaks; // # of matched ions generating isotope envelope profile
 
-            var lambda = ((double)n1 / (double)n) * k;
-            pvalue = 1 - Poisson.CDF(lambda, k1);
-            ret.PoissonScore = (pvalue > 0) ? -Math.Log(pvalue, 2) : 50;
+            var lambda = (n1 / (double)n) * k;
+            pValue = 1 - Poisson.CDF(lambda, k1);
+            ret.PoissonScore = (pValue > 0) ? -Math.Log(pValue, 2) : 50;
             return ret;
         }
 

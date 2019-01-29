@@ -8,9 +8,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMathMap
     {
-        public ProteinSpectrumMathMap(LcMsRun run, int dataid, List<ProteinSpectrumMatch> prsmList, string dataDesc = "")
+        public ProteinSpectrumMathMap(LcMsRun run, int dataId, List<ProteinSpectrumMatch> prsmList, string dataDesc = "")
         {
-            DataId = dataid;
+            DataId = dataId;
             DataDesc = dataDesc;
             Run = run;
             _scanNumToMatchMap = new Dictionary<int, ProteinSpectrumMatch>();

@@ -531,7 +531,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (!_isGzipped || _randomAccess) // can't reset the position on a gzipped file...
             {
-                // perform a read to perform encoding autodetection
+                // perform a read to perform encoding auto detection
                 _fileReader.ReadLine();
                 _encoding = _fileReader.CurrentEncoding;
                 // Reset to beginning of file.
@@ -957,7 +957,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Read the Checksum from the indexedmzML data
+        /// Read the Checksum from the indexed mzML data
         /// </summary>
         private void ReadChecksum()
         {
@@ -1048,12 +1048,12 @@ namespace InformedProteomics.Backend.MassSpecData
                         // Grab everything between '<' and the next '>'
                         var builder = stringBuffer.Substring(searchPoint + 1, (end - 1) - (searchPoint + 1));
                         // Get the ID of the tag
-                        var attribName = "id";
+                        var attributeName = "id";
                         if (_version == MzML_Version.mzML1_0_0)
                         {
-                            attribName = "nativeID";
+                            attributeName = "nativeID";
                         }
-                        var idIndex = builder.IndexOf(attribName + "=\"", StringComparison.Ordinal);
+                        var idIndex = builder.IndexOf(attributeName + "=\"", StringComparison.Ordinal);
                         var idOpenQuote = builder.IndexOf("\"", idIndex, StringComparison.Ordinal);
                         var idCloseQuote = builder.IndexOf("\"", idOpenQuote + 1, StringComparison.Ordinal);
                         var length = idCloseQuote - idOpenQuote - 1;
@@ -1141,7 +1141,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Handle the child nodes of the indexedmzML element
+        /// Handle the child nodes of the indexed mzML element
         /// Called by IndexMzMl (xml hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "indexList" element</param>
@@ -1253,7 +1253,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (reader.Name == "indexedmzML")
             {
                 indexReader = reader;
-                // Read to the mzML root tag, and ignore the extra indexedmzML data
+                // Read to the mzML root tag, and ignore the extra indexed mzML data
                 reader.ReadToDescendant("mzML");
                 if (_randomAccess && !_haveIndex)
                 {
@@ -1516,6 +1516,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 break;
                             case "cvParam":
                                 // Schema requirements: zero to many instances of this element
+                                // ReSharper disable CommentTypo
                                 /* MUST supply a *child* term of MS:1000767 (native spectrum identifier format) only once
                                  *   e.g.: MS:1000768 (Thermo nativeID format)
                                  *   e.g.: MS:1000769 (Waters nativeID format)
@@ -1576,6 +1577,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                  *   e.g.: MS:1002441 "Andi-MS format"
                                  *   et al.
                                  */
+                                // ReSharper restore CommentTypo
                                 var cv = innerReader.GetAttribute("cvRef");
                                 var accession = innerReader.GetAttribute("accession");
                                 if (string.IsNullOrWhiteSpace(cv))
@@ -1588,14 +1590,14 @@ namespace InformedProteomics.Backend.MassSpecData
                                 }
                                 if (!string.IsNullOrWhiteSpace(accession) && CV.TermAccessionLookup[cv].ContainsKey(accession))
                                 {
-                                    var cvid = CV.TermAccessionLookup[cv][accession];
-                                    if (CV.CvidIsA(cvid, CV.CVID.MS_native_spectrum_identifier_format))
+                                    var cvID = CV.TermAccessionLookup[cv][accession];
+                                    if (CV.CvidIsA(cvID, CV.CVID.MS_native_spectrum_identifier_format))
                                     {
-                                        _nativeIdFormat = cvid;
+                                        _nativeIdFormat = cvID;
                                     }
-                                    else if (CV.CvidIsA(cvid, CV.CVID.MS_mass_spectrometer_file_format))
+                                    else if (CV.CvidIsA(cvID, CV.CVID.MS_mass_spectrometer_file_format))
                                     {
-                                        _nativeFormat = cvid;
+                                        _nativeFormat = cvID;
                                     }
                                 }
                                 /*switch (innerReader.GetAttribute("accession"))
@@ -1974,7 +1976,7 @@ namespace InformedProteomics.Backend.MassSpecData
             double tic = 0;
             var precursors = new List<Precursor>();
             var scans = new List<ScanData>();
-            var bdas = new List<BinaryDataArray>();
+            var binaryData = new List<BinaryDataArray>();
             while (reader.ReadState == ReadState.Interactive)
             {
                 // Handle exiting out properly at EndElement tags
@@ -2089,7 +2091,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         // Schema requirements: zero to one instances of this element
                         if (includePeaks)
                         {
-                            bdas.AddRange(ReadBinaryDataArrayList(reader.ReadSubtree(), defaultArraySize));
+                            binaryData.AddRange(ReadBinaryDataArrayList(reader.ReadSubtree(), defaultArraySize));
                             reader.ReadEndElement(); // "binaryDataArrayList" must have child nodes
                         }
                         else
@@ -2109,15 +2111,15 @@ namespace InformedProteomics.Backend.MassSpecData
             Spectrum spectrum;
             var mzs = new BinaryDataArray();
             var intensities = new BinaryDataArray();
-            foreach (var bda in bdas)
+            foreach (var dataArray in binaryData)
             {
-                if (bda.ArrayType == ArrayType.m_z_array)
+                if (dataArray.ArrayType == ArrayType.m_z_array)
                 {
-                    mzs = bda;
+                    mzs = dataArray;
                 }
-                else if (bda.ArrayType == ArrayType.intensity_array)
+                else if (dataArray.ArrayType == ArrayType.intensity_array)
                 {
-                    intensities = bda;
+                    intensities = dataArray;
                 }
             }
 
@@ -2163,7 +2165,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     ion = precursor.Ions[0];
                 }
 
-                var pspectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum) {
+                var productSpectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum) {
                     ActivationMethod = precursor.Activation
                 };
 
@@ -2171,10 +2173,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 // The user param has a slightly higher precision, if that matters.
                 var mz = Math.Abs(scan.MonoisotopicMz) < float.Epsilon ? ion.SelectedIonMz : scan.MonoisotopicMz;
 
-                pspectrum.IsolationWindow = new IsolationWindow(precursor.IsolationWindowTargetMz, precursor.IsolationWindowLowerOffset, precursor.IsolationWindowUpperOffset, mz, ion.Charge);
-                //pspectrum.IsolationWindow.OldCharge = ion.OldCharge;
-                //pspectrum.IsolationWindow.SelectedIonMz = ion.SelectedIonMz;
-                spectrum = pspectrum;
+                productSpectrum.IsolationWindow = new IsolationWindow(precursor.IsolationWindowTargetMz, precursor.IsolationWindowLowerOffset, precursor.IsolationWindowUpperOffset, mz, ion.Charge);
+                // productSpectrum.IsolationWindow.OldCharge = ion.OldCharge;
+                // productSpectrum.IsolationWindow.SelectedIonMz = ion.SelectedIonMz;
+                spectrum = productSpectrum;
             }
             else
             {
@@ -2250,7 +2252,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         // Schema requirements: zero to one instances of this element
                         // Very comparable to mzML_1.1.0's scanList. Use it.
                         scans.AddRange(ReadScanList(reader.ReadSubtree()));
-                        reader.ReadEndElement(); // "acquisitionList" mustt have child nodes
+                        reader.ReadEndElement(); // "acquisitionList" must have child nodes
                         break;
                     case "precursorList":
                         // Schema requirements: zero to one instances of this element
@@ -2976,7 +2978,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             dataSize = 4;
                         }
                         var bytes = Convert.FromBase64String(reader.ReadElementContentAsString()); // Consumes the start and end elements.
-                        //var bytesread = reader.ReadContentAsBase64(bytes, 0, dataSize);
+                        //var bytesRead = reader.ReadContentAsBase64(bytes, 0, dataSize);
                         if (compressed)
                         {
                             bytes = DecompressZLib(bytes, bda.ArrayLength * dataSize);
@@ -3027,7 +3029,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var msCompressed = new MemoryStream(compressedBytes);
             // We must skip the first two bytes
             // See http://george.chiramattel.com/blog/2007/09/deflatestream-block-length-does-not-match.html
-            // EAT the zlib headers, the rest is a normal 'deflate'd stream
+            // Eat the zlib headers, the rest is a normal deflated stream
             msCompressed.ReadByte();
             msCompressed.ReadByte();
             //var msInflated = new MemoryStream((int)(msCompressed.Length * 2));

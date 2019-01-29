@@ -48,7 +48,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
                 else
                 {
-                    if (prsm.SpectralEvalue < ret[scan].SpectralEvalue)
+                    if (prsm.SpectralEValue < ret[scan].SpectralEValue)
                         ret[scan] = prsm;
                 }
             }

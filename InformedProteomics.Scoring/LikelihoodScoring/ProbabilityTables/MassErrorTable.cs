@@ -43,25 +43,25 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 {
                     // look for peaks for current ion and next ion
                     _totalPairs++;
-                    var currIonIndex = nextIonIndex - 1;
-                    var currMz = ions[currIonIndex].GetMonoIsotopicMz();
-                    var currPeak = match.Spectrum.FindPeak(currMz, _tolerance);
+                    var currentIonIndex = nextIonIndex - 1;
+                    var currentMz = ions[currentIonIndex].GetMonoIsotopicMz();
+                    var currentPeak = match.Spectrum.FindPeak(currentMz, _tolerance);
                     var nextMz = ions[nextIonIndex].GetMonoIsotopicMz();
                     var nextPeak = match.Spectrum.FindPeak(nextMz, _tolerance);
 
-                    if (currPeak == null && nextPeak == null)
+                    if (currentPeak == null && nextPeak == null)
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Neither);
                     else if (nextPeak == null)
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.First);
-                    else if (currPeak == null)
+                    else if (currentPeak == null)
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Second);
                     else
                     {
                         // found both peaks, compute mass error
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Both);
-                        var aaIndex = (ionType.IsPrefixIon ? nextIonIndex : currIonIndex);
+                        var aaIndex = (ionType.IsPrefixIon ? nextIonIndex : currentIonIndex);
                         var aaMz = pepSeq[aaIndex].Mass/charge;
-                        var massError = Math.Abs(nextPeak.Mz - currPeak.Mz) - aaMz;
+                        var massError = Math.Abs(nextPeak.Mz - currentPeak.Mz) - aaMz;
                         _massError[ionType].AddDatum(massError);
                     }
                     nextIonIndex++;

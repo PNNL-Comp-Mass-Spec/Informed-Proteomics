@@ -15,6 +15,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="nTerminalResidue"></param>
         /// <param name="cTerminalResidue"></param>
         /// <returns></returns>
-        double GetFragmentScore(Composition.Composition prefixFragmentComposition, Composition.Composition suffixFragmentComposition, AminoAcid nTerminalResidue = null, AminoAcid cTerminalResidue = null);
+        double GetFragmentScore(
+            Composition.Composition prefixFragmentComposition,
+            Composition.Composition suffixFragmentComposition,
+            AminoAcid nTerminalResidue = null,
+            AminoAcid cTerminalResidue = null);
     }
 }

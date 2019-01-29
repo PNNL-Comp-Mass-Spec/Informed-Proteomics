@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Database
         public int ObservationCount { get; set; }
 
         /// <summary>
-        /// Number of residues in the protein sequqence
+        /// Number of residues in the protein sequence
         /// </summary>
         public int SequenceLength { get; }
 

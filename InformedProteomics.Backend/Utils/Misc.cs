@@ -69,6 +69,8 @@ namespace InformedProteomics.Backend.Utils
         public static string GetBuildDateTextFromVersion(Version version)
         {
             var buildDateTime = GetBuildDateFromVersion();
+
+            // ReSharper disable once StringLiteralTypo
             return buildDateTime.ToString("MMMM d, yyyy");
         }
     }

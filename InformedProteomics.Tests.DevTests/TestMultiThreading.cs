@@ -278,7 +278,7 @@ namespace InformedProteomics.Tests.DevTests
             var timeEstimate = sw.Elapsed;
             Console.WriteLine("Read Estimate in " + (timeEstimate - timeDB).TotalSeconds + " Seconds");
             Console.WriteLine("Estimated results: " + estimatedAnnOff);
-            var annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(21, 300, numNTermCleavages, numCTermCleavages);
+            var annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(21, 300, numNTermCleavages, numCTermCleavages);
             var timeGetAnn = sw.Elapsed;
             Console.WriteLine("Read Annotations in " + (timeGetAnn - timeEstimate).TotalSeconds + " Seconds");
             /*/Parallel.ForEach(

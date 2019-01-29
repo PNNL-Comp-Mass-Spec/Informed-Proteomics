@@ -234,7 +234,7 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get the exceptwith of the 2 peak lists
+        /// Compare two peak lists and create a list of peaks that are in peakList1 but not in peakList2
         /// </summary>
         /// <param name="peakList1"></param>
         /// <param name="peakList2"></param>

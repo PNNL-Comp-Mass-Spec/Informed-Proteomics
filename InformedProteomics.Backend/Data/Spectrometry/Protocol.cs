@@ -16,12 +16,12 @@
         Phosphorylation,
 
         /// <summary>
-        /// ITraq Label reagents
+        /// iTRAQ Label reagents
         /// </summary>
         Itraq,
 
         /// <summary>
-        /// ITraq Label reagents with phosphorylation
+        /// iTRAQ Label reagents with phosphorylation
         /// </summary>
         ItraqPhospho,
 

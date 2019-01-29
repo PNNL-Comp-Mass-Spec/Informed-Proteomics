@@ -37,7 +37,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Overloaded equals. Compares based on <see cref="ActivationMethod" /> and <see cref="IsTopDown" />.
         /// </summary>
-        /// <param name="other">The scoringparameter description to compare to.</param>
+        /// <param name="other">The scoring parameter description to compare to.</param>
         /// <returns>A value indicating whether the scoring parameter is equal to the other parameter.</returns>
         protected bool Equals(ScoringParameterDescription other)
         {

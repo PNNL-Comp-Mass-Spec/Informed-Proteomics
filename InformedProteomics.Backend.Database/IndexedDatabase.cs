@@ -19,6 +19,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// File extension to use for Permuted Longest Common Prefix file
         /// </summary>
+        // ReSharper disable once StringLiteralTypo
         public static readonly string PermutedLongestCommonPrefixFileExtension = ".icplcp";
 
         /// <summary>
@@ -206,7 +207,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="maxNumNTermCleavages"></param>
         /// <param name="maxNumCTermCleavages"></param>
         /// <returns></returns>
-        public IEnumerable<AnnotationAndOffset> SequenceAnnotationsAndOffsetsWithNtermOrCtermCleavageNoLargerThan(
+        public IEnumerable<AnnotationAndOffset> SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
             int minSequenceLength, int maxSequenceLength, int maxNumNTermCleavages, int maxNumCTermCleavages)
         {
             foreach (
@@ -224,6 +225,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     if (cleavedLength <= maxSequenceLength)
                     {
+                        // ReSharper disable once CommentTypo
                         //  if (numNTermCleavage <= maxNumNTermCleavages) "both" else "cterm"
                         var cleavedAnnotation = numNTermCleavage == 0
                             ? annotation
@@ -367,7 +369,7 @@ namespace InformedProteomics.Backend.Database
                 var fEnum = FastaDatabase.Characters().GetEnumerator();
 
                 // Use "IntWrapper" to allow modifying the value inside of the foreach
-                var seps = new Queue<IntWrapper>();
+                var sequences = new Queue<IntWrapper>();
                 bool read;
                 while ((read = fEnum.MoveNext()) || curSequence.Count >= minLength)
                 {
@@ -379,32 +381,32 @@ namespace InformedProteomics.Backend.Database
 
                         if (fEnum.Current == FastaDatabaseConstants.Delimiter)
                         {
-                            seps.Enqueue(new IntWrapper(curSequence.Count - 1));
+                            sequences.Enqueue(new IntWrapper(curSequence.Count - 1));
                         }
 
                         if (curSequence.Count < maxLength + 2) continue;
                     }
 
-                    if (seps.Count > 0 && seps.Peek().Value == 0)
+                    if (sequences.Count > 0 && sequences.Peek().Value == 0)
                     {
-                        seps.Dequeue();
+                        sequences.Dequeue();
                     }
 
                     var min = minLength > lcpList.First.Value ? minLength : lcpList.First.Value;
-                    if (seps.Count == 0 || seps.Peek().Value >= maxLength + 2)
+                    if (sequences.Count == 0 || sequences.Peek().Value >= maxLength + 2)
                     {
                         count += maxLength + 2 - min;
                     }
-                    else if (seps.Peek().Value >= min)
+                    else if (sequences.Peek().Value >= min)
                     {
-                        count += seps.Peek().Value - min;
+                        count += sequences.Peek().Value - min;
                     }
 
                     curSequence.RemoveFirst();
                     lcpList.RemoveFirst();
-                    foreach (var sep in seps)
+                    foreach (var sequence in sequences)
                     {
-                        --sep.Value;
+                        --sequence.Value;
                     }
                 }
 
@@ -414,9 +416,9 @@ namespace InformedProteomics.Backend.Database
             else
             {
                 // mode 2
-                foreach (var sonc in SequencesWithOffsetNoCleavage())
+                foreach (var sequenceItem in SequencesWithOffsetNoCleavage())
                 {
-                    var seqLength = sonc.Sequence.Length;
+                    var seqLength = sequenceItem.Sequence.Length;
                     // mode 2
                     for (var i = 0; i <= numCTermCleavages; i++)
                     {
@@ -841,6 +843,7 @@ namespace InformedProteomics.Backend.Database
         //            }
         //        }
 
+        // ReSharper disable once CommentTypo
         //        const string standardAAStr = "ACDEFGHIKLMNPQRSTVWY";
         //        var isStandardAminoAcid = new bool[128];
         //        foreach (var residue in standardAAStr)

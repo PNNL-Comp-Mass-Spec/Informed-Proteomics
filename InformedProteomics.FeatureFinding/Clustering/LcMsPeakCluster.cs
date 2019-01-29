@@ -221,10 +221,10 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
                     if (pValueCheck)
                     {
-                        var poissonPvalue = localWin.GetPoissonTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
-                        var rankSumPvalue = localWin.GetRankSumTestPvalue(envelope.Peaks, TheoreticalEnvelope.Size);
-                        levelOneEnvelope = (rankSumPvalue < 0.01 && poissonPvalue < 0.01);
-                        //levelTwoEnvelope = (rankSumPvalue < 0.05 || poissonPvalue < 0.05);
+                        var poissonPValue = localWin.GetPoissonTestPValue(envelope.Peaks, TheoreticalEnvelope.Size);
+                        var rankSumPValue = localWin.GetRankSumTestPValue(envelope.Peaks, TheoreticalEnvelope.Size);
+                        levelOneEnvelope = (rankSumPValue < 0.01 && poissonPValue < 0.01);
+                        //levelTwoEnvelope = (rankSumPValue < 0.05 || poissonPValue < 0.05);
                     }
 
                     if (levelOneEnvelope)
@@ -288,7 +288,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 }
             }
 
-            // when good envellope is observed at only either even or odd charge...
+            // when good envelope is observed at only either even or odd charge...
             if (BestCorrelationScoreAcrossCharge[0] > 0.7 && BestCorrelationScoreAcrossCharge[1] < 0.5)
             {
                 const int i = 1;
@@ -305,7 +305,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 BestDistanceScoreAcrossCharge[i] = tempBestDistanceScoreAcrossCharge[i];
             }
 
-            // normalize abudnace across charges
+            // normalize abundance across charges
             var s = AbundanceDistributionAcrossCharge[0] + AbundanceDistributionAcrossCharge[1];
             if (s > 0)
             {
@@ -472,9 +472,9 @@ namespace InformedProteomics.FeatureFinding.Clustering
         public HashSet<LcMsPeakCluster> OverlappedFeatures
         {
             // definition
-            // Ovelapped features = features whose scores are affected by inactivating major peaks of this feature;
-            //                    = features that share any major peaks in this features as their peaks
-            //                     + features that share any minor peaks in this  feature as their major peaks
+            // Overlapped features = features whose scores are affected by inactivating major peaks of this feature;
+            //                     = features that share any major peaks in this feature as their peaks
+            //                     + features that share any minor peaks in this feature as their major peaks
             get
             {
                 var ret = new HashSet<LcMsPeakCluster>();
@@ -491,7 +491,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             }
         }
 
-        public bool GoodEnougth
+        public bool GoodEnough
         {
             get
             {

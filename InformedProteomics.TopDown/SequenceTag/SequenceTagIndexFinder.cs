@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var prefixStartIndex = -1;
             var prefixEndIndex = -1;
             //var prefixSequencePeaks = new List<Peak>();
-            //var prefixPval = -1.0;
+            //var prefixPValue = -1.0;
             var prefixSequence = "";
             if (prefixSubString != "")
             {
@@ -93,7 +93,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 prefixEndIndex = (prefixStartIndex == 1) ? 1 : prefixStartIndex + prefixSubString.Length - 1;
                 //prefixSequencePeaks = GetPrefixSequencePeaks(prefixPeakArr, prefixStartIndex, prefixEndIndex);
                 //var prefixRankSum = GetSequenceRankSum(prefixSequencePeaks, rankings, peakList);
-                //prefixPval = FitScoreCalculator.GetRankSumPvalue(peakList.Length, prefixSequencePeaks.Count, prefixRankSum);
+                //prefixPValue = FitScoreCalculator.GetRankSumPValue(peakList.Length, prefixSequencePeaks.Count, prefixRankSum);
                 prefixSequence = GetStringSubSequence(_sequence, prefixStartIndex, prefixEndIndex);
             }
 
@@ -101,7 +101,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var suffixStartIndex = -1;
             var suffixEndIndex = -1;
             //var suffixSequencePeaks = new List<Peak>();
-            //var suffixPval = -1.0;
+            //var suffixPValue = -1.0;
             var suffixSequence = "";
 
             if (suffixSubString != "")
@@ -111,7 +111,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 suffixEndIndex = (suffixStartIndex == 1) ? 1 : suffixStartIndex + suffixSubString.Length - 1;
                 //suffixSequencePeaks = GetSuffixSequencePeaks(suffixPeakArr, suffixStartIndex, suffixEndIndex);
                 //var suffixRankSum = GetSequenceRankSum(suffixSequencePeaks, rankings, peakList);
-                //suffixPval = FitScoreCalculator.GetRankSumPvalue(peakList.Length, suffixSequencePeaks.Count, suffixRankSum);
+                //suffixPValue = FitScoreCalculator.GetRankSumPValue(peakList.Length, suffixSequencePeaks.Count, suffixRankSum);
                 suffixSequence = GetStringSubSequence(_sequence, suffixStartIndex, suffixEndIndex);
             }
 

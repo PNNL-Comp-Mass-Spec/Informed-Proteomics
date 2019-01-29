@@ -81,12 +81,12 @@ namespace InformedProteomics.FeatureFinding.Training
             return finalPrsmGroups;
         }
 
-        public static List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataid, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
+        public static List<ProteinSpectrumMatchSet> GroupingByPrsm(int dataId, IEnumerable<ProteinSpectrumMatch> matches, INodeComparer<ProteinSpectrumMatch> prsmComparer)
         {
             var prsmSet = new NodeSet<ProteinSpectrumMatch>() { };
             prsmSet.AddRange(matches);
-            var groupList = prsmSet.ConnnectedComponents(prsmComparer);
             return groupList.Select(@group => new ProteinSpectrumMatchSet(dataid, @group)).ToList();
+            var groupList = prsmSet.ConnectedComponents(prsmComparer);
         }
 
         private static bool IsGoodTarget(ProductSpectrum ms2Spec, Sequence sequence)
@@ -103,7 +103,7 @@ namespace InformedProteomics.FeatureFinding.Training
             var nTheoreticalIonPeaks = 0;
             var nObservedIonPeaks = 0;
             var nObservedPrefixIonPeaks = 0;
-            var nObservedsuffixIonPeaks = 0;
+            var nObservedSuffixIonPeaks = 0;
 
             foreach (var c in cleavages)
             {
@@ -119,7 +119,7 @@ namespace InformedProteomics.FeatureFinding.Training
                         if (ms2Spec.ContainsIon(ion, tolerance, RelativeIsotopeIntensityThreshold))
                         {
                             if (baseIonType.IsPrefix) nObservedPrefixIonPeaks++;
-                            else nObservedsuffixIonPeaks++;
+                            else nObservedSuffixIonPeaks++;
                             nObservedIonPeaks++;
                         }
                         nTheoreticalIonPeaks++;
@@ -130,13 +130,13 @@ namespace InformedProteomics.FeatureFinding.Training
             if (sequence.Composition.Mass > 3000)
             {
                 if ((double) nObservedPrefixIonPeaks/nObservedIonPeaks > 0.85 ||
-                    (double) nObservedsuffixIonPeaks/nObservedIonPeaks > 0.85) return false;
+                    (double) nObservedSuffixIonPeaks/nObservedIonPeaks > 0.85) return false;
 
-                if (nObservedPrefixIonPeaks < 3 || nObservedsuffixIonPeaks < 3) return false;
+                if (nObservedPrefixIonPeaks < 3 || nObservedSuffixIonPeaks < 3) return false;
             }
             else
             {
-                if (nObservedPrefixIonPeaks < 1 || nObservedsuffixIonPeaks < 1) return false;
+                if (nObservedPrefixIonPeaks < 1 || nObservedSuffixIonPeaks < 1) return false;
             }
 
             return true;

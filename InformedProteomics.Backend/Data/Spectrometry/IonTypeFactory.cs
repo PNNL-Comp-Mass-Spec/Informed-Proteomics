@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class IonTypeFactory
     {
-        private readonly bool _removeReduntantIonTypes;
+        private readonly bool _removeRedundantIonTypes;
 
         /// <summary>
         /// Constructor
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 3   // up to charge 3
             )
         {
-            _removeReduntantIonTypes = removeRedundantIonTypes;
+            _removeRedundantIonTypes = removeRedundantIonTypes;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             _baseIons = baseIons;
             _neutralLosses = neutralLosses;
             _maxCharge = maxCharge;
-            _removeReduntantIonTypes = removeRedundantIonTypes;
+            _removeRedundantIonTypes = removeRedundantIonTypes;
             GenerateAllKnownIonTypes();
         }
 
@@ -141,7 +141,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     foreach (var neutralLoss in _neutralLosses)
                     {
-                        if (_removeReduntantIonTypes &&
+                        if (_removeRedundantIonTypes &&
                             (baseIonType == BaseIonType.Ar && neutralLoss == NeutralLoss.H2O ||
                              baseIonType == BaseIonType.C && neutralLoss == NeutralLoss.NH3 ||
                              baseIonType == BaseIonType.Xr && neutralLoss == NeutralLoss.H2O ||

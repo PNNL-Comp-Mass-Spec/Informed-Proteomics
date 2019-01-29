@@ -395,16 +395,16 @@ namespace InformedProteomics.Backend.MassSpecData
             // Not sure if stripping peaks out is worth it; but definitely want to return as a copy if we do.
             //if (_scanNumSpecMap.TryGetValue(scanNum, out var spec) && !includePeaks)
             //{
-            //    ProductSpectrum pspec = null;
-            //    if ((pspec = spec as ProductSpectrum) != null)
+            //    ProductSpectrum productSpectrum = null;
+            //    if ((productSpectrum = spec as ProductSpectrum) != null)
             //    {
             //        var spec2 = new ProductSpectrum(new List<Peak>(), scanNum)
             //        {
-            //            ActivationMethod = pspec.ActivationMethod,
-            //            ElutionTime = pspec.ElutionTime,
-            //            IsolationWindow = pspec.IsolationWindow,
-            //            MsLevel = pspec.MsLevel,
-            //            NativeId = pspec.NativeId,
+            //            ActivationMethod = productSpectrum.ActivationMethod,
+            //            ElutionTime = productSpectrum.ElutionTime,
+            //            IsolationWindow = productSpectrum.IsolationWindow,
+            //            MsLevel = productSpectrum.MsLevel,
+            //            NativeId = productSpectrum.NativeId,
             //        };
             //        spec = spec2;
             //    }
@@ -577,11 +577,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Old PBF creation workflow
         /// </summary>
-        /// <param name="imlr"></param>
+        /// <param name="lcmsRun"></param>
         /// <param name="writer"></param>
         /// <param name="progress"></param>
         [Obsolete("Use PbfLcMsRun.WriteAsPbf(InMemoryLcMsRun, BinaryWriter, IProgress<ProgressData> = null)", true)]
-        public void WriteAsPbf(InMemoryLcMsRun imlr, BinaryWriter writer, IProgress<ProgressData> progress = null)
+        public void WriteAsPbf(InMemoryLcMsRun lcmsRun, BinaryWriter writer, IProgress<ProgressData> progress = null)
         {
             PbfLcMsRun.WriteAsPbf(this, writer, progress);
         }

@@ -53,7 +53,9 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             }
 
             // Sink
+            // ReSharper disable CommentTypo
             // TODO: adjusting the distribution depending on neighboring amino acid (e.g. R.PEPTIDEK. vs A.PEPTIDEK)
+            // ReSharper restore CommentTypo
             _scoreDistribution = gfTable[gfTable.Length - 1];
         }
 
@@ -94,7 +96,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
             if (!hasValidEdge) return null; //new ScoreDistribution(0, 1);
 
-            // considering Target score for fast computing.....max 2 times faster but not useful at this point Scoredistriubtion
+            // considering Target score for fast computing.....max 2 times faster but not useful at this point ScoreDistribution
             //minScore = Math.Max(_targetScore - _maxAchievableScore[nodeIndex], minScore);
 
             // Compute scoring distribution for the current node
@@ -149,20 +151,20 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             var maxScore = _maxScoreAtNode[lasNodeIndex];
             var minScore = _minScoreAtNode[lasNodeIndex];
 
-            var evalueDist = new double[maxScore - minScore + 1];
-            Array.Copy(lastRow, evalueDist, evalueDist.Length);
+            var eValueDist = new double[maxScore - minScore + 1];
+            Array.Copy(lastRow, eValueDist, eValueDist.Length);
 
-            return evalueDist;
+            return eValueDist;
         }
 
-        public double GetSpectralEValue(double[] evalueDist, int score)
+        public double GetSpectralEValue(double[] eValueDist, int score)
         {
             if (_graph == null) return double.MaxValue;
 
             var spectralEValue = 0d;
-            for (var col = score; col < evalueDist.Length; col++)
+            for (var col = score; col < eValueDist.Length; col++)
             {
-                spectralEValue += evalueDist[col];
+                spectralEValue += eValueDist[col];
             }
             if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
             return spectralEValue;
@@ -215,13 +217,13 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
                 if (_eValueTable[curNodeIndex].Length < maxScore - minScore + 1) _eValueTable[curNodeIndex] = new double[maxScore - minScore + 1];
 
-                var curNodeEvalues = _eValueTable[curNodeIndex];
+                var curNodeEValues = _eValueTable[curNodeIndex];
                 foreach (var edge in _graph.GetEdges(curNodeIndex))
                 {
                     var prevNodeIndex = edge.PrevNodeIndex;
                     var combinedScore = curNodeScore + edge.Score;
 
-                    var prevNodeEvalues = _eValueTable[prevNodeIndex];
+                    var prevNodeEValues = _eValueTable[prevNodeIndex];
                     var prevNodeMinScore = _minScoreAtNode[prevNodeIndex];
 
                     var effectiveMinScoreAtNode = Math.Max(prevNodeMinScore + combinedScore, _minScoreAtNode[curNodeIndex]);
@@ -229,7 +231,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
                     for (var score = effectiveMinScoreAtNode; score <= effectiveMaxScoreAtNode; score++)
                     {
-                        curNodeEvalues[score - minScore] += prevNodeEvalues[score - combinedScore - prevNodeMinScore] * edge.Weight;
+                        curNodeEValues[score - minScore] += prevNodeEValues[score - combinedScore - prevNodeMinScore] * edge.Weight;
                     }
                 }
             }

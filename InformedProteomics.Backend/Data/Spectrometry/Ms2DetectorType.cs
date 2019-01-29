@@ -8,7 +8,7 @@
         /// <summary>
         /// Ion trap
         /// </summary>
-        Iontrap,
+        IonTrap,
 
         /// <summary>
         /// Thermo Orbitrap

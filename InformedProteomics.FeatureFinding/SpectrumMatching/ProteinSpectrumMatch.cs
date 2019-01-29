@@ -9,13 +9,13 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchSet : List<ProteinSpectrumMatch>
     {
-        public ProteinSpectrumMatchSet(int dataid)
+        public ProteinSpectrumMatchSet(int dataId)
         {
-            DataId = dataid;
+            DataId = dataId;
         }
-        public ProteinSpectrumMatchSet(int dataid, IEnumerable<ProteinSpectrumMatch> groupedMatches)
+        public ProteinSpectrumMatchSet(int dataId, IEnumerable<ProteinSpectrumMatch> groupedMatches)
         {
-            DataId = dataid;
+            DataId = dataId;
             AddRange(groupedMatches);
         }
 
@@ -32,9 +32,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public double Mass { get { return this.Select(item => item.Mass).Median(); } }
 
-        public void SetDataId(int dataid)
+        public void SetDataId(int dataId)
         {
-            DataId = dataid;
+            DataId = dataId;
         }
 
         public int DataId { get; private set; }
@@ -70,7 +70,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             ProteinDesc = protDesc;
         }
 
-        public double SpectralEvalue { get; internal set; }
+        public double SpectralEValue { get; internal set; }
 
         public string Sequence { get; }
         public int ScanNum { get; }

@@ -166,6 +166,7 @@ namespace InformedProteomics.Backend.MathAndStats
 
         /// <summary>
         /// Kadane's algorithm
+        /// https://en.wikipedia.org/wiki/Maximum_subarray_problem
         /// </summary>
         /// <param name="a"></param>
         /// <param name="start"></param>

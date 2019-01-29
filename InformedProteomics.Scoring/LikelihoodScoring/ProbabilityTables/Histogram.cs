@@ -75,13 +75,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             set
             {
                 _binEdges = value;
-                var datacollection = new List<T1>();
+                var dataCollection = new List<T1>();
                 foreach (var bin in Bins)
                 {
-                    datacollection.AddRange(bin);
+                    dataCollection.AddRange(bin);
                 }
                 Bins = new List<List<T1>>();
-                Compute(datacollection);
+                Compute(dataCollection);
             }
         }
 
@@ -128,12 +128,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <param name="bins">Number of equal bins to generate.</param>
         public void Equalize(int bins)
         {
-            var datacollection = new List<T1>();
+            var dataCollection = new List<T1>();
             foreach (var bin in Bins)
             {
-                datacollection.AddRange(bin);
+                dataCollection.AddRange(bin);
             }
-            Equalize(bins, datacollection);
+            Equalize(bins, dataCollection);
         }
 
         /// <summary>
@@ -144,10 +144,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <param name="minimum">The lowest possible value of the lowest bin.</param>
         public void Equalize(int bins, T1 minimum)
         {
-            var datacollection = new List<T1>();
+            var dataCollection = new List<T1>();
             foreach (var bin in Bins)
             {
-                datacollection.AddRange(bin);
+                dataCollection.AddRange(bin);
             }
 
             var excludeLow = new List<T1>();
@@ -193,24 +193,24 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
         }
 
-        private void Equalize(int bins, List<T1> datacollection)
+        private void Equalize(int bins, List<T1> dataCollection)
         {
-            if (datacollection.Count == 0) return;
-            datacollection.Sort(_compare);
+            if (dataCollection.Count == 0) return;
+            dataCollection.Sort(_compare);
 
             Bins = new List<List<T1>>();
             BinEdges = new T1[bins];
-            int binSize = datacollection.Count / bins;
             for (int j = 0; j < bins; j++)
+            var binSize = dataCollection.Count / bins;
             {
                 int min = j * binSize;
-                Bins[j].AddRange(datacollection.GetRange(min, binSize));
-                BinEdges[j] = datacollection[min];
+                Bins[j].AddRange(dataCollection.GetRange(min, binSize));
+                BinEdges[j] = dataCollection[min];
 
                 if (j == bins - 1)
-                    Bins[j].AddRange(datacollection.GetRange(min + binSize, datacollection.Count - (min + binSize)));
+                    Bins[j].AddRange(dataCollection.GetRange(min + binSize, dataCollection.Count - (min + binSize)));
             }
-            Total = datacollection.Count;
+            Total = dataCollection.Count;
         }
 
         private void Compute(IEnumerable<T1> data)

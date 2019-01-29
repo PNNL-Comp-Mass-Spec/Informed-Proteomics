@@ -20,19 +20,19 @@ namespace InformedProteomics.TopDown.Quantification
             var edgeDict = GetEdges(nodeList,tol,elutionInterval);
 
             var connectedComponents = new List<List<MSDeconvNode>>();
-            var nodesInComponenets = new Dictionary<MSDeconvNode,int>();
+            var nodesInComponents = new Dictionary<MSDeconvNode, int>();
 
             for (int i = 0; i < nodeList.Count; i++)
             {
-                if (!nodesInComponenets.ContainsKey(nodeList[i]))
+                if (!nodesInComponents.ContainsKey(node))
                 {
-                    connectedComponents.Add(GetConnectedComponenet(nodeList[i],edgeDict,nodesInComponenets));
+                    connectedComponents.Add(GetConnectedComponent(node, edgeDict, nodesInComponents));
                 }
             }
 
             /**foreach (var c in connectedComponents)
             {
-                Console.WriteLine("Connected Componenet Elements:");
+                Console.WriteLine("Connected Component Elements:");
                 foreach (var n in c)
                 {
                     Console.WriteLine("{0} {1}", n.ScanNumber,n.RealMonoMass);
@@ -98,7 +98,11 @@ namespace InformedProteomics.TopDown.Quantification
             return edgeDict;
         }
 
-        private List<MSDeconvNode> GetConnectedComponenet(MSDeconvNode node, Dictionary<MSDeconvNode, List<MSDeconvNode>> edges, Dictionary<MSDeconvNode,int> connectedNodes)
+        private List<MSDeconvNode> GetConnectedComponent(
+            MSDeconvNode node,
+            IReadOnlyDictionary<MSDeconvNode,
+            List<MSDeconvNode>> edges,
+            IDictionary<MSDeconvNode, int> connectedNodes)
         {
             var connectedComp = new List<MSDeconvNode>();
             var toVisit = new List<MSDeconvNode>();

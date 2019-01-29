@@ -20,10 +20,10 @@ namespace InformedProteomics.Backend.MathAndStats
             var num = 1;
             for (var i = 0; i < k; i++)
                 num *= n - i;
-            var denom = 1;
+            var denominator = 1;
             for (var i = 0; i < k; i++)
-                denom *= k - i;
-            return num/denom;
+                denominator *= k - i;
+            return num / denominator;
         }
 
         private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new Dictionary<Tuple<int, int>, double>();

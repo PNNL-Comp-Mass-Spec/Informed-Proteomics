@@ -44,7 +44,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             // close in elution time
             if (f1.CoElutedByNet(f2, 0.003))
             {
-                // two differnt hills
+                // two different hills
                 if (Math.Abs(f1.ApexElutionTime - f2.ApexElutionTime) / f1.Run.GetElutionTime(f1.Run.MaxLcScan) > 0.01d &&
                     f1.ApexIntensity / f1.BoundaryIntensity > 3.0d &&
                     f2.ApexIntensity / f2.BoundaryIntensity > 3.0d)
@@ -56,7 +56,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
                     return false;
                 }
 
-                // otherwise, they are fragmentized features, which
+                // otherwise, they are fragmented features, which
                 return true;
             }
 

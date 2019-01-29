@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// <summary>
         /// Number of PSMs with a QValue &lt; 0.01
         /// </summary>
-        public int NumPsms { get; private set; }
+        public int NumPSMs { get; private set; }
 
         /// <summary>
         /// Number of peptides with a PepQValue &lt; 0.01
@@ -153,7 +153,7 @@ namespace InformedProteomics.Backend.SearchResults
                 .Select(grp => grp.First())
                 .ToArray();
 
-            NumPsms = 0;
+            NumPSMs = 0;
 
             // Calculate q values
             var numDecoy = 0;
@@ -176,7 +176,7 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 qValue[i] = Math.Min(qValue[i + 1], fdr[i]);
                 if (qValue[i] <= 0.01)
-                    ++NumPsms;
+                    ++NumPSMs;
             }
 
             for (var i = 0; i < distinctSorted.Length; i++)
@@ -198,7 +198,7 @@ namespace InformedProteomics.Backend.SearchResults
             }
             var distinctSorted = distinctSorting.GroupBy(r => r.SequenceWithEnds).Select(grp => grp.First()).ToArray();
 
-            // Calculate pepq values
+            // Calculate QValues
             var numDecoy = 0;
             var numTarget = 0;
             var fdr = new double[distinctSorted.Length];

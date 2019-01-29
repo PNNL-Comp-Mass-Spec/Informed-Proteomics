@@ -531,7 +531,9 @@ namespace InformedProteomics.Backend.Database
             var fileNamesToDelete = new List<string>
             {
                 dataset + ".icdecoy*",
+                // ReSharper disable StringLiteralTypo
                 dataset + ".icsfldecoy*"
+                // ReSharper restore StringLiteralTypo
             };
 
             if (!isDecoy)

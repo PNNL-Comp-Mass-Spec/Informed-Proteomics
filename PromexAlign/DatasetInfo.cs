@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using System.IO;
 
@@ -50,10 +46,10 @@ namespace PromexAlign
 
                 datasetNumber++;
 
-                var mspfIdFilePath = string.Empty;
+                var msPathFinderIdFilePath = string.Empty;
                 if (parts.Length > 3)
                 {
-                    mspfIdFilePath = parts[3];
+                    msPathFinderIdFilePath = parts[3];
                 }
 
                 var datasetInfo = new DatasetInfo
@@ -61,7 +57,7 @@ namespace PromexAlign
                     Label = parts[0],
                     RawFilePath = parts[1],
                     Ms1FtFilePath = parts[2],
-                    MsPfIdFilePath = mspfIdFilePath
+                    MsPfIdFilePath = msPathFinderIdFilePath
                 };
 
                 if (string.IsNullOrWhiteSpace(datasetInfo.Label))

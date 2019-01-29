@@ -125,11 +125,11 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double GetMassErrorScore(double massErrorPpm)
         {
-            //y = normpdf(bin_Z, 5.0140, 3.1534);
-            //y2 = normpdf(bin_Z, 6.3361, 4.0447);
+            //y = normPDF(bin_Z, 5.0140, 3.1534);
+            //y2 = normPDF(bin_Z, 6.3361, 4.0447);
             var p = Normal.PDF(5.014, 3.1534, massErrorPpm);
-            var pnull = Normal.PDF(7.3361, 4.0447, massErrorPpm);
-            return Math.Log(p/pnull);
+            var pNull = Normal.PDF(7.3361, 4.0447, massErrorPpm);
+            return Math.Log(p / pNull);
         }
 
         public double GetEdgeScore(ActivationMethod activationMethod, int charge1, double mass1, int charge2, double mass2)

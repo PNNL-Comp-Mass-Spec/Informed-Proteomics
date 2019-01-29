@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <summary>
         /// RankTable constructor for new RankTable without any previously calculated data.
         /// </summary>
-        /// <param name="ionTypes">Iontypes to calculate rank probabilities for.</param>
+        /// <param name="ionTypes">Ion types to calculate rank probabilities for.</param>
         /// <param name="tolerance">Tolerance for finding monoisotopic peak.</param>
         /// <param name="maxRanks">Maximum number of ranks in the RankTable. All ranks
         /// above maxRanks are put into the last rank.</param>
@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         }
 
         /// <summary>
-        /// RankTable constructor for creating RankTable from taining parameter file.
+        /// RankTable constructor for creating RankTable from training parameter file.
         /// </summary>
         /// <param name="file">Training data file past position of RankProbabilities label.</param>
         /// <param name="ionTypeFactory">IonTypeFactory object with all known possible ions in training
