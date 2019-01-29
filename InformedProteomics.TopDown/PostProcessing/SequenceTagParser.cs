@@ -18,8 +18,7 @@ namespace InformedProteomics.TopDown.PostProcessing
 
         public IEnumerable<SequenceTag.SequenceTag> GetSequenceTags(int scanNum)
         {
-            IList<SequenceTag.SequenceTag> tags;
-            if (_scanToTags.TryGetValue(scanNum, out tags)) return tags;
+            if (_scanToTags.TryGetValue(scanNum, out var tags)) return tags;
             return new List<SequenceTag.SequenceTag>();
         }
 
@@ -45,8 +44,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                 if (sequence[i].Length < _minTagLength) continue;
                 var tag = new SequenceTag.SequenceTag(scan[i], sequence[i], isPrefix[i], flankingMass[i]);
 
-                IList<SequenceTag.SequenceTag> tagList;
-                if (_scanToTags.TryGetValue(scan[i], out tagList))
+                if (_scanToTags.TryGetValue(scan[i], out var tagList))
                 {
                     if (tagList.Count < _numTagsPerScan) tagList.Add(tag);
                 }
