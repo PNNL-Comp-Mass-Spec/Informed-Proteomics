@@ -31,12 +31,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
                 var aminoAcidSet = new AminoAcidSet();
 
-                for (int i = 0; i < peptides.Count; i++)
+                for (var i = 0; i < peptides.Count; i++)
                 {
                     if (Convert.ToDouble(filterValues[i]) > filterThreshold || peptideSet.Contains(peptides[i])) continue;
                     peptideSet.Add(peptides[i]);
                     var scanNum = Convert.ToInt32(scans[i]);
-                    int precursorCharge = Convert.ToInt32(precursorCharges[i]);
+                    var precursorCharge = Convert.ToInt32(precursorCharges[i]);
                     specMatches.Add(new SpectrumMatch(new Sequence(peptides[i], aminoAcidSet), _lcms, scanNum, precursorCharge, _decoy));
                 }
             }

@@ -56,13 +56,13 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             var score = scoringParameters.FeatureWeights.Intercept;
             foreach (var ionType in scoringParameters.SelectedIonTypes)
             {
-                FeatureWeights featureVector = this.scoringParameters.FeatureWeights;
-                Composition composition = ionType.IsPrefix ? nTerminalFragmentComposition : cTerminalFragmentComposition;
-                AminoAcid residue = ionType.IsPrefix ? nTerminalResidue : cTerminalResidue;
-                IEnumerable<Composition> offsetCompositions = ionType.GetPossibleCompositions(residue);
+                var featureVector = scoringParameters.FeatureWeights;
+                var composition = ionType.IsPrefix ? nTerminalFragmentComposition : cTerminalFragmentComposition;
+                var residue = ionType.IsPrefix ? nTerminalResidue : cTerminalResidue;
+                var offsetCompositions = ionType.GetPossibleCompositions(residue);
 
-                double ionScore = 0.0;
-                foreach (Composition offsetComp in offsetCompositions)  // Iterate over possible compositions for the current base ion type
+                var ionScore = 0.0;
+                foreach (var offsetComp in offsetCompositions)  // Iterate over possible compositions for the current base ion type
                 {
                     var ionComp = composition + offsetComp;
                     var peak = ProductSpectrum.FindPeak(ionComp, scoringParameters.TrainerTolerance);
@@ -94,7 +94,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The score of the peak.</returns>
         public double GetFragmentScore(DeconvolutedPeak deconvolutedPeak, BaseIonType ionType)
         {
-            IonWeights featureVector = this.scoringParameters.FeatureWeights.IonWeights[ionType];
+            var featureVector = scoringParameters.FeatureWeights.IonWeights[ionType];
             return featureVector.GetMatchedIonPeakScoreWithoutError(deconvolutedPeak);
         }
 
@@ -115,7 +115,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The number of matched fragments.</returns>
         public int GetNumMatchedFragments(Sequence sequence)
         {
-            int count = 0;
+            var count = 0;
             var cleavages = sequence.GetInternalCleavages();
             foreach (var cl in cleavages)
             {
@@ -135,7 +135,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         public double GetUserVisibleScore(Sequence sequence)
         {
             // Calculate linear combination.
-            double score = 0.0;
+            var score = 0.0;
             var cleavages = sequence.GetInternalCleavages();
             foreach (var cl in cleavages)
             {

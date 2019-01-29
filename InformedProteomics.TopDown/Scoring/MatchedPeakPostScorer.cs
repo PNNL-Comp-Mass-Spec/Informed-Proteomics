@@ -87,7 +87,7 @@ namespace InformedProteomics.TopDown.Scoring
             _nTheoreticalIonPeaks = 0;
             _nObservedIonPeaks = 0;
 
-            int index = 0; // cleavage index
+            // var index = 0; // cleavage index
             foreach (var c in cleavages)
             {
                 foreach (var baseIonType in _baseIonTypes)
@@ -99,11 +99,8 @@ namespace InformedProteomics.TopDown.Scoring
                     for (var charge = _minCharge; charge <= _maxCharge; charge++)
                     {
                         var ion = new Ion(fragmentComposition, charge);
-                        int baseIsotopePeakIndex;
-                        int nIsotopes;
-                        int nMatchedIsotopes;
 
-                        if (FindIon(ion, _tolerance, RelativeIsotopeIntensityThreshold, out baseIsotopePeakIndex, out nIsotopes, out nMatchedIsotopes))
+                        if (FindIon(ion, _tolerance, RelativeIsotopeIntensityThreshold, out var baseIsotopePeakIndex, out _, out _))
                         {
                             if (baseIonType.IsPrefix) _prefixIonPeakIndex.Add(baseIsotopePeakIndex);
                             else _suffixIonPeakIndex.Add(baseIsotopePeakIndex);
@@ -114,7 +111,7 @@ namespace InformedProteomics.TopDown.Scoring
                         _nTheoreticalIonPeaks++;
                     }
                 }
-                index++;
+                // index++;
             }
         }
 

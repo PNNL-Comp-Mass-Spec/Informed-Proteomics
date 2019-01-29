@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             _offsets = new Dictionary<int, PrecursorOffsetFrequencyTable>();
             _probabilityThreshold = probabilityThreshold;
 
-            for (int i = 1; i <= charge; i++)
+            for (var i = 1; i <= charge; i++)
             {
                 _offsets.Add(i, new PrecursorOffsetFrequencyTable(searchWidth/(2*i), i, binWidth/i));
             }
@@ -25,7 +25,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var charge = match.PrecursorCharge;
             if (!_offsets.ContainsKey(charge)) throw new Exception("Invalid charge.");
-            for (int i = charge; i > 0; i--)
+            for (var i = charge; i > 0; i--)
             {
                 _offsets[i].AddMatches(new List<SpectrumMatch>{match});
             }

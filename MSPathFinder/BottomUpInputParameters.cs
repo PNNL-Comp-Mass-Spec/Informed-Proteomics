@@ -294,10 +294,9 @@ namespace MSPathFinder
                 }
                 else
                 {
-                    double num;
-                    if (!double.TryParse(value, out num))
+                    if (!double.TryParse(value, out _))
                     {
-                        return "Invalid value (" + value + ") for the parameter " + key + "!";
+                        return "Invalid value (" + value + ") for the parameter " + key + "; must be numeric";
                     }
                 }
             }

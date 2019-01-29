@@ -118,7 +118,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                 if (_prefixes == null)
                 {
                     _prefixes = new List<Composition>();
-                    for (int i = 1; i < Sequence.Count; i++)
+                    for (var i = 1; i < Sequence.Count; i++)
                     {
                         _prefixes.Add(Sequence.GetComposition(0, i));
                     }
@@ -134,7 +134,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                 if (_suffixes == null)
                 {
                     _suffixes = new List<Composition>();
-                    for (int i = 1; i < Sequence.Count; i++)
+                    for (var i = 1; i < Sequence.Count; i++)
                     {
                         _suffixes.Add(Sequence.GetComposition(i, Sequence.Count));
                     }

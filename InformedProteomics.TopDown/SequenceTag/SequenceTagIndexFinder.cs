@@ -29,7 +29,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var suffixPeakArr = new Peak[cleavages.Length];
             //var peakList = new double[_spectrum.Peaks.Length];
 
-            int cleavageIndex = 0;
+            var cleavageIndex = 0;
 
             /*
             for (int i = 0; i < peakList.Length; i++)
@@ -62,7 +62,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             prefixSequenceArr[0] = prefixValueArr[0];
             suffixSequenceArr[suffixSequenceArr.Length - 1] = suffixValueArr[suffixValueArr.Length - 1];
 
-            for (int i = 1; i < prefixValueArr.Length; i++)
+            for (var i = 1; i < prefixValueArr.Length; i++)
             {
                 if (prefixValueArr[i] == 1 && prefixValueArr[i - 1] == 1)
                 {
@@ -71,7 +71,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 }
             }
 
-            for (int i = suffixValueArr.Length - 2; i >= 0; i--)
+            for (var i = suffixValueArr.Length - 2; i >= 0; i--)
             {
                 if (suffixValueArr[i] == 1 && suffixValueArr[i + 1] == 1)
                 {
@@ -150,7 +150,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 subString += seq[start].Residue;
                 return subString;
             }
-            for (int i = startIndex; i < endIndex + 1; i++)
+            for (var i = startIndex; i < endIndex + 1; i++)
             {
                 subString += seq[i].Residue;
             }
@@ -197,8 +197,8 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         private string FindLongestSubstring(int[] booleanSequence)
         {
-            var sequenceString = String.Concat(booleanSequence);
-            Regex regex = new Regex(@"[1]+");
+            var sequenceString = string.Concat(booleanSequence);
+            var regex = new Regex(@"[1]+");
             var matches = regex.Matches(sequenceString);
             var largestSubstring = "";
             foreach (Match m in matches)

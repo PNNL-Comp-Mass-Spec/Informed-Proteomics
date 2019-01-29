@@ -10,7 +10,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
     {
         public IonFrequencyTable(IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges=false)
         {
-                        _ionFrequencies = new Dictionary<IonType, Probability<IonType>>();
+            _ionFrequencies = new Dictionary<IonType, Probability<IonType>>();
             _combineCharges = combineCharges;
             _ionTypes = ionTypes.ToArray();
             _tolerance = tolerance;
@@ -47,7 +47,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             var prefixes = match.Prefixes;
             var suffixes = match.Suffixes;
 
-            for (int i = 0; i < prefixes.Count; i++)
+            for (var i = 0; i < prefixes.Count; i++)
             {
                 var ionTypeFound = new Dictionary<IonType, bool>();
                 foreach (var ionType in _ionTypes)
@@ -69,7 +69,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 }
                 foreach (var key in ionTypeFound.Keys)
                 {
-                    int found = 0;
+                    var found = 0;
                     const int total = 1;
                     if (ionTypeFound[key]) found = 1;
                     AddIonProbability(new Probability<IonType>(key, found, total));
@@ -122,7 +122,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private IonType ReducedChargeIonType(IonType ionType)
         {
-            string name = ionType.Name;
+            var name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)
                 name = name.Remove(1, 1);
             if (ionType.Charge >= 10)

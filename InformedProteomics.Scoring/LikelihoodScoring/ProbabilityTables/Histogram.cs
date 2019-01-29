@@ -22,7 +22,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 _compare = Comparer<T1>.Default;
             Total = 0;
             Bins = new List<List<T1>>();
-            for (int i = 0; i < binEdges.Length; i++)
+            for (var i = 0; i < binEdges.Length; i++)
             {
                 Bins.Add(new List<T1>());
             }
@@ -44,7 +44,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 _compare = Comparer<T1>.Default;
             Total = 0;
             Bins = new List<List<T1>>();
-            for (int i = 0; i < binEdges.Length; i++)
+            for (var i = 0; i < binEdges.Length; i++)
             {
                 Bins.Add(new List<T1>());
             }
@@ -105,7 +105,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <returns>Index of the bin the item will be sorted into.</returns>
         public int GetBinIndex(T1 datum)
         {
-            int i = 0;
+            var i = 0;
             while (i < BinEdges.Length && (_compare.Compare(datum, BinEdges[i]) >= 0))
             {
                 i++;
@@ -200,10 +200,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             Bins = new List<List<T1>>();
             BinEdges = new T1[bins];
-            for (int j = 0; j < bins; j++)
             var binSize = dataCollection.Count / bins;
+            for (var j = 0; j < bins; j++)
             {
-                int min = j * binSize;
+                var min = j * binSize;
                 Bins[j].AddRange(dataCollection.GetRange(min, binSize));
                 BinEdges[j] = dataCollection[min];
 
@@ -222,7 +222,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             foreach (var datum in data)
             {
-                int binIndex = GetBinIndex(datum);
+                var binIndex = GetBinIndex(datum);
                 if (binIndex >= 0)
                 {
                     Bins[binIndex].Add(datum);
@@ -249,7 +249,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var binEdges = hist.BinEdges;
             var alignedEdges = new double[binEdges.Length];
-            for (int i = 0; i < binEdges.Length; i++)
+            for (var i = 0; i < binEdges.Length; i++)
             {
                 alignedEdges[i] = binEdges[i];
                 if (align == BinEdgeAlignment.Center)
@@ -268,7 +268,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var binEdges = hist.BinEdges;
             var alignedEdges = new float[binEdges.Length];
-            for (int i = 0; i < binEdges.Length; i++)
+            for (var i = 0; i < binEdges.Length; i++)
             {
                 alignedEdges[i] = binEdges[i];
                 if (align == BinEdgeAlignment.Center)
@@ -287,7 +287,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var binEdges = hist.BinEdges;
             var alignedEdges = new int[binEdges.Length];
-            for (int i = 0; i < binEdges.Length; i++)
+            for (var i = 0; i < binEdges.Length; i++)
             {
                 alignedEdges[i] = binEdges[i];
                 if (align == BinEdgeAlignment.Center)

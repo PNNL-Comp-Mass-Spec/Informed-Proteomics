@@ -30,7 +30,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
             var peptideSet = new HashSet<string>();
 
-            for (int i = 0; i < peptides.Count; i++)
+            for (var i = 0; i < peptides.Count; i++)
             {
                 if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold || peptideSet.Contains(peptides[i])) continue;
                 peptideSet.Add(peptides[i]);
@@ -38,10 +38,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 //                    var spectrum = lcms.GetSpectrum(scanNum);
 //                    var spec = spectrum as ProductSpectrum;
 //                    if (spec == null || spec.ActivationMethod != Act) continue;
-                int precursorCharge = Convert.ToInt32(precursorCharges[i]);
                 specMatches.Add((formulas != null && formulas[i] != null)
                     ? new SpectrumMatch(peptides[i], DataFileFormat.IcBottomUp, _lcms, scanNum, precursorCharge, _decoy, formulas[i])
                     : new SpectrumMatch(peptides[i], DataFileFormat.IcBottomUp, _lcms, scanNum, precursorCharge, _decoy));
+                var precursorCharge = Convert.ToInt32(precursorCharges[i]);
             }
             return specMatches;
         }

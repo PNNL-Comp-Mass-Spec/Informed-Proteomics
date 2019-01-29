@@ -73,8 +73,8 @@ namespace InformedProteomics.TopDown.Scoring
         /// <returns>The score of the edge.</returns>
         public double GetScore()
         {
-            double massError = Math.Abs(this.SinkNodeIndex - (this.PrevNodeIndex + this.Label.Mass)) / this.SinkNodeIndex * 1e6;
-            double errorScore = this.scorer.GetErrorScore(massError);
+            var massError = Math.Abs(SinkNodeIndex - (PrevNodeIndex + Label.Mass)) / SinkNodeIndex * 1e6;
+            var errorScore = scorer.GetErrorScore(massError);
 
             return errorScore + Weight;
         }

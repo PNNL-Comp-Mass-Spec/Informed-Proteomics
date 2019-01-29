@@ -44,7 +44,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             var binEdges = parameters.Select(param => param.Mass).ToArray();
 
             // Find scoring parameters for precursor mass
-            int binIndex = Array.BinarySearch(binEdges, precursorMass);
+            var binIndex = Array.BinarySearch(binEdges, precursorMass);
             if (binIndex < 0)
             {
                 binIndex = ~binIndex;

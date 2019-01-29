@@ -140,13 +140,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     file.WriteLine("Charge\t"+charge);
                     file.Write("BinSize\t");
                     var massBins = _massSorter[charge].Bins;
-                    for (int i = 0; i < _massBins[charge]; i++)
+                    for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write(massBins[i].Count);
                         if (i < _massBins[charge]-1) file.Write("\t");
                     }
                     file.WriteLine();
-                    for (int i = 0; i < _massBins[charge]; i++)
+                    for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
                         var max = Double.PositiveInfinity;
@@ -235,7 +235,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             if (_computed) return;
             Initialize();
             var total = _dataSet.Count;
-            for (int i = 0; i < total; i++)
+            for (var i = 0; i < total; i++)
             {
                 var target = _dataSet.Dequeue();
                 var charge = target.PrecursorCharge;
@@ -299,7 +299,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 _massBins.Add(charge, chargeTableSize/Config.MassBinSize);
                 _massSorter[charge].Equalize(_massBins[charge], 0);
                 var binCount = _massSorter[charge].BinEdges.Length;
-                for (int i = 0; i < binCount; i++)
+                for (var i = 0; i < binCount; i++)
                 {
                     _rankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
                     _drankTables[charge].Add(new RankTable(Config.IonTypes, Config.Tolerance, Config.MaxRanks));
@@ -314,8 +314,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         private int GetCharge(int charge)
         {
             if (_charges.Count == 0) throw new Exception("Empty training set.");
-            int key = charge;
-            int maxCharge = _charges.Max();
+            var key = charge;
+            var maxCharge = _charges.Max();
             while (!_charges.Contains(key)) key = (key + 1) % maxCharge;
             return key;
         }

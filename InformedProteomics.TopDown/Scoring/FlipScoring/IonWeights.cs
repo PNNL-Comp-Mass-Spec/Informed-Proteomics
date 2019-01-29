@@ -29,10 +29,9 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The score.</returns>
         public double GetMatchedIonPeakScoreWithoutError(DeconvolutedPeak peak)
         {
-            double score = 0.0;
-            score += this.SummedIntensityWeight * peak.Intensity;
-            score += this.SummedPearsonCorrelationWeight * peak.Corr;
-            score += this.SummedCosineWeight * peak.Dist;
+            var score = SummedIntensityWeight * peak.Intensity +
+                        SummedPearsonCorrelationWeight * peak.Corr +
+                        SummedCosineWeight * peak.Dist;
             return score;
         }
     }

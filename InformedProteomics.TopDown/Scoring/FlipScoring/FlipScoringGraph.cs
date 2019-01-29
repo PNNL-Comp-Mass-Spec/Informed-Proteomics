@@ -79,8 +79,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns></returns>
         public double GetEdgeScore(int sourceMassBin, int sinkMassBin)
         {
-            var edge = this.GetEdges(sinkMassBin).First(e => e.PrevNodeIndex == sourceMassBin) as FlipScoringGraphEdge;
-            if (edge == null)
+            if (!(GetEdges(sinkMassBin).First(e => e.PrevNodeIndex == sourceMassBin) is FlipScoringGraphEdge edge))
             {
                 return 0.0;
             }
@@ -96,7 +95,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         public double ScoreSequence(Sequence sequence)
         {
             var cleavages = sequence.GetInternalCleavages();
-            double score = 0.0;
+            var score = 0.0;
             int prevNTermBin = 0, prevCTermBin = 0;
             foreach (var cleavage in cleavages)
             {

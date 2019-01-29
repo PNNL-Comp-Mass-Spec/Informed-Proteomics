@@ -177,7 +177,7 @@ namespace InformedProteomics.Backend.Data.Biology
             {
                 var symbol = element.Element("Symbol")?.Value;
                 var name = element.Element("Name")?.Value;
-                if (int.TryParse(element.Element("NumIsotopes")?.Value, out var numIsotopes)) {
+                if (int.TryParse(element.Element("NumIsotopes")?.Value, out _)) {
                 }
             }
         }

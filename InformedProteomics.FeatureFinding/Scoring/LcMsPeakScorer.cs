@@ -65,8 +65,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 {
                     if (intensities[i][binIdx].Count < 1) continue;
 
-                    double medianIntensity;
-                    _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out medianIntensity);
+                    _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out _);
                 }
             }
         }
@@ -115,12 +114,9 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
         public IsotopeEnvelopeStatisticalInfo PreformStatisticalSignificanceTest(ObservedIsotopeEnvelope envelope)
         {
-            int peakStartIndex;
-            Tuple<double, double> mzBoundary;
-
             //var refPeak = envelope.Peaks[envelope.RefIsotopeInternalIndex];
 
-            var mostAbuMz = 0d;
+            double mostAbuMz;
             var mostAbutPeakInternalIndex = envelope.TheoreticalEnvelope.IndexOrderByRanking[0];
             if (envelope.Peaks[mostAbutPeakInternalIndex] != null)
             {
@@ -131,7 +127,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 mostAbuMz = envelope.TheoreticalEnvelope.GetIsotopeMz(envelope.Charge, mostAbutPeakInternalIndex);
             }
 
-            var rankings = GetLocalRankings(mostAbuMz, out peakStartIndex, out mzBoundary);
+            var rankings = GetLocalRankings(mostAbuMz, out var peakStartIndex, out var mzBoundary);
 
             // smallest delta_mz = 0.01 (th) ?
             var ret = new IsotopeEnvelopeStatisticalInfo

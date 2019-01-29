@@ -105,11 +105,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         private double[] GenerateEdges()
         {
             var binEdges = new List<double>();
-            for (double width = -1 * _offset; width >= -1 * _width; width -= _binWidth)
+            for (var width = -1 * _offset; width >= -1 * _width; width -= _binWidth)
             {
                 binEdges.Add(width);
             }
-            for (double width = _offset; width < _width; width += _binWidth)
+            for (var width = _offset; width < _width; width += _binWidth)
             {
                 binEdges.Add(width);
             }

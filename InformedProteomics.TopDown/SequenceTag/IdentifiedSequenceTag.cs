@@ -64,14 +64,14 @@ namespace InformedProteomics.TopDown.SequenceTag
             if (modStr == null || modStr.Equals(""))
                 return new Sequence(seqStr, aaSet);
 
-            int residueIndex = 0;
+            var residueIndex = 0;
             var modList = modStr.Split(',');
             var modificationInfo = new Dictionary<int, Modification>();
 
             foreach (var ptm in modList)
             {
-                string[] ptmPair = ptm.Split(' ');
-                residueIndex = Int32.Parse(ptmPair[1]);
+                var ptmPair = ptm.Split(' ');
+                residueIndex = int.Parse(ptmPair[1]);
                 if (residueIndex == 0) residueIndex++;
 
                 modificationInfo.Add(residueIndex, Modification.Get(ptmPair[0]));
@@ -90,7 +90,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
                 residueIndex++;
             }
-            Sequence sequence = new Sequence(aaList);
+            var sequence = new Sequence(aaList);
 
             return sequence;
         }

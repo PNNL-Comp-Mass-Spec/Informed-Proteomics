@@ -25,11 +25,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             MaxRanks = maxRanks;
             _rankTable = new Dictionary<IonType, double[]>();
             _rankTotals = new double[MaxRanks+1];
-            for (int i = 0; i < MaxRanks; i++) _rankTotals[i] = 0.0;
+            for (var i = 0; i < MaxRanks; i++) _rankTotals[i] = 0.0;
             foreach (var ionType in ionTypes)
             {
                 _rankTable.Add(ionType, new double[MaxRanks+1]);
-                for (int i = 0; i < MaxRanks+1; i++) _rankTable[ionType][i] = 0.0;
+                for (var i = 0; i < MaxRanks+1; i++) _rankTable[ionType][i] = 0.0;
             }
         }
 
@@ -53,7 +53,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public void AddMatch(SpectrumMatch match)
         {
             var ranks = new RankedPeaks(match.Spectrum);
-            for (int i = 0; i < ranks.Peaks.Length; i++)
+            for (var i = 0; i < ranks.Peaks.Length; i++)
             {
                 var index = i;
                 if (index >= MaxRanks) index = MaxRanks - 1;
@@ -96,13 +96,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             foreach (var ionType in IonTypes)
             {
-                int index = 0;
-                int window = smoothingWindowSize[index];
+                var index = 0;
+                var window = smoothingWindowSize[index];
                 var total = 0.0;
                 var count = 0;
                 var endRank = 0;
 
-                for (int startRank = 0; startRank < MaxRanks;)
+                for (var startRank = 0; startRank < MaxRanks;)
                 {
                     if (startRank >= smoothingRanks[index])
                     {
@@ -110,7 +110,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         window = smoothingWindowSize[index];
                     }
                     endRank = Math.Min(endRank + window + 1, MaxRanks);
-                    for (int i = startRank; i < endRank; i++)
+                    for (var i = startRank; i < endRank; i++)
                     {
                         total += _rankTable[ionType][i];
                         count++;
@@ -118,7 +118,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     var average = total / count;
                     if (average > 0.0)
                     {
-                        for (int i = startRank; i < endRank; i++)
+                        for (var i = startRank; i < endRank; i++)
                         {
                             _rankTable[ionType][i] = average;
                         }
@@ -161,9 +161,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var ionTypes = IonTypes;
             var ranks = new Probability<IonType>[ionTypes.Length, MaxRanks];
-            for (int i = 0; i < ionTypes.Length; i++)
+            for (var i = 0; i < ionTypes.Length; i++)
             {
-                for (int j = 0; j < MaxRanks+1; j++)
+                for (var j = 0; j < MaxRanks+1; j++)
                 {
                     var ionType = ionTypes[i];
                     ranks[i, j] = new Probability<IonType>(ionTypes[i], _rankTable[ionType][j], _rankTotals[j]);
@@ -185,7 +185,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             foreach (var ionType in selectedIonTypes)
             {
                 file.Write(ionType.Name + "\t");
-                for (int i = 0; i < MaxRanks+1; i++)
+                for (var i = 0; i < MaxRanks+1; i++)
                 {
                     file.Write(Math.Round(_rankTable[ionType][i], 2) + "\t");
                 }
@@ -194,7 +194,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             var total = new double[MaxRanks+1];
             var count = new double[MaxRanks+1];
             var prob = new double[MaxRanks+1];
-            for (int i = 0; i < MaxRanks+1; i++)
+            for (var i = 0; i < MaxRanks+1; i++)
             {
                 total[i] = 0.0;
                 count[i] = 0.0;
@@ -202,13 +202,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
             foreach (var ionType in unselectedIonTypes)
             {
-                for (int i = 0; i < MaxRanks+1; i++)
+                for (var i = 0; i < MaxRanks+1; i++)
                 {
                     total[i] += _rankTable[ionType][i];
                     count[i]++;
                 }
             }
-            for (int i = 0; i < MaxRanks+1; i++) prob[i] = Math.Round(total[i] / count[i], 2);
+            for (var i = 0; i < MaxRanks+1; i++) prob[i] = Math.Round(total[i] / count[i], 2);
             file.WriteLine("Unexplained\t" + string.Join("\t", prob));
             file.WriteLine("Total\t" + string.Join("\t", _rankTotals));
         }
@@ -226,7 +226,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 {
                     if (MaxRanks < 0) throw new FormatException("Badly formatted rank data.");
                     _rankTotals = new double[MaxRanks+1];
-                    for (int i = 0; i < MaxRanks+1; i++)
+                    for (var i = 0; i < MaxRanks+1; i++)
                     {
                         _rankTotals[i] = Convert.ToInt32(parts[i]);
                     }
@@ -241,7 +241,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     {
                         var ionType = ionTypeFactory.GetIonType(header);
                         _rankTable.Add(ionType, new double[MaxRanks+1]);
-                        for (int i = 0; i < MaxRanks+1; i++)
+                        for (var i = 0; i < MaxRanks+1; i++)
                         {
                             _rankTable[ionType][i] = Convert.ToDouble(parts[i]);
                         }

@@ -145,7 +145,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
             ClearScore();
 
-            var bestChargeDist = new double[]{10.0d, 10.0d};
+            var bestChargeDist = new[]{10.0d, 10.0d};
             // sum envelopes at each charge
             var summedIntensity = new double[TheoreticalEnvelope.Size];
 
@@ -170,7 +170,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             var repEnvelopeBcDist2 = 10.0d;
             ObservedIsotopeEnvelope repEnvelope2 = null;
 
-            var tempBestDistanceScoreAcrossCharge = new double[2]{ 10, 10 };
+            var tempBestDistanceScoreAcrossCharge = new double[]{ 10, 10 };
             var tempBestIntensityScoreAcrossCharge = new double[2];
             var tempBestCorrelationScoreAcrossCharge = new double[2];
 

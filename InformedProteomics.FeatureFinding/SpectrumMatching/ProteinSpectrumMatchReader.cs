@@ -220,9 +220,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             {
                 sequenceText.Append(aa.Residue);
 
-                if (aa is ModifiedAminoAcid)
+                if (aa is ModifiedAminoAcid ma)
                 {
-                    var ma = aa as ModifiedAminoAcid;
                     var modLabel = string.Format("[{0}]", ma.Modification.Name);
                     sequenceText.Append(modLabel);
                 }

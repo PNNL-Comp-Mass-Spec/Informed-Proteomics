@@ -42,8 +42,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             var header = "";
             foreach (var line in lines)
             {
-                string commentsStripped = line.Split('#')[0];      // remove comments
-                string[] parts = commentsStripped.Split('=');       // split key/value
+                var commentsStripped = line.Split('#')[0];      // remove comments
+                var parts = commentsStripped.Split('=');       // split key/value
                 if (parts.Length < 2)
                 {
                     // The line is either a header, empty line, or invalid
@@ -73,8 +73,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                 else
                 {
                     // key value pair
-                    string key = parts[0].Trim().ToLower();
-                    string value = parts[1].Trim();
+                    var key = parts[0].Trim().ToLower();
+                    var value = parts[1].Trim();
                     keyValue.Add(key, value);
                 }
             }

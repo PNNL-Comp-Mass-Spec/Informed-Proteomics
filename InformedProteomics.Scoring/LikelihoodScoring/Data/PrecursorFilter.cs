@@ -28,7 +28,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             var peaks = specMatch.Spectrum.Peaks;
             var indexes = new List<int>();
 
-            for (int i = 0; i < _offsets.Charge; i++)
+            for (var i = 0; i < _offsets.Charge; i++)
             {
                 var ion = _precursorIonTypes[i].GetIon(specMatch.PeptideComposition);
                 var mz = ion.GetMonoIsotopicMz();
@@ -52,7 +52,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public List<SpectrumMatch> FilterMatches(List<SpectrumMatch> matches)
         {
-            for (int i = 0; i < matches.Count; i++)
+            for (var i = 0; i < matches.Count; i++)
             {
                 matches[i] = Filter(matches[i]);
             }

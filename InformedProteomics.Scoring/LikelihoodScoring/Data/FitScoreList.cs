@@ -7,16 +7,16 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public FitScoreList(IList<double> intensities, IList<double> scores)
         {
-            int counter = 0;
+            var counter = 0;
             if (intensities != null && intensities.Count > 0)
                 counter = intensities.Count;
             else if (scores != null && scores.Count > 0)
                 counter = scores.Count;
 
-            for (int i = 0; i < counter; i++)
+            for (var i = 0; i < counter; i++)
             {
-                double intensity = 0.0;
-                double score = 0.0;
+                var intensity = 0.0;
+                var score = 0.0;
 
                 if (intensities != null)
                     intensity = intensities[i];
@@ -44,7 +44,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             get
             {
                 var scores = new double[Count];
-                for (int i = 0; i < Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     scores[i] = this[i].Score;
                 }
@@ -57,7 +57,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             get
             {
                 var intensities = new double[Count];
-                for (int i = 0; i < Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     intensities[i] = this[i].Intensity;
                 }
@@ -68,11 +68,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         public FitScore MaxScore(ScoreMethod method)
         {
             FitScore score = null;
-            double bestScore = 0.0;
+            var bestScore = 0.0;
 
             foreach (var sc in this)
             {
-                double scScore = sc.Score;
+                var scScore = sc.Score;
                 if (method == ScoreMethod.FitScore)
                     scScore = 1 - scScore;
 

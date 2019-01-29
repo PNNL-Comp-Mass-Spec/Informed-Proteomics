@@ -108,7 +108,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             SmoothingWindowSize = new int[smoothingWindowSizeStr.Length];
             if (SmoothingRanks.Length != SmoothingWindowSize.Length)
                 throw new ArgumentException("SmoothingRanks and SmoothingWindowSize unequal lengths.");
-            for (int i = 0; i < SmoothingRanks.Length; i++)
+
+            for (var i = 0; i < SmoothingRanks.Length; i++)
             {
                 if (smoothingRanksStr[i] == "Max") SmoothingRanks[i] = Int32.MaxValue;
                 else SmoothingRanks[i] = Convert.ToInt32(smoothingRanksStr[i]);
@@ -117,10 +118,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 
             // Read ion data
             var ionInfo = reader.GetNodes("ion").First();
-            int totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
+            var totalCharges = Convert.ToInt32(ionInfo.Contents["totalcharges"]);
             var ionTypeStr = ionInfo.Contents["iontype"].Split(',');
             var ions = new BaseIonType[ionTypeStr.Length];
-            for (int i = 0; i < ionTypeStr.Length; i++)
+            for (var i = 0; i < ionTypeStr.Length; i++)
             {
                 switch (ionTypeStr[i].ToLower())
                 {
@@ -146,7 +147,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             }
             var ionLossStr = ionInfo.Contents["losses"].Split(',');
             var ionLosses = new NeutralLoss[ionLossStr.Length];
-            for (int i = 0; i < ionLossStr.Length; i++)
+            for (var i = 0; i < ionLossStr.Length; i++)
             {
                 switch (ionLossStr[i].ToLower())
                 {
@@ -192,8 +193,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 
             TsvPath = fileInfo.Contents["tsvpath"];
             DataPath = fileInfo.Contents["datapath"];
-            var outPathtemp = fileInfo.Contents["outpath"];
-            OutputPath = outPathtemp;
+            OutputPath = fileInfo.Contents["outpath"];
 
             OutputFileName = OutputPath + fileInfo.Contents["outputfile"];
         }

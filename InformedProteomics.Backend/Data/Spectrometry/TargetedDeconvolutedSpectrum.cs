@@ -46,9 +46,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>The neutral monoisotopic peak.</returns>
         public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
         {
-            double mass = composition.Mass;
+            var mass = composition.Mass;
             DeconvolutedPeak deconvolutedPeak = null;
-            double maxIntensity = 0.0;
+            var maxIntensity = 0.0;
             for (var charge = minCharge; charge <= maxCharge; charge++)
             {
                 var ion = new Ion(composition, charge);
@@ -80,8 +80,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 if (observedPeaks[i] != null) observedIntensities[i] = observedPeaks[i].Intensity;
             }
 
-            double pearsonCorrelation = FitScoreCalculator.GetPearsonCorrelation(envelope, observedIntensities);
-            double cosine = FitScoreCalculator.GetCosine(envelope, observedIntensities);
+            var pearsonCorrelation = FitScoreCalculator.GetPearsonCorrelation(envelope, observedIntensities);
+            var cosine = FitScoreCalculator.GetCosine(envelope, observedIntensities);
 
             return new Tuple<double, double>(pearsonCorrelation, cosine);
         }
