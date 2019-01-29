@@ -490,17 +490,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="signalToNoiseRatio"></param>
         /// <param name="windowPpm"></param>
-        [Obsolete("Use FilterNoiseByLocalWindow", true)]
-        public void FilterNosieByLocalWindow(double signalToNoiseRatio = 1.4826, int windowPpm = 10000)
-        {
-            FilterNoiseByLocalWindow(signalToNoiseRatio, windowPpm);
-        }
-
-        /// <summary>
-        /// Filter noise peaks out using a local window
-        /// </summary>
-        /// <param name="signalToNoiseRatio"></param>
-        /// <param name="windowPpm"></param>
         public void FilterNoiseByLocalWindow(double signalToNoiseRatio = 1.4826, int windowPpm = 10000)
         {
             var filteredPeaks = new List<Peak>();
@@ -586,15 +575,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             return histogram[mostAbundantBinIndex];
-        }
-
-        /// <summary>
-        /// Filter noise peaks out using an intensity histogram
-        /// </summary>
-        [Obsolete("Use FilterNoiseByIntensityHistogram", true)]
-        public void FilterNosieByIntensityHistogram()
-        {
-            FilterNoiseByIntensityHistogram();
         }
 
         /// <summary>
