@@ -538,7 +538,7 @@
         </member>
         <member name="F:ThermoRawFileReader.ActivationTypeConstants.MPD">
             <summary>
-            Multi Photo Dissociation
+            Multi Photon Dissociation
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.ActivationTypeConstants.ECD">
@@ -573,7 +573,7 @@
         </member>
         <member name="F:ThermoRawFileReader.ActivationTypeConstants.PTR">
             <summary>
-            Photon Transfer Reaction
+            Proton Transfer Reaction
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.ActivationTypeConstants.NETD">
@@ -584,6 +584,146 @@
         <member name="F:ThermoRawFileReader.ActivationTypeConstants.NPTR">
             <summary>
             Negative Photon Transfer Reaction
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.UVPD">
+            <summary>
+            Ultra Violet Photo Dissociation
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeA">
+            <summary>
+            Mode A
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeB">
+            <summary>
+            Mode B
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeC">
+            <summary>
+            Mode C
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeD">
+            <summary>
+            Mode D
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeE">
+            <summary>
+            Mode E
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeF">
+            <summary>
+            Mode F
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeG">
+            <summary>
+            Mode G
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeH">
+            <summary>
+            Mode H
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeI">
+            <summary>
+            Mode I
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeJ">
+            <summary>
+            Mode J
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeK">
+            <summary>
+            Mode K
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeL">
+            <summary>
+            Mode L
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeM">
+            <summary>
+            Mode M
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeN">
+            <summary>
+            Mode N
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeO">
+            <summary>
+            Mode O
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeP">
+            <summary>
+            Mode P
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeQ">
+            <summary>
+            Mode Q
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeR">
+            <summary>
+            Mode R
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeS">
+            <summary>
+            Mode S
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeT">
+            <summary>
+            Mode T
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeU">
+            <summary>
+            Mode U
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeV">
+            <summary>
+            Mode V
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeW">
+            <summary>
+            Mode W
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeX">
+            <summary>
+            Mode X
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeY">
+            <summary>
+            Mode Y
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.ModeZ">
+            <summary>
+            Mode Z
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ActivationTypeConstants.LastActivation">
+            <summary>
+            Last Activation
             </summary>
         </member>
         <member name="T:ThermoRawFileReader.MRMScanTypeConstants">
@@ -698,14 +838,19 @@
             MS Controller
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.ControllerTypeConstants.Analog">
+        <member name="F:ThermoRawFileReader.ControllerTypeConstants.MSAnalog">
             <summary>
             Analog controller
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.ControllerTypeConstants.AD_Card">
+        <member name="F:ThermoRawFileReader.ControllerTypeConstants.Analog">
             <summary>
             A/D card controller
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.ControllerTypeConstants.UV">
+            <summary>
+            UV controller
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.ControllerTypeConstants.PDA">
@@ -713,9 +858,9 @@
             PDA controller
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.ControllerTypeConstants.UV">
+        <member name="F:ThermoRawFileReader.ControllerTypeConstants.Other">
             <summary>
-            UV controller
+            Other controller
             </summary>
         </member>
         <member name="T:ThermoRawFileReader.IntensityCutoffTypeConstants">
@@ -766,7 +911,7 @@
         </member>
         <member name="T:ThermoRawFileReader.XRawFileIO">
             <summary>
-            Class for reading Thermo Finnigan .raw files, using the IXRawfile5 interface
+            Class for reading Thermo .raw files
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.XRawFileIO.mMaxScansToCacheInfo">
@@ -807,7 +952,12 @@
         </member>
         <member name="F:ThermoRawFileReader.XRawFileIO.mXRawFile">
             <summary>
-            Cached XRawFile object, for faster accessing
+            Reader that implements ThermoFisher.CommonCore.Data.Interfaces.IRawDataPlus
+            </summary>
+        </member>
+        <member name="F:ThermoRawFileReader.XRawFileIO.mXRawFileHeader">
+            <summary>
+            Cached file header
             </summary>
         </member>
         <member name="P:ThermoRawFileReader.XRawFileIO.FileInfo">
@@ -1064,7 +1214,7 @@
             <param name="maxNumberOfPeaks">Set to 0 (or negative) to return all of the data</param>
             <param name="centroidData">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired)</param>
             <returns>The number of data points, or -1 if an error</returns>
-            <remarks>If maxNumberOfPeaks is 0 (or negative), then returns all data; set maxNumberOfPeaks to > 0 to limit the number of data points returned</remarks>
+            <remarks>If maxNumberOfPeaks is 0 (or negative),  returns all data; set maxNumberOfPeaks to > 0 to limit the number of data points returned</remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@)">
             <summary>
@@ -1094,7 +1244,16 @@
             <param name="maxNumberOfPeaks">Maximum number of data points; 0 to return all data</param>
             <param name="centroidData">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired)</param>
             <returns>The number of data points, or -1 if an error</returns>
-            <remarks>If maxNumberOfPeaks is 0 (or negative), then returns all data; set maxNumberOfPeaks to > 0 to limit the number of data points returned</remarks>
+            <remarks>If maxNumberOfPeaks is 0 (or negative), returns all data; set maxNumberOfPeaks to > 0 to limit the number of data points returned</remarks>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.ReadScanData(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Obtain the mass and intensity for the specified scan
+            </summary>
+            <param name="scan"></param>
+            <param name="maxNumberOfPeaks">Maximum number of data points; 0 to return all data</param>
+            <param name="centroidData">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired)</param>
+            <returns>The scan data container, or null if an error</returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetScanLabelData(System.Int32,ThermoRawFileReader.udtFTLabelInfoType[]@)">
             <summary>
@@ -1168,7 +1327,7 @@
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetCollisionEnergyUnnormalized(System.Int32)">
             <summary>
-            Return un-normalized collision energies via call mXRawFile.GetCollisionEnergyForScanNum
+            Return un-normalized collision energies via call IScanFilter.GetEnergy
             </summary>
             <param name="scan"></param>
             <returns></returns>
