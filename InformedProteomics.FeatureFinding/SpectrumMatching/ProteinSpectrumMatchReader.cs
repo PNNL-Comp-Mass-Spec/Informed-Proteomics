@@ -24,9 +24,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
             if (tool == ProteinSpectrumMatch.SearchTool.Unknown)
             {
-                if (path.EndsWith("IcTda.tsv")) tool = ProteinSpectrumMatch.SearchTool.MsPathFinder;
-                else if (path.EndsWith("MSAlign_ResultTable.txt")) tool = ProteinSpectrumMatch.SearchTool.MsAlign;
-                else if (path.EndsWith("msgfdb_syn.txt")) tool = ProteinSpectrumMatch.SearchTool.MsGfPlus;
+                if (path.EndsWith("IcTda.tsv", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsPathFinder;
+                else if (path.EndsWith("MSAlign_ResultTable.txt", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsAlign;
+                // ReSharper disable once StringLiteralTypo
+                else if (path.EndsWith("msgfdb_syn.txt", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsGfPlus;
             }
 
             if (tool == ProteinSpectrumMatch.SearchTool.MsAlign)

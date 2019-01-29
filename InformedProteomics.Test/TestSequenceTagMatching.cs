@@ -128,7 +128,9 @@ namespace InformedProteomics.Test
 
             var fileEntries = Directory.GetFiles(dataSetPath);
 
-            var dataset = (from fileName in fileEntries where fileName.EndsWith("pbf") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            var dataset = (from fileName in fileEntries
+                           where fileName.EndsWith("pbf", StringComparison.OrdinalIgnoreCase)
+                           select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
 
             var fastaDb = new FastaDatabase(fastaFilePath);

@@ -27,7 +27,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             var fileEntries = Directory.GetFiles(ms1ftFolder);
 
-            var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
+            var dataset = (from fileName in fileEntries
+                           where fileName.EndsWith("ms1ft", StringComparison.OrdinalIgnoreCase)
+                           select Path.GetFileNameWithoutExtension(fileName)).ToList();
             dataset.Sort();
             /*var dataset = new String[]
             {
@@ -131,10 +133,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             const string rawFolder = @"\\protoapps\UserData\Jungkap\CompRef\raw";
 
             var fileEntries = Directory.GetFiles(ms1ftFolder);
-            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft")).ToList();
+            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft", StringComparison.OrdinalIgnoreCase)).ToList();
 
             fileEntries = Directory.GetFiles(rawFolder);
-            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf")).ToList();
+            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf", StringComparison.OrdinalIgnoreCase)).ToList();
 
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }
@@ -149,10 +151,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             const string rawFolder = @"D:\MassSpecFiles\IMER";
 
             var fileEntries = Directory.GetFiles(ms1ftFolder);
-            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft")).ToList();
+            var ms1FtFiles = fileEntries.Where(f => f.EndsWith(".ms1ft", StringComparison.OrdinalIgnoreCase)).ToList();
 
             fileEntries = Directory.GetFiles(rawFolder);
-            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf")).ToList();
+            var rawFiles = fileEntries.Where(f => f.EndsWith(".pbf", StringComparison.OrdinalIgnoreCase)).ToList();
 
             RunFeatureAlignment(ms1FtFiles, rawFiles, outFilePath);
         }

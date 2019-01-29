@@ -89,7 +89,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             if (prefixSubString != "")
             {
                 var prefixIndex = string.Concat(prefixSequenceArr);
-                prefixStartIndex = prefixIndex.IndexOf(prefixSubString) + 1;
+                prefixStartIndex = prefixIndex.IndexOf(prefixSubString, StringComparison.Ordinal) + 1;
                 prefixEndIndex = (prefixStartIndex == 1) ? 1 : prefixStartIndex + prefixSubString.Length - 1;
                 //prefixSequencePeaks = GetPrefixSequencePeaks(prefixPeakArr, prefixStartIndex, prefixEndIndex);
                 //var prefixRankSum = GetSequenceRankSum(prefixSequencePeaks, rankings, peakList);
@@ -107,7 +107,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             if (suffixSubString != "")
             {
                 var suffixIndex = string.Concat(suffixSequenceArr);
-                suffixStartIndex = suffixIndex.IndexOf(suffixSubString) + 1;
+                suffixStartIndex = suffixIndex.IndexOf(suffixSubString, StringComparison.Ordinal) + 1;
                 suffixEndIndex = (suffixStartIndex == 1) ? 1 : suffixStartIndex + suffixSubString.Length - 1;
                 //suffixSequencePeaks = GetSuffixSequencePeaks(suffixPeakArr, suffixStartIndex, suffixEndIndex);
                 //var suffixRankSum = GetSequenceRankSum(suffixSequencePeaks, rankings, peakList);

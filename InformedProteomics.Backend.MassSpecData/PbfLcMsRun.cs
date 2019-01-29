@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.MassSpecData
             double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
             IProgress<ProgressData> progress = null)
         {
-            if (specFilePath.ToLower().EndsWith(FileExtensionConst))
+            if (specFilePath.ToLower().EndsWith(FileExtensionConst, StringComparison.OrdinalIgnoreCase))
             {
                 return specFilePath;
             }
@@ -349,10 +349,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 pbfPath = pbfFileName;
             }
 
-            if (specFileName.EndsWith(FileExtension) || File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out var isCurrent) && isCurrent)
+            if (specFileName.EndsWith(FileExtension, StringComparison.OrdinalIgnoreCase) ||
+                File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out var isCurrent) && isCurrent)
             {
                 // Use regular construction
-                if (!specFileName.EndsWith(FileExtension))
+                if (!specFileName.EndsWith(FileExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     specFileName = pbfPath;
                 }

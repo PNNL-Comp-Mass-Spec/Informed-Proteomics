@@ -642,7 +642,7 @@ namespace InformedProteomics.Tests.DevTests
             var dataset = new List<string>();
             foreach (var fileName in fileEntries)
             {
-                if (fileName.EndsWith("ms1ft"))
+                if (fileName.EndsWith("ms1ft", StringComparison.OrdinalIgnoreCase))
                 {
                     dataset.Add(Path.GetFileNameWithoutExtension(fileName));
                 }
@@ -673,7 +673,7 @@ namespace InformedProteomics.Tests.DevTests
             var dataset = new List<string>();
             foreach (var fileName in fileEntries)
             {
-                if (fileName.EndsWith("ms1ft"))
+                if (fileName.EndsWith("ms1ft", StringComparison.OrdinalIgnoreCase))
                 {
                     dataset.Add(Path.GetFileNameWithoutExtension(fileName));
                 }
