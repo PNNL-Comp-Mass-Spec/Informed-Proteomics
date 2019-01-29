@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Data.Spectrometry;
 
@@ -13,7 +12,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             var peaks = spectrum.Peaks;
             var filteredPeaks = new List<Peak>();
 
-            for (var peakIndex = 0; peakIndex < peaks.Count(); peakIndex++)
+            for (var peakIndex = 0; peakIndex < peaks.Length; peakIndex++)
             {
                 var rank = 1;
                 var peak = peaks[peakIndex];

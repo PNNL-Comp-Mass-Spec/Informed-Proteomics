@@ -200,7 +200,7 @@ namespace InformedProteomics.TopDown.Quantification
 
         private void InitializeMatrix(IList<int[]> matrix)
         {
-            for (var i = 0; i < matrix.Length; i++)
+            for (var i = 0; i < matrix.Count; i++)
             {
                 matrix[i] = new int[_rawFiles.Length];
             }
