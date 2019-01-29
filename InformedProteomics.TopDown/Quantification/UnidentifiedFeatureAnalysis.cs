@@ -22,8 +22,7 @@ namespace InformedProteomics.TopDown.Quantification
         {
             _rawFiles = rawFiles;
             _crossTabFile = crossTabFile;
-            _databaseFile = databaseFile;
-            _searchableDB = new SearchableDatabase(new FastaDatabase(_databaseFile));
+            _searchableDB = new SearchableDatabase(new FastaDatabase(databaseFile));
             _filteredFeatures = new List<Tuple<int,double, double, double, double, double>>();
         }
 
