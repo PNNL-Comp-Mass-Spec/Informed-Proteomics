@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using InformedProteomics.Backend.Data.Spectrometry;
 using MathNet.Numerics.Distributions;
@@ -41,7 +42,12 @@ namespace InformedProteomics.TopDown.Scoring
 
     public class LikelihoodScoringModel
     {
-        public LikelihoodScoringModel(string dataPath)
+        public LikelihoodScoringModel()
+        {
+        }
+
+        [Obsolete("Use parameterless constructor")]
+        public LikelihoodScoringModel(string dataPath) : this()
         {
             /*
             var scorePath = Path.Combine(dataPath, "IonTypeScore.txt");

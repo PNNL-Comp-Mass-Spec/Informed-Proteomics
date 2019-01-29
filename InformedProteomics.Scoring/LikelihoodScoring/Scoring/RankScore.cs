@@ -7,7 +7,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
 {
     public class RankScore
     {
-        public RankScore(ActivationMethod activationMethod, Ms2DetectorType ms2DetectorType, Enzyme enzyme, Protocol protocol)
+        public RankScore(ActivationMethod activationMethod, Enzyme enzyme)
         {
             if (activationMethod == ActivationMethod.HCD && enzyme == Enzyme.Trypsin)
             {
@@ -23,6 +23,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
             {
                 throw new ArgumentException("No parameter file available for selected arguments.");
             }
+        }
+
+        [Obsolete("Use the constructor with two parameters: activationMethod and enzyme")]
+        public RankScore(ActivationMethod activationMethod, Ms2DetectorType ms2DetectorType, Enzyme enzyme, Protocol protocol) :
+            this(activationMethod, enzyme)
+        {
         }
 
         public RankScore(string fileName)

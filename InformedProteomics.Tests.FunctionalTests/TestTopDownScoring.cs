@@ -67,7 +67,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
-            var scoringModel = new LikelihoodScoringModel(filePath);
+            var scoringModel = new LikelihoodScoringModel();
             scoringModel.PrintAllScores();
         }
 
@@ -86,7 +86,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
-            var scoringModel = new LikelihoodScoringModel(filePath);
+            var scoringModel = new LikelihoodScoringModel();
             Console.WriteLine("Score: {0}", scoringModel.GetScore(BaseIonType.Y, 0.99, 1200));
         }*/
 

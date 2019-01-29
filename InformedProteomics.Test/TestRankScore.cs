@@ -23,8 +23,9 @@ namespace InformedProteomics.Test
             Utils.ShowStarting(methodName);
 
             const int ranks = 20;
-            var rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Iontrap, Enzyme.Trypsin,
-                                           Protocol.Standard);
+            // Ms2DetectorType.IonTrap
+            // Protocol.Standard
+            var rankScorer = new RankScore(ActivationMethod.HCD, Enzyme.Trypsin);
             for (var charge = 1; charge < 4; charge++)
             {
                 var ionTypes = rankScorer.GetIonTypes(charge, 0);
