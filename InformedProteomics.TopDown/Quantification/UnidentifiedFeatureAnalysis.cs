@@ -145,7 +145,12 @@ namespace InformedProteomics.TopDown.Quantification
                 var scanElutionTime = run.GetElutionTime(scanNum);
                 if (scanElutionTime < minElution || scanElutionTime > maxElution) continue;
 
-                var spectrum = run.GetSpectrum(ms2List[i]) as ProductSpectrum;
+                if (!(run.GetSpectrum(scanNum) is ProductSpectrum spectrum))
+                {
+                    Console.WriteLine("Unable to retrieve the spectrum for scan " + scanNum);
+                    continue;
+                }
+
                 var window = spectrum.IsolationWindow;
                 var minMz = window.MinMz - .5;
                 var maxMz = window.MaxMz + .5;
