@@ -20,7 +20,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             _maxCharge = maxScanCharge;
             _minMass = minScanMass;
             _maxMass = maxScanMass;
-            _ms1Features= new NodeSet<Ms1Feature>();
+            _ms1Features = new NodeSet<Ms1Feature>();
 
             var nBits = (int)Math.Round(27 - Math.Log(_tolerance.GetValue() / 16, 2));
             _comparer = new MzComparerWithBinning(nBits);
@@ -44,7 +44,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 if (features.Count >= _maxFeaturesPerSpec) break;
                 if (maxInt < 0) maxInt = feature.Abundance;
-                if (feature.Abundance < AbundanceRatioCutoff*maxInt) break;
+                if (feature.Abundance < AbundanceRatioCutoff * maxInt) break;
                 features.Add(feature);
             }
 
@@ -74,12 +74,12 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 maxScan = Run.GetNextScanNum(maxScan, 1);
 
                 var repScanNum = (int)cluster.Select(m => (double)m.ScanNum).Median();
-                var repCharge = (int)(0.5*(minCharge + maxCharge));
+                var repCharge = (int)(0.5 * (minCharge + maxCharge));
                 var abundance = cluster.Sum(m => m.Abundance);
                 var minElution = Run.GetElutionTime(minScan);
                 var maxElution = Run.GetElutionTime(maxScan);
 
-                var repMz = (mass/repCharge) + Constants.Proton;
+                var repMz = (mass / repCharge) + Constants.Proton;
 
                 ret.Add(new LcMsFeature(mass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, minElution, maxElution));
             }

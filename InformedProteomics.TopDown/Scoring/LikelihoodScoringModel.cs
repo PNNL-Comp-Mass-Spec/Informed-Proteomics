@@ -12,7 +12,7 @@ namespace InformedProteomics.TopDown.Scoring
             BinWidth = binWidth;
             MaxBinCenter = maxBinCenter;
             MinBinCenter = minBinCenter;
-            BinCount = (int)Math.Floor((MaxBinCenter - MinBinCenter + BinWidth)/BinWidth);
+            BinCount = (int)Math.Floor((MaxBinCenter - MinBinCenter + BinWidth) / BinWidth);
         }
 
         public int GetBinIndex(double val)
@@ -112,8 +112,7 @@ namespace InformedProteomics.TopDown.Scoring
         public double GetNodeScore(ActivationMethod activationMethod, bool isPrefix, double fragmentIonMass, int fragmentIonCharge,
             double corrScore, double distScore, double intensityScore, double massErrorPpm)
         {
-            var score = GetNodeScoreWithoutMassError(activationMethod, isPrefix, fragmentIonMass, fragmentIonCharge, corrScore,
-                distScore, intensityScore);
+            var score = GetNodeScoreWithoutMassError(activationMethod, isPrefix, fragmentIonMass, fragmentIonCharge, corrScore, distScore, intensityScore);
             score += GetMassErrorScore(massErrorPpm);
             return score;
         }
@@ -134,7 +133,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public double GetEdgeScore(ActivationMethod activationMethod, int charge1, double mass1, int charge2, double mass2)
         {
-            var mzErrorPpm = (Math.Abs(mass1 - mass2)/mass1)*1e6;
+            var mzErrorPpm = (Math.Abs(mass1 - mass2) / mass1) * 1e6;
             return GetEdgeScore(activationMethod, Math.Abs(charge1 - charge2), mzErrorPpm);
         }
 
@@ -194,7 +193,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void LoadMassScoreTable(TextReader reader)
         {
-            for(var i = 0; i < ActivationBinLength; i++)
+            for (var i = 0; i < ActivationBinLength; i++)
             {
                 var line = reader.ReadLine();
                 if (string.IsNullOrEmpty(line)) break;
@@ -215,7 +214,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void LoadChargeScoreTable(TextReader reader)
         {
-            while(true)
+            while (true)
             {
                 var line = reader.ReadLine();
                 if (string.IsNullOrEmpty(line)) break;

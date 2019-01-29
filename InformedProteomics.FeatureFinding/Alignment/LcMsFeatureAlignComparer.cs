@@ -18,12 +18,15 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
         public bool SameCluster(LcMsFeature f1, LcMsFeature f2)
         {
-            if (f1.DataSetId == f2.DataSetId) return false;
+            if (f1.DataSetId == f2.DataSetId)
+                return false;
+
             // tolerant in mass dimension?
             if (!_oneDaltonShift)
             {
                 var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
-                if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
+                if (Math.Abs(f1.Mass - f2.Mass) > massTol)
+                    return false;
             }
             else
             {
@@ -32,11 +35,13 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
                 if (f1.Mass > 10000 && f2.Mass > 10000)
                 {
-                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol && Math.Abs(massDiff - 2) > massTol) return false;
+                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol && Math.Abs(massDiff - 2) > massTol)
+                        return false;
                 }
                 else
                 {
-                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol) return false;
+                    if (massDiff > massTol && Math.Abs(massDiff - 1) > massTol)
+                        return false;
                 }
             }
             /*
@@ -49,7 +54,8 @@ namespace InformedProteomics.FeatureFinding.Alignment
             */
             //if (f1.CoElutedByNet(f2, 0.01)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
 
-            if (f1.CoElutedByNet(f2, 0.01)) return true; //e.g) 200*0.001 = 0.2 min = 30 sec
+            if (f1.CoElutedByNet(f2, 0.01))
+                return true; //e.g) 200*0.001 = 0.2 min = 30 sec
 
             //if (NetDiff(f1, f2) < TolNet) return true;
             return false;

@@ -237,6 +237,7 @@ namespace InformedProteomics.FeatureFinding
             return 0;
         }
 
+        [Obsolete("Unused")]
         private int FilterAndOutputFeaturesOld(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, string ms1FeaturesFilePath)
         {
             var featureId = 0;
@@ -300,7 +301,11 @@ namespace InformedProteomics.FeatureFinding
         /// <param name="outCsvFilePath"></param>
         /// <param name="featureCounter"></param>
         /// <returns></returns>
-        private IEnumerable<Ms1FtEntry> FilterFeaturesWithOutput(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, int[] featureCounter)
+        private IEnumerable<Ms1FtEntry> FilterFeaturesWithOutput(
+            LcMsFeatureContainer container,
+            LcMsPeakMatrix featureFinder,
+            string outCsvFilePath,
+            IList<int> featureCounter)
         {
             // Using an array, since we can't use ref or out parameters
             featureCounter[0] = 0;

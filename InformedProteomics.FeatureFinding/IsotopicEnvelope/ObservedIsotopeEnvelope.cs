@@ -34,7 +34,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             {
                 var s = Abundance;
                 var prob = new double[Size];
-                for(var i = 0; i < Size; i++) if (Peaks[i] != null && Peaks[i].Active) prob[i] = Peaks[i].Intensity/s;
+                for (var i = 0; i < Size; i++) if (Peaks[i] != null && Peaks[i].Active) prob[i] = Peaks[i].Intensity / s;
                 return prob;
             }
         }
@@ -59,7 +59,11 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             get
             {
                 var ret = 0d;
-                foreach (var peak in Peaks.Where(p => p != null && p.Active)) if (peak.Intensity > ret) ret = peak.Intensity;
+                foreach (var peak in Peaks.Where(p => p != null && p.Active))
+                {
+                    if (peak.Intensity > ret) ret = peak.Intensity;
+                }
+
                 return ret;
             }
         }

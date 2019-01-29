@@ -269,11 +269,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             for (var k = 0; k < smoothedXic.Length - 1; k++)
             {
                 var col = k + minCol - xicStartIndex;
-                if (col < 0 || col >= NColumns - 1) continue;
+                if (col < 0 || col >= NColumns - 1)
+                    continue;
 
                 var centerIntensity = 0.5 * (Math.Max(0, smoothedXic[k]) + Math.Max(0, smoothedXic[k + 1]));
 
-                if (!(centerIntensity > 0)) continue;
+                if (!(centerIntensity > 0))
+                    continue;
 
                 var timeInterval = Run.GetElutionTime(ms1ScanNums[col + 1]) - Run.GetElutionTime(ms1ScanNums[col]);
                 var abu = centerIntensity * timeInterval;
@@ -321,11 +323,15 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 for (var j = 0; j < 2; j++)
                 {
-                    if (i == 0 && j > 0) continue;
+                    if (i == 0 && j > 0)
+                        continue;
 
                     var col = (j < 1) ? ms1ScanIndex + i : ms1ScanIndex - i;
-                    if (col >= ms1ScanNums.Length || col < 0) continue;
-                    if (Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime) continue;
+                    if (col >= ms1ScanNums.Length || col < 0)
+                        continue;
+
+                    if (Run.GetElutionTime(ms1ScanNums[col]) > maxElutionTime || Run.GetElutionTime(ms1ScanNums[col]) < minElutionTime)
+                        continue;
 
                     var ms1Spec = Ms1Spectra[col];
                     var observedPeaks = ms1Spec.GetAllIsotopePeaks(targetMass, charge, theoreticalEnvelope, tolerance);
@@ -463,7 +469,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     var isotopeMzLb = (k == 0) ? Ion.GetIsotopeMz(Comparer.GetMzStart(targetMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(Comparer.GetMzAverage(targetMassBinNum - 1), charge, isotopeIndex);
                     var isotopeMzUb = (k == 0) ? Ion.GetIsotopeMz(Comparer.GetMzEnd(targetMassBinNum), charge, isotopeIndex) : Ion.GetIsotopeMz(Comparer.GetMzAverage(targetMassBinNum + 1), charge, isotopeIndex);
 
-                    if (isotopeMzLb < minMs1Mz || isotopeMzUb > maxMs1Mz) continue;
+                    if (isotopeMzLb < minMs1Mz || isotopeMzUb > maxMs1Mz)
+                        continue;
+
                     var st = _ms1PeakList.BinarySearch(new Ms1Peak(isotopeMzLb, 0, 0));
 
                     if (st < 0) st = ~st;
@@ -484,11 +492,14 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         }
                         else
                         {
-                            if (!(_featureMatrix[row][col].AccurateMass > 0)) continue;
-                            var expectedPeakMz = Ion.GetIsotopeMz(_featureMatrix[row][col].AccurateMass, charge, isotopeIndex);
-                            if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > tolerance.GetToleranceAsMz(ms1Peak.Mz)) continue;
+                            if (!(_featureMatrix[row][col].AccurateMass > 0))
+                                continue;
 
-                            // in case of existing isotope peaks, select peaks maximizing envelope similairty
+                            var expectedPeakMz = Ion.GetIsotopeMz(_featureMatrix[row][col].AccurateMass, charge, isotopeIndex);
+                            if (Math.Abs(expectedPeakMz - ms1Peak.Mz) > tolerance.GetToleranceAsMz(ms1Peak.Mz))
+                                continue;
+
+                            // in case of existing isotope peaks, select peaks maximizing envelope similarity
                             if (_featureMatrix[row][col].EnvelopePeaks[i] != null)
                             {
                                 if (_featureMatrix[row][col].CountActivePeaks == 1)
@@ -516,7 +527,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         // for cells missing most abundant peaks
                         for (var col = 0; col < NColumns; col++)
                         {
-                            if (_featureMatrix[row][col].Exist) continue;
+                            if (_featureMatrix[row][col].Exist)
+                                continue;
+
                             var highestIntensity = 0d;
                             var inferredAccurateMass = 0d;
                             // find the most intense abundant peak from neighboring cells
@@ -536,7 +549,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
                 for (var col = 0; col < NColumns; col++)
                 {
-                    if (!_featureMatrix[row][col].Exist) continue;
+                    if (!_featureMatrix[row][col].Exist)
+                        continue;
 
                     if (_featureMatrix[row][col].CountActivePeaks >= nPeaksCutoff)
                     {
@@ -626,18 +640,21 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var row = seed.Charge - _targetMinCharge;
                 var col = ms1ScanNumToIndex[seed.ScanNum];
 
-                if (_featureMatrix[row][col].CheckedOutFlag) continue;
+                if (_featureMatrix[row][col].CheckedOutFlag)
+                    continue;
 
                 var mostAbuMz = _theoreticalEnvelope.GetIsotopeMz(seed.Charge, mostAbuInternalIndex);
                 var seedLocalWin = Ms1Spectra[col].GetLocalMzWindow(mostAbuMz);
                 var poissonPValue = seedLocalWin.GetPoissonTestPValue(_featureMatrix[row][col].EnvelopePeaks, _theoreticalEnvelope.Size);
                 var rankSumPValue = seedLocalWin.GetRankSumTestPValue(_featureMatrix[row][col].EnvelopePeaks, _theoreticalEnvelope.Size);
 
-                if (!goodEnvelope) continue;
                 var goodEnvelope = (rankSumPValue < 0.01 || poissonPValue < 0.01);
+                if (!goodEnvelope)
+                    continue;
 
                 var chargeCheck = CorrectChargeState(seed, Ms1Spectra[col]);
-                if (!chargeCheck) continue;
+                if (!chargeCheck)
+                    continue;
 
                 var seedMass = _featureMatrix[row][col].AccurateMass;
                 var massTol = tolerance.GetToleranceAsMz(seedMass);
@@ -670,13 +687,17 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         else
                             j -= (k - 2);
 
-                        if (j < _cols.First() || j > _cols.Last()) continue;
+                        if (j < _cols.First() || j > _cols.Last())
+                            continue;
 
                         for (var i = minRw; i <= maxRw; i++)
                         {
-                            if (_featureMatrix[i][j].CheckedOutFlag) continue;
-                            if (!(_featureMatrix[i][j].AccurateMass > 0)) continue;
-                            if (Math.Abs(seedMass - _featureMatrix[i][j].AccurateMass) > massTol) continue;
+                            if (_featureMatrix[i][j].CheckedOutFlag)
+                                continue;
+                            if (!(_featureMatrix[i][j].AccurateMass > 0))
+                                continue;
+                            if (Math.Abs(seedMass - _featureMatrix[i][j].AccurateMass) > massTol)
+                                continue;
 
                             Array.Copy(tempEnvelope, tempEnvelope2, tempEnvelope2.Length);
 
@@ -684,7 +705,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                             var newDivergence = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
                             var newCorrelation = _theoreticalEnvelope.GetPearsonCorrelation(tempEnvelope);
 
-                            if (_featureMatrix[i][j].DivergenceDist < 0.02 || _featureMatrix[i][j].CorrelationCoeff > 0.7 || newDivergence < summedBcDist || newCorrelation > summedCorr)
+                            if (_featureMatrix[i][j].DivergenceDist < 0.02 ||
+                                _featureMatrix[i][j].CorrelationCoefficient > 0.7 ||
+                                newDivergence < summedBcDist ||
+                                newCorrelation > summedCorr)
                             {
                                 var envelope = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass,
                                     i + _targetMinCharge, ms1ScanNums[j], _featureMatrix[i][j].EnvelopePeaks,
@@ -713,7 +737,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     refinedCluster = GetLcMsPeakCluster(newCluster.RepresentativeMass, newCluster.RepresentativeCharge, newCluster.MinScanNum, newCluster.MaxScanNum, true);
                 }
 
-                if (refinedCluster != null && (_scorer == null || (_scorer != null && refinedCluster.GoodEnougth && refinedCluster.Score >= _scorer.ScoreThreshold)))
+                if (refinedCluster != null && (_scorer == null || (_scorer != null && refinedCluster.GoodEnough && refinedCluster.Score >= _scorer.ScoreThreshold)))
                 {
                     SetCheckOutFlag(_rows.First(), _rows.Last(), ms1ScanNumToIndex[refinedCluster.MinScanNum], ms1ScanNumToIndex[refinedCluster.MaxScanNum], true);
                     clusters.Add(refinedCluster);
@@ -741,7 +765,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 for (var j = minCol; j <= maxCol; j++)
                 {
-                    if (!_featureMatrix[i][j].Exist) continue;
+                    if (!_featureMatrix[i][j].Exist)
+                        continue;
+
                     distList.Add(_featureMatrix[i][j].DivergenceDist);
                     corrList.Add(_featureMatrix[i][j].CorrelationCoefficient);
                 }
@@ -785,9 +811,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         }
                     }
 
-                    if (!_featureMatrix[i][j].Exist) continue;
-                    if (_featureMatrix[i][j].CountActivePeaks < nPeaksCutoff) continue;
-                    if (_featureMatrix[i][j].DivergenceDist > bcCutoff && _featureMatrix[i][j].CorrelationCoeff < corrCutoff) continue; // exclude outliers
+                    if (!_featureMatrix[i][j].Exist)
+                        continue;
+                    if (_featureMatrix[i][j].CountActivePeaks < nPeaksCutoff)
+                        continue;
+                    if (_featureMatrix[i][j].DivergenceDist > bcCutoff && _featureMatrix[i][j].CorrelationCoefficient < corrCutoff)
+                        continue; // exclude outliers
+
                     var envelope = new ObservedIsotopeEnvelope(_featureMatrix[i][j].AccurateMass, i + _targetMinCharge, ms1ScanNums[j], _featureMatrix[i][j].EnvelopePeaks, _theoreticalEnvelope);
                     envelopes.Add(envelope);
 
@@ -888,7 +918,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             foreach (var i in _rows)
             {
-                if (_corrProfileAcrossCharge[i] < corrCutoff && _distProfileAcrossCharge[i] > bcCutoff) continue;
+                if (_corrProfileAcrossCharge[i] < corrCutoff && _distProfileAcrossCharge[i] > bcCutoff)
+                    continue;
+
                 bcDistList.Add(_distProfileAcrossCharge[i]);
                 corrList.Add(_corrProfileAcrossCharge[i]);
             }
@@ -905,7 +937,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var maxColList = new List<int>();
                 foreach (var i in _rows)
                 {
-                    if (_distProfileAcrossCharge[i] > bcDistMedian && _corrProfileAcrossCharge[i] < corrMedian) continue;
+                    if (_distProfileAcrossCharge[i] > bcDistMedian && _corrProfileAcrossCharge[i] < corrMedian)
+                        continue;
+
                     minColList.Add(_summedEnvelopeColRange[i, 0]);
                     maxColList.Add(_summedEnvelopeColRange[i, 1]);
                 }
@@ -923,10 +957,13 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var maxRow = _rows.First();
             foreach (var i in _rows)
             {
-                if (_corrProfileAcrossCharge[i] < corrCutoff && _distProfileAcrossCharge[i] > bcCutoff) continue;
+                if (_corrProfileAcrossCharge[i] < corrCutoff && _distProfileAcrossCharge[i] > bcCutoff)
+                    continue;
 
-                if (_summedEnvelopeColRange[i, 1] < minCol) continue;
-                if (_summedEnvelopeColRange[i, 0] > maxCol) continue;
+                if (_summedEnvelopeColRange[i, 1] < minCol)
+                    continue;
+                if (_summedEnvelopeColRange[i, 0] > maxCol)
+                    continue;
 
                 if (i < minRow) minRow = i;
                 if (i > maxRow) maxRow = i;
@@ -976,7 +1013,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 for (var j = minCol; j <= maxCol; j++)
                 {
                     if (!_featureMatrix[i][j].Exist ||
-                        (_featureMatrix[i][j].DivergenceDist > GetSeedBcDistThreshold() && _featureMatrix[i][j].CorrelationCoeff < GetSeedCorrThreshold())) continue;
+                        (_featureMatrix[i][j].DivergenceDist > GetSeedBcDistThreshold() && _featureMatrix[i][j].CorrelationCoefficient < GetSeedCorrThreshold()))
+                        continue;
+
                     //_xic[j] += _featureMatrix[i][j].Intensity;
 
                     xic[j - minCol + xicStartIndex] += _featureMatrix[i][j].Intensity;
@@ -1148,12 +1187,16 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             for (var j = minCol; j <= maxCol; j++)
             {
-                if (!_featureMatrix[row][j].Exist) continue;
-                if (_featureMatrix[row][j].CheckedOutFlag) continue;
-                if (Math.Abs(targetMass - _featureMatrix[row][j].AccurateMass) > massTol) continue;
+                if (!_featureMatrix[row][j].Exist)
+                    continue;
+                if (_featureMatrix[row][j].CheckedOutFlag)
+                    continue;
+                if (Math.Abs(targetMass - _featureMatrix[row][j].AccurateMass) > massTol)
+                    continue;
 
                 var bcDist = _featureMatrix[row][j].DivergenceDist;
-                if (bcDist > seedDist) continue;
+                if (bcDist > seedDist)
+                    continue;
 
                 //var signalToNoiseRatio = _featureMatrix[row][j].HighestIntensity / Ms1Spectra[j].MedianIntensity;
                 //if (signalToNoiseRatio < 3) continue;
@@ -1175,7 +1218,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var n = 0;
             for (var col = seedCol; col < NColumns; col++)
             {
-                if (_featureMatrix[row][col].CheckedOutFlag) break;
+                if (_featureMatrix[row][col].CheckedOutFlag)
+                    break;
 
                 if (n >= maxScanSkips)
                 {
@@ -1193,7 +1237,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var tempBcDist = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
                 var tempCorr = _theoreticalEnvelope.GetPearsonCorrelation(tempEnvelope);
 
-                if (tempBcDist < summedBcDist || tempCorr > summedCorr || _featureMatrix[row][col].DivergenceDist < goodEnoughBcDistance || _featureMatrix[row][col].CorrelationCoeff > goodEnoughCorrCoeff)
+                if (tempBcDist < summedBcDist ||
+                    tempCorr > summedCorr ||
+                    _featureMatrix[row][col].DivergenceDist < goodEnoughBcDistance ||
+                    _featureMatrix[row][col].CorrelationCoefficient > goodEnoughCorrCoefficient)
                 {
                     summedBcDist = tempBcDist;
                     summedCorr = tempCorr;
@@ -1233,7 +1280,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var tempBcDist = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
                 var tempCorr = _theoreticalEnvelope.GetPearsonCorrelation(tempEnvelope);
 
-                if (tempBcDist < summedBcDist || tempCorr > summedCorr || _featureMatrix[row][col].DivergenceDist < goodEnoughBcDistance || _featureMatrix[row][col].CorrelationCoeff > goodEnoughCorrCoeff)
+                if (tempBcDist < summedBcDist ||
+                    tempCorr > summedCorr ||
+                    _featureMatrix[row][col].DivergenceDist < goodEnoughBcDistance ||
+                    _featureMatrix[row][col].CorrelationCoefficient > goodEnoughCorrCoefficient)
                 {
                     summedBcDist = tempBcDist;
                     summedCorr = tempCorr;
@@ -1277,7 +1327,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                         continue;
                     }
 
-                    if (!_featureMatrix[row][col].Exist) continue;
+                    if (!_featureMatrix[row][col].Exist)
+                        continue;
 
                     _featureMatrix[row][col].EnvelopePeaks.SumEnvelopeTo(tempEnvelope);
                     var tempBcDist = _theoreticalEnvelope.GetBhattacharyyaDistance(tempEnvelope);
@@ -1337,15 +1388,18 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             for (var i = peakStartIndex; i <= peakEndIndex; i++)
             {
-                if (!(peaks[i].Intensity > intensityThreshold)) continue;
+                if (!(peaks[i].Intensity > intensityThreshold))
+                    continue;
 
                 for (var j = i + 1; j <= peakEndIndex; j++)
                 {
-                    if (!(peaks[j].Intensity > intensityThreshold)) continue;
+                    if (!(peaks[j].Intensity > intensityThreshold))
+                        continue;
 
                     var deltaMz = peaks[j].Mz - peaks[i].Mz;
 
-                    if (deltaMz > maxDeltaMz) break;
+                    if (deltaMz > maxDeltaMz)
+                        break;
 
                     if (Math.Abs(deltaMz - mzTol) < float.Epsilon)
                     {

@@ -19,7 +19,12 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <param name="maxCharge">minimum charge to be considered</param>
         /// <param name="minMass">minimum mass to be considered</param>
         /// <param name="maxMass">maximum mass to be considered</param>
-        public MaxEntDeconvoluter(Spectrum spec, Tolerance tolerance, MzComparerWithBinning massBinning, int minCharge = 1, int maxCharge = 100, double minMass = 10000, double maxMass = 100000)
+        public MaxEntDeconvoluter(
+            Spectrum spec,
+            Tolerance tolerance,
+            MzComparerWithBinning massBinning,
+            int minCharge = 1, int maxCharge = 100,
+            double minMass = 10000, double maxMass = 100000)
         {
             _minCharge = minCharge;
             _maxCharge = maxCharge;

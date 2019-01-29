@@ -15,9 +15,9 @@ namespace InformedProteomics.TopDown.Quantification
             _run = run;
         }
 
-        public List<List<MSDeconvNode>> GetClustersList(Tolerance tol, double elutionInterval,List<MSDeconvNode> nodeList)
+        public List<List<MSDeconvNode>> GetClustersList(Tolerance tol, double elutionInterval, List<MSDeconvNode> nodeList)
         {
-            var edgeDict = GetEdges(nodeList,tol,elutionInterval);
+            var edgeDict = GetEdges(nodeList, tol, elutionInterval);
 
             var connectedComponents = new List<List<MSDeconvNode>>();
             var nodesInComponents = new Dictionary<MSDeconvNode, int>();
@@ -64,15 +64,18 @@ namespace InformedProteomics.TopDown.Quantification
                 if (c.Count()%2 == 0)
                 {
                     medianMass = (sortedMono.ElementAt(halfIndex).RealMonoMass +
-                              sortedMono.ElementAt(halfIndex - 1).RealMonoMass)/2;
+                                  sortedMono.ElementAt(halfIndex - 1).RealMonoMass) / 2;
                 }
-                else medianMass = sortedMono.ElementAt(halfIndex).RealMonoMass;
+                else
+                {
+                    medianMass = sortedMono.ElementAt(halfIndex).RealMonoMass;
+                }
 
                 var info = string.Format("{0} \t {1} \t {2} \t {3} \t {4} \t {5} \t {6} \t {7} \t {8} \t \n", id, minScan, maxScan, minCharge, maxCharge, medianMass, abundance, _run.GetElutionTime(minScanNum), _run.GetElutionTime(maxScanNum));
                 tsv.Append(info);
                 id++;
             }
-            File.WriteAllText(filename+".tsv", tsv.ToString());
+            File.WriteAllText(filename + ".tsv", tsv.ToString());
         }
 
         private Dictionary<MSDeconvNode, List<MSDeconvNode>> GetEdges(IList<MSDeconvNode> nodeList, Tolerance tol, double elutionInterval)
@@ -88,11 +91,11 @@ namespace InformedProteomics.TopDown.Quantification
                     currentIndex = GetIndexRange(nodeList, elutionInterval, currentNode);
                     if (currentIndex.Item2 == -1) break;
                 }
-                edgeDict.Add(n1 ,new List<MSDeconvNode>());
-                for (var i = currentIndex.Item1 ; i < currentIndex.Item2; i++)
+                edgeDict.Add(n1, new List<MSDeconvNode>());
+                for (var i = currentIndex.Item1; i < currentIndex.Item2; i++)
                 {
                     var deltaMass = Math.Abs(nodeList[i].RealMonoMass - n1.RealMonoMass);
-                    if(deltaMass <= tol.GetValue()) edgeDict[n1].Add(nodeList[i]);
+                    if (deltaMass <= tol.GetValue()) edgeDict[n1].Add(nodeList[i]);
                 }
             }
             return edgeDict;
@@ -115,7 +118,7 @@ namespace InformedProteomics.TopDown.Quantification
                 {
                     connectedComp.Add(current);
                     if (connectedNodes.ContainsKey(current)) break;
-                    connectedNodes.Add(current,0);
+                    connectedNodes.Add(current, 0);
                     if (!edges.ContainsKey(current)) break;
                     foreach (var n in edges[current])
                     {
@@ -131,15 +134,15 @@ namespace InformedProteomics.TopDown.Quantification
             var startIndex = -1;
             var endIndex = -1;
             var setStart = false;
-            for (int i = nodeList.IndexOf(node); i < nodeList.Count-1; i++)
+            for (var i = nodeList.IndexOf(node); i < nodeList.Count - 1; i++)
             {
-                if(nodeList[i]. ScanNumber == node.ScanNumber && !setStart)
+                if (nodeList[i].ScanNumber == node.ScanNumber && !setStart)
                 {
                     setStart = true;
                     startIndex = i + 1;
                 }
 
-                var deltaElution = _run.GetElutionTime(nodeList[i+1].ScanNumber) - _run.GetElutionTime(node.ScanNumber);
+                var deltaElution = _run.GetElutionTime(nodeList[i + 1].ScanNumber) - _run.GetElutionTime(node.ScanNumber);
                 if (deltaElution > elutionInterval)
                 {
                     endIndex = i + 1;
@@ -147,7 +150,7 @@ namespace InformedProteomics.TopDown.Quantification
                 }
             }
 
-            return new Tuple<int, int>(startIndex,endIndex);
+            return new Tuple<int, int>(startIndex, endIndex);
         }
 
         private readonly LcMsRun _run;

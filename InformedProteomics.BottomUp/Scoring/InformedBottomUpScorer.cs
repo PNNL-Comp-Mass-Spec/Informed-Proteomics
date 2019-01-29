@@ -21,7 +21,9 @@ namespace InformedProteomics.BottomUp.Scoring
             MinProductCharge = minProductCharge;
             MaxProductCharge = maxProductCharge;
             Tolerance = tolerance;
-            _rankScorer = new RankScore(ActivationMethod.HCD, Ms2DetectorType.Orbitrap, Enzyme.Trypsin, Protocol.Standard);
+            // Ms2DetectorType.Orbitrap
+            // Protocol.Standard
+            _rankScorer = new RankScore(ActivationMethod.HCD, Enzyme.Trypsin);
             _scoredSpectra = new Dictionary<int, ScoredSpectrum>();
         }
 

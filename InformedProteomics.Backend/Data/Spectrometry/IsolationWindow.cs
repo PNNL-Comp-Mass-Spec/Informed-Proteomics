@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// MS2 spectrum isolation window data
     /// </summary>
-    public class IsolationWindow: IComparable<IsolationWindow>
+    public class IsolationWindow : IComparable<IsolationWindow>
     {
         /// <summary>
         /// Constructor
@@ -78,7 +78,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             get
             {
-                if (MonoisotopicMz != null && Charge != null) return (MonoisotopicMz - Constants.Proton)*Charge;
+                if (MonoisotopicMz != null && Charge != null)
+                    return (MonoisotopicMz - Constants.Proton) * Charge;
+
                 return null;
             }
         }
