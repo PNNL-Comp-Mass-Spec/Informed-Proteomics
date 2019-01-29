@@ -84,6 +84,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// Converts a <see cref="LcMsFeature"/> to a <see cref="Ms1FtEntry"/>
         /// </summary>
         /// <param name="feature"></param>
+        /// <param name="featureId"></param>
         /// <returns></returns>
         public static Ms1FtEntry ToMs1FtEntry(this LcMsFeature feature, int featureId = 0)
         {

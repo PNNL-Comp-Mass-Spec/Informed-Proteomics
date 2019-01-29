@@ -24,8 +24,8 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-            //const string TestRawFile = @"D:\\Vlad_TopDown\\raw\\yufeng_column_test2.raw";
-            //const string TestResultFile = @"D:\\Vlad_TopDown\\results\\yufeng_column_test2_IcTda.tsv";
+            //const string TestRawFile = @"D:\Vlad_TopDown\raw\yufeng_column_test2.raw";
+            //const string TestResultFile = @"D:\Vlad_TopDown\results\yufeng_column_test2_IcTda.tsv";
             const string TestRawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string TestResultFile = @"D:\MassSpecFiles\training\IdResult\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             //const string TestRawFile = @"D:\MassSpecFiles\Lewy\Lewy_intact_01.raw";
