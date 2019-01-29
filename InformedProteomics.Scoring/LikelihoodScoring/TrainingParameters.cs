@@ -168,7 +168,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         #endregion
 
         #region Private Methods
-        private void Read(StreamReader file)
+        private void Read(TextReader file)
         {
             var ionTypeFactory = new IonTypeFactory(2);
             var massBins = new List<double>();

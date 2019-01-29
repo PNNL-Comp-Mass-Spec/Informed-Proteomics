@@ -39,7 +39,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <param name="file">Training data file past position of RankProbabilities label.</param>
         /// <param name="ionTypeFactory">IonTypeFactory object with all known possible ions in training
         /// parameter file.</param>
-        public RankTable(StreamReader file, IonTypeFactory ionTypeFactory)
+        public RankTable(TextReader file, IonTypeFactory ionTypeFactory)
         {
             MaxRanks = -1;
             _rankTable = new Dictionary<IonType, double[]>();
@@ -213,7 +213,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             file.WriteLine("Total\t" + string.Join("\t", _rankTotals));
         }
 
-        private void ReadFromFile(StreamReader file, IonTypeFactory ionTypeFactory)
+        private void ReadFromFile(TextReader file, IonTypeFactory ionTypeFactory)
         {
             var line = file.ReadLine();
             while (line != null)

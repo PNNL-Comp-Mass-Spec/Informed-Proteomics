@@ -177,7 +177,7 @@ namespace InformedProteomics.TopDown.Scoring
             return charge - 1;
         }
 
-        private void LoadIonTypeScoreTable(StreamReader reader)
+        private void LoadIonTypeScoreTable(TextReader reader)
         {
             for (var i = 0; i < ActivationBinLength; i++)
             {
@@ -192,7 +192,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private void LoadMassScoreTable(StreamReader reader)
+        private void LoadMassScoreTable(TextReader reader)
         {
             for(var i = 0; i < ActivationBinLength; i++)
             {
@@ -213,7 +213,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private void LoadChargeScoreTable(StreamReader reader)
+        private void LoadChargeScoreTable(TextReader reader)
         {
             while(true)
             {
@@ -230,7 +230,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
         }
 
-        private void LoadPeakScoreTable(StreamReader reader, double[][][] table)
+        private void LoadPeakScoreTable(TextReader reader, IReadOnlyList<double[][]> table)
         {
             var binLen = table[0][0].Length;
             while (true)
