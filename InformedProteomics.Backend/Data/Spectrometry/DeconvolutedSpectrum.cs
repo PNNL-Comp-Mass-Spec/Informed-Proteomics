@@ -40,7 +40,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="peaks"></param>
         /// <param name="scanNum"></param>
-        public DeconvolutedSpectrum(ICollection<DeconvolutedPeak> peaks, int scanNum) : base(scanNum)
+        public DeconvolutedSpectrum(IEnumerable<DeconvolutedPeak> peaks, int scanNum) : base(scanNum)
         {
             StorePeaks(peaks.ToList());
         }

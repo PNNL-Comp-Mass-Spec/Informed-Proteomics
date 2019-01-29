@@ -75,7 +75,7 @@ namespace InformedProteomics.TopDown.Quantification
             File.WriteAllText(filename+".tsv", tsv.ToString());
         }
 
-        private Dictionary<MSDeconvNode, List<MSDeconvNode>> GetEdges(List<MSDeconvNode> nodeList, Tolerance tol, double elutionInterval)
+        private Dictionary<MSDeconvNode, List<MSDeconvNode>> GetEdges(IList<MSDeconvNode> nodeList, Tolerance tol, double elutionInterval)
         {
             var edgeDict = new Dictionary<MSDeconvNode, List<MSDeconvNode>>();
             var currentNode = nodeList[0];
@@ -126,7 +126,7 @@ namespace InformedProteomics.TopDown.Quantification
             return connectedComp;
         }
 
-        private Tuple<int, int> GetIndexRange(List<MSDeconvNode> nodeList, double elutionInterval, MSDeconvNode node)
+        private Tuple<int, int> GetIndexRange(IList<MSDeconvNode> nodeList, double elutionInterval, MSDeconvNode node)
         {
             var startIndex = -1;
             var endIndex = -1;

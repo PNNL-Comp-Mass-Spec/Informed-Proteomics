@@ -103,7 +103,7 @@ namespace InformedProteomics.TopDown.Quantification
             return new MSDeconvNode(scanNum,mass,intensity,charge);
         }
 
-        private MSDeconvNode GetDeconvLineDecon2Ls(String[] line)
+        private MSDeconvNode GetDeconvLineDecon2Ls(IReadOnlyList<string> line)
         {
             var scanNum = int.Parse(line[0]);
             var charge = int.Parse(line[1]);

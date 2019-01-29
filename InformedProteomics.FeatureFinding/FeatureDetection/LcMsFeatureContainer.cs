@@ -186,7 +186,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             return false;
         }
 
-        private IList<LcMsPeakCluster> RemoveOverlappedFeatures(SortedSet<LcMsPeakCluster> featureSet)
+        private IEnumerable<LcMsPeakCluster> RemoveOverlappedFeatures(ISet<LcMsPeakCluster> featureSet)
         {
             var outFeatures = new List<LcMsPeakCluster>();
             var tol = new Tolerance(5);

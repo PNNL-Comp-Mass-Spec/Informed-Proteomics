@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <param name="data">Data to insert into histogram when it is created.</param>
         /// <param name="binEdges">Array of minimum values for each histogram bin.</param>
         /// <param name="compare">Comparer to compare items in histogram.</param>
-        public Histogram(List<T1> data, T1[] binEdges, IComparer<T1> compare=null)
+        public Histogram(IReadOnlyCollection<T1> data, T1[] binEdges, IComparer<T1> compare=null)
         {
             _compare = compare;
             if (compare == null)

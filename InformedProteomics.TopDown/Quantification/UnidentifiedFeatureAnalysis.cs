@@ -164,7 +164,7 @@ namespace InformedProteomics.TopDown.Quantification
             return spectrumList;
         }
 
-        private List<SequenceTag.SequenceTag> GetTags(List<ProductSpectrum> spectrums)
+        private List<SequenceTag.SequenceTag> GetTags(IReadOnlyCollection<ProductSpectrum> spectra)
         {
             var tagDict = new Dictionary<string,SequenceTag.SequenceTag>();
             if (spectra.Count == 0) return tagDict.Values.ToList();
@@ -181,7 +181,7 @@ namespace InformedProteomics.TopDown.Quantification
             return tagDict.Values.ToList();
         }
 
-        private int TagsInDatabase(List<SequenceTag.SequenceTag> tags)
+        private int TagsInDatabase(IReadOnlyCollection<SequenceTag.SequenceTag> tags)
         {
             var hits = 0;
             if (tags.Count == 0) return hits;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.MathAndStats;
@@ -70,7 +71,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="ion">Theoretical ion.</param>
         /// <param name="observedPeaks">The observed isotopic distribution.</param>
         /// <returns>A tuple where the first item is pearson correlation and the second item is cosine.</returns>
-        private Tuple<double, double> GetCorrCos(Ion ion, Peak[] observedPeaks)
+        private Tuple<double, double> GetCorrCos(Ion ion, IReadOnlyList<Peak> observedPeaks)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             var envelope = isotopomerEnvelope;

@@ -120,7 +120,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         private static IEnumerable<Composition> DefaultCompositionCalculator(
-            Dictionary<char, double[]> possibleOffsets,
+            IReadOnlyDictionary<char, double[]> possibleOffsets,
             AminoAcid aminoAcid)
         {
             if (aminoAcid == null) return possibleOffsets['*'].Select(off => new CompositionWithDeltaMass(off));

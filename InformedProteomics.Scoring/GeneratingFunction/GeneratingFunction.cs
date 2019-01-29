@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using InformedProteomics.Scoring.TopDown;
+using System.Collections.Generic;
 
 namespace InformedProteomics.Scoring.GeneratingFunction
 {
@@ -64,7 +62,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         private IScoringGraph _graph;
         private ScoreDistribution _scoreDistribution;
 
-        private ScoreDistribution GetScoreDistribution(int nodeIndex, ScoreDistribution[] gfTable)
+        private ScoreDistribution GetScoreDistribution(int nodeIndex, IReadOnlyList<ScoreDistribution> gfTable)
         {
             var curNodeScore = _graph.GetNodeScore(nodeIndex);
 
