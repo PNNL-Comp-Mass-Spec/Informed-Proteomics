@@ -101,7 +101,7 @@ namespace InformedProteomics.FeatureFinding.Training
             var cleavages = sequence.GetInternalCleavages();
             const double RelativeIsotopeIntensityThreshold = 0.7d;
 
-            var nTheoreticalIonPeaks = 0;
+            // Unused: var nTheoreticalIonPeaks = 0;
             var nObservedIonPeaks = 0;
             var nObservedPrefixIonPeaks = 0;
             var nObservedSuffixIonPeaks = 0;
@@ -123,7 +123,7 @@ namespace InformedProteomics.FeatureFinding.Training
                             else nObservedSuffixIonPeaks++;
                             nObservedIonPeaks++;
                         }
-                        nTheoreticalIonPeaks++;
+                        // nTheoreticalIonPeaks++;
                     }
                 }
             }
