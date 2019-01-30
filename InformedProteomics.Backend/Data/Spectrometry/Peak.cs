@@ -21,12 +21,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Peak m/z
         /// </summary>
-        public double Mz { get; protected set; }
+        public double Mz { get; }
 
         /// <summary>
         /// Peak intensity
         /// </summary>
-        public double Intensity { get; protected set; }
+        public double Intensity { get; }
 
         /// <summary>
         /// Compare 2 peaks (for sorting by m/z)
@@ -75,7 +75,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return Mz.GetHashCode();
         }
 

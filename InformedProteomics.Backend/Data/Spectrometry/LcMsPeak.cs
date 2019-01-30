@@ -22,22 +22,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Scan number where peak was observed
         /// </summary>
-        public int ScanNum { get; private set; }
-
-        /// <summary>
-        /// Replace the data in the peak (used by PbfLcMsRun)
-        /// </summary>
-        /// <param name="mz"></param>
-        /// <param name="intensity"></param>
-        /// <param name="scanNum"></param>
-        /// <returns></returns>
-        public LcMsPeak ReplaceData(double mz, double intensity, int scanNum)
-        {
-            Mz = mz;
-            Intensity = intensity;
-            ScanNum = scanNum;
-            return this;
-        }
+        public int ScanNum { get; }
 
         /// <summary>
         /// Compare 2 LcMsPeaks (for sorting)
