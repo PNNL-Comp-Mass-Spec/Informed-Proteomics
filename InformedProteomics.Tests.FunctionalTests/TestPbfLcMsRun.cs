@@ -30,12 +30,18 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
+            var outputFilePath = PbfLcMsRun.GetPbfFileName(TestRawFilePath);
+            if (File.Exists(outputFilePath))
+            {
+                Console.WriteLine(@"Deleting existing file...");
+                File.Delete(outputFilePath);
+            }
+
             Console.WriteLine(@"Writing...");
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
 
-            var outputFilePath = PbfLcMsRun.GetPbfFileName(TestRawFilePath);
             var pbf = new PbfLcMsRun(TestRawFilePath, null, outputFilePath);
 
             Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
