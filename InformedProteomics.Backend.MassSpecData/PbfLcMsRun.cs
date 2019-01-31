@@ -426,7 +426,16 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
             FileFormatVersion = FileFormatId.ToString();
-            _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+
+            try
+            {
+                _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+            }
+            catch
+            {
+                // For when something else, like a file scanner, has opened the file with read-write access
+                _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            }
 
             CreatePrecursorNextScanMap();
         }
