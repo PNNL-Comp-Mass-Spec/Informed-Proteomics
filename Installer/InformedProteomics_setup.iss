@@ -18,7 +18,8 @@ Source: InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend
 Source: InformedProteomics.Backend\bin\Release\net451\MathNet.Numerics.dll                                                                        ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net451\PRISM.dll                                                                                   ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net451\PSI_Interface.dll                                                                           ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\net451\CsvHelper.dll                                                                               ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net451\CsvHelper.dll                                                                               ; DestDir: {app}  
+Source: InformedProteomics.Backend\bin\Release\net451\System.ValueTuple.dll                                                                       ; DestDir: {app}
 
 ; InformedProteomics.Backend.Database
 Source: InformedProteomics.Backend.Database\bin\Release\net451\InformedProteomics.Backend.Database.dll                                            ; DestDir: {app}
@@ -31,7 +32,11 @@ Source: InformedProteomics.Backend.Database\bin\Release\net451\ProteinFileReader
 Source: InformedProteomics.Backend.MassSpecData\bin\Release\InformedProteomics.Backend.MassSpecData.dll                                           ; DestDir: {app}
 
 ; Manually managed libraries
-Source: lib\ThermoRawFileReader.dll                                                                                                               ; DestDir: {app}
+Source: lib\RawFileReaderLicense.doc                                                                                                              ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.BackgroundSubtraction.dll                                                                                     ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.Data.dll                                                                                                      ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.MassPrecisionEstimator.dll                                                                                    ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.RawFileReader.dll                                                                                             ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
 Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}
