@@ -640,14 +640,15 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Returns all mass spectra.
         /// Uses "yield return" to allow processing one spectra at a time if called from a foreach loop statement.
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        /// <param name="includePeaks">Only used for random-access capable reading</param>
+        /// <returns>all spectra</returns>
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             if (!_randomAccess)
             {
                 return ReadAllSpectraNonRandom();
             }
-            return ReadAllSpectraRandom();
+            return ReadAllSpectraRandom(includePeaks);
         }
 
         /// <summary>
@@ -667,6 +668,18 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             return ReadMassSpectrumRandom(index, includePeaks);
         }
+
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return ReadMassSpectrum(scanNum, includePeaks);
+        }
+
         #endregion
 
         #region Interface Helper Functions: Non-Random Access
@@ -744,7 +757,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Uses "yield return" to use less memory when called from a "foreach" statement
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<Spectrum> ReadAllSpectraRandom()
+        private IEnumerable<Spectrum> ReadAllSpectraRandom(bool includePeaks = true)
         {
             if (!_haveIndex || !_haveMetaData)
             {
@@ -752,7 +765,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             foreach (var specIndex in _spectrumOffsets.Offsets)
             {
-                yield return ReadMassSpectrumRandom(specIndex.IdNum);
+                yield return ReadMassSpectrumRandom(specIndex.IdNum, includePeaks);
             }
         }
 

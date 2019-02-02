@@ -51,16 +51,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Reads all spectra
         /// </summary>
+        /// <param name="includePeaks"></param>
         /// <returns>all spectra</returns>
         [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             for (var scanNum = _minLcScan; scanNum <= _maxLcScan; scanNum++)
             {
                 Spectrum spec = null;
                 try
                 {
-                    spec = ReadMassSpectrum(scanNum);
+                    spec = ReadMassSpectrum(scanNum, includePeaks);
                 }
                 catch (System.Runtime.InteropServices.COMException/* ex*/)
                 {
@@ -196,6 +197,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 IsolationWindow = isolationWindow
             };
             return productSpec;
+        }
+
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return ReadMassSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>

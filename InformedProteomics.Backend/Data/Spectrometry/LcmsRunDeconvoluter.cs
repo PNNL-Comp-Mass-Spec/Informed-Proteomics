@@ -75,8 +75,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Gets all spectra.
         /// Deconvolutes spectra in parallel as it reads them.
         /// </summary>
+        /// <param name="includePeaks">Ignored</param>
         /// <returns>Deconvoluted spectra.</returns>
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             return dataReader.ReadAllSpectra()
                        .Where(spec => msLevelSet.Contains(spec.MsLevel))
@@ -101,6 +102,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
 
             return spectrum;
+        }
+
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return ReadMassSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>

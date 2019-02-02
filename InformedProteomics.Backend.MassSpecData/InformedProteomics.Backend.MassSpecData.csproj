@@ -59,6 +59,7 @@
     <Compile Include="PbfLcMsRun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProteoWizardReader.cs" />
+    <Compile Include="SpectrumAccessorWrapper.cs" />
     <Compile Include="XCaliburReader.cs" />
   </ItemGroup>
   <ItemGroup>

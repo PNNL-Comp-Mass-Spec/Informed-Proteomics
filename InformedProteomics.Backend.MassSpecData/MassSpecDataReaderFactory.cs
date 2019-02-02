@@ -55,6 +55,28 @@ namespace InformedProteomics.Backend.MassSpecData
             return reader;
         }
 
+        public static ISpectrumAccessor GetMassSpecDataAccessor(string filePath, IProgress<ProgressData> progress = null)
+        {
+            var reader = GetMassSpecDataReader(filePath);
+            if (reader == null)
+            {
+                return null;
+            }
+
+            if (!reader.TryMakeRandomAccessCapable())
+            {
+                // Convert to PBF to support random access
+                reader = PbfLcMsRun.GetLcMsRun(filePath, progress);
+            }
+
+            if (reader is ISpectrumAccessor specAcc)
+            {
+                return specAcc;
+            }
+
+            return new SpectrumAccessorWrapper(reader, progress);
+        }
+
         /// <summary>
         /// Gets the appropriate classifying MassSpecDataType for the supplied path
         /// </summary>

@@ -66,10 +66,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Gets all spectra
         /// </summary>
+        /// <param name="includePeaks"></param>
         /// <returns>all spectra</returns>
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
-            return _pwizReader.ReadAllSpectra();
+            return _pwizReader.ReadAllSpectra(includePeaks);
         }
 
         /// <summary>
@@ -102,6 +103,17 @@ namespace InformedProteomics.Backend.MassSpecData
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             return _pwizReader.ReadMassSpectrum(scanNum, includePeaks);
+        }
+
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return ReadMassSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>
@@ -705,13 +717,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Gets all spectra
         /// </summary>
+        /// <param name="includePeaks"></param>
         /// <returns>all spectra</returns>
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             LoadPwizReader();
             for (var i = 1; i <= _numSpectra; i++)
             {
-                yield return ReadSpectrum(i);
+                yield return ReadSpectrum(i, includePeaks);
             }
         }
 
@@ -796,6 +809,17 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             LoadPwizReader();
             return ReadSpectrum(scanNum, includePeaks);
+        }
+
+        /// <summary>
+        /// Read the specified spectrum from the file, optionally reading only the metadata
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <param name="includePeaks"></param>
+        /// <returns></returns>
+        public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
+        {
+            return ReadMassSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>

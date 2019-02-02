@@ -8,13 +8,14 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// Interface for objects that can supply mass spectrometry data, usually from a file
     /// </summary>
-    public interface IMassSpecDataReader : IDisposable
+    public interface IMassSpecDataReader : ISpectrumExtractor, IDisposable
     {
         /// <summary>
         /// Gets all spectra
         /// </summary>
+        /// <param name="includePeaks"></param>
         /// <returns>all spectra</returns>
-        IEnumerable<Spectrum> ReadAllSpectra();
+        IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true);
 
         /// <summary>
         /// Returns the spectrum specified by the scan number.

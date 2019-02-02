@@ -94,10 +94,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Gets all spectra
         /// </summary>
+        /// <param name="includePeaks"></param>
         /// <returns>all spectra</returns>
-        public IEnumerable<Spectrum> ReadAllSpectra()
+        public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
-            return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, true));
+            return AllScanNumbers.OrderBy(x => x).Select(x => ReadMassSpectrum(x, includePeaks));
         }
 
         /// <summary>
@@ -170,133 +171,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="scanNum"></param>
         /// <returns></returns>
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
-
-        /// <summary>
-        /// Create a summed MS1 spectrum from the scans within <paramref name="elutionTimeTolerance"/> of <paramref name="scanNum"/>
-        /// </summary>
-        /// <param name="scanNum"></param>
-        /// <param name="elutionTimeTolerance"></param>
-        /// <returns></returns>
-        public Spectrum GetSummedMs1Spectrum(int scanNum, double elutionTimeTolerance)
-        {
-            var elutionTime = GetElutionTime(scanNum);
-            var minScanNum = scanNum;
-            var curScanNum = scanNum;
-            while (minScanNum >= MinLcScan)
-            {
-                curScanNum = GetPrevScanNum(curScanNum, 1);
-                var curElutionTime = GetElutionTime(curScanNum);
-                if (elutionTime - curElutionTime < elutionTimeTolerance) minScanNum = curScanNum;
-                else break;
-            }
-            var maxScanNum = scanNum;
-            curScanNum = scanNum;
-            while (maxScanNum <= MaxLcScan)
-            {
-                curScanNum = GetNextScanNum(curScanNum, 1);
-                var curElutionTime = GetElutionTime(curScanNum);
-                if (curElutionTime - elutionTime < elutionTimeTolerance) maxScanNum = curScanNum;
-                else break;
-            }
-            return GetSummedMs1Spectrum(minScanNum, maxScanNum);
-        }
-
-        /// <summary>
-        /// Create a summed MS1 spectrum from the scans in the supplied range
-        /// </summary>
-        /// <param name="minScanNum">min scan number, inclusive</param>
-        /// <param name="maxScanNum">max scan number, inclusive</param>
-        /// <returns></returns>
-        public SummedSpectrum GetSummedMs1Spectrum(int minScanNum, int maxScanNum)
-        {
-            if (minScanNum < MinLcScan) minScanNum = MinLcScan;
-            if (maxScanNum > MaxLcScan) maxScanNum = MaxLcScan;
-
-            var scanNums = new List<int>();
-            for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
-            {
-                if (GetMsLevel(scanNum) != 1) continue;
-                scanNums.Add(scanNum);
-            }
-
-            return GetSummedSpectrum(scanNums, minScanNum);
-        }
-
-        /// <summary>
-        /// Produce a summed spectrum using the data in the scans specified by <paramref name="scanNums"/>
-        /// </summary>
-        /// <param name="scanNums"></param>
-        /// <param name="repScanNum">Representative scan number</param>
-        /// <returns></returns>
-        public SummedSpectrum GetSummedSpectrum(IList<int> scanNums, int repScanNum = 0)
-        {
-            var mzComparer = new MzComparerWithBinning();
-
-            var mzDic = new Dictionary<int, List<double>>();
-            var intDic = new Dictionary<int, double>();
-
-            foreach (var scanNum in scanNums)
-            {
-                var spec = GetSpectrum(scanNum);
-                if (spec == null) continue;
-                foreach (var peak in spec.Peaks)
-                {
-                    var mzBin = mzComparer.GetBinNumber(peak.Mz);
-
-                    if (mzDic.TryGetValue(mzBin, out var mzList))
-                    {
-                        mzList.Add(peak.Mz);
-                        intDic[mzBin] += peak.Intensity;
-                    }
-                    else
-                    {
-                        mzDic.Add(mzBin, new List<double> { peak.Mz });
-                        intDic.Add(mzBin, peak.Intensity);
-                    }
-                }
-            }
-            var summedPeakList = new List<Peak>();
-            foreach (var entry in mzDic)
-            {
-                var binNum = entry.Key;
-                var mzList = entry.Value;
-                var medianMz = mzList.Median();
-                var intensity = intDic[binNum];
-                summedPeakList.Add(new Peak(medianMz, intensity));
-            }
-            summedPeakList.Sort();
-
-            var summedSpec = new SummedSpectrum(summedPeakList, repScanNum) {ScanNums = scanNums};
-            return summedSpec;
-        }
-
-        /// <summary>
-        /// Get a summed MS2 spectrum from the dataset, with the provided limits
-        /// </summary>
-        /// <param name="monoIsotopicMass"></param>
-        /// <param name="minScanNum">min scan number, inclusive</param>
-        /// <param name="maxScanNum">max scan number, inclusive</param>
-        /// <param name="minCharge">min charge, inclusive</param>
-        /// <param name="maxCharge">max charge, inclusive</param>
-        /// <param name="activationMethod"></param>
-        /// <returns></returns>
-        public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass,
-            int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
-        {
-            var isoEnv = Averagine.GetIsotopomerEnvelope(monoIsotopicMass);
-            var ms2ScanNums = new List<int>();
-            for (var charge = minCharge; charge <= maxCharge; charge++)
-            {
-                var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
-                ms2ScanNums.AddRange(GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
-                    .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum &&
-                        (activationMethod == ActivationMethod.Unknown ||
-                        ((ProductSpectrum) GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod)))
-                        ;
-            }
-            var summedSpec = GetSummedSpectrum(ms2ScanNums);
-            return new ProductSpectrum(summedSpec.Peaks, 0) {ActivationMethod = activationMethod};
-        }
 
         /*
         public ProductSpectrum GetSummedMs2Spectrum(double monoIsotopicMass, Ms1Feature range,
