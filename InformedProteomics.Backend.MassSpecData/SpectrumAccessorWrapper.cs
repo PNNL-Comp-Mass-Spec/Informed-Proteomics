@@ -35,6 +35,11 @@ namespace InformedProteomics.Backend.MassSpecData
 
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
+            if (!scanMetadata.ContainsKey(scanNum))
+            {
+                return null;
+            }
+
             return reader.GetSpectrum(scanNum, includePeaks);
         }
 
