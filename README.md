@@ -114,7 +114,11 @@ Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches
 
 ### Supported file formats
 
-These programs, when used with no other software installed, only support the use of centroid mzML files as spectrum input. If Thermo Finnigan MSFileReader is installed, it also supports reading from Thermo Finnigan .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
+These programs, when used with no other software installed, only support the use of centroid mzML files as spectrum input.
+
+Versions prior to February 1, 2019: If Thermo Finnigan MSFileReader is installed, it also supports reading from Thermo Finnigan .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
+
+Versions after February 1, 2019: If running as a 64-bit program, reading from Thermo Finnigan .raw files is supported via the included RawFileReader dlls (no additional software install required).
 
 Several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
 
@@ -145,6 +149,8 @@ Website: http://panomics.pnnl.gov/ or http://omics.pnl.gov
 Licensed under the Apache License, Version 2.0; you may not use this file except
 in compliance with the License.  You may obtain a copy of the License at
 http://www.apache.org/licenses/LICENSE-2.0
+
+RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc. All rights reserved.
 
 -------------------------------------------------------------------------------
 
