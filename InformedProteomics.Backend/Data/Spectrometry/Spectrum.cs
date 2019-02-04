@@ -469,7 +469,33 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Filter noise peaks out of the spectrum
+        /// Filter noise peaks out of the spectrum: requires use of <see cref="PeakDetailed"/> with populated noise values.
+        /// Any non-<see cref="PeakDetailed"/> peaks will be assumed good.
+        /// If no <see cref="PeakDetailed"/> peaks, <see cref="FilterNoise"/> is called internally.
+        /// </summary>
+        /// <param name="signalToNoiseRatio"></param>
+        public void FilterNoiseWithPeakNoiseInfo(double signalToNoiseRatio = 1.4826)
+        {
+            if (Peaks.Length < 2) return;
+
+            if (!Peaks.Any(x => x is PeakDetailed))
+            {
+                FilterNoise(signalToNoiseRatio);
+            }
+
+            Peaks = Peaks.Where(x =>
+            {
+                if (x is PeakDetailed pd)
+                {
+                    return pd.SignalToNoise >= signalToNoiseRatio;
+                }
+
+                return true;
+            }).ToArray();
+        }
+
+        /// <summary>
+        /// Filter noise peaks out of the spectrum using a basic signal-to-noise calculation
         /// </summary>
         /// <param name="signalToNoiseRatio"></param>
         public void FilterNoise(double signalToNoiseRatio = 1.4826)

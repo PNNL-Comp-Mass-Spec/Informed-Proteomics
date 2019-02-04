@@ -24,6 +24,6 @@
         /// <summary>
         /// Calculated SignalToNoise value
         /// </summary>
-        public double SignalToNoise => Intensity / Noise;
+        public double SignalToNoise => Intensity / (!Noise.Equals(0) ? Noise : double.Epsilon);
     }
 }
