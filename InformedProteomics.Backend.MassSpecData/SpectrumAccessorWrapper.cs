@@ -82,7 +82,7 @@ namespace InformedProteomics.Backend.MassSpecData
             reader?.Dispose();
         }
 
-        private class ScanMetadata
+        private struct ScanMetadata
         {
             public int MsLevel { get; }
             public double ElutionTime { get; }

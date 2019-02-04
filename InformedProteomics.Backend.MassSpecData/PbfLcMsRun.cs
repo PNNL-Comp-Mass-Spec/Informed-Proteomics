@@ -1895,7 +1895,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
 
                 progData.StepRange(100);
-                var peaksToRemove = new List<ReusableLcMsPeak>();
+                lastProgressTime = DateTime.MinValue;
                 count = 0;
                 var prevMzIndex = -1;
                 if (isMs1List)
@@ -1920,7 +1920,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                         count++;
 
-                        if (peak == null)
+                        if (peak.Mz.Equals(0))
                             continue;
 
                         if (isMs1List)
@@ -1937,8 +1937,6 @@ namespace InformedProteomics.Backend.MassSpecData
                         writer.Write((float) peak.Intensity);
                         writer.Write(peak.ScanNum);
 
-                        peaksToRemove.Add(peak);
-
                         var datum = metadata[peak.ScanNum];
                         datum.ReadOne();
 
@@ -1950,15 +1948,6 @@ namespace InformedProteomics.Backend.MassSpecData
                             }
 
                             metadata.Remove(datum.ScanNum);
-                            var numDead = datum.NumPeaks < maxInMemoryPerSpec ? datum.NumPeaks : maxInMemoryPerSpec;
-                            if (numDead >= peaksToRemove.Count - 500)
-                            {
-                                peaksToRemove.Clear();
-                            }
-                            else
-                            {
-                                peaksToRemove.RemoveRange(peaksToRemove.Count - numDead - 1, numDead);
-                            }
                         }
                     }
                     maxInMemoryPerSpec = CalculateMaxSpecsInMem(memFreeLessReserve, metadata.Count);
@@ -1968,7 +1957,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         if (datum.Count < maxInMemoryPerSpec && datum.MorePeaksToRead)
                         {
-                            peaks.AddRange(datum.ReadPeaksReuse(_reader, maxInMemoryPerSpec - datum.Count, peaksToRemove));
+                            peaks.AddRange(datum.ReadPeaks(_reader, maxInMemoryPerSpec - datum.Count));
                         }
                     }
 
@@ -1989,35 +1978,31 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
             }
-
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false); // We just killed a large number of objects when the list of peaks went out of scope.
         }
 
         /// <summary>
-        /// Basically a version of <see cref="LcMsPeak"/> that supports re-use; not using <see cref="LcMsPeak"/> because we don't want to allow changing the data in normal use.
+        /// Basically a struct version of <see cref="LcMsPeak"/> for avoiding some class memory allocation/collection issues, and pointer overhead
         /// </summary>
-        private class ReusableLcMsPeak : IComparable<ReusableLcMsPeak>
+        /// <remarks>When using a class, there is a very large number of small objects placed in the generation 2 heap,
+        /// which requires a blocking garbage collection to clear. The first workaround was to re-use peak objects to
+        /// minimize the number of objects allocated (and necessary garbage collections), but that still tended to have
+        /// some post-PBF creation memory usage issues. Changing to a struct significantly reduces those issues, even
+        /// though these structs are slightly larger than Microsoft's recommendation at
+        /// https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/choosing-between-class-and-struct</remarks>
+        private struct ChromatogramPeak : IComparable<ChromatogramPeak>
         {
-            public ReusableLcMsPeak(double mz, double intensity, int scanNum)
+            public ChromatogramPeak(double mz, double intensity, int scanNum)
             {
                 Mz = mz;
                 Intensity = intensity;
                 ScanNum = scanNum;
             }
 
-            public double Mz { get; private set; }
-            public double Intensity { get; private set; }
-            public int ScanNum { get; private set; }
+            public double Mz { get; }
+            public double Intensity { get; }
+            public int ScanNum { get; }
 
-            public ReusableLcMsPeak ReplaceData(double mz, double intensity, int scanNum)
-            {
-                Mz = mz;
-                Intensity = intensity;
-                ScanNum = scanNum;
-                return this;
-            }
-
-            public int CompareTo(ReusableLcMsPeak other)
+            public int CompareTo(ChromatogramPeak other)
             {
                 // Sort by mz, then by scan number
                 var mzCompare = Mz.CompareTo(other.Mz);
@@ -2032,7 +2017,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private class SplitLcMsPeakLists
         {
-            private readonly List<List<ReusableLcMsPeak>> _lists;
+            private readonly List<List<ChromatogramPeak>> _lists;
             private readonly List<bool> _sorted;
             private readonly int _mod;
             private readonly double _mzMod;
@@ -2045,18 +2030,18 @@ namespace InformedProteomics.Backend.MassSpecData
                 _mzMod = 0;
                 _mod = (int)(peakCount / Divisor + 1);
                 _mzMod = (maxMz - _minMz) / (_mod - 1);
-                _lists = new List<List<ReusableLcMsPeak>>(_mod + 2);
+                _lists = new List<List<ChromatogramPeak>>(_mod + 2);
                 _sorted = new List<bool>(_mod + 2);
                 for (var i = 0; i <= _mod + 1; i++)
                 {
-                    _lists.Add(new List<ReusableLcMsPeak>(1000));
+                    _lists.Add(new List<ChromatogramPeak>(1000));
                     _sorted.Add(false);
                 }
             }
 
-            private void Add(ReusableLcMsPeak peak)
+            private void Add(ChromatogramPeak peak)
             {
-                if (peak == null)
+                if (peak.Mz.Equals(0))
                 {
                     return;
                 }
@@ -2074,7 +2059,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 _sorted[list] = false;
             }
 
-            public void AddRange(IEnumerable<ReusableLcMsPeak> peaks)
+            public void AddRange(IEnumerable<ChromatogramPeak> peaks)
             {
                 foreach (var peak in peaks)
                 {
@@ -2126,7 +2111,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             private long _enumerated;
 
-            public IEnumerator<ReusableLcMsPeak> GetReusableEnumerator()
+            public IEnumerator<ChromatogramPeak> GetReusableEnumerator()
             {
                 for (var i = 0; i < _lists.Count; i++)
                 {
@@ -2140,7 +2125,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         }
                         _enumerated -= _lists[i].Count; // prevent creep
                         _lists[i].Clear();
-                        _lists[i] = new List<ReusableLcMsPeak>(10);
+                        _lists[i] = new List<ChromatogramPeak>(10);
                     }
                 }
             }
@@ -2193,11 +2178,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 _nextPeakOffset = reader.BaseStream.Position;
             }
 
-            public IEnumerable<ReusableLcMsPeak> ReadPeaks(BinaryReader reader, int numPeaksToRead)
+            public IEnumerable<ChromatogramPeak> ReadPeaks(BinaryReader reader, int numPeaksToRead)
             {
                 if (PeaksRead >= NumPeaks)
                 {
-                    yield return null;
+                    yield return new ChromatogramPeak();
                 }
                 reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
 
@@ -2207,36 +2192,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     var intensity = reader.ReadSingle();
                     Count++;
                     PeaksRead++;
-                    yield return new ReusableLcMsPeak(mz, intensity, ScanNum);
-                }
-                _nextPeakOffset = reader.BaseStream.Position;
-            }
-
-            public IEnumerable<ReusableLcMsPeak> ReadPeaksReuse(BinaryReader reader, int numPeaksToRead, IList<ReusableLcMsPeak> peakStock)
-            {
-                if (PeaksRead >= NumPeaks)
-                {
-                    yield return null;
-                }
-                reader.BaseStream.Seek(_nextPeakOffset, SeekOrigin.Begin);
-
-                for (var i = 0; i < numPeaksToRead && PeaksRead < NumPeaks; i++)
-                {
-                    var mz = reader.ReadDouble();
-                    var intensity = reader.ReadSingle();
-                    Count++;
-                    PeaksRead++;
-                    var lastIndex = peakStock.Count - 1;
-                    if (lastIndex >= 0)
-                    {
-                        var peak = peakStock[lastIndex];
-                        peakStock.RemoveAt(lastIndex);
-                        yield return peak.ReplaceData(mz, intensity, ScanNum);
-                    }
-                    else
-                    {
-                        yield return new ReusableLcMsPeak(mz, intensity, ScanNum);
-                    }
+                    yield return new ChromatogramPeak(mz, intensity, ScanNum);
                 }
                 _nextPeakOffset = reader.BaseStream.Position;
             }
