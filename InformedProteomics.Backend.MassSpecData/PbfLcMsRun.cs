@@ -1815,6 +1815,11 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             // Other thought for a slower, but really low-memory chromatogram creator:
             //   Make sure peaks are sorted ascending when written, and then jump through all spectra, performing a massive merge sort on the peaks and outputting the lowest spectra
+
+            // Limit progress reporting to 5 times per second - reporting progress for every output peak may overload consumers of the progress reporting
+            // Overload was particularly noted in LcMsSpectator, causing UI lockups and extreme memory usage.
+            const double minTimeForProgressSeconds = 0.2;
+
             var progData = new ProgressData(progress);
             var count = 0;
             var countTotal = scansForMsLevelX.Count;
@@ -1853,22 +1858,27 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 if (_reader == null)
                 {
-                    _reader =
-                        new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read,
-                                FileShare.ReadWrite));
+                    _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
                 }
 
                 progData.StepRange(5);
+                var lastProgressTime = DateTime.MinValue;
                 // Read in metadata, and the first "maxInMemoryPerSpec" peaks of each scan (min 5, max 25000000 / numSpectra)
                 foreach (var scan in scansForMsLevelX)
                 {
-                    progData.Report(count, countTotal);
+                    if (lastProgressTime.AddSeconds(minTimeForProgressSeconds) < DateTime.Now)
+                    {
+                        progData.Report(count, countTotal);
+                        lastProgressTime = DateTime.Now;
+                    }
                     count++;
                     var datum = GetPeakMetaDataForSpectrum(scan);
                     peaksCount += datum.NumPeaks;
                     metadata.Add(datum.ScanNum, datum);
                     peaks.AddRange(datum.ReadPeaks(_reader, maxInMemoryPerSpec));
                 }
+
+                progData.Report(100);
 
                 if (peaksCount == 0)
                 {
@@ -1903,7 +1913,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     while (peaksEnum.MoveNext())
                     {
                         var peak = peaksEnum.Current;
-                        progData.Report(count, peaksCount);
+                        if (lastProgressTime.AddSeconds(minTimeForProgressSeconds) < DateTime.Now)
+                        {
+                            progData.Report(count, peaksCount);
+                            lastProgressTime = DateTime.Now;
+                        }
                         count++;
 
                         if (peak == null)
@@ -1960,6 +1974,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
                     peaksEnum = peaks.GetReusableEnumerator();
                 }
+
+                progData.Report(100);
 
                 if (isMs1List)
                 {
