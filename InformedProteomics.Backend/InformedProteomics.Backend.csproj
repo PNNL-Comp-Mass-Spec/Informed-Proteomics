@@ -14,7 +14,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</PackageProjectUrl>
     <Copyright>Copyright @ PNNL 2017</Copyright>
     <Title>InformedProteomics.Backend</Title>
