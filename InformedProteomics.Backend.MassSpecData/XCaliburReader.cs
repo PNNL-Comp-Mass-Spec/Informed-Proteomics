@@ -365,6 +365,12 @@ namespace InformedProteomics.Backend.MassSpecData
                     preInfo.Charge = null;
             }
 
+            if (preInfo.MonoisotopicMz < float.Epsilon && preInfo.Charge == 0)
+            {
+                // Thermo software probably couldn't determine a charge state, and set the monoisotopic m/z to 0
+                preInfo.MonoisotopicMz = reaction.PrecursorMass;
+            }
+
             if (ms2IsolationWidthIndex >= 0)
             {
                 preInfo.IsolationWidth = Convert.ToDouble(extras.Values[ms2IsolationWidthIndex]);
