@@ -475,6 +475,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 return pwizPath;
             }
 
+            // Look for Per-user and per-machine ProteoWizard installs; use whichever install is newer.
+
+            var possibleInstallDirs = new List<DirectoryInfo>();
+            // Per-User ProteoWizard install detection
+            var localAppDataDir = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Apps"));
+            if (localAppDataDir.Exists)
+            {
+                var bitness = Environment.Is64BitProcess ? 64 : 32;
+                possibleInstallDirs.AddRange(localAppDataDir.EnumerateDirectories($"ProteoWizard*{bitness}-bit"));
+            }
+
             // NOTE: This call returns the 32-bit Program Files folder if the running process is 32-bit
             // or the 64-bit Program Files folder if the running process is 64-bit
             var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
@@ -504,22 +515,44 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Look for subfolders whose names start with ProteoWizard, for example "ProteoWizard 3.0.9490"
-            var subFolders = pwizFolder.GetDirectories("ProteoWizard*").ToList();
+            possibleInstallDirs.AddRange(pwizFolder.EnumerateDirectories("ProteoWizard*"));
 
-            if (subFolders.Count <= 0)
+            if (possibleInstallDirs.Count <= 0)
             {
                 return null;
             }
 
             // Try to sort by version, it properly handles the version rolling over powers of 10 (but string sorting does not)
             var byVersion = new List<Tuple<System.Version, DirectoryInfo>>();
-            foreach (var folder in subFolders)
+            foreach (var folder in possibleInstallDirs)
             {
                 try
                 {
                     // Just ignoring the directory here if it has no version
-                    var version = System.Version.Parse(folder.Name.Trim().Split(' ').Last());
-                    byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version, folder));
+                    var versionString = folder.Name.Trim().Split(' ').Last();
+                    if (folder.Name.EndsWith("-bit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var split = folder.Name.Trim().Split(' ');
+                        versionString = split[split.Length - 2];
+                    }
+
+                    if (string.IsNullOrWhiteSpace(versionString) || !versionString.Contains("."))
+                    {
+                        continue;
+                    }
+
+                    var versionSplit = versionString.Split('.');
+
+                    if (System.Version.TryParse(versionString, out var version))
+                    {
+                        // Old pre-Git SCM conversion install - only has 3 components
+                        byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version, folder));
+                    }
+                    else if (versionSplit.Length > 3 && System.Version.TryParse(string.Join(".", versionSplit.Take(versionSplit.Length - 1)), out var version2))
+                    {
+                        // Post-Git SCM conversion install - last section of the version is a Git hash, and will not parse
+                        byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version2, folder));
+                    }
                 }
                 catch (Exception)
                 {
@@ -528,35 +561,35 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             if (byVersion.Count > 0)
             {
-                byVersion.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-                byVersion.Reverse();
-                var subFoldersOrig = subFolders.ToArray();
-                subFolders = byVersion.Select(x => x.Item2).ToList();
+                // Reverse sort the list
+                byVersion.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+                var subFoldersOrig = possibleInstallDirs.ToArray();
+                possibleInstallDirs = byVersion.Select(x => x.Item2).ToList();
                 // Guarantee that any folder where we couldn't parse a version is in the list, but at the end.
                 foreach (var folder in subFoldersOrig)
                 {
-                    if (!subFolders.Contains(folder))
+                    if (!possibleInstallDirs.Contains(folder))
                     {
-                        subFolders.Add(folder);
+                        possibleInstallDirs.Add(folder);
                     }
                 }
             }
             else
             {
                 // Sorting by version failed, try the old method.
-                subFolders.Sort((x, y) => string.Compare(x.FullName, y.FullName, StringComparison.Ordinal));
-                subFolders.Reverse(); // reverse the sort order - this should give us the highest installed version of ProteoWizard first
+                // reverse the sort order - this should give us the highest installed version of ProteoWizard first
+                possibleInstallDirs.Sort((x, y) => string.Compare(y.FullName, x.FullName, StringComparison.Ordinal));
             }
 
-            foreach (var folder in subFolders)
+            foreach (var folder in possibleInstallDirs)
             {
-                if (folder.GetFiles(TargetDllName).Length > 0)
+                if (folder.GetFiles(TargetDllName).Length > 0 && File.Exists(Path.Combine(folder.FullName, "pwiz_bindings_cli.dll")))
                 {
                     return folder.FullName;
                 }
             }
             // If the above failed, return the highest version installed
-            return subFolders[0].FullName;
+            return possibleInstallDirs[0].FullName;
         }
 
         static ProteoWizardReaderImplementation()
@@ -918,6 +951,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     if (thermoMonoMass == null || thermoMonoMass.Value.Equals(0))
                     {
                         thermoMonoMass = selectedIonMz;
+                    }
+                    if (target.Equals(0))
+                    {
+                        target = selectedIonMz;
                     }
                     iw = new Data.Spectrometry.IsolationWindow(target, lowOff, uppOff, thermoMonoMass, charge);
                 }
