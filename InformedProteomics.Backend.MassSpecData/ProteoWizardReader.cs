@@ -750,7 +750,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Both versions implement IList<double>, so I can get the object via reflection and cast it to an IList<double> (or IEnumerable<double>).
 
             // Get the MethodInfo for BinaryDataArray.data property accessor
-            var _binaryDataArrayGetData = typeof(BinaryDataArray).GetProperty("data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?.GetMethod;
+            _binaryDataArrayGetData = typeof(BinaryDataArray).GetProperty("data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?.GetMethod;
 
             _loaded = true;
         }
