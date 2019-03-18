@@ -673,6 +673,8 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly List<string> _filters = new List<string>();
         private string _fileFormatVersion = string.Empty;
         private string _srcFileChecksum = string.Empty;
+        private MethodInfo _binaryDataArrayGetData;
+
         private void LoadPwizReader()
         {
             if (_loaded)
@@ -739,6 +741,16 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 _fileFormatVersion = software.version;
             }
+
+            // BinaryDataArray.get_data() problem fix
+            // Pre-Nov. 7th, 2018 pwiz_binding_cli.dll: bda.data returns pwiz.CLI.msdata.BinaryData,  is a semi-automatic wrapper for a C++ vector, which implements IList<double>
+            // Pre-Nov. 7th, 2018 pwiz_binding_cli.dll: bda.data returns pwiz.CLI.util.BinaryData implements IList<double>, but also provides other optimization functions
+            // The best way to access this before was bda.data.ToArray()
+            // In the future, this could be changed to bda.data.Storage.ToArray(), but that may lead to more data copying than just using the IEnumerable<double> interface
+            // Both versions implement IList<double>, so I can get the object via reflection and cast it to an IList<double> (or IEnumerable<double>).
+
+            // Get the MethodInfo for BinaryDataArray.data property accessor
+            var _binaryDataArrayGetData = typeof(BinaryDataArray).GetProperty("data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?.GetMethod;
 
             _loaded = true;
         }
@@ -856,6 +868,31 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// This method exists to handle an abstraction needed for now to handle pwiz_bindings_cli.dll changes committed to ProteoWizard on November 7, 2018
+        /// This abstraction may be removed at a point in the future when versions of ProteoWizard older than that date are less likely to be in use.
+        /// </summary>
+        /// <param name="bda"></param>
+        /// <returns></returns>
+        private double[] GetBinaryDataAsArray(BinaryDataArray bda)
+        {
+            // BinaryDataArray.get_data() problem fix
+            // Pre-Nov. 7th, 2018 pwiz_binding_cli.dll: bda.data returns pwiz.CLI.msdata.BinaryData,  is a semi-automatic wrapper for a C++ vector, which implements IList<double>
+            // Pre-Nov. 7th, 2018 pwiz_binding_cli.dll: bda.data returns pwiz.CLI.util.BinaryData implements IList<double>, but also provides other optimization functions
+            // The best way to access this before was bda.data.ToArray()
+            // In the future, this could be changed to bda.data.Storage.ToArray(), but that may lead to more data copying than just using the IEnumerable<double> interface
+            // Both versions implement IList<double>, so I can get the object via reflection and cast it to an IList<double> (or IEnumerable<double>).
+
+            // Call via reflection to avoid issues of the InformedProteomics compiled reference vs. the ProteoWizard compiled DLL
+            var dataObj = _binaryDataArrayGetData?.Invoke(bda, null);
+            if (dataObj != null && dataObj is IEnumerable<double> data)
+            {
+                return data.ToArray();
+            }
+
+            return new double[0];
+        }
+
+        /// <summary>
         /// Internal spectrum reader to eliminate excess calls to LoadPwizReader() when called from ReadAllSpectra()
         /// </summary>
         /// <param name="scanIndex"></param>
@@ -873,11 +910,11 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (bda.hasCVParam(CVID.MS_m_z_array))
                 {
-                    mzArray = bda.data.ToArray();
+                    mzArray = GetBinaryDataAsArray(bda);
                 }
                 if (bda.hasCVParam(CVID.MS_intensity_array))
                 {
-                    intensityArray = bda.data.ToArray();
+                    intensityArray = GetBinaryDataAsArray(bda);
                 }
             }
             double scanTime = 0;
