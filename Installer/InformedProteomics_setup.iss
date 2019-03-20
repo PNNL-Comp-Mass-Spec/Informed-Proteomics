@@ -81,6 +81,10 @@ Source: PbfGen\bin\Release\PbfGen.exe.config                                    
 Source: ProMex\bin\Release\ProMex.exe                                                                                                             ; DestDir: {app}
 Source: ProMex\bin\Release\ProMex.exe.config                                                                                                      ; DestDir: {app}
 
+; ProMexAlign
+Source: ProMexAlign\bin\Release\ProMexAlign.exe                                                                                                   ; DestDir: {app}
+Source: ProMexAlign\bin\Release\ProMexAlign.exe.config                                                                                            ; DestDir: {app}
+
 Source: README.md                                                                                                                                 ; DestDir: {app}; DestName: "Readme.txt"
 ;Source: RevisionHistory.txt                                                                                                                       ; DestDir: {app}
 Source: Example_Files\Mod_Examples.txt                                                                                                            ; DestDir: {app}

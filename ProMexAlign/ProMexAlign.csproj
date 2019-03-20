@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PromexAlign</RootNamespace>
-    <AssemblyName>PromexAlign</AssemblyName>
+    <RootNamespace>ProMexAlign</RootNamespace>
+    <AssemblyName>ProMexAlign</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

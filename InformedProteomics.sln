@@ -47,7 +47,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomics.Tests.De
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BAB01DF1-A68A-4F98-9000-697CB1AB6B71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromexAlign", "PromexAlign\PromexAlign.csproj", "{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProMexAlign", "ProMexAlign\ProMexAlign.csproj", "{C2C569D4-41C4-4DCE-8191-9107CFBA59B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformedProteomics.Backend.Database", "InformedProteomics.Backend.Database\InformedProteomics.Backend.Database.csproj", "{451D1CE9-97D2-4898-9F59-4D058223637A}"
 EndProject
