@@ -27,36 +27,34 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Perform a set number of random mutations on a string
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="textToMutate"></param>
         /// <param name="numMutations"></param>
         /// <returns></returns>
-        public static string Mutate(string str, int numMutations)
+        public static string Mutate(string textToMutate, int numMutations)
         {
-            var length = str.Length;
+            var textLength = textToMutate.Length;
 
             // Use a HashSet to assure that there are no duplicates
             var selectedIndexSet = new HashSet<int>();
+            var maxValues = Math.Min(numMutations, textLength);
 
-            var maxIterations = numMutations * 5;
-            var iteration = 0;
-            while (selectedIndexSet.Count < numMutations && iteration < maxIterations)
+            while (selectedIndexSet.Count < maxValues)
             {
                 // This .Add command proceeds gracefully if the HashSet already contains the newly generated random number
-                selectedIndexSet.Add(_random.Next(length));
-                iteration++;
+                selectedIndexSet.Add(_random.Next(textLength));
             }
 
-            var mutated = new StringBuilder(length);
-            for (var i = 0; i < length; i++)
+            var mutated = new StringBuilder(textLength);
+            for (var i = 0; i < textLength; i++)
             {
                 if (!selectedIndexSet.Contains(i))
                 {
-                    mutated.Append(str[i]);
+                    mutated.Append(textToMutate[i]);
                 }
                 else
                 {
-                    var mutatedResidue = str[i];
-                    while (mutatedResidue == str[i])
+                    var mutatedResidue = textToMutate[i];
+                    while (mutatedResidue == textToMutate[i])
                     {
                         mutatedResidue = AminoAcid.StandardAminoAcidCharacters[_random.Next(AminoAcid.StandardAminoAcidCharacters.Length)];
                     }
