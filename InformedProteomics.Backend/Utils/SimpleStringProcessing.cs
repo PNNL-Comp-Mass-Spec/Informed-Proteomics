@@ -33,11 +33,19 @@ namespace InformedProteomics.Backend.Utils
         public static string Mutate(string str, int numMutations)
         {
             var length = str.Length;
+
+            // Use a HashSet to assure that there are no duplicates
             var selectedIndexSet = new HashSet<int>();
-            while(selectedIndexSet.Count < numMutations)
+
+            var maxIterations = numMutations * 5;
+            var iteration = 0;
+            while (selectedIndexSet.Count < numMutations && iteration < maxIterations)
             {
+                // This .Add command proceeds gracefully if the HashSet already contains the newly generated random number
                 selectedIndexSet.Add(_random.Next(length));
+                iteration++;
             }
+
             var mutated = new StringBuilder(length);
             for (var i = 0; i < length; i++)
             {
