@@ -24,10 +24,17 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
             if (tool == ProteinSpectrumMatch.SearchTool.Unknown)
             {
-                if (path.EndsWith("IcTda.tsv", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsPathFinder;
-                else if (path.EndsWith("MSAlign_ResultTable.txt", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsAlign;
-                // ReSharper disable once StringLiteralTypo
-                else if (path.EndsWith("msgfdb_syn.txt", StringComparison.OrdinalIgnoreCase)) tool = ProteinSpectrumMatch.SearchTool.MsGfPlus;
+                if (path.EndsWith("IcTda.tsv", StringComparison.OrdinalIgnoreCase))
+                    tool = ProteinSpectrumMatch.SearchTool.MsPathFinder;
+                else if (path.EndsWith("MSAlign_ResultTable.txt", StringComparison.OrdinalIgnoreCase))
+                    tool = ProteinSpectrumMatch.SearchTool.MsAlign;
+                // ReSharper disable StringLiteralTypo
+                else if (path.EndsWith("msgfplus_syn.txt", StringComparison.OrdinalIgnoreCase) ||
+                         path.EndsWith("msgfplus_fht.txt", StringComparison.OrdinalIgnoreCase) ||
+                         path.EndsWith("msgfdb_syn.txt", StringComparison.OrdinalIgnoreCase) ||
+                         path.EndsWith("msgfdb_fht.txt", StringComparison.OrdinalIgnoreCase))
+                    tool = ProteinSpectrumMatch.SearchTool.MsGfPlus;
+                // ReSharper restore StringLiteralTypo
             }
 
             if (tool == ProteinSpectrumMatch.SearchTool.MsAlign)
