@@ -922,7 +922,14 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (s.hasCVParam(CVID.MS_scan_start_time))
                 {
-                    scanTime = (double)(s.cvParam(CVID.MS_scan_start_time).value);
+                    var timeCvParam = s.cvParam(CVID.MS_scan_start_time);
+                    scanTime = (double)timeCvParam.value;
+                    // Conversion: CV dictates possible units of 'minute' and 'second'
+                    if (timeCvParam.units == CVID.UO_second)
+                    {
+                        scanTime /= 60;
+                    }
+                }
                 }
             }
             if (msLevel > 1)
