@@ -666,6 +666,27 @@ namespace InformedProteomics.Backend.MassSpecData
         public override double MaxMs1Mz => _maxMs1Mz;
 
         /// <summary>
+        /// Get the native ID of the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
+        public override string GetNativeId(int scanNum)
+        {
+            if (!ScanNumNativeIdMap.TryGetValue(scanNum, out var nativeId))
+            {
+                nativeId = string.Empty;
+                var spec = GetSpectrum(scanNum, false);
+                if (spec != null)
+                {
+                    nativeId = spec.NativeId;
+                }
+                ScanNumNativeIdMap.Add(scanNum, nativeId);
+            }
+
+            return nativeId;
+        }
+
+        /// <summary>
         /// Read the specified spectrum from the file, optionally reading only the metadata
         /// </summary>
         /// <param name="scanNum"></param>

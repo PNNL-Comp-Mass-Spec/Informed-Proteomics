@@ -918,6 +918,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
             double scanTime = 0;
+            double driftTime = 0;
             foreach (var s in pwizSpec.scanList.scans)
             {
                 if (s.hasCVParam(CVID.MS_scan_start_time))
@@ -930,6 +931,12 @@ namespace InformedProteomics.Backend.MassSpecData
                         scanTime /= 60;
                     }
                 }
+
+                if (s.hasCVParam(CVID.MS_ion_mobility_drift_time))
+                {
+                    var driftCvParam = s.cvParam(CVID.MS_ion_mobility_drift_time);
+                    // No conversion: CV dictates only valid units of 'millisecond'
+                    driftTime = (double) driftCvParam.value;
                 }
             }
             if (msLevel > 1)
@@ -1010,6 +1017,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     IsolationWindow = iw,
                     MsLevel = msLevel,
                     ElutionTime = scanTime,
+                    DriftTime = driftTime,
                 };
             }
             return new Spectrum(mzArray, intensityArray, scanIndex)
@@ -1018,6 +1026,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 TotalIonCurrent = tic,
                 ElutionTime = scanTime,
                 MsLevel = msLevel,
+                DriftTime = driftTime,
             };
         }
 

@@ -288,6 +288,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
             ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;
             ScanNumElutionTimeMap[spec.ScanNum] = spec.ElutionTime;
+            ScanNumNativeIdMap[spec.ScanNum] = spec.NativeId;
             if (spec.MsLevel == 1)
             {
                 if (trackingInfo.PrecursorSignalToNoiseRatioThreshold > 0.0)

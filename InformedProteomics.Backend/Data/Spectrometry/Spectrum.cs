@@ -74,6 +74,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double ElutionTime { get; set; }
 
         /// <summary>
+        /// Ion Mobility drift time (milliseconds)
+        /// </summary>
+        public double DriftTime { get; set; }
+
+        /// <summary>
         /// Peaks
         /// </summary>
         /// <remarks>Peaks are assumed to be sorted according to m/z</remarks>

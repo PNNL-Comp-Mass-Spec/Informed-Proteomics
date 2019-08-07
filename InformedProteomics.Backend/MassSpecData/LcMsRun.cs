@@ -204,6 +204,27 @@ namespace InformedProteomics.Backend.MassSpecData
             return ScanNumElutionTimeMap.TryGetValue(scanNum, out var elutionTime) ? elutionTime : 0.0;
         }
 
+        /// <summary>
+        /// Get the native ID of the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
+        public virtual string GetNativeId(int scanNum)
+        {
+            return ScanNumNativeIdMap.TryGetValue(scanNum, out var nativeId) ? nativeId : string.Empty;
+        }
+
+        /// <summary>
+        /// Get the ion mobility drift time of the specified scan number (if data is ion mobility)
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
+        public double GetDriftTime(int scanNum)
+        {
+            // TODO: Not implemented for LcMsRun, not stored in PbfLcMsRun, so return 0.
+            return 0;
+        }
+
         #endregion
 
         #region Scan numbers
@@ -626,6 +647,11 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Dictionary to map scan numbers to elution times
         /// </summary>
         protected Dictionary<int, double> ScanNumElutionTimeMap;
+
+        /// <summary>
+        /// Dictionary to map scan numbers to native IDs
+        /// </summary>
+        protected Dictionary<int, string> ScanNumNativeIdMap;
 
         /// <summary>
         /// True if DIA data, false if not, null if unknown

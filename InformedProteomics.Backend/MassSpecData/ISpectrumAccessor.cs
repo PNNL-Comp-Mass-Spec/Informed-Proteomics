@@ -10,6 +10,13 @@ namespace InformedProteomics.Backend.MassSpecData
     public interface ISpectrumAccessor : ISpectrumExtractor, IDisposable
     {
         /// <summary>
+        /// Get the native ID of the specified scan number
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
+        string GetNativeId(int scanNum);
+
+        /// <summary>
         /// Index of first LC scan in the dataset
         /// </summary>
         int MinLcScan { get; }
@@ -30,6 +37,13 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="scanNum"></param>
         /// <returns></returns>
         double GetElutionTime(int scanNum);
+
+        /// <summary>
+        /// Get the ion mobility drift time of the specified scan number (if data is ion mobility)
+        /// </summary>
+        /// <param name="scanNum"></param>
+        /// <returns></returns>
+        double GetDriftTime(int scanNum);
 
         /// <summary>
         /// Gets the MS level of the specified scan
