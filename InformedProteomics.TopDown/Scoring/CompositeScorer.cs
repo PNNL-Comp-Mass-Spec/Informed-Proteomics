@@ -9,14 +9,14 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class CompositeScorer : AbstractFragmentScorer
     {
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1)
-            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, int minCharge, int maxCharge, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+            : base(ms2Spec, tol, minCharge, maxCharge, relativeIsotopeIntensityThreshold, activationMethod)
         {
             ReferencePeakIntensity = GetRefIntensity(ms2Spec.Peaks);
         }
 
-        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1)
-            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold)
+        public CompositeScorer(Spectrum ms2Spec, Tolerance tol, double relativeIsotopeIntensityThreshold = 0.1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+            : base(ms2Spec, tol, 1, 20, relativeIsotopeIntensityThreshold, activationMethod)
         {
         }
 
@@ -36,33 +36,79 @@ namespace InformedProteomics.TopDown.Scoring
             prefixHit = false;
             suffixHit = false;
 
-            foreach (var baseIonType in BaseIonTypes)
+            if (!InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                var fragmentComposition = baseIonType.IsPrefix
-                              ? prefixFragmentComposition + baseIonType.OffsetComposition
-                              : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
-
-                var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
-                var fragmentIonMass = fragmentComposition.Mass;
-
-                var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
-
-                foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
+                foreach (var baseIonType in BaseIonTypes)
                 {
-                    var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
-                    var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
-                    var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
+                    var fragmentComposition = baseIonType.IsPrefix
+                        ? prefixFragmentComposition + baseIonType.OffsetComposition
+                        : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                    score += param.Count;
-                    score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
-                    score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
-                    score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
-                    score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+                    if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
 
-                    if (baseIonType.IsPrefix) prefixHit = true;
-                    else suffixHit = true;
+                    var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
+                    var fragmentIonMass = fragmentComposition.Mass;
+
+                    var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
+
+                    foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
+                    {
+                        var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
+                        var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
+                        var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
+
+                        score += param.Count;
+                        score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
+                        score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
+                        score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
+                        score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                        if (baseIonType.IsPrefix) prefixHit = true;
+                        else suffixHit = true;
+                    }
+                }
+            }
+            else
+            {
+                //var ionsFound = new Dictionary<bool, double>();
+
+                foreach (var baseIonType in BaseIonTypes)
+                {
+                    try
+                    {
+                        var fragmentComposition = baseIonType.IsPrefix
+                            ? prefixFragmentComposition + baseIonType.OffsetComposition
+                            : suffixFragmentComposition + baseIonType.OffsetComposition;
+
+                        if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
+
+                        var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
+                        var fragmentIonMass = fragmentComposition.Mass;
+
+                        var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
+
+                        foreach (var matchedPeak in FindMatchedPeaks(fragmentComposition, CorrThreshold, DistThreshold))
+                        {
+                            var observedMostAbuPeak = matchedPeak.ObservedPeaks[mostAbundantIsotopeIndex];
+                            var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, matchedPeak.Charge, mostAbundantIsotopeIndex);
+                            var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
+
+                            score += param.Count;
+                            score += param.Intensity * Math.Min(observedMostAbuPeak.Intensity / ReferencePeakIntensity, 1.0); // intensity-based scoring
+                            score += param.Dist * matchedPeak.Dist; // Envelope distance-based scoring
+                            score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
+                            score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
+
+                            if (baseIonType.IsPrefix) prefixHit = true;
+                            else suffixHit = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(@"Error in CompositeScorer GetFragmentScore: " + ex.Message);
+                        throw;
+                    }
                 }
             }
 
@@ -122,30 +168,78 @@ namespace InformedProteomics.TopDown.Scoring
 
         static CompositeScorer()
         {
-            ScoreParam = new ScoreWeight()
+            if (!InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                Beta0 = -5.39335774417474*WeightScaleFactor,
-                Cutoff = 3.0 * WeightScaleFactor,
-                ComplementaryIonCount = -0.378768218613132 * WeightScaleFactor,
-                Prefix = new IonScoreWeight
+                ScoreParam = new ScoreWeight()
                 {
-                    Count = -1.125486077 * WeightScaleFactor,
-                    ConsecutiveMatch = 0.125523007 * WeightScaleFactor,
-                    Intensity = 0.323923971 * WeightScaleFactor,
-                    Corr = 1.473096149 * WeightScaleFactor,
-                    Dist = 0.179502658 * WeightScaleFactor,
-                    MassError = -0.032959575 * WeightScaleFactor,
-                },
-                Suffix = new IonScoreWeight()
+                    Beta0 = -5.39335774417474 * WeightScaleFactor,
+                    Cutoff = 3.0 * WeightScaleFactor,
+                    ComplementaryIonCount = -0.378768218613132 * WeightScaleFactor,
+                    Prefix = new IonScoreWeight
+                    {
+                        Count = -1.125486077 * WeightScaleFactor,
+                        ConsecutiveMatch = 0.125523007 * WeightScaleFactor,
+                        Intensity = 0.323923971 * WeightScaleFactor,
+                        Corr = 1.473096149 * WeightScaleFactor,
+                        Dist = 0.179502658 * WeightScaleFactor,
+                        MassError = -0.032959575 * WeightScaleFactor,
+                    },
+                    Suffix = new IonScoreWeight()
+                    {
+                        Count = -0.886170429 * WeightScaleFactor,
+                        ConsecutiveMatch = 0.083704707 * WeightScaleFactor,
+                        Intensity = 0.372673677 * WeightScaleFactor,
+                        Corr = 1.18929338 * WeightScaleFactor,
+                        Dist = -0.284321389 * WeightScaleFactor,
+                        MassError = -0.026141488 * WeightScaleFactor,
+                    },
+                };
+            }
+            else
+            {
+                var trainedParam = new double[]
                 {
-                    Count = -0.886170429 * WeightScaleFactor,
-                    ConsecutiveMatch = 0.083704707 * WeightScaleFactor,
-                    Intensity = 0.372673677 * WeightScaleFactor,
-                    Corr = 1.18929338 * WeightScaleFactor,
-                    Dist = -0.284321389 * WeightScaleFactor,
-                    MassError = -0.026141488 * WeightScaleFactor,
-                },
-            };
+                    -4.35615875783574,
+                    -0.263297798433790,
+                    -0.863126458013878,
+                    0.238325241230975,
+                    0.294277332664349,
+                    0.882288576167220,
+                    0.732263929496114,
+                    -0.0199416790747384,
+                    -0.498811136842684,
+                    0.180874679890120,
+                    0.299790673329884,
+                    0.492391631834416,
+                    0.314410358803801,
+                    -0.0134845040032297,
+                };
+
+                ScoreParam = new ScoreWeight()
+                {
+                    Beta0 = trainedParam[0] * WeightScaleFactor,
+                    Cutoff = 2.0 * WeightScaleFactor,
+                    ComplementaryIonCount = trainedParam[1] * WeightScaleFactor,
+                    Prefix = new IonScoreWeight
+                    {
+                        Count = trainedParam[2] * WeightScaleFactor,
+                        ConsecutiveMatch = trainedParam[3] * WeightScaleFactor,
+                        Intensity = trainedParam[4] * WeightScaleFactor,
+                        Corr = trainedParam[5] * WeightScaleFactor,
+                        Dist = trainedParam[6] * WeightScaleFactor,
+                        MassError = trainedParam[7] * WeightScaleFactor,
+                    },
+                    Suffix = new IonScoreWeight()
+                    {
+                        Count = trainedParam[8] * WeightScaleFactor,
+                        ConsecutiveMatch = trainedParam[9] * WeightScaleFactor,
+                        Intensity = trainedParam[10] * WeightScaleFactor,
+                        Corr = trainedParam[11] * WeightScaleFactor,
+                        Dist = trainedParam[12] * WeightScaleFactor,
+                        MassError = trainedParam[13] * WeightScaleFactor,
+                    },
+                };
+            }
         }
 
         public double ScoreCutOff => CompositeScorer.ScoreParam.Cutoff;

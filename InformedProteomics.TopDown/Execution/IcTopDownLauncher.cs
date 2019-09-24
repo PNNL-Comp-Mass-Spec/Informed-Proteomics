@@ -18,6 +18,7 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
+using InformedProteomics.Scoring.Interfaces;
 using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
@@ -239,36 +240,42 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             // Deconvolute spectra
-            //var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, Options.ProductIonTolerance);
-            //var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
-            //if (!File.Exists(MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, DPbfLcMsRun.FileExtensionConst)))
-            //{
-            //    progData.StepRange(progData.MaxPercentage + 2.0);
-            //}
-            //var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
-            //
-            //_ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
-            //                                       Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, fullRun: _run as PbfLcMsRun);
-            _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
-                                                            Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
-
-#pragma warning disable 162
-            if (USE_PARALLEL_FOREACH)
+            if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+                var deconvoluter = new Deconvoluter(Options.MinProductIonCharge, Options.MaxProductIonCharge, 2, Options.ProductIonTolerance);
+                var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
+                if (!File.Exists(MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, DPbfLcMsRun.FileExtensionConst)))
                 {
-                    //_ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
-                    _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
-                });
+                    progData.StepRange(progData.MaxPercentage + 2.0);
+                }
+                var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
+
+                _ms2ScorerFactory2 = new CompositeScorerFactory(deconvolutedRun, _massBinComparer, Options.AminoAcidSet,
+                                                       Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance, fullRun: _run as PbfLcMsRun);
             }
             else
             {
-                foreach (var ms2ScanNum in _ms2ScanNums)
+                _ms2ScorerFactory2 = new CompositeScorerFactory(_run, _massBinComparer, Options.AminoAcidSet,
+                                                                Options.MinProductIonCharge, Options.MaxProductIonCharge, Options.ProductIonTolerance);
+
+#pragma warning disable 162
+                if (USE_PARALLEL_FOREACH)
                 {
-                    _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
+                    Parallel.ForEach(_ms2ScanNums, pfeOptions, ms2ScanNum =>
+                    {
+                        //_ms2ScorerFactory2.GetScorer(ms2ScanNum, activationMethod: Options.ActivationMethod);
+                        _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
+                    });
                 }
-            }
+                else
+                {
+                    foreach (var ms2ScanNum in _ms2ScanNums)
+                    {
+                        _ms2ScorerFactory2.DeconvoluteProductSpectrum(ms2ScanNum);
+                    }
+                }
 #pragma warning restore 162
+            }
 
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
@@ -693,8 +700,16 @@ namespace InformedProteomics.TopDown.Execution
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
                         //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
-                        //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum);
-                        var scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
+                        IScorer scorer;
+                        if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
+                        {
+                            scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum);
+                        }
+                        else
+                        {
+                            scorer = _ms2ScorerFactory2.GetMs2Scorer(ms2ScanNum);
+                        }
+
                         var score = seqGraph.GetFragmentScore(scorer);
 
                         var precursorIon = new Ion(proteinCompositionWithH2O, charge);

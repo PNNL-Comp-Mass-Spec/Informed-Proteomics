@@ -78,6 +78,8 @@ namespace MSPathFinderT
                 parameters.MaxNumNTermCleavages = 1; // max number of N-term cleavages
                 parameters.MaxNumCTermCleavages = 0; // max number of C-term cleavages
 
+                FlipSwitch.Instance.SetUseFlipScoring(parameters.UseFLIP);
+
                 foreach (var specFilePath in parameters.SpecFilePaths)
                 {
                     // Update the spec file path in the parameters for each search

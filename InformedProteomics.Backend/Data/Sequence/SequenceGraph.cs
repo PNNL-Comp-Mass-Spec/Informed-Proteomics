@@ -522,37 +522,56 @@ namespace InformedProteomics.Backend.Data.Sequence
             if (score != null) return (double)score;
 
             var node = _graph[seqIndex][modIndex];
-            /*double? curNodeScore;
+            double? curNodeScore;
+            var prevNodeScore = 0.0;
 
-            if (nodeScore[seqIndex][modIndex] != null)
+            if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                curNodeScore = nodeScore[seqIndex][modIndex];
-            }
-            else
-            {
-                var prefixFragmentComposition = GetComplementaryComposition(seqIndex, modIndex);
-                var suffixFragmentComposition = GetComposition(seqIndex, modIndex);
-
-                if (scorer == null)
+                if (nodeScore[seqIndex][modIndex] != null)
                 {
-                    ConsoleMsgUtils.ShowWarning("Null scorer in GetFragmentScore");
-                    curNodeScore = 0;
+                    curNodeScore = nodeScore[seqIndex][modIndex];
                 }
                 else
                 {
-                    nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(prefixFragmentComposition,
-                                                                            suffixFragmentComposition);
-                    curNodeScore = nodeScore[seqIndex][modIndex];
-                }
-            }*/
-            var curNodeScore = nodeScore[seqIndex][modIndex] ??
-                (nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex)));
+                    var prefixFragmentComposition = GetComplementaryComposition(seqIndex, modIndex);
+                    var suffixFragmentComposition = GetComposition(seqIndex, modIndex);
 
-            var prevNodeScore = 0.0;
-            if (node.GetPrevNodeIndices().Any() && seqIndex > 0)
-            {
-                prevNodeScore = node.GetPrevNodeIndices().Max(previousNode => GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore));
+                    if (scorer == null)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Null scorer in GetFragmentScore");
+                        curNodeScore = 0;
+                    }
+                    else
+                    {
+                        nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(prefixFragmentComposition, suffixFragmentComposition);
+                        curNodeScore = nodeScore[seqIndex][modIndex];
+                    }
+                }
+
+                if (node.GetPrevNodeIndices().Any())
+                {
+                    foreach (var previousNode in node.GetPrevNodeIndices())
+                    {
+                        if (seqIndex == 0)
+                            continue;
+
+                        var prevScore = GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore);
+                        if (prevScore > prevNodeScore)
+                            prevNodeScore = prevScore;
+                    }
+                }
             }
+            else
+            {
+                curNodeScore = nodeScore[seqIndex][modIndex] ??
+                               (nodeScore[seqIndex][modIndex] = scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex)));
+
+                if (node.GetPrevNodeIndices().Any() && seqIndex > 0)
+                {
+                    prevNodeScore = node.GetPrevNodeIndices().Max(previousNode => GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore));
+                }
+            }
+
             maxScore[seqIndex][modIndex] = curNodeScore + prevNodeScore;
             // ReSharper disable PossibleInvalidOperationException
             return (double)maxScore[seqIndex][modIndex];

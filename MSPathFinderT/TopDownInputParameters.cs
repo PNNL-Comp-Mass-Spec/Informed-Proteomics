@@ -145,9 +145,13 @@ namespace MSPathFinderT
         [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
         public string ScansFilePath { get; set; }
 
+        [Option("flip", HelpText = "If specified, FLIP scoring code will be used (supports UVPD spectra)")]
+        public bool UseFLIP { get; set; }
+
         public TopDownInputParameters()
         {
             ScansFilePath = "";
+            UseFLIP = false;
         }
 
         public bool Validate()
@@ -359,6 +363,9 @@ namespace MSPathFinderT
                 Console.WriteLine("Processing specific MS2 scans:");
                 Console.WriteLine(string.Join(", ", ScanNumbers));
             }
+
+            if (UseFLIP)
+            Console.WriteLine("Using FLIP scoring.");
         }
 
         /// <summary>

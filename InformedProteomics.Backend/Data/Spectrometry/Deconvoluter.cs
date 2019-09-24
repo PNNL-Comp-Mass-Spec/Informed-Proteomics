@@ -475,54 +475,87 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     var windowSpectrum = new Spectrum(window, 1);
                     var peakMz = peak.Mz;
 
-                    //var bestScore = 0.0;
-                    //DeconvolutedPeak bestPeak = null;
-
-                    for (var charge = maxCharge; charge >= minCharge; charge--)
+                    if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
                     {
-                        var mass = (peak.Mz * charge) - charge * Constants.Proton;
-                        //var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(mass);
-                        //var mostAbundantIsotopeIndex = isotopomerEnvelope.MostAbundantIsotopeIndex;
-                        var mostAbundantIsotopeIndex = Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex;
+                        var bestScore = 0.0;
+                        DeconvolutedPeak bestPeak = null;
 
-                        for (var isotopeIndex = mostAbundantIsotopeIndex - isotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex + isotopeOffsetTolerance; isotopeIndex++)
+                        for (var charge = maxCharge; charge >= minCharge; charge--)
                         {
-                            var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
-                            var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
-                            var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
-                            if (observedPeaks == null) continue;
+                            var mass = (peak.Mz * charge) - charge * Constants.Proton;
+                            var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(mass);
+                            var mostAbundantIsotopeIndex = isotopomerEnvelope.MostAbundantIsotopeIndex;
 
-                            var envelop = isotopomerEnvelope.Envelope;
-                            var observedIntensities = new double[observedPeaks.Length];
-
-                            for (var i = 0; i < observedPeaks.Length; i++)
+                            for (var isotopeIndex = mostAbundantIsotopeIndex - isotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex + isotopeOffsetTolerance; isotopeIndex++)
                             {
-                                var observedPeak = observedPeaks[i];
-                                observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
+                                var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
+                                var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
+                                if (observedPeaks == null) continue;
+
+                                var envelop = isotopomerEnvelope.Envelope;
+                                var observedIntensities = new double[observedPeaks.Length];
+
+                                for (var i = 0; i < observedPeaks.Length; i++)
+                                {
+                                    var observedPeak = observedPeaks[i];
+                                    observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
+                                }
+
+                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                                var bcDist = sim.Item1;
+                                var corr = sim.Item2;
+                                var score = corr / (bcDist * ((double)Math.Abs(isotopeIndex - mostAbundantIsotopeIndex) / envelop.Length));
+
+                                if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+
+                                // monoIsotopeMass is valid
+                                if (score >= bestScore)
+                                {
+                                    bestScore = score;
+                                    bestPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
+                                }
                             }
+                        }
 
-                            var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
-                            var bcDist = sim.Item1;
-                            var corr = sim.Item2;
-                            //var score = corr / (bcDist * ((double)Math.Abs(isotopeIndex - mostAbundantIsotopeIndex) / envelop.Length));
-
-                            if (corr < corrScoreThreshold && bcDist > 0.03) continue;
-
-                            // monoIsotopeMass is valid
-                            //if (score >= bestScore)
-                            //{
-                            //    bestScore = score;
-                            //    bestPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
-                            //}
-                            var deconvPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
-                            monoIsotopePeakList.Add(deconvPeak);
+                        if (bestPeak != null)
+                        {
+                            monoIsotopePeakList.Add(bestPeak);
                         }
                     }
+                    else
+                    {
+                        for (var charge = maxCharge; charge >= minCharge; charge--)
+                        {
+                            var mass = (peak.Mz * charge) - charge * Constants.Proton;
+                            var mostAbundantIsotopeIndex = Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex;
 
-                    //if (bestPeak != null)
-                    //{
-                    //    monoIsotopePeakList.Add(bestPeak);
-                    //}
+                            for (var isotopeIndex = mostAbundantIsotopeIndex - isotopeOffsetTolerance; isotopeIndex <= mostAbundantIsotopeIndex + isotopeOffsetTolerance; isotopeIndex++)
+                            {
+                                var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
+                                var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
+                                var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
+                                if (observedPeaks == null) continue;
+
+                                var envelop = isotopomerEnvelope.Envelope;
+                                var observedIntensities = new double[observedPeaks.Length];
+
+                                for (var i = 0; i < observedPeaks.Length; i++)
+                                {
+                                    var observedPeak = observedPeaks[i];
+                                    observedIntensities[i] = observedPeak != null ? (float) observedPeak.Intensity : 0.0;
+                                }
+
+                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                                var bcDist = sim.Item1;
+                                var corr = sim.Item2;
+
+                                if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+
+                                var deconvPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
+                                monoIsotopePeakList.Add(deconvPeak);
+                            }
+                        }
+                    }
                 }
 
                 monoIsotopePeakList.Sort();
