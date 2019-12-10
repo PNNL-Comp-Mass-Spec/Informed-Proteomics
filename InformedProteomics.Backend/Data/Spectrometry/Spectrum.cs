@@ -22,8 +22,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="scanNum"></param>
         public Spectrum(IList<double> mzArr, IList<double> intensityArr, int scanNum)
         {
-            Peaks = new Peak[mzArr.Count];
-            for(var i=0; i<mzArr.Count; i++) Peaks[i] = new Peak(mzArr[i], intensityArr[i]);
+            if (mzArr == null || intensityArr == null)
+            {
+                Peaks = new Peak[0];
+            }
+            else
+            {
+                Peaks = new Peak[mzArr.Count];
+                for (var i = 0; i < mzArr.Count; i++)
+                {
+                    Peaks[i] = new Peak(mzArr[i], intensityArr[i]);
+                }
+            }
+
             ScanNum = scanNum;
         }
 
@@ -565,7 +576,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     if (prevIndexEnd >= indexStart)
                     {
                         for (var i = prevIndexStart; i < indexEnd; i++) intensityValues.Remove(Peaks[i].Intensity);
-                        for (var i = prevIndexEnd+1; i <= indexEnd; i++) intensityValues.Add(Peaks[i].Intensity);
+                        for (var i = prevIndexEnd + 1; i <= indexEnd; i++) intensityValues.Add(Peaks[i].Intensity);
                     }
                     else
                     {
@@ -574,7 +585,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
 
                 var intensityMedian = intensityValues.Median();
-                if (peak.Intensity > intensityMedian*signalToNoiseRatio) filteredPeaks.Add(peak);
+                if (peak.Intensity > intensityMedian * signalToNoiseRatio) filteredPeaks.Add(peak);
 
                 prevIndexStart = indexStart;
                 prevIndexEnd = indexEnd;
@@ -661,8 +672,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             for (var i = 0; i < Peaks.Length; i++)
             {
-                mzData[i] = (float) Peaks[i].Mz;
-                intensityData[i] = (float) Peaks[i].Intensity;
+                mzData[i] = (float)Peaks[i].Mz;
+                intensityData[i] = (float)Peaks[i].Intensity;
             }
 
             var spline = new CubicSpline();
