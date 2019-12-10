@@ -10,6 +10,8 @@
 
         public double Score { get; }
         public string Modifications { get; }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return Score+"\t"+Modifications;

@@ -34,6 +34,7 @@ namespace InformedProteomics.Backend.Database
             SequenceHash = Sha1Hash(proteinSequence);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return SequenceLength + " residues: " + SequenceHash;

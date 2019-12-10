@@ -302,6 +302,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         internal IEnumerable<ModificationInstance> Modifications { get; set; }
         internal int Index { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return string.Format("{0}+, {1:F1} Da, Score {2:F1}", Charge, Mass, Score);

@@ -154,6 +154,7 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public class LcMsRunNullException : Exception { }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return RepresentativeMass.ToString("0.0") + " Da, " +

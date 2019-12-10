@@ -14,6 +14,7 @@
 
         public string Modifications { get; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return string.Join("\t",
