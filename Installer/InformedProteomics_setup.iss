@@ -4,7 +4,8 @@
 #define ApplicationVersion GetFileVersion('..\MSPathFinderT\bin\Release\MSPathFinderT.exe')
 
 [CustomMessages]
-AppName=DeconTools
+AppName=MSPathFinder
+
 [Messages]
 ; WelcomeLabel2 set in the code section
 ; WelcomeLabel2=This will install [name/ver] on your computer.%n%n%n%nNOTICE:%nReading of some data files requires access to a "{code:GetInstallArch}"-bit ProteoWizard installation. Please install "{code:GetInstallArch}"-bit ProteoWizard before using the program to avoid errors.%n%n
