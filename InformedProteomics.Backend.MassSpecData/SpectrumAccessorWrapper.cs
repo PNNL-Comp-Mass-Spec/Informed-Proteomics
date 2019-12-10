@@ -117,6 +117,12 @@ namespace InformedProteomics.Backend.MassSpecData
                 ElutionTime = elutionTime;
                 DriftTime = driftTime;
             }
+
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return string.Format("MS{0} at {1:F2} minutes: {2}", MsLevel, ElutionTime, NativeId);
+            }
         }
     }
 }
