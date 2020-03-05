@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net451;net462;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;net472;netstandard2.0</TargetFrameworks>
     <RootNamespace>InformedProteomics.Backend.Database</RootNamespace>
     <AssemblyName>InformedProteomics.Backend.Database</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.1.2</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <Description>Protein database parsing and preprocessing for performing database searches</Description>
