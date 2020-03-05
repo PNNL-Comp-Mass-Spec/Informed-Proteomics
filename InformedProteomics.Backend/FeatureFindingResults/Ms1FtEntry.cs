@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -110,7 +111,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <param name="writeExtendedData">if true, the data in <see cref="ExtendedData"/> will also be output to the .ms1ft file</param>
         public static void WriteToFile(string filePath, IEnumerable<Ms1FtEntry> features, bool writeExtendedData = false)
         {
-            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))))
+            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.InvariantCulture))
             {
                 SetCsvWriterConfig(tsv.Configuration);
                 if (writeExtendedData)
@@ -144,7 +145,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
                 }
                 stream.BaseStream.Seek(0, SeekOrigin.Begin);
                 stream.DiscardBufferedData();
-                using (var tsv = new CsvReader(stream))
+                using (var tsv = new CsvReader(stream, CultureInfo.InvariantCulture))
                 {
                     SetCsvReaderConfig(tsv.Configuration);
                     if (readExtendedData && hasExtended)

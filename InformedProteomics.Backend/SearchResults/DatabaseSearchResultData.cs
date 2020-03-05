@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
@@ -185,7 +186,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// <param name="includeTdaScores">If FDR scores should be output also</param>
         public static void WriteResultsToFile(string filePath, IEnumerable<DatabaseSearchResultData> resultData, bool includeTdaScores = false)
         {
-            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))))
+            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)), CultureInfo.InvariantCulture))
             {
                 SetCsvWriterConfig(tsv.Configuration);
                 if (includeTdaScores)
@@ -219,7 +220,7 @@ namespace InformedProteomics.Backend.SearchResults
                 }
                 stream.BaseStream.Seek(0, SeekOrigin.Begin);
                 stream.DiscardBufferedData();
-                using (var tsv = new CsvReader(stream))
+                using (var tsv = new CsvReader(stream, CultureInfo.InvariantCulture))
                 {
                     SetCsvReaderConfig(tsv.Configuration);
                     if (hasTda)

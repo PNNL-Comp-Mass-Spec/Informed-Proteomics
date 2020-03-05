@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Biology;
-using InformedProteomics.Backend.Data.Composition;
 using InformedProteomics.Backend.Data.Spectrometry;
-using MathNet.Numerics.Statistics;
 using PSI_Interface.CV;
 
 namespace InformedProteomics.Backend.MassSpecData
