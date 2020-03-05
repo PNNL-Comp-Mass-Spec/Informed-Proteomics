@@ -111,10 +111,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
             // OxyPlot WPF PngExporter requires STA Thread. Running it as below a separate thread means that the exe no longer needs to be flagged STAThread.
             var thread = new Thread(() =>
             {
-                using (var stream = File.Create(imgPath))
-                {
-                    OxyPlot.Wpf.PngExporter.Export(_featureMap, stream, 1200, 900, OxyColor.FromRgb(byte.MaxValue, byte.MaxValue, byte.MaxValue));
-                }
+                OxyPlot.Wpf.PngExporter.Export(_featureMap, imgPath, 1200, 900, OxyColor.FromRgb(byte.MaxValue, byte.MaxValue, byte.MaxValue));
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
