@@ -13,84 +13,86 @@ AppName=MSPathFinder
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
 [Files]
 ; InformedProteomics.Backend
-Source: InformedProteomics.Backend\bin\Release\net451\InformedProteomics.Backend.dll                                                              ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\InformedProteomics.Backend.dll                    ; DestDir: {app}
 
 ; InformedProteomics.Backend Nuget libraries
-Source: InformedProteomics.Backend\bin\Release\net451\MathNet.Numerics.dll                                                                        ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\net451\PRISM.dll                                                                                   ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\net451\PSI_Interface.dll                                                                           ; DestDir: {app}
-Source: InformedProteomics.Backend\bin\Release\net451\CsvHelper.dll                                                                               ; DestDir: {app}  
-Source: InformedProteomics.Backend\bin\Release\net451\System.ValueTuple.dll                                                                       ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\CsvHelper.dll                                     ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\MathNet.Numerics.dll                              ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\Microsoft.Bcl.AsyncInterfaces.dll                 ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\PRISM.dll                                         ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\PSI_Interface.dll                                 ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\System.Runtime.CompilerServices.Unsafe.dll        ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\System.Threading.Tasks.Extensions.dll             ; DestDir: {app}
 
 ; InformedProteomics.Backend.Database
-Source: InformedProteomics.Backend.Database\bin\Release\net451\InformedProteomics.Backend.Database.dll                                            ; DestDir: {app}
+Source: InformedProteomics.Backend.Database\bin\Release\net472\InformedProteomics.Backend.Database.dll  ; DestDir: {app}
 
 ; InformedProteomics.Backend.Database Nuget libraries
-Source: InformedProteomics.Backend.Database\bin\Release\net451\SAIS.dll                                                                           ; DestDir: {app}
-Source: InformedProteomics.Backend.Database\bin\Release\net451\ProteinFileReader.dll                                                              ; DestDir: {app}
+Source: InformedProteomics.Backend.Database\bin\Release\net472\SAIS.dll                                 ; DestDir: {app}
+Source: InformedProteomics.Backend.Database\bin\Release\net472\ProteinFileReader.dll                    ; DestDir: {app}
 
 ; InformedProteomics.Backend.MassSpecData
-Source: InformedProteomics.Backend.MassSpecData\bin\Release\InformedProteomics.Backend.MassSpecData.dll                                           ; DestDir: {app}
+Source: InformedProteomics.Backend.MassSpecData\bin\Release\InformedProteomics.Backend.MassSpecData.dll ; DestDir: {app}
 
 ; Manually managed libraries
-Source: lib\RawFileReaderLicense.doc                                                                                                              ; DestDir: {app}
-Source: lib\ThermoFisher.CommonCore.BackgroundSubtraction.dll                                                                                     ; DestDir: {app}
-Source: lib\ThermoFisher.CommonCore.Data.dll                                                                                                      ; DestDir: {app}
-Source: lib\ThermoFisher.CommonCore.MassPrecisionEstimator.dll                                                                                    ; DestDir: {app}
-Source: lib\ThermoFisher.CommonCore.RawFileReader.dll                                                                                             ; DestDir: {app}
+Source: lib\RawFileReaderLicense.doc                                                         ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.BackgroundSubtraction.dll                                ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.Data.dll                                                 ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.MassPrecisionEstimator.dll                               ; DestDir: {app}
+Source: lib\ThermoFisher.CommonCore.RawFileReader.dll                                        ; DestDir: {app}
 
 ; InformedProteomics.BottomUp
-Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll                                                                   ; DestDir: {app}
+Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll              ; DestDir: {app}
 
 ; InformedProteomics.FeatureFinding Nuget libraries
-Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.dll                                                                                 ; DestDir: {app}
-Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.Wpf.dll                                                                             ; DestDir: {app}
+Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.dll                            ; DestDir: {app}
+Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.Wpf.dll                        ; DestDir: {app}
 
 ; InformedProteomics.FeatureFinding libraries
-Source: InformedProteomics.FeatureFinding\bin\Release\InformedProteomics.FeatureFinding.dll                                                       ; DestDir: {app}
+Source: InformedProteomics.FeatureFinding\bin\Release\InformedProteomics.FeatureFinding.dll  ; DestDir: {app}
 
 ; InformedProteomics.Scoring
-Source: InformedProteomics.Scoring\bin\Release\InformedProteomics.Scoring.dll                                                                     ; DestDir: {app}
+Source: InformedProteomics.Scoring\bin\Release\InformedProteomics.Scoring.dll                ; DestDir: {app}
 
 ; InformedProteomics.TopDown
-Source: InformedProteomics.TopDown\bin\Release\InformedProteomics.TopDown.dll                                                                     ; DestDir: {app}
+Source: InformedProteomics.TopDown\bin\Release\InformedProteomics.TopDown.dll                ; DestDir: {app}
 
 ; TopDownTrainer
-Source: lib\TopDownTrainer\Accord.dll                                                                                                             ; DestDir: {app}
-Source: lib\TopDownTrainer\Accord.MachineLearning.dll                                                                                             ; DestDir: {app}
-Source: lib\TopDownTrainer\Accord.Math.Core.dll                                                                                                   ; DestDir: {app}
-Source: lib\TopDownTrainer\Accord.Math.dll                                                                                                        ; DestDir: {app}
-Source: lib\TopDownTrainer\Accord.Statistics.dll                                                                                                  ; DestDir: {app}
-Source: lib\TopDownTrainer\TopDownTrainer.exe                                                                                                     ; DestDir: {app}
+Source: lib\TopDownTrainer\Accord.dll                                                        ; DestDir: {app}
+Source: lib\TopDownTrainer\Accord.MachineLearning.dll                                        ; DestDir: {app}
+Source: lib\TopDownTrainer\Accord.Math.Core.dll                                              ; DestDir: {app}
+Source: lib\TopDownTrainer\Accord.Math.dll                                                   ; DestDir: {app}
+Source: lib\TopDownTrainer\Accord.Statistics.dll                                             ; DestDir: {app}
+Source: lib\TopDownTrainer\TopDownTrainer.exe                                                ; DestDir: {app}
 
 ; InformedProteomics.TopDown Nuget libraries
-;Source: InformedProteomics.TopDown\bin\Release\MathNet.Numerics.dll                                                                               ; DestDir: {app}
+;Source: InformedProteomics.TopDown\bin\Release\MathNet.Numerics.dll                         ; DestDir: {app}
 
 ; MSPathFinder (bottom up)
-;Source: MSPathFinder\bin\Release\MSPathFinder.exe                                                                                                 ; DestDir: {app}
-;Source: MSPathFinder\bin\Release\MSPathFinder.exe.config                                                                                          ; DestDir: {app}
+;Source: MSPathFinder\bin\Release\MSPathFinder.exe                                           ; DestDir: {app}
+;Source: MSPathFinder\bin\Release\MSPathFinder.exe.config                                    ; DestDir: {app}
 
 ; MSPathFinder (top down)
-Source: MSPathFinderT\bin\Release\MSPathFinderT.exe                                                                                               ; DestDir: {app}
-Source: MSPathFinderT\bin\Release\MSPathFinderT.exe.config                                                                                        ; DestDir: {app}
+Source: MSPathFinderT\bin\Release\MSPathFinderT.exe                                          ; DestDir: {app}
+Source: MSPathFinderT\bin\Release\MSPathFinderT.exe.config                                   ; DestDir: {app}
 
 ; PbfGen
-Source: PbfGen\bin\Release\PbfGen.exe                                                                                                             ; DestDir: {app}
-Source: PbfGen\bin\Release\PbfGen.exe.config                                                                                                      ; DestDir: {app}
+Source: PbfGen\bin\Release\PbfGen.exe                                                        ; DestDir: {app}
+Source: PbfGen\bin\Release\PbfGen.exe.config                                                 ; DestDir: {app}
 
 ; ProMex
-Source: ProMex\bin\Release\ProMex.exe                                                                                                             ; DestDir: {app}
-Source: ProMex\bin\Release\ProMex.exe.config                                                                                                      ; DestDir: {app}
+Source: ProMex\bin\Release\ProMex.exe                                                        ; DestDir: {app}
+Source: ProMex\bin\Release\ProMex.exe.config                                                 ; DestDir: {app}
 
 ; ProMexAlign
-Source: ProMexAlign\bin\Release\ProMexAlign.exe                                                                                                   ; DestDir: {app}
-Source: ProMexAlign\bin\Release\ProMexAlign.exe.config                                                                                            ; DestDir: {app}
+Source: ProMexAlign\bin\Release\ProMexAlign.exe                                              ; DestDir: {app}
+Source: ProMexAlign\bin\Release\ProMexAlign.exe.config                                       ; DestDir: {app}
 
-Source: README.md                                                                                                                                 ; DestDir: {app}; DestName: "Readme.txt"
-;Source: RevisionHistory.txt                                                                                                                       ; DestDir: {app}
-Source: Example_Files\Mod_Examples.txt                                                                                                            ; DestDir: {app}
-Source: Example_Files\MSPathFinder_Mods.txt                                                                                                       ; DestDir: {app}
-Source: Example_Files\MSPathFinder_Mods_Phospho.txt                                                                                               ; DestDir: {app}
+Source: README.md                                                                            ; DestDir: {app}; DestName: "Readme.md"
+;Source: RevisionHistory.txt                                                                 ; DestDir: {app}
+Source: Example_Files\Mod_Examples.txt                                                       ; DestDir: {app}
+Source: Example_Files\MSPathFinder_Mods.txt                                                  ; DestDir: {app}
+Source: Example_Files\MSPathFinder_Mods_Phospho.txt                                          ; DestDir: {app}
 
 
 [Dirs]
