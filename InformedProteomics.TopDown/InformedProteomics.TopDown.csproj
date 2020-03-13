@@ -139,7 +139,7 @@
       <Version>2.6.2</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
-      <Version>2.2.1</Version>
+      <Version>2.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
