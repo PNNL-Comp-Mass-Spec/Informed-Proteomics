@@ -132,7 +132,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 var probability = match.Probability;
 
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_compound_formula, Value = match.Composition, });
+                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_formula, Value = match.Composition, });
                 //specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
                 specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture), });
                 specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
