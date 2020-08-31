@@ -13,13 +13,18 @@ namespace InformedProteomics.TopDown.Execution
             _scoreCutoff = minScore;
             Ms2ScanVector = ms2ScanVector;
             _ms2ScanToIndexMap = new int[ms2ScanVector.Last() + 1];
+
             for(var i = 0; i < ms2ScanVector.Length; i++)
             {
                 var scanNum = ms2ScanVector[i];
                 _ms2ScanToIndexMap[scanNum] = i;
             }
+
             _matchedSet = new SortedSet<DatabaseSequenceSpectrumMatch>[maxModifications + 1][];
-            for(var i = 0; i <= maxModifications; i++) _matchedSet[i] = new SortedSet<DatabaseSequenceSpectrumMatch>[ms2ScanVector.Length];
+            for (var i = 0; i <= maxModifications; i++)
+            {
+                _matchedSet[i] = new SortedSet<DatabaseSequenceSpectrumMatch>[ms2ScanVector.Length];
+            }
 
         }
 
