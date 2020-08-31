@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="15.0.1" />
     <PackageReference Include="MathNet.Numerics" Version="4.9.0" />
-    <PackageReference Include="PRISM-Library" Version="2.6.2" />
+    <PackageReference Include="PRISM-Library" Version="2.6.10" />
     <PackageReference Include="PSI_Interface" Version="2.3.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
