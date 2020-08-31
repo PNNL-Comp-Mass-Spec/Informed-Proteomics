@@ -117,7 +117,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             new AminoAcid('P', "Proline", new Composition.Composition(5, 7, 1, 1, 0)),
             new AminoAcid('V', "Valine", new Composition.Composition(5, 9, 1, 1, 0)),
             new AminoAcid('T', "Threonine", new Composition.Composition(4, 7, 1, 2, 0)),
-            new AminoAcid('C', "Cystine", new Composition.Composition(3, 5, 1, 1, 1)),
+            new AminoAcid('C', "Cysteine", new Composition.Composition(3, 5, 1, 1, 1)),
             new AminoAcid('L', "Leucine", new Composition.Composition(6, 11, 1, 1, 0)),
             new AminoAcid('I', "Isoleucine", new Composition.Composition(6, 11, 1, 1, 0)),
             new AminoAcid('N', "Asparagine", new Composition.Composition(4, 6, 2, 2, 0)),
