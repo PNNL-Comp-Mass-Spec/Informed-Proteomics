@@ -11,6 +11,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 {
     public class ProteinSpectrumMatchReader
     {
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: Desc, msgfdb
+
         public readonly double FdrCutoff;
 
         public ProteinSpectrumMatchReader(double fdrCutoff = 0.01)
@@ -259,7 +262,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
             foreach (var modParts in mods.Select(mod => mod.Split(' ')))
             {
-                if (modParts.Length < 0)
+                if (modParts.Length == 0)
                 {
                     throw new FormatException("Unknown Modification");
                 }
