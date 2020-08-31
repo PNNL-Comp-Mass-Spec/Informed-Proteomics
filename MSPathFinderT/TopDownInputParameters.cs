@@ -279,9 +279,9 @@ namespace MSPathFinderT
                 return false;
             }
             if (!string.IsNullOrWhiteSpace(FeatureFilePath) &&
-                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".csv") &&
-                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".ms1ft") &&
-                !Path.GetExtension(FeatureFilePath).ToLower().Equals(".msalign"))
+                !Path.GetExtension(FeatureFilePath).Equals(".csv", StringComparison.OrdinalIgnoreCase) &&
+                !Path.GetExtension(FeatureFilePath).Equals(".ms1ft", StringComparison.OrdinalIgnoreCase) &&
+                !Path.GetExtension(FeatureFilePath).Equals(".msalign", StringComparison.OrdinalIgnoreCase))
             {
                 PrintError("Invalid extension for the Feature file path (" + Path.GetExtension(FeatureFilePath) + ")");
                 return false;
