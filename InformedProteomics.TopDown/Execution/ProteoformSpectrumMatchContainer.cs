@@ -27,7 +27,7 @@ namespace InformedProteomics.TopDown.Execution
         {
             if (newMatch.Score < _scoreCutoff) return;
             var scanIndex = _ms2ScanToIndexMap[newMatch.ScanNum];
-            var modIndex = (newMatch.Modifications == null) ? 0 : newMatch.Modifications.GetNumModifications();
+            var modIndex = newMatch.Modifications?.GetNumModifications() ?? 0;
             if (modIndex >= _matchedSet.Length) return;
 
             // thread safe

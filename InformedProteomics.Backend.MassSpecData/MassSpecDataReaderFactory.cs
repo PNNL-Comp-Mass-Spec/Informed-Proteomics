@@ -48,8 +48,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     else
                     {
                         var arch = Environment.Is64BitProcess ? "64" : "32";
-                        ConsoleMsgUtils.ShowWarning(string.Format("WARNING: Could not find a reader for file \"{0}\"." +
-                                                                  " Is ProteoWizard {1}-bit installed?", filePath, arch));
+                        ConsoleMsgUtils.ShowWarning("WARNING: Could not find a reader for file \"{0}\"." +
+                                                    " Is ProteoWizard {1}-bit installed?", filePath, arch);
                     }
                     break;
             }
