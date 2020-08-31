@@ -578,7 +578,7 @@ namespace InformedProteomics.TopDown.Execution
             };
 
             var maxNumNTermCleavages = Options.InternalCleavageMode == InternalCleavageType.NoInternalCleavage ? Options.MaxNumNTermCleavages : 0;
-            //foreach (var annotationAndOffset in annotationsAndOffsets)
+
             Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
             {
                 if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)

@@ -190,8 +190,6 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         private readonly AminoAcidSet _aaSet;
 
         private readonly double _maxSequenceMass;
-//        private readonly int _minProductIonCharge;
-//        private readonly int _maxProductIonCharge;
 
         private IEnumerable<FlankingMassMatch> GetForwardMatches(
             MatchedTag matchedTag,

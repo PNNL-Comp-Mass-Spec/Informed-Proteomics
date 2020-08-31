@@ -21,7 +21,6 @@ namespace InformedProteomics.TopDown.Execution
             _matchedSet = new SortedSet<DatabaseSequenceSpectrumMatch>[maxModifications + 1][];
             for(var i = 0; i <= maxModifications; i++) _matchedSet[i] = new SortedSet<DatabaseSequenceSpectrumMatch>[ms2ScanVector.Length];
 
-            _checkedOutScanNumbers = new List<int>();
         }
 
         public void AddMatch(DatabaseSequenceSpectrumMatch newMatch)
@@ -77,9 +76,5 @@ namespace InformedProteomics.TopDown.Execution
         public readonly FastaDatabase Database;
         private readonly int _scoreCutoff;
         private readonly SortedSet<DatabaseSequenceSpectrumMatch>[][] _matchedSet;
-
-        private readonly List<int> _checkedOutScanNumbers;
-
-        //private readonly HashSet<int> checkOutFlagMs2Scans;
     }
 }

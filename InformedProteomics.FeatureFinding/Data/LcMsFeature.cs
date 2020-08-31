@@ -154,8 +154,6 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public readonly ProteinSpectrumMatchSet ProteinSpectrumMatches;
 
-        public class LcMsRunNullException : Exception { }
-
         /// <inheritdoc />
         public override string ToString()
         {

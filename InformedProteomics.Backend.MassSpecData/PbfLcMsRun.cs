@@ -794,7 +794,6 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (targetOffset < _offsetPrecursorChromatogramBegin) return new Xic();
             var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramBegin, _offsetPrecursorChromatogramEnd, targetOffset);
-            //if (!xic.Any()) return xic;
             return xic;
         }
 
@@ -1192,14 +1191,12 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Guarantee sorted peaks.
-            //var peaks = spec.Peaks.ToList();
             Array.Sort(spec.Peaks);
-            //peaks.Sort();
+
             // Number of peaks: 4
             writer.Write(spec.Peaks.Length);
-            //writer.Write(peaks.Count);
+
             foreach (var peak in spec.Peaks)
-            //foreach (var peak in peaks)
             {
                 // m/z: 8
                 writer.Write(peak.Mz);

@@ -179,12 +179,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #endregion
 
-        # region Private Static Members
-
-//        private static readonly AminoAcidSet StandardAaSet = new AminoAcidSet();
-
-        #endregion
-
         /// <inheritdoc />
         public override string ToString()
         {

@@ -299,7 +299,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public Composition.Composition[] GetUniqueCompositions()
         {
-            //var aaList = AminoAcid.StandardAminoAcidArr.ToList();
             var uniqueCompositionList = new List<Composition.Composition>();
             var tempModTable = new List<Composition.Composition>[AminoAcid.StandardAminoAcidArr.Length];
             for (var i = 0; i < AminoAcid.StandardAminoAcidArr.Length; i++)
@@ -322,7 +321,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                         if (tempModTable[i].Contains(mAa.Composition)) continue;
                         tempModTable[i].Add(mAa.Composition);
                         uniqueCompositionList.Add(mAa.Composition);
-                        //aaList.Add(mAa);
                     }
                     //Console.WriteLine();
                 }
@@ -355,7 +353,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         #region Private Members
 
-        //private readonly Dictionary<char, AminoAcid> _residueMap = new Dictionary<char, AminoAcid>();
         private readonly Dictionary<SequenceLocation, Dictionary<char, AminoAcid>> _locationSpecificResidueMap;
         private readonly Dictionary<SequenceLocation, Dictionary<char, int[]>> _locationSpecificResidueModMap;
 
