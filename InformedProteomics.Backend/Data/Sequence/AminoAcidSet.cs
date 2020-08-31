@@ -317,10 +317,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
                     foreach (var modIndex in GetModificationIndices(residue, location))
                     {
-                        var mAa = new ModifiedAminoAcid(aa, _modificationParams.GetModification(modIndex));
-                        if (tempModTable[i].Contains(mAa.Composition)) continue;
-                        tempModTable[i].Add(mAa.Composition);
-                        uniqueCompositionList.Add(mAa.Composition);
+                        var modifiedAa = new ModifiedAminoAcid(aa, _modificationParams.GetModification(modIndex));
+                        if (tempModTable[i].Contains(modifiedAa.Composition)) continue;
+                        tempModTable[i].Add(modifiedAa.Composition);
+                        uniqueCompositionList.Add(modifiedAa.Composition);
                     }
                     //Console.WriteLine();
                 }
