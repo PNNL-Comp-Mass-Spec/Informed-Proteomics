@@ -103,7 +103,7 @@ namespace InformedProteomics.Backend.MassSpecData
             reader?.Dispose();
         }
 
-        private struct ScanMetadata
+        private readonly struct ScanMetadata
         {
             public string NativeId { get; }
             public int MsLevel { get; }

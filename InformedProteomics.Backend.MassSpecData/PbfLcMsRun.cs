@@ -2009,7 +2009,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// some post-PBF creation memory usage issues. Changing to a struct significantly reduces those issues, even
         /// though these structs are slightly larger than Microsoft's recommendation at
         /// https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/choosing-between-class-and-struct</remarks>
-        private struct ChromatogramPeak : IComparable<ChromatogramPeak>
+        private readonly struct ChromatogramPeak : IComparable<ChromatogramPeak>
         {
             public ChromatogramPeak(double mz, double intensity, int scanNum)
             {
