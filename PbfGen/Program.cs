@@ -7,7 +7,7 @@ using PRISM;
 
 namespace PbfGen
 {
-    public class Program
+    public static class Program
     {
         public static string Version
         {

@@ -8,8 +8,9 @@ using PRISM;
 
 namespace MSPathFinderT
 {
-    public class Program
+    public static class Program
     {
+        // Ignore Spelling: tda
         public const string Name = "MSPathFinderT";
         public static string Version
         {
