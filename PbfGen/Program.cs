@@ -9,6 +9,8 @@ namespace PbfGen
 {
     public static class Program
     {
+        // Ignore Spelling: pbf
+
         public static string Version
         {
             get
@@ -35,10 +37,20 @@ namespace PbfGen
                     SetConsoleMode(handle, EnableExtendedFlags);
                 }
 
-                var exeName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                string entryAsmName;
+                try
+                {
+                    // ReSharper disable once PossibleNullReferenceException
+                    entryAsmName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                }
+                catch
+                {
+                    // This method was likely invoked by NUnit
+                    entryAsmName = "Unknown_Assembly";
+                }
 
-                var parser = new CommandLineParser<PbfGenInputParameters>(exeName, Version);
-                parser.UsageExamples.Add($"Using -start and -end to limit the scan range to include in the .pbf file\n\t{exeName}.exe -s Dataset.raw -start 2000 -end 3000");
+                var parser = new CommandLineParser<PbfGenInputParameters>(entryAsmName, Version);
+                parser.UsageExamples.Add($"Using -start and -end to limit the scan range to include in the .pbf file\n\t{entryAsmName}.exe -s Dataset.raw -start 2000 -end 3000");
 
                 var results = parser.ParseArgs(args);
 

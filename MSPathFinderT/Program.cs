@@ -11,6 +11,7 @@ namespace MSPathFinderT
     public static class Program
     {
         // Ignore Spelling: tda
+
         public const string Name = "MSPathFinderT";
         public static string Version
         {
@@ -43,6 +44,7 @@ namespace MSPathFinderT
                 string entryAsmName;
                 try
                 {
+                    // ReSharper disable once PossibleNullReferenceException
                     entryAsmName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
                 }
                 catch
