@@ -22,6 +22,8 @@ namespace InformedProteomics.TopDown.Execution
     /// </summary>
     public class MzidResultsWriter
     {
+        // Ignore Spelling: Cvid, mzIdentML
+
         private readonly FastaDatabase database;
         private readonly LcMsRun lcmsRun;
         private readonly MsPfParameters options;
@@ -183,7 +185,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             settings.AdditionalSearchParams.Items.Add(new UserParamObj() { Name = "SpecifiedActivationMethod", Value = activationMethod });
 
-            // Add search type, if not a target-deacoy search
+            // Add search type, if not a target-decoy search
             if (options.TargetDecoySearchMode != DatabaseSearchMode.Both)
             {
                 settings.AdditionalSearchParams.Items.Add(new UserParamObj() { Name = "SearchType", Value = options.TargetDecoySearchMode.ToString() });

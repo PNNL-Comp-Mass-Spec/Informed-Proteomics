@@ -12,6 +12,8 @@ namespace InformedProteomics.Backend.Data.Composition
     /// </summary>
     public class Composition: AbstractComposition
     {
+        // Ignore Spelling: readonly, UniMod
+
         /// <summary>
         /// Empty composition
         /// </summary>

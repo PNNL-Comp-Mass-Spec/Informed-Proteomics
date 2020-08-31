@@ -13,6 +13,8 @@ namespace InformedProteomics.Backend.FeatureFindingResults
     /// </summary>
     public class Ms1FtEntry
     {
+        // Ignore Spelling: Xic
+
         /// <summary>
         /// Feature ID
         /// </summary>

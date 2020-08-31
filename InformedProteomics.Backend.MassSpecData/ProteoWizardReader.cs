@@ -22,6 +22,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.</remarks>
     public sealed class ProteoWizardReader : IMassSpecDataReader
     {
+        // Ignore Spelling: Apps, centroiding, cli, fid, lcd, Pwiz, Shimadzu, snr, stateful, uimf
+
         #region Static stateful data
 
         /// <summary>
@@ -299,7 +301,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// event before first instantiating the class.</remarks>
     internal sealed class ProteoWizardReaderImplementation : IMassSpecDataReader
     {
-        #region AssemblyResolverHandler for finding ProteoWizard dlls
+        #region AssemblyResolverHandler for finding ProteoWizard DLLs
 
         /// <summary>
         /// Add the Assembly Resolver to the system assembly resolver chain
@@ -514,7 +516,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            // Look for subfolders whose names start with ProteoWizard, for example "ProteoWizard 3.0.9490"
+            // Look for subdirectories whose names start with ProteoWizard, for example "ProteoWizard 3.0.9490"
             possibleInstallDirs.AddRange(pwizFolder.EnumerateDirectories("ProteoWizard*"));
 
             if (possibleInstallDirs.Count <= 0)

@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class Modification : IMolecule
     {
+        // Ignore Spelling: UniMod
+
         /// <summary>
         /// The format string for outputting modification masses within sequences
         /// </summary>
@@ -169,6 +171,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         // ReSharper disable IdentifierTypo
         // ReSharper disable CommentTypo
         // ReSharper disable StringLiteralTypo
+
+        // Ignore Spelling: Acetyl, Acetylation, Carbamidomethylation, Carbamyl, Carbamylation, Carboxymethyl, Carboxymethylation,
+        // Ignore Spelling: Cysteinyl, Deamidation, Deamidated, Dehydro, DelC2H2, Dethiomethyl, DiMethylation, Gln, Glutathione,
+        // Ignore Spelling: Itraq4Plex, Methylation, Nethylmaleimide, NipCam, Nitrosyl, Oxidation, Phosphorylation,
+        // Ignore Spelling: PyroCarbamidomethyl, PyroGluE, PyroGluQ, SerToAsn, SerToAsp, SerToXle
+        // Ignore Spelling: ThrToAla, Tmt6Plex, Trimethyl, TriMethylation, TriOxidation
 
         /// <summary>
         /// Acetylation
@@ -361,7 +369,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private static readonly Dictionary<string, Modification> NameToModMap;
 
         /// <summary>
-        /// Dictionary mapping mod mass (formatted with const MOD_MASS_FORMAT_STRING) to mod name
+        /// Dictionary mapping mod mass (formatted with constant MOD_MASS_FORMAT_STRING) to mod name
         /// </summary>
         private static readonly Dictionary<string, IList<Modification>> MassToModMap;
 

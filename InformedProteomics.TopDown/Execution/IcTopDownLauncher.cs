@@ -25,6 +25,8 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDownLauncher : EventNotifier
     {
+        // Ignore Spelling: deconvolute, deconvoluted, ic, Nums, pbf
+
         private const bool USE_PARALLEL_FOREACH = true;
 
         //public const int NumMatchesPerSpectrum = 1;
@@ -858,7 +860,7 @@ namespace InformedProteomics.TopDown.Execution
                     if (spec.Peaks.Length == 0)
                         continue;
 
-                    currentTask = "Looping over prsms for scan " + scanNum;
+                    currentTask = "Looping over PRSMs for scan " + scanNum;
 
                     var matchIndex = 0;
                     foreach (var match in prsms)

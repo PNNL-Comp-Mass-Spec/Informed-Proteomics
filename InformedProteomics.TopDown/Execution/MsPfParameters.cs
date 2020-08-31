@@ -13,6 +13,8 @@ namespace InformedProteomics.TopDown.Execution
     /// </summary>
     public class MsPfParameters
     {
+        // Ignore Spelling: Tda, tri
+
         public const string ParameterFileExtension = ".param";
 
         /// <summary>
@@ -194,7 +196,7 @@ namespace InformedProteomics.TopDown.Execution
         public int MaxDynamicModificationsPerSequence { get; set; }
 
         /// <summary>
-        /// Gets or sets the DB search mode, using a 'tri state bool'
+        /// Gets or sets the DB search mode, using a tri-state boolean
         /// </summary>
         /// <remarks>default true
         /// true: target and decoy, false: target only, null: decoy only</remarks>

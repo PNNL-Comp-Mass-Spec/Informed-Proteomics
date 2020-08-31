@@ -7,6 +7,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class AminoAcid : IMolecule
     {
+        // Ignore Spelling: Arg, Asn, Cys, Gln, Glu, Gly, Ile, Leu, Lys, Phe, Ser, Thr, Trp, Tyr, UniProt
+
         #region Constructors
 
         /// <summary>

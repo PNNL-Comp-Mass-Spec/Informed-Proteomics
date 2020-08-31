@@ -15,6 +15,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public class PbfLcMsRun: LcMsRun, IPbfLcMsRun
     {
+        // Ignore Spelling: Baf, LcMs, Nums, overridable, Pbf, struct, structs
+
         /// <summary>
         /// File extension
         /// </summary>
@@ -26,7 +28,7 @@ namespace InformedProteomics.Backend.MassSpecData
         protected virtual string FileExtensionVirtual => FileExtensionConst;
 
         /// <summary>
-        /// File extension - overrideable. Returns <see cref="FileExtensionConst"/> for current type. See <see cref="FileExtensionConst"/> for static access.
+        /// File extension - overridable. Returns <see cref="FileExtensionConst"/> for current type. See <see cref="FileExtensionConst"/> for static access.
         /// </summary>
         public string FileExtension => FileExtensionVirtual;
 
@@ -719,7 +721,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Returns a xic for the chosen range that covers the entire run.
+        /// Returns a XIC for the chosen range that covers the entire run.
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>

@@ -12,6 +12,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public static class MassSpecDataReaderFactory
     {
+        // Ignore Spelling: cli, lcd, pwiz, Shimadzu
+
         /// <summary>
         /// Gets the appropriate IMassSpecDataReader for the supplied path.
         /// It is recommended that "NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path
@@ -161,7 +163,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             get
             {
-                // These file extensions need to be lowercase due to Linq queries of the form "types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()"
+                // These file extensions need to be lowercase due to LINQ queries of the form "types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()"
                 var internalSupported = new List<string> {".mzml", ".mzml.gz", ".pbf"};
                 if (_thermoRawAvailable)
                 {
@@ -297,7 +299,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Tests to see if we can can use RawFileReader (i.e. are we running as 64-bit process)
+        /// Tests to see if we can use RawFileReader (i.e. are we running as 64-bit process)
         /// </summary>
         /// <returns></returns>
         public static bool IsThermoRawAvailable()

@@ -7,6 +7,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class XicPoint: IComparable<XicPoint>
     {
+        // Ignore Spelling: Xic
+
         /// <summary>
         /// Constructor
         /// </summary>

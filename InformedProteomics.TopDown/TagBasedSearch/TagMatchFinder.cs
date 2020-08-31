@@ -13,6 +13,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 {
     public class TagMatchFinder
     {
+        // Ignore Spelling: Da
+
         // TODO: better to compute this from mod file
         public const double MinSumModificationMasses = -200.0;
         public const double Ms1CorrThreshold = 0.7;

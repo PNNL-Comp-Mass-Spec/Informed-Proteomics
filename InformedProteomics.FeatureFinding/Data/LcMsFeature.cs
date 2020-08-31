@@ -5,6 +5,8 @@ namespace InformedProteomics.FeatureFinding.Data
 {
     public class LcMsFeature
     {
+        // Ignore Spelling: Da
+
         public LcMsFeature(double repMass, int repCharge, double repMz, int repScanNum, double abundance)
             : this(repMass, repCharge, repMz, repScanNum, abundance,
             repCharge, repCharge, repScanNum, repScanNum, 0, 0)

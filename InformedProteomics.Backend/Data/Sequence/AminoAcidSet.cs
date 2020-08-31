@@ -58,7 +58,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Generate an amino acid map with Cys static modification
+        /// Generate an amino acid map with a Cysteine static modification
         /// </summary>
         /// <param name="cysMod"></param>
         public AminoAcidSet(Modification cysMod) : this()

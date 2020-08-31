@@ -16,6 +16,8 @@ namespace InformedProteomics.Backend.SearchResults
     /// </summary>
     public class DatabaseSearchResultData
     {
+        // Ignore Spelling: Dehydro, desc
+
         /// <summary>
         /// Scan number
         /// </summary>
@@ -307,7 +309,7 @@ namespace InformedProteomics.Backend.SearchResults
         }
 
         /// <summary>
-        /// Read results from tsv file into group of objects from PSI_Interface
+        /// Read results from TSV file into group of objects from PSI_Interface
         /// </summary>
         /// <param name="idFilePath"></param>
         /// <returns></returns>
@@ -333,7 +335,9 @@ namespace InformedProteomics.Backend.SearchResults
                     SpecEv = databaseSearchResult.SpecEValue,
                 };
 
-                // Parse modification
+                // Parse the modification list, e.g.
+                // Dehydro 9,Dehydro 20,Dehydro 27,Dehydro 48
+
                 var modParts = databaseSearchResult.Modifications.Split(',');
                 if (modParts.Length > 0)
                 {
