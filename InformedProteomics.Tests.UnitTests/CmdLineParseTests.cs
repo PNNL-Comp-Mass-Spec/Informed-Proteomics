@@ -124,7 +124,7 @@ namespace InformedProteomics.Tests.UnitTests
             Assert.AreEqual(ActivationMethod.PQD, options.ActivationMethod);
             var valid = options.Validate(string.Empty);
             Assert.IsTrue(valid, "Call to options.Validate failed");
-            options.Display();
+            options.Display(string.Empty);
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace InformedProteomics.Tests.UnitTests
             Assert.AreEqual(ActivationMethod.PQD, options.ActivationMethod);
             var valid = options.Validate(string.Empty);
             Assert.IsTrue(valid, "Call to options.Validate failed");
-            options.Display();
+            options.Display(string.Empty);
         }
 
         [Test]
@@ -209,7 +209,7 @@ namespace InformedProteomics.Tests.UnitTests
             var valid = options.Validate(paramFile.FullName);
 
             Assert.IsTrue(valid, "Call to options.Validate failed");
-            options.Display();
+            options.Display(paramFilePath);
 
             Assert.AreEqual(mzMLFilePath, options.SpecFilePath);
             Assert.AreEqual(fastaFilePath, options.DatabaseFilePath);
@@ -296,7 +296,7 @@ namespace InformedProteomics.Tests.UnitTests
             var valid = options.Validate(paramFile.FullName);
 
             Assert.IsTrue(valid, "Call to options.Validate failed");
-            options.Display();
+            options.Display(paramFilePath);
 
             Assert.AreEqual(mzMLFilePath, options.SpecFilePath);
             Assert.AreEqual(fastaFilePath, options.DatabaseFilePath);
