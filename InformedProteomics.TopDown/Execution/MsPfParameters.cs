@@ -65,7 +65,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxNumCTermCleavages = 0;
             MaxNumThreads = 0;
             ScanNumbers = null;
-            NumMatchesPerSpectrum = 3;
+            MatchesPerSpectrumToKeepInMemory = 3;
             TagBasedSearch = true;
 
             ActivationMethod = ActivationMethod.Unknown;
@@ -81,9 +81,15 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         public AminoAcidSet AminoAcidSet { get; set; }
 
+        /// <summary>
+        /// Maximum number of N-terminal cleavages
+        /// </summary>
         /// <remarks>default 1</remarks>
         public int MaxNumNTermCleavages { get; set; }
 
+        /// <summary>
+        /// Maximum number of C-terminal cleavages
+        /// </summary>
         /// <remarks>default 0</remarks>
         public int MaxNumCTermCleavages { get; set; }
 
@@ -247,11 +253,19 @@ namespace InformedProteomics.TopDown.Execution
         public IEnumerable<int> ScanNumbers { get; set; }
 
         /// <summary>
-        /// Number of matches to track for each spectrum
+        /// Number of matches to track in memory for each spectrum
+        /// The matches are used when computing confidence scores
         /// </summary>
         /// <remarks>Defaults to 3</remarks>
-        public int NumMatchesPerSpectrum { get; set; }
+        [Obsolete("Superseded by MatchesPerSpectrumToTrack")]
+        public int NumMatchesPerSpectrum => MatchesPerSpectrumToKeepInMemory;
 
+        /// <summary>
+        /// Number of matches to track in memory for each spectrum
+        /// The matches in memory are used when computing spectral E-values
+        /// </summary>
+        /// <remarks>Defaults to 3</remarks>
+        public int MatchesPerSpectrumToKeepInMemory { get; set; }
         /// <summary>
         /// Maximum number of threads
         /// </summary>

@@ -6,10 +6,15 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class ProteoformSpectrumMatchContainer
     {
-        public ProteoformSpectrumMatchContainer(FastaDatabase database, int[] ms2ScanVector, int maxModifications, int maxNumMatchesPerSpectrum, int minScore = 4)
+        public ProteoformSpectrumMatchContainer(
+            FastaDatabase database,
+            int[] ms2ScanVector,
+            int maxModifications,
+            int matchesPerSpectrumToKeepInMemory,
+            int minScore = 4)
         {
             Database = database;
-            NumMatchesPerSpectrum = maxNumMatchesPerSpectrum;
+            MatchesPerSpectrumToKeepInMemory = matchesPerSpectrumToKeepInMemory;
             _scoreCutoff = minScore;
             Ms2ScanVector = ms2ScanVector;
             _ms2ScanToIndexMap = new int[ms2ScanVector.Last() + 1];
@@ -46,7 +51,7 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     var existingMatches = _matchedSet[modIndex][scanIndex];
                     var maxScore = existingMatches.Max.Score;
-                    if (existingMatches.Count < NumMatchesPerSpectrum && maxScore * ScoreRatioCutoff < newMatch.Score)
+                    if (existingMatches.Count < MatchesPerSpectrumToKeepInMemory && maxScore * ScoreRatioCutoff < newMatch.Score)
                     {
                         existingMatches.Add(newMatch);
                         existingMatches.RemoveWhere(mt => mt.Score < maxScore * ScoreRatioCutoff);
@@ -75,7 +80,7 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private const double ScoreRatioCutoff = 0.7;
-        public readonly int NumMatchesPerSpectrum;
+        public readonly int MatchesPerSpectrumToKeepInMemory;
         public readonly int[] Ms2ScanVector;
         private readonly int[] _ms2ScanToIndexMap;
         public readonly FastaDatabase Database;

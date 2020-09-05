@@ -17,7 +17,6 @@ namespace InformedProteomics.BottomUp.Execution
 {
     public class IcBottomUpLauncher
     {
-        //public const int NumMatchesPerSpectrum = 10;
         public const string TargetFileExtension = "_IcTarget.tsv";
         public const string DecoyFileExtension = "_IcDecoy.tsv";
         public const string TdaFileExtension = "_IcTda.tsv";
@@ -64,7 +63,7 @@ namespace InformedProteomics.BottomUp.Execution
             ProductIonTolerance = new Tolerance(10);
             RunTargetDecoyAnalysis = DatabaseSearchMode.Both;
             NumTolerableTermini = 1;
-            NumMatchesPerSpectrum = 10;
+            MatchesPerSpectrumToReport = 10;
         }
 
         public string ErrorMessage { get; private set; }
@@ -74,32 +73,61 @@ namespace InformedProteomics.BottomUp.Execution
         public AminoAcidSet AminoAcidSet { get; }
         public Enzyme Enzyme { get; }
 
+        /// <summary>
+        /// Min Sequence Length
+        /// </summary>
         /// <remarks>default 6</remarks>
         public int MinSequenceLength { get; set; }
 
+        /// <summary>
+        /// Max Sequence Length
+        /// </summary>
         /// <remarks>default 30</remarks>
         public int MaxSequenceLength { get; set; }
 
+        /// <summary>
+        /// Min Precursor Ion Charge
+        /// </summary>
         /// <remarks>default 1</remarks>
         public int MinPrecursorIonCharge { get; set; }
 
+        /// <summary>
+        /// Max Precursor Ion Charge
+        /// </summary>
         /// <remarks>default 4</remarks>
         public int MaxPrecursorIonCharge { get; set; }
 
+        /// <summary>
+        /// Min Product Ion Charge
+        /// </summary>
         /// <remarks>default 1</remarks>
         public int MinProductIonCharge { get; set; }
 
+        /// <summary>
+        /// Max Product Ion Charge
+        /// </summary>
         /// <remarks>default 3</remarks>
         public int MaxProductIonCharge { get; set; }
 
+        /// <summary>
+        /// Precursor Ion Tolerance
+        /// </summary>
         /// <remarks>default 10 ppm</remarks>
         public Tolerance PrecursorIonTolerance { get; set; }
 
+        /// <summary>
+        /// Product Ion Tolerance
+        /// </summary>
         /// <remarks>default 10 ppm</remarks>
         public Tolerance ProductIonTolerance { get; set; }
 
-        /// <remarks>default true
-        /// true: target and decoy, false: target only, null: decoy only</remarks>
+        /// <summary>
+        /// Run Target Decoy Analysis boolean (reads/updates RunTargetDecoyAnalysis)
+        /// </summary>
+        /// <remarks>
+        /// default true
+        /// true: target and decoy, false: target only, null: decoy only
+        /// </remarks>
         public bool? RunTargetDecoyAnalysisBool
         {
             get
@@ -128,18 +156,33 @@ namespace InformedProteomics.BottomUp.Execution
             }
         }
 
+        /// <summary>
+        /// Run Target Decoy Analysis
+        /// </summary>
         /// <remarks>default Both</remarks>
         public DatabaseSearchMode RunTargetDecoyAnalysis { get; set; }
 
+        /// <summary>
+        /// Num Tolerable Termini
+        /// </summary>
         /// <remarks>default 1</remarks>
         public int NumTolerableTermini { get; set; }
 
+        /// <summary>
+        /// Matches per spectrum to report in the results
+        /// </summary>
         /// <remarks>default 10</remarks>
-        public int NumMatchesPerSpectrum { get; set; }
+        public int MatchesPerSpectrumToReport { get; set; }
 
+        /// <summary>
+        /// Max Number of Threads
+        /// </summary>
         /// <remarks>default 4</remarks>
         public int MaxNumThreads { get; set; } // TODO: Actually implement multithreading....
 
+        /// <summary>
+        /// Precursor Ion Tolerance, in ppm
+        /// </summary>
         /// <remarks>default 10 ppm</remarks>
         public double PrecursorIonTolerancePpm
         {
@@ -147,6 +190,9 @@ namespace InformedProteomics.BottomUp.Execution
             set => PrecursorIonTolerance = new Tolerance(value);
         }
 
+        /// <summary>
+        /// Product Ion Tolerance, in ppm
+        /// </summary>
         /// <remarks>default 10 ppm</remarks>
         public double ProductIonTolerancePpm
         {
@@ -364,7 +410,10 @@ namespace InformedProteomics.BottomUp.Execution
                         else // already exists
                         {
                             var existingMatches = matches[ms2ScanNum];
-                            if (existingMatches.Count < NumMatchesPerSpectrum) existingMatches.Add(prsm);
+                            if (existingMatches.Count < MatchesPerSpectrumToReport)
+                            {
+                                existingMatches.Add(prsm);
+                            }
                             else
                             {
                                 var minScore = existingMatches.Min.Score;

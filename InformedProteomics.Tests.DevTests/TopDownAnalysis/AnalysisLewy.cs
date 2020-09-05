@@ -451,32 +451,32 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 //var clusters = featureFinder.FindFeatures(binNum);
                 var massCenter = comparer.GetMzAverage(binNum);
                 var cluster = featureFinder.GetLcMsPeakClusterWithoutScoring(massCenter, 9, 22, 7885, 8057);
-                var theoEnv = cluster.TheoreticalEnvelope;
+                var theoreticalEnvelope = cluster.TheoreticalEnvelope;
 
-                var summedEnvelope = new double[theoEnv.Size];
+                var summedEnvelope = new double[theoreticalEnvelope.Size];
                 var bestCorr = -1d;
                 var bestCharge = 0;
-                double[] bestChargeEnv = null;
+                double[] bestChargeEnvelope = null;
 
                 for (var c = 0; c < cluster.Envelopes.Length; c++)
                 {
-                    var summedAtCharge = new double[theoEnv.Size];
+                    var summedAtCharge = new double[theoreticalEnvelope.Size];
                     for (var t = 0; t < cluster.Envelopes[c].Length; t++)
                     {
                         if (cluster.Envelopes[c][t] == null) continue;
                         cluster.Envelopes[c][t].Peaks.SumEnvelopeTo(summedAtCharge);
                         cluster.Envelopes[c][t].Peaks.SumEnvelopeTo(summedEnvelope);
                     }
-                    var corr1 = theoEnv.GetPearsonCorrelation(summedAtCharge);
+                    var corr1 = theoreticalEnvelope.GetPearsonCorrelation(summedAtCharge);
 
                     if (corr1 > bestCorr)
                     {
                         bestCorr = corr1;
-                        bestChargeEnv = summedAtCharge;
+                        bestChargeEnvelope = summedAtCharge;
                         bestCharge = c + 9;
                     }
                 }
-                var corr2 = theoEnv.GetPearsonCorrelation(summedEnvelope);
+                var corr2 = theoreticalEnvelope.GetPearsonCorrelation(summedEnvelope);
 
                 Console.Write(massCenter);
                 Console.Write("\t");
@@ -488,7 +488,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 Console.Write("\t");
                 Console.Write(string.Join("\t", summedEnvelope));
                 Console.Write("\t");
-                Console.Write(string.Join("\t", bestChargeEnv));
+                Console.Write(string.Join("\t", bestChargeEnvelope));
                 Console.Write("\n");
             }
         }*/

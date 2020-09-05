@@ -174,7 +174,7 @@ namespace InformedProteomics.TopDown.Execution
                 new UserParamObj() { Name = "PrecursorIonTolerance", Value = options.PrecursorIonTolerance.ToString() },
                 new UserParamObj() { Name = "ProductIonTolerance", Value = options.ProductIonTolerance.ToString() },
                 new UserParamObj() { Name = "SearchMode", Value = options.InternalCleavageMode.ToString() },
-                new UserParamObj() { Name = "NumMatchesPerSpectrum", Value = options.NumMatchesPerSpectrum.ToString() },
+                new UserParamObj() { Name = "MatchesPerSpectrumToKeepInMemory", Value = options.MatchesPerSpectrumToKeepInMemory.ToString() },
                 new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() },
             });
 
