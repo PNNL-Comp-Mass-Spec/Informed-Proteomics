@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using InformedProteomics.Backend.Data.Enum;
+using PRISM;
 
 namespace InformedProteomics.Backend.Data.Sequence
 {
@@ -47,8 +48,24 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static List<SearchModification> ParseModification(string line)
         {
+            if (string.IsNullOrWhiteSpace(line))
+                return null;
+
+            var poundIndex = line.IndexOf('#');
+            if (poundIndex > 0)
+            {
+                // var modComment = line.Substring(poundIndex);
+                line = line.Substring(0, poundIndex - 1).Trim();
+            }
+
             var token = line.Split(',');
-            if (token.Length != 5) return null;
+            if (token.Length != 5)
+            {
+                ConsoleMsgUtils.ShowWarning(
+                    "Modification specification must be a comma separated list of 5 items; " +
+                    "this line is invalid:\n" + line);
+                return null;
+            }
 
             // Composition
             var compStr = token[0].Trim();
@@ -172,7 +189,8 @@ namespace InformedProteomics.Backend.Data.Sequence
                         throw new Exception(string.Format("{0} at line {1}.", e.Message, lineNum), e);
                     }
 
-                    searchModList.AddRange(mods);
+                    if (mods != null)
+                        searchModList.AddRange(mods);
                 }
             }
 
