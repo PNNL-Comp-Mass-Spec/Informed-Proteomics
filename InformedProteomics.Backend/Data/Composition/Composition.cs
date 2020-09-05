@@ -439,18 +439,52 @@ namespace InformedProteomics.Backend.Data.Composition
         }
 
         /// <summary>
+        /// String representation of this composition
+        /// </summary>
+        /// <param name="spaceSeparated">When true, separate fields using spaces instead of commas</param>
+        /// <returns></returns>
+        public string ToString(bool spaceSeparated)
+        {
+            var formatString = spaceSeparated ?
+                                   "{0,-6}" :
+                                   "{0}";
+
+            var elements = new List<string>
+            {
+                string.Format(formatString, string.Format("{0}({1}) ", "C", C)),
+                string.Format(formatString, string.Format("{0}({1}) ", "H", H)),
+                string.Format(formatString, string.Format("{0}({1}) ", "N", N)),
+                string.Format(formatString, string.Format("{0}({1}) ", "O", O)),
+                string.Format(formatString, string.Format("{0}({1}) ", "S", S))
+            };
+
+            if (P != 0)
+                elements.Add(string.Format(formatString, string.Format("{0}({1}) ", "P", P)));
+
+            if (_additionalElements == null)
+                return string.Join(string.Empty, elements).Trim();
+
+            foreach (var element in _additionalElements)
+            {
+                elements.Add(string.Format(formatString, string.Format("{0}({1}) ", element.Key.Code, element.Value)));
+            }
+
+            return string.Join(string.Empty, elements).Trim();
+        }
+        /// <summary>
         /// Return the composition as an empirical formula
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Empirical formula</returns>
+        /// <remarks>Lists C, H, N, O, S, and P first, then additional elements</remarks>
         public string ToPlainString()
         {
             var basicCompositionStr =
-                (C == 0 ? "" : "C" + C)
-                + (H == 0 ? "" : "H" + H)
-                + (N == 0 ? "" : "N" + N)
-                + (O == 0 ? "" : "O" + O)
-                + (S == 0 ? "" : "S" + S)
-                + (P == 0 ? "" : "P" + P);
+                (C == 0 ? string.Empty : "C" + C) +
+                (H == 0 ? string.Empty : "H" + H) +
+                (N == 0 ? string.Empty : "N" + N) +
+                (O == 0 ? string.Empty : "O" + O) +
+                (S == 0 ? string.Empty : "S" + S) +
+                (P == 0 ? string.Empty : "P" + P);
 
             if (_additionalElements == null)
                 return basicCompositionStr;

@@ -62,13 +62,28 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <inheritdoc />
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3},{4}",
-                Modification.Composition,
+            return ToString(false);
+        }
+
+        /// <summary>
+        /// String representation of this search mod
+        /// </summary>
+        /// <param name="spaceSeparated">When true, separate fields using spaces instead of commas</param>
+        /// <returns></returns>
+        public string ToString(bool spaceSeparated)
+        {
+            var formatString = spaceSeparated ?
+                                   "{0,-30} {1,-5} {2,-4} {3,-15} {4}" :
+                                   "{0},{1},{2},{3},{4}";
+
+            return string.Format(formatString,
+                Modification.Composition.ToString(spaceSeparated),
                 TargetResidue,
                 (IsFixedModification ? "fix" : "opt"),
                 Location,
                 Modification.Name
-                );
+            );
         }
+
     }
 }
