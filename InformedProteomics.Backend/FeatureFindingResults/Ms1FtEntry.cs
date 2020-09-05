@@ -93,7 +93,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <summary>
         /// The theoretical envelope of the feature
         /// </summary>
-        public string Envelope { get; set; } = "";
+        public string Envelope { get; set; } = string.Empty;
 
         /// <summary>
         /// The feature score

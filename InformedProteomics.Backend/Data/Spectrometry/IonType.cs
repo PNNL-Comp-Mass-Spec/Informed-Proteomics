@@ -160,7 +160,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public string GetName(int index)
         {
             string chargeStr;
-            if (Charge == 1) chargeStr = "";
+            if (Charge == 1)
+            {
+                chargeStr = string.Empty;
+            }
             else
             {
                 var builder = new StringBuilder(Charge);

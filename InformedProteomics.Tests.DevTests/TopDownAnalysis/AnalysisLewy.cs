@@ -306,7 +306,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
 
                 Array.Sort(directoryTimes.ToArray(), directories);
-                var newMspDir = "";
+                var newMspDir = string.Empty;
                 for (var j = directories.Length - 1; j >= 0; j--)
                 {
                     if (directories[j].IndexOf("Auto10889", StringComparison.OrdinalIgnoreCase) > 0)
@@ -343,7 +343,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 //}
 
                 /*
-                var oldMspDir = "";
+                var oldMspDir = string.Empty;
                 for (var j = 0; j < directories.Length; j++)
                 {
                     if (directories[j].IndexOf("MSP2014") > 0)
@@ -382,7 +382,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
 
                 Array.Sort(directoryTimes.ToArray(), directories);
-                var newMspDir = "";
+                var newMspDir = string.Empty;
                 for (var j = directories.Length - 1; j >= 0; j--)
                 {
                     if (directories[j].IndexOf("MSP201502", StringComparison.OrdinalIgnoreCase) > 0)

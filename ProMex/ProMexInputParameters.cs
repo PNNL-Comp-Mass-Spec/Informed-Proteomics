@@ -47,8 +47,8 @@ namespace ProMex
 
         public ProMexInputParameters() : base()
         {
-            //InputPath = "";
-            //OutputPath = "";
+            //InputPath = string.Empty;
+            //OutputPath = string.Empty;
             //MinSearchCharge = 1;
             //MaxSearchCharge = 60;
             //MinSearchMass = 2000;
@@ -58,7 +58,7 @@ namespace ProMex
             //CsvOutput = false;
             //LikelihoodScoreThreshold = -10;
             //MaxThreads = 0;
-            //ExistingFeaturesFilePath = "";
+            //ExistingFeaturesFilePath = string.Empty;
         }
 
         public bool Validate()

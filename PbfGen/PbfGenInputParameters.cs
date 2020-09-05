@@ -22,8 +22,8 @@ namespace PbfGen
 
         public PbfGenInputParameters()
         {
-            SourcePath = "";
-            OutputDir = "";
+            SourcePath = string.Empty;
+            OutputDir = string.Empty;
             StartScan = -1;
             EndScan = -1;
         }

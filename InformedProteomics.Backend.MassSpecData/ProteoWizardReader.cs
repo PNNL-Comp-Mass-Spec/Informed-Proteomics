@@ -352,7 +352,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Retrieve the list of referenced assemblies in an array of AssemblyName.
-            var tempAssemblyPath = "";
+            var tempAssemblyPath = string.Empty;
 
             var referencedAssemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies();
 

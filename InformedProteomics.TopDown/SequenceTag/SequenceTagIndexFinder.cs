@@ -9,6 +9,8 @@ namespace InformedProteomics.TopDown.SequenceTag
 {
     public class SequenceTagIndexFinder
     {
+        // Ignore Spelling: foreach
+
         public SequenceTagIndexFinder(Tolerance tolerance, int minCharge, int maxCharge)
         {
             _tolerance = tolerance;
@@ -85,8 +87,8 @@ namespace InformedProteomics.TopDown.SequenceTag
             var prefixEndIndex = -1;
             //var prefixSequencePeaks = new List<Peak>();
             //var prefixPValue = -1.0;
-            var prefixSequence = "";
-            if (prefixSubString != "")
+            var prefixSequence = string.Empty;
+            if (!string.IsNullOrWhiteSpace(prefixSubString))
             {
                 var prefixIndex = string.Concat(prefixSequenceArr);
                 prefixStartIndex = prefixIndex.IndexOf(prefixSubString, StringComparison.Ordinal) + 1;
@@ -102,9 +104,9 @@ namespace InformedProteomics.TopDown.SequenceTag
             var suffixEndIndex = -1;
             //var suffixSequencePeaks = new List<Peak>();
             //var suffixPValue = -1.0;
-            var suffixSequence = "";
+            var suffixSequence = string.Empty;
 
-            if (suffixSubString != "")
+            if (!string.IsNullOrWhiteSpace(suffixSubString))
             {
                 var suffixIndex = string.Concat(suffixSequenceArr);
                 suffixStartIndex = suffixIndex.IndexOf(suffixSubString, StringComparison.Ordinal) + 1;
@@ -144,7 +146,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             var startIndex = start - 1;
             var endIndex = end - 1;
-            var subString = "";
+            var subString = string.Empty;
             if (startIndex == endIndex)
             {
                 subString += seq[start].Residue;
@@ -200,7 +202,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             var sequenceString = string.Concat(booleanSequence);
             var regex = new Regex(@"[1]+");
             var matches = regex.Matches(sequenceString);
-            var largestSubstring = "";
+            var largestSubstring = string.Empty;
             foreach (Match m in matches)
             {
                 if (m.Length > largestSubstring.Length) largestSubstring = m.Value;

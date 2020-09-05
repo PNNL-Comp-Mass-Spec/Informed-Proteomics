@@ -39,7 +39,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             var keyValue = new Dictionary<string, string>();
             var lines = System.IO.File.ReadAllLines(fileName);
             char[] headerBrackets = { '[', ']' };
-            var header = "";
+            var header = string.Empty;
             foreach (var line in lines)
             {
                 var commentsStripped = line.Split('#')[0];      // remove comments
@@ -48,7 +48,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                 {
                     // The line is either a header, empty line, or invalid
                     parts[0] = parts[0].Trim().ToLower();
-                    if (parts[0] == "")
+                    if (parts[0] == string.Empty)
                         // empty line
                         continue;
                     if (currentNode == null)

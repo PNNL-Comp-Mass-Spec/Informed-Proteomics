@@ -20,7 +20,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
             var file = File.ReadLines(_fileName);
             var mgfState = MgfState.Label;
 
-            var sequence = "";
+            var sequence = string.Empty;
             int scanNum = 0, charge = 0;
             var peaks = new List<Peak>();
 
@@ -43,7 +43,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                             var chargeStr = parameter[1].Substring(0, parameter[1].Length - 1);
                             charge = Convert.ToInt32(chargeStr);
                             mgfState = MgfState.Peak;
-                            if (sequence == "" || scanNum == 0 || charge == 0)
+                            if (sequence == string.Empty || scanNum == 0 || charge == 0)
                                 throw new FormatException("Incomplete spectrum entry.");
                         }
                         break;
@@ -54,7 +54,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                             mgfState = MgfState.Label;
                             if (peptideSet.Contains(sequence))
                             {
-                                sequence = "";
+                                sequence = string.Empty;
                                 scanNum = 0;
                                 charge = 0;
                                 peaks.Clear();
@@ -65,7 +65,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                             var sequenceReader = new MgfSequenceReader();
                             var seq = sequenceReader.GetSequence(sequence);
                             var specMatch = new SpectrumMatch(seq, spectrum, scanNum, charge, _decoy);
-                            sequence = "";
+                            sequence = string.Empty;
                             scanNum = 0;
                             charge = 0;
                             specMatches.Add(specMatch);

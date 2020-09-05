@@ -106,7 +106,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 var mz = double.Parse(parser.GetData("PrecursorMZ")[i]);
                 var protName = parser.GetData("Protein")[i];
-                var protDesc = "";
+                var protDesc = string.Empty;
                 var score = double.Parse(parser.GetData("MSGFScore")[i]);
                 var charge = int.Parse(parser.GetData("Charge")[i]);
 

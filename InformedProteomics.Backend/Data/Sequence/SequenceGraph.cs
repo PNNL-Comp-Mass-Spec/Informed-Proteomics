@@ -342,7 +342,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 nodeScore[si] = new double?[_graph[si].Length];
                 maxScore[si] = new Tuple<double, string>[_graph[si].Length];
             }
-            maxScore[0][0] = new Tuple<double, string>(0.0, "");
+            maxScore[0][0] = new Tuple<double, string>(0.0, string.Empty);
             nodeScore[_index][_sinkModIndex] = 0.0;
 
             var fragmentScore = GetFragmentScoreAndModifications(_index, _sinkModIndex, scorer, nodeScore, maxScore);
@@ -434,7 +434,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             if (bestPrevNodeIndex < 0)  // source
             {
-                return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>((double)curNodeScore, "");
+                return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>((double)curNodeScore, string.Empty);
             }
 
             var modPos = _index - seqIndex;

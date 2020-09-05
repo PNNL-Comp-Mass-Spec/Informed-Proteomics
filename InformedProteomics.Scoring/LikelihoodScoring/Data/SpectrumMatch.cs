@@ -22,7 +22,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public SpectrumMatch(Sequence sequence, Spectrum spectrum, int scanNum=0, int precursorCharge=1, bool decoy=false)
         {
-            Peptide = "";
+            Peptide = string.Empty;
             foreach (var aa in sequence) Peptide += aa.Residue;
             _spectrum = spectrum;
             ScanNum = scanNum;
@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public SpectrumMatch(Sequence sequence, LazyLcMsRun lcms, int scanNum = 0, int precursorCharge = 1, bool decoy = false)
         {
-            Peptide = "";
+            Peptide = string.Empty;
             foreach (var aa in sequence) Peptide += aa.Residue;
             _spectrum = null;
             _lcms = lcms;

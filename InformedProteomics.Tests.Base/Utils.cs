@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.Base
 
         private const string DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss tt";
 
-        private static string mLastStatus = "";
+        private static string mLastStatus = string.Empty;
 
         /// <summary>
         /// Look for the default .mzML testing file in the default test file folder,
