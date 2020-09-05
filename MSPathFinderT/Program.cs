@@ -53,8 +53,13 @@ namespace MSPathFinderT
                     entryAsmName = "Unknown_Assembly";
                 }
 
-                var parser = new CommandLineParser<TopDownInputParameters>(entryAsmName, Version);
+                var parser = new CommandLineParser<TopDownInputParameters>(entryAsmName, Version)
+                {
+                    ParamKeysFieldWidth = 20
+                };
+
                 parser.UsageExamples.Add(string.Format("Perform a target+decoy search with default parameters and a mods file:\n{0}.exe -s TestFile.raw -d sampleProteins.fasta -mod mods.txt -tda 1", entryAsmName));
+
                 // TODO: add more examples, maybe a link to GitHub?
                 var results = parser.ParseArgs(args);
                 if (!results.Success)

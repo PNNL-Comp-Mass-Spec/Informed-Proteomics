@@ -9,6 +9,8 @@ using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
 using PRISM;
+using PRISM.AppSettings;
+using PRISM.Logging;
 
 namespace MSPathFinderT
 {
@@ -24,7 +26,7 @@ namespace MSPathFinderT
         [Option("d", "database", Required = true, HelpText = "Database File (*.fasta or *.fa or *.faa)", HelpShowsDefault = false)]
         public override string DatabaseFilePath { get; set; }
 
-        [Option("o", "outputDir", HelpText = "Output Folder", HelpShowsDefault = false)]
+        [Option("o", "outputDir", HelpText = "Output Directory", HelpShowsDefault = false)]
         public override string OutputDir { get; set; }
 
         [Option("m", "searchMode", Min = 0, Max = 2, HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)", Hidden = true)]
@@ -59,7 +61,7 @@ namespace MSPathFinderT
         [Option("ic", HelpText = "Search Mode")]
         public override InternalCleavageType InternalCleavageMode { get; set; }
 
-        [Option("tagSearch", HelpText = "Include Tag-based Search (can use '0' for false, '1' for true)")]
+        [Option("tagSearch", HelpText = "Include Tag-based Search (use true or false;\nor use '0' for false or '1' for true)")]
         public override bool TagBasedSearch { get; set; }
 
         [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport", HelpText = "Number of results to report for each mass spectrum")]
@@ -73,7 +75,11 @@ namespace MSPathFinderT
             HelpShowsDefault = false)]
         public string ModsFilePath { get; set; }
 
-        [Option("tda", Min = -1, Max = 1, HelpText = "Database search mode (0: don't search decoy database, 1: search shuffled decoy database)")]
+        // ReSharper disable once UnusedMember.Global
+        [Option("tda", Min = -1, Max = 1,
+            HelpText = "Database search mode:\n" +
+                       "0: don't search decoy database, \n" +
+                       "1: search shuffled decoy database\n")]
         public int TdaInt
         {
             get
@@ -102,7 +108,10 @@ namespace MSPathFinderT
             }
         }
 
-        //[Option("tda", HelpText = "Database search mode")]
+        /// <summary>
+        /// Database search mode enum
+        /// </summary>
+        /// <remarks>This can alternatively be set using TdaInt</remarks>
         public override DatabaseSearchMode TargetDecoySearchMode { get; set; }
 
         [Option("t", "precursorTol", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
@@ -143,7 +152,7 @@ namespace MSPathFinderT
         [Option("maxMass", /*Min = 1,*/ HelpText = "Maximum sequence mass in Da")]
         public override double MaxSequenceMass { get; set; }
 
-        [Option("feature", HelpText = "*.ms1ft, *_isos.csv, or *.msalign, (Default: Run ProMex)", HelpShowsDefault = false)]
+        [Option("feature", HelpText = "*.ms1ft, *_isos.csv, or *.msalign (Default: Run ProMex)", HelpShowsDefault = false)]
         public override string FeatureFilePath { get; set; }
 
         [Option("threads", Min = 0, HelpText = "Maximum number of threads, or 0 to set automatically")]
@@ -155,7 +164,7 @@ namespace MSPathFinderT
         [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
         public string ScansFilePath { get; set; }
 
-        [Option("flip", HelpText = "If specified, FLIP scoring code will be used (supports UVPD spectra)")]
+        [Option("flip", HelpText = "If specified, FLIP scoring code will be used\n(supports UVPD spectra)")]
         public bool UseFLIP { get; set; }
 
         /// <summary>
@@ -192,7 +201,8 @@ namespace MSPathFinderT
             SpecFilePath = MassSpecDataReaderFactory.GetDatasetName(SpecFilePath);
 
             var isDirectoryDataset = MassSpecDataReaderFactory.IsADirectoryDataset(SpecFilePath);
-            // True if specFilePath is a directory that is NOT a supported folder-type dataset.
+
+            // This will be True if SpecFilePath is a directory that is NOT a supported folder-type dataset.
             var specPathIsDirectory = Directory.Exists(SpecFilePath) && !isDirectoryDataset;
 
             if (!File.Exists(SpecFilePath) && !specPathIsDirectory && !isDirectoryDataset)
@@ -201,11 +211,12 @@ namespace MSPathFinderT
                 return false;
             }
 
-            var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
+            // The extensions in this variable start with a period
+            var supportedFileExtensions = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
 
-            if (!specPathIsDirectory && !(types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()))
+            if (!specPathIsDirectory && !(supportedFileExtensions.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()))
             {
-                PrintError("Invalid file extension for spectrum file: (" + Path.GetExtension(SpecFilePath) + ") " + SpecFilePath);
+                PrintError("Invalid file extension for spectrum file (" + Path.GetExtension(SpecFilePath) + "): " + SpecFilePath);
                 return false;
             }
 
@@ -287,7 +298,7 @@ namespace MSPathFinderT
             // Scans file validation
             if (!string.IsNullOrWhiteSpace(ScansFilePath) && !File.Exists(ScansFilePath))
             {
-                PrintError("Scans File file not found: " + ScansFilePath);
+                PrintError("Scans File not found: " + ScansFilePath);
                 return false;
             }
             try
@@ -320,7 +331,6 @@ namespace MSPathFinderT
                 return false;
             }
 
-            // MinX/MaxX validation
             if (MinSequenceLength > MaxSequenceLength)
             {
                 PrintError("MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!");
@@ -344,17 +354,26 @@ namespace MSPathFinderT
             return true;
         }
 
-        private static void PrintError(string errorMessage)
+        private static void PrintError(string errorMessage, Exception ex = null)
         {
             Console.WriteLine();
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine("Error: " + errorMessage);
-            Console.WriteLine("----------------------------------------------------------");
+            ConsoleMsgUtils.ShowWarning(
+                "----------------------------------------------------------\n" +
+                "Error: " + errorMessage + "\n" +
+                "----------------------------------------------------------");
+
+            if (ex != null)
+            {
+                ConsoleMsgUtils.ShowWarning(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
+            }
+
             Console.WriteLine();
         }
 
-        public void Display()
+        public void Display(string parameterFilePath)
         {
+            Console.WriteLine();
+
             Console.WriteLine("MaxThreads: " + MaxNumThreads);
 
             foreach (var specFilePath in SpecFilePaths)
@@ -362,28 +381,33 @@ namespace MSPathFinderT
                 Console.WriteLine("SpectrumFilePath: " + specFilePath);
             }
 
-            Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
-            Console.WriteLine("FeatureFilePath:  {0}", FeatureFilePath ?? "N/A");
-            Console.WriteLine("OutputDir:        " + OutputDir);
-            Console.WriteLine("InternalCleavageMode: " + InternalCleavageMode);
-            Console.WriteLine("Tag-based search: " + TagBasedSearch);
-            Console.WriteLine("Tda: " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
-            Console.WriteLine("PrecursorIonTolerancePpm: " + PrecursorIonTolerancePpm);
-            Console.WriteLine("ProductIonTolerancePpm: " + ProductIonTolerancePpm);
-            Console.WriteLine("MinSequenceLength: " + MinSequenceLength);
-            Console.WriteLine("MaxSequenceLength: " + MaxSequenceLength);
-            Console.WriteLine("MinPrecursorIonCharge: " + MinPrecursorIonCharge);
-            Console.WriteLine("MaxPrecursorIonCharge: " + MaxPrecursorIonCharge);
-            Console.WriteLine("MinProductIonCharge: " + MinProductIonCharge);
-            Console.WriteLine("MaxProductIonCharge: " + MaxProductIonCharge);
-            Console.WriteLine("MinSequenceMass: " + MinSequenceMass);
-            Console.WriteLine("MaxSequenceMass: " + MaxSequenceMass);
+            Console.WriteLine("DatabaseFilePath:           " + DatabaseFilePath);
+            Console.WriteLine("FeatureFilePath:            {0}", FeatureFilePath ?? "N/A");
+
+            var parameterFilePathToShow = string.IsNullOrWhiteSpace(parameterFilePath) ? "N/A" : parameterFilePath;
+            Console.WriteLine("ParameterFilePath:          {0}", parameterFilePathToShow);
+
+            Console.WriteLine("OutputDir:                  " + OutputDir);
+            Console.WriteLine("InternalCleavageMode:       " + InternalCleavageMode);
+            Console.WriteLine("Tag-based search:           " + TagBasedSearch);
+            Console.WriteLine("Tda:                        " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
+            Console.WriteLine("PrecursorIonTolerancePpm:   " + PrecursorIonTolerancePpm);
+            Console.WriteLine("ProductIonTolerancePpm:     " + ProductIonTolerancePpm);
+            Console.WriteLine("MinSequenceLength:          " + MinSequenceLength);
+            Console.WriteLine("MaxSequenceLength:          " + MaxSequenceLength);
+            Console.WriteLine("MinPrecursorIonCharge:      " + MinPrecursorIonCharge);
+            Console.WriteLine("MaxPrecursorIonCharge:      " + MaxPrecursorIonCharge);
+            Console.WriteLine("MinProductIonCharge:        " + MinProductIonCharge);
+            Console.WriteLine("MaxProductIonCharge:        " + MaxProductIonCharge);
+            Console.WriteLine("MinSequenceMass:            " + MinSequenceMass);
+            Console.WriteLine("MaxSequenceMass:            " + MaxSequenceMass);
+            Console.WriteLine("MatchesPerSpectrumToReport: " + MatchesPerSpectrumToReport);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + MaxDynamicModificationsPerSequence);
-            Console.WriteLine("Modifications: ");
+            Console.WriteLine("Modifications:");
 
             foreach (var searchMod in Modifications)
             {
-                Console.WriteLine(searchMod);
+                Console.WriteLine(searchMod.ToString(true));
             }
 
             if (!string.IsNullOrWhiteSpace(FeatureFilePath))
@@ -391,14 +415,16 @@ namespace MSPathFinderT
                 Console.WriteLine("Getting MS1 features from " + FeatureFilePath);
             }
 
-            if (ScanNumbers != null && ScanNumbers.Any())
+            if (ScanNumbers?.Any() == true)
             {
                 Console.WriteLine("Processing specific MS2 scans:");
                 Console.WriteLine(string.Join(", ", ScanNumbers));
             }
 
             if (UseFLIP)
-            Console.WriteLine("Using FLIP scoring.");
+                Console.WriteLine("Using FLIP scoring.");
+
+            Console.WriteLine();
         }
 
         /// <summary>
