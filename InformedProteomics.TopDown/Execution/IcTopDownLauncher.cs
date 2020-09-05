@@ -407,7 +407,12 @@ namespace InformedProteomics.TopDown.Execution
             return true;
         }
 
-        private List<DatabaseSearchResultData> RunDatabaseSearch(FastaDatabase searchDb, string outputFilePath, ISequenceFilter ms1Filter, string searchModeString, IProgress<ProgressData> progress)
+        private List<DatabaseSearchResultData> RunDatabaseSearch(
+            FastaDatabase searchDb,
+            string outputFilePath,
+            ISequenceFilter ms1Filter,
+            string searchModeString,
+            IProgress<ProgressData> progress)
         {
             var progData = new ProgressData(progress);
             var sw = new Stopwatch();
@@ -469,33 +474,44 @@ namespace InformedProteomics.TopDown.Execution
 
         private int[] _tagMs2ScanNum;
 
-        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database, out long estimatedProteins, CancellationToken? cancellationToken = null)
+        private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(
+            FastaDatabase database,
+            out long estimatedProteins,
+            CancellationToken? cancellationToken = null)
         {
             var indexedDb = new IndexedDatabase(database);
             indexedDb.Read();
-            estimatedProteins = indexedDb.EstimateTotalPeptides(Options.InternalCleavageMode, Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
+
+            estimatedProteins = indexedDb.EstimateTotalPeptides(
+                Options.InternalCleavageMode,
+                Options.MinSequenceLength, Options.MaxSequenceLength,
+                Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
+
             IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
             if (Options.InternalCleavageMode == InternalCleavageType.MultipleInternalCleavages)
             {
-                //annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumThreads, cancellationToken);
+                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(
+                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumThreads, cancellationToken);
             }
             else if (Options.InternalCleavageMode == InternalCleavageType.NoInternalCleavage)
             {
-                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumCTermCleavages);
+                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(
+                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumCTermCleavages);
             }
             else
             {
-                annotationsAndOffsets = indexedDb
-                    .SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
-                        Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
+                annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
+                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
             }
 
             return annotationsAndOffsets;
         }
 
-        private void RunTagBasedSearch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, FastaDatabase db,
-                                        CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        private void RunTagBasedSearch(
+            SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            FastaDatabase db,
+            CancellationToken? cancellationToken = null,
+            IProgress<ProgressData> progress = null)
         {
             _tagSearchEngine.SetDatabase(db);
 
@@ -555,7 +571,12 @@ namespace InformedProteomics.TopDown.Execution
             progData.Report(100.0);
         }
 
-        private void RunSearch(SortedSet<DatabaseSequenceSpectrumMatch>[] matches, FastaDatabase db, ISequenceFilter sequenceFilter, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        private void RunSearch(
+            SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            FastaDatabase db,
+            ISequenceFilter sequenceFilter,
+            CancellationToken? cancellationToken = null,
+            IProgress<ProgressData> progress = null)
         {
             var progData = new ProgressData(progress)
             {
@@ -598,8 +619,10 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         private void SearchProgressReport(
-            ref int numProteins, ref DateTime lastUpdate,
-            long estimatedProteins, Stopwatch sw,
+            ref int numProteins,
+            ref DateTime lastUpdate,
+            long estimatedProteins,
+            Stopwatch sw,
             ProgressData progData,
             SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
             string itemName = "proteins")
@@ -655,8 +678,13 @@ namespace InformedProteomics.TopDown.Execution
                                         matchCountStats));
         }
 
-        private void SearchForMatches(AnnotationAndOffset annotationAndOffset, ISequenceFilter sequenceFilter, SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
-            int maxNumNTermCleavages, bool isDecoy, CancellationToken? cancellationToken = null)
+        private void SearchForMatches(
+            AnnotationAndOffset annotationAndOffset,
+            ISequenceFilter sequenceFilter,
+            SortedSet<DatabaseSequenceSpectrumMatch>[] matches,
+            int maxNumNTermCleavages,
+            bool isDecoy,
+            CancellationToken? cancellationToken = null)
         {
             var pfeOptions = new ParallelOptions
             {
@@ -758,7 +786,8 @@ namespace InformedProteomics.TopDown.Execution
                     else
                     {
                         var minScore = existingMatches.Min.Score;
-                        if (!(prsm.Score > minScore)) return;
+                        if (!(prsm.Score > minScore))
+                            return;
                         existingMatches.Add(prsm);
                         existingMatches.Remove(existingMatches.Min);
                     }
