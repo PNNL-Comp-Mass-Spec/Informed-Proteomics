@@ -18,7 +18,6 @@ using InformedProteomics.Scoring.GeneratingFunction;
 using InformedProteomics.Scoring.TopDown;
 using InformedProteomics.TopDown.Scoring;
 using InformedProteomics.TopDown.TagBasedSearch;
-using InformedProteomics.Scoring.Interfaces;
 using PRISM;
 
 namespace InformedProteomics.TopDown.Execution
@@ -29,7 +28,6 @@ namespace InformedProteomics.TopDown.Execution
 
         private const bool USE_PARALLEL_FOREACH = true;
 
-        //public const int NumMatchesPerSpectrum = 1;
         public const string TargetFileNameEnding = "_IcTarget.tsv";
         public const string DecoyFileNameEnding = "_IcDecoy.tsv";
         public const string TdaFileNameEnding = "_IcTda.tsv";
@@ -319,7 +317,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else if (validTargetResults)
             {
-                OnStatusEvent(string.Format("Target results file '{0}' exists; skipping target search.", targetOutputFilePath));
+                OnWarningEvent(string.Format("Target results file '{0}' exists; skipping target search.", targetOutputFilePath));
             }
 
             progData.StepRange(98.0, "Running Decoy search"); // total to 98%
@@ -333,7 +331,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else if (validDecoyResults)
             {
-                OnStatusEvent(string.Format("Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath));
+                OnWarningEvent(string.Format("Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath));
             }
 
             progData.StepRange(100.0, "Writing combined results file");
