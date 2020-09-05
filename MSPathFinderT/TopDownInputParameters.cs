@@ -114,14 +114,14 @@ namespace MSPathFinderT
         /// <remarks>This can alternatively be set using TdaInt</remarks>
         public override DatabaseSearchMode TargetDecoySearchMode { get; set; }
 
-        [Option("t", "precursorTol", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
+        [Option("t", "precursorTol", "PMTolerance", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
         public override double PrecursorIonTolerancePpm
         {
             get => PrecursorIonTolerance.GetValue();
             set => PrecursorIonTolerance = new Tolerance(value);
         }
 
-        [Option("f", "fragmentTol", /*Min = 1,*/ HelpText = "Fragment Ion Tolerance (in PPM)")]
+        [Option("f", "fragmentTol", "FragTolerance", /*Min = 1,*/ HelpText = "Fragment Ion Tolerance (in PPM)")]
         public override double ProductIonTolerancePpm
         {
             get => ProductIonTolerance.GetValue();
@@ -158,7 +158,7 @@ namespace MSPathFinderT
         [Option("threads", Min = 0, HelpText = "Maximum number of threads, or 0 to set automatically")]
         public override int MaxNumThreads { get; set; }
 
-        [Option("act", HelpText = "Activation Method")]
+        [Option("act", "ActivationMethod", HelpText = "Activation Method")]
         public override ActivationMethod ActivationMethod { get; set; }
 
         [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
