@@ -10,6 +10,8 @@ namespace InformedProteomics.Tests.Base
 {
     public static class Utils
     {
+        // Ignore Spelling: yyyy-MM-dd, hh:mm:ss tt, pbf
+
         public const string DEFAULT_TEST_FILE_FOLDER = @"\\proto-2\UnitTest_Files\InformedProteomics_TestFiles";
 
         public const string DEFAULT_SPEC_FILES_FOLDER = DEFAULT_TEST_FILE_FOLDER + @"\SpecFiles";
@@ -45,7 +47,7 @@ namespace InformedProteomics.Tests.Base
         /// Look for the default .pbf testing file in the default test file folder,
         /// plus also in the UnitTest_Files directory in this project or solution
         /// </summary>
-        /// <param name="createIfMissing">If true and the .mzML file is ofund, create the .pbf file</param>
+        /// <param name="createIfMissing">If true and the .mzML file is found, create the .pbf file</param>
         /// <returns>Path to the file if found, otherwise the default path on Proto-2</returns>
         public static string GetPbfTestFilePath(bool createIfMissing)
         {

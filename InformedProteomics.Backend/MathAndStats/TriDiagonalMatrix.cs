@@ -48,6 +48,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </remarks>
     public class TriDiagonalMatrixF
     {
+        // Ignore Spelling: Seghers, NxN, tri, sublicense
+
         /// <summary>
         /// The values for the sub-diagonal. A[0] is never used.
         /// </summary>

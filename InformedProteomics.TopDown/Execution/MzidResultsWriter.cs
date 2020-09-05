@@ -197,7 +197,7 @@ namespace InformedProteomics.TopDown.Execution
                 var modObj = new SearchModificationObj()
                 {
                     FixedMod = mod.IsFixedModification,
-                    MassDelta = (float) mod.Modification.Mass,
+                    MassDelta = (float)mod.Modification.Mass,
                     Residues = mod.TargetResidue.ToString(),
                 };
                 // "*" is used for wildcard residue N-Term or C-Term modifications. mzIdentML standard says that "." should be used instead.

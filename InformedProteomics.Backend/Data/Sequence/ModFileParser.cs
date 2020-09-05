@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class ModFileParser
     {
+        // Ignore Spelling: Prot
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -59,39 +61,54 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             // Residues
             var residueStr = token[1].Trim();
-            var isResidueStrLegitimate = residueStr.Equals("*")
-                || residueStr.Any() && residueStr.All(AminoAcid.IsStandardAminoAcidResidue);
+            var isResidueStrLegitimate = residueStr.Equals("*") || residueStr.Length > 0 && residueStr.All(AminoAcid.IsStandardAminoAcidResidue);
             if (!isResidueStrLegitimate)
             {
                 throw new Exception(string.Format("Illegal residues: \"{0}\" in \"{1}\"", residueStr, line));
             }
 
-            // isFixedModification
+            // Determine the modification type
             bool isFixedModification;
-            if (token[2].Trim().Equals("fix", StringComparison.InvariantCultureIgnoreCase)) isFixedModification = true;
-            else if (token[2].Trim().Equals("opt", StringComparison.InvariantCultureIgnoreCase)) isFixedModification = false;
+            if (token[2].Trim().Equals("fix", StringComparison.OrdinalIgnoreCase))
+            {
+                isFixedModification = true;
+            }
+            else if (token[2].Trim().Equals("opt", StringComparison.OrdinalIgnoreCase))
+            {
+                isFixedModification = false;
+            }
             else
             {
-                throw new Exception(string.Format("Illegal modification type (fix or opt): \"{0}\" in \"{1}\"", token[2].Trim(), line));
+                throw new Exception(string.Format("Illegal modification type (should be fix or opt): \"{0}\" in \"{1}\"", token[2].Trim(), line));
             }
 
             // Location
             SequenceLocation location;
             var locStr = token[3].Trim().Split()[0];
-            if (locStr.Equals("any", StringComparison.InvariantCultureIgnoreCase))
+            if (locStr.Equals("any", StringComparison.OrdinalIgnoreCase))
+            {
                 location = SequenceLocation.Everywhere;
-            else if (locStr.Equals("N-Term", StringComparison.InvariantCultureIgnoreCase) ||
-                     locStr.Equals("NTerm", StringComparison.InvariantCultureIgnoreCase))
+            }
+            else if (locStr.Equals("N-Term", StringComparison.OrdinalIgnoreCase) ||
+                     locStr.Equals("NTerm", StringComparison.OrdinalIgnoreCase))
+            {
                 location = SequenceLocation.PeptideNTerm;
-            else if (locStr.Equals("C-Term", StringComparison.InvariantCultureIgnoreCase) ||
-                     locStr.Equals("CTerm", StringComparison.InvariantCultureIgnoreCase))
+            }
+            else if (locStr.Equals("C-Term", StringComparison.OrdinalIgnoreCase) ||
+                     locStr.Equals("CTerm", StringComparison.OrdinalIgnoreCase))
+            {
                 location = SequenceLocation.PeptideCTerm;
-            else if (locStr.Equals("Prot-N-Term", StringComparison.InvariantCultureIgnoreCase) ||
-                     locStr.Equals("ProtNTerm", StringComparison.InvariantCultureIgnoreCase))
+            }
+            else if (locStr.Equals("Prot-N-Term", StringComparison.OrdinalIgnoreCase) ||
+                     locStr.Equals("ProtNTerm", StringComparison.OrdinalIgnoreCase))
+            {
                 location = SequenceLocation.ProteinNTerm;
-            else if (locStr.Equals("Prot-C-Term", StringComparison.InvariantCultureIgnoreCase) ||
-                     locStr.Equals("ProtCTerm", StringComparison.InvariantCultureIgnoreCase))
+            }
+            else if (locStr.Equals("Prot-C-Term", StringComparison.OrdinalIgnoreCase) ||
+                     locStr.Equals("ProtCTerm", StringComparison.OrdinalIgnoreCase))
+            {
                 location = SequenceLocation.ProteinCTerm;
+            }
             else
             {
                 throw new Exception(string.Format("Illegal modification location (any|(Prot-?)?(N|C)-?Term): \"{0}\" in \"{1}\"", token[3].Trim(), line));
@@ -119,14 +136,18 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var searchModList = new List<SearchModification>();
             var lineNum = 0;
+
             maxNumDynModsPerPeptide = 0;
             foreach (var line in lines)
             {
                 lineNum++;
                 var tokenArr = line.Split('#');
-                if (tokenArr.Length == 0) continue;
+                if (tokenArr.Length == 0)
+                    continue;
+
                 var s = tokenArr[0].Trim();
-                if (s.Length == 0) continue;
+                if (s.Length == 0)
+                    continue;
 
                 if (s.StartsWith("NumMods="))
                 {

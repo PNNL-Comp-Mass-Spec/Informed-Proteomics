@@ -16,6 +16,8 @@ namespace InformedProteomics.Backend.Database
     /// </summary>
     public class IndexedDatabase
     {
+        // Ignore Spelling: Lcp, cterm, foreach, const, ntt, sep, nmc
+
         /// <summary>
         /// File extension to use for Permuted Longest Common Prefix file
         /// </summary>
@@ -212,8 +214,7 @@ namespace InformedProteomics.Backend.Database
         {
             foreach (
                 var annotationAndOffset in
-                    IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue,
-                        maxNumCTermCleavages))
+                IntactSequenceAnnotationsAndOffsets(minSequenceLength, int.MaxValue, maxNumCTermCleavages))
             {
                 // numCTermCleavages <= maxNumCTermCleavages
                 var annotation = annotationAndOffset.Annotation;
@@ -238,8 +239,7 @@ namespace InformedProteomics.Backend.Database
 
             foreach (
                 var annotationAndOffset in
-                    IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(minSequenceLength, int.MaxValue,
-                        maxNumCTermCleavages))
+                IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(minSequenceLength, int.MaxValue, maxNumCTermCleavages))
             {
                 // numCTermCleavages > maxNumCTermCleavages
                 var annotation = annotationAndOffset.Annotation;
@@ -308,8 +308,9 @@ namespace InformedProteomics.Backend.Database
                 ++offset;
                 if (residue == FastaDatabaseConstants.Delimiter)
                 {
-                    if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(buf.ToArray(), curOffset);
-                    //if (buf != null && buf.Count > 0) yield return new SequenceAndOffset(Encoding.GetString(buf.ToArray()), curOffset);
+                    if (buf != null && buf.Count > 0)
+                        yield return new SequenceAndOffset(buf.ToArray(), curOffset);
+
                     buf = new List<byte>();
                     curOffset = offset;
                 }
@@ -368,7 +369,7 @@ namespace InformedProteomics.Backend.Database
                 var lcpEnum = PLcps().GetEnumerator();
                 var fEnum = FastaDatabase.Characters().GetEnumerator();
 
-                // Use "IntWrapper" to allow modifying the value inside of the foreach
+                // Use "IntWrapper" to allow modifying the value inside of the for each loop
                 var sequences = new Queue<IntWrapper>();
                 bool read;
                 while ((read = fEnum.MoveNext()) || curSequence.Count >= minLength)
@@ -607,16 +608,17 @@ namespace InformedProteomics.Backend.Database
                 threads = ParallelizationUtils.NumPhysicalCores;
             }
 
-            //int prevThreads, prevPorts;
-            //ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
-            //ThreadPool.SetMinThreads(8, prevPorts);
             var token = cancellationToken ?? CancellationToken.None;
 
             // pre, peptide sequence, next
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(48).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
             //return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(4).WithExecutionMode(ParallelExecutionMode.ForceParallelism).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, enzymaticResidues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
-            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel().WithDegreeOfParallelism(threads).WithCancellation(token).SelectMany(seqAndLcp => AnnotationsAndOffsetsParallelInternal(minLength, numTolerableTermini, numMissedCleavages, residues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
+            return SequencesWithLcpAndOffset(minLength, maxLength + 2).AsParallel()
+                .WithDegreeOfParallelism(threads).WithCancellation(token)
+                .SelectMany(seqAndLcp =>
+                    AnnotationsAndOffsetsParallelInternal(
+                        minLength, numTolerableTermini, numMissedCleavages, residues, isNTermEnzyme, seqAndLcp, isCleavable, isStandardAminoAcid));
         }
 
         private IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallelInternal(int minLength, int numTolerableTermini,
@@ -895,10 +897,10 @@ namespace InformedProteomics.Backend.Database
         //}
 
         //public long NumSequences(int minLength, int maxLength, int numTolerableTermini,
-        //                                              int numMissedCleavages, Enzyme enzyme)
+        //                         int numMissedCleavages, Enzyme theEnzyme)
         //{
-        //    return NumSequences(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
-        //                       enzyme.IsNTerm);
+        //    return NumSequences(minLength, maxLength, numTolerableTermini, numMissedCleavages,
+        //                       theEnzyme.Residues, theEnzyme.IsNTerm);
         //}
     }
 

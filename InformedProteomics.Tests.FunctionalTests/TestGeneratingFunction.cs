@@ -19,6 +19,8 @@ namespace InformedProteomics.Tests.FunctionalTests
     [TestFixture]
     public class TestGeneratingFunction
     {
+        // Ignore Spelling: Rescoring, const
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -159,11 +161,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string sequence = "SGWYELSKSSNDQFKFVLKAGNGEVILTSELYTGKSGAMNGIESVQTNSPIEARYAKEVAKNDKPYFNLKAANHQIIGTSQMYSSTA";
             const int scanNum = 4084;
             const int charge = 7;
-            var aaSet = new AminoAcidSet();
+            var aminoAcidSet = new AminoAcidSet();
             var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
-            var informedScorer = new InformedTopDownScorer(run, aaSet, 1, 15, new Tolerance(10));
+            var informedScorer = new InformedTopDownScorer(run, aminoAcidSet, 1, 15, new Tolerance(10));
             var scores = informedScorer.GetScores(AminoAcid.ProteinNTerm, sequence, AminoAcid.ProteinCTerm, composition, charge, scanNum);
             Console.WriteLine(scores);
         }*/

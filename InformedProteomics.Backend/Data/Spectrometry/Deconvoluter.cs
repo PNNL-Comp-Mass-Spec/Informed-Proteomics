@@ -365,7 +365,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    if (peakMz <= maxMz)    // find match, move to previous isotope
                     {
                         var peak = spec.Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||
@@ -394,7 +394,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    if (peakMz >= minMz)    // find match, move to previous isotope
                     {
                         var peak = spec.Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||
@@ -468,7 +468,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                     if (!isBest) continue;
 
-                    // peak has the maximum intensity, window = [prevIndex+1,nextIndex-1]
+                    // peak has the maximum intensity, window = [previousIndex+1, nextIndex-1]
 
                     var window = new Peak[nextIndex - prevIndex - 1];
                     Array.Copy(peaks, prevIndex + 1, window, 0, window.Length);

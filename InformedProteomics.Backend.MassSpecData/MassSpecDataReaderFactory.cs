@@ -169,11 +169,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     internalSupported.Add(".raw");
                 }
+
                 if (_pwizAvailable)
                 {
                     var pwizSupported = ProteoWizardReader.SupportedFilesFilterList;
                     internalSupported = internalSupported.Concat(pwizSupported.Where(ext => !internalSupported.Contains(ext))).ToList();
                 }
+
                 return internalSupported;
             }
         }

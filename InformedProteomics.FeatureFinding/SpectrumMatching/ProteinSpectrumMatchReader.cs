@@ -116,7 +116,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var firstResId = 0;
                 var lastResId = 0;
                 var fdr = double.Parse(parser.GetData("QValue")[i]);
-                if (fdr > FdrCutoff) continue;
+                if (fdr > FdrCutoff)
+                    continue;
 
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsGfPlus)
                 {
@@ -125,7 +126,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 prsmList.Add(prsm);
 
-                if (prsmList.Count >= maxPrsm) break;
+                if (prsmList.Count >= maxPrsm)
+                    break;
             }
 
             return prsmList;

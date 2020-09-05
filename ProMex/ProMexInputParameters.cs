@@ -7,6 +7,8 @@ namespace ProMex
 {
     public class ProMexInputParameters : LcMsFeatureFinderInputParameters
     {
+        // Ignore Spelling: pbf, Da, heatmap, csv
+
         [Option("i", ArgPosition = 1, Required = true, HelpText = "Input file or input folder; supports .pbf, .mzML, and several vendor formats (see documentation)", HelpShowsDefault = false)]
         public override string InputPath { get; set; }
 

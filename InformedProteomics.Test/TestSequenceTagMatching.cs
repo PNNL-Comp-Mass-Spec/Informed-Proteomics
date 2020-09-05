@@ -19,6 +19,8 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestSequenceTagMatching
     {
+        // Ignore Spelling: const, aaSet, Lewy, pbf, Yufeng, Weijun, Glyco, Jungkap, nClv, idx, Diff
+
         [Test]
         [Category("Local_Testing")]
         public void TestSearchWithTagGeneration()

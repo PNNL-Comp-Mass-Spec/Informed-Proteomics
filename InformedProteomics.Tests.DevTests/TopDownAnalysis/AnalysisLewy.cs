@@ -13,6 +13,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
     class AnalysisLewy
     {
+        // Ignore Spelling: Lewy, Jungkap, prsm, promex, Desc, dest, msp, foreach, Pbf, Tsv, Lc
+
         public const string DataPath = @"\\Proto-5\VOrbiETD02\2014_3";
         public const string PbfPath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_214\2014_3";
         public const string DatabaseFilePath = @"\\protoapps\UserData\Jungkap\Lewy\db\ID_005140_7A170668.fasta";
@@ -316,7 +318,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                 if (newMspDir.Length < 1)
                 {
-                    Console.WriteLine(dataName + " is mssing");
+                    Console.WriteLine(dataName + " is missing");
                     continue;
                 }
 

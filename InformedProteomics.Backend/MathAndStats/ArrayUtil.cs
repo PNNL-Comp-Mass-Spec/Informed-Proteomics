@@ -10,6 +10,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </summary>
     public static class ArrayUtil
     {
+        // Ignore Spelling: Kadane's
+
         /// <summary>
         /// Create a string to display the array values.
         /// </summary>

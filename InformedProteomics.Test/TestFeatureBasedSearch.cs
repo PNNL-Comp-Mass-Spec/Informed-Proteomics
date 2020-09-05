@@ -21,6 +21,8 @@ namespace InformedProteomics.Test
     [TestFixture]
     class TestFeatureBasedSearch
     {
+        // Ignore Spelling: const, Lewy
+
         [Test]
         [Category("Local_Testing")]
         public void TestFeatureId()
@@ -90,8 +92,7 @@ namespace InformedProteomics.Test
                         var protein = fastaDb.GetProteinName(index);
                         var startIndex = fastaDb.GetZeroBasedPositionInProtein(index);
                         var matchedTag = new MatchedTag(tag, startIndex, featureMass);
-                        IList<MatchedTag> existingTags;
-                        if (proteinsToTags.TryGetValue(protein, out existingTags))
+                        if (proteinsToTags.TryGetValue(protein, out var existingTags))
                         {
                             existingTags.Add(matchedTag);
                         }
@@ -192,8 +193,7 @@ namespace InformedProteomics.Test
                     var protein = fastaDb.GetProteinName(index);
                     var startIndex = fastaDb.GetOneBasedPositionInProtein(index);
                     var matchedTag = new MatchedTag(tag, startIndex, 0.0);
-                    IList<MatchedTag> existingTags;
-                    if (proteinsToTags.TryGetValue(protein, out existingTags))
+                    if (proteinsToTags.TryGetValue(protein, out var existingTags))
                     {
                         existingTags.Add(matchedTag);
                     }

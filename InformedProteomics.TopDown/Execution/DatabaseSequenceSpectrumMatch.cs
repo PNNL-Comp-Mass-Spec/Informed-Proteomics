@@ -5,6 +5,9 @@ using InformedProteomics.Backend.Database;
 
 namespace InformedProteomics.TopDown.Execution
 {
+    /// <summary>
+    /// This class tracks a single proteoform match to a mass spectrum
+    /// </summary>
     public class DatabaseSequenceSpectrumMatch: IComparable<DatabaseSequenceSpectrumMatch>
     {
         public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset,
