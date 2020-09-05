@@ -26,13 +26,15 @@ namespace MSPathFinderT
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
+        // Ignore Spelling: endif
+
         public static int Main(string[] args)
         {
             var errorCode = 0;
 
-#if (!DEBUG)
+// #if (!DEBUG)
             try
-#endif
+// #endif
             {
                 var osVersionInfo = new OSVersionInfo();
                 if (osVersionInfo.GetOSVersion().IndexOf("windows", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -135,12 +137,12 @@ namespace MSPathFinderT
                     }
                 }
             }
-#if (!DEBUG)
+// #if (!DEBUG)
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                Console.WriteLine("Exception while processing: " + ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                ConsoleMsgUtils.ShowWarning("Exception while processing: " + ex.Message);
+                ConsoleMsgUtils.ShowWarning(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
                 errorCode = -Math.Abs(ex.Message.GetHashCode());
 
                 System.Threading.Thread.Sleep(1500);
@@ -150,9 +152,9 @@ namespace MSPathFinderT
                 else
                     return errorCode;
             }
-#endif
+// #endif
 
-                return errorCode;
+            return errorCode;
         }
 
         private static void TopDownLauncher_ProgressUpdate(string progressMessage, float percentComplete)
