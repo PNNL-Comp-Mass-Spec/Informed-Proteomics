@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.Database;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.Backend.SearchResults;
+using PRISM;
 using PSI_Interface.CV;
 using PSI_Interface.IdentData;
 using PSI_Interface.IdentData.IdentDataObjs;
@@ -92,6 +94,8 @@ namespace InformedProteomics.TopDown.Execution
                 }
             }
 
+            var missingKeys = new SortedSet<string>();
+
             foreach (var match in matches)
             {
                 var scanNum = match.ScanNum;
@@ -105,19 +109,46 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 var specIdent = creator.AddSpectrumIdentification(specData, nativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
                     match.Charge, 1, double.NaN);
+
                 specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
                 var pep = new PeptideObj(match.Sequence);
 
                 var modText = match.Modifications;
                 if (!string.IsNullOrWhiteSpace(modText))
                 {
-                    var mods = modText.Split(',');
-                    foreach (var mod in mods)
+                    try
                     {
-                        var tokens = mod.Split(' ');
-                        var modInfo = modDict[tokens[0]];
-                        var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, modInfo.Name, int.Parse(tokens[1]), modInfo.Mass);
-                        pep.Modifications.Add(modObj);
+                        var mods = modText.Split(',');
+                        foreach (var mod in mods)
+                        {
+                            var tokens = mod.Split(' ');
+
+                            if (!modDict.TryGetValue(tokens[0], out var modInfo))
+                            {
+                                if (!missingKeys.Contains(tokens[0]))
+                                {
+                                    ConsoleMsgUtils.ShowWarning("Modification dictionary does not have key {0}", tokens[0]);
+                                    Console.WriteLine("Keys in the dictionary:");
+                                    foreach (var key in modDict.Keys)
+                                    {
+                                        Console.WriteLine(key);
+                                    }
+
+                                    ConsoleMsgUtils.ShowWarning("Results in the .mzid file will be inaccurate");
+
+                                    missingKeys.Add(tokens[0]);
+                                }
+                            }
+                            else
+                            {
+                                var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, modInfo.Name, int.Parse(tokens[1]), modInfo.Mass);
+                                pep.Modifications.Add(modObj);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleMsgUtils.ShowError("Error parsing mods while writing .mzid", ex);
                     }
                 }
                 specIdent.Peptide = pep;
@@ -175,6 +206,7 @@ namespace InformedProteomics.TopDown.Execution
                 new UserParamObj() { Name = "ProductIonTolerance", Value = options.ProductIonTolerance.ToString() },
                 new UserParamObj() { Name = "SearchMode", Value = options.InternalCleavageMode.ToString() },
                 new UserParamObj() { Name = "MatchesPerSpectrumToKeepInMemory", Value = options.MatchesPerSpectrumToKeepInMemory.ToString() },
+                new UserParamObj() { Name = "MatchesPerSpectrumToReport", Value = options.MatchesPerSpectrumToReport.ToString() },
                 new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() },
             });
 

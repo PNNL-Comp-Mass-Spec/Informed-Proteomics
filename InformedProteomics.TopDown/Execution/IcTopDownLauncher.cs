@@ -464,8 +464,10 @@ namespace InformedProteomics.TopDown.Execution
                 progData.StatusInternal = p.Status;
                 progData.Report(p.Percent);
             });
-            var bestMatches = RunGeneratingFunction(matches, null, progGen);
-            var results = WriteResultsToFile(bestMatches, outputFilePath, searchDb);
+
+            var bestMatchesByScan = RunGeneratingFunction(matches, null, progGen);
+
+            var results = WriteResultsToFile(bestMatchesByScan, outputFilePath, searchDb);
             sw.Stop();
 
             OnStatusEvent(string.Format("{1}-spectrum match E-value calculation elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds, searchModeStringCap));
@@ -778,7 +780,7 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     var existingMatches = matches[ms2ScanNum];
                     //var maxScore = existingMatches.Max.Score;
-                    if (existingMatches.Count < Options.NumMatchesPerSpectrum)
+                    if (existingMatches.Count < Options.MatchesPerSpectrumToKeepInMemory)
                     {
                         //if (!(maxScore*0.7 < prsm.Score)) return;
                         existingMatches.Add(prsm);
@@ -791,7 +793,7 @@ namespace InformedProteomics.TopDown.Execution
                         existingMatches.Add(prsm);
                         existingMatches.Remove(existingMatches.Min);
                     }
-                    //if (NumMatchesPerSpectrum > 1) existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
+                    //if (MatchesPerSpectrumToKeepInMemory > 1) existingMatches.RemoveWhere(mt => mt.Score < maxScore * 0.7);
                 }
             }
         }
@@ -836,7 +838,10 @@ namespace InformedProteomics.TopDown.Execution
 
         private LinkedList<Tuple<double, ScoreDistribution>>[] _cachedScoreDistributions;
 
-        private DatabaseSequenceSpectrumMatch[] RunGeneratingFunction(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        private Dictionary<int, List<DatabaseSequenceSpectrumMatch>> RunGeneratingFunction(
+            IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches,
+            CancellationToken? cancellationToken = null,
+            IProgress<ProgressData> progress = null)
         {
             var progData = new ProgressData(progress)
             {
@@ -992,10 +997,14 @@ namespace InformedProteomics.TopDown.Execution
                 }
             });
 
-            var finalMatches = new DatabaseSequenceSpectrumMatch[matches.Length];
+            // Keys in this dictionary are scan number
+            // Values are the list of matches for each scan
+            var finalMatches = new Dictionary<int, List<DatabaseSequenceSpectrumMatch>>();
+
             foreach (var scanNum in scanNums)
             {
-                finalMatches[scanNum] = matches[scanNum].OrderBy(m => m.SpecEvalue).First();
+                var matchesForScan = matches[scanNum].OrderBy(m => m.SpecEvalue).Take(Options.MatchesPerSpectrumToReport).ToList();
+                finalMatches.Add(scanNum, matchesForScan);
             }
 
             progData.StatusInternal = string.Empty;
@@ -1008,6 +1017,7 @@ namespace InformedProteomics.TopDown.Execution
             var nMatches = 0;
             lock (matches)
             {
+                // ReSharper disable once UselessBinaryOperation
                 nMatches += _ms2ScanNums.Where(scanNum => matches[scanNum] != null).Sum(scanNum => matches[scanNum].Count);
             }
             return nMatches;
@@ -1055,47 +1065,54 @@ namespace InformedProteomics.TopDown.Execution
 
         }
 
-        private List<DatabaseSearchResultData> WriteResultsToFile(IReadOnlyList<DatabaseSequenceSpectrumMatch> matches, string outputFilePath, FastaDatabase database)
+        private List<DatabaseSearchResultData> WriteResultsToFile(
+            IReadOnlyDictionary<int, List<DatabaseSequenceSpectrumMatch>> matchesByScan,
+            string outputFilePath,
+            FastaDatabase database)
         {
-            var results = CreateResults(matches, database).ToList();
+            var results = CreateResults(matchesByScan, database).ToList();
             DatabaseSearchResultData.WriteResultsToFile(outputFilePath, results);
             return results;
         }
 
-        private IEnumerable<DatabaseSearchResultData> CreateResults(IReadOnlyList<DatabaseSequenceSpectrumMatch> matches, FastaDatabase database)
+        private IEnumerable<DatabaseSearchResultData> CreateResults(
+            IReadOnlyDictionary<int, List<DatabaseSequenceSpectrumMatch>> matchesByScan,
+            FastaDatabase database)
         {
             foreach (var scanNum in _ms2ScanNums)
             {
-                var match = matches[scanNum];
-                if (match == null)
+                if (!matchesByScan.TryGetValue(scanNum, out var matches))
                     continue;
 
-                var start = database.GetOneBasedPositionInProtein(match.Offset) + 1 + match.NumNTermCleavages;
-                var proteinName = database.GetProteinName(match.Offset);
-                var result = new DatabaseSearchResultData()
+                foreach (var match in matches)
                 {
-                    ScanNum = scanNum,
-                    Pre = match.Pre.ToString(),
-                    Sequence = match.Sequence,
-                    Post = match.Post.ToString(),
-                    Modifications = match.ModificationText,
-                    Composition = match.Ion.Composition.ToString(),
-                    ProteinName = proteinName,
-                    ProteinLength = database.GetProteinLength(proteinName),
-                    ProteinDescription = database.GetProteinDescription(match.Offset),
-                    Start = start,
-                    End = start + match.Sequence.Length - 1,
-                    Charge = match.Ion.Charge,
-                    MostAbundantIsotopeMz = match.Ion.GetMostAbundantIsotopeMz(),
-                    Mass = match.Ion.Composition.Mass,
-                    NumMatchedFragments = match.NumMatchedFragments,
-                    Probability = CompositeScorer.GetProbability(match.Score),
-                    SpecEValue = match.SpecEvalue,
-                    EValue = match.SpecEvalue * database.GetNumEntries(),
-                    Ms1Feature = match.FeatureId
-                };
+                    var start = database.GetOneBasedPositionInProtein(match.Offset) + 1 + match.NumNTermCleavages;
+                    var proteinName = database.GetProteinName(match.Offset);
+                    var result = new DatabaseSearchResultData
+                    {
+                        ScanNum = scanNum,
+                        Pre = match.Pre.ToString(),
+                        Sequence = match.Sequence,
+                        Post = match.Post.ToString(),
+                        Modifications = match.ModificationText,
+                        Composition = match.Ion.Composition.ToString(),
+                        ProteinName = proteinName,
+                        ProteinLength = database.GetProteinLength(proteinName),
+                        ProteinDescription = database.GetProteinDescription(match.Offset),
+                        Start = start,
+                        End = start + match.Sequence.Length - 1,
+                        Charge = match.Ion.Charge,
+                        MostAbundantIsotopeMz = match.Ion.GetMostAbundantIsotopeMz(),
+                        Mass = match.Ion.Composition.Mass,
+                        NumMatchedFragments = match.NumMatchedFragments,
+                        Probability = CompositeScorer.GetProbability(match.Score),
+                        SpecEValue = match.SpecEvalue,
+                        EValue = match.SpecEvalue * database.GetNumEntries(),
+                        Ms1Feature = match.FeatureId
+                    };
 
-                yield return result;
+                    yield return result;
+                }
             }
         }
 

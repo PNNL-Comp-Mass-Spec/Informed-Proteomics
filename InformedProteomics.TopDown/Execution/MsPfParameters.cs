@@ -66,6 +66,7 @@ namespace InformedProteomics.TopDown.Execution
             MaxNumThreads = 0;
             ScanNumbers = null;
             MatchesPerSpectrumToKeepInMemory = 3;
+            MatchesPerSpectrumToReport = 1;
             TagBasedSearch = true;
 
             ActivationMethod = ActivationMethod.Unknown;
@@ -266,6 +267,13 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <remarks>Defaults to 3</remarks>
         public int MatchesPerSpectrumToKeepInMemory { get; set; }
+
+        /// <summary>
+        /// Number of matches per spectrum to list in the results file
+        /// </summary>
+        /// <remarks>Defaults to 1</remarks>
+        public virtual int MatchesPerSpectrumToReport { get; set; }
+
         /// <summary>
         /// Maximum number of threads
         /// </summary>

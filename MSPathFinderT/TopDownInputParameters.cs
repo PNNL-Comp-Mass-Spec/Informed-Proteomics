@@ -62,7 +62,15 @@ namespace MSPathFinderT
         [Option("tagSearch", HelpText = "Include Tag-based Search (can use '0' for false, '1' for true)")]
         public override bool TagBasedSearch { get; set; }
 
-        [Option("mod", HelpText = "Path to modification file. (Default: no modifications)", HelpShowsDefault = false)]
+        [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport", HelpText = "Number of results to report for each mass spectrum")]
+        public override int MatchesPerSpectrumToReport { get; set; }
+
+        [Option("mod",
+            HelpText = "Path to modification file that defines static and dynamic modifications. " +
+                       "Modifications can alternatively be defined in a parameter file, as specified by /ParamFile or -ParamFile\n" +
+                       "Modifications defined using the -mod switch take precedence over modifications defined in a parameter file\n" +
+                       "(Default: empty string, meaning no modifications)",
+            HelpShowsDefault = false)]
         public string ModsFilePath { get; set; }
 
         [Option("tda", Min = -1, Max = 1, HelpText = "Database search mode (0: don't search decoy database, 1: search shuffled decoy database)")]
