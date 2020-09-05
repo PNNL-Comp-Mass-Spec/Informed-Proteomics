@@ -84,26 +84,34 @@ namespace MSPathFinderT
         {
             get
             {
-                if (TargetDecoySearchMode == DatabaseSearchMode.Both)
-                    return 1;
-                if (TargetDecoySearchMode == DatabaseSearchMode.Decoy)
-                    return -1;
-                //(Tda2 == DatabaseSearchMode.Target)
-                return 0;
+                switch (TargetDecoySearchMode)
+                {
+                    case DatabaseSearchMode.Both:
+                        // Target and Decoy search
+                        return 1;
+
+                    case DatabaseSearchMode.Decoy:
+                        // Decoy search only (shuffled database)
+                        return -1;
+
+                    default:
+                        // Target search only
+                        return 0;
+                }
             }
             set
             {
-                if (value == -1)
+                switch (value)
                 {
-                    TargetDecoySearchMode = DatabaseSearchMode.Decoy;
-                }
-                else if (value == 1)
-                {
-                    TargetDecoySearchMode = DatabaseSearchMode.Both;
-                }
-                else
-                {
-                    TargetDecoySearchMode = DatabaseSearchMode.Target;
+                    case -1:
+                        TargetDecoySearchMode = DatabaseSearchMode.Decoy;
+                        break;
+                    case 1:
+                        TargetDecoySearchMode = DatabaseSearchMode.Both;
+                        break;
+                    default:
+                        TargetDecoySearchMode = DatabaseSearchMode.Target;
+                        break;
                 }
             }
         }
