@@ -134,7 +134,7 @@ namespace InformedProteomics.FeatureFinding
 
         private bool MsPbfFile(string path)
         {
-            return path.ToLower().EndsWith(".pbf");
+            return path.EndsWith(".pbf", StringComparison.OrdinalIgnoreCase);
         }
 
         public const string FileExtension = "ms1ft";

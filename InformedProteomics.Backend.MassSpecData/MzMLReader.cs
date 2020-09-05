@@ -1199,11 +1199,11 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.MoveToContent();
             var iType = reader.GetAttribute("name");
             var eType = IndexList.IndexListType.Unknown;
-            if (iType != null && iType.ToLower() == "spectrum")
+            if (iType != null && string.Equals(iType, "spectrum", StringComparison.OrdinalIgnoreCase))
             {
                 eType = IndexList.IndexListType.Spectrum;
             }
-            else if (iType != null && iType.ToLower() == "chromatogram")
+            else if (iType != null && string.Equals(iType, "chromatogram", StringComparison.OrdinalIgnoreCase))
             {
                 eType = IndexList.IndexListType.Chromatogram;
             }
@@ -1597,7 +1597,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 {
                                     cv = "MS";
                                 }
-                                if (cv.ToUpper().Contains("PSI"))
+                                if (cv.IndexOf("PSI", StringComparison.OrdinalIgnoreCase) >= 0)
                                 {
                                     cv = "MS";
                                 }

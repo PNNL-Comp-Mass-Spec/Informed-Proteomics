@@ -135,10 +135,10 @@ namespace InformedProteomics.Test
             var actStr = config.Contents["activationmethod"].ToLower();
 
             _combineCharges = (config.Contents.ContainsKey("combinecharges") &&
-                 config.Contents["combinecharges"].ToLower() == "true");
+                 string.Equals(config.Contents["combinecharges"], "true", StringComparison.OrdinalIgnoreCase));
 
             _useDecoy = (config.Contents.ContainsKey("usedecoy") &&
-                config.Contents["usedecoy"].ToLower() == "true");
+                string.Equals(config.Contents["usedecoy"], "true", StringComparison.OrdinalIgnoreCase));
 
             _relativeIntensityThreshold = Convert.ToDouble(config.Contents["relativeintensitythreshold"]);
 

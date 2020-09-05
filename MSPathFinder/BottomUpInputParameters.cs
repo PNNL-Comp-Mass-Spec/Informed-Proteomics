@@ -261,7 +261,7 @@ namespace MSPathFinder
                     }
                     if (Directory.Exists(value)) continue;
                     var extension = Path.GetExtension(value);
-                    if (!Path.GetExtension(value).ToLower().Equals(".raw"))
+                    if (!Path.GetExtension(value).Equals(".raw", StringComparison.OrdinalIgnoreCase))
                     {
                         return "Invalid extension for the parameter " + key + " (" + extension + ")!";
                     }

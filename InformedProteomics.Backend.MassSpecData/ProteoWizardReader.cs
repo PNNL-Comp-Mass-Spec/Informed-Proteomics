@@ -335,7 +335,7 @@ namespace InformedProteomics.Backend.MassSpecData
             Console.WriteLine("Looking for: " + args.Name);
             //Console.WriteLine("Wanted by: " + args.RequestingAssembly);
 #endif
-            if (!args.Name.ToLower().StartsWith("pwiz_bindings_cli"))
+            if (!args.Name.StartsWith("pwiz_bindings_cli", StringComparison.OrdinalIgnoreCase))
             {
                 return Assembly.LoadFrom(""); // We are not interested in searching for anything else - resolving pwiz_bindings_cli provides the hint for all of its dependencies.
                 // This will actually trigger an exception, which is handled in the system code, and the dll search goes on down the chain.

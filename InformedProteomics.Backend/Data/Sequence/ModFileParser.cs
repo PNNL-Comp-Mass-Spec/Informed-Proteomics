@@ -149,7 +149,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 if (s.Length == 0)
                     continue;
 
-                if (s.StartsWith("NumMods="))
+                if (s.StartsWith("NumMods=", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {

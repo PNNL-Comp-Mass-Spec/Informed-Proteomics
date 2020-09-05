@@ -29,7 +29,7 @@ namespace MSPathFinder
         private static void Main(string[] args)
         {
             var osVersionInfo = new OSVersionInfo();
-            if (osVersionInfo.GetOSVersion().ToLower().Contains("windows"))
+            if (osVersionInfo.GetOSVersion().IndexOf("windows", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 var handle = Process.GetCurrentProcess().MainWindowHandle;
                 SetConsoleMode(handle, EnableExtendedFlags);

@@ -205,17 +205,17 @@ namespace InformedProteomics.TopDown.Execution
                 sw.Reset();
                 sw.Start();
                 var extension = Path.GetExtension(Options.FeatureFilePath);
-                if (extension.ToLower().Equals(".csv"))
+                if (extension.Equals(".csv", StringComparison.OrdinalIgnoreCase))
                 {
                     OnStatusEvent("Reading ICR2LS/Decon2LS results...");
                     ms1Filter = new IsosFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath);
                 }
-                else if (extension.ToLower().Equals(".ms1ft"))
+                else if (extension.Equals(".ms1ft", StringComparison.OrdinalIgnoreCase))
                 {
                     OnStatusEvent("Reading ProMex results...");
                     ms1Filter = new Ms1FtFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath, -10);
                 }
-                else if (extension.ToLower().Equals(".msalign"))
+                else if (extension.Equals(".msalign", StringComparison.OrdinalIgnoreCase))
                 {
                     OnStatusEvent("Reading MS-Align+ results...");
                     ms1Filter = new MsDeconvFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath);

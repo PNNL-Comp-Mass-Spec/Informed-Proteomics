@@ -698,7 +698,7 @@ namespace InformedProteomics.Tests.DevTests
 
                     foreach (var sourceFilePath in mspFiles)
                     {
-                        if (!sourceFilePath.ToLower().EndsWith(".zip")) continue;
+                        if (!sourceFilePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) continue;
 
                         var sourceFile = new FileInfo(sourceFilePath);
 
