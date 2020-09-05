@@ -158,13 +158,28 @@ namespace MSPathFinderT
         [Option("flip", HelpText = "If specified, FLIP scoring code will be used (supports UVPD spectra)")]
         public bool UseFLIP { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <remarks>
+        /// The CommandLineParser class will look for a parameter named /ParamFile (or -ParamFile)
+        /// If defined, it will read settings from that parameter file, looking for settings that match the properties in this class
+        /// It will not read NumMods, StaticMod, or DynamicMod entries
+        /// Reading that info is accomplished via methods in this class
+        /// </remarks>
         public TopDownInputParameters()
         {
-            ScansFilePath = "";
+            ScansFilePath = string.Empty;
             UseFLIP = false;
         }
 
-        public bool Validate()
+        /// <summary>
+        /// Validate options
+        /// </summary>
+        /// <parameterFilePath>Path to the parameter file specified by /ParamFile or -ParamFile, or an empty string if not provided</parameterFilePath>
+        /// <returns>True if options are valid, otherwise false</returns>
+        /// <remarks>Will also load dynamic and static modifications from the parameter file, if defined</remarks>
+        public bool Validate(string parameterFilePath)
         {
             // Spec file path validation
             if (string.IsNullOrWhiteSpace(SpecFilePath))
@@ -194,8 +209,7 @@ namespace MSPathFinderT
                 return false;
             }
 
-            // TODO: Handle non-.raw files in the subfolder
-            SpecFilePaths = Directory.Exists(SpecFilePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(SpecFilePath) ? Directory.GetFiles(SpecFilePath, "*.raw") : new[] { SpecFilePath };
+            SpecFilePaths = GetSpecFilePaths(SpecFilePath);
 
             // Database path validation
             if (string.IsNullOrWhiteSpace(DatabaseFilePath))
@@ -240,25 +254,34 @@ namespace MSPathFinderT
             }
 
             // Mods file validation
-            if (!string.IsNullOrWhiteSpace(ModsFilePath) && !File.Exists(ModsFilePath))
+            if (string.IsNullOrWhiteSpace(ModsFilePath))
             {
-                PrintError("Modifications file not found: " + ModsFilePath);
-                return false;
+                if (string.IsNullOrWhiteSpace(parameterFilePath))
+                {
+                    AminoAcidSet = new AminoAcidSet();
+                    Modifications = new List<SearchModification>();
+                }
+                else
+                {
+                    var success = LoadModsFromMSPathFinderParameterFile(parameterFilePath);
+                    if (!success)
+                        return false;
+                }
             }
-
-            try
+            else
             {
+                if (!File.Exists(ModsFilePath))
+                {
+                    PrintError("Modifications file not found: " + ModsFilePath);
+                    return false;
+                }
+
                 var errorMessage = LoadModsFile(ModsFilePath);
                 if (!string.IsNullOrWhiteSpace(errorMessage))
                 {
                     PrintError(errorMessage);
                     return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                PrintError("Exception parsing the file for parameter -mod: " + ex.Message);
-                return false;
             }
 
             // Scans file validation
@@ -409,29 +432,55 @@ namespace MSPathFinderT
             return threads;
         }
 
+        private static IEnumerable<string> GetSpecFilePaths(string fileOrDirectoryPath)
+        {
+            try
+            {
+
+                if (Directory.Exists(fileOrDirectoryPath) &&
+                    !MassSpecDataReaderFactory.IsADirectoryDataset(fileOrDirectoryPath))
+                {
+                    // Process all .raw files in the given directory
+                    return Directory.GetFiles(fileOrDirectoryPath, "*.raw");
+                }
+            }
+            catch (Exception ex)
+            {
+                PrintError(string.Format("Exception examining the file or directory path ({0}): {1}", fileOrDirectoryPath, ex.Message), ex);
+            }
+
+            // Use the file or directory path as-is
+            return new[] { fileOrDirectoryPath };
+        }
+
+        /// <summary>
+        /// Parse the modification info file, if defined
+        /// </summary>
+        /// <param name="modFilePath"></param>
+        /// <returns>Error message if an error</returns>
         private string LoadModsFile(string modFilePath)
         {
-            if (string.IsNullOrWhiteSpace(modFilePath))
+            try
             {
-                AminoAcidSet = new AminoAcidSet();
-                Modifications = new List<SearchModification>();
+                if (!File.Exists(modFilePath))
+                {
+                    return "-mod file not found: " + modFilePath;
+                }
+
+                var parser = new ModFileParser(modFilePath);
+                Modifications = parser.SearchModifications.ToList();
+                MaxDynamicModificationsPerSequence = parser.MaxNumDynModsPerSequence;
+
+                if (Modifications == null)
+                    return "Error while parsing " + modFilePath;
+
+                AminoAcidSet = new AminoAcidSet(Modifications, MaxDynamicModificationsPerSequence);
                 return string.Empty;
             }
-
-            if (!File.Exists(modFilePath))
+            catch (Exception ex)
             {
-                return "-mod file not found: " + modFilePath;
+                return "Exception parsing the file for parameter -mod: " + ex.Message;
             }
-
-            var parser = new ModFileParser(modFilePath);
-            Modifications = parser.SearchModifications.ToList();
-            MaxDynamicModificationsPerSequence = parser.MaxNumDynModsPerSequence;
-
-            if (Modifications == null)
-                return "Error while parsing " + modFilePath;
-
-            AminoAcidSet = new AminoAcidSet(Modifications, MaxDynamicModificationsPerSequence);
-            return string.Empty;
         }
 
         private string LoadScansFile(string scansFilePath)
@@ -472,5 +521,250 @@ namespace MSPathFinderT
 
             return string.Empty;
         }
+
+        /// <summary>
+        /// Read the MSPathFinder parameter file to look for NumMods plus any StaticMod or DynamicMod entries
+        /// </summary>
+        /// <param name="parameterFilePath"></param>
+        /// <returns>True if success, false if an error</returns>
+        private bool LoadModsFromMSPathFinderParameterFile(string parameterFilePath)
+        {
+            var paramFileReader = new KeyValueParamFileReader("MSPathFinder", parameterFilePath);
+            RegisterEvents(paramFileReader);
+
+            var success = paramFileReader.ParseKeyValueParameterFile(out var paramFileEntries);
+            if (!success)
+            {
+                ConsoleMsgUtils.ShowWarning(paramFileReader.ErrorMessage);
+                return false;
+            }
+
+            var numMods = 0;
+            var staticMods = new List<string>();
+            var dynamicMods = new List<string>();
+
+            try
+            {
+                foreach (var kvSetting in paramFileEntries)
+                {
+                    var paramValue = kvSetting.Value;
+
+                    if (kvSetting.Key.Equals("NumMods", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (int.TryParse(paramValue, out var intValue))
+                        {
+                            numMods = intValue;
+                        }
+                        else
+                        {
+                            var errMsg = "Invalid value for NumMods in the MSPathFinder parameter file";
+                            ConsoleMsgUtils.ShowWarning(errMsg + ": " + kvSetting.Key + "=" + kvSetting.Value);
+                            return false;
+                        }
+                    }
+                    else if (kvSetting.Key.Equals("StaticMod", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!string.IsNullOrWhiteSpace(paramValue) && !paramValue.Equals("none", StringComparison.OrdinalIgnoreCase))
+                        {
+                            staticMods.Add(paramValue);
+                        }
+                    }
+                    else if (kvSetting.Key.Equals("DynamicMod", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!string.IsNullOrWhiteSpace(paramValue) && !paramValue.Equals("none", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dynamicMods.Add(paramValue);
+                        }
+                    }
+
+                }
+
+                var modsValidated = StoreMSPathFinderModifications(numMods, staticMods, dynamicMods);
+
+                return modsValidated;
+            }
+            catch (Exception ex)
+            {
+                PrintError("Exception extracting dynamic and static mod information from the MSPathFinder parameter file", ex);
+                return false;
+            }
+        }
+
+        private bool StoreMSPathFinderModifications(int maxDynamicModsPerSequence, IEnumerable<string> staticMods, IEnumerable<string> dynamicMods)
+        {
+            try
+            {
+                MaxDynamicModificationsPerSequence = maxDynamicModsPerSequence;
+
+                Modifications = new List<SearchModification>();
+
+                foreach (var staticMod in staticMods)
+                {
+                    if (ParseMSPathFinderValidateMod(staticMod, out var modClean, out var parsedMods))
+                    {
+                        if (modClean.Contains(",opt,"))
+                        {
+                            // Static (fixed) mod is listed as dynamic
+                            // Abort the analysis since the parameter file is misleading and needs to be fixed
+                            var errMsg = "Static mod definition contains ',opt,'; update the param file to have ',fix,' or change to 'DynamicMod='";
+                            PrintError(errMsg + "\n" + staticMod);
+                            return false;
+                        }
+
+                        Modifications.AddRange(parsedMods);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                foreach (var dynamicMod in dynamicMods)
+                {
+                    if (ParseMSPathFinderValidateMod(dynamicMod, out var modClean, out var parsedMods))
+                    {
+                        if (modClean.Contains(",fix,"))
+                        {
+                            // Dynamic (optional) mod is listed as static
+                            // Abort the analysis since the parameter file is misleading and needs to be fixed
+                            var errMsg = "Dynamic mod definition contains ',fix,'; update the param file to have ',opt,' or change to 'StaticMod='";
+                            PrintError(errMsg + "\n" + dynamicMod);
+                            return false;
+                        }
+
+                        Modifications.AddRange(parsedMods);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                AminoAcidSet = new AminoAcidSet(Modifications, MaxDynamicModificationsPerSequence);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                PrintError("Exception storing dynamic and static mod information loaded from the MSPathFinder parameter file", ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the modification definition text
+        /// </summary>
+        /// <param name="mod">Modification definition</param>
+        /// <param name="modClean">Cleaned-up modification definition (output param)</param>
+        /// <param name="parsedMods">
+        /// List of search modifications determined using modClean
+        /// There will be multiple items if the modification affects multiple residues
+        /// </param>
+        /// <returns>True if valid; false if invalid</returns>
+        /// <remarks>A valid modification definition contains 5 parts and doesn't contain any whitespace</remarks>
+        private bool ParseMSPathFinderValidateMod(string mod, out string modClean, out List<SearchModification> parsedMods)
+        {
+            var comment = string.Empty;
+
+            modClean = string.Empty;
+
+            var poundIndex = mod.IndexOf('#');
+            if (poundIndex > 0)
+            {
+                comment = mod.Substring(poundIndex);
+                mod = mod.Substring(0, poundIndex - 1).Trim();
+            }
+
+            var splitMod = mod.Split(',');
+
+            if (splitMod.Length < 5)
+            {
+                // Invalid mod definition; must have 5 sections
+                ConsoleMsgUtils.ShowWarning("Invalid modification string; must have 5 sections: " + mod);
+                parsedMods = new List<SearchModification>();
+                return false;
+            }
+
+            // Make sure mod does not have both * and any
+            if (splitMod[1].Trim() == "*" && splitMod[3].ToLower().Trim() == "any")
+            {
+                ConsoleMsgUtils.ShowWarning("Modification cannot contain both * and any: " + mod);
+                parsedMods = new List<SearchModification>();
+                return false;
+            }
+
+            // Reconstruct the mod definition, making sure there is no whitespace
+            modClean = splitMod[0].Trim();
+            for (var index = 1; index <= splitMod.Length - 1; index++)
+            {
+                modClean += "," + splitMod[index].Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                modClean += "     " + comment;
+            }
+
+            try
+            {
+                parsedMods = ModFileParser.ParseModification(modClean);
+            }
+            catch (Exception ex)
+            {
+                ConsoleMsgUtils.ShowWarning(
+                    "Invalid modification line: {0}\n{1}\n\n(originally {2})",
+                    modClean, ex.Message, mod);
+                parsedMods = new List<SearchModification>();
+                return false;
+            }
+
+            return parsedMods != null;
+        }
+
+        #region "Events"
+
+        private static void RegisterEvents(IEventNotifier processingClass, bool writeDebugEventsToLog = true)
+        {
+            if (writeDebugEventsToLog)
+            {
+                processingClass.DebugEvent += DebugEventHandler;
+            }
+            else
+            {
+                processingClass.DebugEvent += DebugEventHandlerConsoleOnly;
+            }
+
+            processingClass.StatusEvent += StatusEventHandler;
+            processingClass.ErrorEvent += ErrorEventHandler;
+            processingClass.WarningEvent += WarningEventHandler;
+            // Ignore: processingClass.ProgressUpdate += ProgressUpdateHandler;
+        }
+
+        private static void DebugEventHandlerConsoleOnly(string statusMessage)
+        {
+            ConsoleMsgUtils.ShowDebug(statusMessage);
+        }
+
+        private static void DebugEventHandler(string statusMessage)
+        {
+            ConsoleMsgUtils.ShowDebug(statusMessage);
+        }
+
+        private static void StatusEventHandler(string statusMessage)
+        {
+            Console.WriteLine(statusMessage);
+        }
+
+        private static void ErrorEventHandler(string errorMessage, Exception ex)
+        {
+            PrintError(errorMessage, ex);
+        }
+
+        private static void WarningEventHandler(string warningMessage)
+        {
+            ConsoleMsgUtils.ShowWarning(warningMessage);
+        }
+
+        #endregion
     }
 }

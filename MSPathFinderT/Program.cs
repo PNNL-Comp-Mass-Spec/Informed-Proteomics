@@ -64,7 +64,7 @@ namespace MSPathFinderT
                     return -3;
                 }
 
-                if (!results.ParsedResults.Validate())
+                if (!results.ParsedResults.Validate(results.ParamFilePath))
                 {
                     parser.PrintHelp();
 
@@ -76,7 +76,7 @@ namespace MSPathFinderT
                 var parameters = results.ParsedResults;
 
                 Console.WriteLine(Name + " " + Version);
-                parameters.Display();
+                parameters.Display(results.ParamFilePath);
 
                 parameters.MaxNumNTermCleavages = 1; // max number of N-term cleavages
                 parameters.MaxNumCTermCleavages = 0; // max number of C-term cleavages
