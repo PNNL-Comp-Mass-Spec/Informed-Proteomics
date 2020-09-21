@@ -13,6 +13,11 @@ namespace MSPathFinderT
         // Ignore Spelling: tda
 
         public const string Name = "MSPathFinderT";
+
+        /// <summary>
+        /// Program version, including the build date
+        /// </summary>
+        /// <remarks>Example: MSPathFinderT version 1.0.7569 (September 21, 2020)</remarks>
         public static string Version
         {
             get

@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.SearchResults
     /// </summary>
     public class FdrCalculator
     {
+        // Ignore Spelling: Qvalue
+
         private readonly bool _multiplePeptidesPerScan;
         private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
         private readonly List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
@@ -126,7 +128,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// Write the results with the FDR data to the specified file
         /// </summary>
         /// <param name="outputFilePath"></param>
-        /// <param name="includeDecoy"></param>
+        /// <param name="includeDecoy">When true, include decoy-based results in the _IcTda.tsv file</param>
         public void WriteTo(string outputFilePath, bool includeDecoy = false)
         {
             //var resultsToUse = searchResults;

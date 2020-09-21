@@ -10,6 +10,8 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class TopDownScorer //TODO consider binning ....
     {
+        // Ignore Spelling: readonly, Xic, Xics, foreach, iso, diff
+
         public static int MinCharge = 8;
         public static int MaxCharge = 25;
 
@@ -201,7 +203,7 @@ namespace InformedProteomics.TopDown.Scoring
             return score;
         }
 
-        public double[][][][] GetTruncatedXics(int scanNumber) // main charge, other charge, Lc, mz  i scanNumber >= 0 Xics should contain the scanNumber
+        public double[][][][] GetTruncatedXics(int scanNumber) // main charge, other charge, LC, mz  i scanNumber >= 0 Xics should contain the scanNumber
         {
             var truncatedXics = new double[MaxCharge - MinCharge + 1][][][];
             for (var charge = MinCharge; charge <= MaxCharge; charge++)
@@ -350,9 +352,9 @@ namespace InformedProteomics.TopDown.Scoring
                 }
             }
            // System.Environment.Exit(1);
-          //  for (var i = 0; i < smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex-_minIsotopeIndex].Length; i++ )
+           //  for (var i = 0; i < smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex-_minIsotopeIndex].Length; i++ )
            // {
-            //    Console.WriteLine(i + "\t" + smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i] + "\t" + _xicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i]);
+           //    Console.WriteLine(i + "\t" + smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i] + "\t" + _xicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i]);
            // }
             return smoothedXicArray;
         }
@@ -393,10 +395,10 @@ namespace InformedProteomics.TopDown.Scoring
                      //       Console.WriteLine(charge + "\t" + xicPeak.MostAbundantIsotopeMz + "\t" + xicPeak.Intensity + "\t" + scanNumberIndex[xicPeak.MostAbundantIsotopeMz]);
                         //if(k == 0 && charge == 13) Console.WriteLine(xicPeak.MostAbundantIsotopeMz + " " + xicPeak.Intensity);
                     }
-                  //  Console.WriteLine();
+                    //  Console.WriteLine();
                 }
-               // System.Environment.Exit(1);
-               //
+                // System.Environment.Exit(1);
+                //
                 xicArray[charge - MinCharge] = xicArrayForThisCharge;
             }
             return xicArray;

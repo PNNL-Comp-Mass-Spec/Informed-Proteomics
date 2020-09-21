@@ -10,6 +10,10 @@ namespace InformedProteomics.Backend.Data.Biology
     /// </summary>
     public class Atom : IMatter, IEquatable<Atom>
     {
+        // ReSharper disable CommentTypo
+        // Ignore Spelling: Hexose, Acetylhexosamine, Fucose, acetyl, glycoyl neuraminic, Heptose, Pentose, Neu, UniMod, Gc
+        // ReSharper restore CommentTypo
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -53,7 +57,7 @@ namespace InformedProteomics.Backend.Data.Biology
         public int NominalMass { get; set; }
 
         /// <summary>
-        /// Get an array of all supported elements, and some compounds
+        /// Get an array of all supported elements, plus some compounds
         /// </summary>
         public static readonly Atom[] AtomArr =
             {
@@ -92,7 +96,6 @@ namespace InformedProteomics.Backend.Data.Biology
 
                 // Compounds
 
-                // TODO: Move to somewhere more appropriate
                 // ReSharper disable StringLiteralTypo
                 new Atom("Hex", 162.052824, 162, "Hexose"),
                 new Atom("HexNAc", 203.079373, 203, "N-Acetylhexosamine"),
