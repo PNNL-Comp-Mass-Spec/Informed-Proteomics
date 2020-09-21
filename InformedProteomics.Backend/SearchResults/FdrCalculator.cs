@@ -244,15 +244,28 @@ namespace InformedProteomics.Backend.SearchResults
 
         private bool CalculatePepQValues()
         {
-            IEnumerable<DatabaseSearchResultData> distinctSorting = searchResults.OrderBy(r => r.EValue).ThenByDescending(r => r.Probability);
-            if (!_multiplePeptidesPerScan)
+            IEnumerable<DatabaseSearchResultData> distinctSorting = searchResults
+                .OrderBy(r => r.EValue)
+                .ThenByDescending(r => r.Probability);
+
+            IEnumerable<DatabaseSearchResultData> distinctSortingOnePerScan;
+
+            if (_multiplePeptidesPerScan)
             {
-                distinctSorting = distinctSorting
+                distinctSortingOnePerScan = distinctSorting;
+            }
+            else
+            {
+                distinctSortingOnePerScan = distinctSorting
                     .Where(r => r.QValue < UNDEFINED_QVALUE)
                     .GroupBy(r => r.ScanNum)
                     .Select(grp => grp.First());
             }
-            var distinctSorted = distinctSorting.GroupBy(r => r.SequenceWithEnds).Select(grp => grp.First()).ToArray();
+
+            var distinctSorted = distinctSortingOnePerScan
+                .GroupBy(r => r.SequenceWithEnds)
+                .Select(grp => grp.First())
+                .ToArray();
 
             // Calculate QValues
             var numDecoy = 0;
