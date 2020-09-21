@@ -389,5 +389,14 @@ namespace InformedProteomics.Backend.SearchResults
 
             return simpleMzIdentMLData;
         }
+
+        /// <summary>
+        /// Show the scan number and the sequence
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Format("Scan {0,4}, EValue {1:0.00000}, Probability {2:0.00000}: {3}", ScanNum, EValue, Probability, SequenceWithEnds);
+        }
     }
 }
