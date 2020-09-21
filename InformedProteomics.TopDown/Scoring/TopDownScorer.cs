@@ -124,7 +124,7 @@ namespace InformedProteomics.TopDown.Scoring
             return new Tuple<int, int>(l,r);
         }
 
-        private bool FilterXic(double[][] truncatedXics1, double[][] truncatedXics2)
+        private bool FilterXic(IReadOnlyList<double[]> truncatedXics1, IReadOnlyList<double[]> truncatedXics2)
         {
             const double threshold = 0.5; // TODO
             var abundantXic1 = truncatedXics1[_maxIntensityIsotopeIndex - _minIsotopeIndex];
@@ -146,7 +146,7 @@ namespace InformedProteomics.TopDown.Scoring
             return corr < threshold;
         }
 
-        private int GetIsotopeCorrelationIntegerRawScore(double[][] truncatedXics)
+        private int GetIsotopeCorrelationIntegerRawScore(IReadOnlyList<double[]> truncatedXics)
         {
             const double threshold = 0.5; // TODO
 
@@ -161,9 +161,9 @@ namespace InformedProteomics.TopDown.Scoring
                 apexIndex = i;
             }
 
-            var isotopePeaks = new double[truncatedXics.Length];
+            var isotopePeaks = new double[truncatedXics.Count];
             //Console.WriteLine(" truncatedXics.Length " + truncatedXics.Length);
-            for (var k = 0; k < truncatedXics.Length; k++)
+            for (var k = 0; k < truncatedXics.Count; k++)
             {
                 if (k != _maxIntensityIsotopeIndex - _minIsotopeIndex)
                 {
