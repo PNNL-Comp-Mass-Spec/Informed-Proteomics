@@ -57,23 +57,23 @@ namespace InformedProteomics.TopDown.Scoring
             _tolerance = tolerance;
 
             _maxIntensityIsotopeIndex = _proteinCompositionPlusWater.GetMostAbundantIsotopeZeroBasedIndex();
-            var thorethicalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelopeRelativeIntensities();
+            var theoreticalIsotopeEnvelope = _proteinCompositionPlusWater.GetIsotopomerEnvelopeRelativeIntensities();
 
             _minIsotopeIndex = 0;
-            for (var i = 0; i < thorethicalIsotopeEnvelope.Length; i++)
+            for (var i = 0; i < theoreticalIsotopeEnvelope.Length; i++)
             {
-                if (!(thorethicalIsotopeEnvelope[i] > MinIsotopeIntensity)) continue;
+                if (!(theoreticalIsotopeEnvelope[i] > MinIsotopeIntensity)) continue;
                 _minIsotopeIndex = i;
                 break;
             }
 
-            _isotopeEnvelope = new double[Math.Min(_maxIntensityIsotopeIndex + NumberAfterMaxIsotopeIndex, thorethicalIsotopeEnvelope.Length) - _minIsotopeIndex];
+            _isotopeEnvelope = new double[Math.Min(_maxIntensityIsotopeIndex + NumberAfterMaxIsotopeIndex, theoreticalIsotopeEnvelope.Length) - _minIsotopeIndex];
             for (var k = 0; k < _isotopeEnvelope.Length; k++)
             {
-                _isotopeEnvelope[k] = thorethicalIsotopeEnvelope[k + _minIsotopeIndex];
+                _isotopeEnvelope[k] = theoreticalIsotopeEnvelope[k + _minIsotopeIndex];
             }
 
-            /*foreach (var iso in thorethicalIsotopeEnvelope)
+            /*foreach (var iso in theoreticalIsotopeEnvelope)
             {
                 Console.WriteLine(iso);
             }
