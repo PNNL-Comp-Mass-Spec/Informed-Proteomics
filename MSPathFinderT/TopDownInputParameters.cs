@@ -67,6 +67,9 @@ namespace MSPathFinderT
         [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport", HelpText = "Number of results to report for each mass spectrum")]
         public override int MatchesPerSpectrumToReport { get; set; }
 
+        [Option("IncludeDecoy", "IncludeDecoys", "IncludeDecoyResults", HelpText = "Include decoy results in the _IcTda.tsv file")]
+        public override bool IncludeDecoyResults { get; set; }
+
         [Option("mod",
             HelpText = "Path to modification file that defines static and dynamic modifications. " +
                        "Modifications can alternatively be defined in a parameter file, as specified by /ParamFile or -ParamFile\n" +
@@ -410,6 +413,7 @@ namespace MSPathFinderT
             Console.WriteLine("MinSequenceMass:            " + MinSequenceMass);
             Console.WriteLine("MaxSequenceMass:            " + MaxSequenceMass);
             Console.WriteLine("MatchesPerSpectrumToReport: " + MatchesPerSpectrumToReport);
+            Console.WriteLine("IncludeDecoyResults:        " + IncludeDecoyResults);
             Console.WriteLine("MaxDynamicModificationsPerSequence: " + MaxDynamicModificationsPerSequence);
             Console.WriteLine("Modifications:");
 

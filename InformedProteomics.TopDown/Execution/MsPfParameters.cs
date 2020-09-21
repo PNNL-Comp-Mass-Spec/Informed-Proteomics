@@ -67,6 +67,7 @@ namespace InformedProteomics.TopDown.Execution
             ScanNumbers = null;
             MatchesPerSpectrumToKeepInMemory = 3;
             MatchesPerSpectrumToReport = 1;
+            IncludeDecoyResults = false;
             TagBasedSearch = true;
 
             ActivationMethod = ActivationMethod.Unknown;
@@ -273,6 +274,11 @@ namespace InformedProteomics.TopDown.Execution
         /// </summary>
         /// <remarks>Defaults to 1</remarks>
         public virtual int MatchesPerSpectrumToReport { get; set; }
+
+        /// <summary>
+        /// Gets or sets the option to include decoy results in the _IcTda.tsv file
+        /// </summary>
+        public virtual bool IncludeDecoyResults { get; set; }
 
         /// <summary>
         /// Maximum number of threads

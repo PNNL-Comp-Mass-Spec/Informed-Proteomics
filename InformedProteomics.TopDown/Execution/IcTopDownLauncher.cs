@@ -369,7 +369,7 @@ namespace InformedProteomics.TopDown.Execution
                     return false;
                 }
 
-                fdrCalculator.WriteTo(tdaOutputFilePath);
+                fdrCalculator.WriteTo(tdaOutputFilePath, Options.IncludeDecoyResults);
                 var mzidWriter = new MzidResultsWriter(targetDb, _run, Options);
                 mzidWriter.WriteResultsToMzid(fdrCalculator.FilteredResults, mzidOutputFilePath);
             }
