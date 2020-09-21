@@ -281,6 +281,15 @@ namespace InformedProteomics.Backend.SearchResults
             searchResults.AddRange(decoyResults);
             searchResults.AddRange(targetResults);
 
+            // Assign Result IDs, order by scan then EValue, then descending probability
+            var resultID = 1;
+            foreach (var item in searchResults.OrderBy(r => r.ScanNum)
+                .ThenBy(r => r.EValue)
+                .ThenByDescending(r => r.Probability))
+            {
+                item.ResultID = resultID++;
+            }
+
             if (searchResults.Count == 0)
             {
                 // NOTE: The DMS Analysis Manager looks for the text "No results found"

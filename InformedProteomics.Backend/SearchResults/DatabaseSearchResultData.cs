@@ -140,6 +140,11 @@ namespace InformedProteomics.Backend.SearchResults
         public bool HasTdaScores { get; private set; }
 
         /// <summary>
+        /// Integer ID to associate with this result; initially 0
+        /// </summary>
+        public int ResultID { get; set; }
+
+        /// <summary>
         /// The sequence, with the pre and post residues
         /// </summary>
         public string SequenceWithEnds
