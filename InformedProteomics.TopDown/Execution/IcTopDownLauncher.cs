@@ -156,7 +156,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
-            progData.StepRange(progData.MaxPercentage + 2.0, "Reading Fasta File");
+            progData.StepRange(progData.MaxPercentage + 2, "Reading Fasta File");
             OnStatusEvent(progData.Status);
 
             // Target database
@@ -174,7 +174,7 @@ namespace InformedProteomics.TopDown.Execution
                 var ms1FtFilePath = MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, LcMsFeatureFinderLauncher.FileExtension);
                 if (!File.Exists(ms1FtFilePath))
                 {
-                    progData.StepRange(progData.MaxPercentage + 10.0);
+                    progData.StepRange(progData.MaxPercentage + 10);
                     UpdateStatus("Running ProMex...", progData);
                     sw.Reset();
                     sw.Start();
@@ -199,7 +199,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else
             {
-                progData.StepRange(progData.MaxPercentage + 1.0);
+                progData.StepRange(progData.MaxPercentage + 1);
                 sw.Reset();
                 sw.Start();
                 var extension = Path.GetExtension(Options.FeatureFilePath);
@@ -246,7 +246,7 @@ namespace InformedProteomics.TopDown.Execution
                 var lcmsRunDeconvoluter = new LcmsRunDeconvoluter(_run, deconvoluter, 2, pfeOptions.MaxDegreeOfParallelism);
                 if (!File.Exists(MassSpecDataReaderFactory.ChangeExtension(Options.SpecFilePath, DPbfLcMsRun.FileExtensionConst)))
                 {
-                    progData.StepRange(progData.MaxPercentage + 2.0);
+                    progData.StepRange(progData.MaxPercentage + 2);
                 }
                 var deconvolutedRun = new DPbfLcMsRun(Options.SpecFilePath, lcmsRunDeconvoluter, keepDataReaderOpen: true);
 
@@ -307,7 +307,7 @@ namespace InformedProteomics.TopDown.Execution
             var tdaOutputFilePath = Path.Combine(Options.OutputDir, specFileName + TdaFileNameEnding);
             var mzidOutputFilePath = Path.Combine(Options.OutputDir, specFileName + MzidFileNameEnding);
 
-            progData.StepRange(progData.MaxPercentage + ((98.0 - progData.MaxPercentage) / 2.0), "Running Target search");
+            progData.StepRange(progData.MaxPercentage + (98 - progData.MaxPercentage) / 2.0, "Running Target search");
             List<DatabaseSearchResultData> targetSearchResults = null;
 
             var validTargetResults = ResultsFileHasData(targetOutputFilePath);
