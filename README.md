@@ -193,9 +193,9 @@ Several other formats are supported if an appropriate version of ProteoWizard is
 See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample modification definition files.
 
 ## System Requirements
+
 Minimum required:
-* .NET 4.5.1 installed
-* Will probably try to run on anything where you can install .NET 4.5.1.
+* .NET 4.7.2 installed
 
 Minimum recommended:
 * 2.4 GHz, quad-core CPU
@@ -208,7 +208,7 @@ Written by Sangtae Kim, Junkap Park, and Chris Wilkins for the Department of Ene
 Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.
 
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-Website: http://panomics.pnnl.gov/ or http://omics.pnl.gov
+Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
 
 -------------------------------------------------------------------------------
 
