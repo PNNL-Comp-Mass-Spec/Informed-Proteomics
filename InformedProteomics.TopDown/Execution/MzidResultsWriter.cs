@@ -96,88 +96,117 @@ namespace InformedProteomics.TopDown.Execution
 
             var missingKeys = new SortedSet<string>();
 
+            var scanOrder = new List<int>();
+            var matchesByScan = new Dictionary<int, List<DatabaseSearchResultData>>();
+
             foreach (var match in matches)
             {
-                var scanNum = match.ScanNum;
-                var spec = lcmsRun.GetSpectrum(scanNum, false);
-                var matchIon = new Ion(Composition.Parse(match.Composition), match.Charge);
-
-                var nativeId = spec.NativeId;
-                if (string.IsNullOrWhiteSpace(spec.NativeId))
+                if (matchesByScan.TryGetValue(match.ScanNum, out var scanMatches))
                 {
-                    nativeId = "scan=" + spec.ScanNum;
+                    scanMatches.Add(match);
+                    continue;
                 }
-                var specIdent = creator.AddSpectrumIdentification(specData, nativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
-                    match.Charge, 1, double.NaN);
 
-                specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
-                var pep = new PeptideObj(match.Sequence);
+                matchesByScan.Add(match.ScanNum, new List<DatabaseSearchResultData> {match});
+                scanOrder.Add(match.ScanNum);
+            }
 
-                var modText = match.Modifications;
-                if (!string.IsNullOrWhiteSpace(modText))
+            foreach (var scanMatches in scanOrder.Select(scanNumber => matchesByScan[scanNumber]))
+            {
+                for (var rank = 1; rank <= scanMatches.Count; rank++)
                 {
-                    try
+                    var match = scanMatches[rank - 1];
+
+                    var scanNum = match.ScanNum;
+                    var spec = lcmsRun.GetSpectrum(scanNum, false);
+                    var matchIon = new Ion(Composition.Parse(match.Composition), match.Charge);
+
+                    var nativeId = spec.NativeId;
+                    if (string.IsNullOrWhiteSpace(spec.NativeId))
                     {
-                        var mods = modText.Split(',');
-                        foreach (var mod in mods)
+                        nativeId = "scan=" + spec.ScanNum;
+                    }
+
+                    var specIdent = creator.AddSpectrumIdentification(specData, nativeId, spec.ElutionTime, match.MostAbundantIsotopeMz,
+                        match.Charge, rank, double.NaN);
+
+                    specIdent.CalculatedMassToCharge = matchIon.GetMonoIsotopicMz();
+                    var pep = new PeptideObj(match.Sequence);
+
+                    var modText = match.Modifications;
+                    if (!string.IsNullOrWhiteSpace(modText))
+                    {
+                        try
                         {
-                            var tokens = mod.Split(' ');
-
-                            if (!modDict.TryGetValue(tokens[0], out var modInfo))
+                            var mods = modText.Split(',');
+                            foreach (var mod in mods)
                             {
-                                if (!missingKeys.Contains(tokens[0]))
+                                var tokens = mod.Split(' ');
+
+                                if (!modDict.TryGetValue(tokens[0], out var modInfo))
                                 {
-                                    ConsoleMsgUtils.ShowWarning("Modification dictionary does not have key {0}", tokens[0]);
-                                    Console.WriteLine("Keys in the dictionary:");
-                                    foreach (var key in modDict.Keys)
+                                    if (!missingKeys.Contains(tokens[0]))
                                     {
-                                        Console.WriteLine(key);
+                                        ConsoleMsgUtils.ShowWarning("Modification dictionary does not have key {0}", tokens[0]);
+                                        Console.WriteLine("Keys in the dictionary:");
+                                        foreach (var key in modDict.Keys)
+                                        {
+                                            Console.WriteLine(key);
+                                        }
+
+                                        ConsoleMsgUtils.ShowWarning("Results in the .mzid file will be inaccurate");
+
+                                        missingKeys.Add(tokens[0]);
                                     }
-
-                                    ConsoleMsgUtils.ShowWarning("Results in the .mzid file will be inaccurate");
-
-                                    missingKeys.Add(tokens[0]);
+                                }
+                                else
+                                {
+                                    var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, modInfo.Name, int.Parse(tokens[1]),
+                                        modInfo.Mass);
+                                    pep.Modifications.Add(modObj);
                                 }
                             }
-                            else
-                            {
-                                var modObj = new ModificationObj(CV.CVID.MS_unknown_modification, modInfo.Name, int.Parse(tokens[1]), modInfo.Mass);
-                                pep.Modifications.Add(modObj);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ConsoleMsgUtils.ShowError("Error parsing mods while writing .mzid", ex);
                         }
                     }
-                    catch (Exception ex)
+
+                    specIdent.Peptide = pep;
+
+                    var proteinName = match.ProteinName;
+                    var protLength = match.ProteinLength;
+                    var proteinDescription = match.ProteinDescription;
+                    var dbSeq = new DbSequenceObj(searchDb, protLength, proteinName, proteinDescription);
+
+                    var start = match.Start;
+                    var end = match.End;
+                    var pepEv = new PeptideEvidenceObj(dbSeq, pep, start, end, match.Pre, match.Post, match.ProteinName.StartsWith("XXX"));
+                    specIdent.AddPeptideEvidence(pepEv);
+
+                    var probability = match.Probability;
+
+                    specIdent.CVParams.Add(new CVParamObj() {Cvid = CV.CVID.MS_chemical_formula, Value = match.Composition,});
+                    //specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
+                    specIdent.CVParams.Add(new CVParamObj()
+                        {Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture),});
+                    specIdent.CVParams.Add(new CVParamObj()
+                        {Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture),});
+                    specIdent.CVParams.Add(new CVParamObj()
+                        {Cvid = CV.CVID.MS_MSPathFinder_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture),});
+                    if (match.HasTdaScores)
                     {
-                        ConsoleMsgUtils.ShowError("Error parsing mods while writing .mzid", ex);
+                        specIdent.CVParams.Add(new CVParamObj()
+                            {Cvid = CV.CVID.MS_MSPathFinder_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture),});
+                        specIdent.CVParams.Add(new CVParamObj()
+                            {Cvid = CV.CVID.MS_MSPathFinder_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture),});
                     }
+                    // MS-GF+ similarity: find/add isotope error?
+                    // MS-GF+ similarity: find/add assumed dissociation method?
+                    //specIdent.UserParams.Add(new UserParamObj() {Name = "Assumed Dissociation Method", Value = match.});
+
                 }
-                specIdent.Peptide = pep;
-
-                var proteinName = match.ProteinName;
-                var protLength = match.ProteinLength;
-                var proteinDescription = match.ProteinDescription;
-                var dbSeq = new DbSequenceObj(searchDb, protLength, proteinName, proteinDescription);
-
-                var start = match.Start;
-                var end = match.End;
-                var pepEv = new PeptideEvidenceObj(dbSeq, pep, start, end, match.Pre, match.Post, match.ProteinName.StartsWith("XXX"));
-                specIdent.AddPeptideEvidence(pepEv);
-
-                var probability = match.Probability;
-
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_formula, Value = match.Composition, });
-                //specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
-                specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture), });
-                if (match.HasTdaScores)
-                {
-                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture), });
-                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_MSPathFinder_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture), });
-                }
-                // MS-GF+ similarity: find/add isotope error?
-                // MS-GF+ similarity: find/add assumed dissociation method?
-                //specIdent.UserParams.Add(new UserParamObj() {Name = "Assumed Dissociation Method", Value = match.});
             }
 
             var identData = creator.GetIdentData();
@@ -207,7 +236,7 @@ namespace InformedProteomics.TopDown.Execution
                 new UserParamObj() { Name = "SearchMode", Value = options.InternalCleavageMode.ToString() },
                 new UserParamObj() { Name = "MatchesPerSpectrumToKeepInMemory", Value = options.MatchesPerSpectrumToKeepInMemory.ToString() },
                 new UserParamObj() { Name = "MatchesPerSpectrumToReport", Value = options.MatchesPerSpectrumToReport.ToString() },
-                new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() },
+                new UserParamObj() { Name = "TagBasedSearch", Value = options.TagBasedSearch.ToString() }
             });
 
             var activationMethod = options.ActivationMethod.ToString();
