@@ -85,29 +85,95 @@ Usage: PbfGen.exe
 ## MSPathFinder Syntax ##
 
 ```
-MSPathFinderT version 1.0.6232 (January 23, 2017)
+MSPathFinderT version 1.0.7569 (September 21, 2020)
+
 Usage: MSPathFinderT.exe
-        -s SpectrumFile (*.raw)
-        -d DatabaseFile (*.fasta or *.fa)
-        [-o OutputFolder]
-        [-m SearchMode] (0: multiple internal cleavages, 1: single internal cleavage (default), 2: no internal cleavage)
-        [-tagSearch 0/1] (1: include tag-based search (default), 0: skip tag-based search)
-        [-mod ModificationFileName] (modification file, default: no modification)
-        [-t PrecursorToleranceInPpm] (e.g. 10, Default: 10)
-        [-f FragmentIonToleranceInPpm] (e.g. 10, Default: 10)
-        [-tda 0/1] (0: don't search decoy database (default), 1: search shuffled decoy database)
-        [-minLength MinSequenceLength] (minimum sequence length, default: 21)
-        [-maxLength MaxSequenceLength] (maximum sequence length, default: 500)
-        [-minCharge MinPrecursorCharge] (minimum precursor ion charge, default: 2)
-        [-maxCharge MaxPrecursorCharge] (maximum precursor ion charge, default: 50)
-        [-minFragCharge MinPrecursorCharge] (minimum fragment ion charge, default: 1)
-        [-maxFragCharge MaxPrecursorCharge] (maximum fragment ion charge, default: 20)
-        [-minMass MinSequenceMassInDa] (minimum sequence mass in Da, default: 3000.0)
-        [-maxMass MaxSequenceMassInDa] (maximum sequence mass in Da, default: 50000.0)
-        [-feature FeatureFile] (*.ms1ft, *_isos.csv, or *.msalign, default: Run ProMex)
-        [-threads MaxNumThreads] (maximum number of threads, default: 0 automatic setting)
-        [-scansFile FilePath] (text file with MS2 scans to process)
-        [-act ActivationMethod] (0: CID, 1: ETD, 2: HCD, 3: ECD, 4: PQD, 5: UVPD, 6: Unknown/as written
+
+  -s, arg#1              Required. Spectrum File (*.raw)
+
+  -d, -database          Required. Database File (*.fasta or *.fa or *.faa)
+
+  -o, -outputDir         Output Directory
+
+  -ic                    Search Mode (Default: SingleInternalCleavage (or 1))
+                         Possible values are:
+                           0 or 'NoInternalCleavage': No Internal Cleavage
+                           1 or 'SingleInternalCleavage': Single Internal Cleavage
+                           2 or 'MultipleInternalCleavages': Multiple Internal Cleavages
+
+  -tagSearch             Include Tag-based Search (use true or false;
+                         or use '0' for false or '1' for true) (Default: True)
+
+  -n                     Number of results to report for each mass spectrum (Default: 1)
+
+  -IncludeDecoys         Include decoy results in the _IcTda.tsv file (Default: False)
+
+  -mod                   Path to modification file that defines static and dynamic
+                         modifications. Modifications can alternatively be defined
+                         in a parameter file, as specified by /ParamFile or -ParamFile
+                         Modifications defined using the -mod switch take
+                         precedence over modifications defined in a parameter file
+                         (Default: empty string, meaning no modifications)
+
+  -tda                   Database search mode:
+                         0: don't search decoy database,
+                         1: search shuffled decoy database
+                         (Default: 0, Min: -1, Max: 1)
+
+  -t, -precursorTol      Precursor Tolerance (in PPM) (Default: 10)
+
+  -f, -fragmentTol       Fragment Ion Tolerance (in PPM) (Default: 10)
+
+  -minLength             Minimum Sequence Length (Default: 21, Min: 0)
+
+  -maxLength             Maximum Sequence Length (Default: 500, Min: 0)
+
+  -minCharge             Minimum precursor ion charge (Default: 2, Min: 1)
+
+  -maxCharge             Maximum precursor ion charge (Default: 50, Min: 1)
+
+  -minFragCharge         Minimum fragment ion charge (Default: 1, Min: 1)
+
+  -maxFragCharge         Maximum fragment ion charge (Default: 20, Min: 1)
+
+  -minMass               Minimum sequence mass in Da (Default: 3000)
+
+  -maxMass               Maximum sequence mass in Da (Default: 50000)
+
+  -feature               *.ms1ft, *_isos.csv, or *.msalign (Default: Run ProMex)
+
+  -threads               Maximum number of threads, or 0 to set automatically
+                         (Default: 0, Min: 0)
+
+  -act                   Activation Method (Default: Unknown (or 6))
+                         Possible values are:
+                           0 or 'CID'
+                           1 or 'ETD'
+                           2 or 'HCD'
+                           3 or 'ECD'
+                           4 or 'PQD'
+                           5 or 'UVPD'
+                           6 or 'Unknown'
+
+  -scansFile             Text file with MS2 scans to process
+
+  -flip                  If specified, FLIP scoring code will be used
+                         (supports UVPD spectra) (Default: False)
+
+  -ParamFile             Path to a file containing program parameters. Additional
+                         arguments on the command line can supplement or override
+                         the arguments in the param file. Lines starting with '#'
+                         or ';' will be treated as comments; blank lines are
+                         ignored. Lines that start with text that does not match a
+                         parameter will also be ignored.
+
+  -CreateParamFile       Create an example parameter file. Can supply a path; if
+                         path is not supplied, the example parameter file content
+                         will output to the console.
+
+  NOTE:                  arg#1, arg#2, etc. refer to positional arguments, used
+                         like "AppName.exe [arg#1] [arg#2] [other args]".
+
 ```
 
 Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches, but can increase the runtime by 30% to 50%.
