@@ -337,29 +337,31 @@ namespace InformedProteomics.TopDown.Execution
             progData.StepRange(100.0, "Writing combined results file");
             if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Both))
             {
+                var multiplePeptidesPerScan = Options.MatchesPerSpectrumToReport > 1;
+
                 // Add "QValue" and "PepQValue"
                 FdrCalculator fdrCalculator;
                 if (targetSearchResults == null && decoySearchResults == null)
                 {
                     // Objects not populated, try to read in the files.
-                    fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath);
+                    fdrCalculator = new FdrCalculator(targetOutputFilePath, decoyOutputFilePath, multiplePeptidesPerScan);
                 }
                 else if (targetSearchResults == null)
                 {
                     // Target search skipped, read in the result file
                     targetSearchResults = DatabaseSearchResultData.ReadResultsFromFile(targetOutputFilePath);
-                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults, multiplePeptidesPerScan);
                 }
                 else if (decoySearchResults == null)
                 {
                     // Decoy search skipped, read in the result file
                     decoySearchResults = DatabaseSearchResultData.ReadResultsFromFile(decoyOutputFilePath);
-                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults, multiplePeptidesPerScan);
                 }
                 else
                 {
                     // Just use the objects
-                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults);
+                    fdrCalculator = new FdrCalculator(targetSearchResults, decoySearchResults, multiplePeptidesPerScan);
                 }
 
                 if (fdrCalculator.HasError())

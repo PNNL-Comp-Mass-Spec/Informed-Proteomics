@@ -13,6 +13,8 @@ namespace InformedProteomics.Backend.SearchResults
     {
         // Ignore Spelling: Qvalue
 
+        private const int UNDEFINED_QVALUE = 10;
+
         private readonly bool _multiplePeptidesPerScan;
         private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
         private readonly List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
@@ -143,7 +145,35 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 resultsToWrite = resultsToUse.Where(x => !x.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix));
             }
-            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
+
+            if (!_multiplePeptidesPerScan) {
+                DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
+                return;
+            }
+
+            // Group together results from the same scan
+            var scanOrder = new List<int>();
+            var matchesByScan = new Dictionary<int, List<DatabaseSearchResultData>>();
+
+            foreach (var match in resultsToWrite)
+            {
+                if (matchesByScan.TryGetValue(match.ScanNum, out var scanMatches))
+                {
+                    scanMatches.Add(match);
+                    continue;
+                }
+
+                matchesByScan.Add(match.ScanNum, new List<DatabaseSearchResultData> { match });
+                scanOrder.Add(match.ScanNum);
+            }
+
+            var resultsToWriteScanGrouped = new List<DatabaseSearchResultData>();
+            foreach (var scanMatches in scanOrder.Select(scanNumber => matchesByScan[scanNumber]))
+            {
+                resultsToWriteScanGrouped.AddRange(scanMatches);
+            }
+
+            DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWriteScanGrouped, true);
         }
 
         private bool CalculateQValues()
@@ -156,6 +186,12 @@ namespace InformedProteomics.Backend.SearchResults
                 .ToArray();
 
             NumPSMs = 0;
+
+            var resultIDsWithQValue = new SortedSet<int>();
+            foreach (var item in distinctSorted)
+            {
+                resultIDsWithQValue.Add(item.ResultID);
+            }
 
             // Calculate q values
             var numDecoy = 0;
@@ -188,6 +224,21 @@ namespace InformedProteomics.Backend.SearchResults
 
             filteredResults.AddRange(distinctSorted);
 
+            if (_multiplePeptidesPerScan)
+            {
+                // Append the non-rank 1 peptides
+                foreach (var item in searchResults)
+                {
+                    if (resultIDsWithQValue.Contains(item.ResultID))
+                        continue;
+
+                    // Set the QValue and PepQValue to 10 since those values are not accurate for results with rank 2 or higher
+                    item.QValue = UNDEFINED_QVALUE;
+                    item.PepQValue = UNDEFINED_QVALUE;
+                    filteredResults.Add(item);
+                }
+            }
+
             return true;
         }
 
@@ -196,7 +247,10 @@ namespace InformedProteomics.Backend.SearchResults
             IEnumerable<DatabaseSearchResultData> distinctSorting = searchResults.OrderBy(r => r.EValue).ThenByDescending(r => r.Probability);
             if (!_multiplePeptidesPerScan)
             {
-                distinctSorting = distinctSorting.GroupBy(r => r.ScanNum).Select(grp => grp.First());
+                distinctSorting = distinctSorting
+                    .Where(r => r.QValue < UNDEFINED_QVALUE)
+                    .GroupBy(r => r.ScanNum)
+                    .Select(grp => grp.First());
             }
             var distinctSorted = distinctSorting.GroupBy(r => r.SequenceWithEnds).Select(grp => grp.First()).ToArray();
 
@@ -232,7 +286,7 @@ namespace InformedProteomics.Backend.SearchResults
                 annotationToPepQValue[peptide[i]] = pepQValue[i];
             }
 
-            foreach (var item in filteredResults)
+            foreach (var item in filteredResults.Where(item => item.QValue < UNDEFINED_QVALUE))
             {
                 item.PepQValue = annotationToPepQValue[item.SequenceWithEnds];
             }
