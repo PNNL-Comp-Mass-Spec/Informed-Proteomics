@@ -89,17 +89,24 @@ Source: ProMexAlign\bin\Release\ProMexAlign.exe                                 
 Source: ProMexAlign\bin\Release\ProMexAlign.exe.config                                       ; DestDir: {app}
 
 Source: README.md                                                                            ; DestDir: {app}; DestName: "Readme.md"
-;Source: RevisionHistory.txt                                                                 ; DestDir: {app}
+
 Source: Example_Files\Mod_Examples.txt                                                       ; DestDir: {app}
 Source: Example_Files\MSPathFinder_Mods.txt                                                  ; DestDir: {app}
 Source: Example_Files\MSPathFinder_Mods_Phospho.txt                                          ; DestDir: {app}
+
+Source: Example_Files\MSPF_MetOx_CysDehydro_LysMethDiMethTriMeth_NTermAcet_NoInternalCleavage_NoTagSearch.txt     ; DestDir: {app}
+Source: Example_Files\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt                                  ; DestDir: {app}
+Source: Example_Files\MSPF_MetOx_STYPhos_LysMethDiMethTriMeth_NTermAcet_CysTriOx_SingleInternalCleavage_10ppm.txt ; DestDir: {app}
+Source: Example_Files\MSPF_STYPhos_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt                     ; DestDir: {app}
+Source: Example_Files\MSPF_STYPhos_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop3.txt                     ; DestDir: {app}
+Source: Example_Files\MSPF_CysDehydro_LysMethDiMethTriMeth_NTermAcet_SingleInternalCleavage.txt                   ; DestDir: {app}
 
 
 [Dirs]
 Name: {commonappdata}\Informed-Proteomics; Flags: uninsalwaysuninstall
 
 ;[Tasks]
-;Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
+; Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 ; Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 
 [Icons]
@@ -121,8 +128,8 @@ AppVersion={#ApplicationVersion}
 ;AppVerName=InformedProteomics
 AppID=Informed-Proteomics-Id
 AppPublisher=Pacific Northwest National Laboratory
-AppPublisherURL=http://omics.pnl.gov/software
-AppSupportURL=http://omics.pnl.gov/software
+AppPublisherURL=https://omics.pnl.gov/software
+AppSupportURL=https://omics.pnl.gov/software
 AppUpdatesURL=https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
 DefaultDirName={autopf}\Informed-Proteomics
 DefaultGroupName=Informed-Proteomics
@@ -170,25 +177,12 @@ end;
 
 procedure InitializeWizard;
 var
-  message2_a: string;
-  message2_b: string;
-  message2_c: string;
-  message2: string;
   appname: string;
   appversion: string;
   RichViewer: TRichEditViewer;
 begin
   appname := '{#SetupSetting("AppName")}';
   appversion := '{#SetupSetting("AppVersion")}';
-  (* This is the old version, that doesn't support any hyperlink. Using RTF instead to provide a link. *)
-  (* #13 is carriage return, #10 is new line *)
-  (*message2_a := 'This will install ' + appname + ' version ' + appversion + ' on your computer.' + #10#10#10 +   *)
-  (*  'NOTICE:' + #10 + 'Reading of some data files requires access to a ';                                        *)
-  (*message2_b := '-bit ProteoWizard or Thermo MSFileReader installation. Please install ';                        *)
-  (*message2_c := '-bit ProteoWizard and/or Thermo MSFileReader before using the program to avoid errors.' + #10 + *)
-  (*  'See https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki/PBFGen-Usage for details.' + #10#10;    *)
-  (*message2 := message2_a + GetInstallArch + message2_b + GetInstallArch + message2_c;                            *)
-  (*WizardForm.WelcomeLabel2.Caption := message2;                                                                  *)
 
   RichViewer := TRichEditViewer.Create(WizardForm);
   RichViewer.Left := WizardForm.WelcomeLabel2.Left;
