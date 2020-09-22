@@ -82,7 +82,7 @@ Usage: PbfGen.exe
         [-o OutputDir]
 ```
 
-## MSPathFinder Syntax ##
+## MSPathFinder Syntax
 
 ```
 MSPathFinderT version 1.0.7569 (September 21, 2020)
@@ -188,6 +188,14 @@ Versions after February 1, 2019: If running as a 64-bit program, reading from Th
 
 Several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
 
+## MSPathFinder Parameter Files
+
+See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample parameter files
+* Example command for invoking MSPathFinder with a parameter file:
+```
+MSPathFinderT.exe -s C:\WorkDir\Dataset.pbf -feature C:\WorkDir\Dataset.ms1ft -d C:\WorkDir\Proteins.fasta -o C:\WorkDir  /ParamFile:C:\WorkDir\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt
+```
+
 ## MSPathFinder Mods File
 
 See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample modification definition files.
@@ -195,7 +203,7 @@ See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomi
 ## System Requirements
 
 Minimum required:
-* .NET 4.7.2 installed
+* .NET 4.7.2
 
 Minimum recommended:
 * 2.4 GHz, quad-core CPU
