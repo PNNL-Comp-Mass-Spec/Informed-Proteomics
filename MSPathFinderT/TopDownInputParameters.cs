@@ -389,16 +389,18 @@ namespace MSPathFinderT
 
             foreach (var specFilePath in SpecFilePaths)
             {
-                Console.WriteLine("SpectrumFilePath: " + specFilePath);
+                Console.WriteLine("SpectrumFilePath:  " + specFilePath);
             }
 
-            Console.WriteLine("DatabaseFilePath:           " + DatabaseFilePath);
-            Console.WriteLine("FeatureFilePath:            {0}", FeatureFilePath ?? "N/A");
+            Console.WriteLine("DatabaseFilePath:  " + DatabaseFilePath);
+            Console.WriteLine("DatabaseFilePath:  " + DatabaseFilePath);
+            Console.WriteLine("FeatureFilePath:   {0}", FeatureFilePath ?? "N/A");
 
             var parameterFilePathToShow = string.IsNullOrWhiteSpace(parameterFilePath) ? "N/A" : parameterFilePath;
-            Console.WriteLine("ParameterFilePath:          {0}", parameterFilePathToShow);
+            Console.WriteLine("ParameterFilePath: {0}", parameterFilePathToShow);
 
-            Console.WriteLine("OutputDir:                  " + OutputDir);
+            Console.WriteLine("OutputDir:         " + OutputDir);
+            Console.WriteLine();
             Console.WriteLine("InternalCleavageMode:       " + InternalCleavageMode);
             Console.WriteLine("Tag-based search:           " + TagBasedSearch);
             Console.WriteLine("Tda:                        " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
