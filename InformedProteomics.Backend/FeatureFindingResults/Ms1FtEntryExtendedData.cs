@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CsvHelper.Configuration;
+﻿using CsvHelper.Configuration;
 
 namespace InformedProteomics.Backend.FeatureFindingResults
 {
