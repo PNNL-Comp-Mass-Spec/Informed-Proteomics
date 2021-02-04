@@ -378,7 +378,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
         public void SetChargeRange(int minCharge, int maxCharge)
         {
             MinCharge = minCharge;
-            MaxCharge = MaxCharge;
+            MaxCharge = maxCharge;
         }
 
         // only temporary use (will be removed)
