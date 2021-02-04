@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Database
             _leftLcps = new byte[_suffixArray.Length];
             _rightLcps = new byte[_suffixArray.Length];
 
-            InitializeLcps(neighboringLcps, _leftLcps, _rightLcps, 0, _suffixArray.Length-1);
+            InitializeLcps(neighboringLcps, _leftLcps, _rightLcps, 0, _suffixArray.Length - 1);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace InformedProteomics.Backend.Database
             if (end - start == 1)
             {
                 // _neighboringLcps[index] encodes the LCP(index-1, index)
-//                Console.WriteLine("Returning {0}", nLcps[end]);
+                //                Console.WriteLine("Returning {0}", nLcps[end]);
                 return nLcps[end];
             }
 
@@ -227,15 +227,15 @@ namespace InformedProteomics.Backend.Database
             rLcps[middleIndex] = rLcp;
 
             // return the smallest one
-//            Console.WriteLine("Returning {0}", lLcp < rLcp ? lLcp : rLcp);
+            //            Console.WriteLine("Returning {0}", lLcp < rLcp ? lLcp : rLcp);
             return lLcp < rLcp ? lLcp : rLcp;
         }
 
         /// <summary>
         /// Compares two suffices (index1 and index2)
         /// </summary>
-        /// <param name="index">suffix index</param>
         /// <param name="pattern">sequence to compare</param>
+        /// <param name="index">suffix index</param>
         /// <param name="startIndex">known common prefix</param>
         /// <returns>a positive number if 1 is larger,
         /// a negative if 1 is smaller and 0 if they are equal.

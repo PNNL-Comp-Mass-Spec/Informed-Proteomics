@@ -108,7 +108,7 @@ namespace InformedProteomics.FeatureFinding.Training
             var prsmSet = new NodeSet<ProteinSpectrumMatch>();
             prsmSet.AddRange(matches);
             var groupList = prsmSet.ConnectedComponents(prsmComparer);
-            return groupList.Select(group => new ProteinSpectrumMatchSet(dataId, group)).ToList();
+            return groupList.ConvertAll(group => new ProteinSpectrumMatchSet(dataId, group));
         }
 
         private static bool IsGoodTarget(ProductSpectrum ms2Spec, Sequence sequence)
@@ -116,11 +116,13 @@ namespace InformedProteomics.FeatureFinding.Training
             var BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             var BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
             var tolerance = new Tolerance(10);
-            var minCharge = 1;
-            var maxCharge = 20;
+
+            const int minCharge = 1;
+            const int maxCharge = 20;
+
             var baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
             var cleavages = sequence.GetInternalCleavages();
-            const double RelativeIsotopeIntensityThreshold = 0.7d;
+            const double relativeIsotopeIntensityThreshold = 0.7d;
 
             // Unused: var nTheoreticalIonPeaks = 0;
             var nObservedIonPeaks = 0;
@@ -138,7 +140,7 @@ namespace InformedProteomics.FeatureFinding.Training
                     for (var charge = minCharge; charge <= maxCharge; charge++)
                     {
                         var ion = new Ion(fragmentComposition, charge);
-                        if (ms2Spec.ContainsIon(ion, tolerance, RelativeIsotopeIntensityThreshold))
+                        if (ms2Spec.ContainsIon(ion, tolerance, relativeIsotopeIntensityThreshold))
                         {
                             if (baseIonType.IsPrefix)
                             {
@@ -158,8 +160,8 @@ namespace InformedProteomics.FeatureFinding.Training
 
             if (sequence.Composition.Mass > 3000)
             {
-                if ((double) nObservedPrefixIonPeaks/nObservedIonPeaks > 0.85 ||
-                    (double) nObservedSuffixIonPeaks/nObservedIonPeaks > 0.85)
+                if ((double)nObservedPrefixIonPeaks / nObservedIonPeaks > 0.85 ||
+                    (double)nObservedSuffixIonPeaks / nObservedIonPeaks > 0.85)
                 {
                     return false;
                 }

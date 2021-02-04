@@ -11,7 +11,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             var prsmSet = new NodeSet<ProteinSpectrumMatch>();
             prsmSet.AddRange(matches);
             var groupList = prsmSet.ConnectedComponents(prsmComparer);
-            return groupList.Select(group => new ProteinSpectrumMatchSet(dataId, group)).ToList();
+            return groupList.ConvertAll(group => new ProteinSpectrumMatchSet(dataId, group));
         }
 
         public ProteinSpectrumMatchSet[][] GroupAcrossRuns(List<ProteinSpectrumMatchSet>[] prsmGroup, INodeComparer<ProteinSpectrumMatchSet> prsmGroupComparer)

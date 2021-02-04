@@ -87,11 +87,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     continue;
                 }
 
-                var maxCharge = cluster.Select(m => m.MaxCharge).Max();
-                var minCharge = cluster.Select(m => m.MinCharge).Min();
+                var maxCharge = cluster.Max(m => m.MaxCharge);
+                var minCharge = cluster.Min(m => m.MinCharge);
                 var mass = cluster.Select(m => m.Mass).Median();
-                var maxScan = cluster.Select(m => m.ScanNum).Max();
-                var minScan = cluster.Select(m => m.ScanNum).Min();
+                var maxScan = cluster.Max(m => m.ScanNum);
+                var minScan = cluster.Min(m => m.ScanNum);
                 minScan = Run.GetPrevScanNum(minScan, 1);
                 maxScan = Run.GetNextScanNum(maxScan, 1);
 

@@ -76,7 +76,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 var k = protNameDesc.IndexOf(' ');
                 var protName = (k < 0) ? protNameDesc : protNameDesc.Substring(0, k);
-                var protDesc = (k < 0) ? protNameDesc : protNameDesc.Substring(k+1);
+                var protDesc = (k < 0) ? protNameDesc : protNameDesc.Substring(k + 1);
 
                 var firstResId = int.Parse(parser.GetData("First_residue")[i]);
                 var lastResId = int.Parse(parser.GetData("Last_residue")[i]);
@@ -134,9 +134,11 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 var seq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
                 var sequenceText = GetSequenceText(seq);
-                var mass = (mz - Constants.Proton)*charge;
-                var firstResId = 0;
-                var lastResId = 0;
+                var mass = (mz - Constants.Proton) * charge;
+
+                const int firstResId = 0;
+                const int lastResId = 0;
+
                 var fdr = double.Parse(parser.GetData("QValue")[i]);
                 if (fdr > FdrCutoff)
                 {

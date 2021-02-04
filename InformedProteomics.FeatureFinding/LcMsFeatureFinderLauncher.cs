@@ -448,7 +448,7 @@ namespace InformedProteomics.FeatureFinding
 
             sb.Append("\t");
             sb.Append("");
-            sb.Append(string.Format("\t{0:0.0}", feature.Score));
+            sb.AppendFormat("\t{0:0.0}", feature.Score);
             return sb.ToString();
         }
 
@@ -485,7 +485,7 @@ namespace InformedProteomics.FeatureFinding
             }
 
             // LikelihoodRatio
-            sb.Append(string.Format("\t{0:0.0000}", feature.Score));
+            sb.AppendFormat("\t{0:0.0000}", feature.Score);
 
             if (scoreReport)
             {

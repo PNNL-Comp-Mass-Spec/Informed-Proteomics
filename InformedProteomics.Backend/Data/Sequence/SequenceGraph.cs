@@ -416,7 +416,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             AddAminoAcid(cTerm.Residue);
             for (var i = sequence.Length - 1; i >= 0; i--)
             {
-                if (AddAminoAcid(sequence[i]) == false)
+                if (!AddAminoAcid(sequence[i]))
                 {
                     IsValid = false;
                     break;
