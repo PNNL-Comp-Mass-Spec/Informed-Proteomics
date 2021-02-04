@@ -645,8 +645,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 }
 
                 // move right
-                var nextIndex = peakIndex + 1;
-                while (nextIndex < peaks.Count)
+                for (var nextIndex = peakIndex + 1; nextIndex < peaks.Count; nextIndex++)
                 {
                     var nextPeak = peaks[nextIndex];
                     if (nextPeak.Mass - thisMass > windowSize)
@@ -658,8 +657,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     {
                         rank++;
                     }
-
-                    nextIndex++;
                 }
                 if (rank <= topRankCutoff)
                 {

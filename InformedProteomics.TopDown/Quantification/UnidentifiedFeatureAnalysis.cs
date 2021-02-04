@@ -171,7 +171,7 @@ namespace InformedProteomics.TopDown.Quantification
                     }
 
                     spectrumList.Add(spectrum);
-                    if (!(det.Item1 > -1))
+                    if (det.Item1 <= -1)
                     {
                         det = new Tuple<int, double, int>(scanNum, mz, j + 2);
                     }

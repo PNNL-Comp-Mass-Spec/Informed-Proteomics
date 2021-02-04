@@ -347,7 +347,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             {
                 for (var chargeIdx = 0; chargeIdx < 2; chargeIdx++)
                 {
-                    AbundanceDistributionAcrossCharge[chargeIdx] = AbundanceDistributionAcrossCharge[chargeIdx] / s;
+                    AbundanceDistributionAcrossCharge[chargeIdx] /= s;
                 }
             }
 

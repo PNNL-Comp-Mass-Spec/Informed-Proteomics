@@ -365,7 +365,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         //var intScore = mostAbuPeak.Intensity / medIntensity;
                         //var intScore = summedIntensity / refIntensity;
 
-                        if (ionMatch == false || curObsIonIntensity < intScore)
+                        if (!ionMatch || curObsIonIntensity < intScore)
                         {
                             curObsIonMass = Ion.GetMonoIsotopicMass(mostAbuPeak.Mz, charge, mostAbundantIsotopeIndex);
                             curObsIonCharge = charge;

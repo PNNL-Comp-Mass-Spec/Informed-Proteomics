@@ -698,7 +698,7 @@ namespace InformedProteomics.Backend.Database
                         ++ntt;
                     }
 
-                    if (!(ntt < numTolerableTermini - 1))
+                    if (ntt >= numTolerableTermini - 1)
                     {
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 1; i < seqArr.Length - 1; i++)
@@ -736,7 +736,7 @@ namespace InformedProteomics.Backend.Database
                         ++ntt;
                     }
 
-                    if (!(ntt < numTolerableTermini - 1))
+                    if (ntt >= numTolerableTermini - 1)
                     {
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 2; i < seqArr.Length - 1; i++)

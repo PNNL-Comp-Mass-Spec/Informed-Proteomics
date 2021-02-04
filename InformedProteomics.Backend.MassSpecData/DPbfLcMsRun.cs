@@ -105,8 +105,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             foreach (var peakBase in spec.Peaks)
             {
-                var peak = peakBase as DeconvolutedPeak;
-                if (peak == null)
+                if (!(peakBase is DeconvolutedPeak peak))
                 {
                     continue;
                 }
@@ -240,14 +239,14 @@ namespace InformedProteomics.Backend.MassSpecData
             // Number of peaks: 4
             writer.Write(spec.Peaks.Length);
             //writer.Write(peaks.Count);
+
             foreach (var peakIn in spec.Peaks)
-            //foreach (var peak in peaks)
             {
-                var peak = peakIn as DeconvolutedPeak;
-                if (peak == null)
+                if (!(peakIn is DeconvolutedPeak peak))
                 {
                     throw new ArgumentException("Input spectrum peaks array must contain only DeconvolutedPeaks!");
                 }
+
                 // m/z: 8
                 writer.Write(peak.Mz);
                 // intensity: 4

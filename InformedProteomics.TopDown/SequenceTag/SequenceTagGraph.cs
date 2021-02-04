@@ -60,7 +60,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             for (var i = 0; i < _hasInEdge.Length; i++)
             {
-                if (_hasInEdge[i] == false)
+                if (!_hasInEdge[i])
                 {
                     yield return i;
                 }
@@ -224,7 +224,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             if (!flag)
             {
                 var t = ProcessPath(EdgeList.Reverse());
-                if (t == false)
+                if (!t)
                 {
                     return;
                 }

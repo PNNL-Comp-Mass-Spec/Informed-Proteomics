@@ -471,7 +471,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             lock (_fileLock)
             {
-                if (ReadMetaInfo() == false)
+                if (!ReadMetaInfo())
                 {
                     throw new FormatException("Illegal pbf file format!");
                 }
@@ -2213,7 +2213,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     // remove the already-enumerated peaks
                     for (var i = 0; i < _lists.Count && _enumerated > 0; i++)
                     {
-                        if (_lists[i].Count <= 0)
+                        if (_lists[i].Count == 0)
                         {
                             continue;
                         }

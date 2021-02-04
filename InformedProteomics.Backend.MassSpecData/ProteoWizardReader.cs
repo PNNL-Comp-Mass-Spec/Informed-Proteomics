@@ -522,7 +522,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Look for subdirectories whose names start with ProteoWizard, for example "ProteoWizard 3.0.9490"
             possibleInstallDirs.AddRange(pwizFolder.EnumerateDirectories("ProteoWizard*"));
 
-            if (possibleInstallDirs.Count <= 0)
+            if (possibleInstallDirs.Count == 0)
             {
                 return null;
             }
