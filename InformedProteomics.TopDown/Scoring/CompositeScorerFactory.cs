@@ -97,7 +97,7 @@ namespace InformedProteomics.TopDown.Scoring
         public double FilteringWindowSize { get; }    // 1.1
         public int IsotopeOffsetTolerance { get; }   // 2
 
-        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass)
         {
             if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass)
             {
@@ -118,7 +118,7 @@ namespace InformedProteomics.TopDown.Scoring
             return _scoringGraphFactory.CreateScoringGraph(deconvScorer, precursorMass);
         }
 
-        public IScorer GetMs2Scorer(int scanNum, int precursorCharge = 1, ActivationMethod activationMethod = ActivationMethod.Unknown)
+        public IScorer GetMs2Scorer(int scanNum, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
@@ -174,7 +174,7 @@ namespace InformedProteomics.TopDown.Scoring
                     return scorer;
                 }
 
-                scorer = this.GetMs2Scorer(scanNum, precursorCharge, activationMethod);
+                scorer = this.GetMs2Scorer(scanNum, activationMethod);
                 this._ms2Scorer.TryAdd(scanNum, scorer);
                 return scorer;
             }

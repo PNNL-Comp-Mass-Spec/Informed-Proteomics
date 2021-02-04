@@ -175,8 +175,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         {
             config.Delimiter = "\t";
 
-            //    delegate(string header, int i) { return header?.Trim().ToLower(); };
-            config.PrepareHeaderForMatch = (header, i) => header?.Trim().ToLower();
+            config.PrepareHeaderForMatch = (header, _) => header?.Trim().ToLower();
 
             config.HeaderValidated = null;
             config.MissingFieldFound = null;

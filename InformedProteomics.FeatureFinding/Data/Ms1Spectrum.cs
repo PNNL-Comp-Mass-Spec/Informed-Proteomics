@@ -55,7 +55,7 @@ namespace InformedProteomics.FeatureFinding.Data
             }
         }
 
-        public Ms1Peak[] GetAllIsotopePeaks(double monoIsotopeMass, int charge, TheoreticalIsotopeEnvelope isotopeList, Tolerance tolerance)
+        public Ms1Peak[] GetAllIsotopePeaks(int charge, TheoreticalIsotopeEnvelope isotopeList, Tolerance tolerance)
         {
             var observedPeaks = new Ms1Peak[isotopeList.Size];
             var mz = isotopeList.GetIsotopeMz(charge, 0);

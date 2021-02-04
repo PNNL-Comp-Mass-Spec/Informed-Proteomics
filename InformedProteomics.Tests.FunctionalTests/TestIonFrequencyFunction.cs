@@ -189,8 +189,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
         // Configuration
         //        private const int ScanNum = 30623;
-        private const double NoiseFiltration = 0;
-        private const ActivationMethod Act = ActivationMethod.HCD;
+
         private const int MaxCharge = 1;
         private const int MaxPrecCharge = 4;
         private const double RelativeIntensityThreshold = 1.0;

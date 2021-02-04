@@ -14,11 +14,9 @@ namespace InformedProteomics.TopDown.Scoring
         public const double DistThreshold = 0.07;
         private readonly bool _includeMassErrorScore;
 
-        public LikelihoodScorer(LikelihoodScoringModel model, ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, bool massErrorScore = true)
+        public LikelihoodScorer(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, bool massErrorScore = true)
             : base(ms2Spec, tolerance, minCharge, maxCharge, 0.1)
         {
-            //_model = model;
-
             //var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity) * 0.1;
             //var medIntensity = ms2Spec.Peaks.Select(p => p.Intensity).Median();
             //_refIntensity = Math.Min(medIntensity, refIntensity);

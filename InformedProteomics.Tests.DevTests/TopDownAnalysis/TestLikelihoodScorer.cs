@@ -281,7 +281,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             writer.Write("\n");
         }
 
-        private void GetNodeStatistics(bool isDecoy, ProductSpectrum ms2Spec, Sequence sequence, StreamWriter writer) //, StreamWriter mzErrorWriter)
+        private void GetNodeStatistics(ProductSpectrum ms2Spec, Sequence sequence, StreamWriter writer) //, StreamWriter mzErrorWriter)
         {
             if (ms2Spec == null)
             {

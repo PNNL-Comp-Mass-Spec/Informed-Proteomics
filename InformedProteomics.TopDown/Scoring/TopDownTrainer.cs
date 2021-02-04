@@ -14,13 +14,11 @@ namespace InformedProteomics.TopDown.Scoring
         private InMemoryLcMsRun _run;
         private Tolerance _tolerance;
 
-        public void Train(string outFileName, InMemoryLcMsRun run, Tolerance tolerance, string annotationFileName)
+        public void Train(InMemoryLcMsRun run, Tolerance tolerance)
         {
             // charge, scan number, protein
             _run = run;
             _tolerance = tolerance;
-            var target = new Dictionary<int, Dictionary<int, Composition>>();
-            var decoy = new Dictionary<int, Dictionary<int, Composition>>();
 
             _missingXicCounterTarget = new Dictionary<int, int>();
             _missingXicCounterDecoy = new Dictionary<int, int>();

@@ -38,8 +38,8 @@ namespace InformedProteomics.TopDown.Scoring
             _ms2Scorer = new Dictionary<int, IScorer>();
         }
 
-        public double FilteringWindowSize { get; }    // 1.1
-        public int IsotopeOffsetTolerance { get; }   // 2
+        public double FilteringWindowSize { get; }  // 1.1
+        public int IsotopeOffsetTolerance { get; }  // 2
 
         public IScorer GetMs2Scorer(int scanNum)
         {
@@ -89,7 +89,7 @@ namespace InformedProteomics.TopDown.Scoring
             Spectrum spec, int minCharge, int maxCharge, Tolerance tolerance, double corrThreshold,
             int isotopeOffsetTolerance, double filteringWindowSize = 1.1)
         {
-            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.ScanNum, spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, 1.1, tolerance, corrThreshold);
+            var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(spec.ScanNum, spec.Peaks, minCharge, maxCharge, isotopeOffsetTolerance, filteringWindowSize, tolerance, corrThreshold);
             var peakList = new List<Peak>();
             var binHash = new HashSet<int>();
             foreach (var deconvolutedPeak in deconvolutedPeaks)
@@ -155,7 +155,7 @@ namespace InformedProteomics.TopDown.Scoring
                 }
             }
 
-            public double GetPrecursorIonScore(Ion precursorIon)
+            public double GetPrecursorIonScore()
             {
                 return 0.0;
             }

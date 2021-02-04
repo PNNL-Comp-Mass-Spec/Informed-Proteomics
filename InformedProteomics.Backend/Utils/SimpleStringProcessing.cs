@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Utils
         /// <returns></returns>
         public static string Shuffle(string str)
         {
-            var indices = Enumerable.Range(0, str.Length).OrderBy(r => _random.Next()).ToArray();
+            var indices = Enumerable.Range(0, str.Length).OrderBy(_ => _random.Next()).ToArray();
             var sflStr = new StringBuilder(str.Length);
             foreach (var index in indices)
             {

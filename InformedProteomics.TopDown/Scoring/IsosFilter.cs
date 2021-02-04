@@ -26,7 +26,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
-            return _lcMsMatchMap.GetMatchingMs2ScanNums(sequenceMass, _massTolerance, _run);
+            return _lcMsMatchMap.GetMatchingMs2ScanNums(sequenceMass);
         }
 
         private void Read(string isosFileName)

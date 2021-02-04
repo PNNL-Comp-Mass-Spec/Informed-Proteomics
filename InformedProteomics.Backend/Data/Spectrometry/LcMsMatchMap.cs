@@ -25,10 +25,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the MS2 scan numbers that match the sequence mass
         /// </summary>
         /// <param name="sequenceMass"></param>
-        /// <param name="tolerance"></param>
-        /// <param name="run"></param>
-        /// <returns></returns>
-        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass, Tolerance tolerance, LcMsRun run)
+        /// <returns>List of scan numbers</returns>
+        public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
 

@@ -446,7 +446,7 @@ namespace InformedProteomics.Test
             //topDownLauncher.ForceParallel = true;
             //topDownLauncher.MaxNumThreads = -1;
 
-            topDownLauncher.RunSearch(0.7);
+            topDownLauncher.RunSearch();
             //topDownLauncher.RunIntactProteinSearch();
         }
 

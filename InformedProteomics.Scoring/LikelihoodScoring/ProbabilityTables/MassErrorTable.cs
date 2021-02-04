@@ -81,10 +81,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
         }
 
-        public void WriteToFile(StreamWriter file, IonType[] selectedIonTypes)
-        {
-        }
-
         public Probability<double> GetMassErrorProbability(double massError, IonType ionType)
         {
             var index = _massError[ionType].GetBinIndex(massError);

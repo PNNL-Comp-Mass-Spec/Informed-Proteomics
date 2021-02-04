@@ -95,7 +95,7 @@ namespace InformedProteomics.TopDown.Execution
             OnProgressUpdate(progMsg, (float)progData.Percent);
         }
 
-        public bool RunSearch(double corrThreshold = 0.7, CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
+        public bool RunSearch(CancellationToken? cancellationToken = null, IProgress<ProgressData> progress = null)
         {
             // Get the Normalized spec file/folder path
             Options.SpecFilePath = MassSpecDataReaderFactory.NormalizeDatasetPath(Options.SpecFilePath);

@@ -399,7 +399,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     }
 
                     var ms1Spec = Ms1Spectra[col];
-                    var observedPeaks = ms1Spec.GetAllIsotopePeaks(targetMass, charge, theoreticalEnvelope, tolerance);
+                    var observedPeaks = ms1Spec.GetAllIsotopePeaks(charge, theoreticalEnvelope, tolerance);
 
                     var bcDist = theoreticalEnvelope.GetBhattacharyyaDistance(observedPeaks);
                     var pearsonCorrelationCoefficient = theoreticalEnvelope.GetPearsonCorrelation(observedPeaks);
@@ -985,7 +985,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
                     if (reCollectAllPeaks || !_featureMatrix[i][j].Exist || Math.Abs(_featureMatrix[i][j].AccurateMass - targetMass) > massTol)
                     {
-                        var peaks = Ms1Spectra[j].GetAllIsotopePeaks(targetMass, i + _targetMinCharge, _theoreticalEnvelope, tolerance);
+                        var peaks = Ms1Spectra[j].GetAllIsotopePeaks(i + _targetMinCharge, _theoreticalEnvelope, tolerance);
 
                         if (peaks.Count(p => p != null) > 0)
                         {
